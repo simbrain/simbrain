@@ -22,21 +22,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 
 /**
  * <b>Gauge</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
  * initializing various projection algorithms.
  */
-public class Gauge implements CouplingContainer {
+public class Gauge {//implements CouplingContainer {
 
     /** Log4j logger. */
     private static final Logger logger = Logger.getLogger(Gauge.class);
 
+    private final GaugeComponent parent;
+    
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
 
@@ -59,7 +60,7 @@ public class Gauge implements CouplingContainer {
     private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
 
     /** Coupling list. */
-    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
+//    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
 
     // TO ADD A NEW PROJECTION ALGORITHM:
     // Create a projection class modeled on any of the Project_ classes,
@@ -77,22 +78,28 @@ public class Gauge implements CouplingContainer {
     /**
      * Default constructor for gauge.
      */
-    public Gauge() {
+    public Gauge(final GaugeComponent parent) {
+        this.parent = parent;
         currentProjector = this.getProjectorByName(defaultProjector);
     }
 
+    GaugeComponent getParent() {
+        return parent;
+    }
+    
     /**
      * Adds the current states and resets the state vector.
      * The curent state is set by couplings to other workspace components.
      */
     public void updateCurrentState() {
-        if (getCouplings() == null || getCouplings().size() < 1) return;
+//        if (getCouplings() == null || getCouplings().size() < 1) return;
         
         logger.trace("updateCurrentState() called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
             logger.debug("could not update current state");
             return;
         }
+        
         addDatapoint(currentState);
         currentProjector.project();
         // reset the current state
@@ -115,7 +122,7 @@ public class Gauge implements CouplingContainer {
      * @param dims dimensions to update
      */
     public void resetCouplings(final int dims) {
-        couplings.clear();
+//        couplings.clear();
         consumers.clear();
         for (int i = 0; i < dims; i++) {
             consumers.add(new Variable(this, i));
@@ -326,9 +333,9 @@ public class Gauge implements CouplingContainer {
     /**
      * {@inheritDoc}
      */
-    public List<Coupling> getCouplings() {
-        return couplings;
-    }
+//    public List<Coupling> getCouplings() {
+//        return couplings;
+//    }
 
     /**
      * No producers.

@@ -25,10 +25,9 @@ import java.io.File;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.apache.log4j.Logger;
 import org.simbrain.gauge.core.Gauge;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
@@ -41,10 +40,10 @@ public class GaugeComponent extends WorkspaceComponent<WorkspaceComponentListene
     }
 
     /** Logger. */
-    private Logger logger = Logger.getLogger(GaugeComponent.class);
+//    private Logger logger = Logger.getLogger(GaugeComponent.class);
 
     /** Current gauge. */
-    private Gauge gauge = new Gauge();
+    private Gauge gauge = new Gauge(this);
     
     public Gauge getGauge() {
         return gauge;

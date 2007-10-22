@@ -30,12 +30,10 @@ import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -220,7 +218,7 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
                     Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
                     SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
                     
-                    this.getGaugePanel().getGauge().getCouplings().add(coupling);
+//                    this.getGaugePanel().getGauge().getCouplings().add(coupling);
                 }
             }
 
@@ -368,9 +366,9 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
     /**
      * Returns reference to gauge model which contains couplings.
      */
-    public CouplingContainer getCouplingContainer() {
-        return this.getGaugePanel().getGauge();
-    }
+//    public CouplingContainer getCouplingContainer() {
+//        return this.getGaugePanel().getGauge();
+//    }
 
     /**
      * Responds to internal frame closed.

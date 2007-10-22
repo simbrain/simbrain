@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.Utils;
-import org.simnet.interfaces.RootNetwork;
 
 import Jama.Matrix;
 

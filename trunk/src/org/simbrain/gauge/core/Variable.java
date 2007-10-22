@@ -2,9 +2,9 @@ package org.simbrain.gauge.core;
 
 import java.lang.reflect.Type;
 
+import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.SingleAttributeConsumer;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a consumer object, so other components
@@ -61,8 +61,7 @@ public class Variable extends SingleAttributeConsumer<Double> {
         return "Dimension " + dimension;
     }
 
-    public WorkspaceComponent getParentComponent() {
-        // TODO Auto-generated method stub
-        return null;
+    public GaugeComponent getParentComponent() {
+        return gauge.getParent();
     }
 }

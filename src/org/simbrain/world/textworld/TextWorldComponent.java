@@ -18,35 +18,20 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.JInternalFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * <b>TextWorldComponent</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link TextWorld}.
  */
-public class TextWorldComponent extends WorkspaceComponent {
+public class TextWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
     /**
      * Creates a new frame of type TextWorld.
      * @param ws Workspace to add frame to

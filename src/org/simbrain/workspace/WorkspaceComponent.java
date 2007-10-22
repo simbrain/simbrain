@@ -21,6 +21,8 @@ package org.simbrain.workspace;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -30,7 +32,7 @@ import org.apache.log4j.Logger;
  * out some of the coupling management since much of this is focused on
  * the GUI aspects of the JInternalFrames.
  */
-public abstract class WorkspaceComponent {
+public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
 
     private static final Logger LOGGER = Logger.getLogger(WorkspaceComponent.class);
     
@@ -88,11 +90,34 @@ public abstract class WorkspaceComponent {
     public abstract void close();
 
     /**
+     * called by Workspace to update the state of the component
+     */
+    protected abstract void update();
+    
+    /**
      * Update that goes beyond updating couplings.
      * Called when global workspace update is called.
      */
-    public abstract void update();
-
+    void doUpdate() {
+        update();
+        
+        for (E listener : listeners) listener.componentUpdated();
+    }
+    
+    Collection<E> listeners = new HashSet<E>();
+    
+    protected Collection<? extends E> getListeners() {
+        return Collections.unmodifiableCollection(listeners);
+    }
+    
+    public void addListener(E listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeListener(E listener) {
+        listeners.add(listener);
+    }
+    
     /**
      * Save vs. save-as.  Saves the currentfile.
      */

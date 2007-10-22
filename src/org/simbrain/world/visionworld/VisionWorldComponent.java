@@ -18,31 +18,19 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.Action;
-import javax.swing.JInternalFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Vision world frame.
  */
-public final class VisionWorldComponent extends WorkspaceComponent {//implements CouplingContainer {
+public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {//implements CouplingContainer {
 
     /**
      * Create a new vision world frame with the specified workspace.

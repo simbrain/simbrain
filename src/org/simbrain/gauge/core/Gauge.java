@@ -86,6 +86,8 @@ public class Gauge implements CouplingContainer {
      * The curent state is set by couplings to other workspace components.
      */
     public void updateCurrentState() {
+        if (getCouplings() == null || getCouplings().size() < 1) return;
+        
         logger.trace("updateCurrentState() called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
             logger.debug("could not update current state");

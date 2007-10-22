@@ -114,7 +114,7 @@ public class SimbrainDesktop {
     /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
-    private Map<WorkspaceComponent, DesktopComponent> components = new LinkedHashMap<WorkspaceComponent, DesktopComponent>();
+    private Map<WorkspaceComponent<?>, DesktopComponent> components = new LinkedHashMap<WorkspaceComponent<?>, DesktopComponent>();
     
     /**
      * Default constructor.
@@ -353,14 +353,14 @@ public class SimbrainDesktop {
 
     }
     
-    private Map<Class<? extends WorkspaceComponent>, Class<? extends DesktopComponent>> wrappers 
-        = new HashMap<Class<? extends WorkspaceComponent>, Class<? extends DesktopComponent>>();
+    private Map<Class<? extends WorkspaceComponent<?>>, Class<? extends DesktopComponent>> wrappers 
+        = new HashMap<Class<? extends WorkspaceComponent<?>>, Class<? extends DesktopComponent>>();
     
-    public void registerComponent(Class<? extends WorkspaceComponent> component, Class<? extends DesktopComponent> gui) {
+    public void registerComponent(Class<? extends WorkspaceComponent<?>> component, Class<? extends DesktopComponent> gui) {
         wrappers.put(component, gui);
     }
     
-    private DesktopComponent getDesktopComponent(WorkspaceComponent component) {
+    private DesktopComponent getDesktopComponent(WorkspaceComponent<?> component) {
         Class<? extends WorkspaceComponent> componentClass = component.getClass();
         Class<? extends DesktopComponent> guiClass = wrappers.get(componentClass);
         
@@ -631,7 +631,7 @@ public class SimbrainDesktop {
      */
     public JMenu getProducerMenu(final ActionListener listener) {
         JMenu producerMenu = new JMenu("Producers");
-        for (WorkspaceComponent component : workspace.getComponentList()) {
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
             JMenu componentMenu = new JMenu(component.getName());
             for (Producer producer : component.getProducers()) {
                 JMenu producerItem = new JMenu(producer.getDescription());
@@ -655,7 +655,7 @@ public class SimbrainDesktop {
      */
     public JMenu getConsumerMenu(final ActionListener listener) {
         JMenu consumerMenu = new JMenu("Consumers");
-        for (WorkspaceComponent component : workspace.getComponentList()) {
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
             JMenu componentMenu = new JMenu(component.getName());
             for (Consumer consumer : component.getConsumers()) {
                 JMenu consumerItem = new JMenu(consumer.getDescription());

@@ -1,23 +1,16 @@
 package org.simbrain.world.gameworld2d;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.JInternalFrame;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
 
-public class GameWorld2DComponent extends WorkspaceComponent implements CouplingContainer {
+public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentListener> implements CouplingContainer {
 
     /** Reference to the wrapped game world object. */
     private GameWorld2D world;

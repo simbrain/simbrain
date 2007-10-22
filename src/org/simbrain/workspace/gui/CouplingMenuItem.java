@@ -90,7 +90,7 @@ public class CouplingMenuItem extends JMenuItem {
     /**
      * @return the container
      */
-    public WorkspaceComponent getWorkspaceComponent() {
+    public WorkspaceComponent<?> getWorkspaceComponent() {
         return component;
     }
 

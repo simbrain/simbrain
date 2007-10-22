@@ -26,19 +26,15 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
-import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.core.Projector;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspaceComponent;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
  * variables the Gauge is representing.
  */
-public class GaugeComponent extends WorkspaceComponent implements ActionListener, MenuListener {
+public class GaugeComponent extends WorkspaceComponent<WorkspaceComponentListener> implements ActionListener, MenuListener {
 
     public GaugeComponent(String name) {
         super(name);
@@ -58,36 +54,20 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(Projector.class, "logger");
-        xstream.omitField(Dataset.class, "logger");
-        xstream.omitField(Dataset.class, "distances");
-        xstream.omitField(Dataset.class, "dataset");
-        return xstream;
-    }
-
-    /**
-     * Returns reference to gauge model which contains couplings.
-     */
-//    public CouplingContainer getCouplingContainer() {
-//        return this.getGaugePanel().getGauge();
+//    private XStream getXStream() {
+//        XStream xstream = new XStream(new DomDriver());
+//        xstream.omitField(Projector.class, "logger");
+//        xstream.omitField(Dataset.class, "logger");
+//        xstream.omitField(Dataset.class, "distances");
+//        xstream.omitField(Dataset.class, "dataset");
+//        return xstream;
 //    }
 
-    /**
-     * Global update.
-     */
-    public void update() {
-//        super.update();
-        // TODO implement
-//        if (this.getGaugePanel().getGauge().getCouplings() != null) {
-//            if (this.getGaugePanel().getGauge().getCouplings().size() > 0) {
-//                gaugePanel.getGauge().updateCurrentState();
-//                gaugePanel.updateGraphics();
-//            }
-//        }
+    @Override
+    protected void update() {
+        gauge.updateCurrentState();
     }
-
+    
     @Override
     public void close() {
         // TODO Auto-generated method stub

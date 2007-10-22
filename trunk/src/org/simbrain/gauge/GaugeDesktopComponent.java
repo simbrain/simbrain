@@ -30,10 +30,12 @@ import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -104,12 +106,19 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
 
     /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("Help");
+    
+    private WorkspaceComponentListener listener = new WorkspaceComponentListener() {
+        public void componentUpdated() {
+            gaugePanel.updateGraphics();
+        }
+    };
 
     /**
      * Default constructor.
      */
     public GaugeDesktopComponent(GaugeComponent component) {
         super(component);
+        component.addListener(listener);
         this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
         this.setPreferredSize(new Dimension(300,300));
         gaugePanel = new GaugePanel(component.getGauge());
@@ -193,21 +202,24 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
      * Responds to actions performed.
      * @param e Action event
      */
+    // TODO make sure types match in coupling
+    @SuppressWarnings("unchecked")
     public void actionPerformed(final ActionEvent e) {
         logger.debug("coupling menu item selected");
         // Handle Coupling wireup
         if (e.getSource() instanceof CouplingMenuItem) {
-            System.out.println("coupling menu item!");
             
             int oldDims = gaugePanel.getGauge().getDimensions();
-         // TODO refactor
-            Collection<Producer> producers = null; //((CouplingMenuItem) e.getSource()).getWorkspaceComponent().getProducers();
+            
+            Collection<? extends Producer> producers = ((CouplingMenuItem) e.getSource()).getWorkspaceComponent().getProducers();
             int newDims = producers.size();
             gaugePanel.getGauge().resetCouplings(newDims);
-            Iterator<Producer> producerIterator = producers.iterator();
+            Iterator<? extends Producer> producerIterator = producers.iterator();
             for (Consumer consumer : this.getGaugePanel().getGauge().getConsumers()) {
                 if (producerIterator.hasNext()) {
-                    Coupling coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                    SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
+                    
                     this.getGaugePanel().getGauge().getCouplings().add(coupling);
                 }
             }
@@ -217,7 +229,6 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
                 gaugePanel.getGauge().init(newDims);
                 gaugePanel.resetGauge();
             }
-
         }
 
         if ((e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class)) {
@@ -359,19 +370,6 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
      */
     public CouplingContainer getCouplingContainer() {
         return this.getGaugePanel().getGauge();
-    }
-
-    /**
-     * Global update.
-     */
-    public void update() {
-//            super.update();
-        if (this.getGaugePanel().getGauge().getCouplings() != null) {
-            if (this.getGaugePanel().getGauge().getCouplings().size() > 0) {
-                gaugePanel.getGauge().updateCurrentState();
-                gaugePanel.updateGraphics();
-            }
-        }
     }
 
     /**

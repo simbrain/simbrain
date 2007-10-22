@@ -21,6 +21,7 @@ package org.simbrain.network;
 import java.io.File;
 import java.util.Collection;
 
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -29,7 +30,7 @@ import org.simnet.interfaces.RootNetwork;
 /**
  * Network frame.
  */
-public final class NetworkComponent extends WorkspaceComponent {
+public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     private RootNetwork rootNetwork = new RootNetwork();
     

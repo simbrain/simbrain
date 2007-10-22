@@ -18,41 +18,16 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.JScrollPane;
-import javax.swing.event.InternalFrameEvent;
-
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.dataworld.DataWorldPreferences;
-import org.simnet.interfaces.RootNetwork;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 
 /**
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link OdorWorldPanel}.
  */
-public class OdorWorldComponent extends WorkspaceComponent {
+public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /**
      * Default constructor.
@@ -74,15 +49,15 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.setMode(XStream.ID_REFERENCES);
-        xstream.omitField(OdorWorldEntity.class, "theImage");
-        xstream.omitField(OdorWorldAgent.class, "effectorList");
-        xstream.omitField(OdorWorldAgent.class, "sensorList");
-        xstream.omitField(OdorWorld.class, "couplings");
-        return xstream;
-    }
+//    private static XStream getXStream() {
+//        XStream xstream = new XStream(new DomDriver());
+//        xstream.setMode(XStream.ID_REFERENCES);
+//        xstream.omitField(OdorWorldEntity.class, "theImage");
+//        xstream.omitField(OdorWorldAgent.class, "effectorList");
+//        xstream.omitField(OdorWorldAgent.class, "sensorList");
+//        xstream.omitField(OdorWorld.class, "couplings");
+//        return xstream;
+//    }
 
     /**
      * Save a specified file  Called by "save".

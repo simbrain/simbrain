@@ -18,40 +18,15 @@
  */
 package org.simbrain.world.dataworld;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Vector;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
-import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspaceComponent;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
-public class DataWorldComponent extends WorkspaceComponent {
+public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     
     /**
@@ -74,14 +49,14 @@ public class DataWorldComponent extends WorkspaceComponent {
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(TableModel.class, "consumers");
-        xstream.omitField(TableModel.class, "producers");
-        xstream.omitField(TableModel.class, "couplingList");
-        xstream.omitField(TableModel.class, "model");
-        return xstream;
-    }
+//    private XStream getXStream() {
+//        XStream xstream = new XStream(new DomDriver());
+//        xstream.omitField(TableModel.class, "consumers");
+//        xstream.omitField(TableModel.class, "producers");
+//        xstream.omitField(TableModel.class, "couplingList");
+//        xstream.omitField(TableModel.class, "model");
+//        return xstream;
+//    }
 
     /**
      * Save a specified file.

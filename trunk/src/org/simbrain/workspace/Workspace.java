@@ -37,7 +37,7 @@ public class Workspace {
 
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
     
-    CouplingManager manager = new CouplingManager();
+    private final CouplingManager manager = new CouplingManager();
     
     /** List of workspace components. */
     private ArrayList<WorkspaceComponent> componentList = new ArrayList<WorkspaceComponent>();
@@ -104,12 +104,16 @@ public class Workspace {
         manager.updateAllCouplings();
         
         for (WorkspaceComponent component : componentList) {
-            component.update();
+            component.doUpdate();
         }
         
         updateCompleted = true;
     }
 
+    public void addCoupling(Coupling<?> coupling) {
+        manager.addCoupling(coupling);
+    }
+    
 //    private boolean hasCouplings(WorkspaceComponent component) {
 //        if (component.getCouplingContainer() == null) {
 //            return false;

@@ -3,7 +3,6 @@ package org.simbrain.gauge.core;
 import java.lang.reflect.Type;
 
 import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
@@ -18,11 +17,15 @@ public class Variable extends SingleAttributeConsumer<Double> {
     /** Reference to gauge. */
     private Gauge gauge;
 
+    /** reference to parent component */
+    private final GaugeComponent parent;
+    
     /**
      * @param columnNumber
      */
-    public Variable(final Gauge gauge, final int dimension) {
+    public Variable(final Gauge gauge, final GaugeComponent parent, final int dimension) {
         this.dimension = dimension;
+        this.parent = parent;
         this.gauge = gauge;
     }
 
@@ -40,19 +43,6 @@ public class Variable extends SingleAttributeConsumer<Double> {
         gauge.setValue(dimension, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-//    public void setDefaultConsumingAttribute(final ConsumingAttribute consumingAttribute) {
-//    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Consumer getParent() {
-        return this;
-    }
-
     public Type getType() {
         return Double.TYPE;
     }
@@ -62,6 +52,6 @@ public class Variable extends SingleAttributeConsumer<Double> {
     }
 
     public GaugeComponent getParentComponent() {
-        return gauge.getParent();
+        return parent;
     }
 }

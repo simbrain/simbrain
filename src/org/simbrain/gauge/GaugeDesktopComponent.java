@@ -12,13 +12,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
@@ -26,14 +24,12 @@ import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
 import org.simbrain.gauge.core.Dataset;
+import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -41,16 +37,22 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-public class GaugeDesktopComponent extends DesktopComponent implements ActionListener, MenuListener {
+public class GaugeDesktopComponent extends DesktopComponent {
 
     private static final long serialVersionUID = 1L;
 
     /** Logger. */
     private Logger logger = Logger.getLogger(GaugeComponent.class);
 
+    /** the gauge that is the underlying model */
+    private final Gauge gauge;
+    
     /** Gauge panel. */
-    private GaugePanel gaugePanel;
+    private final GaugePanel gaugePanel;
 
+    /** the parent component */
+    private GaugeComponent component;
+    
     /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
 
@@ -88,7 +90,7 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
     private JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
 
     /** Coupling menu item. Must be reset every time.  */
-    JMenuItem producerListItem;
+    private JMenuItem producerListItem;
 
     /** Graphics preferences menu item. */
     private JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
@@ -105,9 +107,14 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
     /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("Help");
     
-    private WorkspaceComponentListener listener = new WorkspaceComponentListener() {
+    /** listener for gaugeComponent events */
+    private final GaugeComponentListener listener = new GaugeComponentListener() {
         public void componentUpdated() {
             gaugePanel.updateGraphics();
+        }
+
+        public void dimensionsChanged(int newDimensions) {
+            gaugePanel.resetGauge();
         }
     };
 
@@ -119,7 +126,8 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
         component.addListener(listener);
         this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
         this.setPreferredSize(new Dimension(300,300));
-        gaugePanel = new GaugePanel(component.getGauge());
+        gauge = component.getGauge();
+        gaugePanel = new GaugePanel(gauge);
 
         JPanel buffer = new JPanel();
         buffer.setLayout(new BorderLayout());
@@ -141,21 +149,21 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
         mb.add(prefsMenu);
         mb.add(helpMenu);
 
-        helpMenu.addMenuListener(this);
-        prefsMenu.addMenuListener(this);
+        helpMenu.addMenuListener(menuListener);
+        prefsMenu.addMenuListener(menuListener);
 
-        importCSV.addActionListener(this);
-        open.addActionListener(this);
-        exportHigh.addActionListener(this);
-        exportLow.addActionListener(this);
-        save.addActionListener(this);
-        saveAs.addActionListener(this);
-        projectionPrefs.addActionListener(this);
-        graphicsPrefs.addActionListener(this);
-        generalPrefs.addActionListener(this);
-        setAutozoom.addActionListener(this);
-        close.addActionListener(this);
-        helpItem.addActionListener(this);
+        importCSV.addActionListener(menuItemListener);
+        open.addActionListener(menuItemListener);
+        exportHigh.addActionListener(menuItemListener);
+        exportLow.addActionListener(menuItemListener);
+        save.addActionListener(menuItemListener);
+        saveAs.addActionListener(menuItemListener);
+        projectionPrefs.addActionListener(menuItemListener);
+        graphicsPrefs.addActionListener(menuItemListener);
+        generalPrefs.addActionListener(menuItemListener);
+        setAutozoom.addActionListener(menuItemListener);
+        close.addActionListener(menuItemListener);
+        helpItem.addActionListener(menuItemListener);
 
         open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -186,7 +194,8 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
      */
     private void setCouplingMenu() {
         prefsMenu.removeAll();
-        producerListItem = SimbrainDesktop.getInstance().getProducerListMenu(this);
+        producerListItem = SimbrainDesktop.getInstance().getProducerListMenu();
+        producerListItem.addActionListener(couplingMenuListener);
         prefsMenu.add(producerListItem);
         prefsMenu.addSeparator();
         prefsMenu.add(projectionPrefs);
@@ -195,42 +204,13 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
         prefsMenu.addSeparator();
         prefsMenu.add(setAutozoom);
     }
-
+    
     /**
      * Responds to actions performed.
      * @param e Action event
      */
-    // TODO make sure types match in coupling
-    @SuppressWarnings("unchecked")
-    public void actionPerformed(final ActionEvent e) {
-        logger.debug("coupling menu item selected");
-        // Handle Coupling wireup
-        if (e.getSource() instanceof CouplingMenuItem) {
-            
-            int oldDims = gaugePanel.getGauge().getDimensions();
-            
-            Collection<? extends Producer> producers = ((CouplingMenuItem) e.getSource()).getWorkspaceComponent().getProducers();
-            int newDims = producers.size();
-            gaugePanel.getGauge().resetCouplings(newDims);
-            Iterator<? extends Producer> producerIterator = producers.iterator();
-            for (Consumer consumer : this.getGaugePanel().getGauge().getConsumers()) {
-                if (producerIterator.hasNext()) {
-                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                    SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
-                    
-//                    this.getGaugePanel().getGauge().getCouplings().add(coupling);
-                }
-            }
-
-            // If the new data is consistent with the old, don't reset the gauge
-            if (oldDims != newDims){
-                gaugePanel.getGauge().init(newDims);
-                gaugePanel.resetGauge();
-            }
-        }
-
-        if ((e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class)) {
-
+    private final ActionListener menuItemListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
             JMenuItem jmi = (JMenuItem) e.getSource();
 
             if (jmi == open) {
@@ -239,31 +219,28 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
                 showSaveFileDialog();
             } else if (jmi == save) {
                 save();
-            } else {
-                JMenuItem importCSV2 = importCSV;
-                if (jmi == importCSV2) {
-                    importCSV();
-                } else if (jmi == exportLow) {
-                    exportLow();
-                } else if (jmi == exportHigh) {
-                    exportHigh();
-                } else if (jmi == projectionPrefs) {
-                    gaugePanel.handlePreferenceDialogs();
-                } else if (jmi == graphicsPrefs) {
-                    gaugePanel.showGraphicsDialog();
-                } else if (jmi == generalPrefs) {
-                    gaugePanel.showGeneralDialog();
-                } else if (jmi == setAutozoom) {
-                    gaugePanel.setAutoZoom(setAutozoom.isSelected());
-                    gaugePanel.repaint();
-                } else if (jmi == close) {
-                    this.dispose();
-                } else if (jmi == helpItem) {
-                    Utils.showQuickRef("Gauge.html");
-                }
+            } else if (jmi == importCSV) {
+                importCSV();
+            } else if (jmi == exportLow) {
+                exportLow();
+            } else if (jmi == exportHigh) {
+                exportHigh();
+            } else if (jmi == projectionPrefs) {
+                gaugePanel.handlePreferenceDialogs();
+            } else if (jmi == graphicsPrefs) {
+                gaugePanel.showGraphicsDialog();
+            } else if (jmi == generalPrefs) {
+                gaugePanel.showGeneralDialog();
+            } else if (jmi == setAutozoom) {
+                gaugePanel.setAutoZoom(setAutozoom.isSelected());
+                gaugePanel.repaint();
+            } else if (jmi == close) {
+                GaugeDesktopComponent.this.dispose();
+            } else if (jmi == helpItem) {
+                Utils.showQuickRef("Gauge.html");
             }
         }
-    }
+    };
 
     /**
      * Returns a properly initialized xstream object.
@@ -289,9 +266,9 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
             reader = new FileReader(theFile);
             Projector projector = (Projector) getXStream().fromXML(reader);
             projector.postOpenInit();
-            this.getGaugePanel().getGauge().setCurrentProjector(projector);
-            this.getGaugePanel().updateGraphics();
-            this.getGaugePanel().getGauge().resetCouplings(projector.getUpstairs().getDimensions());
+            gauge.setCurrentProjector(projector);
+            gaugePanel.updateGraphics();
+            component.resetCouplings(projector.getUpstairs().getDimensions());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -305,8 +282,8 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
      */
     public void save(final File f) {
         setCurrentFile(f);
-        this.getGaugePanel().getGauge().getCurrentProjector().preSaveInit();
-        String xml = getXStream().toXML(this.getGaugePanel().getGauge().getCurrentProjector());
+        gauge.getCurrentProjector().preSaveInit();
+        String xml = getXStream().toXML(gauge.getCurrentProjector());
         try {
             FileWriter writer  = new FileWriter(f);
             writer.write(xml);
@@ -329,8 +306,8 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
 
         if (theFile != null) {
             Dataset data = new Dataset(theFile);
-            gaugePanel.getGauge().getCurrentProjector().init(data, null);
-            gaugePanel.getGauge().getCurrentProjector().project();
+            gauge.getCurrentProjector().init(data, null);
+            gauge.getCurrentProjector().project();
             gaugePanel.centerCamera();
             gaugePanel.updateGraphics();
             setCurrentDirectory(chooser.getCurrentLocation());
@@ -345,7 +322,7 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
-            gaugePanel.getGauge().getUpstairs().saveData(theFile);
+            gauge.getUpstairs().saveData(theFile);
             setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
@@ -358,17 +335,10 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
-            gaugePanel.getGauge().getDownstairs().saveData(theFile);
+            gauge.getDownstairs().saveData(theFile);
             setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
-
-    /**
-     * Returns reference to gauge model which contains couplings.
-     */
-//    public CouplingContainer getCouplingContainer() {
-//        return this.getGaugePanel().getGauge();
-//    }
 
     /**
      * Responds to internal frame closed.
@@ -376,83 +346,64 @@ public class GaugeDesktopComponent extends DesktopComponent implements ActionLis
      * @param e Internal frame event
      */
     public void close() {
-        getGaugePanel().stopThread();
+        gaugePanel.stopThread();
         GaugePreferences.setCurrentDirectory(getCurrentDirectory());
     }
 
-    /**
-     * @return Returns the theGaugePanel.
+    /** 
+     * Menu Listener
      */
-    public GaugePanel getGaugePanel() {
-        return gaugePanel;
-    }
-
-    /**
-     * @param theGaugePanel The theGaugePanel to set.
-     */
-    public void setGaugePanel(final GaugePanel theGaugePanel) {
-        this.gaugePanel = theGaugePanel;
-    }
-
-    /**
-     * Checks to see if anything has changed and then offers to save if true.
-     */
-    public void showHasChangedDialog() {
-        Object[] options = {"Save", "Don't Save", "Cancel"};
-        int s = JOptionPane
-                .showInternalOptionDialog(
-                        this,
-                        "Gauge "
-                                + this.getName()
-                                + " has changed since last save,\nwould you like to save these changes?",
-                        "Gauge Has Changed", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-
-        if (s == 0) {
-            // saveCombined();
-            dispose();
-        } else if (s == 1) {
-            dispose();
-        } else {
-            return;
+    private final MenuListener menuListener = new MenuListener() {
+        /**
+         * Menu cancelled.
+         * @param arg0 Menu event
+         */
+        public void menuCanceled(final MenuEvent arg0) {
         }
-    }
 
-    /**
-     * Menu cancelled.
-     * @param arg0 Menu event
-     */
-    public void menuCanceled(final MenuEvent arg0) {
-    }
+        /**
+         * Menu Deslected.
+         * @param arg0 Menu event
+         */
+        public void menuDeselected(final MenuEvent arg0) {
+        }
 
-    /**
-     * Menu Deslected.
-     * @param arg0 Menu event
-     */
-    public void menuDeselected(final MenuEvent arg0) {
-    }
-
-    /**
-     * Menu selected.
-     * @param arg0 Menu event
-     */
-    public void menuSelected(final MenuEvent arg0) {
-        if (arg0.getSource().equals(fileMenu)) {
-            if (this.isChangedSinceLastSave()) {
-                save.setEnabled(true);
-            } else if (!this.isChangedSinceLastSave()) {
-                save.setEnabled(false);
-            }
-        } else if (arg0.getSource().equals(prefsMenu)) {
-            setCouplingMenu();
-            if (gaugePanel.getGauge().getCurrentProjector().hasDialog()) {
-                projectionPrefs.setEnabled(true);
-            } else {
-                projectionPrefs.setEnabled(false);
+        /**
+         * Menu selected.
+         * @param arg0 Menu event
+         */
+        public void menuSelected(final MenuEvent arg0) {
+            if (arg0.getSource().equals(fileMenu)) {
+                if (GaugeDesktopComponent.this.isChangedSinceLastSave()) {
+                    save.setEnabled(true);
+                } else if (!GaugeDesktopComponent.this.isChangedSinceLastSave()) {
+                    save.setEnabled(false);
+                }
+            } else if (arg0.getSource().equals(prefsMenu)) {
+                setCouplingMenu();
+                if (gauge.getCurrentProjector().hasDialog()) {
+                    projectionPrefs.setEnabled(true);
+                } else {
+                    projectionPrefs.setEnabled(false);
+                }
             }
         }
-    }
+    };
 
+    /**
+     * ActionListener for coupling menu events
+     */
+    private final ActionListener couplingMenuListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            logger.debug("coupling menu item selected");
+            
+            CouplingMenuItem menuItem = (CouplingMenuItem) e.getSource();
+            Collection<? extends Producer> producers = menuItem.getWorkspaceComponent().getProducers();
+            
+            component.wireCouplings(producers);
+        }
+    };
+    
     @Override
     public String getFileExtension() {
         return "gdf";

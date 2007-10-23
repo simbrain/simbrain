@@ -55,9 +55,12 @@ import edu.umd.cs.piccolo.util.PBounds;
  */
 public class GaugePanel extends PCanvas implements ActionListener {
 
+    private static final long serialVersionUID = 1L;
+
     /** Logger. */
     private Logger logger = Logger.getLogger(GaugePanel.class);
 
+    /** the underlying gauge */
     private final Gauge theGauge;
     
     /** Thread of type gauge. */
@@ -177,11 +180,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
         projectionList.setMaximumSize(new java.awt.Dimension(200, 100));
 
-        keyEventHandler = new KeyEventHandler(this);
+        keyEventHandler = new KeyEventHandler(theGauge);
         addInputEventListener(keyEventHandler);
         getRoot().getDefaultInputManager().setKeyboardFocus(keyEventHandler);
 
-        mouseHandler = new MouseEventHandler(this);
+        mouseHandler = new MouseEventHandler(theGauge);
         addInputEventListener(mouseHandler);
 
         theToolBar.add(onOffBox);
@@ -257,7 +260,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * Show genneral prefs dialog.
      */
     public void showGeneralDialog() {
-        DialogGeneral dialog = new DialogGeneral(this);
+        DialogGeneral dialog = new DialogGeneral(theGauge);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -547,9 +550,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @return a reference to the gauge
      */
-    public Gauge getGauge() {
-        return theGauge;
-    }
+//    public Gauge getGauge() {
+//        return theGauge;
+//    }
 
     /**
      * Used by the thread to be sure an iteration is complete before it iterates again.

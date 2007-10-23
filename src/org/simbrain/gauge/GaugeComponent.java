@@ -18,32 +18,34 @@
  */
 package org.simbrain.gauge;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.core.Variable;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
  * variables the Gauge is representing.
  */
-public class GaugeComponent extends WorkspaceComponent<WorkspaceComponentListener> implements ActionListener, MenuListener {
+public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
 
+    /** Consumer list. */
+    private Collection<Consumer> consumers = new ArrayList<Consumer>();
+    
     public GaugeComponent(String name) {
         super(name);
     }
 
-    /** Logger. */
-//    private Logger logger = Logger.getLogger(GaugeComponent.class);
-
     /** Current gauge. */
-    private Gauge gauge = new Gauge(this);
+    private Gauge gauge = new Gauge();
     
     public Gauge getGauge() {
         return gauge;
@@ -62,6 +64,51 @@ public class GaugeComponent extends WorkspaceComponent<WorkspaceComponentListene
 //        return xstream;
 //    }
 
+    /**
+     * Update couplings.
+     *
+     * @param dims dimensions to update
+     */
+    public void resetCouplings(final int dims) {
+        consumers.clear();
+        for (int i = 0; i < dims; i++) {
+            consumers.add(new Variable(gauge, this, i));
+        }
+    }
+    
+    /**
+     * Wires the provided producers to gauge consumers.
+     * If the number of producers has changed since the last
+     * wire-up or this is the first wire-up, the component
+     * the Gauge is refreshed
+     */
+    @SuppressWarnings("unchecked")
+    void wireCouplings(Collection<? extends Producer> producers) {
+        /* Handle Coupling wire-up */
+        int oldDims = gauge.getDimensions();
+        
+        int newDims = producers.size();
+
+        resetCouplings(newDims);
+        
+        Iterator<? extends Producer> producerIterator = producers.iterator();
+        
+        for (Consumer consumer : consumers) {
+            if (producerIterator.hasNext()) {
+                Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
+            }
+        }
+
+        /* If the new data is inconsistent with the old, reset the gauge */
+        if (oldDims != newDims){
+            gauge.init(newDims);
+            for (GaugeComponentListener listener : getListeners()) {
+                listener.dimensionsChanged(newDims);
+            }
+        }
+    }
+    
     @Override
     protected void update() {
         gauge.updateCurrentState();
@@ -87,26 +134,6 @@ public class GaugeComponent extends WorkspaceComponent<WorkspaceComponentListene
 
     @Override
     public void save(File saveFile) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void menuCanceled(MenuEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void menuDeselected(MenuEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void menuSelected(MenuEvent e) {
         // TODO Auto-generated method stub
         
     }

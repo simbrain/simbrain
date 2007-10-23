@@ -29,6 +29,7 @@ import java.awt.event.MouseListener;
 import java.util.Iterator;
 
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -178,7 +179,10 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         }
 
         ret.addSeparator();
-        ret.add(SimbrainDesktop.getInstance().getProducerListMenu(this));
+        
+        JMenu producerMenu = SimbrainDesktop.getInstance().getProducerListMenu();
+        producerMenu.addActionListener(this);
+        ret.add(producerMenu);
 
         return ret;
     }

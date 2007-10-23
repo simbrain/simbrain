@@ -35,13 +35,6 @@ public class Variable extends SingleAttributeConsumer<Double> {
     public String getDescription() {
         return "Dimension ";
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Consumer getParent() {
-        return this;
-    }
     
     public Type getType() {
         return Double.TYPE;

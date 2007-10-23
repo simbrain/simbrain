@@ -20,6 +20,8 @@ package org.simbrain.gauge.graphics;
 
 import java.awt.event.KeyEvent;
 
+import org.simbrain.gauge.core.Gauge;
+
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
@@ -29,13 +31,13 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  */
 public class KeyEventHandler extends PBasicInputEventHandler {
     /** Gauge panel. */
-    private GaugePanel gp;
+    private Gauge gauge;
 
     /**
      * @param gaugePanel Gauge to handle key events.
      */
-    public KeyEventHandler(final GaugePanel gaugePanel) {
-        gp = gaugePanel;
+    public KeyEventHandler(final Gauge gauge) {
+        this.gauge = gauge;
     }
 
     /**
@@ -46,11 +48,11 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 
         switch (keycode) {
             case KeyEvent.VK_H:
-                gp.getGauge().getUpstairs().printDataset();
+                gauge.getUpstairs().printDataset();
                 break;
 
             case KeyEvent.VK_L:
-                gp.getGauge().getDownstairs().printDataset();
+                gauge.getDownstairs().printDataset();
 
                 break;
 
@@ -66,14 +68,14 @@ public class KeyEventHandler extends PBasicInputEventHandler {
     /**
      * @param gp Gauge panel to respond to.
      */
-    public void setGp(final GaugePanel gp) {
-        this.gp = gp;
-    }
+//    public void setGp(final Gauge gauge) {
+//        this.gauge = gauge;
+//    }
 
     /**
      * @return Gauge panel to respond to.
      */
-    public GaugePanel getGp() {
-        return this.gp;
-    }
+//    public GaugePanel getGp() {
+//        return this.gp;
+//    }
 }

@@ -46,19 +46,6 @@ public class ConsumingColumn extends SingleAttributeConsumer<Double> {
     public String getDescription() {
         return "Column " + columnNumber;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-//    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute) {
-//    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Consumer getParent() {
-        return this;
-    }
     
     public Type getType() {
         return Double.TYPE;

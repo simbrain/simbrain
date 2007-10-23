@@ -18,26 +18,18 @@
  */
 package org.simbrain.gauge.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 
 /**
  * <b>Gauge</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
  * initializing various projection algorithms.
  */
-public class Gauge {//implements CouplingContainer {
+public class Gauge {
 
     /** Log4j logger. */
     private static final Logger logger = Logger.getLogger(Gauge.class);
 
-    private final GaugeComponent parent;
-    
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
 
@@ -56,35 +48,26 @@ public class Gauge {//implements CouplingContainer {
     /** Current data point.  */
     double[] currentState = null;
 
-    /** Consumer list. */
-    private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
-
-    /** Coupling list. */
-//    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
-
-    // TO ADD A NEW PROJECTION ALGORITHM:
-    // Create a projection class modeled on any of the Project_ classes,
-    // which implements Projector, and make appropriate places in locations
-    // ONE, TWO, and THREE below.  You must also change the updateProjectionMenu() method
-    // in gaugePanel.
-    // If there is a dialog box associated with this projector, then changes will have
-    // to be made to org.hisee.graphics.GaugePanel.handlePreferenceDialogs() as well
-
+    /* 
+     * TO ADD A NEW PROJECTION ALGORITHM:
+     * Create a projection class modeled on any of the Project_ classes,
+     * which implements Projector, and make appropriate places in locations
+     * ONE, TWO, and THREE below.  You must also change the updateProjectionMenu() method
+     * in gaugePanel.
+     * If there is a dialog box associated with this projector, then changes will have
+     * to be made to org.hisee.graphics.GaugePanel.handlePreferenceDialogs() as well
+     */
+    
     /** List of available projection algorithms. */
     public static final String[] PROJECTOR_LIST = {
-    //ONE: Add name of new projection algorithm
+    //TODO ONE: Add name of new projection algorithm
             "Sammon", "PCA", "Coordinate" };
 
     /**
      * Default constructor for gauge.
      */
-    public Gauge(final GaugeComponent parent) {
-        this.parent = parent;
+    public Gauge() {
         currentProjector = this.getProjectorByName(defaultProjector);
-    }
-
-    GaugeComponent getParent() {
-        return parent;
     }
     
     /**
@@ -92,8 +75,6 @@ public class Gauge {//implements CouplingContainer {
      * The curent state is set by couplings to other workspace components.
      */
     public void updateCurrentState() {
-//        if (getCouplings() == null || getCouplings().size() < 1) return;
-        
         logger.trace("updateCurrentState() called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
             logger.debug("could not update current state");
@@ -102,7 +83,7 @@ public class Gauge {//implements CouplingContainer {
         
         addDatapoint(currentState);
         currentProjector.project();
-        // reset the current state
+        /* reset the current state */
         currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
     }
 
@@ -117,26 +98,13 @@ public class Gauge {//implements CouplingContainer {
     }
 
     /**
-     * Update couplings.
-     *
-     * @param dims dimensions to update
-     */
-    public void resetCouplings(final int dims) {
-//        couplings.clear();
-        consumers.clear();
-        for (int i = 0; i < dims; i++) {
-            consumers.add(new Variable(this, i));
-        }
-    }
-
-    /**
      * Fill in current data point.
      *
      * @param dimension dimension of the dataset to set value of
      * @param value value to add
      */
     public void setValue(final int dimension, final double value) {
-    	//logger.trace("dimension = " + dimension + "    value = " + value );
+    	logger.trace("dimension = " + dimension + "    value = " + value );
         if (currentState == null) {
             currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
         }
@@ -160,7 +128,7 @@ public class Gauge {//implements CouplingContainer {
         if (isOn()) {
             currentProjector.addDatapoint(point);
 
-            //This is needed to invoke the current projector's init function
+            /* This is needed to invoke the current projector's init function */
             if (currentProjector.isIterable()) {
                 currentProjector.init(getUpstairs(), getDownstairs());
             }
@@ -211,7 +179,7 @@ public class Gauge {//implements CouplingContainer {
      * @return Projector type by name.
      */
     public Projector getProjectorByName(final String name) {
-        //THREE: Add code below to associate a projector with its name
+        // TODO THREE: Add code below to associate a projector with its name
         Projector ret = null;
 
         if (name.equalsIgnoreCase("Sammon")) {
@@ -321,29 +289,7 @@ public class Gauge {//implements CouplingContainer {
     public void setDefaultProjector(final String defaultProjector) {
         this.defaultProjector = defaultProjector;
     }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<Consumer> getConsumers() {
-        return consumers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-//    public List<Coupling> getCouplings() {
-//        return couplings;
-//    }
-
-    /**
-     * No producers.
-     */
-    public List<Producer> getProducers() {
-        return null;
-    }
-
+    
     /**
      * @return the currentState
      */

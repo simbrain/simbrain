@@ -21,6 +21,7 @@ package org.simbrain.gauge.graphics;
 import java.awt.Color;
 import java.awt.geom.Ellipse2D;
 
+import org.simbrain.gauge.core.Gauge;
 import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -35,7 +36,7 @@ public class PNodeDatapoint extends PPath {
     private int index = 0;
 
     /** Reference to parent panel. */
-    private GaugePanel gaugePanel;
+    private Gauge gauge;
 
     /**
      * Piccolo node data points. (Currently only handles 2-d points)
@@ -47,7 +48,7 @@ public class PNodeDatapoint extends PPath {
     public PNodeDatapoint(final GaugePanel gp, final double[] point, final int i, final double size) {
         super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float) size, (float) size), null);
         index = i;
-        gaugePanel = gp;
+        this.gauge = gauge;
 
         addInputEventListener(new ToolTipTextUpdater() {
            protected String getUpstairsText() {
@@ -75,7 +76,7 @@ public class PNodeDatapoint extends PPath {
 
     /** @see Object */
     public String toString() {
-        return Utils.doubleArrayToString(gaugePanel.getGauge().getUpstairs().getPoint(index));
+        return Utils.doubleArrayToString(gauge.getUpstairs().getPoint(index));
     }
 
     /**
@@ -85,6 +86,6 @@ public class PNodeDatapoint extends PPath {
      * @return the low dimensnional coordinates
      */
     protected String toStringDownstairs() {
-        return Utils.doubleArrayToString(gaugePanel.getGauge().getDownstairs().getPoint(index));
+        return Utils.doubleArrayToString(gauge.getDownstairs().getPoint(index));
     }
 }

@@ -18,6 +18,7 @@
  */
 package org.simbrain.gauge.graphics;
 
+import org.simbrain.gauge.core.Gauge;
 import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.PNode;
@@ -33,15 +34,15 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 public class MouseEventHandler extends PDragSequenceEventHandler {
 
     /** Gauge panel. */
-    private GaugePanel gp;
+    private Gauge gauge;
 
 
     /**
      * Responds to mouse events.
      * @param gauge Gauge to respond to.
      */
-    public MouseEventHandler(final GaugePanel gauge) {
-        gp = gauge;
+    public MouseEventHandler(final Gauge gauge) {
+        this.gauge = gauge;
 
     }
 
@@ -56,7 +57,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
         if (theNode instanceof PNodeDatapoint) {
             int i = ((PNodeDatapoint) theNode).getIndex();
-            System.out.println(Utils.doubleArrayToString(gp.getGauge().getUpstairs().getPoint(i)));
+            System.out.println(Utils.doubleArrayToString(gauge.getUpstairs().getPoint(i)));
         }
     }
 
@@ -64,14 +65,14 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     /**
      * @param gp Set new gauge panel.
      */
-    public void setGp(final GaugePanel gp) {
-        this.gp = gp;
-    }
+//    public void setGp(final GaugePanel gp) {
+//        this.gp = gp;
+//    }
 
     /**
      * @return Current gauge panel.
      */
-    public GaugePanel getGp() {
-        return this.gp;
-    }
+//    public GaugePanel getGp() {
+//        return this.gp;
+//    }
 }

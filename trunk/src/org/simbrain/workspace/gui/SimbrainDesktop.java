@@ -678,13 +678,13 @@ public class SimbrainDesktop {
      * @param listener the component which will listens to the menu items in this menu
      * @return the menu containing all available components with nonempty produer lists
      */
-    public JMenu getProducerListMenu(final ActionListener listener) {
+    public JMenu getProducerListMenu() {
         JMenu producerListMenu = new JMenu("Producer lists");
         for (WorkspaceComponent component : workspace.getComponentList()) {
             System.out.println("component: " + component);
                 CouplingMenuItem producerListItem = new CouplingMenuItem(component, CouplingMenuItem.EventType.PRODUCER_LIST);
                 producerListItem.setText(component.getName());
-                producerListItem.addActionListener(listener);
+//                producerListItem.addActionListener(listener);
                 producerListMenu.add(producerListItem);
         }
         return producerListMenu;

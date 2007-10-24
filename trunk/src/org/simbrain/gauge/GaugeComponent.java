@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Variable;
 import org.simbrain.workspace.Consumer;
@@ -37,6 +38,8 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  */
 public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
 
+    private static final Logger LOGGER = Logger.getLogger(GaugeComponent.class);
+    
     /** Consumer list. */
     private Collection<Consumer> consumers = new ArrayList<Consumer>();
     
@@ -85,6 +88,9 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
     @SuppressWarnings("unchecked")
     void wireCouplings(Collection<? extends Producer> producers) {
         /* Handle Coupling wire-up */
+        
+        LOGGER.debug("wiring " + producers.size() + " producers");
+        
         int oldDims = gauge.getDimensions();
         
         int newDims = producers.size();

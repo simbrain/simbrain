@@ -2,9 +2,7 @@ package org.simbrain.world.dataworld;
 
 import java.lang.reflect.Type;
 
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.SingleAttributeConsumer;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a consumer object, so other components 
@@ -13,15 +11,15 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class ConsumingColumn extends SingleAttributeConsumer<Double> {
 
     /** The number of the column being represented. */
-    private int columnNumber;
+    private final int columnNumber;
 
     /** Reference to table model. */
-    private TableModel tableModel;
+    private DataModel<Double> tableModel;
 
     /**
      * @param columnNumber
      */
-    public ConsumingColumn(final TableModel table, final int columnNumber) {
+    public ConsumingColumn(final DataModel<Double> table, final int columnNumber) {
         this.tableModel = table;
         this.columnNumber = columnNumber;
     }
@@ -37,7 +35,7 @@ public class ConsumingColumn extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public void setValue(Double value) {
-        tableModel.setValueAt(columnNumber, value);
+        tableModel.set(columnNumber, value);
     }
 
     /**
@@ -51,7 +49,7 @@ public class ConsumingColumn extends SingleAttributeConsumer<Double> {
         return Double.TYPE;
     }
 
-    public WorkspaceComponent getParentComponent() {
+    public DataWorldComponent getParentComponent() {
         // TODO Auto-generated method stub
         return null;
     }

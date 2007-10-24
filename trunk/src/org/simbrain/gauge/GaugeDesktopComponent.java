@@ -42,7 +42,7 @@ public class GaugeDesktopComponent extends DesktopComponent {
     private static final long serialVersionUID = 1L;
 
     /** Logger. */
-    private Logger logger = Logger.getLogger(GaugeComponent.class);
+    private static final Logger LOGGER = Logger.getLogger(GaugeComponent.class);
 
     /** the gauge that is the underlying model */
     private final Gauge gauge;
@@ -123,6 +123,7 @@ public class GaugeDesktopComponent extends DesktopComponent {
      */
     public GaugeDesktopComponent(GaugeComponent component) {
         super(component);
+        this.component = component;
         component.addListener(listener);
         this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
         this.setPreferredSize(new Dimension(300,300));
@@ -194,8 +195,7 @@ public class GaugeDesktopComponent extends DesktopComponent {
      */
     private void setCouplingMenu() {
         prefsMenu.removeAll();
-        producerListItem = SimbrainDesktop.getInstance().getProducerListMenu();
-        producerListItem.addActionListener(couplingMenuListener);
+        producerListItem = SimbrainDesktop.getInstance().getProducerListMenu(couplingMenuItemListener);
         prefsMenu.add(producerListItem);
         prefsMenu.addSeparator();
         prefsMenu.add(projectionPrefs);
@@ -393,9 +393,10 @@ public class GaugeDesktopComponent extends DesktopComponent {
     /**
      * ActionListener for coupling menu events
      */
-    private final ActionListener couplingMenuListener = new ActionListener() {
+    private final ActionListener couplingMenuItemListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            logger.debug("coupling menu item selected");
+            LOGGER.debug("coupling menu item selected");
+            System.out.println("here");
             
             CouplingMenuItem menuItem = (CouplingMenuItem) e.getSource();
             Collection<? extends Producer> producers = menuItem.getWorkspaceComponent().getProducers();

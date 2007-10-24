@@ -304,8 +304,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
         } else if (getNetworkPanel().getSelectedNeurons().size() > 1) {
-            JMenu producerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getProducerListMenu();
-            producerMenu.addActionListener(this);
+            JMenu producerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getProducerListMenu(this);
             producerMenu.setText("Set input sources");
             contextMenu.add(producerMenu);
             JMenu consumerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getConsumerListMenu(this);

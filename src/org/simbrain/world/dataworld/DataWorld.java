@@ -22,11 +22,12 @@ import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -35,12 +36,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -49,16 +48,17 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  *
  * @author rbartley, jyoshimi
  */
-public class DataWorld extends JPanel implements MouseListener, KeyListener, ActionListener {
+public class DataWorld extends JPanel {
 
     private static final long serialVersionUID = 1L;
-
-    /** Table model. */
-    private TableModel tableModel;
 
     /** Data table. */
     private JXTable table;
 
+    private TableModel tableModel;
+    
+    private final DataModel<Double> dataModel;
+    
     /** Parent frame that calls world. */
     private DataWorldDesktopComponent parentFrame;
 
@@ -83,82 +83,101 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     /** Local variable used for iterating. */
     private int currentRowCounter = 0;
 
+    final DataWorldDesktopComponent ws;
+    
     /**
      * Creates a new instance of the data world.
      *
      * @param ws World frame to create a new data world within
      */
-    public DataWorld(final DataWorldDesktopComponent ws) {
+    public DataWorld(final DataWorldDesktopComponent ws, DataModel<Double> model) {
         super(new BorderLayout());
+        this.ws = ws;
         setParentFrame(ws);
 
-        tableModel = new TableModel(this);
-        table = new JXTable(tableModel.getModel());
+        this.dataModel = model;
+        tableModel = new DataTableModel(dataModel);
+        table = new JXTable(tableModel);
 
-        addRow.addActionListener(parentFrame);
-        addRow.setActionCommand("addRowHere");
-        addCol.addActionListener(parentFrame);
-        addCol.setActionCommand("addColHere");
-        remRow.addActionListener(parentFrame);
-        remRow.setActionCommand("remRowHere");
-        remCol.addActionListener(parentFrame);
-        remCol.setActionCommand("remColHere");
+        addRow.addActionListener(addRowHereListener);
+//        addRow.setActionCommand("addRowHere");
+        addCol.addActionListener(addColHereListener);
+//        addCol.setActionCommand("addColHere");
+        remRow.addActionListener(remRowHereListener);
+//        remRow.setActionCommand("remRowHere");
+        remCol.addActionListener(remColHereListener);
+//        remCol.setActionCommand("remColHere");
         add("Center", table);
-        table.addKeyListener(this);
-        table.addMouseListener(this);
+        table.addKeyListener(keyListener);
+        table.addMouseListener(mouseListener);
         table.setColumnSelectionAllowed(true);
         table.setRolloverEnabled(true);
         table.setRowSelectionAllowed(true);
     }
 
-    /**
-     * Responds to mouse clicked event.
-     *
-     * @param e Mouse event
-     */
-    public void mouseClicked(final MouseEvent e) {
-    }
-
-    /**
-     * Responds to mouse pressed event.
-     *
-     * @param e Mouse event
-     */
-    public void mousePressed(final MouseEvent e) {
-        selectedPoint = e.getPoint();
-   //     model.setCurrentRow(table.getSelectedRow());
-
-        // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
-        boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
-        if (isRightClick) {
-            JPopupMenu menu = buildPopupMenu();
-            menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
+    private ActionListener addRowHereListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            if (getSelectedPoint().x < (getTable().getRowHeight() * getTable().getRowCount())) {
+                getDataModel().insertNewRow(getSelectedRow());
+            } else {
+                getDataModel().addNewRow();
+            }
+            ws.setChangedSinceLastSave(true);
+            ws.pack();
         }
-    }
+    };
+    
+    private ActionListener addColHereListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            getDataModel().insertNewColumn(getSelectedColumn());
+            getDataModel().zeroFillNew();
+            ws.setChangedSinceLastSave(true);
+            ws.pack();
+        }
+    };
+    
+    private ActionListener remRowHereListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            getDataModel().removeRow(getSelectedRow());
+            ws.setChangedSinceLastSave(true);
+            ws.pack();
+        }
+    };
 
-    /**
-     * Responds to mouse released event.
-     *
-     * @param e Mouse event
-     */
-    public void mouseReleased(final MouseEvent e) {
+    private ActionListener remColHereListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            getDataModel().removeColumn(getSelectedColumn());
+            ws.setChangedSinceLastSave(true);
+            ws.pack();
+        }
+    };
+    
+    public int getSelectedColumn()
+    {
+        return getTable().columnAtPoint(selectedPoint);
     }
-
-    /**
-     * Responds to mouse entered events.
-     *
-     * @param e Mouse event
-     */
-    public void mouseEntered(final MouseEvent e) {
+    
+    public int getSelectedRow()
+    {
+        return getTable().rowAtPoint(selectedPoint);
     }
-
-    /**
-     * Responds to mouse exited event.
-     *
-     * @param e Mouse event
-     */
-    public void mouseExited(final MouseEvent e) {
-    }
+    
+    private MouseListener mouseListener = new MouseAdapter() {
+        /**
+         * Responds to mouse pressed event.
+         *
+         * @param e Mouse event
+         */
+        public void mousePressed(final MouseEvent e) {
+            selectedPoint = e.getPoint();
+            // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
+            boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
+            if (isRightClick) {
+                JPopupMenu menu = buildPopupMenu();
+                menu.show(DataWorld.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
+            }
+        }
+    };
 
     /**
      * @return The pop up menu to be built.
@@ -168,20 +187,20 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
 
         ret.add(addRow);
 
-        if (this.getTable().columnAtPoint(selectedPoint) != 0) {
+        if (getSelectedColumn() != 0) {
             ret.add(addCol);
         }
 
         ret.add(remRow);
 
-        if (this.getTable().columnAtPoint(selectedPoint) != 0) {
+        if (getSelectedColumn() != 0) {
             ret.add(remCol);
         }
 
         ret.addSeparator();
         
-        JMenu producerMenu = SimbrainDesktop.getInstance().getProducerListMenu();
-        producerMenu.addActionListener(this);
+        JMenu producerMenu = SimbrainDesktop.getInstance().getProducerListMenu(couplingMenuItemListener);
+        
         ret.add(producerMenu);
 
         return ret;
@@ -221,8 +240,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     public JTable getTable() {
         return table;
     }
-
-
+    
     /**
      * Displays the randomize dialog.
      */
@@ -231,9 +249,9 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         JPanel pane = new JPanel();
         JTextField lower = new JTextField();
         JTextField upper = new JTextField();
-        lower.setText(Integer.toString(tableModel.getLowerBound()));
+        lower.setText(Integer.toString(dataModel.getLowerBound()));
         lower.setColumns(3);
-        upper.setText(Integer.toString(tableModel.getUpperBound()));
+        upper.setText(Integer.toString(dataModel.getUpperBound()));
         upper.setColumns(3);
         pane.add(new JLabel("Lower Bound"));
         pane.add(lower);
@@ -245,8 +263,8 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         rand.setLocationRelativeTo(getParentFrame());
         rand.setVisible(true);
         if (!rand.hasUserCancelled()) {
-            tableModel.setLowerBound(Integer.parseInt(lower.getText()));
-            tableModel.setUpperBound(Integer.parseInt(upper.getText()));
+            dataModel.setLowerBound(Integer.parseInt(lower.getText()));
+            dataModel.setUpperBound(Integer.parseInt(upper.getText()));
         }
 
         repaint();
@@ -262,7 +280,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
             incrementCurrentRow();
             currentRowCounter = 0;
             thisRowCount = (int) Double.parseDouble(""
-                    + table.getModel().getValueAt(tableModel.getCurrentRow(),
+                    + table.getModel().getValueAt(dataModel.getCurrentRow(),
                             table.getModel().getColumnCount() - 1));
         }
     }
@@ -271,14 +289,14 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
      * Increment current row by 1.
      */
     public void incrementCurrentRow() {
-        if (tableModel.isIterationMode()) {
+        if (dataModel.isIterationMode()) {
             table.setColumnSelectionAllowed(false);
-            if (tableModel.getCurrentRow() >= (table.getRowCount() - 1)) {
-                tableModel.setCurrentRow(0);
+            if (dataModel.getCurrentRow() >= (table.getRowCount() - 1)) {
+                dataModel.setCurrentRow(0);
             } else {
-                tableModel.setCurrentRow(tableModel.getCurrentRow() + 1);
+                dataModel.setCurrentRow(dataModel.getCurrentRow() + 1);
             }
-            table.setRowSelectionInterval(tableModel.getCurrentRow(), tableModel.getCurrentRow());
+            table.setRowSelectionInterval(dataModel.getCurrentRow(), dataModel.getCurrentRow());
         } else {
             table.setColumnSelectionAllowed(true);
         }
@@ -288,18 +306,9 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     /**
      * @return Returns the model.
      */
-    public TableModel getTableModel() {
-        return tableModel;
+    public DataModel<Double> getDataModel() {
+        return dataModel;
     }
-
-    /**
-     * @param model The model to set.
-     */
-    public void setTableModel(final TableModel model) {
-        table.setModel(model.getModel());
-        this.tableModel = model;
-    }
-
 
     /**
      * @return The selected point.
@@ -317,38 +326,25 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         this.selectedPoint = selectedPoint;
     }
 
-    /**
-     * Responds to key typed events.
-     *
-     * @param arg0 Key event
-     */
-    public void keyTyped(final KeyEvent arg0) {
-        this.getParentFrame().setChangedSinceLastSave(true);
-    }
-
-    /**
-     * Responds to key pressed events.
-     *
-     * @param arg0 Key event
-     */
-    public void keyPressed(final KeyEvent arg0) {
-    }
-
-    /**
-     * Responds to key released events.
-     *
-     * @param arg0 Key event
-     */
-    public void keyReleased(final KeyEvent arg0) {
-    }
+    private KeyListener keyListener = new KeyAdapter() {
+        /**
+         * Responds to key typed events.
+         *
+         * @param arg0 Key event
+         */
+        public void keyTyped(final KeyEvent arg0) {
+            getParentFrame().setChangedSinceLastSave(true);
+        }
+    };
 
 
     /**
      * Handle iteration mode and column updating.
      */
+    // TODO associate to update event
     public void completedInputRound() {
-        if (tableModel.isIterationMode()) {
-            if (tableModel.isLastColumnBasedIteration()) {
+        if (dataModel.isIterationMode()) {
+            if (dataModel.isLastColumnBasedIteration()) {
                 incrementUsingLastColumn();
             } else {
                 incrementCurrentRow();
@@ -356,20 +352,22 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void actionPerformed(ActionEvent event) {
-        if (event.getSource() instanceof CouplingMenuItem) {
-            CouplingMenuItem m = (CouplingMenuItem) event.getSource();
-            // TODO refactor
-//            Iterator<Producer> producerIterator = m.getCouplingContainer().getProducers().iterator();
-//            for (Consumer consumer : this.getTableModel().getConsumers()) {
-//                if (producerIterator.hasNext()) {
-//                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-//                    this.getTableModel().getCouplings().add(coupling);
-//                }
-//            }
+    private ActionListener couplingMenuItemListener = new ActionListener() {
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent event) {
+            if (event.getSource() instanceof CouplingMenuItem) {
+                CouplingMenuItem m = (CouplingMenuItem) event.getSource();
+                // TODO refactor
+    //            Iterator<Producer> producerIterator = m.getCouplingContainer().getProducers().iterator();
+    //            for (Consumer consumer : this.getTableModel().getConsumers()) {
+    //                if (producerIterator.hasNext()) {
+    //                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+    //                    this.getTableModel().getCouplings().add(coupling);
+    //                }
+    //            }
+            }
         }
-    }
+    };
 }

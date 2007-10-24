@@ -27,7 +27,14 @@ import org.simbrain.workspace.WorkspaceComponent;
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
 public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
-
+    
+    /** Table model. */
+    private final DataModel<Double> dataModel = new DataModel<Double>();
+    
+    DataModel<Double> getDataModel()
+    {
+        return dataModel;
+    }
     
     /**
      * This method is the default constructor.
@@ -82,13 +89,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 //    public String getCurrentDirectory() {
 //        return DataWorldPreferences.getCurrentDirectory();
 //    }
-
-   /**
-    * Returns reference to table model which contains couplings.
-    */
-//   public CouplingContainer getCouplingContainer() {
-//       return this.getWorld().getTableModel();
-//   }
 
     @Override
     public void update() {

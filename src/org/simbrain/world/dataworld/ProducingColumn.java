@@ -5,7 +5,6 @@ import java.lang.reflect.Type;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.SingleAttributeProducer;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a producer object, so other components 
@@ -17,7 +16,7 @@ public class ProducingColumn extends SingleAttributeProducer<Double> {
     private int columnNumber;
 
     /** Reference to table model. */
-    private TableModel tableModel;
+    private DataModel<Double> tableModel;
 
     /**
      * Construct producing column.
@@ -25,7 +24,7 @@ public class ProducingColumn extends SingleAttributeProducer<Double> {
      * @param table reference to parent table
      * @param columnNumber the column number to set
      */
-    public ProducingColumn(final TableModel table, final int columnNumber) {
+    public ProducingColumn(final DataModel<Double> table, final int columnNumber) {
         this.tableModel = table;
         this.columnNumber = columnNumber;
     }
@@ -41,7 +40,7 @@ public class ProducingColumn extends SingleAttributeProducer<Double> {
      * {@inheritDoc}
      */
     public Double getValue() {
-        return (Double) tableModel.getValueAt(columnNumber);
+        return tableModel.get(columnNumber);
     }
 
     /**
@@ -55,6 +54,7 @@ public class ProducingColumn extends SingleAttributeProducer<Double> {
      * {@inheritDoc}
      */
     public void setDefaultProducingAttribute(ProducingAttribute<?> consumingAttribute) {
+        // TODO
     }
 
     /**
@@ -68,7 +68,7 @@ public class ProducingColumn extends SingleAttributeProducer<Double> {
         return Double.TYPE;
     }
 
-    public WorkspaceComponent getParentComponent() {
+    public DataWorldComponent getParentComponent() {
         // TODO Auto-generated method stub
         return null;
     }

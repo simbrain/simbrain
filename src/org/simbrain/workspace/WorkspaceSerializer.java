@@ -76,38 +76,38 @@ public class WorkspaceSerializer {
     public void readWorkspace(final File f, final boolean isImport) {
 
         workspace.clearWorkspace();
-        WorkspaceSerializer serializer = null;
-        FileReader reader;
-        try {
-            reader = new FileReader(f);
-            serializer = (WorkspaceSerializer) getXStream().fromXML(reader);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        for (WorkspaceComponentProxy component : serializer.getComponentList()) {
-            try {
-                WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
-                // TODO handle desktop components
-//                theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
-//                theComponent.setPath(component.getPath());
-
-		    workspace.addWorkspaceComponent(theComponent);
-                if (component.getPath() != null) {
-                    if (isImport) {
-                        // TODO fix
-                        //theComponent.open(new File(WorkspacePreferences.getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
-                    } else {
-                        theComponent.open(new File(component.getPath()));
-                    }
-                }
-
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+//        WorkspaceSerializer serializer = null;
+//        FileReader reader;
+//        try {
+//            reader = new FileReader(f);
+//            serializer = (WorkspaceSerializer) getXStream().fromXML(reader);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        for (WorkspaceComponentProxy component : serializer.getComponentList()) {
+//            try {
+//                WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
+//                // TODO handle desktop components
+////                theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
+////                theComponent.setPath(component.getPath());
+//
+//		    workspace.addWorkspaceComponent(theComponent);
+//                if (component.getPath() != null) {
+//                    if (isImport) {
+//                        // TODO fix
+//                        //theComponent.open(new File(WorkspacePreferences.getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
+//                    } else {
+//                        theComponent.open(new File(component.getPath()));
+//                    }
+//                }
+//
+//            } catch (InstantiationException e) {
+//                e.printStackTrace();
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         // Graphics clean up
         // TODO

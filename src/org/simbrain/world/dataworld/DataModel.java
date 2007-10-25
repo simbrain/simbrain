@@ -1,12 +1,28 @@
 package org.simbrain.world.dataworld;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 
 public class DataModel<E> {
-
+    
+    /** Default initial number of rows. */
+    private static final int DEFAULT_ROW_COUNT = 5;
+    
+    /** Default initial number of columns. */
+    private static final int DEFAULT_COLUMN_COUNT = 6;
+    
+    private List<List<E>> data = new ArrayList<List<E>>();
+    
+    /** */
+    private int width = DEFAULT_COLUMN_COUNT;
+    
+    /** */
+    private int height = DEFAULT_ROW_COUNT;
+    
     /** Iteration mode. */
     private boolean iterationMode = false;
     
@@ -19,30 +35,66 @@ public class DataModel<E> {
     /** Randomization lower bound. */
     private int lowerBound = 0;
 
-    private int currentRow;
+    private int currentRow = 0;
 
+    private List<Listener> listeners = new ArrayList<Listener>();
+    
     /** List of consumers. */
     private ArrayList<Consumer> consumers = new ArrayList<Consumer>();
 
     /** List of producers. */
     private ArrayList<Producer> producers = new ArrayList<Producer>();
 
+    DataModel() {
+        for (int i = 0; i < height; i++) {
+            data.add((List<E>) newRow());
+        }
+        
+        for (int i = 0; i < width; i++) {
+            consumers.add(new ConsumingColumn<E>(this, i));
+            producers.add(new ProducingColumn<E>(this, i));
+        }
+    }
+    
+    public void addListener(Listener listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeListener(Listener listener) {
+        listeners.remove(listener);
+    }
+    
+    public List<? extends Consumer> getConsumers() {
+        return Collections.unmodifiableList(consumers);
+    }
+    
+    public List<? extends Producer> getProducers() {
+        return Collections.unmodifiableList(producers);
+    }
+    
+    private List<E> newRow() {
+        ArrayList<E> row = new ArrayList<E>();
+        
+        for (int i = 0; i < width; i++) row.add(null);
+        
+        return row;
+    }
+    
     public void set(int row, int column, E value) {
-        // TODO
+        data.get(row).set(column, value);
+        for (Listener listener : listeners) listener.itemChanged(row, column);
     }
 
     public E get(int row, int column) {
-        // TODO
-        return null;
+        return data.get(row).get(column);
     }
 
     public void set(int column, E value) {
-
+        set(currentRow, column, value);
     }
 
     public E get(int column) {
-        // TODO
-        return null;
+        return get(currentRow, column);
     }
 
    /**
@@ -107,77 +159,82 @@ public class DataModel<E> {
         this.currentRow = currentRow;
     }
     
-    public void addNewRow()
-    {
-        // TODO
+    public void addNewRow() {
+        height++;
+        data.add(newRow());
+        for (Listener listener : listeners) listener.rowAdded(height - 1);
     }
     
-    public void insertNewRow(int at)
-    {
-        // TODO
+    public void insertNewRow(int at) {
+        height++;
+        data.add(at, newRow());
+        for (Listener listener : listeners) listener.rowAdded(at);
     }
     
-    public void addNewColumn()
-    {
-        // TODO
+    public void addNewColumn() {
+        width++;
+        for (List<E> row : data) row.add(null);
+        consumers.add(new ConsumingColumn<E>(this, width - 1));
+        for (Listener listener : listeners) listener.columnAdded(width - 1);
     }
     
-    public void insertNewColumn(int at)
-    {
-        // TODO
+    public void insertNewColumn(int at) {
+        width++;
+        for (List<E> row : data) row.add(at, null);
+        consumers.add(new ConsumingColumn<E>(this, at));
+        for (Listener listener : listeners) listener.columnAdded(at);
     }
 
-    public void removeLastRow()
-    {
-        // TODO
+    public void removeLastRow() {
+        height--;
+        data.remove(height);
+        for (Listener listener : listeners) listener.rowRemoved(height);
     }
     
-    public void removeRow(int at)
-    {
-        // TODO
+    public void removeRow(int at) {
+        height--;
+        data.remove(at);
+        for (Listener listener : listeners) listener.rowRemoved(at);
     }
     
-    public void removeLastColumn()
-    {
-        // TODO
+    public void removeLastColumn() {
+        width--;
+        for (List<E> row : data) row.remove(width);
+        consumers.add(new ConsumingColumn<E>(this, width));
+        for (Listener listener : listeners) listener.columnRemoved(width);
     }
     
-    public void removeColumn(int at)
-    {
-        // TODO
+    public void removeColumn(int at) {
+        width--;
+        for (List<E> row : data) row.remove(at);
+        consumers.add(new ConsumingColumn<E>(this, at));
+        for (Listener listener : listeners) listener.columnRemoved(at);
     }
     
-    public int getColumnCount()
-    {
-        // TODO
-        return 0;
+    public int getColumnCount() {
+        return width;
     }
     
-    public int getRowCount()
-    {
-        // TODO
-        return 0;
+    public int getRowCount() {
+        return height;
     }
     
     /**
-     * Fills the table with zeros.
+     * Fills the table with the given value.
      */
-    public void zeroFill() {
-        // TODO
+    public void fill(E value) {
+        for (List<E> row : data) {
+            Collections.fill(row, value);
+        }
     }
 
     /**
-     * Same as zerofill, but only fills the last column.
+     * Same as fill, but only fills the last column.
      */
-    public void zeroFillNew() {
-//        for (int j = 0; j < model.getRowCount(); j++) {
-//            model.setValueAt(new Double(0), j, model.getColumnCount() - 1);
-//        }
-    }
-    
-    public void randomize()
-    {
-        // TODO 
+    public void fillNew(E value) {
+        for (List<E> row : data) {
+            row.set(width - 1, value);
+        }
     }
     
     public void update()
@@ -185,224 +242,69 @@ public class DataModel<E> {
         // TODO
     }
     
-    // /** Table Model Delegate. */
-    // private DefaultTableModel model;
-    //
-    // /** Default initial number of rows. */
-    // private static final int DEFAULT_ROW_COUNT = 5;
-    //
-    // /** Default initial number of columns. */
-    // private static final int DEFAULT_COLUMN_COUNT = 6;
-    //
-
-    //
-    // /** Persistable form of matrix data. */
-    // private String[][] stringMatrixRepresentation;
-    //
-    //
-    // /**
-    // * Create a new table model for the specified data world.
-    // *
-    // * @param dataWorld data world
-    // */
-    // public TableModel() {
-    //
-    // model = new DefaultTableModel();
-    //
-    // for (int i = 1; i < DEFAULT_COLUMN_COUNT; i++) {
-    // model.addColumn(Integer.toString(i));
-    // }
-    //
-    // for (int i = 1; i < DEFAULT_ROW_COUNT; i++) {
-    // model.addRow(newRow());
-    // }
-    // initConsumersAndProducers();
-    // }
-    //
-    // /**
-    // * {@inheritDoc}
-    // */
-    // public void preSaveInit() {
-    // stringMatrixRepresentation = new
-    // String[getModel().getRowCount()][getModel().getColumnCount()];
-    // for (int i = 0; i < getModel().getRowCount(); i++) {
-    // for (int j = 0; j < getModel().getColumnCount(); j++) {
-    // stringMatrixRepresentation[i][j] = new String("" +
-    // getModel().getValueAt(i, j));
-    // }
-    // }
-    // }
-    //
-    // /**
-    // * {@inheritDoc}
-    // */
-    // public void postOpenInit() {
-    // model = new DefaultTableModel(stringMatrixRepresentation.length,
-    // stringMatrixRepresentation[0].length);
-    // for (int i = 0; i < stringMatrixRepresentation.length; i++) {
-    // for (int j = 0; j < stringMatrixRepresentation[0].length; j++) {
-    // model.setValueAt(stringMatrixRepresentation[i][j], i, j);
-    // }
-    // }
-    // Vector<String> columnNames = new Vector<String>();
-    // for (int i = 0; i < stringMatrixRepresentation[0].length; i++) {
-    // columnNames.add("" + i + 1);
-    // }
-    // model.setColumnIdentifiers(columnNames);
-    // initConsumersAndProducers();
-    // }
-    //
-    // /**
-    // * Initializes all consumers and producers.
-    // */
-    // public void initConsumersAndProducers() {
-    // consumers = new ArrayList<Consumer>();
-    // producers = new ArrayList<Producer>();
-    // couplingList = new ArrayList<Coupling>();
-    // for (int i = 0; i < this.getModel().getColumnCount(); i++) {
-    // consumers.add(new ConsumingColumn(this, i));
-    // producers.add(new ProducingColumn(this, i));
-    // }
-    // }
-    //
-    // /**
-    // * Return a new vector to be used in addRow.
-    // *
-    // * @return a new vector to be used in addRow
-    // */
-    // public Vector newRow() {
-    // Vector row = new Vector(model.getColumnCount());
-    // for (int i = 0; i < model.getColumnCount(); i++) {
-    // row.add(i, new Double(0));
-    // }
-    // return row;
-    // }
-    //
-    // /**
-    // * Fills the table with zeros.
-    // */
-    // public void zeroFill() {
-    // for (int i = 1; i < model.getColumnCount(); i++) {
-    // for (int j = 0; j < model.getRowCount(); j++) {
-    // model.setValueAt(new Double(0), j, i);
-    // }
-    // }
-    // }
-    //
-    // /**
-    // * Same as zerofill, but only fills the last column.
-    // */
-    // public void zeroFillNew() {
-    // for (int j = 0; j < model.getRowCount(); j++) {
-    // model.setValueAt(new Double(0), j, model.getColumnCount() - 1);
-    // }
-    // }
-    //
-    // /**
-    // * Clear the table.
-    // */
-    // public void removeAllRows() {
-    // for (int i = model.getRowCount(); i > 0; --i) {
-    // model.removeRow(i - 1);
-    // }
-    // }
-    //
-    // /**
-    // * Add a matrix of string data to the table, as doubles.
-    // *
-    // * @param data the matrix of string doubles to add
-    // */
-    // public void addMatrix(final String[][] data) {
-    // removeAllRows();
-    //
-    // int numCols = data[0].length;
-    // model.addColumn("");
-    //
-    // for (int i = 0; i < numCols; i++) {
-    // model.addColumn(Integer.toString(i));
-    // }
-    //
-    // for (int i = 0; i < data.length; i++) {
-    // Vector row = new Vector(data[i].length + 1);
-    // for (int j = 0; j < data[i].length; j++) {
-    // row.add(j , Double.valueOf((String) data[i][j]));
-    // }
-    //
-    // model.addRow(row);
-    // }
-    // }
-    //
-    // /**
-    // * Overrides superclass to provide coupling support.
-    // *
-    // * @param column passed to superclass.
-    // */
-    // public void addColumn(final String column) {
-    // model.addColumn(column);
-    // consumers.add(new ConsumingColumn(this, model.getColumnCount()));
-    // producers.add(new ProducingColumn(this, model.getColumnCount()));
-    // model.fireTableStructureChanged();
-    // model.fireTableDataChanged();
-    // }
-    //
-    // /**
-    // * Remove a column at the specified point.
-    // *
-    // * @param index column to remove
-    // */
-    // public void removeColumn(final int index) {
-    // consumers.remove(index);
-    // producers.remove(index);
-    // for (Iterator i = model.getDataVector().iterator(); i.hasNext(); ) {
-    // Vector row = (Vector) i.next();
-    // row.remove(index);
-    // }
-    // zeroFill();
-    // model.fireTableStructureChanged();
-    // model.fireTableDataChanged();
-    // }
-    //
-    // /**
-    // * @param currentRow the currentRow to set
-    // */
-    // public void setCurrentRow(int currentRow) {
-    // this.currentRow = currentRow;
-    // }
-    //
-    // /**
-    // * Randomizes the values.
-    // *
-    // */
-    // public void randomize() {
-    //
-    // for (int i = 0; i < model.getColumnCount(); i++) {
-    // for (int j = 0; j < model.getRowCount(); j++) {
-    // model.setValueAt(randomInteger(), j, i);
-    // }
-    // }
-    // }
-    //
-    // /**
-    // * @return A random integer.
-    // */
-    // public Double randomInteger() {
-    // if (upperBound >= lowerBound) {
-    // double drand = Math.random();
-    // drand = (drand * (upperBound - lowerBound)) + lowerBound;
-    //
-    // Double element = new Double(drand);
-    //
-    // return element;
-    // }
-    //
-    // return new Double(0);
-    // }
-    //
-    //
-    // /**
-    // * @return the tableModel
-    // */
-    // public DefaultTableModel getModel() {
-    // return model;
-    // }
+    public interface Listener {
+        void dataChanged();
+        void columnAdded(int column);
+        void columnRemoved(int column);
+        void rowAdded(int row);
+        void rowRemoved(int row);
+        void itemChanged(int row, int column);
+    }
+    
+//    /** Persistable form of matrix data. */
+//    private String[][] stringMatrixRepresentation;
+    
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public void preSaveInit() {
+//        stringMatrixRepresentation = new
+//            String[getModel().getRowCount()][getModel().getColumnCount()];
+//        
+//        for (int i = 0; i < getModel().getRowCount(); i++) {
+//            for (int j = 0; j < getModel().getColumnCount(); j++) {
+//                stringMatrixRepresentation[i][j] = new String("" +
+//                getModel().getValueAt(i, j));
+//            }
+//        }
+//    }
+    
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public void postOpenInit() {
+//        model = new DefaultTableModel(stringMatrixRepresentation.length,
+//            stringMatrixRepresentation[0].length);
+//        for (int i = 0; i < stringMatrixRepresentation.length; i++) {
+//            for (int j = 0; j < stringMatrixRepresentation[0].length; j++) {
+//                model.setValueAt(stringMatrixRepresentation[i][j], i, j);
+//            }
+//        }
+//    }
+    
+//    /**
+//     * Add a matrix of string data to the table, as doubles.
+//     *
+//     * @param data the matrix of string doubles to add
+//     */
+//    public void addMatrix(final String[][] data) {
+//        removeAllRows();
+//        
+//        int numCols = data[0].length;
+//        model.addColumn("");
+//        
+//        for (int i = 0; i < numCols; i++) {
+//            model.addColumn(Integer.toString(i));
+//        }
+//        
+//        for (int i = 0; i < data.length; i++) {
+//            Vector row = new Vector(data[i].length + 1);
+//            
+//            for (int j = 0; j < data[i].length; j++) {
+//                row.add(j , Double.valueOf((String) data[i][j]));
+//            }
+//                
+//            model.addRow(row);
+//        }
+//    }
 }

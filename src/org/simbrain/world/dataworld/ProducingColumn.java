@@ -10,13 +10,13 @@ import org.simbrain.workspace.SingleAttributeProducer;
  * Wraps a column of the table with a producer object, so other components 
  * can write read data from a data world column.
  */
-public class ProducingColumn extends SingleAttributeProducer<Double> {
+public class ProducingColumn<E> extends SingleAttributeProducer<E> {
 
     /** The number of the column being represented. */
     private int columnNumber;
 
     /** Reference to table model. */
-    private DataModel<Double> tableModel;
+    private DataModel<E> tableModel;
 
     /**
      * Construct producing column.
@@ -24,7 +24,7 @@ public class ProducingColumn extends SingleAttributeProducer<Double> {
      * @param table reference to parent table
      * @param columnNumber the column number to set
      */
-    public ProducingColumn(final DataModel<Double> table, final int columnNumber) {
+    public ProducingColumn(final DataModel<E> table, final int columnNumber) {
         this.tableModel = table;
         this.columnNumber = columnNumber;
     }
@@ -39,7 +39,7 @@ public class ProducingColumn extends SingleAttributeProducer<Double> {
     /**
      * {@inheritDoc}
      */
-    public Double getValue() {
+    public E getValue() {
         return tableModel.get(columnNumber);
     }
 

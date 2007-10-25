@@ -19,9 +19,12 @@
 package org.simbrain.world.dataworld;
 
 import java.io.File;
+import java.util.List;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -91,6 +94,16 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 //    }
 
     @Override
+    public List<? extends Consumer> getConsumers() {
+        return dataModel.getConsumers();
+    }
+    
+    @Override
+    public List<? extends Producer> getProducers() {
+        return dataModel.getProducers();
+    }
+    
+    @Override
     public void update() {
         
     }
@@ -99,4 +112,3 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public void close() {
     }
 }
-

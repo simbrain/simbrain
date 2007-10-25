@@ -130,7 +130,7 @@ public class DataWorld extends JPanel {
     private ActionListener addColHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             getDataModel().insertNewColumn(getSelectedColumn());
-            getDataModel().zeroFillNew();
+            getDataModel().fillNew(new Double(0));
             ws.setChangedSinceLastSave(true);
             ws.pack();
         }

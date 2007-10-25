@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Random;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -265,7 +266,7 @@ public class DataWorldDesktopComponent extends DesktopComponent {
     private ActionListener addColListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().addNewColumn();
-            world.getDataModel().zeroFillNew();
+            world.getDataModel().fillNew(new Double(0));
             setChangedSinceLastSave(true);
             pack();
         }
@@ -289,14 +290,26 @@ public class DataWorldDesktopComponent extends DesktopComponent {
 
     private ActionListener zeroFillListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().zeroFill();
+            world.getDataModel().fill(new Double(0));
             setChangedSinceLastSave(true);
         }
     };
     
     private ActionListener randomizeListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().randomize();
+            Random rand = new Random();
+            
+            DataModel<Double> model = world.getDataModel();
+            int height = model.getRowCount();
+            int width = model.getColumnCount();
+            int lower = model.getLowerBound();
+            int range = model.getUpperBound() - lower;
+            
+            for (int i = 0; i < height * width; i++) {
+                double value = (rand.nextDouble() * range) + lower;
+                model.set(i / width, i % height, value);
+            }
+
             setChangedSinceLastSave(true);
         }
     };

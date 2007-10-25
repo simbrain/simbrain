@@ -18,28 +18,52 @@
  */
 package org.simbrain.world.dataworld;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import javax.swing.table.AbstractTableModel;
 
 /**
  * <b>TableModel</b> extends DefaultTableModel so that the addRow and addColumn
  * commands are available.
  */
-public class DataTableModel implements TableModel {
+public class DataTableModel extends AbstractTableModel {
 
+    private static final long serialVersionUID = 1L;
+    
     private final DataModel<Double> model;
-    private List<TableModelListener> listeners = new ArrayList<TableModelListener>();
+    
+    private final DataModel.Listener listener = new DataModel.Listener() {
+
+        public void columnAdded(int column) {
+            fireTableStructureChanged();
+            fireTableDataChanged();
+        }
+
+        public void columnRemoved(int column) {
+            fireTableStructureChanged();
+            fireTableDataChanged();
+        }
+
+        public void dataChanged() {
+            fireTableDataChanged();
+        }
+
+        public void itemChanged(int row, int column) {
+            fireTableCellUpdated(row, column);
+        }
+
+        public void rowAdded(int row) {
+            fireTableRowsInserted(row, row);
+        }
+
+        public void rowRemoved(int row) {
+            fireTableRowsDeleted(row, row);
+        }
+        
+    };
     
     DataTableModel(final DataModel<Double> model)
     {
         this.model = model;
-    }
-    
-    public void addTableModelListener(TableModelListener listener) {
-        listeners.add(listener);
+        model.addListener(listener);
     }
 
     public Class<?> getColumnClass(int columnIndex) {
@@ -64,10 +88,6 @@ public class DataTableModel implements TableModel {
 
     public boolean isCellEditable(int row, int column) {
         return true;
-    }
-
-    public void removeTableModelListener(TableModelListener listener) {
-        listeners.remove(listener);
     }
 
     public void setValueAt(Object value, int row, int column) {

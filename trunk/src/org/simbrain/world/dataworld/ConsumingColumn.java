@@ -8,18 +8,18 @@ import org.simbrain.workspace.SingleAttributeConsumer;
  * Wraps a column of the table with a consumer object, so other components 
  * can write numerical data to a data world column.
  */
-public class ConsumingColumn extends SingleAttributeConsumer<Double> {
+public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
 
     /** The number of the column being represented. */
     private final int columnNumber;
 
     /** Reference to table model. */
-    private DataModel<Double> tableModel;
+    private DataModel<E> tableModel;
 
     /**
      * @param columnNumber
      */
-    public ConsumingColumn(final DataModel<Double> table, final int columnNumber) {
+    public ConsumingColumn(final DataModel<E> table, final int columnNumber) {
         this.tableModel = table;
         this.columnNumber = columnNumber;
     }
@@ -34,7 +34,7 @@ public class ConsumingColumn extends SingleAttributeConsumer<Double> {
     /**
      * {@inheritDoc}
      */
-    public void setValue(Double value) {
+    public void setValue(E value) {
         tableModel.set(columnNumber, value);
     }
 

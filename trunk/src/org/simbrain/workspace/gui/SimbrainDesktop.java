@@ -555,7 +555,7 @@ public class SimbrainDesktop {
         /* Display the window. */
         frame.setVisible(true);
 
-        workspaceSerializer.readWorkspace(new File(WorkspacePreferences.getDefaultFile()), false);
+        //workspaceSerializer.readWorkspace(new File(WorkspacePreferences.getDefaultFile()), false);
     }
 
 

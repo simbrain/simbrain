@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -36,8 +35,7 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.DesktopComponent;
 
 /**
@@ -48,14 +46,25 @@ public final class VisionWorldDesktopComponent extends DesktopComponent implemen
     /** Vision world. */
     private final VisionWorld visionWorld;
 
+    /** Listener for vision world component events. */
+    private interface VisionWorldComponentListener extends WorkspaceComponentListener {
+    };
+
+    /** Listener for vision world component events. */
+    private final VisionWorldComponentListener listener = new VisionWorldComponentListener() {
+        public void componentUpdated() {
+            updateComponent();
+        }
+    };
 
     /**
      * Create a new vision world frame with the specified workspace.
      *
-     * @param workspace workspace, must not be null
+     * @param component component, must not be null
      */
     public VisionWorldDesktopComponent(VisionWorldComponent component) {
         super(component);
+        component.addListener(listener);
         this.setPreferredSize(new Dimension(400,400));
 
         VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
@@ -119,7 +128,6 @@ public final class VisionWorldDesktopComponent extends DesktopComponent implemen
     @Override
     public void save(File saveFile) {
         // TODO Auto-generated method stub
-        
     }
 
 
@@ -152,6 +160,7 @@ public final class VisionWorldDesktopComponent extends DesktopComponent implemen
     /** {@inheritDoc} */
     public void updateComponent() {
         super.updateComponent();
+        // Possibly change this later so only sensors with couplings are updated.
         VisionWorldModel model = visionWorld.getModel();
         PixelMatrix pixelMatrix = model.getPixelMatrix();
         SensorMatrix sensorMatrix = model.getSensorMatrix();

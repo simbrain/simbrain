@@ -142,16 +142,17 @@ abstract class AbstractSensorNode
         sb.append(sensor.getReceptiveField().getHeight());
         sb.append("\n  Location:  (");
         sb.append(sensor.getReceptiveField().getX());
-        sb.append(", ");
-        sb.append(sensor.getReceptiveField().getY());
-        sb.append(")\n");
-        for (ProducingAttribute attr : sensor.getProducingAttributes()) {
-            sb.append("  ");
-            sb.append(attr.getAttributeDescription());
-            sb.append(":  ");
-            sb.append(attr.getValue());
-            sb.append("\n");
-        }
+        sb.append(")");
+        sb.append(sensor.getReceptiveField().getY());        
+        sb.append("\n  Value: " + sensor.getLastSample());
+        sb.append("\n");
+//        for (ProducingAttribute attr : sensor.getProducingAttributes()) {
+//            sb.append("  ");
+//            sb.append(attr.getAttributeDescription());
+//            sb.append(":  ");
+//            sb.append(attr.getValue());
+//            sb.append("\n");
+//        }
         return sb.toString();
     }
 

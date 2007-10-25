@@ -56,7 +56,7 @@ public final class Sensor implements Producer {
     private final String producerDescription;
 
     private final SampleAttribute attribute = new SampleAttribute();
-    
+
     /** List of producing attributes. */
 //    private final List<ProducingAttribute<Double>> producingAttributes = Collections.singletonList((ProducingAttribute<Double>) new SampleAttribute());
 
@@ -128,6 +128,10 @@ public final class Sensor implements Producer {
         Image image = pixelMatrix.view(receptiveField);
         BufferedImage bufferedImage = toBufferedImage(image);
         sample = filter.filter(bufferedImage);
+        return sample;
+    }
+
+    public double getLastSample() {
         return sample;
     }
 

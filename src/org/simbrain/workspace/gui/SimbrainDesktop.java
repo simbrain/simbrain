@@ -75,19 +75,19 @@ public class SimbrainDesktop {
 
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
-    
+
     private static final SimbrainDesktop DESKTOP = new SimbrainDesktop(new Workspace());
-    
+
     public static SimbrainDesktop getInstance() {
         return DESKTOP;
     }
-    
+
     /** Desktop pane. */
     private JDesktopPane desktop;
 
     /** Cached context menu. */
     private JPopupMenu contextMenu;
-    
+
     /** Workspace tool bar. */
     private JToolBar wsToolBar = new JToolBar();
 
@@ -622,7 +622,7 @@ public class SimbrainDesktop {
 
         System.exit(0);
     }
-    
+
     /**
      * Get a menu representing all available producers.
      *
@@ -676,7 +676,7 @@ public class SimbrainDesktop {
      * which returns such a list.
      *
      * @param listener the component which will listens to the menu items in this menu
-     * @return the menu containing all available components with nonempty produer lists
+     * @return the menu containing all available components with nonempty producer lists
      */
     public JMenu getProducerListMenu(ActionListener listener) {
         JMenu producerListMenu = new JMenu("Producer lists");
@@ -690,7 +690,6 @@ public class SimbrainDesktop {
     }
 
     /**
-     * 
      * Get a menu representing all components which have lists of consumers,
      * which returns such a list.
      *

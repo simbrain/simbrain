@@ -904,7 +904,7 @@ public abstract class Neuron implements Producer, Consumer {
             return getParent().getActivation();
         }
         public void setValue(Double value) {
-            getParent().setInputValue(value);
+            getParent().setInputValue(value == null ? 0 : value);
         }
         public Neuron getParent() {
             return Neuron.this;

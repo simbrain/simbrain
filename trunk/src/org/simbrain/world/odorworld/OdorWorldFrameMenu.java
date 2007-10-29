@@ -82,28 +82,24 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     }
 
     private final ActionListener openItemListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             parentFrame.showOpenFileDialog();
         }
     };
     
     private final ActionListener saveListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             parentFrame.save();
         }
     };
     
     private final ActionListener saveAsListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             parentFrame.showSaveFileDialog();
         }
     };
     
     private final ActionListener prefsListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             parentFrame.getWorldPanel().showGeneralDialog();
             parentFrame.setChangedSinceLastSave(true);
@@ -111,14 +107,12 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     };
     
     private final ActionListener scriptItemListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             parentFrame.getWorldPanel().showScriptDialog();
         }
     };
     
     private final ActionListener helpItemListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             Utils.showQuickRef("World.html");
         }

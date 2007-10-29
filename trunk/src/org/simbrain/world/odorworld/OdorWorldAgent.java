@@ -22,8 +22,8 @@ import java.awt.Image;
 import java.awt.Point;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
@@ -217,10 +217,12 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     public void setOrientation(final double d) {
         orientation = d;
 
-        Entry<Double, Image> entry = images.lowerEntry(orientation);
-        if (entry == null) entry = images.firstEntry();
+        SortedMap<Double, Image> headMap = images.headMap(orientation);
         
-        setImage(entry.getValue());
+        Image image = headMap.size() > 0 ? 
+          images.get(headMap.lastKey()) : images.get(images.firstKey());
+        
+        setImage(image);
     }
 
     /**
@@ -471,7 +473,6 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         this.whiskerLength = whiskerLength;
     }
 
-    @Override
     public OdorWorldComponent getParentComponent() {
         return component;
     }

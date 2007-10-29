@@ -41,7 +41,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
-public class DataWorldDesktopComponent extends DesktopComponent { 
+public class DataWorldDesktopComponent extends DesktopComponent<DataWorldComponent> { 
 
     private static final long serialVersionUID = 1L;
 

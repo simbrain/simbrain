@@ -21,7 +21,6 @@ package org.simbrain.world.odorworld;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
@@ -40,6 +39,8 @@ import org.simbrain.util.Utils;
  * environment.
  */
 public class DialogOdorWorldEntity extends StandardDialog implements ActionListener {
+
+    private static final long serialVersionUID = 1L;
 
     /** The dimension for the combobox renderer. */
     private final int cbRendererDimension = 35;
@@ -158,8 +159,8 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
             if (!Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText())) {
                 entityRef.setName(tfEntityName.getText());
 
-                ArrayList a = new ArrayList();
-                a.add(entityRef);
+//                ArrayList a = new ArrayList();
+//                a.add(entityRef);
                 //entityRef.getParent().getParentWorkspace().removeAgentsFromCouplings(a);
                 //entityRef.getParent().getParentWorkspace().attachAgentsToCouplings();
             } else {

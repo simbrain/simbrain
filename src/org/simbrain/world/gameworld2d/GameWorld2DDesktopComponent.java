@@ -11,8 +11,10 @@ import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.DesktopComponent;
 
-public class GameWorld2DDesktopComponent extends DesktopComponent implements CouplingContainer {
+public class GameWorld2DDesktopComponent extends DesktopComponent<GameWorld2DComponent> implements CouplingContainer {
 
+    private static final long serialVersionUID = 1L;
+    
     /** Reference to the wrapped game world object. */
     private GameWorld2D world;
 

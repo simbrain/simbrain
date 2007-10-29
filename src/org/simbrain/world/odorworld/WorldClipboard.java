@@ -100,7 +100,7 @@ public final class WorldClipboard {
         temp.setImageName(entity.getImageName());
         temp.setName("Copy of " + entity.getName());
         temp.setStimulus(entity.getStimulus());
-        temp.setImage(entity.getImage());
+        temp.setImage(entity.getImage().getImage());
         setClipboardEntity(temp);
     }
 
@@ -110,16 +110,7 @@ public final class WorldClipboard {
      * @param agent Agent to be copied
      */
     public static void copyAgent(final OdorWorldAgent agent) {
-        OdorWorldAgent temp = new OdorWorldAgent();
-        temp.setImageName(agent.getImageName());
-        temp.setMovementIncrement(agent.getMovementIncrement());
-        temp.setName("Copy of " + agent.getName());
-        temp.setOrientation(agent.getOrientation());
-        temp.setStimulus(agent.getStimulus());
-        temp.setImage(agent.getImage());
-        temp.setTurnIncrement(agent.getTurnIncrement());
-        temp.setWhiskerAngle(agent.getWHISKER_ANGLE());
-        temp.setWhiskerLength(agent.getWhiskerLength());
+        OdorWorldAgent temp = agent.copy();
         setClipboardEntity(temp);
     }
 
@@ -129,7 +120,7 @@ public final class WorldClipboard {
      * @param wall Wall to copy
      */
     public static void copyWall(final Wall wall) {
-        Wall temp = new Wall();
+        Wall temp = new Wall(wall.getParent(), wall.getPanel());
         temp.setWidth(wall.getWidth());
         temp.setHeight(wall.getHeight());
         setClipboardEntity(temp);

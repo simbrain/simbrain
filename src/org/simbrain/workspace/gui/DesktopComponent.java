@@ -37,11 +37,11 @@ import org.simbrain.workspace.WorkspacePreferences;
  * out some of the coupling management since much of this is focused on
  * the GUI aspects of the JInternalFrames.
  */
-public abstract class DesktopComponent extends JInternalFrame {
+public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends JInternalFrame {
 
     private static final Logger LOGGER = Logger.getLogger(DesktopComponent.class);
     
-    private final WorkspaceComponent workspaceComponent;
+    private final E workspaceComponent;
     
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(DesktopComponent.class);
@@ -67,7 +67,7 @@ public abstract class DesktopComponent extends JInternalFrame {
     /**
      * Construct a workspace component.
      */
-    public DesktopComponent(WorkspaceComponent workspaceComponent) {
+    public DesktopComponent(E workspaceComponent) {
         super();
         
         this.workspaceComponent = workspaceComponent;
@@ -318,5 +318,10 @@ public abstract class DesktopComponent extends JInternalFrame {
             simpleName = simpleName.replaceFirst("Component", "");
         }
         return simpleName;
+    }
+    
+    public E getWorkspaceComponent()
+    {
+        return workspaceComponent;
     }
 }

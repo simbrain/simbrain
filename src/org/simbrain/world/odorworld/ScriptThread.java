@@ -59,9 +59,10 @@ public class ScriptThread extends Thread {
      */
     private Runnable updateScript = new Runnable() {
             public void run() {
-               ((OdorWorldEntity) worldRef.getWorld().getEntityList().get(Integer.parseInt(values[iterationNumber][0]))).moveTo(
-                                Integer.parseInt(values[iterationNumber][1]),
-                                Integer.parseInt(values[iterationNumber][2]));
+               ((OdorWorldEntity) worldRef.getWorld().getEntityList().get(
+                    Integer.parseInt(values[iterationNumber][0]))).moveTo(
+                    Integer.parseInt(values[iterationNumber][1]),
+                    Integer.parseInt(values[iterationNumber][2]));
                //worldRef.fireWorldChanged();
                iterationNumber++;
                dialog.setIterationNumber(iterationNumber);

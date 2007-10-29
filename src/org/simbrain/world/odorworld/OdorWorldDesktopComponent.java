@@ -20,40 +20,23 @@ package org.simbrain.world.odorworld;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JScrollPane;
-import javax.swing.event.InternalFrameEvent;
 
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.world.dataworld.DataWorldPreferences;
-import org.simnet.interfaces.RootNetwork;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 
 /**
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link OdorWorldPanel}.
  */
-public class OdorWorldDesktopComponent extends DesktopComponent implements ActionListener {
+public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldComponent> {
+
+    private static final long serialVersionUID = 1L;
 
     /** The height of the scrollbar (used for resizing). */
     private static final int SCROLLBAR_HEIGHT = 75;
@@ -118,32 +101,34 @@ public class OdorWorldDesktopComponent extends DesktopComponent implements Actio
      * @param theFile the wld file containing world information
      */
     public void open(final File theFile) {
-        this.setCurrentFile(theFile);
-        worldPanel.setParentFrame(this);
-        FileReader reader;
-        try {
-            reader = new FileReader(theFile);
-            worldPanel.setWorld((OdorWorld) getXStream().fromXML(reader));
-            worldPanel.getWorld().postUnmarshallInit();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        setStringReference(theFile);
-        worldPanel.repaint();
+//        this.setCurrentFile(theFile);
+//        worldPanel.setParentFrame(this);
+//        FileReader reader;
+//        try {
+//            reader = new FileReader(theFile);
+//            worldPanel.setWorld((OdorWorld) getXStream().fromXML(reader));
+//            worldPanel.getWorld().postUnmarshallInit();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        setStringReference(theFile);
+//        worldPanel.repaint();
     }
 
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
+    @SuppressWarnings("unused")
     private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.setMode(XStream.ID_REFERENCES);
-        xstream.omitField(OdorWorldEntity.class, "theImage");
-        xstream.omitField(OdorWorldAgent.class, "effectorList");
-        xstream.omitField(OdorWorldAgent.class, "sensorList");
-        xstream.omitField(OdorWorld.class, "couplings");
-        return xstream;
+//        XStream xstream = new XStream(new DomDriver());
+//        xstream.setMode(XStream.ID_REFERENCES);
+//        xstream.omitField(OdorWorldEntity.class, "theImage");
+//        xstream.omitField(OdorWorldAgent.class, "effectorList");
+//        xstream.omitField(OdorWorldAgent.class, "sensorList");
+//        xstream.omitField(OdorWorld.class, "couplings");
+//        return xstream;
+        return null;
     }
 
     /**
@@ -152,48 +137,27 @@ public class OdorWorldDesktopComponent extends DesktopComponent implements Actio
      * @param theFile the file to save to
      */
     public void save(final File theFile) {
-        setCurrentFile(theFile);
-        String xml = getXStream().toXML(worldPanel.getWorld());
-        try {
-            FileWriter writer  = new FileWriter(theFile);
-            writer.write(xml);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        setStringReference(theFile);
-        setChangedSinceLastSave(false);
+//        setCurrentFile(theFile);
+//        String xml = getXStream().toXML(worldPanel.getWorld());
+//        try {
+//            FileWriter writer  = new FileWriter(theFile);
+//            writer.write(xml);
+//            writer.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        setStringReference(theFile);
+//        setChangedSinceLastSave(false);
     }
 
-    /**
-     * Responds to actions performed.
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-        Object e1 = e.getSource();
-
-        if (e1 == menu.getOpenItem()) {
-            showOpenFileDialog();
-        } else if (e1 == menu.getSaveItem()) {
-            save();
-        } else if (e1 == menu.getSaveAsItem()) {
-            showSaveFileDialog();
-        } else if (e1 == menu.getPrefsItem()) {
-            worldPanel.showGeneralDialog();
-            this.setChangedSinceLastSave(true);
-        } else if (e1 == menu.getScriptItem()) {
-            worldPanel.showScriptDialog();
-        } else if (e1 == menu.getHelpItem()) {
-            Utils.showQuickRef("World.html");
-        }
-    }
+    
 
     /**
      * Return the arraylist of agents.
      *
      * @return List of agents
      */
-    public ArrayList getAgentList() {
+    public ArrayList<OdorWorldAgent> getAgentList() {
         return worldPanel.getWorld().getAgentList();
     }
 
@@ -236,7 +200,7 @@ public class OdorWorldDesktopComponent extends DesktopComponent implements Actio
     /**
      * {@inheritDoc}
      */
-    public CouplingContainer getCouplingContainer() {
-        return worldPanel.getWorld();
-    }
+//    public CouplingContainer getCouplingContainer() {
+//        return worldPanel.getWorld();
+//    }
 }

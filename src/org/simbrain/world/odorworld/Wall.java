@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -38,6 +37,8 @@ public class Wall extends AbstractEntity {
     private int height;
     /** Width value. */
     private int width;
+    /** the parent panel */
+    final OdorWorldPanel panel;
     /** Parent world. */
     private OdorWorld parent;
     /** Stimulus. */
@@ -72,18 +73,13 @@ public class Wall extends AbstractEntity {
     }
 
     /**
-     * Default wall constructor.
-     */
-    public Wall() {
-    }
-
-    /**
      * Creates a wall in OdorWorld.
      *
      * @param parentWorld Current world
      */
-    public Wall(final OdorWorld parentWorld) {
+    public Wall(final OdorWorld parentWorld, final OdorWorldPanel panel) {
         parent = parentWorld;
+        this.panel = panel;
     }
 
     /**
@@ -186,15 +182,24 @@ public class Wall extends AbstractEntity {
     }
 
     /**
+     * Returns the parent panel
+     *  
+     * @return the parent panel
+     */
+    public OdorWorldPanel getPanel() {
+        return panel;
+    }
+    
+    /**
      * Implements abstract paintThis() from AbstractEntity.
      *
      * @param g the world graphics object
      */
     public void paintThis(final Graphics g) {
-        g.setColor(new Color(getParent().getWallColor()));
+        g.setColor(panel.getWallColor());
         g.fillRect(getX(), getY(), getWidth(), getHeight());
     }
-
+    
     /**
      * Return the rectangle at the point.
      *

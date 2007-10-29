@@ -1,22 +1,15 @@
 package org.simbrain.world.odorworld;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 
 //TODO: Model view
-public class OdorWorld implements CouplingContainer {
-
-
-    /** Initial color of wall. */
-    private Color wallColor = Color.RED;
+public class OdorWorld {
 
     /** The increment of a manual turn. */
     public static final int manualMotionTurnIncrement = 4;
@@ -25,7 +18,7 @@ public class OdorWorld implements CouplingContainer {
     private static final int stimInitVal = 10;
 
     /** The initial orientation for adding agents. */
-    public static final int initOrientation = 45;
+    public static final float INIT_ORIENTATION = 45;
 
     /** The width of the world. */
     private int worldWidth = 300;
@@ -45,29 +38,25 @@ public class OdorWorld implements CouplingContainer {
     /** The boolean representing whether or not an object is solid (cannot be moved through). */
     private boolean objectInhibitsMovement = true;
 
-
     /** The list of all entities in the world. */
     //World entities and entity selection
     private ArrayList<AbstractEntity> abstractEntityList = new ArrayList<AbstractEntity>();
 
     /** The list of all dead entities. */
-    private ArrayList<OdorWorldEntity> deadEntityList = new ArrayList<OdorWorldEntity>();
+    private ArrayList<AbstractEntity> deadEntityList = new ArrayList<AbstractEntity>();
 
     /** Current creature within the world. */
     private OdorWorldAgent currentCreature = null;
 
-    /** List of couplings for this world. */
-    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
-
     /** Name of world. */
     private String worldName;
-
+    
     /**
      * {@inheritDoc}
      */
     public void postUnmarshallInit() {
         for (OdorWorldEntity entity : this.getEntityList()) {
-            entity.setImage(ResourceManager.getImageIcon(entity.getImageName()));
+            entity.setImage(ResourceManager.getImage(entity.getImageName()));
         }
     }
 
@@ -86,24 +75,14 @@ public class OdorWorld implements CouplingContainer {
      * @param entity world entity to delete
      */
     public void removeEntity(final AbstractEntity entity) {
-        AbstractEntity e = entity;
-        if (e != null) {
-            abstractEntityList.remove(e);
-
-            if (e instanceof OdorWorldAgent) {
-                final ArrayList a = new ArrayList();
-                a.add(e);
-                //this.getParentFrame().getWorkspace().removeAgentsFromCouplings(a);
-            }
-            e = null;
-        }
+        abstractEntityList.remove(entity);
     }
 
     /**
      * @return the list of entity names
      */
-    public ArrayList getEntityNames() {
-        final ArrayList temp = new ArrayList();
+    public ArrayList<String> getEntityNames() {
+        final ArrayList<String> temp = new ArrayList<String>();
 
         for (int i = 0; i < abstractEntityList.size(); i++) {
             final AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
@@ -141,13 +120,13 @@ public class OdorWorld implements CouplingContainer {
      * @return a list of entities
      */
     public ArrayList<OdorWorldEntity> getEntityList() {
-        final ArrayList temp = new ArrayList();
+        final ArrayList<OdorWorldEntity> temp = new ArrayList<OdorWorldEntity>();
 
         for (int i = 0; i < abstractEntityList.size(); i++) {
             final AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
 
             if (tempElement instanceof OdorWorldEntity) {
-                temp.add(tempElement);
+                temp.add((OdorWorldEntity) tempElement);
             }
         }
 
@@ -169,14 +148,14 @@ public class OdorWorld implements CouplingContainer {
     /**
      * @return Returns the agentList.
      */
-    public ArrayList getAgentList() {
-        final ArrayList ret = new ArrayList();
+    public ArrayList<OdorWorldAgent> getAgentList() {
+        final ArrayList<OdorWorldAgent> ret = new ArrayList<OdorWorldAgent>();
 
         for (int i = 0; i < abstractEntityList.size(); i++) {
             final AbstractEntity temp = (AbstractEntity) abstractEntityList.get(i);
 
             if (temp instanceof OdorWorldAgent) {
-                ret.add(temp);
+                ret.add((OdorWorldAgent) temp);
             }
         }
 
@@ -189,7 +168,7 @@ public class OdorWorld implements CouplingContainer {
      * @param e Lazarus
      */
     public void resurrect(final AbstractEntity e) {
-        ((OdorWorldEntity) e).reset();
+        if (e instanceof OdorWorldEntity) ((OdorWorldEntity) e).reset();
         getAbstractEntityList().add(e);
         getDeadEntityList().remove(e);
     }
@@ -198,16 +177,10 @@ public class OdorWorld implements CouplingContainer {
      *
      * @param p the location where the agent should be added
      */
-    public void addAgent(final Point p) {
-        final OdorWorldAgent a = new OdorWorldAgent(this, "Mouse "
-                + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, initOrientation);
-        a.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
-        abstractEntityList.add(a);
-        //this.getParentFrame().getWorkspace().attachAgentsToCouplings();
-     }
-
-
-
+    public void addAgent(OdorWorldAgent agent) {
+        abstractEntityList.add(agent);
+    }
+    
     /**
      * Remove all objects from world.
      */
@@ -218,15 +191,8 @@ public class OdorWorld implements CouplingContainer {
     /**
      * @return the abstractEntityList
      */
-    public ArrayList getAbstractEntityList() {
+    public ArrayList<AbstractEntity> getAbstractEntityList() {
         return abstractEntityList;
-    }
-
-    /**
-     * @param abstractEntityList the abstractEntityList to set
-     */
-    public void setAbstractEntityList(ArrayList abstractEntityList) {
-        this.abstractEntityList = abstractEntityList;
     }
 
     /**
@@ -246,15 +212,8 @@ public class OdorWorld implements CouplingContainer {
     /**
      * @return the deadEntityList
      */
-    public ArrayList getDeadEntityList() {
+    public ArrayList<AbstractEntity> getDeadEntityList() {
         return deadEntityList;
-    }
-
-    /**
-     * @param deadEntityList the deadEntityList to set
-     */
-    public void setDeadEntityList(ArrayList deadEntityList) {
-        this.deadEntityList = deadEntityList;
     }
 
     /**
@@ -314,37 +273,16 @@ public class OdorWorld implements CouplingContainer {
     }
 
     /**
-     * @return Returns the wallColor.
-     */
-    public int getWallColor() {
-        return wallColor.getRGB();
-    }
-
-    /**
-     * @param wallColor The wallColor to set.
-     */
-    public void setWallColor(final int wallColor) {
-        this.wallColor = new Color(wallColor);
-    }
-
-    /**
      * {@inheritDoc}
      */
-    public List<Consumer> getConsumers() {
+    public List<? extends Consumer> getConsumers() {
         return getAgentList();
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<Coupling> getCouplings() {
-        return couplings;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<Producer> getProducers() {
+    public List<? extends Producer> getProducers() {
         return getAgentList();
     }
 

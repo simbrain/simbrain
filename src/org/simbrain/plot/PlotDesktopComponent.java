@@ -33,7 +33,7 @@ import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
-public class PlotDesktopComponent extends DesktopComponent implements ActionListener, MenuListener, CouplingContainer  {
+public class PlotDesktopComponent extends DesktopComponent<PlotComponent> implements ActionListener, MenuListener, CouplingContainer  {
 
     /** Time series. */
     XYSeries series = new XYSeries("Time series");

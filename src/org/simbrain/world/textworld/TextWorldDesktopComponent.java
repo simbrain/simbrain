@@ -47,7 +47,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
  * <b>TextWorldComponent</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link TextWorld}.
  */
-public class TextWorldDesktopComponent extends DesktopComponent implements ActionListener {
+public class TextWorldDesktopComponent extends DesktopComponent<TextWorldComponent> implements ActionListener {
 
     /** Instance of world of type TextWorld. */
     private TextWorld world;

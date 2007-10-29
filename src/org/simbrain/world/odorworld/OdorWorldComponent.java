@@ -20,8 +20,8 @@ package org.simbrain.world.odorworld;
 
 import java.io.File;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
@@ -29,6 +29,8 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
+    private OdorWorld world = new OdorWorld();
+    
     /**
      * Default constructor.
      */
@@ -45,6 +47,10 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         // TODO implement
     }
 
+    OdorWorld getWorld() {
+        return world;
+    }
+    
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object

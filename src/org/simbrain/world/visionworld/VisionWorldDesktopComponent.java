@@ -41,7 +41,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
 /**
  * Vision world frame.
  */
-public final class VisionWorldDesktopComponent extends DesktopComponent implements CouplingContainer {
+public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWorldComponent> implements CouplingContainer {
 
     /** Vision world. */
     private final VisionWorld visionWorld;

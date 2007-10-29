@@ -98,14 +98,12 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     private boolean updateCompleted;
 
     final ActionListener copyListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             WorldClipboard.copyItem(selectedEntity);
         }
     };
     
     final ActionListener cutListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             WorldClipboard.cutItem(selectedEntity, OdorWorldPanel.this);
             getParentFrame().setChangedSinceLastSave(true);
@@ -113,7 +111,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
     
     final ActionListener pasteListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             WorldClipboard.pasteItem(selectedPoint, OdorWorldPanel.this);
             getParentFrame().setChangedSinceLastSave(true);
@@ -121,7 +118,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
     
     final ActionListener clearAllListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             world.clearAllEntities();
             getParentFrame().repaint();
@@ -130,7 +126,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
     
     final ActionListener deleteListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             world.removeEntity(selectedEntity);
             getParentFrame().repaint();
@@ -139,7 +134,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
         
     final ActionListener addListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             world.addEntity(selectedPoint);
             getParentFrame().repaint();
@@ -148,7 +142,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
     
     final ActionListener propsListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             showGeneralDialog();
             getParentFrame().setChangedSinceLastSave(true);
@@ -156,7 +149,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
         
     final ActionListener objectPropsListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             showEntityDialog((OdorWorldEntity) selectedEntity);
             getParentFrame().repaint();
@@ -167,7 +159,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     int mouseCounter = 0;
     
     final ActionListener addAgentListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             OdorWorldAgent a = new OdorWorldAgent(parentFrame.getWorkspaceComponent(), 
                 "Mouse " + (++mouseCounter),  "Mouse.gif", selectedPoint.x, selectedPoint.y, 
@@ -181,7 +172,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
         
     final ActionListener wallListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             drawingWalls = true;
             getParentFrame().repaint();
@@ -190,7 +180,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     };
         
     final ActionListener wallPropsListener = new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
             showWallDialog((Wall) selectedEntity);
             getParentFrame().repaint();

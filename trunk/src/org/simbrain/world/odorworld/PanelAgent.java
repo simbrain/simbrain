@@ -27,6 +27,9 @@ import org.simbrain.util.LabelledItemPanel;
  * <b>PanelAgent</b> is a panel used to adjust the "detectors"  of creature entities in the world.
  */
 public class PanelAgent extends LabelledItemPanel {
+    
+    private static final long serialVersionUID = 1L;
+    
     /** Entity referenced. */
     private OdorWorldAgent entityRef = null;
     /** Whisker angle field. */

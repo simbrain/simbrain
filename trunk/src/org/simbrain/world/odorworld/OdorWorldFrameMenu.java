@@ -19,6 +19,8 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
@@ -28,11 +30,16 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.simbrain.util.Utils;
+
 
 /**
  * <b>OdorWorldFrameMenu</b>.
  */
 public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
+    
+    private static final long serialVersionUID = 1L;
+    
     /** Parent frame. */
     private OdorWorldDesktopComponent parentFrame;
     /** File menu. */
@@ -74,6 +81,49 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         parentFrame = frame;
     }
 
+    private final ActionListener openItemListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parentFrame.showOpenFileDialog();
+        }
+    };
+    
+    private final ActionListener saveListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parentFrame.save();
+        }
+    };
+    
+    private final ActionListener saveAsListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parentFrame.showSaveFileDialog();
+        }
+    };
+    
+    private final ActionListener prefsListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parentFrame.getWorldPanel().showGeneralDialog();
+            parentFrame.setChangedSinceLastSave(true);
+        }
+    };
+    
+    private final ActionListener scriptItemListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parentFrame.getWorldPanel().showScriptDialog();
+        }
+    };
+    
+    private final ActionListener helpItemListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Utils.showQuickRef("World.html");
+        }
+    };
+    
     /**
      * Sets up menus.
      */
@@ -86,11 +136,11 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
 
         add(getScriptMenu());
         getScriptMenu().add(getScriptItem());
-        getScriptItem().addActionListener(parentFrame);
+        getScriptItem().addActionListener(scriptItemListener);
 
         add(getHelpMenu());
         getHelpMenu().add(getHelpItem());
-        getHelpItem().addActionListener(parentFrame);
+        getHelpItem().addActionListener(helpItemListener);
     }
 
     /**
@@ -106,19 +156,19 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getFileMenu().add(getClose());
         getFileMenu().addMenuListener(this);
 
-        getClose().addActionListener(parentFrame);
+//        getClose().addActionListener(closeListener);
         getClose().setAccelerator(KeyStroke.getKeyStroke(
                                                 KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getSaveItem().addActionListener(parentFrame);
+        getSaveItem().addActionListener(saveListener);
         getSaveItem().setAccelerator(KeyStroke.getKeyStroke(
                                                        KeyEvent.VK_S,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getSaveAsItem().addActionListener(parentFrame);
-        getOpenItem().addActionListener(parentFrame);
+        getSaveAsItem().addActionListener(saveAsListener);
+        getOpenItem().addActionListener(openItemListener);
         getOpenItem().setAccelerator(KeyStroke.getKeyStroke(
                                                        KeyEvent.VK_O,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getPrefsItem().addActionListener(parentFrame);
+        getPrefsItem().addActionListener(prefsListener);
     }
 
     /**
@@ -134,19 +184,19 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getEditMenu().addSeparator();
         getEditMenu().add(getClearAllItem());
 
-        getCutItem().addActionListener(parentFrame.getWorldPanel());
+        getCutItem().addActionListener(parentFrame.getWorldPanel().cutListener);
         getCutItem().setAccelerator(KeyStroke.getKeyStroke(
                                                       KeyEvent.VK_X,
                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getCopyItem().addActionListener(parentFrame.getWorldPanel());
+        getCopyItem().addActionListener(parentFrame.getWorldPanel().copyListener);
         getCopyItem().setAccelerator(KeyStroke.getKeyStroke(
                                                        KeyEvent.VK_C,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getPasteItem().addActionListener(parentFrame.getWorldPanel());
+        getPasteItem().addActionListener(parentFrame.getWorldPanel().pasteListener);
         getPasteItem().setAccelerator(KeyStroke.getKeyStroke(
                                                         KeyEvent.VK_V,
                                                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getClearAllItem().addActionListener(parentFrame.getWorldPanel());
+        getClearAllItem().addActionListener(parentFrame.getWorldPanel().clearAllListener);
     }
 
     /**

@@ -45,6 +45,9 @@ import org.simbrain.util.LabelledItemPanel;
  * object has on the  input nodes of the network of non-creature entities in the world.
  */
 public class PanelStimulus extends LabelledItemPanel implements ActionListener {
+    
+    private static final long serialVersionUID = 1L;
+    
     /** Entity reference. */
     private AbstractEntity entityRef = new OdorWorldEntity();
     /** Value array. */

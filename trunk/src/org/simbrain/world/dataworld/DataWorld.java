@@ -28,6 +28,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collection;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -40,6 +41,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -358,15 +360,10 @@ public class DataWorld extends JPanel {
          */
         public void actionPerformed(ActionEvent event) {
             if (event.getSource() instanceof CouplingMenuItem) {
-                CouplingMenuItem m = (CouplingMenuItem) event.getSource();
-                // TODO refactor
-    //            Iterator<Producer> producerIterator = m.getCouplingContainer().getProducers().iterator();
-    //            for (Consumer consumer : this.getTableModel().getConsumers()) {
-    //                if (producerIterator.hasNext()) {
-    //                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-    //                    this.getTableModel().getCouplings().add(coupling);
-    //                }
-    //            }
+                CouplingMenuItem menuItem = (CouplingMenuItem) event.getSource();
+                Collection<? extends Producer> producers = menuItem.getWorkspaceComponent().getProducers();
+                
+                ws.getWorkspaceComponent().wireCouplings(producers);
             }
         }
     };

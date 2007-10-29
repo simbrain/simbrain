@@ -39,6 +39,8 @@ import com.Ostermiller.util.CSVParser;
  */
 public class DialogScript extends StandardDialog implements ActionListener {
 
+    private static final long serialVersionUID = 1L;
+
     /** The initial offset for the dialog. */
     private final int initialDialogPlacement = 500;
 

@@ -36,6 +36,9 @@ import org.simbrain.util.StandardDialog;
  * to be sent the network, and the way  outputs from the network are expressed in the world.
  */
 public class DialogOdorWorld extends StandardDialog implements ActionListener {
+    
+    private static final long serialVersionUID = 1L;
+
     /** The inital value for world width field's number of columns. */
     private final int initialWorldWidth = 5;
 

@@ -18,10 +18,8 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-
 
 /**
  * <b>AbstractEntity</b> is an abstract class providing a basic  structure for all items in the world.

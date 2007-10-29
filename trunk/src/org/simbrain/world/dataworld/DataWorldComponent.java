@@ -19,17 +19,23 @@
 package org.simbrain.world.dataworld;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
 public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+    private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
     
     /** Table model. */
     private final DataModel<Double> dataModel = new DataModel<Double>();
@@ -46,6 +52,21 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         super(name);
     }
 
+    @SuppressWarnings("unchecked")
+    void wireCouplings(Collection<? extends Producer> producers) {
+        /* Handle Coupling wire-up */
+        LOGGER.debug("wiring " + producers.size() + " producers");
+        
+        Iterator<? extends Producer> producerIterator = producers.iterator();
+        
+        for (Consumer consumer : getConsumers()) {
+            if (producerIterator.hasNext()) {
+                Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
+            }
+        }
+    }
+    
     /**
      * Read a world from a world-xml file.
      *

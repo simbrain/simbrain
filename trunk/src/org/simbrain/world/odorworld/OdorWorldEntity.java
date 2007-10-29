@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -35,7 +35,7 @@ import org.simbrain.resource.ResourceManager;
 public class OdorWorldEntity extends AbstractEntity {
 
     /** Icon renderer. */
-    private ImageIcon image = new ImageIcon();
+    private final ImageIcon image = new ImageIcon();
 
     /** Images to be made into icons. */
     private static ImageIcon[] images;
@@ -258,15 +258,15 @@ public class OdorWorldEntity extends AbstractEntity {
     /**
      * @return The image.
      */
-    public ImageIcon getImage() {
+    ImageIcon getImage() {
         return image;
     }
 
     /**
      * @param theImage The image to be set.
      */
-    public void setImage(final ImageIcon theImage) {
-        this.image = theImage;
+    void setImage(final Image theImage) {
+        this.image.setImage(theImage);
     }
 
     /**

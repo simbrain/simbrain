@@ -32,7 +32,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
 /**
  * Network frame.
  */
-public final class NetworkDesktopComponent extends DesktopComponent {
+public final class NetworkDesktopComponent extends DesktopComponent<NetworkComponent> {
 
     private static final long serialVersionUID = 1L;
 

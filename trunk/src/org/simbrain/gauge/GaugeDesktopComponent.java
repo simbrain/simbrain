@@ -37,7 +37,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-public class GaugeDesktopComponent extends DesktopComponent {
+public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
 
     private static final long serialVersionUID = 1L;
 

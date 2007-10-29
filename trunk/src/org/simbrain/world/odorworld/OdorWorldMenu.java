@@ -61,16 +61,16 @@ public class OdorWorldMenu {
      * Build the popup menu displayed when users right-click in world.
      */
     public void initMenu() {
-        getDeleteItem().addActionListener(parentWorld);
-        getObjectPropsItem().addActionListener(parentWorld);
-        getAddItem().addActionListener(parentWorld);
-        getAddAgentItem().addActionListener(parentWorld);
-        getPropsItem().addActionListener(parentWorld);
-        getWallItem().addActionListener(parentWorld);
-        getWallPropsItem().addActionListener(parentWorld);
-        getCutItem().addActionListener(parentWorld);
-        getCopyItem().addActionListener(parentWorld);
-        getPasteItem().addActionListener(parentWorld);
+        getDeleteItem().addActionListener(parentWorld.deleteListener);
+        getObjectPropsItem().addActionListener(parentWorld.objectPropsListener);
+        getAddItem().addActionListener(parentWorld.addListener);
+        getAddAgentItem().addActionListener(parentWorld.addAgentListener);
+        getPropsItem().addActionListener(parentWorld.propsListener);
+        getWallItem().addActionListener(parentWorld.wallListener);
+        getWallPropsItem().addActionListener(parentWorld.wallPropsListener);
+        getCutItem().addActionListener(parentWorld.cutListener);
+        getCopyItem().addActionListener(parentWorld.copyListener);
+        getPasteItem().addActionListener(parentWorld.pasteListener);
     }
 
     /**

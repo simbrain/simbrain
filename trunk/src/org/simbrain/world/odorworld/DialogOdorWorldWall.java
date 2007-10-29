@@ -39,6 +39,8 @@ import org.simbrain.util.StandardDialog;
  */
 public class DialogOdorWorldWall extends StandardDialog implements ActionListener, ChangeListener {
 
+    private static final long serialVersionUID = 1L;
+
     /** The initial offset of the dialog. */
     private final int initialDialogPlacement = 500;
 
@@ -145,7 +147,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
             Color theColor = getColor();
 
             if (theColor != null) {
-                worldPanel.getWorld().setWallColor(theColor.getRGB());
+                worldPanel.setWallColor(theColor);
             }
         }
 

@@ -640,6 +640,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
 
         @Override
         public void setValue(Double value) {
+            System.out.println("value: " + value);
             goStraightForward(value);
         }
     }

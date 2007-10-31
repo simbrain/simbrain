@@ -106,6 +106,7 @@ public class OdorWorldEntity extends AbstractEntity {
      * @param newPosition New position of entity.
      */
     public void setLocation(final Point newPosition) {
+        System.out.println("new location: " + newPosition);
         location = newPosition;
     }
 

@@ -24,7 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 public class CouplingManager {
+    private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
+    
     private List<Coupling<?>> all = new ArrayList<Coupling<?>>();
     private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings = new HashMap<SourceTarget, List<Coupling<?>>>();
     
@@ -37,7 +41,9 @@ public class CouplingManager {
     }
     
     void updateAllCouplings() {
+        LOGGER.debug("updating all couplings");
         for (Coupling<?> coupling : getCouplings()) {
+            LOGGER.trace(coupling.getClass());
             coupling.setBuffer();
         }
         

@@ -19,7 +19,10 @@
 package org.simbrain.world.odorworld;
 
 import java.io.File;
+import java.util.List;
 
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -83,11 +86,20 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public String getFileExtension() {
         return "wld";
     }
+    
+    @Override
+    public List<? extends Consumer> getConsumers() {
+        return world.getConsumers();
+    }
+    
+    @Override
+    public List<? extends Producer> getProducers() {
+        return world.getProducers();
+    }
 
     @Override
-    public void update() {
-        // TODO Auto-generated method stub
-        
+    protected void update() {
+        /* no implementation */
     }
 
 //    @Override

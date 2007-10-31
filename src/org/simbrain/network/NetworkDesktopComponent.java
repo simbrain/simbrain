@@ -26,7 +26,6 @@ import java.io.File;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.gui.DesktopComponent;
 
 /**
@@ -86,12 +85,6 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         setJMenuBar(menuBar);
     }
 
-    /**
-     * Returns a refrence to the root network, which contains all couplings.
-     */
-    public CouplingContainer getCouplingContainer() {
-        return networkPanel.getRootNetwork();
-    }
     /**
      * Return the network panel for this network frame.
      *

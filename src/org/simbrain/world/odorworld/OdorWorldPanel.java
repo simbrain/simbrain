@@ -25,8 +25,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JPanel;
@@ -50,8 +52,7 @@ import javax.swing.JPopupMenu;
  * </li>
  * </ul>
  */
-public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotionListener,
-                                        KeyListener {
+public class OdorWorldPanel extends JPanel implements KeyListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -219,8 +220,8 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
         world = parent.getWorkspaceComponent().getWorld();
 
         setBackground(backgroundColor);
-        this.addMouseListener(this);
-        this.addMouseMotionListener(this);
+        this.addMouseListener(mouseListener);
+        this.addMouseMotionListener(mouseDraggedListener);
         this.addKeyListener(this);
         this.setFocusable(true);
 
@@ -237,116 +238,94 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     //////////////////////
     // Graphics Methods //
     //////////////////////
-    /**
-     * Task to perform when mouse enters world.
-     * @param mouseEvent Mouse event
-     */
-    public void mouseEntered(final MouseEvent mouseEvent) {
-    }
+    
+    private final MouseListener mouseListener = new MouseAdapter() {
 
-    /**
-     * Task to perform when the mouse exits world.
-     * @param mouseEvent Mouse event
-     */
-    public void mouseExited(final MouseEvent mouseEvent) {
-    }
+        /**
+         * Task to perform when mouse button is pressed.
+         * @param mouseEvent Mouse event
+         */
+        public void mousePressed(final MouseEvent mouseEvent) {
+            selectedEntity = null;
 
-    /**
-     * Task to perform when mouse is moved within the world.
-     * @param e Mouse event
-     */
-    public void mouseMoved(final MouseEvent e) {
-    }
+            selectedPoint = mouseEvent.getPoint();
 
-    /**
-     * Task to perform when mouse button is clicked.
-     * @param mouseEvent Mouse event
-     */
-    public void mouseClicked(final MouseEvent mouseEvent) {
-    }
+            for (int i = 0; (i < world.getAbstractEntityList().size()) && (selectedEntity == null); i++) {
+                final AbstractEntity temp = (AbstractEntity) world.getAbstractEntityList().get(i);
 
-    /**
-     * Task to perform when mouse button is released.
-     * @param mouseEvent Mouse event
-     */
-    public void mouseReleased(final MouseEvent mouseEvent) {
-        if (drawingWalls) {
-            setWallPoint2(mouseEvent.getPoint());
-            addWall();
-            draggingPoint = null;
-            this.getParentFrame().setChangedSinceLastSave(true);
-        }
-    }
-
-    /**
-     * Task to perform when mouse button is held and mouse moved.
-     * @param e Mouse event
-     */
-    public void mouseDragged(final MouseEvent e) {
-        if (drawingWalls) {
-            draggingPoint = e.getPoint();
-            repaint();
-        }
-
-        final Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
-
-        if ((selectedEntity != null) && this.getBounds().contains(selectedEntity.getRectangle(test))) {
-            selectedEntity.setX(test.x);
-            selectedEntity.setY(test.y);
-            repaint();
-            this.getParentFrame().setChangedSinceLastSave(true);
-        }
-    }
-
-    /**
-     * Task to perform when mouse button is pressed.
-     * @param mouseEvent Mouse event
-     */
-    public void mousePressed(final MouseEvent mouseEvent) {
-        selectedEntity = null;
-
-        selectedPoint = mouseEvent.getPoint();
-
-        for (int i = 0; (i < world.getAbstractEntityList().size()) && (selectedEntity == null); i++) {
-            final AbstractEntity temp = (AbstractEntity) world.getAbstractEntityList().get(i);
-
-            if (temp.getRectangle().contains(selectedPoint)) {
-                selectedEntity = temp;
-            }
-        }
-
-        if (selectedEntity != null) {
-            distanceX = selectedEntity.getX() - mouseEvent.getPoint().x;
-            distanceY = selectedEntity.getY() - mouseEvent.getPoint().y;
-        }
-
-        //submits point for wall drawing
-        if (drawingWalls) {
-            mouseEvent.getPoint();
-            setWallPoint1(selectedPoint);
-        }
-
-        if (selectedEntity instanceof OdorWorldAgent) {
-            world.setCurrentCreature((OdorWorldAgent) selectedEntity);
-        }
-
-        //Show popupmenu for right click
-        if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-            final JPopupMenu menu = buildPopupMenu(selectedEntity);
-            menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
-        } else if (mouseEvent.getClickCount() == 2) { //open dialogue for that world-item
-            if (selectedEntity instanceof Wall) {
-                showWallDialog((Wall) selectedEntity);
-            } else {
-                showEntityDialog((OdorWorldEntity) selectedEntity);
+                if (temp.getRectangle().contains(selectedPoint)) {
+                    selectedEntity = temp;
+                }
             }
 
-            this.getParentFrame().setChangedSinceLastSave(true);
+            if (selectedEntity != null) {
+                distanceX = selectedEntity.getX() - mouseEvent.getPoint().x;
+                distanceY = selectedEntity.getY() - mouseEvent.getPoint().y;
+            }
+
+            //submits point for wall drawing
+            if (drawingWalls) {
+                mouseEvent.getPoint();
+                setWallPoint1(selectedPoint);
+            }
+
+            if (selectedEntity instanceof OdorWorldAgent) {
+                world.setCurrentCreature((OdorWorldAgent) selectedEntity);
+            }
+
+            //Show popupmenu for right click
+            if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
+                final JPopupMenu menu = buildPopupMenu(selectedEntity);
+                menu.show(OdorWorldPanel.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
+            } else if (mouseEvent.getClickCount() == 2) { //open dialogue for that world-item
+                if (selectedEntity instanceof Wall) {
+                    showWallDialog((Wall) selectedEntity);
+                } else {
+                    showEntityDialog((OdorWorldEntity) selectedEntity);
+                }
+
+                getParentFrame().setChangedSinceLastSave(true);
+            }
+
+            final java.awt.Container container = getParent().getParent();
+            container.repaint();
         }
 
-        final java.awt.Container container = this.getParent().getParent();
-        container.repaint();
-    }
+        /**
+         * Task to perform when mouse button is released.
+         * @param mouseEvent Mouse event
+         */
+        public void mouseReleased(final MouseEvent mouseEvent) {
+            if (drawingWalls) {
+                setWallPoint2(mouseEvent.getPoint());
+                addWall();
+                draggingPoint = null;
+                getParentFrame().setChangedSinceLastSave(true);
+            }
+        }
+    };
+
+    private final MouseMotionListener mouseDraggedListener = new MouseMotionAdapter() {
+        /**
+         * Task to perform when mouse button is held and mouse moved.
+         * @param e Mouse event
+         */
+        public void mouseDragged(final MouseEvent e) {
+            if (drawingWalls) {
+                draggingPoint = e.getPoint();
+                repaint();
+            }
+
+            final Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
+
+            if ((selectedEntity != null) && getBounds().contains(selectedEntity.getRectangle(test))) {
+                selectedEntity.setX(test.x);
+                selectedEntity.setY(test.y);
+                repaint();
+                getParentFrame().setChangedSinceLastSave(true);
+            }
+        }
+    };
 
     /**
      * Task to perform when keyboard button is released.
@@ -611,11 +590,7 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
 
         return ret;
     }
-
-
-
-
-
+    
 //    /**
 //     * Returns a menu with a sub-menu for each agent.
 //     *

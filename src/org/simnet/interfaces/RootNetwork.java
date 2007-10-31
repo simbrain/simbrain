@@ -30,8 +30,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simnet.NetworkThread;
 import org.simnet.util.SimpleId;
@@ -48,7 +46,7 @@ import bsh.Interpreter;
  * When instantiating a view (including when using Simbrain as an API, or from a command-line, a root network must
  * first be created.  Acts as a "container" for all subsequent networks.
  */
-public class RootNetwork extends Network implements CouplingContainer {
+public class RootNetwork extends Network {
 
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(RootNetwork.class);
@@ -114,7 +112,7 @@ public class RootNetwork extends Network implements CouplingContainer {
     private SortedSet<Integer> updatePriorities = null;
 
     /** List of couplings. */
-    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
+//    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
 
     /** Name generator. */
     private SimpleId networkIdGenerator = new SimpleId("Netork", 1);
@@ -221,13 +219,13 @@ public class RootNetwork extends Network implements CouplingContainer {
         }
     }
 
-    public void updateCouplings() {
-        logger.debug("updateCouplings called");
-        for (Coupling coupling : getCouplings()) {
-            logger.debug("updating coupling: " + coupling);
-            coupling.update();
-        }
-    }
+//    public void updateCouplings() {
+//        logger.debug("updateCouplings called");
+//        for (Coupling coupling : getCouplings()) {
+//            logger.debug("updating coupling: " + coupling);
+//            coupling.update();
+//        }
+//    }
     
     /**
      * The core update function of the neural network.  Calls the current update function on each neuron, decays all
@@ -235,7 +233,7 @@ public class RootNetwork extends Network implements CouplingContainer {
      */
     public void update() {
         logger.debug("update called");
-        updateCouplings();
+//        updateCouplings();
         switch (this.updateMethod) {
 	        case PRIORITYBASED:
                 logger.debug("priority-based update");
@@ -843,9 +841,9 @@ public class RootNetwork extends Network implements CouplingContainer {
     /**
      * {@inheritDoc}
      */
-    public List<Coupling> getCouplings() {
-        return couplings;
-    }
+//    public List<Coupling> getCouplings() {
+//        return couplings;
+//    }
 
     /**
      * {@inheritDoc}

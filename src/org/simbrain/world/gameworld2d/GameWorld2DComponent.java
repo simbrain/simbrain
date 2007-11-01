@@ -6,11 +6,10 @@ import java.util.List;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
-public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentListener> implements CouplingContainer {
+public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Reference to the wrapped game world object. */
     private GameWorld2D world;

@@ -7,11 +7,10 @@ import java.util.List;
 
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.DesktopComponent;
 
-public class GameWorld2DDesktopComponent extends DesktopComponent<GameWorld2DComponent> implements CouplingContainer {
+public class GameWorld2DDesktopComponent extends DesktopComponent<GameWorld2DComponent> {
 
     private static final long serialVersionUID = 1L;
     

@@ -25,7 +25,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -33,7 +32,7 @@ import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
-public class PlotDesktopComponent extends DesktopComponent<PlotComponent> implements ActionListener, MenuListener, CouplingContainer  {
+public class PlotDesktopComponent extends DesktopComponent<PlotComponent> implements ActionListener, MenuListener  {
 
     /** Time series. */
     XYSeries series = new XYSeries("Time series");
@@ -90,11 +89,6 @@ public class PlotDesktopComponent extends DesktopComponent<PlotComponent> implem
             );
         getContentPane().add("Center", new ChartPanel(chart));
     }
-
-    public CouplingContainer getCouplingContainer() {
-        return this;
-    }
-    
     
     /**
      * Responds to actions performed.

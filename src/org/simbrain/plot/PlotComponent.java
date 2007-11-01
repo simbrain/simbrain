@@ -11,12 +11,11 @@ import org.jfree.data.xy.XYSeries;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 
-public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener> implements CouplingContainer {
+public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Time series. */
     XYSeries series = new XYSeries("Time series");
@@ -37,11 +36,6 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     public PlotComponent(String name) {
         super(name);
     }
-
-    public CouplingContainer getCouplingContainer() {
-        return this;
-    }
-    
     
     /**
      * Responds to actions performed.

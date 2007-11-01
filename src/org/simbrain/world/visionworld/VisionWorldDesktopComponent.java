@@ -33,7 +33,6 @@ import javax.swing.JToolBar;
 
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.DesktopComponent;
@@ -41,7 +40,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
 /**
  * Vision world frame.
  */
-public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWorldComponent> implements CouplingContainer {
+public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWorldComponent> {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
@@ -104,13 +103,6 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         contentPane.setLayout(new BorderLayout());
         contentPane.add("North", toolBar);
         contentPane.add("Center", visionWorld);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public CouplingContainer getCouplingContainer() {
-        return this;
     }
 
     @Override

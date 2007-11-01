@@ -14,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -632,17 +633,23 @@ public class SimbrainDesktop {
     public JMenu getProducerMenu(final ActionListener listener) {
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-            JMenu componentMenu = new JMenu(component.getName());
-            for (Producer producer : component.getProducers()) {
-                JMenu producerItem = new JMenu(producer.getDescription());
-                for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
-                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                    attributeItem.addActionListener(listener);
-                    producerItem.add(attributeItem);
+            
+            
+            Collection<? extends Producer> producers = component.getProducers();
+            
+            if (producers.size() > 0) {
+                JMenu componentMenu = new JMenu(component.getName());
+                for (Producer producer : component.getProducers()) {
+                    JMenu producerItem = new JMenu(producer.getDescription());
+                    for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
+                        CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                        attributeItem.addActionListener(listener);
+                        producerItem.add(attributeItem);
+                    }
+                    componentMenu.add(producerItem);
                 }
-                componentMenu.add(producerItem);
+                producerMenu.add(componentMenu);
             }
-            producerMenu.add(componentMenu);
         }
         return producerMenu;
     }
@@ -656,17 +663,21 @@ public class SimbrainDesktop {
     public JMenu getConsumerMenu(final ActionListener listener) {
         JMenu consumerMenu = new JMenu("Consumers");
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-            JMenu componentMenu = new JMenu(component.getName());
-            for (Consumer consumer : component.getConsumers()) {
-                JMenu consumerItem = new JMenu(consumer.getDescription());
-                for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
-                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                    attributeItem.addActionListener(listener);
-                    consumerItem.add(attributeItem);
+            Collection<? extends Consumer> consumers = component.getConsumers();
+            
+            if (consumers.size() > 0) {
+                JMenu componentMenu = new JMenu(component.getName());
+                for (Consumer consumer : component.getConsumers()) {
+                    JMenu consumerItem = new JMenu(consumer.getDescription());
+                    for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
+                        CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                        attributeItem.addActionListener(listener);
+                        consumerItem.add(attributeItem);
+                    }
+                    componentMenu.add(consumerItem);
                 }
-                componentMenu.add(consumerItem);
+                consumerMenu.add(componentMenu);
             }
-            consumerMenu.add(componentMenu);
         }
         return consumerMenu;
     }

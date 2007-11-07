@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspacePreferences;
 
 /**
@@ -119,7 +120,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      * Update that goes beyond updating couplings.
      * Called when global workspace update is called.
      */
-    public void updateComponent() {
+    protected void update() {
         repaint();
     }
 
@@ -323,5 +324,16 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
     public E getWorkspaceComponent()
     {
         return workspaceComponent;
+    }
+    
+    protected class BasicComponentListener implements WorkspaceComponentListener
+    {
+        public BasicComponentListener() {
+            
+        }
+        
+        public void componentUpdated() {
+            update();
+        }
     }
 }

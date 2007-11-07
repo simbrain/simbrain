@@ -49,12 +49,12 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
     private interface VisionWorldComponentListener extends WorkspaceComponentListener {
     };
 
-    /** Listener for vision world component events. */
-    private final VisionWorldComponentListener listener = new VisionWorldComponentListener() {
-        public void componentUpdated() {
-            updateComponent();
-        }
-    };
+//    /** Listener for vision world component events. */
+//    private final VisionWorldComponentListener listener = new VisionWorldComponentListener() {
+//        public void componentUpdated() {
+//            updateComponent();
+//        }
+//    };
 
     /**
      * Create a new vision world frame with the specified workspace.
@@ -63,7 +63,7 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
      */
     public VisionWorldDesktopComponent(VisionWorldComponent component) {
         super(component);
-        component.addListener(listener);
+        component.addListener(new BasicComponentListener());
         this.setPreferredSize(new Dimension(400,400));
 
         VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
@@ -150,8 +150,9 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
     }
 
     /** {@inheritDoc} */
-    public void updateComponent() {
-        super.updateComponent();
+    @Override
+    public void update() {
+        super.update();
         // Possibly change this later so only sensors with couplings are updated.
         VisionWorldModel model = visionWorld.getModel();
         PixelMatrix pixelMatrix = model.getPixelMatrix();

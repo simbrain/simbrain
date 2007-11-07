@@ -88,7 +88,7 @@ public class GameWorld2DDesktopComponent extends DesktopComponent<GameWorld2DCom
 
 
     @Override
-    public void updateComponent() {
+    public void update() {
         world.stop();
         world.player.snapToGrid();
         world.start();

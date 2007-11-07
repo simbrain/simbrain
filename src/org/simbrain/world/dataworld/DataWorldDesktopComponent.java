@@ -105,6 +105,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     public DataWorldDesktopComponent(DataWorldComponent component) {
         super(component);
         
+        component.addListener(new BasicComponentListener());
         world = new DataWorld(this, component.getDataModel());
         checkIterationMode();
         getContentPane().setLayout(new BorderLayout());
@@ -384,12 +385,12 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     }
 
     @Override
-    public void updateComponent() {
+    protected void update() {
         // TODO refactor
         world.getDataModel().update();
 //        this.getWorld().getTableModel().fireTableDataChanged();
         world.completedInputRound();
-        super.updateComponent();
+        super.update();
     }
 
     @Override

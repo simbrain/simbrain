@@ -85,6 +85,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      *
      */
     public void postAddInit() {
+        /* no implementation */
     }
 
     /**

@@ -1,30 +1,26 @@
 package org.simbrain.world.gameworld2d;
 
+import java.awt.Dimension;
 import java.io.File;
-import java.util.List;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Reference to the wrapped game world object. */
     private GameWorld2D world;
-
+    
     /**
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
      * @param ws the workspace associated with this frame
      */
     public GameWorld2DComponent(String name) {
         super(name);
-    }
-
-    @Override
-    public void postAddInit() {
-        world.init();
+        
+        world = new GameWorld2D();
+        world.initEngineApplet(30,30,10,10,null,null,null);
+        world.setPreferredSize(new Dimension(450,400));
     }
 
     /**
@@ -34,12 +30,12 @@ public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentL
         return world;
     }
 
-    /**
-     * @param world The world to set.
-     */
-    public void setWorld(GameWorld2D world) {
-        this.world = world;
-    }
+//    /**
+//     * @param world The world to set.
+//     */
+//    public void setWorld(GameWorld2D world) {
+//        this.world = world;
+//    }
 
     @Override
     public void close() {
@@ -58,26 +54,10 @@ public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentL
         
     }
 
-    public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Coupling> getCouplings() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Producer> getProducers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
     }
-
 
     @Override
     public void update() {

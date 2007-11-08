@@ -53,13 +53,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
 
     /**
-     * If any initialization is needed after adding this component to workspace.
-     *
-     */
-    public void postAddInit() {
-    }
-
-    /**
      * Used when saving a workspace.  All changed workspace components are saved using
      * this method.
      *

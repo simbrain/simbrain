@@ -75,7 +75,9 @@ public class Workspace {
     {
         LOGGER.debug("adding component: " + component);
         componentList.add(component);
+        component.setWorkspace(this);
         workspaceChanged = true;
+        
         for (WorkspaceListener listener : listeners) {
             listener.componentAdded(component);
         }

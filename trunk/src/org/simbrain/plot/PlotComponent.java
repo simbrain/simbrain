@@ -1,31 +1,28 @@
 package org.simbrain.plot;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.swing.JMenuItem;
 
 import org.jfree.data.xy.XYSeries;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.CouplingMenuItem;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Time series. */
-    XYSeries series = new XYSeries("Time series");
+    private final XYSeries series = new XYSeries("Time series");
+    private int time = 0;
 
     /** Consumer list. */
-    private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
-
-    /** Coupling list. */
-    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
-
+//    private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
+    private final Variable variable;
+    
     /** Coupling menu item. Must be reset every time.  */
     JMenuItem couplingMenuItem;
 
@@ -35,24 +32,12 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
      */
     public PlotComponent(String name) {
         super(name);
-    }
-    
-    /**
-     * Responds to actions performed.
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-
-        // Handle Coupling wireup
-        if (e.getSource() instanceof CouplingMenuItem) {
-            CouplingMenuItem m = (CouplingMenuItem) e.getSource();
-            Coupling coupling = new Coupling(m.getProducingAttribute(), this.getConsumers().get(0).getDefaultConsumingAttribute());
-            getCouplings().clear();
-            getCouplings().add(coupling);
-        }
+        variable = new Variable(this);
     }
 
-    int time = 0;
+    XYSeries getSeries() {
+        return series;
+    }
     
     public void setValue(double value) {
         series.add(time++, value);
@@ -80,26 +65,16 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
         // TODO Auto-generated method stub
     }
 
+    void couple(ProducingAttribute<Double> attribute) {
+      Coupling<Double> coupling = new Coupling<Double>(attribute, variable);
+      getWorkspace().addCoupling(coupling);
+    }
     
     /**
      * {@inheritDoc}
      */
-    public List<Consumer> getConsumers() {
-        return consumers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<Coupling> getCouplings() {
-        return couplings;
-    }
-
-    /**
-     * No producers.
-     */
-    public List<Producer> getProducers() {
-        return null;
+    public Collection<? extends Consumer> getConsumers() {
+        return Collections.singleton(variable);
     }
 
     @Override
@@ -109,7 +84,6 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
 
     @Override
     public void update() {
-        // TODO Auto-generated method stub
-        
+        /* no implementation */
     }
 }

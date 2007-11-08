@@ -44,6 +44,9 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
 
+    /** the workspace that 'owns' this component */
+    private Workspace workspace;
+    
     /**
      * Construct a workspace component.
      */
@@ -67,7 +70,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * @param openFile file representing saved component.
      */
     public abstract void open(File openFile);
-
 
     /**
      * The file extension for a component type, e.g. ".net".
@@ -178,5 +180,15 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public Collection<? extends Producer> getProducers()
     {
         return Collections.emptySet();
+    }
+    
+    void setWorkspace(Workspace workspace)
+    {
+        this.workspace = workspace;
+    }
+    
+    public Workspace getWorkspace()
+    {
+        return workspace;
     }
 }

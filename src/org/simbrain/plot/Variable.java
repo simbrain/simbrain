@@ -2,9 +2,7 @@ package org.simbrain.plot;
 
 import java.lang.reflect.Type;
 
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.SingleAttributeConsumer;
-import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a consumer object, so other components
@@ -13,20 +11,21 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class Variable extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
-    private PlotComponent gauge;
+    private PlotComponent plot;
 
     /**
      * @param columnNumber
      */
-    public Variable(final PlotComponent gauge) {
-        this.gauge = gauge;
+    public Variable(final PlotComponent plot) {
+        this.plot = plot;
     }
 
     /**
      * {@inheritDoc}
      */
     public void setValue(Double value) {
-        gauge.setValue(value);
+        System.out.println("set value");
+        plot.setValue(value);
     }
 
     /**
@@ -40,8 +39,8 @@ public class Variable extends SingleAttributeConsumer<Double> {
         return Double.TYPE;
     }
 
-    public WorkspaceComponent getParentComponent() {
-        return gauge;
+    public PlotComponent getParentComponent() {
+        return plot;
     }
 
     public String getAttributeDescription() {

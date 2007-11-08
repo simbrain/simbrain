@@ -70,6 +70,8 @@ public class PlotDesktopComponent extends DesktopComponent<PlotComponent> {
         ChartPanel panel = new ChartPanel(chart);
         
         getContentPane().add("Center", panel);
+        
+        this.setSize(500, 400);
     }
     
     private final ActionListener actionListener = new ActionListener() {

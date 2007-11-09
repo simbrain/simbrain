@@ -19,7 +19,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 public class PlotDesktopComponent extends DesktopComponent<PlotComponent> {
 
@@ -91,7 +90,7 @@ public class PlotDesktopComponent extends DesktopComponent<PlotComponent> {
      * Set up the coupling menu.
      */
     private void setCouplingMenuItem() {
-        couplingMenuItem = SimbrainDesktop.getInstance().getProducerMenu(actionListener);
+        couplingMenuItem = getDesktop().getProducerMenu(actionListener);
         couplingMenuItem.setText("Set plotter source");
     }
 

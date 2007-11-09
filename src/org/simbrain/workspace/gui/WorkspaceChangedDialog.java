@@ -44,13 +44,14 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
-    private final Workspace workspace;
+//    private final Workspace workspace;
+    private final SimbrainDesktop desktop;
     
     /**
      * Constructor for workspace changed dialog.
      */
-    public WorkspaceChangedDialog(Workspace workspace) {
-        this.workspace = workspace;
+    public WorkspaceChangedDialog(SimbrainDesktop desktop) {
+        this.desktop = desktop;
         init();
     }
     
@@ -109,7 +110,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
     public void initPanel() {
 
         int i = 0;
-        for (WorkspaceComponent component : SimbrainDesktop.getInstance().getWorkspace().getComponentList()) {
+        for (WorkspaceComponent<?> component : desktop.getWorkspace().getComponentList()) {
             if (component.isChangedSinceLastSave()) {
                 JCheckBox checker = new JCheckBox();
                 panel.addItem(component.getName() + "." + component.getFileExtension(), checker);
@@ -141,7 +142,8 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
      * Save all checked components.
      */
     private void doSaves() {
-
+        Workspace workspace = desktop.getWorkspace();
+        
         int i = 0;
         for (JCheckBox checkBox : checkBoxList) {
             if (checkBox.isSelected()) {
@@ -153,7 +155,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
             if (workspace.getCurrentFile() != null) {
                 new WorkspaceSerializer(workspace).writeWorkspace(workspace.getCurrentFile());
             } else {
-                SimbrainDesktop.getInstance().saveWorkspace();
+                desktop.saveWorkspace();
             }
         }
     }

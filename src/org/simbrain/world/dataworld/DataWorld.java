@@ -43,7 +43,6 @@ import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * <b>DataWorld</b> is a jpanel which contains a table object and a that table's model object.
@@ -201,7 +200,7 @@ public class DataWorld extends JPanel {
 
         ret.addSeparator();
         
-        JMenu producerMenu = SimbrainDesktop.getInstance().getProducerListMenu(couplingMenuItemListener);
+        JMenu producerMenu = ws.getDesktop().getProducerListMenu(couplingMenuItemListener);
         
         ret.add(producerMenu);
 
@@ -247,7 +246,7 @@ public class DataWorld extends JPanel {
      * Displays the randomize dialog.
      */
     public void displayRandomizeDialog() {
-        StandardDialog rand = new StandardDialog(SimbrainDesktop.getInstance().getFrame(), "randomize Bounds");
+        StandardDialog rand = new StandardDialog(ws.getDesktop().getFrame(), "randomize Bounds");
         JPanel pane = new JPanel();
         JTextField lower = new JTextField();
         JTextField upper = new JTextField();

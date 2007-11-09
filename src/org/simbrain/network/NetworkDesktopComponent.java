@@ -49,7 +49,7 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         super(component);
         this.setPreferredSize(new Dimension(450,400));
 
-        networkPanel = new NetworkPanel(component.getRootNetwork());
+        networkPanel = new NetworkPanel(component.getRootNetwork(), this);
 
         // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         JPanel buffer = new JPanel();

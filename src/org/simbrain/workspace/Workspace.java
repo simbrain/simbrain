@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.gui.WorkspaceChangedDialog;
 
 /**
  * <b>Workspace</b> is the container for all Simbrain windows--network, world, and gauge.
@@ -40,7 +39,7 @@ public class Workspace {
     private final CouplingManager manager = new CouplingManager();
     
     /** List of workspace components. */
-    private ArrayList<WorkspaceComponent> componentList = new ArrayList<WorkspaceComponent>();
+    private ArrayList<WorkspaceComponent<?>> componentList = new ArrayList<WorkspaceComponent<?>>();
 
     /** Sentinel for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
@@ -71,7 +70,7 @@ public class Workspace {
         listeners.remove(listener);
     }
 
-    public void addWorkspaceComponent(WorkspaceComponent component)
+    public void addWorkspaceComponent(WorkspaceComponent<?> component)
     {
         LOGGER.debug("adding component: " + component);
         componentList.add(component);
@@ -88,7 +87,7 @@ public class Workspace {
      *
      * @param window
      */
-    public void removeWorkspaceComponent(final WorkspaceComponent component) {
+    public void removeWorkspaceComponent(final WorkspaceComponent<?> component) {
         LOGGER.debug("removing component: " + component);
         
         for (WorkspaceListener listener : listeners) {
@@ -105,7 +104,7 @@ public class Workspace {
     public void globalUpdate() {
         manager.updateAllCouplings();
         
-        for (WorkspaceComponent component : componentList) {
+        for (WorkspaceComponent<?> component : componentList) {
             component.doUpdate();
         }
         
@@ -155,10 +154,8 @@ public class Workspace {
      */
     public void clearWorkspace() {
         if (changesExist()) {
-            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
-
-            if (dialog.hasUserCancelled()) {
-                return;
+            for (WorkspaceListener listener : listeners) {
+                if (!listener.clearWorkspace()) return;
             }
         }
         workspaceChanged = false;
@@ -173,7 +170,7 @@ public class Workspace {
      * Disposes all Simbrain Windows.
      */
     public void removeAllComponents() {
-        for (WorkspaceComponent component : componentList) {
+        for (WorkspaceComponent<?> component : componentList) {
             for (WorkspaceListener listener : listeners) {
                 listener.componentRemoved(component);
             }
@@ -192,7 +189,7 @@ public class Workspace {
             return true;
         } else {
             boolean hasChanged = false;
-            for (WorkspaceComponent window : componentList) {
+            for (WorkspaceComponent<?> window : componentList) {
                 if (window.isChangedSinceLastSave()) {
                     hasChanged = true;
                 }
@@ -226,7 +223,7 @@ public class Workspace {
     /**
      * @return the componentList
      */
-    public List<? extends WorkspaceComponent> getComponentList() {
+    public List<? extends WorkspaceComponent<?>> getComponentList() {
         return Collections.unmodifiableList(componentList);
     }
 

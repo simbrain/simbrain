@@ -144,10 +144,11 @@ public class WorkspaceActionManager {
      *
      * @param workspace workspace, must not be null
      */
-    public WorkspaceActionManager(Workspace workspace) {
+    public WorkspaceActionManager(SimbrainDesktop desktop) {
+        Workspace workspace = desktop.getWorkspace();
         clearWorkspaceAction = new ClearWorkspaceAction(workspace);
 
-        importWorkspaceAction = new ImportWorkspaceAction(workspace);
+        importWorkspaceAction = new ImportWorkspaceAction(desktop);
         exportWorkspaceAction = new ExportWorkspaceAction(workspace);
 
         openDataWorldAction = new OpenDataWorldAction();
@@ -155,9 +156,9 @@ public class WorkspaceActionManager {
         openNetworkAction = new OpenNetworkAction(workspace);
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
 
-        openWorkspaceAction = new OpenWorkspaceAction(workspace);
-        saveWorkspaceAction = new SaveWorkspaceAction(workspace);
-        saveWorkspaceAsAction = new SaveWorkspaceAsAction(workspace);
+        openWorkspaceAction = new OpenWorkspaceAction(desktop);
+        saveWorkspaceAction = new SaveWorkspaceAction(desktop);
+        saveWorkspaceAsAction = new SaveWorkspaceAsAction(desktop);
 
         newNetworkAction = new NewNetworkAction(workspace);
         newGaugeAction = new NewGaugeAction(workspace);
@@ -172,7 +173,7 @@ public class WorkspaceActionManager {
 
         workspaceHelpAction = new WorkspaceHelpAction();
 
-        quitWorkspaceAction = new QuitWorkspaceAction(workspace);
+        quitWorkspaceAction = new QuitWorkspaceAction(desktop);
 
         globalUpdateAction = new GlobalUpdateAction(workspace);
         globalRunAction = new GlobalRunAction(workspace);

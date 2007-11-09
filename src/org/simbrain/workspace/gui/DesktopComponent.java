@@ -255,7 +255,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
             }
             close();
             
-            SimbrainDesktop.getInstance().getWorkspace().removeWorkspaceComponent(workspaceComponent);
+            getDesktop().getWorkspace().removeWorkspaceComponent(workspaceComponent);
         }
     }
 
@@ -322,13 +322,21 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         return simpleName;
     }
     
-    public E getWorkspaceComponent()
-    {
+    public E getWorkspaceComponent() {
         return workspaceComponent;
     }
     
-    protected class BasicComponentListener implements WorkspaceComponentListener
-    {
+    private SimbrainDesktop desktop;
+    
+    void setDesktop(SimbrainDesktop desktop) {
+        this.desktop = desktop;
+    }
+    
+    public SimbrainDesktop getDesktop() {
+        return desktop;
+    }
+    
+    protected class BasicComponentListener implements WorkspaceComponentListener {
         public BasicComponentListener() {
             
         }

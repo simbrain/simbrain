@@ -29,7 +29,6 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -62,7 +61,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         for (Consumer consumer : getConsumers()) {
             if (producerIterator.hasNext()) {
                 Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
+                getWorkspace().addCoupling(coupling);
             }
         }
     }

@@ -30,7 +30,6 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
@@ -102,7 +101,7 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
         for (Consumer consumer : consumers) {
             if (producerIterator.hasNext()) {
                 Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
+                getWorkspace().addCoupling(coupling);
             }
         }
 

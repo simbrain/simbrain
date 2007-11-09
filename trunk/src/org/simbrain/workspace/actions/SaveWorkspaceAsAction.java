@@ -22,13 +22,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Save current workspace to specified file.
  */
-public final class SaveWorkspaceAsAction extends WorkspaceAction {
+public final class SaveWorkspaceAsAction extends DesktopAction {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,13 +36,13 @@ public final class SaveWorkspaceAsAction extends WorkspaceAction {
      * Create a save workspace as action with the specified
      * workspace.
      */
-    public SaveWorkspaceAsAction(Workspace workspace) {
-        super("Save Workspace As", workspace);
+    public SaveWorkspaceAsAction(SimbrainDesktop desktop) {
+        super("Save Workspace As", desktop);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop.getInstance().saveWorkspace();
+        desktop.saveWorkspace();
     }
 }

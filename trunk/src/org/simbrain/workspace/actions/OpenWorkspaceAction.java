@@ -26,13 +26,12 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Open a new workspace.
  */
-public final class OpenWorkspaceAction extends WorkspaceAction {
+public final class OpenWorkspaceAction extends DesktopAction {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,8 +40,8 @@ public final class OpenWorkspaceAction extends WorkspaceAction {
      * Create an open workspace action with the specified
      * workspace.
      */
-    public OpenWorkspaceAction(Workspace workspace) {
-        super("Open Workspace", workspace);
+    public OpenWorkspaceAction(SimbrainDesktop desktop) {
+        super("Open Workspace", desktop);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
         putValue(SHORT_DESCRIPTION, "Open workspace");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -53,6 +52,6 @@ public final class OpenWorkspaceAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop.getInstance().openWorkspace();
+        desktop.openWorkspace();
     }
 }

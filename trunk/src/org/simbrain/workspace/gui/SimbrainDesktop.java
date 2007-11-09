@@ -79,9 +79,9 @@ public class SimbrainDesktop {
 
     private static final SimbrainDesktop DESKTOP = new SimbrainDesktop(new Workspace());
 
-    public static SimbrainDesktop getInstance() {
-        return DESKTOP;
-    }
+//    public static SimbrainDesktop getInstance() {
+//        return DESKTOP;
+//    }
 
     /** Desktop pane. */
     private JDesktopPane desktop;
@@ -115,7 +115,7 @@ public class SimbrainDesktop {
     /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
-    private Map<WorkspaceComponent<?>, DesktopComponent> components = new LinkedHashMap<WorkspaceComponent<?>, DesktopComponent>();
+    private Map<WorkspaceComponent<?>, DesktopComponent<?>> components = new LinkedHashMap<WorkspaceComponent<?>, DesktopComponent<?>>();
     
     /**
      * Default constructor.
@@ -132,7 +132,7 @@ public class SimbrainDesktop {
         //Set up the GUI.
         desktop = new JDesktopPane(); //a specialized layered pane
 
-        actionManager = new WorkspaceActionManager(workspace);
+        actionManager = new WorkspaceActionManager(this);
         
         createAndAttachMenus();
 
@@ -180,13 +180,7 @@ public class SimbrainDesktop {
     {
         return guiChanged || workspace.changesExist();
     }
-    
-//    public List<? extends DesktopComponent> getComponentList() {
-//        return Collections.unmodifiableList(components.values());
-//    }
-    
-    
-    
+        
     /**
      * Creates the workspace tool bar.
      *
@@ -207,7 +201,7 @@ public class SimbrainDesktop {
         bar.addSeparator();
         bar.add(actionManager.getNewNetworkAction());
 
-        // World menu button.
+        /* World menu button. */
         JButton button = new JButton();
         button.setIcon(ResourceManager.getImageIcon("World.gif"));
         final JPopupMenu worldMenu = new JPopupMenu();
@@ -223,7 +217,7 @@ public class SimbrainDesktop {
         button.setComponentPopupMenu(worldMenu);
         bar.add(button);
 
-        // Gauge menu button.
+        /* Gauge menu button. */
         button = new JButton();
         button.setIcon(ResourceManager.getImageIcon("Gauge.png"));
         final JPopupMenu gaugeMenu = new JPopupMenu();
@@ -354,21 +348,22 @@ public class SimbrainDesktop {
 
     }
     
-    private Map<Class<? extends WorkspaceComponent<?>>, Class<? extends DesktopComponent>> wrappers 
-        = new HashMap<Class<? extends WorkspaceComponent<?>>, Class<? extends DesktopComponent>>();
+    private Map<Class<? extends WorkspaceComponent<?>>, Class<? extends DesktopComponent<?>>> wrappers 
+        = new HashMap<Class<? extends WorkspaceComponent<?>>, Class<? extends DesktopComponent<?>>>();
     
-    public void registerComponent(Class<? extends WorkspaceComponent<?>> component, Class<? extends DesktopComponent> gui) {
+    public void registerComponent(Class<? extends WorkspaceComponent<?>> component, Class<? extends DesktopComponent<?>> gui) {
         wrappers.put(component, gui);
     }
     
-    private DesktopComponent getDesktopComponent(WorkspaceComponent<?> component) {
-        Class<? extends WorkspaceComponent> componentClass = component.getClass();
-        Class<? extends DesktopComponent> guiClass = wrappers.get(componentClass);
+    @SuppressWarnings("unchecked")
+    private DesktopComponent<?> getDesktopComponent(WorkspaceComponent<?> component) {
+        Class<? extends WorkspaceComponent<?>> componentClass = (Class<? extends WorkspaceComponent<?>>) component.getClass();
+        Class<? extends DesktopComponent<?>> guiClass = wrappers.get(componentClass);
         
         if (guiClass == null) throw new IllegalArgumentException("no desktop component registered for " + component.getClass());
         
         try {
-            Constructor<? extends DesktopComponent> constructor = guiClass.getConstructor(componentClass);
+            Constructor<? extends DesktopComponent<?>> constructor = guiClass.getConstructor(componentClass);
             return constructor.newInstance(component);
         } catch (RuntimeException e) {
             throw e;
@@ -378,10 +373,19 @@ public class SimbrainDesktop {
     }
     
     private final WorkspaceListener listener = new WorkspaceListener() {
+        public boolean clearWorkspace() {
+            if (changesExist()) {
+                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(SimbrainDesktop.this);
 
+                return !dialog.hasUserCancelled();
+            }
+            
+            return true;
+        }
+        
         public void workspaceCleared() {
             if (changesExist()) {
-                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(workspace);
+                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(SimbrainDesktop.this);
 
                 if (dialog.hasUserCancelled()) {
                     return;
@@ -389,6 +393,8 @@ public class SimbrainDesktop {
             }
             
             frame.setTitle("Simbrain");
+            
+            return;
         }
         
         /**
@@ -396,10 +402,14 @@ public class SimbrainDesktop {
          *
          * @param component
          */
+        @SuppressWarnings("unchecked")
         public void componentAdded(final WorkspaceComponent workspaceComponent) {
             LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
-            DesktopComponent component = getDesktopComponent(workspaceComponent);        
+            DesktopComponent<?> component = getDesktopComponent(workspaceComponent);        
+            
+            /* set this as the parent desktop for the desktop component */
+            component.setDesktop(SimbrainDesktop.this);
             
             /* HANDLE COMPONENT BOUNDS */
             
@@ -412,9 +422,9 @@ public class SimbrainDesktop {
                     (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
                 guiChanged = true;
             } else {
-                DesktopComponent dc = null;
+                DesktopComponent<?> dc = null;
                 
-                for (DesktopComponent next : components.values()) {
+                for (DesktopComponent<?> next : components.values()) {
                     dc = next;
                 }
                 
@@ -457,8 +467,9 @@ public class SimbrainDesktop {
             component.postAddInit();
         }
 
+        @SuppressWarnings("unchecked")
         public void componentRemoved(WorkspaceComponent workspaceComponent) {
-            DesktopComponent component = components.get(workspaceComponent);
+            DesktopComponent<?> component = components.get(workspaceComponent);
             
             component.dispose();
             components.remove(component);
@@ -471,7 +482,7 @@ public class SimbrainDesktop {
     public void openWorkspace() {
 
         if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(workspace);
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 
             if (theDialog.hasUserCancelled()) {
                 return;
@@ -506,7 +517,7 @@ public class SimbrainDesktop {
 //        workspaceChanged = false;
 
         if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(workspace);
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 
             if (theDialog.hasUserCancelled()) {
                 return;
@@ -529,7 +540,7 @@ public class SimbrainDesktop {
      */
     public void save() {
         if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(workspace);
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 
             if (theDialog.hasUserCancelled()) {
                 return;
@@ -691,7 +702,7 @@ public class SimbrainDesktop {
      */
     public JMenu getProducerListMenu(ActionListener listener) {
         JMenu producerListMenu = new JMenu("Producer lists");
-        for (WorkspaceComponent component : workspace.getComponentList()) {
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
                 CouplingMenuItem producerListItem = new CouplingMenuItem(component, CouplingMenuItem.EventType.PRODUCER_LIST);
                 producerListItem.setText(component.getName());
                 producerListItem.addActionListener(listener);
@@ -709,7 +720,7 @@ public class SimbrainDesktop {
      */
     public JMenu getConsumerListMenu(final ActionListener listener) {
         JMenu consumerListMenu = new JMenu("Consumer lists");
-        for (WorkspaceComponent component : workspace.getComponentList()) {
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
                 CouplingMenuItem consumerListItem = new CouplingMenuItem(component, CouplingMenuItem.EventType.CONSUMER_LIST);
                 consumerListItem.setText(component.getName());
                 consumerListItem.addActionListener(listener);
@@ -739,7 +750,7 @@ public class SimbrainDesktop {
          */
         public void windowClosing(final WindowEvent arg0) {
             if (changesExist()) {
-                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(workspace);
+                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(SimbrainDesktop.this);
 
                 if (dialog.hasUserCancelled()) {
                     return;

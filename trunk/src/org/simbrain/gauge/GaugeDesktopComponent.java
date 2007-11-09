@@ -32,7 +32,6 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -195,7 +194,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      */
     private void setCouplingMenu() {
         prefsMenu.removeAll();
-        producerListItem = SimbrainDesktop.getInstance().getProducerListMenu(couplingMenuItemListener);
+        producerListItem = getDesktop().getProducerListMenu(couplingMenuItemListener);
         prefsMenu.add(producerListItem);
         prefsMenu.addSeparator();
         prefsMenu.add(projectionPrefs);

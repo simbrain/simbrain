@@ -261,13 +261,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Groups nodes together for ease of use. */
     private ViewGroupNode vgn;
 
+    private final NetworkDesktopComponent desktopComponent;
+    
     /**
      * Create a new rootNetwork panel.
      */
-    public NetworkPanel(RootNetwork rootNetwork) {
-
+    public NetworkPanel(RootNetwork rootNetwork, NetworkDesktopComponent desktopComponent) {
         super();
-
+        
+        this.desktopComponent = desktopComponent;
         this.rootNetwork = rootNetwork;
         
         // always render in high quality
@@ -1264,7 +1266,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @inheritDoc org.simnet.interfaces.NetworkListener#neuronAdded */
     public void neuronAdded(final NetworkEvent e) {
-        NeuronNode node = new NeuronNode(this, e.getNeuron());
+        NeuronNode node = new NeuronNode(this, e.getNeuron(), desktopComponent);
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
         setChangedSinceLastSave(true);

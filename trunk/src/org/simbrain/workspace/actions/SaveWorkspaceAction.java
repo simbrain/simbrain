@@ -26,13 +26,12 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Save current workspace.
  */
-public final class SaveWorkspaceAction extends WorkspaceAction {
+public final class SaveWorkspaceAction extends DesktopAction {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,8 +39,8 @@ public final class SaveWorkspaceAction extends WorkspaceAction {
      * Create a save workspace action with the specified
      * workspace.
      */
-    public SaveWorkspaceAction(Workspace workspace) {
-        super("Save Workspace", workspace);
+    public SaveWorkspaceAction(SimbrainDesktop desktop) {
+        super("Save Workspace", desktop);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
         putValue(SHORT_DESCRIPTION, "Save workspace");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -52,6 +51,6 @@ public final class SaveWorkspaceAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop.getInstance().save();
+        desktop.save();
     }
 }

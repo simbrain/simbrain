@@ -24,28 +24,41 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.gui.WorkspaceChangedDialog;
 
 /**
  * Import workspace.
  */
-public final class ImportWorkspaceAction extends AbstractAction {
+public final class ImportWorkspaceAction extends DesktopAction {
 
     private static final long serialVersionUID = 1L;
     
     private final WorkspaceSerializer serializer;
     
+    private final Workspace workspace;
+    
     /**
      * Create an import workspace action with the specified
      * workspace.
      */
-    public ImportWorkspaceAction(Workspace workspace) {
-        super("Import Workspace");
+    public ImportWorkspaceAction(SimbrainDesktop desktop) {
+        super("Import Workspace", desktop);
+        this.workspace = desktop.getWorkspace();
         serializer = new WorkspaceSerializer(workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+        if (workspace.changesExist()) {
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(desktop);
+
+            if (theDialog.hasUserCancelled()) {
+                return;
+            }
+        }
+        
         serializer.importWorkspace();
     }
 }

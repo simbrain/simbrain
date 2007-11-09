@@ -124,7 +124,7 @@ public class WorkspaceSerializer {
     public void writeWorkspace(final File theFile) {
 
         ArrayList<WorkspaceComponentProxy> list = new ArrayList<WorkspaceComponentProxy>();
-        for (WorkspaceComponent component : workspace.getComponentList()) {
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
             // TODO fix
 //            WorkspaceComponentProxy proxy = new WorkspaceComponentProxy(component.getPath(), component.getName(), 
 //                            component.getClass(), component.getX(), component.getY(), component.getWidth(), component.getHeight());
@@ -189,13 +189,7 @@ public class WorkspaceSerializer {
      * which contains the exported workspace.
      */
     public void importWorkspace() {
-        if (workspace.changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(workspace);
-
-            if (theDialog.hasUserCancelled()) {
-                return;
-            }
-        }
+        
 //        workspaceChanged = false;
 
         String currentDirectory = WorkspacePreferences.getCurrentDirectory();

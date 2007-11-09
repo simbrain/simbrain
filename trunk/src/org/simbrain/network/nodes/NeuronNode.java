@@ -35,6 +35,7 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkDesktopComponent;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
@@ -138,14 +139,17 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         offset(x, y);
     }
 
+    private NetworkDesktopComponent desktopComponent;
+    
     /**
      * Create a new neuron node.
      *
      * @param net Reference to NetworkPanel
      * @param neuron reference to model neuron
      */
-    public NeuronNode(final NetworkPanel net, final Neuron neuron) {
+    public NeuronNode(final NetworkPanel net, final Neuron neuron, NetworkDesktopComponent desktopComponent) {
         super(net);
+        this.desktopComponent = desktopComponent;
         this.neuron = neuron;
         offset(neuron.getX(), neuron.getY());
         init();
@@ -299,18 +303,18 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // Add coupling menus
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
-            JMenu producerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getProducerMenu(popUpMenuListener);
+            JMenu producerMenu = desktopComponent.getDesktop().getProducerMenu(popUpMenuListener);
             producerMenu.setText("Set input source");
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getConsumerMenu(popUpMenuListener);
+            JMenu consumerMenu = desktopComponent.getDesktop().getConsumerMenu(popUpMenuListener);
             consumerMenu.setText("Set output target");
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
         } else if (getNetworkPanel().getSelectedNeurons().size() > 1) {
-            JMenu producerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getProducerListMenu(popUpMenuListener);
+            JMenu producerMenu = desktopComponent.getDesktop().getProducerListMenu(popUpMenuListener);
             producerMenu.setText("Set input sources");
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getConsumerListMenu(popUpMenuListener);
+            JMenu consumerMenu = desktopComponent.getDesktop().getConsumerListMenu(popUpMenuListener);
             consumerMenu.setText("Set output targets");
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
@@ -676,13 +680,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 LOGGER.debug("single producer");
                 Coupling coupling = new Coupling( m.getProducingAttribute(), getNeuron().getDefaultConsumingAttribute());
                 
-                SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
-//                getNetworkPanel().getRootNetwork().getCouplings().add(coupling); // THIS IS WRONG!
+                desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
             } else if (m.getEventType() == CouplingMenuItem.EventType.SINGLE_CONSUMER) {
                 LOGGER.debug("single consumer");
                 Coupling coupling = new Coupling(getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
-                SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
-//                getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
+                desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
             } else if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
                 LOGGER.debug("single producer");
                 // BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
@@ -692,8 +694,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 for (Neuron neuron : getNetworkPanel().getSelectedModelNeurons()) { // Iterate through our consumers
                     if (producerIterator.hasNext()) {
                         Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), neuron.getDefaultConsumingAttribute());
-                        SimbrainDesktop.getInstance().getWorkspace().addCoupling(coupling);
-//                        getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
+                        desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
                     } else {
                         break;
                     }

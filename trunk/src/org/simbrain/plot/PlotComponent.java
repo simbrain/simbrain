@@ -18,7 +18,9 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     /** Time series. */
     private final XYSeries series = new XYSeries("Time series");
     private int time = 0;
-
+    private long lastUpdate;
+    private static final long UPDATE_INTERVAL = 250;
+    
     /** Consumer list. */
 //    private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
     private final Variable variable;
@@ -40,7 +42,10 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     }
     
     public void setValue(double value) {
-        series.add(time++, value);
+        long current = System.currentTimeMillis();
+        boolean update = current - lastUpdate > UPDATE_INTERVAL;
+        series.add(time++, value, update);
+        if (update) lastUpdate = current;
     }
 
     @Override

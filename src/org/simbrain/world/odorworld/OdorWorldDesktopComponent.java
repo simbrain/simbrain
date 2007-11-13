@@ -200,7 +200,6 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
     }
 
     public void componentUpdated() {
-        System.out.println("updated");
         worldPanel.repaint();
     }
 }

@@ -24,23 +24,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.List;
 
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.DesktopComponent;
 
 /**
@@ -48,6 +37,8 @@ import org.simbrain.workspace.gui.DesktopComponent;
  * data.  The main environment codes is in {@link TextWorld}.
  */
 public class TextWorldDesktopComponent extends DesktopComponent<TextWorldComponent> implements ActionListener {
+
+    private static final long serialVersionUID = 1L;
 
     /** Instance of world of type TextWorld. */
     private TextWorld world;
@@ -188,27 +179,10 @@ public class TextWorldDesktopComponent extends DesktopComponent<TextWorldCompone
     @Override
     public void save(File saveFile) {
         // TODO Auto-generated method stub
-        
-    }
-
-    public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Coupling> getCouplings() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Producer> getProducers() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
     }
-
 }

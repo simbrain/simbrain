@@ -353,17 +353,9 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      * Menu Listener
      */
     private final MenuListener menuListener = new MenuListener() {
-        /**
-         * Menu cancelled.
-         * @param arg0 Menu event
-         */
         public void menuCanceled(final MenuEvent arg0) {
         }
 
-        /**
-         * Menu Deslected.
-         * @param arg0 Menu event
-         */
         public void menuDeselected(final MenuEvent arg0) {
         }
 

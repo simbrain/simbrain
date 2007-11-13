@@ -44,13 +44,6 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     RootNetwork getRootNetwork() {
         return rootNetwork;
     }
-    
-    /**
-     * Returns a reference to the root network, which contains all couplings.
-     */
-//    public CouplingContainer getCouplingContainer() {
-//        return networkPanel.getRootNetwork();
-//    }
 
     @Override
     public void save(File saveFile) {

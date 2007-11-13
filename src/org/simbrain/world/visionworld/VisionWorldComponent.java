@@ -22,10 +22,9 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Vision world frame.
@@ -41,13 +40,6 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
         super(name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-//    public CouplingContainer getCouplingContainer() {
-//        return this;
-//    }
-
     @Override
     public void close() {
         // TODO Auto-generated method stub
@@ -59,26 +51,17 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
         return null;
     }
 
-
     @Override
     public void save(File saveFile) {
         // TODO Auto-generated method stub
         
     }
 
-
     /** {@inheritDoc} */
     public List<Consumer> getConsumers() {
         return Collections.<Consumer>emptyList();
     }
-
-
-    /** {@inheritDoc} */
-    public List<Coupling> getCouplings() {
-        return Collections.<Coupling>emptyList();
-    }
-
-
+    
     /** {@inheritDoc} */
 //    public List<Producer> getProducers() {
 //        List<Producer> producers = new ArrayList<Producer>();
@@ -110,5 +93,4 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
     public void open(File openFile) {
         // TODO Auto-generated method stub
     }
-
 }

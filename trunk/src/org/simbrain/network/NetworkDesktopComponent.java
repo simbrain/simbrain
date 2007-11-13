@@ -109,16 +109,17 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         // TODO Auto-generated method stub
     }
 
-//    @Override
-//    public void setCurrentDirectory(String currentDirectory) {        
+    @Override
+    public void setCurrentDirectory(String currentDirectory) {        
 //        super.setCurrentDirectory(currentDirectory);
 //        NetworkPreferences.setCurrentDirectory(currentDirectory);
-//    }
+    }
 
-//    @Override
-//    public String getCurrentDirectory() {
+    @Override
+    public String getCurrentDirectory() {
+        return null;
 //        return NetworkPreferences.getCurrentDirectory();
-//    }
+    }
 
     @Override
     public void open(File openFile) {

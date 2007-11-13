@@ -125,17 +125,12 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
      */
     public void addMenuBar(final DataWorld table) {
         open.addActionListener(openListener);
-//        open.setActionCommand("open");
         open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
         save.addActionListener(saveListener);
-//        save.setActionCommand("save");
         save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
         saveAs.addActionListener(saveListener);
-//        saveAs.setActionCommand("saveAs");
-//        close.addActionListener(closeListener);
-//        close.setActionCommand("close");
         close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
         mb.add(file);
@@ -146,23 +141,15 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         file.addMenuListener(menuListener);
 
         addRow.addActionListener(addRowListener);
-//        addRow.setActionCommand("addRow");
         addCol.addActionListener(addColListener);
-//        addCol.setActionCommand("addCol");
         remRow.addActionListener(remRowListener);
-//        remRow.setActionCommand("remRow");
         remCol.addActionListener(remColListener);
-//        remCol.setActionCommand("remCol");
         zeroFill.addActionListener(zeroFillListener);
-//        zeroFill.setActionCommand("zeroFill");
         randomize.addActionListener(randomizeListener);
-//        randomize.setActionCommand("randomize");
         randomProps.addActionListener(randomPropsListener);
-//        randomProps.setActionCommand("randomProps");
         iterationMode.addActionListener(iterationModeListener);
-//        iterationMode.setActionCommand("iterationMode");
         columnIteration.addActionListener(columnIterationListener);
-//        columnIteration.setActionCommand("columnIteration");
+
         edit.add(addRow);
         edit.add(addCol);
         edit.add(zeroFill);
@@ -351,19 +338,9 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
             }
         }
     
-        /**
-         * Menu deselected event.
-         *
-         * @param e Menu event
-         */
         public void menuDeselected(final MenuEvent e) {
         }
     
-        /**
-         * Menu canceled event.
-         *
-         * @param e Menu event
-         */
         public void menuCanceled(final MenuEvent e) {
         }
     };

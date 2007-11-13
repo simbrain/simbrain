@@ -31,10 +31,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.DesktopComponent;
 
 /**
@@ -42,12 +39,10 @@ import org.simbrain.workspace.gui.DesktopComponent;
  */
 public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWorldComponent> {
 
+    private static final long serialVersionUID = 1L;
+    
     /** Vision world. */
     private final VisionWorld visionWorld;
-
-    /** Listener for vision world component events. */
-    private interface VisionWorldComponentListener extends WorkspaceComponentListener {
-    };
 
 //    /** Listener for vision world component events. */
 //    private final VisionWorldComponentListener listener = new VisionWorldComponentListener() {
@@ -115,25 +110,11 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         // TODO Auto-generated method stub
         return null;
     }
-
-
+    
     @Override
     public void save(File saveFile) {
         // TODO Auto-generated method stub
     }
-
-
-    /** {@inheritDoc} */
-    public List<Consumer> getConsumers() {
-        return Collections.<Consumer>emptyList();
-    }
-
-
-    /** {@inheritDoc} */
-    public List<Coupling> getCouplings() {
-        return Collections.<Coupling>emptyList();
-    }
-
 
     /** {@inheritDoc} */
     public List<Producer> getProducers() {
@@ -169,5 +150,4 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
     public void open(File openFile) {
         // TODO Auto-generated method stub
     }
-
 }

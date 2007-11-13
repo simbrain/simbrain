@@ -135,7 +135,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
             open(theFile);
             setCurrentDirectory(chooser.getCurrentLocation());
         }
-
     }
 
     /**
@@ -143,12 +142,15 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      */
     public void showSaveFileDialog() {
         SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
+        
         if (getCurrentFile() != null) {
             chooser.setSelectedFile(getCurrentFile());
         } else {
             chooser.setSelectedFile(new File(getName() + "." + getFileExtension()));
         }
+        
         File theFile = chooser.showSaveDialog();
+        
         if (theFile != null) {
             save(theFile);
             setCurrentDirectory(chooser.getCurrentLocation());
@@ -211,16 +213,16 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
     /**
      * @return the path
      */
-    public String getPath() {
-        return path;
-    }
+//    public String getPath() {
+//        return path;
+//    }
 
     /**
      * @param path path of file.
      */
-    public void setPath(final String path) {
-        this.path = path;
-    }
+//    public void setPath(final String path) {
+//        this.path = path;
+//    }
 
     /**
      * Sets a string path to this network in a manner independent of OS.  Used in persistence.
@@ -338,7 +340,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
     
     protected class BasicComponentListener implements WorkspaceComponentListener {
         public BasicComponentListener() {
-            
+            /* need a public constructor for subclasses */
         }
         
         public void componentUpdated() {

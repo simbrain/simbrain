@@ -101,22 +101,4 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     protected void update() {
         /* no implementation */
     }
-
-//    @Override
-//    public void setCurrentDirectory(final String currentDirectory) {        
-//        super.setCurrentDirectory(currentDirectory);
-//        OdorWorldPreferences.setCurrentDirectory(currentDirectory);
-//    }
-//
-//    @Override
-//    public String getCurrentDirectory() {
-//        return OdorWorldPreferences.getCurrentDirectory();
-//    }
-
-    /**
-     * {@inheritDoc}
-     */
-//    public CouplingContainer getCouplingContainer() {
-//        return worldPanel.getWorld();
-//    }
 }

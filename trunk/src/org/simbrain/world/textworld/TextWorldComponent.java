@@ -21,11 +21,10 @@ package org.simbrain.world.textworld;
 import java.io.File;
 import java.util.List;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * <b>TextWorldComponent</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
@@ -43,7 +42,6 @@ public class TextWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     @Override
     public void close() {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
@@ -55,15 +53,9 @@ public class TextWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     @Override
     public void save(File saveFile) {
         // TODO Auto-generated method stub
-        
     }
 
     public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Coupling> getCouplings() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -78,12 +70,8 @@ public class TextWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         // TODO Auto-generated method stub
     }
 
-
-
     @Override
     public void update() {
         // TODO Auto-generated method stub
-        
     }
-
 }

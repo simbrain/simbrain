@@ -15,6 +15,9 @@ public class Agent extends Moveable {
 
     private static final float HOVER_HEIGHT = 0.5f;
 
+    /** the name of this agent */
+    private final String name;
+    
     /** a logger based on this class and the agent name */
     private final Logger logger;
 
@@ -43,9 +46,15 @@ public class Agent extends Moveable {
     public Agent(final String name) {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
+        this.name = name;
+        
         logger.debug("created new Agent: " + name);
     }
 
+    public String getName() {
+        return name;
+    }
+    
     public void setLimit(int limit) {
         this.limit = limit;
     }

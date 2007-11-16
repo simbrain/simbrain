@@ -56,6 +56,9 @@ public class AgentElement extends MultipleViewElement<Node> {
     /** Updates one node based on the agent. */
     @Override
     public void updateSpatial(final Node node) {
+        
+        if (agent.getLocation() == null) return;
+        
         node.lookAt(agent.getLocation().add(agent.getDirection()), Y_AXIS);
         node.setLocalTranslation(agent.getLocation());
     }

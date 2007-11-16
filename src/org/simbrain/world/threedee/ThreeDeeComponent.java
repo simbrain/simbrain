@@ -9,11 +9,15 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 
 public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
-    private Environment environment;
+    private Environment environment = new Environment();
     private Set<Agent> agents = new HashSet<Agent>();
     
     public ThreeDeeComponent(String name) {
         super(name);
+    }
+    
+    public Environment getEnvironment() {
+        return environment;
     }
     
     public Agent createAgent() {

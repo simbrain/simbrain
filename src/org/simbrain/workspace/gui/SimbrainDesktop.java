@@ -61,6 +61,8 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.textworld.TextWorldComponent;
 import org.simbrain.world.textworld.TextWorldDesktopComponent;
+import org.simbrain.world.threedee.ThreeDeeComponent;
+import org.simbrain.world.threedee.gui.MainConsole;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
@@ -162,6 +164,7 @@ public class SimbrainDesktop {
         registerComponent(PlotComponent.class, PlotDesktopComponent.class);
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
+        registerComponent(ThreeDeeComponent.class, MainConsole.class);
         
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);

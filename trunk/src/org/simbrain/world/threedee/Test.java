@@ -6,6 +6,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -16,6 +18,9 @@ public class Test {
     
     public static void main(String[] args)
     {
+        Logger.getLogger("com.jme").setLevel(Level.OFF);
+        Logger.getLogger("com.jmex").setLevel(Level.OFF);
+        
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {

@@ -49,6 +49,11 @@ public class Agent extends Moveable {
         this.name = name;
         
         logger.debug("created new Agent: " + name);
+        
+        direction = new Vector3f(0,0,0);
+        location = new Vector3f(0,0,0);
+        tenativeLocation = new Vector3f(0,0,0);
+        tenativeDirection = new Vector3f(0,0,0);
     }
 
     public String getName() {

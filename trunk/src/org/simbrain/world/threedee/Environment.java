@@ -86,7 +86,7 @@ public class Environment {
      * @param parent the parent node
      */
     public void init(final Renderer renderer, final Node parent) {
-        LOGGER.debug("init");
+        LOGGER.debug("init: " + renderer);
 
         for (final Element element : elements) {
             LOGGER.debug("element: " + element);
@@ -131,8 +131,7 @@ public class Environment {
                 final Element b = elements.get(j);
                 final SpatialData bData = b.getTentative();
 
-                if (bData == null)
-                    continue;
+                if (bData == null) continue;
 
                 final Vector3f bCenter = bData.centerPoint();
                 final float bRadius = bData.radius();

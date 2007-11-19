@@ -18,6 +18,9 @@
  */
 package org.simbrain.workspace.gui;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.simbrain.resource.ResourceManager;
 
 
@@ -41,6 +44,10 @@ public class Splasher {
      * @param args the command line arguments
      */
     public static void main(final String[] args) {
+        // TODO find a better solution
+        Logger.getLogger("com.jme").setLevel(Level.OFF);
+        Logger.getLogger("com.jmex").setLevel(Level.OFF);
+        
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop", args);
         SplashWindow.disposeSplash();

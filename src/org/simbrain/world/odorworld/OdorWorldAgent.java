@@ -546,7 +546,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         abstract Point location();
         
         public double getDistance(Point from) {
-            return SimbrainMath.distance(from, getLocation());
+            return SimbrainMath.distance(from, location());
         }
     }
     

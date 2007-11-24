@@ -135,10 +135,13 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
         buffer.add(gaugePanel);
         buffer.add("South", gaugePanel.getBottomPanel());
         setContentPane(buffer);
-
-        setUpMenus();
     }
 
+    @Override
+    public void postAddInit() {
+        setUpMenus();
+    }
+    
     /**
      * Sets up gauge frame menus.
      */

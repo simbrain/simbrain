@@ -1,7 +1,9 @@
 package org.simbrain.world.threedee;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,6 +28,9 @@ public class Environment {
     /** Timer that fires the update operation. */
     private Timer timer;
 
+    /** The elements in this environment. */
+    private final Map<Renderer, Node> parents = new HashMap<Renderer, Node>();
+    
     /** The elements in this environment. */
     private final List<Element> elements = new ArrayList<Element>();
 
@@ -54,7 +59,14 @@ public class Environment {
      * @param agent the agent to add
      */
     public void add(final Agent agent) {
-        elements.add(new AgentElement(agent));
+        AgentElement element = new AgentElement(agent);
+        
+        elements.add(element);
+        
+        for (Map.Entry<Renderer, Node> parent : parents.entrySet()) {
+            element.init(parent.getKey(), parent.getValue());
+        }
+        
         views.add(agent);
         agent.setEnvironment(this);
         agent.setLimit((size * 2) - 1);
@@ -88,6 +100,8 @@ public class Environment {
     public void init(final Renderer renderer, final Node parent) {
         LOGGER.debug("init: " + renderer);
 
+        parents.put(renderer, parent);
+        
         for (final Element element : elements) {
             LOGGER.debug("element: " + element);
             element.init(renderer, parent);

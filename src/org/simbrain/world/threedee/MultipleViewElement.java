@@ -22,6 +22,7 @@ public abstract class MultipleViewElement<T extends Spatial> implements Element 
         spatials.put(renderer, spatial);
         parent.attachChild(spatial);
         initSpatial(renderer, spatial);
+        parent.updateRenderState();
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.gui;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.simbrain.world.threedee.Moveable;
 
 /**
  * Binds key events to Moveable actions and provides a Input instance that can

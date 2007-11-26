@@ -23,7 +23,7 @@ public class SpatialData {
      * 
      * @return the center point
      */
-    Vector3f centerPoint() {
+    public Vector3f centerPoint() {
         return center;
     }
 
@@ -32,7 +32,7 @@ public class SpatialData {
      * 
      * @return the radius
      */
-    float radius() {
+    public float radius() {
         return radius;
     }
 }

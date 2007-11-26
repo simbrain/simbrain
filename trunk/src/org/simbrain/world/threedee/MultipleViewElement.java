@@ -31,7 +31,7 @@ public abstract class MultipleViewElement<T extends Spatial> implements Element 
      * @param renderer the renderer that will render the spatial
      * @param spatial the spatial to initialize
      */
-    abstract void initSpatial(Renderer renderer, T spatial);
+    public abstract void initSpatial(Renderer renderer, T spatial);
 
     /**
      * Creates a new spatial.

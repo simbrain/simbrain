@@ -1,4 +1,4 @@
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.environment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.simbrain.world.threedee.Agent;
+import org.simbrain.world.threedee.AgentElement;
+import org.simbrain.world.threedee.Collision;
+import org.simbrain.world.threedee.Element;
+import org.simbrain.world.threedee.SpatialData;
+import org.simbrain.world.threedee.Viewable;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.math.Vector3f;

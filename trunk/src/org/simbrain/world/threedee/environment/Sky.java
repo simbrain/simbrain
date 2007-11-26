@@ -1,4 +1,4 @@
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.environment;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -6,6 +6,9 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.world.threedee.Collision;
+import org.simbrain.world.threedee.MultipleViewElement;
+import org.simbrain.world.threedee.SpatialData;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.image.Texture;

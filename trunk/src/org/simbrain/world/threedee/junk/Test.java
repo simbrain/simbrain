@@ -1,4 +1,4 @@
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.junk;
 
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
@@ -12,6 +12,13 @@ import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+
+import org.simbrain.world.threedee.Agent;
+import org.simbrain.world.threedee.CanvasHelper;
+import org.simbrain.world.threedee.Moveable;
+import org.simbrain.world.threedee.environment.Environment;
+import org.simbrain.world.threedee.gui.FreeBirdView;
+import org.simbrain.world.threedee.gui.KeyHandler;
 
 public class Test {
     static Environment environment = new Environment();

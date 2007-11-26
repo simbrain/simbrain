@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.threedee.environment.Environment;
 
 public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 

@@ -1,8 +1,7 @@
 package org.simbrain.world.threedee.gui;
 
 import org.apache.log4j.Logger;
-import org.simbrain.world.threedee.AwtView;
-import org.simbrain.world.threedee.Environment;
+import org.simbrain.world.threedee.environment.Environment;
 import org.simbrain.world.threedee.Viewable;
 
 import com.jme.renderer.Renderer;
@@ -11,7 +10,7 @@ import com.jmex.awt.SimpleCanvasImpl;
 
 public class AgentView extends SimpleCanvasImpl {
 
-    private static final Logger LOGGER = Logger.getLogger(AwtView.class);
+    private static final Logger LOGGER = Logger.getLogger(AgentView.class);
 
     private static final long serialVersionUID = 1L;
     

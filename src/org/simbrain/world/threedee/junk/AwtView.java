@@ -1,4 +1,4 @@
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.junk;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
+import org.simbrain.world.threedee.Viewable;
+import org.simbrain.world.threedee.environment.Environment;
 
 import com.jme.renderer.Renderer;
 import com.jme.scene.state.CullState;

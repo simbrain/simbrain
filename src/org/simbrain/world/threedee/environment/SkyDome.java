@@ -30,7 +30,7 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.environment;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.image.Texture;

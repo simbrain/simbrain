@@ -1,4 +1,6 @@
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.gui;
+
+import org.simbrain.world.threedee.Moveable;
 
 import com.jme.math.Vector3f;
 

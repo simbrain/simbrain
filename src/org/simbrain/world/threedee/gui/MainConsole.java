@@ -1,7 +1,6 @@
 package org.simbrain.world.threedee.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -17,7 +16,6 @@ import javax.swing.JPanel;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
-import org.simbrain.world.threedee.KeyHandler;
 import org.simbrain.world.threedee.Moveable;
 import org.simbrain.world.threedee.ThreeDeeComponent;
 
@@ -25,7 +23,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<AgentView, Component> views = new HashMap<AgentView, Component>();
+    private Map<AgentView, JFrame> views = new HashMap<AgentView, JFrame>();
     
     ThreeDeeComponent component;
     
@@ -37,8 +35,8 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
     private final int WIDTH = 512;
     private final int HEIGHT = 384;
     
-    BorderLayout layout;// = new BorderLayout();
-    JPanel root;// = new JPanel();
+    BorderLayout layout;
+    JPanel root;
     JPanel agents;
     
     public void postAddInit() {
@@ -125,6 +123,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         agent.addInput(0, handler.input);
         innerFrame.addKeyListener(handler);
         innerFrame.setSize(WIDTH, HEIGHT);
+        innerFrame.setResizable(false);
         innerFrame.setVisible(true);
     }
     
@@ -143,9 +142,15 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         return handler;
     }
     
+    /**
+     * remove all the views
+     */
     @Override
     public void close() {
-        // TODO Auto-generated method stub
+        for (JFrame frame : views.values()) {
+            frame.setVisible(false);
+            frame.dispose();
+        }
     }
 
     @Override

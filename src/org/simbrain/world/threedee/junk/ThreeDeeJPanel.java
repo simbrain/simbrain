@@ -1,4 +1,4 @@
-package org.simbrain.world.threedee;
+package org.simbrain.world.threedee.junk;
 
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;

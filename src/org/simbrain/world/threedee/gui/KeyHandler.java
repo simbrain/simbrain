@@ -2,11 +2,15 @@ package org.simbrain.world.threedee.gui;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.simbrain.world.threedee.Moveable;
+import org.simbrain.world.threedee.Moveable.Action;
 
 /**
  * Binds key events to Moveable actions and provides a Input instance that can
@@ -21,8 +25,8 @@ public class KeyHandler implements KeyListener {
     private final Map<Integer, Moveable.Action> bindings = new HashMap<Integer, Moveable.Action>();
 
     /** An input that can be set on a Moveable instance. */
-    public final Moveable.Input input = new Moveable.Input();
-
+    public final Collection<Action> input = Collections.synchronizedCollection(new HashSet<Action>());
+    
     /**
      * Adds an new binding in this handler.
      * 
@@ -39,15 +43,17 @@ public class KeyHandler implements KeyListener {
      * Handles a key being pressed down.
      */
     public void keyPressed(final KeyEvent e) {
-        LOGGER.trace("keypressed:" + e);
-        input.set(bindings.get(e.getKeyCode()));
+        LOGGER.trace("keypressed: " + e);
+        input.add(bindings.get(e.getKeyCode()));
     }
 
     /**
      * Handles a key being released.
      */
     public void keyReleased(final KeyEvent e) {
-        input.clear(bindings.get(e.getKeyCode()));
+        LOGGER.trace("keyreleased: " + e);
+        input.remove(bindings.get(e.getKeyCode()));
+        LOGGER.trace("input: " + input.size());
     }
 
     /**

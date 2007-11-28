@@ -1,13 +1,6 @@
 package org.simbrain.world.threedee;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedee.environment.Environment;
 
 import com.jme.math.Vector3f;

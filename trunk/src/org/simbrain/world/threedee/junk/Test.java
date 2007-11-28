@@ -70,7 +70,7 @@ public class Test {
         
         innerFrame.getRootPane().add(canvas.getCanvas());
         
-        KeyHandler handler = getHandler();
+        KeyHandler handler = getHandler(agent);
         
         agent.addInput(0, handler.input);
         
@@ -96,7 +96,7 @@ public class Test {
         
         innerFrame.getRootPane().add(canvas.getCanvas());
         
-        KeyHandler handler = getHandler();
+        KeyHandler handler = getHandler(bird);
         
         bird.addInput(0, handler.input);
         
@@ -104,18 +104,18 @@ public class Test {
         innerFrame.setSize(width, height);
     }
     
-    private static KeyHandler getHandler()
+    private static KeyHandler getHandler(Moveable moveable)
     {
         KeyHandler handler = new KeyHandler();
         
-        handler.addBinding(KeyEvent.VK_LEFT, Moveable.Action.LEFT);
-        handler.addBinding(KeyEvent.VK_RIGHT, Moveable.Action.RIGHT);
-        handler.addBinding(KeyEvent.VK_UP, Moveable.Action.FORWARD);
-        handler.addBinding(KeyEvent.VK_DOWN, Moveable.Action.BACKWARD);
-        handler.addBinding(KeyEvent.VK_A, Moveable.Action.DOWN);
-        handler.addBinding(KeyEvent.VK_Z, Moveable.Action.UP);
-        handler.addBinding(KeyEvent.VK_U, Moveable.Action.RISE);
-        handler.addBinding(KeyEvent.VK_J, Moveable.Action.FALL);
+        handler.addBinding(KeyEvent.VK_LEFT, moveable.left());
+        handler.addBinding(KeyEvent.VK_RIGHT, moveable.right());
+        handler.addBinding(KeyEvent.VK_UP, moveable.forward());
+        handler.addBinding(KeyEvent.VK_DOWN, moveable.backward());
+        handler.addBinding(KeyEvent.VK_A, moveable.down());
+        handler.addBinding(KeyEvent.VK_Z, moveable.up());
+        handler.addBinding(KeyEvent.VK_U, moveable.rise());
+        handler.addBinding(KeyEvent.VK_J, moveable.fall());
         
         return handler;
     }

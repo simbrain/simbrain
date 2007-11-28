@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
-import org.simbrain.world.threedee.Moveable;
 import org.simbrain.world.threedee.ThreeDeeComponent;
 
 public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
@@ -118,7 +117,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         innerFrame.getRootPane().setLayout(layout);
         innerFrame.getRootPane().add(canvas.getCanvas());
         
-        KeyHandler handler = getHandler();
+        KeyHandler handler = getHandler(agent);
         
         agent.addInput(0, handler.input);
         innerFrame.addKeyListener(handler);
@@ -127,13 +126,13 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         innerFrame.setVisible(true);
     }
     
-    private static KeyHandler getHandler() {
+    private KeyHandler getHandler(Agent agent) {
         KeyHandler handler = new KeyHandler();
         
-        handler.addBinding(KeyEvent.VK_LEFT, Moveable.Action.LEFT);
-        handler.addBinding(KeyEvent.VK_RIGHT, Moveable.Action.RIGHT);
-        handler.addBinding(KeyEvent.VK_UP, Moveable.Action.FORWARD);
-        handler.addBinding(KeyEvent.VK_DOWN, Moveable.Action.BACKWARD);
+        handler.addBinding(KeyEvent.VK_LEFT, agent.left());
+        handler.addBinding(KeyEvent.VK_RIGHT, agent.right());
+        handler.addBinding(KeyEvent.VK_UP, agent.forward());
+        handler.addBinding(KeyEvent.VK_DOWN, agent.backward());
 //        handler.addBinding(KeyEvent.VK_A, Moveable.Action.DOWN);
 //        handler.addBinding(KeyEvent.VK_Z, Moveable.Action.UP);
 //        handler.addBinding(KeyEvent.VK_U, Moveable.Action.RISE);

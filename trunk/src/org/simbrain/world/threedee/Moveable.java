@@ -1,8 +1,7 @@
 package org.simbrain.world.threedee;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -26,8 +25,8 @@ public abstract class Moveable implements Viewable {
      * processed in an update. That is the input with updates with the highest
      * priority will block events on a lower priority input.
      */
-    private final SortedMap<Integer, Input> inputs = Collections
-            .synchronizedSortedMap(new TreeMap<Integer, Input>());
+    private final SortedMap<Integer, Collection<? extends Action>> inputs = Collections
+      .synchronizedSortedMap(new TreeMap<Integer, Collection<? extends Action>>());
 
     /** The number of degrees each turn event rotates the view. */
     private final float rotationSpeed = 2.5f;
@@ -59,7 +58,7 @@ public abstract class Moveable implements Viewable {
      * @param priority the priority of the input provided
      * @param input the input for this view
      */
-    public void addInput(final int priority, final Input input) {
+    public void addInput(final int priority, final Collection<Action> input) {
         inputs.put(priority, input);
     }
 
@@ -110,14 +109,22 @@ public abstract class Moveable implements Viewable {
         upSpeed = 0f;
 
         /* input is synchronized but we need to lock over the iterator */
-        synchronized (inputs) {
-            for (final Input input : inputs.values()) {
-                /*
-                 * if there are events on this input process them and then
-                 * return
-                 */
-                if (input.actions.size() > 0) {
-                    input.doActions(this);
+        for (final Collection<? extends Action> input : inputs.values()) {
+            /*
+             * if there are events on this input process them and then
+             * return
+             */
+            synchronized (input) {
+                if (input.size() > 0) {
+                    for (final Action action : input) {
+                        if (action.parent != this) {
+                            throw new IllegalArgumentException(
+                                "actions can only be handled by parent");
+                        }
+                        
+                        action.doAction();
+                    }
+                    
                     doUpdates();
 
                     return;
@@ -215,141 +222,116 @@ public abstract class Moveable implements Viewable {
         return speed;
     }
 
-    /**
-     * Returns the maximum movement speed.
-     * 
-     * @return the maximum movement speed
-     */
-    public float getMovementSpeed() {
-        return movementSpeed;
-    }
-
-    /**
-     * An input instance holds all the action that have occurred and to update
-     * the view.
-     * 
-     * @author Matt Watson
-     */
-    public static class Input {
-        /**
-         * The current set of actions.
-         */
-        private final Set<Action> actions = new HashSet<Action>();
-
-        /**
-         * Sets a current action.
-         * 
-         * @param action the action to set
-         */
-        public void set(final Action action) {
-            actions.add(action);
-        }
-
-        /**
-         * Removes a current action.
-         * 
-         * @param action the action to remove
-         */
-        public void clear(final Action action) {
-            actions.remove(action);
-        }
-
-        /**
-         * Executes the current actions against the provided Moveable.
-         * 
-         * @param moveable the view to apply the actions to
-         */
-        private void doActions(final Moveable moveable) {
-            for (final Action action : actions) {
-                if (action != null) {
-                    action.doAction(moveable);
-                }
+    /** Turn left. */
+    public Action left() {
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("left: " + super.value);
+                leftRightRot += getValue() * rotationSpeed;
             }
-        }
-
-        /**
-         * Presents a debug string with the number of current actions.
-         */
-        @Override
-        public String toString() {
-            return "actions: " + actions.size();
-        }
+        };
     }
 
+    /** Turn right. */
+    public Action right() { 
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("right");
+                leftRightRot -= getValue() * rotationSpeed;
+            }
+        };
+    }
+
+    /** Move forwards. */
+    public Action forward() {
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("forward");
+                speed = getValue() * movementSpeed;
+            }
+        };
+    }
+
+    /** Move backwards. */
+    public final Action backward() { 
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("backward");
+                speed = 0f - (getValue() * movementSpeed);
+            }
+        };
+    }
+
+    /** Rise straight up regardless of orientation. */
+    public final Action rise() { 
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("rise");
+                upSpeed = getValue() * movementSpeed;
+            }
+        };
+    }
+
+    /** Fall straight down regardless of orientation. */
+    public final Action fall() { 
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("fall");
+                upSpeed = 0 - (getValue() * movementSpeed);
+            }
+        };
+    }
+
+    /** Nose down. */
+    public final Action down() { 
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("down");
+                upDownRot += getValue() * rotationSpeed;
+            }
+        };
+    }
+
+    /** Nose up. */
+    public final Action up() { 
+        return new Action() {
+            @Override
+            void doAction() {
+                LOGGER.trace("up");
+                upDownRot -= getValue() * rotationSpeed;
+            }
+        };
+    }
+    
     /**
      * Enum of actions that can be applied to a Moveable.
      * 
      * @author Matt Watson
      */
-    public enum Action {
-        /** Turn left. */
-        LEFT {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.leftRightRot += agent.rotationSpeed;
-            }
-        },
-
-        /** Turn right. */
-        RIGHT {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.leftRightRot -= agent.rotationSpeed;
-            }
-        },
-
-        /** Move forwards. */
-        FORWARD {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.speed = agent.movementSpeed;
-            }
-        },
-
-        /** Move backwards. */
-        BACKWARD {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.speed = 0f - agent.movementSpeed;
-            }
-        },
-
-        /** Rise straight up regardless of orientation. */
-        RISE {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.upSpeed = agent.movementSpeed;
-            }
-        },
-
-        /** Fall straight down regardless of orientation. */
-        FALL {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.upSpeed = 0 - agent.movementSpeed;
-            }
-        },
-
-        /** Nose down. */
-        DOWN {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.upDownRot += agent.rotationSpeed;
-            }
-        },
-
-        /** Nose up. */
-        UP {
-            @Override
-            void doAction(final Moveable agent) {
-                agent.upDownRot -= agent.rotationSpeed;
-            }
-        };
-
+    public abstract class Action {
         /**
          * Method all action instances use. Not meant to be called this from
          * outside this class.
          */
-        abstract void doAction(Moveable agent);
+        abstract void doAction();
+        
+        final Moveable parent = Moveable.this;
+        
+        private float value = 1f;
+        
+        public void setValue(float amount) {
+            this.value = amount;
+        }
+        
+        public float getValue() {
+            return value;
+        }
     }
 }

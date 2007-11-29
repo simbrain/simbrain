@@ -259,4 +259,8 @@ public class Workspace {
     private void clearWorkspaceThread() {
         workspaceThread = null;
     }
+
+    public CouplingManager getManager() {
+        return manager;
+    }
 }

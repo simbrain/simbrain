@@ -30,7 +30,7 @@ import java.util.List;
 public class ModifiableListModel<E> extends GenericListModel<E> {
 
     private static final long serialVersionUID = 1L;
-    
+
     /** List of couplings. */
     private final List<E> list;
 
@@ -39,6 +39,13 @@ public class ModifiableListModel<E> extends GenericListModel<E> {
      */
     public ModifiableListModel() {
         this(new ArrayList<E>());
+    }
+
+    /**
+     * Clear list.
+     */
+    public void clear() {
+        this.list.clear();
     }
 
     /**

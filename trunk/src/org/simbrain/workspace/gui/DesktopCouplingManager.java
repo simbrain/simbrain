@@ -31,8 +31,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -51,6 +53,7 @@ import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.CouplingManager;
 
@@ -61,16 +64,14 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
 
     private static final long serialVersionUID = 1L;
 
+    /** Reference to coupling manager. */
     private final CouplingManager manager;
-    
+
     /** List of consumers for use in dialog. */
     private JList consumerJList = new JList();
 
     /** Combo box of available consumers. */
     private JComboBox consumerComboBox = new JComboBox();
-
-    /** Reference to current component (on the consumer / coupling side). */
-    private WorkspaceComponent currentComponent = null;
 
     /** List of producers for use in dialog. */
     private JList producerJList = new JList();
@@ -80,45 +81,26 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
 
     /** Area of coupled items. */
     private CouplingTray couplingTray = new CouplingTray();
-    /** model for CouplingTray */
+
+    /** Model for CouplingTray. */
     CouplingTray.CouplingList trayModel = new CouplingTray.CouplingList();
-    
+
     /** Reference of parent frame. */
     private final JFrame frame;
 
-    private final KeyAdapter couplingKeyAdapter = new KeyAdapter()
-    {
-        /**
-         * {@inheritDoc}
-         */
-        public void keyPressed(final KeyEvent event) {
-            int keyCode = event.getKeyCode();
-            switch (keyCode) {
-            case KeyEvent.VK_BACK_SPACE:        
-                if (getCouplingTray().hasFocus()) {
-                    deleteSelectedCouplings();
-                }
-                break;
-            default:
-                break;
-            }
-        }
-    };
-    
     /**
-     * Default constructor. Creates and displays the coupling manager.
+     * Creates and displays the coupling manager.
+     *
      * @param frame parent of panel.
      */
-    public DesktopCouplingManager(final JFrame frame) {
+    public DesktopCouplingManager(final SimbrainDesktop desktop, final JFrame frame) {
         super();
-        
-        this.manager = new CouplingManager();
-        this.frame = frame;
-        
-        GenericListModel<WorkspaceComponent> componentList = null;
-//            = new GenericListModel<WorkspaceComponent>(SimbrainDesktop.getInstance().getComponentList());
 
-        ///////////////
+        this.manager = desktop.getWorkspace().getManager();
+        this.frame = frame;
+        GenericListModel componentList = new GenericListModel(desktop.getWorkspace().getComponentList());
+
+         ///////////////
         // CONSUMERS //
         ///////////////
         JPanel leftPanel = new JPanel(new BorderLayout());
@@ -145,8 +127,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         consumerComboBox.addActionListener(this);
         if (consumerComboBox.getModel().getSize() > 0) {
             consumerComboBox.setSelectedIndex(0);
-            this.refreshComponentList(componentList.getElementAt(0), consumerComboBox);
-//            this.refreshComponentList(components.get(0), consumerComboBox);
+           this.refreshComponentList((WorkspaceComponent<?>)componentList.getElementAt(0), consumerComboBox);
         }
         leftPanel.add("North", consumerComboBox);
         leftPanel.add("Center", leftScrollPane);
@@ -161,6 +142,9 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         JButton deleteButton = new JButton("Remove");
         deleteButton.addActionListener(this);
         centerButtonTray.add(deleteButton);
+        for (Coupling coupling : manager.getCouplings()) {
+            trayModel.addElement(coupling);
+        }
         addCouplingContextMenu(couplingTray);
         couplingTray.setModel(trayModel);
         couplingTray.setSize(new Dimension(250, 350));
@@ -198,11 +182,10 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         addProducerContextMenu(producerJList);
         producerComboBox.setModel(componentList);
         producerComboBox.addActionListener(this);
-        
-        if (producerComboBox.getModel().getSize() > 0) {
+
+      if (producerComboBox.getModel().getSize() > 0) {
             producerComboBox.setSelectedIndex(0);
-//            this.refreshComponentList(componentList.getComponentList().get(0), producerComboBox);
-            this.refreshComponentList(componentList.getElementAt(0), producerComboBox);
+            this.refreshComponentList((WorkspaceComponent<?>)componentList.getElementAt(0), producerComboBox);
         }
 
         rightPanel.add("North", producerComboBox);
@@ -249,7 +232,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * name.
      */
     private class ConsumerCellRenderer extends DefaultListCellRenderer {
-        
+
         private static final long serialVersionUID = 1L;
 
         /**
@@ -267,8 +250,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)
                     super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Consumer consumer = (Consumer) object;
-//            renderer.setText(consumer.getConsumerDescription() + ":"
-//                    + consumer.getDefaultConsumingAttribute().getAttributeDescription());
+            renderer.setText(consumer.getDescription() + ":" + consumer.getDefaultConsumingAttribute().getAttributeDescription());
             return renderer;
        }
     }
@@ -371,7 +353,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * name.
      */
     private class ProducerCellRenderer extends DefaultListCellRenderer {
-        
+
         private static final long serialVersionUID = 1L;
 
         /**
@@ -389,8 +371,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)
                     super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Producer producer = (Producer) object;
-//            renderer.setText(producer.getProducerDescription() + ":"
-//                    + producer.getDefaultProducingAttribute().getAttributeDescription());
+            renderer.setText(producer.getDescription() + ":" + producer.getDefaultProducingAttribute().getAttributeDescription());
             return renderer;
        }
     }
@@ -427,7 +408,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * Packages a coupling into a menu item.
      */
     private class ProducerMenuItem extends JMenuItem {
-        
+
         private static final long serialVersionUID = 1L;
 
         /** Attribute of producer. */
@@ -487,38 +468,24 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     }
 
     /**
-     * Refresh the main parts of coupling manager.
-     * For consumer combo box, refresh consumer list + coupling tray.
-     * For producer combo box, refresh producer list.
+     * Refresh combo boxes.
      *
      * @param component the workspace component being checked
      * @param comboBox the combo box upon which the refresh is based
      */
     private void refreshComponentList(final WorkspaceComponent component, final JComboBox comboBox) {
-//        if (component != null) {
-//            if (comboBox == consumerComboBox) {
-//                currentComponent = component;
-//                if (component.getCouplingContainer() != null) {
-//                    if (component.getCouplingContainer().getConsumers() != null) {
-//                        manager.refreshConsumers(component.getCouplingContainer());
-//                        consumerJList.setModel(new GenericListModel<Consumer>(manager.getConsumers()));
-//                    }
-//                    if (component.getCouplingContainer().getCouplings() != null) {
-//                        ArrayList<Coupling> couplings = new ArrayList<Coupling>(component.getCouplingContainer().getCouplings());
-//                        couplingTray.setModel(new CouplingTray.CouplingList(couplings));
-//                    }
-//                }
-//            } else if (comboBox == producerComboBox) {
-//                if (component.getCouplingContainer() != null) {
-//                    if (component.getCouplingContainer().getProducers() == null) {
-//                        producerJList.setModel(new DefaultComboBoxModel());
-//                    } else {
-//                        manager.refreshProducers(component.getCouplingContainer());
-//                        producerJList.setModel(new GenericListModel<Producer>(manager.getProducers()));
-//                    }
-//                }
-//            }
-//        }
+        if (component != null) {
+            // Populate consumer / Producer Lists
+            if (comboBox == consumerComboBox) {
+                if (component.getConsumers() != null)  {
+                    consumerJList.setModel(new GenericListModel<Consumer>((List) component.getConsumers()));
+                }
+          } else if (comboBox == producerComboBox) {
+              if (component.getProducers() != null) {
+                  producerJList.setModel(new GenericListModel<Producer>((List) component.getProducers()));
+              }
+          }
+        }
     }
 
     /**
@@ -652,14 +619,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * Update workspace to reflect all changes that have been made.
      */
     private void applyChanges() {
-//        if (currentComponent != null) {
-//            if (currentComponent.getCouplingContainer() != null) {
-//                currentComponent.getCouplingContainer().getCouplings().clear();
-//                for (Coupling coupling : trayModel) {
-//                    currentComponent.getCouplingContainer().getCouplings().add(coupling);
-//                }
-//            }
-//        }
+        for (Coupling coupling : trayModel) {
+            if (!manager.containsCoupling(coupling)) {
+                manager.addCoupling(coupling);
+            }
+        }
     }
 
     /**
@@ -827,6 +791,28 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     public CouplingTray getCouplingTray() {
         return couplingTray;
     }
+    
+    /**
+     * Handle key events.
+     */
+    private final KeyAdapter couplingKeyAdapter = new KeyAdapter()
+    {
+        /**
+         * {@inheritDoc}
+         */
+        public void keyPressed(final KeyEvent event) {
+            int keyCode = event.getKeyCode();
+            switch (keyCode) {
+            case KeyEvent.VK_BACK_SPACE:
+                if (getCouplingTray().hasFocus()) {
+                    deleteSelectedCouplings();
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    };
 }
 
 

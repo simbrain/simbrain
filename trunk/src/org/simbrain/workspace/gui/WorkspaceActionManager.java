@@ -184,7 +184,7 @@ public class WorkspaceActionManager {
         globalRunAction = new GlobalRunAction(workspace);
         globalStopAction = new GlobalStopAction(workspace);
 
-        openCouplingManagerAction = new OpenCouplingManagerAction();
+        openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
     }
 
     /**

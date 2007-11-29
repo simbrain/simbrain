@@ -8,27 +8,28 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 
 public class DataModel<E> {
-    
+
     /** Default initial number of rows. */
     private static final int DEFAULT_ROW_COUNT = 5;
-    
+
     /** Default initial number of columns. */
-    private static final int DEFAULT_COLUMN_COUNT = 6;
-    
+    private static final int DEFAULT_COLUMN_COUNT = 5;
+
+    /** The data. */
     private List<List<E>> data = new ArrayList<List<E>>();
-    
-    /** */
+
+    /** Number of columns. */
     private int width = DEFAULT_COLUMN_COUNT;
-    
-    /** */
+
+    /** Number of rows. */
     private int height = DEFAULT_ROW_COUNT;
-    
+
     /** Iteration mode. */
     private boolean iterationMode = false;
-    
+
     /** Use last column for iteration. */
     private boolean lastColumnBasedIteration = false;
-    
+
     /** Randomization upper bound. */
     private int upperBound = 1;
 
@@ -38,7 +39,7 @@ public class DataModel<E> {
     private int currentRow = 0;
 
     private List<Listener> listeners = new ArrayList<Listener>();
-    
+
     /** List of consumers. */
     private ArrayList<Consumer> consumers = new ArrayList<Consumer>();
 
@@ -55,7 +56,7 @@ public class DataModel<E> {
             producers.add(new ProducingColumn<E>(this, i));
         }
     }
-    
+
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
@@ -71,15 +72,16 @@ public class DataModel<E> {
     public List<? extends Producer> getProducers() {
         return Collections.unmodifiableList(producers);
     }
-    
+
     private List<E> newRow() {
         ArrayList<E> row = new ArrayList<E>();
-        
-        for (int i = 0; i < width; i++) row.add(null);
-        
+
+        for (int i = 0; i < width; i++) {
+            row.add(null);
+        }
         return row;
     }
-    
+
     public void set(int row, int column, E value) {
         data.get(row).set(column, value);
         for (Listener listener : listeners) listener.itemChanged(row, column);
@@ -158,13 +160,13 @@ public class DataModel<E> {
     public void setCurrentRow(int currentRow) {
         this.currentRow = currentRow;
     }
-    
+
     public void addNewRow() {
         height++;
         data.add(newRow());
         for (Listener listener : listeners) listener.rowAdded(height - 1);
     }
-    
+
     public void insertNewRow(int at) {
         height++;
         data.add(at, newRow());
@@ -177,7 +179,7 @@ public class DataModel<E> {
         consumers.add(new ConsumingColumn<E>(this, width - 1));
         for (Listener listener : listeners) listener.columnAdded(width - 1);
     }
-    
+
     public void insertNewColumn(int at) {
         width++;
         for (List<E> row : data) row.add(at, null);

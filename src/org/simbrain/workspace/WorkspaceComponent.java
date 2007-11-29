@@ -171,24 +171,20 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         }
         return simpleName;
     }
-    
-    public Collection<? extends Consumer> getConsumers()
-    {
+
+    public Collection<? extends Consumer> getConsumers() {
         return Collections.emptySet();
     }
-    
-    public Collection<? extends Producer> getProducers()
-    {
+
+    public Collection<? extends Producer> getProducers() {
         return Collections.emptySet();
     }
-    
-    void setWorkspace(Workspace workspace)
-    {
+
+    void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
     }
-    
-    public Workspace getWorkspace()
-    {
+
+    public Workspace getWorkspace() {
         return workspace;
     }
 }

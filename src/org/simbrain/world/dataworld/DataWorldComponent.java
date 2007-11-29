@@ -35,15 +35,14 @@ import org.simbrain.workspace.WorkspaceComponentListener;
  */
 public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
-    
+
     /** Table model. */
     private final DataModel<Double> dataModel = new DataModel<Double>();
-    
-    DataModel<Double> getDataModel()
-    {
+
+    DataModel<Double> getDataModel() {
         return dataModel;
     }
-    
+
     /**
      * This method is the default constructor.
      */

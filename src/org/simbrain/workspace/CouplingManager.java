@@ -27,43 +27,48 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 public class CouplingManager {
+
     private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
-    
+
     private List<Coupling<?>> all = new ArrayList<Coupling<?>>();
+
     private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings = new HashMap<SourceTarget, List<Coupling<?>>>();
-    
-    List<? extends Coupling<?>> getCouplings() {
+
+    public List<? extends Coupling<?>> getCouplings() {
         return Collections.unmodifiableList(all);
     }
-    
-    List<? extends Coupling<?>> getCouplings(WorkspaceComponent source, WorkspaceComponent target) {
+
+    public List<? extends Coupling<?>> getCouplings(WorkspaceComponent source, WorkspaceComponent target) {
         return Collections.unmodifiableList(sourceTargetCouplings.get(new SourceTarget(source, target)));
     }
-    
+
     void updateAllCouplings() {
         LOGGER.debug("updating all couplings");
         for (Coupling<?> coupling : getCouplings()) {
             LOGGER.trace(coupling.getClass());
             coupling.setBuffer();
         }
-        
+
         for (Coupling<?> coupling : getCouplings()) {
             coupling.update();
         }
     }
-    
+
     //TODO implement findCoupling
     Coupling<?> findCoupling(String sourceId, String targetId) {
         return null;
     }
-    
-    void addCoupling(Coupling<?> coupling) {
+
+    public boolean containsCoupling(Coupling<?> coupling) {
+       return all.contains(coupling);
+    }
+
+    public void addCoupling(Coupling<?> coupling) {
         all.add(coupling);
-        
         SourceTarget sourceTarget = new SourceTarget(
             coupling.getConsumingAttribute().getParent().getParentComponent(),
             coupling.getProducingAttribute().getParent().getParentComponent());
-                
+
         List<Coupling<?>> couplings = sourceTargetCouplings.get(sourceTarget);
         
         if (couplings == null) {

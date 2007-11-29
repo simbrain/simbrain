@@ -99,12 +99,15 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     /** Determines whether iteration mode uses last column. */
     private JCheckBoxMenuItem columnIteration = new JCheckBoxMenuItem("Use last column");
 
+
     /**
-     * This method is the default constructor.
+     * Default constructor.
+     *
+     * @param component reference to model component
      */
-    public DataWorldDesktopComponent(DataWorldComponent component) {
+    public DataWorldDesktopComponent(final DataWorldComponent component) {
+
         super(component);
-        
         component.addListener(new BasicComponentListener());
         world = new DataWorld(this, component.getDataModel());
         checkIterationMode();
@@ -114,7 +117,6 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         getContentPane().add(world.getTable().getTableHeader(), BorderLayout.PAGE_START);
         worldScroller.setViewportView(world);
         worldScroller.setEnabled(false);
-        
         pack();
     }
 
@@ -133,6 +135,9 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         saveAs.addActionListener(saveListener);
         close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
+        randomize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
+        
         mb.add(file);
         file.add(open);
         file.add(save);
@@ -230,19 +235,19 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
 //        setStringReference(worldFile);
 //        setChangedSinceLastSave(false);
     }
-    
+
     private ActionListener openListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             showOpenFileDialog();
         }
     };
-    
+
     private ActionListener saveListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             save();
         }
     };
-    
+
     private ActionListener addRowListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().addNewRow();
@@ -250,7 +255,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
             pack();
         }
     };
-        
+
     private ActionListener addColListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().addNewColumn();
@@ -286,16 +291,18 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     private ActionListener randomizeListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             Random rand = new Random();
-            
+
             DataModel<Double> model = world.getDataModel();
             int height = model.getRowCount();
             int width = model.getColumnCount();
             int lower = model.getLowerBound();
             int range = model.getUpperBound() - lower;
-            
-            for (int i = 0; i < height * width; i++) {
-                double value = (rand.nextDouble() * range) + lower;
-                model.set(i / width, i % height, value);
+
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++ ) {
+                    double value = (rand.nextDouble() * range) + lower;
+                    model.set(i , j, value);                    
+                }
             }
 
             setChangedSinceLastSave(true);

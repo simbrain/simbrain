@@ -57,9 +57,9 @@ public class DataWorld extends JPanel {
     private JXTable table;
 
     private TableModel tableModel;
-    
+
     private final DataModel<Double> dataModel;
-    
+
     /** Parent frame that calls world. */
     private DataWorldDesktopComponent parentFrame;
 
@@ -127,7 +127,7 @@ public class DataWorld extends JPanel {
             ws.pack();
         }
     };
-    
+
     private ActionListener addColHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             getDataModel().insertNewColumn(getSelectedColumn());
@@ -136,7 +136,7 @@ public class DataWorld extends JPanel {
             ws.pack();
         }
     };
-    
+
     private ActionListener remRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             getDataModel().removeRow(getSelectedRow());
@@ -152,17 +152,15 @@ public class DataWorld extends JPanel {
             ws.pack();
         }
     };
-    
-    public int getSelectedColumn()
-    {
+
+    public int getSelectedColumn() {
         return getTable().columnAtPoint(selectedPoint);
     }
-    
-    public int getSelectedRow()
-    {
+
+    public int getSelectedRow() {
         return getTable().rowAtPoint(selectedPoint);
     }
-    
+
     private MouseListener mouseListener = new MouseAdapter() {
         /**
          * Responds to mouse pressed event.
@@ -199,9 +197,9 @@ public class DataWorld extends JPanel {
         }
 
         ret.addSeparator();
-        
+
         JMenu producerMenu = ws.getDesktop().getProducerListMenu(couplingMenuItemListener);
-        
+
         ret.add(producerMenu);
 
         return ret;

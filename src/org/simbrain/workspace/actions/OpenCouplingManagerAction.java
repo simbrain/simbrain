@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.DesktopCouplingManager;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Open data world in current workspace.
@@ -33,12 +34,16 @@ public final class OpenCouplingManagerAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
+    /** Reference to Simbrain desktop. */
+    private SimbrainDesktop desktop;
+
     /**
      * Create an open data world with the specified
      * workspace.
      */
-    public OpenCouplingManagerAction() {
+    public OpenCouplingManagerAction(final SimbrainDesktop desktop) {
         super("Open coupling manager");
+        this.desktop = desktop;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("BothWays.png"));
         putValue(SHORT_DESCRIPTION, "Open coupling manager");
     }
@@ -46,12 +51,11 @@ public final class OpenCouplingManagerAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         JFrame frame = new JFrame();
-        DesktopCouplingManager cm = new DesktopCouplingManager(frame);
+        DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
         frame.setContentPane(cm);
         frame.setSize(850, 420);
         frame.setLocationRelativeTo(null);
         frame.pack();
-        frame.setResizable(true); // Maybe should allow this...
         frame.setVisible(true);
     }
 }

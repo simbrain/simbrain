@@ -273,7 +273,8 @@ public final class Sensor implements Producer {
         public Double getValue() {
             return sample;
         }
-        
+
+        /** {@inheritDoc} */
         public Type getType() {
             return Double.TYPE;
         }
@@ -282,5 +283,9 @@ public final class Sensor implements Producer {
     public WorkspaceComponent getParentComponent() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void setDefaultProducingAttribute(
+            ProducingAttribute<?> producingAttribute) {        
     }
 }

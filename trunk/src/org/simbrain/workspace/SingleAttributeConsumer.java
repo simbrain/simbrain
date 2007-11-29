@@ -8,12 +8,15 @@ public abstract class SingleAttributeConsumer<E> implements Consumer, ConsumingA
     public ConsumingAttribute<E> getDefaultConsumingAttribute() {
         return this;
     }
-    
+
     public List<ConsumingAttribute<E>> getConsumingAttributes() {
         return Collections.singletonList(getDefaultConsumingAttribute());
     }
-    
+
     public final Consumer getParent() {
         return this;
+    }
+    
+    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute) {
     }
 }

@@ -27,6 +27,5 @@ public interface Producer extends AttributeHolder {
      *
      * @param producingAttribute the default producing attribute to set.
      */
-     // TODO is this needed?
-//    public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
+    public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
 }

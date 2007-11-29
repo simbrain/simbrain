@@ -27,6 +27,5 @@ public interface Consumer extends AttributeHolder {
      *
      * @param consumingAttribute the default consuming attribute to set.
      */
-    // TODO is this needed?
-//    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute);
+    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute);
 }

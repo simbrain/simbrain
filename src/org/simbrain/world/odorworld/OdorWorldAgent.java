@@ -66,16 +66,16 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     private ArrayList<ConsumingAttribute<?>> effectorList = new ArrayList<ConsumingAttribute<?>>();
 
     /** Default effector. */
-    private final ConsumingAttribute<Double> defaultEffector = new Forward();
+    private ConsumingAttribute<Double> defaultEffector = new Forward();
 
     /** List of sensors. */
     private ArrayList<ProducingAttribute<?>> sensorList = new ArrayList<ProducingAttribute<?>>();
 
     /** Default sensor. */
-    private final ProducingAttribute<Double> defaultSensor = new CenterSensor(1);
+    private ProducingAttribute<Double> defaultSensor = new CenterSensor(1);
 
     private final OdorWorldComponent component;
-    
+
     /**
      * Default constructor.
      */
@@ -140,6 +140,21 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     /**
      * {@inheritDoc}
      */
+   public void setDefaultConsumingAttribute(final ConsumingAttribute consumingAttribute) {
+      defaultEffector = consumingAttribute;
+   }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
+       defaultSensor = producingAttribute;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription() {
         return this.getName();
     }
@@ -165,6 +180,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         return defaultSensor;
     }
 
+    
     /**
      * @return orientation in degrees
      */
@@ -756,4 +772,5 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
             }
         }
     }
+
 }

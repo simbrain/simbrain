@@ -944,10 +944,10 @@ public abstract class Neuron implements Producer, Consumer {
     /**
      * @param defaultConsumingAttribute the defaultConsumingAttribute to set
      */
-//    public void setDefaultConsumingAttribute(
-//            ConsumingAttribute defaultConsumingAttribute) {
-//        this.defaultConsumingAttribute = defaultConsumingAttribute;
-//    }
+    public void setDefaultConsumingAttribute(
+            ConsumingAttribute defaultConsumingAttribute) {
+        this.defaultConsumingAttribute = defaultConsumingAttribute;
+    }
 
     /**
      * @return the defaultProducingAttribute
@@ -956,13 +956,13 @@ public abstract class Neuron implements Producer, Consumer {
         return defaultProducingAttribute;
     }
 
-//    /**
-//     * @param defaultProducingAttribute the defaultProducingAttribute to set
-//     */
-//    public void setDefaultProducingAttribute(
-//            ProducingAttribute defaultProducingAttribute) {
-//        this.defaultProducingAttribute = defaultProducingAttribute;
-//    }
+    /**
+     * @param defaultProducingAttribute the defaultProducingAttribute to set
+     */
+    public void setDefaultProducingAttribute(
+            ProducingAttribute defaultProducingAttribute) {
+        this.defaultProducingAttribute = defaultProducingAttribute;
+    }
 
     /**
      * Describes this as a consumer.
@@ -970,17 +970,10 @@ public abstract class Neuron implements Producer, Consumer {
     public String getDescription() {
         return getId();
     }
-    
+
     public WorkspaceComponent getParentComponent() {
         // TODO add implementation
         return null;
-        
     }
 
-//    /**
-//     * Describes this as a producer.
-//     */
-//    public String getProducerDescription() {
-//        return getId();
-//    }
 }

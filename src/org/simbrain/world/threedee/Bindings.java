@@ -15,12 +15,20 @@ import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.world.threedee.Moveable.Action;
 
 class Bindings implements Consumer, Producer {
+
     private final ThreeDeeComponent component;
-//    private final Agent agent;
+
     private final List<ConsumingBinding> consumers = new ArrayList<ConsumingBinding>();
-    
+
+    private ConsumingAttribute defaultConsumingAttribute = null;
+
+    /**
+     * 
+     * @param agent
+     * @param component
+     */
     Bindings(Agent agent, ThreeDeeComponent component) {
-//        this.agent = agent;
+
         this.component = component;
         
         consumers.add(new ConsumingBinding("left", agent.left()));
@@ -28,6 +36,8 @@ class Bindings implements Consumer, Producer {
         consumers.add(new ConsumingBinding("forward", agent.forward()));
         consumers.add(new ConsumingBinding("backward", agent.backward()));
         
+        defaultConsumingAttribute = consumers.get(0);
+
         agent.addInput(10, new AbstractCollection<Action>(){
             @Override
             public Iterator<Action> iterator() {
@@ -112,15 +122,22 @@ class Bindings implements Consumer, Producer {
     }
 
     public ConsumingAttribute<?> getDefaultConsumingAttribute() {
-        // TODO is there a sensible choice?
-        return null;
+        return defaultConsumingAttribute;
     }
-    
+
     public List<? extends ConsumingAttribute<?>> getConsumingAttributes() {
         return Collections.unmodifiableList(consumers);
     }
-    
+
+    public void setDefaultConsumingAttribute(ConsumingAttribute consumingAttribute) {
+        defaultConsumingAttribute = consumingAttribute;
+    }
+
+    public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute) {
+        // TODO Auto-generated method stub        
+    }
     public ThreeDeeComponent getParentComponent() {
         return component;
     }
+
 }

@@ -3,6 +3,7 @@ package org.simbrain.gauge.core;
 import java.lang.reflect.Type;
 
 import org.simbrain.gauge.GaugeComponent;
+import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
@@ -17,9 +18,9 @@ public class Variable extends SingleAttributeConsumer<Double> {
     /** Reference to gauge. */
     private Gauge gauge;
 
-    /** reference to parent component */
+    /** Reference to parent component */
     private final GaugeComponent parent;
-    
+
     /**
      * @param columnNumber
      */

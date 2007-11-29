@@ -18,11 +18,13 @@
  */
 package org.simnet.neurons;
 
+import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.ProducingAttribute;
 import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>BinaryNeuron</b> type to be used in creating different types of networks.
+ * <b>BinaryNeuron</b> takes one of two values.  See docs.
  */
 public class BinaryNeuron extends Neuron {
 
@@ -112,4 +114,5 @@ public class BinaryNeuron extends Neuron {
     public void setBias(final double bias) {
         this.bias = bias;
     }
+
 }

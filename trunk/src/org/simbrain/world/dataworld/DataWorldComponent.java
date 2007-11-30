@@ -54,9 +54,9 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     void wireCouplings(Collection<? extends Producer> producers) {
         /* Handle Coupling wire-up */
         LOGGER.debug("wiring " + producers.size() + " producers");
-        
-        Iterator<? extends Producer> producerIterator = producers.iterator();
-        
+
+       Iterator<? extends Producer> producerIterator = producers.iterator();
+
         for (Consumer consumer : getConsumers()) {
             if (producerIterator.hasNext()) {
                 Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
@@ -64,7 +64,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
             }
         }
     }
-    
+
     /**
      * Read a world from a world-xml file.
      *

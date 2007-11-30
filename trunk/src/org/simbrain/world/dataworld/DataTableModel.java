@@ -75,7 +75,7 @@ public class DataTableModel extends AbstractTableModel {
     }
 
     public String getColumnName(int columnIndex) {
-        return "" + columnIndex;
+        return "" + (columnIndex + 1);
     }
 
     public int getRowCount() {

@@ -28,7 +28,7 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
      * From consuming attribute.
      */
     public String getAttributeDescription() {
-        return "Column " + columnNumber;
+        return "Column " + (columnNumber + 1);
     }
 
     /**
@@ -42,9 +42,9 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "Column " + columnNumber;
+        return "Column " + (columnNumber + 1);
     }
-    
+
     public Type getType() {
         return Double.TYPE;
     }

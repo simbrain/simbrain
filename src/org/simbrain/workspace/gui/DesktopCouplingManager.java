@@ -31,6 +31,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -478,11 +479,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             // Populate consumer / Producer Lists
             if (comboBox == consumerComboBox) {
                 if (component.getConsumers() != null)  {
-                    consumerJList.setModel(new GenericListModel<Consumer>((List) component.getConsumers()));
+                    consumerJList.setModel(new GenericListModel<Consumer>(component.getConsumers()));
                 }
           } else if (comboBox == producerComboBox) {
               if (component.getProducers() != null) {
-                  producerJList.setModel(new GenericListModel<Producer>((List) component.getProducers()));
+                  producerJList.setModel(new GenericListModel<Producer>(component.getProducers()));
               }
           }
         }

@@ -19,11 +19,15 @@ public class CanvasHelper {
     public static final int REFRESH_WAIT = 10;
 
     /** The canvas that is created. */
-    final LWJGLCanvas canvas;
+    private final LWJGLCanvas canvas;
 
     /**
      * Creates an new Canvas helper with the provided height and width using the
      * provided JMECanvasImplementor.
+     * 
+     * @param width The width of the canvas.
+     * @param height The height of the canvas.
+     * @param impl The 'implementor' instance.
      */
     public CanvasHelper(final int width, final int height, final JMECanvasImplementor impl) {
         /* make the canvas */
@@ -69,7 +73,7 @@ public class CanvasHelper {
      * Starts a thread that repaints the canvas.
      */
     private void startRepaintThread() {
-        new Thread() {
+        Thread thread = new Thread() {
             {
                 setDaemon(true);
             }
@@ -85,6 +89,8 @@ public class CanvasHelper {
                     }
                 }
             }
-        }.start();
+        };
+        
+        thread.start();
     }
 }

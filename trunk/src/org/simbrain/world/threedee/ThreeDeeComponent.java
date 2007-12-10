@@ -14,20 +14,46 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.world.threedee.environment.Environment;
 
+/**
+ * A representing a 3D world in a workspace.
+ * 
+ * @author Matt Watson
+ */
 public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentListener> {
-
+    /** The environment for the 3D world. */
     private Environment environment = new Environment();
+    /** The set of agents in the environment. */
     private Set<Agent> agents = new HashSet<Agent>();
+    
+    /**
+     * The bindings that allow agents to be be wrapped as producers
+     * and consumers.
+     */
     private List<Bindings> bindings = new ArrayList<Bindings>();
     
-    public ThreeDeeComponent(String name) {
+    /**
+     * Creates a new ThreeDeeComponent with the given name.
+     * 
+     * @param name The name of the component.
+     */
+    public ThreeDeeComponent(final String name) {
         super(name);
     }
     
+    /**
+     * Returns the environment for this Component.
+     * 
+     * @return The Environment for this Component.
+     */
     public Environment getEnvironment() {
         return environment;
     }
     
+    /**
+     * Creates a new Agent and adds it to the Environment.
+     * 
+     * @return The newly created Agent.
+     */
     public Agent createAgent() {
         Agent agent = new Agent("" + agents.size());
         agents.add(agent);
@@ -37,37 +63,58 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
         return agent;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<? extends Producer> getProducers() {
         return Collections.unmodifiableCollection(bindings);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<? extends Consumer> getConsumers() {
         return Collections.unmodifiableCollection(bindings);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getFileExtension() {
         // TODO Auto-generated method stub
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void open(File openFile) {
+    public void open(final File openFile) {
         // TODO Auto-generated method stub
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
         // TODO Auto-generated method stub
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void save(File saveFile) {
+    public void save(final File saveFile) {
         // TODO Auto-generated method stub
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void update() {
         // TODO Auto-generated method stub

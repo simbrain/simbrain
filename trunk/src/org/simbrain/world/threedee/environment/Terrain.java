@@ -21,18 +21,46 @@ import com.jmex.terrain.util.ProceduralTextureGenerator;
  * @author Matt Watson
  */
 public class Terrain extends MultipleViewElement<TerrainPage> {
+    /** temporary hard-coding. */
+    private static final int GRASS_LOW = -128;
+    /** temporary hard-coding. */
+    private static final int GRASS_OPTIMAL = 0;
+    /** temporary hard-coding. */
+    private static final int GRASS_HIGH = 128;
+    /** temporary hard-coding. */
+    private static final int DIRT_LOW = 0;
+    /** temporary hard-coding. */
+    private static final int DIRT_OPTIMAL = 128;
+    /** temporary hard-coding. */
+    private static final int DIRT_HIGH = 255;
+    /** temporary hard-coding. */
+    private static final int SNOW_LOW = 128;
+    /** temporary hard-coding. */
+    private static final int SNOW_OPTIMAL = 255;
+    /** temporary hard-coding. */
+    private static final int SNOW_HIGH = 384;
+    
+    /** The size of the blocks in the TerrainPage. */
+    private static final int BLOCK_SIZE = 64;
+    
     /** A height map creates a 'natural' bumpy terrain. */
     private final MidPointHeightMap heightMap;
 
     /** The underlying jME Object that represents the terrain. */
     private final TerrainPage heightBlock;
+    
+    /** The size of the terrain. */
+    private final int size;
 
     /**
      * Creates a terrain based on the given size. It will actually create 4
      * blocks of the given size in both directions so the total area will be the
      * square of 2 times size.
+     * 
+     * @param size The size of the terrain.
      */
     Terrain(final int size) {
+        this.size = size;
         heightMap = new MidPointHeightMap(size, 1f);
         heightBlock = create();
     }
@@ -48,28 +76,31 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
     }
 
     /**
-     * Creates a new TerrainBlock based on the underlying height map.
+     * {@inheritDoc}
      */
     @Override
     public TerrainPage create() {
         final Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
 
-        return new TerrainPage("Terrain", 64, heightMap.getSize() + 1, terrainScale, heightMap
-                .getHeightMap(), false);
+        return new TerrainPage("Terrain", BLOCK_SIZE, heightMap.getSize() + 1, terrainScale,
+            heightMap.getHeightMap(), false);
     }
 
     /**
-     * Initializes a TerrainBlock.
+     * {@inheritDoc}
      */
     @Override
     public void initSpatial(final Renderer renderer, final TerrainPage block) {
         /* generate a terrain texture with 2 textures */
         final ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
 
-        pt.addTexture(ResourceManager.getImageIcon("grassb.png"), -128, 0, 128);
-        pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"), 0, 128, 255);
-        pt.addTexture(ResourceManager.getImageIcon("highest.jpg"), 128, 255, 384);
-        pt.createTexture(256);
+        pt.addTexture(ResourceManager.getImageIcon("grassb.png"),
+            GRASS_LOW, GRASS_OPTIMAL, GRASS_HIGH);
+        pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"),
+            DIRT_LOW, DIRT_OPTIMAL, DIRT_HIGH);
+        pt.addTexture(ResourceManager.getImageIcon("highest.jpg"),
+            SNOW_LOW, SNOW_OPTIMAL, SNOW_HIGH);
+        pt.createTexture(size);
 
         /* assign the texture to the terrain */
         final TextureState ts = renderer.createTextureState();
@@ -87,6 +118,8 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
 
     /**
      * No implementation.
+     * 
+     * @param block Not used.
      */
     @Override
     public void updateSpatial(final TerrainPage block) {
@@ -95,6 +128,8 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
 
     /**
      * No implementation.
+     * 
+     * @param collision Not used.
      */
     public void collision(final Collision collision) {
         /* no implementation */
@@ -109,6 +144,8 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
 
     /**
      * No implementation.
+     * 
+     * @return null
      */
     public SpatialData getTentative() {
         /* no implementation */

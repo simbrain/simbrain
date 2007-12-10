@@ -27,8 +27,10 @@ import com.jme.scene.Node;
  * @author Matt Watson
  */
 public class Environment {
+    /** The number of milliseconds between refresh events. */
     public static final int REFRESH_WAIT = 10;
 
+    /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Environment.class);
 
     /** Timer that fires the update operation. */
@@ -43,6 +45,7 @@ public class Environment {
     /** All the views on this environment. */
     private final List<Viewable> views = new ArrayList<Viewable>();
 
+    /** The size of the environment. */
     private final int size = 256;
     
     /** The terrain for the environment. */
@@ -90,8 +93,8 @@ public class Environment {
     /**
      * Returns the floor height at the x and z coordinates of the given point.
      * 
-     * @param location
-     * @return
+     * @param location The location to get the floor height at.
+     * @return The floor height at the x and z coordinates of the given point.
      */
     public float getFloorHeight(final Vector3f location) {
         return terrain.getHeight(location);
@@ -141,8 +144,7 @@ public class Environment {
             final Element a = elements.get(i);
             final SpatialData aData = a.getTentative();
 
-            if (aData == null)
-                continue;
+            if (aData == null) { continue; }
 
             final Vector3f aCenter = aData.centerPoint();
             final float aRadius = aData.radius();
@@ -151,7 +153,7 @@ public class Environment {
                 final Element b = elements.get(j);
                 final SpatialData bData = b.getTentative();
 
-                if (bData == null) continue;
+                if (bData == null) { continue; }
 
                 final Vector3f bCenter = bData.centerPoint();
                 final float bRadius = bData.radius();
@@ -184,30 +186,65 @@ public class Environment {
      * @author Matt Watson
      */
     private static class CollisionData {
-        final Collision collisionA;
+        /** The collision data for the first element. */
+        private final Collision collisionA;
+        /** The collision data for the second element. */
+        private final Collision collisionB;
 
-        final Collision collisionB;
-
+        /**
+         * Creates a new CollisionData instance.
+         * 
+         * @param a The first element.
+         * @param aCenter The first element's center.
+         * @param aRadius The radius of the first element.
+         * @param b The second element.
+         * @param bCenter The second element's center.
+         * @param bRadius The radius of the second element.
+         */
         CollisionData(final Element a, final Vector3f aCenter, final float aRadius,
                 final Element b, final Vector3f bCenter, final float bRadius) {
+            /**
+             * Inner class for collision calculations.
+             * 
+             * @author Matt Watson
+             */
             class CollisionLocal implements Collision {
-                final Element other;
+                /** The other element. */
+                private final Element other;
+                /** The point of impact. */
+                private final Vector3f point;
 
-                final Vector3f point;
-
-                CollisionLocal(final Element other, Vector3f center, final float percent) {
+                /**
+                 * Creates a new CollisionLocal instance.
+                 * 
+                 * @param other The other element.
+                 * @param center The center of the element this collision is respective to.
+                 * @param fraction The the fraction representing the how far from the center
+                 *        point to the bounding sphere surface the collision took place.
+                 */
+                CollisionLocal(final Element other, final Vector3f center, final float fraction) {
                     this.other = other;
 
-                    center = (Vector3f) center.clone();
-                    center.interpolate(other.getTentative().centerPoint(), percent);
+                    Vector3f point = (Vector3f) center.clone();
+                    point.interpolate(other.getTentative().centerPoint(), fraction);
 
-                    this.point = center;
+                    this.point = point;
                 }
 
+                /**
+                 * Returns the other element in the collision.
+                 * 
+                 * @return The other element in the collision.
+                 */
                 public Element other() {
                     return other;
                 }
 
+                /**
+                 * Returns the point of impact.
+                 * 
+                 * @return The point of impact.
+                 */
                 public Vector3f point() {
                     return point;
                 }

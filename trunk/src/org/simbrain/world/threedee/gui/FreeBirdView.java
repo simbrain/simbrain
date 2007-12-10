@@ -10,6 +10,9 @@ import com.jme.math.Vector3f;
  * @author Matt Watson
  */
 public class FreeBirdView extends Moveable {
+    /** The height at which the free-bird starts. */
+    private static final float START_HEIGHT = 25f;
+    
     /** The current direction of the view. */
     private Vector3f direction;
 
@@ -17,7 +20,7 @@ public class FreeBirdView extends Moveable {
     private Vector3f location;
 
     /**
-     * Returns the current direction.
+     * {@inheritDoc}
      */
     @Override
     protected Vector3f getDirection() {
@@ -25,7 +28,7 @@ public class FreeBirdView extends Moveable {
     }
 
     /**
-     * Returns the current location.
+     * {@inheritDoc}
      */
     @Override
     protected Vector3f getLocation() {
@@ -33,16 +36,16 @@ public class FreeBirdView extends Moveable {
     }
 
     /**
-     * Initializes the view with the given direction and location.
+     * {@inheritDoc}
      */
     @Override
     public void init(final Vector3f direction, final Vector3f location) {
         this.direction = direction;
-        this.location = location.add(0, 25f, 0);
+        this.location = location.add(0, START_HEIGHT, 0);
     }
 
     /**
-     * Sets the current location.
+     * {@inheritDoc}
      */
     @Override
     protected void updateDirection(final Vector3f direction) {
@@ -50,7 +53,7 @@ public class FreeBirdView extends Moveable {
     }
 
     /**
-     * Sets the current direction.
+     * {@inheritDoc}
      */
     @Override
     protected void updateLocation(final Vector3f location) {

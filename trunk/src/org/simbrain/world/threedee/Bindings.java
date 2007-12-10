@@ -14,35 +14,48 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.world.threedee.Moveable.Action;
 
+/**
+ * Acts as the consumer and producer associated with an Agent.
+ * 
+ * @author Matt Watson
+ */
 class Bindings implements Consumer, Producer {
+    /**
+     * the priority of the agent.  There's nothing special about the number
+     * 10.  It's just sufficiently high to allow others to preempt bindings.
+     */
+    private static final int PRIORITY = 10;
 
+    /** the component associated with this binding. */
     private final ThreeDeeComponent component;
-
+    
+    /** the consumers for the wrapped agent. */
     private final List<ConsumingBinding> consumers = new ArrayList<ConsumingBinding>();
 
-    private ConsumingAttribute defaultConsumingAttribute = null;
+    /** The default consuming attribute for this set of Bindings. */
+    private ConsumingAttribute<?> defaultConsumingAttribute = null;
 
     /**
-     * 
-     * @param agent
-     * @param component
+     * Creates a new bindings object for the given agent
+     * and component.
+     *
+     * @param agent the agent to bind to.
+     * @param component the parent component.
      */
-    Bindings(Agent agent, ThreeDeeComponent component) {
-
+    Bindings(final Agent agent, final ThreeDeeComponent component) {
         this.component = component;
-        
+
         consumers.add(new ConsumingBinding("left", agent.left()));
         consumers.add(new ConsumingBinding("right", agent.right()));
         consumers.add(new ConsumingBinding("forward", agent.forward()));
         consumers.add(new ConsumingBinding("backward", agent.backward()));
-        
         defaultConsumingAttribute = consumers.get(0);
 
-        agent.addInput(10, new AbstractCollection<Action>(){
+        agent.addInput(PRIORITY, new AbstractCollection<Action>() {
             @Override
             public Iterator<Action> iterator() {
                 final Iterator<ConsumingBinding> internal = consumers.iterator();
-                
+
                 return new Iterator<Action>() {
 
                   public boolean hasNext() {
@@ -65,79 +78,131 @@ class Bindings implements Consumer, Producer {
             }
         });
     }
-    
-    private abstract class Binding implements Attribute
-    {
-        final String description;
-        
-        Binding(String description) {
+
+    /**
+     * Binds to a single Action on an Agent.
+     *
+     * @author Matt Watson
+     */
+    private abstract class Binding implements Attribute {
+        /** The description for this Binding. */
+        private final String description;
+
+        /**
+         * Creates a new Binding.
+         * 
+         * @param description The description for the Binding.
+         */
+        Binding(final String description) {
             this.description = description;
         }
-        
+
+        /**
+         * {@inheritDoc}
+         */
         public Bindings getParent() {
             return Bindings.this;
         }
-        
+
+        /**
+         * {@inheritDoc}
+         */
         public String getAttributeDescription() {
             return description;
         }
-        
+
+        /**
+         * {@inheritDoc}
+         */
         public Type getType() {
             return Float.TYPE;
         }
     }
-    
-//    private abstract class ProducingBinding extends Binding implements ProducingAttribute<Float> {
-//        ProducingBinding(String description) {
-//            super(description);
-//        }
-//    }
-    
+
+    /**
+     * Implements a consumer binding.
+     *
+     * @author Matt Watson
+     */
     private class ConsumingBinding extends Binding implements ConsumingAttribute<Double> {
-        final Action action;
-        
-        ConsumingBinding(String description, Action action) {
+        /** The action this binding is bound to. */
+        private final Action action;
+
+        /**
+         * Creates a new ConsumingBinding.
+         * 
+         * @param description The description of the Binding.
+         * @param action The action this Binding is bound to.
+         */
+        ConsumingBinding(final String description, final Action action) {
             super(description);
-            
+
             this.action = action;
             action.setValue(0);
         }
 
-        public void setValue(Double value) {
+        /**
+         * {@inheritDoc}
+         */
+        public void setValue(final Double value) {
             action.setValue(value.floatValue());
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public ProducingAttribute<?> getDefaultProducingAttribute() {
         // TODO is there a sensible choice?
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<? extends ProducingAttribute<?>> getProducingAttributes() {
         return Collections.emptyList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription() {
         return "3D Agent";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ConsumingAttribute<?> getDefaultConsumingAttribute() {
         return defaultConsumingAttribute;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<? extends ConsumingAttribute<?>> getConsumingAttributes() {
         return Collections.unmodifiableList(consumers);
     }
 
-    public void setDefaultConsumingAttribute(ConsumingAttribute consumingAttribute) {
+    /**
+     * {@inheritDoc}
+     */
+    public void setDefaultConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
         defaultConsumingAttribute = consumingAttribute;
     }
 
-    public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute) {
-        // TODO Auto-generated method stub        
+    /**
+     * {@inheritDoc}
+     */
+    public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {
+        // TODO Auto-generated method stub
     }
+
+    /**
+     * {@inheritDoc}
+     */
     public ThreeDeeComponent getParentComponent() {
         return component;
     }
-
 }

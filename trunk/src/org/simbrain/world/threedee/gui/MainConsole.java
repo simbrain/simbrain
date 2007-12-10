@@ -18,26 +18,46 @@ import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
 import org.simbrain.world.threedee.ThreeDeeComponent;
 
+/**
+ * The main panel from which the 3D environment can be controlled.
+ * 
+ * @author Matt Watson
+ */
 public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
-
+    /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
-
-    private Map<AgentView, JFrame> views = new HashMap<AgentView, JFrame>();
     
-    ThreeDeeComponent component;
+    /** Temporary hard-coded width of the frames. */
+    private static final int WIDTH = 512;
+    /** Temporary hard-coded height of the frames. */
+    private static final int HEIGHT = 384;
     
-    public MainConsole(ThreeDeeComponent component) {
+    /** All the current views. */
+    private final Map<AgentView, JFrame> views = new HashMap<AgentView, JFrame>();
+    /** The parent Component. */
+    private final ThreeDeeComponent component;
+    
+    /** BorderLayout for root panel. */
+    private BorderLayout layout;
+    /** The custom root panel. */
+    private JPanel root;
+    /** The panel that hold all the Agent controls. */
+    private JPanel agents;
+    
+    /**
+     * Creates a new main console.
+     * 
+     * @param component The parent component.
+     */
+    public MainConsole(final ThreeDeeComponent component) {
         super(component);
         this.component = component;
     }
 
-    private final int WIDTH = 512;
-    private final int HEIGHT = 384;
-    
-    BorderLayout layout;
-    JPanel root;
-    JPanel agents;
-    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void postAddInit() {
         layout = new BorderLayout();
         root = new JPanel();
@@ -45,7 +65,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         root.setLayout(layout);
         root.add(mainPanel(), BorderLayout.NORTH);
         
-        agents = new JPanel(new GridLayout(0,1));
+        agents = new JPanel(new GridLayout(0, 1));
         root.add(agents, BorderLayout.CENTER);
         
         getContentPane().add(root);
@@ -53,18 +73,28 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         pack();
     }
     
+    /**
+     * Returns a new main panel.
+     * 
+     * @return A new main panel.
+     */
     private JPanel mainPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(1,1));
+        panel.setLayout(new GridLayout(1, 1));
         
-        agents = new JPanel(new GridLayout(0,1));
+        agents = new JPanel(new GridLayout(0, 1));
         
         panel.add(new JButton(new NewAgentAction()));
         
         return panel;
     }
     
-    private void agentPanel(Agent agent) {
+    /**
+     * Creates a new Agent panel for the provided panel.
+     * 
+     * @param agent The Agent to create the panel for.
+     */
+    private void agentPanel(final Agent agent) {
         JPanel panel = new JPanel();
         JButton button = new JButton(new CreateAgentViewAction(agent));
         
@@ -73,39 +103,65 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         pack();
     }
     
+    /**
+     * Action for a new agent.
+     * 
+     * @author Matt Watson
+     */
     private class NewAgentAction extends AbstractAction {
+        /** The default serial version ID. */
         private static final long serialVersionUID = 1L;
 
+        /* init block */
         {
             this.putValue(AbstractAction.NAME, "New Agent");
         }
         
-        public void actionPerformed(ActionEvent e) {
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(final ActionEvent e) {
             Agent agent = component.createAgent();
             
             agentPanel(agent);
         }
     };
     
+    /**
+     * Action for a new agent view.
+     * 
+     * @author Matt Watson
+     */
     private class CreateAgentViewAction extends AbstractAction {
+        /** The default serial version ID. */
         private static final long serialVersionUID = 1L;
-        
+        /** The agent to create a view for. */
         private Agent agent;
         
-        {
+        /**
+         * Creates a new instance.
+         * 
+         * @param agent The agent to create a view for.
+         */
+        CreateAgentViewAction(final Agent agent) {
+            this.agent = agent;
             this.putValue(AbstractAction.NAME, "Create View");
         }
         
-        CreateAgentViewAction(Agent agent) {
-            this.agent = agent;
-        }
-        
-        public void actionPerformed(ActionEvent e) {
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(final ActionEvent e) {
             createView(agent);
         }
     };
     
-    private void createView(Agent agent) {
+    /**
+     * Creates a new view for an agent.
+     * 
+     * @param agent the agent to create a view for.
+     */
+    private void createView(final Agent agent) {
         AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
         CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
         JFrame innerFrame = new JFrame("agent " + agent.getName());
@@ -119,14 +175,21 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         
         KeyHandler handler = getHandler(agent);
         
-        agent.addInput(0, handler.input);
+        agent.addInput(0, handler.getInput());
         innerFrame.addKeyListener(handler);
         innerFrame.setSize(WIDTH, HEIGHT);
         innerFrame.setResizable(false);
         innerFrame.setVisible(true);
     }
     
-    private KeyHandler getHandler(Agent agent) {
+    /**
+     * Gets a key handler for an agent.
+     * 
+     * @param agent the agent to get a key handler for.
+     * 
+     * @return the new key handler.
+     */
+    private KeyHandler getHandler(final Agent agent) {
         KeyHandler handler = new KeyHandler();
         
         handler.addBinding(KeyEvent.VK_LEFT, agent.left());
@@ -142,7 +205,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
     }
     
     /**
-     * remove all the views
+     * {@inheritDoc}
      */
     @Override
     public void close() {
@@ -152,19 +215,28 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getFileExtension() {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void open(File openFile) {
+    public void open(final File openFile) {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void save(File saveFile) {
+    public void save(final File saveFile) {
         // TODO Auto-generated method stub
     }
 }

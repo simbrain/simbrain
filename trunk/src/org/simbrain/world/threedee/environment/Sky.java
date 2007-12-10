@@ -20,15 +20,25 @@ import com.jme.util.TextureManager;
  * in an environment.
  */
 public class Sky extends MultipleViewElement<SkyDome> {
-    int count = 0;
+    /** The number of planes for the dome. */
+    private static final int PLANES = 5;
+    /** The number of radial samples for the dome. */
+    private static final int RADIAL_SAMPLES = 12;
+    /** The radius of the dome. */
+    private static final float RADIUS = 200;
+    
+    /** The count of views that have been created. */
+    private int count = 0;
     
     /**
-     * Creates a skybox.
+     * Returns a new SkyDome instance.
+     * 
+     * @return A new SkyDome instance.
      */
     @Override
     public SkyDome create() {
 //        return new Skybox("sky" + ++count, 200, 200, 200);
-        return new SkyDome("sky" + ++count, 5, 12, 200);
+        return new SkyDome("sky" + ++count, PLANES, RADIAL_SAMPLES, RADIUS);
     }
 
     /**
@@ -39,7 +49,7 @@ public class Sky extends MultipleViewElement<SkyDome> {
      */
     @Override
     public void initSpatial(final Renderer renderer, final SkyDome skybox) {
-        skybox.renderer = renderer;
+        skybox.setRenderer(renderer);
 
         ImageIcon image = ResourceManager.getImageIcon("sky.png");
         
@@ -68,8 +78,11 @@ public class Sky extends MultipleViewElement<SkyDome> {
         skybox.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void updateSpatial(SkyDome box) {
+    public void updateSpatial(final SkyDome box) {
         /* no implementation */
     }
 
@@ -91,7 +104,7 @@ public class Sky extends MultipleViewElement<SkyDome> {
     /**
      * {@inheritDoc}
      */
-    public void collision(Collision collision) {
+    public void collision(final Collision collision) {
         /* no implementation */
     }
 }

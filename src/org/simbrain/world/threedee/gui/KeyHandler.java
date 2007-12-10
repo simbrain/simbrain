@@ -19,13 +19,15 @@ import org.simbrain.world.threedee.Moveable.Action;
  * @author Matt Watson
  */
 public class KeyHandler implements KeyListener {
+    /** The static logger for the class. */
     private static final Logger LOGGER = Logger.getLogger(KeyHandler.class);
 
     /** The bindings set for this handler. */
     private final Map<Integer, Moveable.Action> bindings = new HashMap<Integer, Moveable.Action>();
 
     /** An input that can be set on a Moveable instance. */
-    public final Collection<Action> input = Collections.synchronizedCollection(new HashSet<Action>());
+    private final Collection<Action> input = Collections.synchronizedCollection(
+        new HashSet<Action>());
     
     /**
      * Adds an new binding in this handler.
@@ -40,7 +42,16 @@ public class KeyHandler implements KeyListener {
     }
 
     /**
-     * Handles a key being pressed down.
+     * Returns the input collection.
+     * 
+     * @return The input collection.
+     */
+    public Collection<Action> getInput() {
+        return input;
+    }
+    
+    /**
+     * {@inheritDoc}
      */
     public void keyPressed(final KeyEvent e) {
         LOGGER.trace("keypressed: " + e);
@@ -48,7 +59,7 @@ public class KeyHandler implements KeyListener {
     }
 
     /**
-     * Handles a key being released.
+     * {@inheritDoc}
      */
     public void keyReleased(final KeyEvent e) {
         LOGGER.trace("keyreleased: " + e);
@@ -57,7 +68,7 @@ public class KeyHandler implements KeyListener {
     }
 
     /**
-     * Handles a key being typed (no implementation).
+     * {@inheritDoc}
      */
     public void keyTyped(final KeyEvent e) {
         /* no implementation */

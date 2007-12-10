@@ -8,10 +8,15 @@ import com.jme.renderer.Renderer;
 import com.jme.scene.state.CullState;
 import com.jmex.awt.SimpleCanvasImpl;
 
+/**
+ * Implements a canvas that renders the perspective of an Agent.
+ * 
+ * @author Matt Watson
+ */
 public class AgentView extends SimpleCanvasImpl {
-
+    /** The static logger for the class. */
     private static final Logger LOGGER = Logger.getLogger(AgentView.class);
-
+    /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
     
     /** The environment this view is displaying. */
@@ -29,7 +34,8 @@ public class AgentView extends SimpleCanvasImpl {
      * @param width the width
      * @param height the height
      */
-    AgentView(final Viewable viewable, final Environment environment, final int width, final int height) {
+    AgentView(final Viewable viewable, final Environment environment,
+            final int width, final int height) {
         super(width, height);
     
         this.environment = environment;
@@ -56,7 +62,7 @@ public class AgentView extends SimpleCanvasImpl {
         LOGGER.debug("frustum top: " + cam.getFrustumTop());
         LOGGER.debug("frustum bottom: " + cam.getFrustumBottom());
     
-        /* 
+        /*
          * Sets up a cullstate to improve performance
          * This will prevent triangles that are not visible
          * from be rendered.

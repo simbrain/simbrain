@@ -9,10 +9,18 @@ import com.jme.math.Vector3f;
  * @author Matt Watson
  */
 public class SpatialData {
+    /** The center of the Spatial. */
     private final Vector3f center;
 
+    /** The Radius of the rough bounding sphere for the Spatial. */
     private final float radius;
 
+    /**
+     * Creates a new SpatialData for the given center and radius.
+     * 
+     * @param center The center of the Spatial.
+     * @param radius The radius of the Spatial's bounding sphere.
+     */
     public SpatialData(final Vector3f center, final float radius) {
         this.center = center;
         this.radius = radius;

@@ -14,12 +14,20 @@ import com.jme.renderer.Camera;
 
 /**
  * Implements the basic functionality of a moveable view.
- * 
+ *
  * @author Matt Watson
  */
 public abstract class Moveable implements Viewable {
+    /** the static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Moveable.class);
-    
+
+    /** used to put the camera out in front of the moveable so it it's not in the view. */
+    private static final float VIEW_LEAD = 0.5f;
+    /** arbitrary number used to calculate the current angle. */
+    private static final int ROT_CALC_BUFFER = 3600;
+    /** the number of degrees in a circle. */
+    private static final int DEGREES_IN_A_CIRCLE = 360;
+
     /**
      * All the inputs for this view sorted by priority. Only one input will be
      * processed in an update. That is the input with updates with the highest
@@ -54,7 +62,7 @@ public abstract class Moveable implements Viewable {
 
     /**
      * Adds an input with the given priority (lower has more priority).
-     * 
+     *
      * @param priority the priority of the input provided
      * @param input the input for this view
      */
@@ -66,7 +74,7 @@ public abstract class Moveable implements Viewable {
      * Initializes the implementation with the given direction and location.
      * This is essentially a suggestion. Implementations can use these objects
      * and modify them or ignore them.
-     * 
+     *
      * @param direction the direction
      * @param location the location
      */
@@ -75,21 +83,22 @@ public abstract class Moveable implements Viewable {
     /**
      * Updates the camera direction and location based on getDirection and
      * getLocation. Sets the camera up and left axis for proper culling.
+     *
+     * @param camera determines the perspective of the view
      */
     public void render(final Camera camera) {
         final Vector3f direction = getDirection();
 
         camera.setDirection(direction);
-        
+
         Vector3f location = getLocation();
-        
-        /* 
-         * move the view up a little and out in front 
+
+        /*
+         * move the view up a little and out in front
          * to improve the view
          */
-        location = location.add(0, .5f, 0);
+        location = location.add(0, VIEW_LEAD, 0);
         location = location.add(direction);
-        
         camera.setLocation(location);
 
         final Vector3f left = direction.cross(Y_AXIS).normalizeLocal();
@@ -121,10 +130,10 @@ public abstract class Moveable implements Viewable {
                             throw new IllegalArgumentException(
                                 "actions can only be handled by parent");
                         }
-                        
+
                         action.doAction();
                     }
-                    
+
                     doUpdates();
 
                     return;
@@ -145,11 +154,11 @@ public abstract class Moveable implements Viewable {
          * normalize the left/right angle and then use it to set the left/right
          * quaternion
          */
-        leftRightRot = (leftRightRot + 3600) % 360;
+        leftRightRot = (leftRightRot + ROT_CALC_BUFFER) % DEGREES_IN_A_CIRCLE;
         leftRightQuat.fromAngleNormalAxis(leftRightRot * FastMath.DEG_TO_RAD, Y_AXIS);
 
-        /* normalize the up/down angle and then use it to set the up/down quat */
-        upDownRot = (upDownRot + 3600) % 360;
+        /* normalize the up/down angle and then use it to set the up/down quaternion */
+        upDownRot = (upDownRot + ROT_CALC_BUFFER) % DEGREES_IN_A_CIRCLE;
         upDownQuat.fromAngleAxis(upDownRot * FastMath.DEG_TO_RAD, X_AXIS);
 
         /* get copies of the current direction and location */
@@ -178,35 +187,35 @@ public abstract class Moveable implements Viewable {
 
     /**
      * Return the current committed location.
-     * 
+     *
      * @return the current location
      */
     protected abstract Vector3f getLocation();
 
     /**
      * Return the current committed direction.
-     * 
+     *
      * @return the current direction
      */
     protected abstract Vector3f getDirection();
 
     /**
      * Update the location tentatively.
-     * 
+     *
      * @param location the new location
      */
     protected abstract void updateLocation(Vector3f location);
 
     /**
      * Update the direction tentatively.
-     * 
+     *
      * @param direction the new direction
      */
     protected abstract void updateDirection(Vector3f direction);
 
     /**
      * Sets the current speed.
-     * 
+     *
      * @param speed the new speed
      */
     protected void setSpeed(final float speed) {
@@ -215,14 +224,18 @@ public abstract class Moveable implements Viewable {
 
     /**
      * Returns the current speed.
-     * 
+     *
      * @return the current speed
      */
     public float getSpeed() {
         return speed;
     }
 
-    /** Turn left. */
+    /**
+     * returns an action for turning left.
+     *
+     * @return an action for turning left.
+     */
     public Action left() {
         return new Action() {
             @Override
@@ -233,8 +246,12 @@ public abstract class Moveable implements Viewable {
         };
     }
 
-    /** Turn right. */
-    public Action right() { 
+    /**
+     * returns an action for turning right.
+     *
+     * @return an action for turning right.
+     */
+    public Action right() {
         return new Action() {
             @Override
             void doAction() {
@@ -244,7 +261,11 @@ public abstract class Moveable implements Viewable {
         };
     }
 
-    /** Move forwards. */
+    /**
+     * returns an action for moving forwards.
+     *
+     * @return an action for moving forwards.
+     */
     public Action forward() {
         return new Action() {
             @Override
@@ -255,8 +276,12 @@ public abstract class Moveable implements Viewable {
         };
     }
 
-    /** Move backwards. */
-    public final Action backward() { 
+    /**
+     * returns an action for moving backwards.
+     *
+     * @return an action for moving backwards.
+     */
+    public final Action backward() {
         return new Action() {
             @Override
             void doAction() {
@@ -266,8 +291,12 @@ public abstract class Moveable implements Viewable {
         };
     }
 
-    /** Rise straight up regardless of orientation. */
-    public final Action rise() { 
+    /**
+     * returns an action for rising straight up regardless of orientation.
+     *
+     * @return an action for rising straight up regardless of orientation.
+     */
+    public final Action rise() {
         return new Action() {
             @Override
             void doAction() {
@@ -277,8 +306,12 @@ public abstract class Moveable implements Viewable {
         };
     }
 
-    /** Fall straight down regardless of orientation. */
-    public final Action fall() { 
+    /**
+     * returns an action for falling straight down regardless of orientation.
+     *
+     * @return an action for falling straight down regardless of orientation.
+     */
+    public final Action fall() {
         return new Action() {
             @Override
             void doAction() {
@@ -288,8 +321,12 @@ public abstract class Moveable implements Viewable {
         };
     }
 
-    /** Nose down. */
-    public final Action down() { 
+    /**
+     * returns an action for nosing down.
+     *
+     * @return an action for nosing down.
+     */
+    public final Action down() {
         return new Action() {
             @Override
             void doAction() {
@@ -299,8 +336,12 @@ public abstract class Moveable implements Viewable {
         };
     }
 
-    /** Nose up. */
-    public final Action up() { 
+    /**
+     * returns an action for nosing up.
+     *
+     * @return an action for nosing up.
+     */
+    public final Action up() {
         return new Action() {
             @Override
             void doAction() {
@@ -309,10 +350,10 @@ public abstract class Moveable implements Viewable {
             }
         };
     }
-    
+
     /**
      * Enum of actions that can be applied to a Moveable.
-     * 
+     *
      * @author Matt Watson
      */
     public abstract class Action {
@@ -321,15 +362,31 @@ public abstract class Moveable implements Viewable {
          * outside this class.
          */
         abstract void doAction();
-        
-        final Moveable parent = Moveable.this;
-        
+
+        /** used to make sure this Action is not passed to a different agent. */
+        private final Moveable parent = Moveable.this;
+
+        /**
+         * the value used to determine the amount of the actions change.
+         * 1 is the default and the normal full amount. Larger values
+         * and negative values are allowed.
+         */
         private float value = 1f;
-        
-        public void setValue(float amount) {
+
+        /**
+         * Sets the degree of the action.  0 will result in no change.
+         *
+         * @param amount the amount to move.
+         */
+        public void setValue(final float amount) {
             this.value = amount;
         }
-        
+
+        /**
+         * Retrieves the movement value for this action.
+         *
+         * @return the movement value.
+         */
         public float getValue() {
             return value;
         }

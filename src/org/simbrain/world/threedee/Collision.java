@@ -18,10 +18,11 @@ public interface Collision {
     Element other();
 
     /**
-     * A vector from the center point of the element identifying the point of
+     * Returns a vector from the center point of the element identifying the point of
      * contact.
      * 
-     * @return
+     * @return A vector from the center point of the element identifying the point of
+     * contact.
      */
     Vector3f point();
 }

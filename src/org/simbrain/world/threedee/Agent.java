@@ -8,65 +8,79 @@ import com.jme.math.Vector3f;
 /**
  * An implementation of Moveable that provides simple collision handling and
  * hugs the terrain of the environment provided.
- * 
+ *
  * @author Matt Watson
  */
 public class Agent extends Moveable {
+    /** the radius used to determine whether this agent has collided with another. */
     private static final float COLLISION_RADIUS = 0.5f;
-
+    /** the height that the agent 'hovers' above the terrain. */
     private static final float HOVER_HEIGHT = 0.5f;
 
-    /** the name of this agent */
+    /** the name of this agent. */
     private final String name;
-    
-    /** a logger based on this class and the agent name */
+
+    /** a logger based on this class and the agent name. */
     private final Logger logger;
 
-    /** the environment this agent lives in */
+    /** the environment this agent lives in. */
     private Environment environment;
 
-    /** the current location */
+    /** the current location. */
     private volatile Vector3f direction;
 
-    /** the current direction */
+    /** the current direction. */
     private volatile Vector3f location;
 
-    /** tentative location */
+    /** tentative location. */
     private volatile Vector3f tenativeLocation;
 
-    /** tentative direction */
+    /** tentative direction. */
     private volatile Vector3f tenativeDirection;
 
+    /** determines the limits (x, z) of the world. */
     private int limit;
-    
+
     /**
      * Create a new Agent with the given name.
-     * 
+     *
      * @param name the agents name
      */
     public Agent(final String name) {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
         this.name = name;
-        
+
         logger.debug("created new Agent: " + name);
-        
-        direction = new Vector3f(0,0,0);
-        location = new Vector3f(0,0,0);
-        tenativeLocation = new Vector3f(0,0,0);
-        tenativeDirection = new Vector3f(0,0,0);
+
+        direction = new Vector3f(0, 0, 0);
+        location = new Vector3f(0, 0, 0);
+        tenativeLocation = new Vector3f(0, 0, 0);
+        tenativeDirection = new Vector3f(0, 0, 0);
     }
 
+    /**
+     * returns the name of the agent.
+     *
+     * @return the name of the agent.
+     */
     public String getName() {
         return name;
     }
-    
-    public void setLimit(int limit) {
+
+    /**
+     * sets the limit (x, z) for the world.
+     *
+     * @param limit the limit (x, z) for the world.
+     */
+    public void setLimit(final int limit) {
         this.limit = limit;
     }
-    
+
     /**
-     * Returns the current direction.
+     * returns the current direction.
+     *
+     * @return the current direction.
      */
     @Override
     protected Vector3f getDirection() {
@@ -74,7 +88,9 @@ public class Agent extends Moveable {
     }
 
     /**
-     * Returns the current location.
+     * returns the current location.
+     *
+     * @return the current location.
      */
     @Override
     protected Vector3f getLocation() {
@@ -83,6 +99,9 @@ public class Agent extends Moveable {
 
     /**
      * Sets the current and tentative locations and directions.
+     *
+     * @param direction the direction vector that controls the view (updateable.)
+     * @param location the location of the view (updateable.)
      */
     @Override
     public void init(final Vector3f direction, final Vector3f location) {
@@ -95,6 +114,8 @@ public class Agent extends Moveable {
 
     /**
      * Updates the tentative direction.
+     *
+     * @param direction the new tentative direction.
      */
     @Override
     protected void updateDirection(final Vector3f direction) {
@@ -103,6 +124,8 @@ public class Agent extends Moveable {
 
     /**
      * Updates the tentative location.
+     *
+     * @param location the new tentative location.
      */
     @Override
     protected void updateLocation(final Vector3f location) {
@@ -116,16 +139,16 @@ public class Agent extends Moveable {
     protected void doUpdates() {
         super.doUpdates();
 
-        /* 
-         * if the agent has gone beyond it's limit 
+        /*
+         * if the agent has gone beyond it's limit
          * move it to the other side the environment
          */
         float x = tenativeLocation.getX();
         float z = tenativeLocation.getZ();
-        
-        if (Math.abs(x) > limit) tenativeLocation.setX(-1 * x);
-        if (Math.abs(z) > limit) tenativeLocation.setZ(-1 * z);
-        
+
+        if (Math.abs(x) > limit) { tenativeLocation.setX(-1 * x); }
+        if (Math.abs(z) > limit) { tenativeLocation.setZ(-1 * z); }
+
         setHeight();
     }
 
@@ -135,19 +158,18 @@ public class Agent extends Moveable {
     private void setHeight() {
         final float height = environment.getFloorHeight(tenativeLocation);
 
-        if (!Float.isNaN(height)) tenativeLocation.setY(height + HOVER_HEIGHT);
+        if (!Float.isNaN(height)) { tenativeLocation.setY(height + HOVER_HEIGHT); }
     }
 
     /**
      * Implements the logic for collisions.
-     * 
-     * @param collision
+     *
+     * @param collision the collision detail.
      */
     public void collision(final Collision collision) {
         final float speed = getSpeed();
 
-        if (speed == 0)
-            return;
+        if (speed == 0) { return; }
 
         tenativeDirection = (Vector3f) direction.clone();
         tenativeLocation = (Vector3f) location.clone();
@@ -156,7 +178,7 @@ public class Agent extends Moveable {
     /**
      * Returns the tentative spatial data for this agent. This is used after an
      * update but before a commit.
-     * 
+     *
      * @return the tentative spatial data
      */
     public SpatialData getTenative() {
@@ -173,7 +195,7 @@ public class Agent extends Moveable {
 
     /**
      * Sets the environment for the agent.
-     * 
+     *
      * @param environment the agent's environment
      */
     public void setEnvironment(final Environment environment) {

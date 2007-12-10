@@ -11,12 +11,21 @@ import com.jme.scene.Spatial;
  * Implementation of Element that allows multiple views to render the same
  * element properly by providing distinct spatials to each renderer.
  * 
+ * @param <T> The spatial type is the root element for this Element.
+ * 
  * @author Matt Watson
  */
 public abstract class MultipleViewElement<T extends Spatial> implements Element {
-    /** holds the spatials, keyed by renderer */
+    /** Holds the spatials, keyed by renderer. */
     private final Map<Renderer, T> spatials = new HashMap<Renderer, T>();
 
+    /**
+     * Initializes a renderer and parent as a new view on the Element.
+     * 
+     * @param renderer The renderer that will render this Element.
+     * @param parent The parent Node to which the Element's root node
+     *        will be attached.
+     */
     public void init(final Renderer renderer, final Node parent) {
         final T spatial = create();
         spatials.put(renderer, spatial);

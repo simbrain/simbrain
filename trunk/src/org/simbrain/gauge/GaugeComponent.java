@@ -32,23 +32,33 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
- * variables the Gauge is representing.
+ * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also
+ * stores information about the variables the Gauge is representing.
  */
 public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
-
+    /** the static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(GaugeComponent.class);
     
     /** Consumer list. */
     private Collection<Consumer> consumers = new ArrayList<Consumer>();
     
-    public GaugeComponent(String name) {
+    /**
+     * Creates a new gauge component.
+     * 
+     * @param name The name of the component.
+     */
+    public GaugeComponent(final String name) {
         super(name);
     }
 
     /** Current gauge. */
     private Gauge gauge = new Gauge();
     
+    /**
+     * Returns the underlying Gauge.
+     * 
+     * @return The underlying Gauge.
+     */
     public Gauge getGauge() {
         return gauge;
     }
@@ -83,9 +93,11 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
      * If the number of producers has changed since the last
      * wire-up or this is the first wire-up, the component
      * the Gauge is refreshed
+     * 
+     * @param producers The producers too wire up with couplings.
      */
     @SuppressWarnings("unchecked")
-    void wireCouplings(Collection<? extends Producer> producers) {
+    void wireCouplings(final Collection<? extends Producer> producers) {
         /* Handle Coupling wire-up */
         
         LOGGER.debug("wiring " + producers.size() + " producers");
@@ -100,13 +112,14 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
         
         for (Consumer consumer : consumers) {
             if (producerIterator.hasNext()) {
-                Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                Coupling<?> coupling = new Coupling(producerIterator.next()
+                    .getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
                 getWorkspace().addCoupling(coupling);
             }
         }
 
         /* If the new data is inconsistent with the old, reset the gauge */
-        if (oldDims != newDims){
+        if (oldDims != newDims) {
             gauge.init(newDims);
             for (GaugeComponentListener listener : getListeners()) {
                 listener.dimensionsChanged(newDims);
@@ -114,31 +127,46 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void update() {
         gauge.updateCurrentState();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
         // TODO Auto-generated method stub
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getFileExtension() {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void open(File openFile) {
+    public void open(final File openFile) {
         // TODO Auto-generated method stub
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void save(File saveFile) {
+    public void save(final File saveFile) {
         // TODO Auto-generated method stub
         
     }

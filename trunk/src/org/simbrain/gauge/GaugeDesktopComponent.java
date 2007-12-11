@@ -36,20 +36,31 @@ import org.simbrain.workspace.gui.DesktopComponent;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+/**
+ * Represents and interacts with a GaugeComponent in the SimbrainDesktop environment.
+ * 
+ * @author Matt Watson
+ */
 public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
 
+    /** The default static version Id for this class. */
     private static final long serialVersionUID = 1L;
 
-    /** Logger. */
+    /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(GaugeComponent.class);
 
-    /** the gauge that is the underlying model */
+    /** The initial height for the internal frame. */
+    private static final int INITIAL_HEIGHT = 300;
+    /** The initial width for the internal frame. */
+    private static final int INITIAL_WIDTH = 300;
+    
+    /** The gauge that is the underlying model. */
     private final Gauge gauge;
     
     /** Gauge panel. */
     private final GaugePanel gaugePanel;
 
-    /** the parent component */
+    /** The parent component. */
     private GaugeComponent component;
     
     /** Menu bar. */
@@ -106,26 +117,34 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
     /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("Help");
     
-    /** listener for gaugeComponent events */
+    /** Listener for gaugeComponent events. */
     private final GaugeComponentListener listener = new GaugeComponentListener() {
+        /**
+         * {@inheritDoc}
+         */
         public void componentUpdated() {
             gaugePanel.updateGraphics();
         }
 
-        public void dimensionsChanged(int newDimensions) {
+        /**
+         * {@inheritDoc}
+         */
+        public void dimensionsChanged(final int newDimensions) {
             gaugePanel.resetGauge();
         }
     };
-
+    
     /**
-     * Default constructor.
+     * Creates a new instance.
+     * 
+     * @param component The component this object will wrap.
      */
-    public GaugeDesktopComponent(GaugeComponent component) {
+    public GaugeDesktopComponent(final GaugeComponent component) {
         super(component);
         this.component = component;
         component.addListener(listener);
         this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
-        this.setPreferredSize(new Dimension(300,300));
+        this.setPreferredSize(new Dimension(INITIAL_HEIGHT, INITIAL_WIDTH));
         gauge = component.getGauge();
         gaugePanel = new GaugePanel(gauge);
 
@@ -137,6 +156,9 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
         setContentPane(buffer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void postAddInit() {
         setUpMenus();
@@ -343,18 +365,14 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
     }
 
     /**
-     * Responds to internal frame closed.
-     *
-     * @param e Internal frame event
+     * Cleans-up and closes the Gauge panel.
      */
     public void close() {
         gaugePanel.stopThread();
         GaugePreferences.setCurrentDirectory(getCurrentDirectory());
     }
 
-    /** 
-     * Menu Listener
-     */
+    /**  Menu Listener. */
     private final MenuListener menuListener = new MenuListener() {
         public void menuCanceled(final MenuEvent arg0) {
         }
@@ -384,32 +402,40 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
         }
     };
 
-    /**
-     * ActionListener for coupling menu events
-     */
+    /** ActionListener for coupling menu events. */
     private final ActionListener couplingMenuItemListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             LOGGER.debug("coupling menu item selected");
             System.out.println("here");
             
             CouplingMenuItem menuItem = (CouplingMenuItem) e.getSource();
-            Collection<? extends Producer> producers = menuItem.getWorkspaceComponent().getProducers();
+            Collection<? extends Producer> producers
+                = menuItem.getWorkspaceComponent().getProducers();
             
             component.wireCouplings(producers);
         }
     };
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getFileExtension() {
         return "gdf";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void setCurrentDirectory(final String currentDirectory) {        
+    public void setCurrentDirectory(final String currentDirectory) {
         super.setCurrentDirectory(currentDirectory);
         GaugePreferences.setCurrentDirectory(currentDirectory);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getCurrentDirectory() {
         return GaugePreferences.getCurrentDirectory();

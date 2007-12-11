@@ -22,17 +22,35 @@ import java.awt.Color;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-
 /**
- * <b>GaugePreferences</b> handles storage and retrieval of user preferences, e.g.  background color for the gauge
- * panel, point size, etc.
+ * <b>GaugePreferences</b> handles storage and retrieval of user preferences, e.g.
+ * background color for the GaugePanel, point size, etc.
  */
-public class GaugePreferences {
+public final class GaugePreferences {
+    
+    /**
+     * Private constructor prevents instantiation.
+     */
+    private GaugePreferences() {
+        /* no implementation */
+    }
+    
+    /** The default tolerance. */
+    private static final double DEFAULT_TOLERANCE = .05;
+    /** The default perturbation. */
+    private static final double DEFAULT_PERTURBATION = .1;
+    /** The default iterations between updates. */
+    private static final int DEFAULT_ITERATIONS_BETWEEN_UPDATES = 10;
+    /** The default epsilon. */
+    private static final int DEFAULT_EPSILON = 3;
+    
     /** User preferences. */
-    private static final Preferences GAUGE_PREFERENCES = Preferences.userRoot().node("/org/simbrain/gauge");
-    /** File system seperator. */
+    private static final Preferences GAUGE_PREFERENCES = Preferences.userRoot().node(
+        "/org/simbrain/gauge");
+    
+    /** File system separator. */
     public static final String FS = System.getProperty("file.separator");
-
+    
     /**
      * Save all user preferences.
      */
@@ -80,7 +98,7 @@ public class GaugePreferences {
     }
 
     /**
-     * Restores sammon preferences to default values.
+     * Restores Sammon preferences to default values.
      */
     public static void restoreSammonDefaults() {
         setEpsilon(getDefaultEpsilon());
@@ -168,11 +186,13 @@ public class GaugePreferences {
         return GAUGE_PREFERENCES.getDouble("Tolerance", getDefaultTolerance());
     }
 
+    
+    
     /**
      * @return Default tolerance
      */
     public static double getDefaultTolerance() {
-        return .05;
+        return DEFAULT_TOLERANCE;
     }
 
     /**
@@ -193,7 +213,7 @@ public class GaugePreferences {
      * @return Default perturbation amount.
      */
     public static double getDefaultPerturbationAmount() {
-        return .1;
+        return DEFAULT_PERTURBATION;
     }
 
     /**
@@ -291,14 +311,15 @@ public class GaugePreferences {
      * @return Current number of iterations between updates.
      */
     public static int getIterationsBetweenUpdates() {
-        return GAUGE_PREFERENCES.getInt("IterationsBetweenUptates", getDefaultIterationsBetweenUpdates());
+        return GAUGE_PREFERENCES.getInt("IterationsBetweenUptates",
+            getDefaultIterationsBetweenUpdates());
     }
 
     /**
      * @return Default number of iterations between updates.
      */
     public static int getDefaultIterationsBetweenUpdates() {
-        return 10;
+        return DEFAULT_ITERATIONS_BETWEEN_UPDATES;
     }
 
     /**
@@ -309,17 +330,17 @@ public class GaugePreferences {
     }
 
     /**
-     * @return Current epslion value.
+     * @return Current epsilon value.
      */
     public static double getEpsilon() {
         return GAUGE_PREFERENCES.getDouble("Epsilon", getDefaultEpsilon());
     }
 
     /**
-     * @return Defalut epsilon value.
+     * @return Default epsilon value.
      */
     public static double getDefaultEpsilon() {
-        return 3;
+        return DEFAULT_EPSILON;
     }
 
     /**
@@ -379,7 +400,7 @@ public class GaugePreferences {
     }
 
     /**
-     * @return Defalut auto find value.
+     * @return Default auto find value.
      */
     public static boolean getDefaultAutoFind() {
         return true;

@@ -18,6 +18,10 @@
  */
 package org.simnet.neurons;
 
+import java.lang.reflect.Type;
+
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.ConsumingAttribute;
 import org.simnet.interfaces.Neuron;
 
 
@@ -28,10 +32,30 @@ public class StochasticNeuron extends Neuron {
     /** Probability the neuron will fire. */
     private double firingProbability = .5;
 
+    private void addConsumer(Neuron n) {
+        n.getConsumingAttributes().add(new ConsumingAttribute<Double>() {
+
+            public Consumer getParent() {
+                return StochasticNeuron.this;
+            }
+
+            public void setValue(Double value){
+                firingProbability = value;
+            }
+
+            public String getAttributeDescription() {
+                return "Firing Probability";
+            }
+
+            public Type getType() {
+                return StochasticNeuron.class;
+            }});
+    }
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public StochasticNeuron() {
+        addConsumer(this);
     }
 
     /**
@@ -48,6 +72,7 @@ public class StochasticNeuron extends Neuron {
      */
     public StochasticNeuron(final Neuron n) {
         super(n);
+        addConsumer(n);
     }
 
     /**

@@ -647,10 +647,9 @@ public class SimbrainDesktop {
     public JMenu getProducerMenu(final ActionListener listener) {
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-            
-            
+
             Collection<? extends Producer> producers = component.getProducers();
-            
+
             if (producers.size() > 0) {
                 JMenu componentMenu = new JMenu(component.getName());
                 for (Producer producer : component.getProducers()) {

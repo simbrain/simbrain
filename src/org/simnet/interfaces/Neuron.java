@@ -112,7 +112,7 @@ public abstract class Neuron implements Producer, Consumer {
 
     /**
      * Target / reward value (not all neurons will use this).
-     * "Value" addded to disambiguate from synapse's target neuron.
+     * "Value" added to disambiguate from synapse's target neuron.
      */
     // private double targetValue = 0;
 

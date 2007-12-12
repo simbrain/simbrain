@@ -123,7 +123,7 @@ public class Gauge {
             return;
         }
 
-        logger.debug("guage: isOn " + isOn());
+        logger.debug("Gauge: isOn " + isOn());
 
         if (isOn()) {
             currentProjector.addDatapoint(point);

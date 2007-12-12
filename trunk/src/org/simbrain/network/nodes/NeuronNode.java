@@ -661,7 +661,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
 
     /**
-     * Updates the psoition of the view neuron based on the position of the model neuron.
+     * Updates the position of the view neuron based on the position of the model neuron.
      */
     public void pullViewPositionFromModel() {
         //System.out.println("view neuron updated");
@@ -672,23 +672,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private final ActionListener popUpMenuListener = new ActionListener() {
 
         public void actionPerformed(ActionEvent e) {
-            LOGGER.debug("pop up producer menu event");
-            
+            LOGGER.debug("pop up producer / consumer menu event");
+
             CouplingMenuItem m = (CouplingMenuItem) e.getSource();
-            
+
             if (m.getEventType() == CouplingMenuItem.EventType.SINGLE_PRODUCER) {
                 LOGGER.debug("single producer");
                 Coupling coupling = new Coupling( m.getProducingAttribute(), getNeuron().getDefaultConsumingAttribute());
-                
                 desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
             } else if (m.getEventType() == CouplingMenuItem.EventType.SINGLE_CONSUMER) {
                 LOGGER.debug("single consumer");
                 Coupling coupling = new Coupling(getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
                 desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
             } else if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
-                LOGGER.debug("single producer");
-                // BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
+                LOGGER.debug("producer list");
                 // Iterate through selected neurons and attach as many producers as possible
+                // TODO: BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
                 // TODO: Move this code to networkpanel and make it more general than neurons.
                 Iterator producerIterator = m.getWorkspaceComponent().getProducers().iterator(); // Get the other guy's producers
                 for (Neuron neuron : getNetworkPanel().getSelectedModelNeurons()) { // Iterate through our consumers
@@ -704,12 +703,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 // Send our producers over to their consumers
                 // TODO refactor
 //                    m.getCouplingContainer().getCouplings().clear(); //TODO: need some form of reset also
-                Iterator producerIterator =  getNetworkPanel().getSelectedModelNeurons().iterator(); // Get the other guy's producers
-                for (Consumer consumer : m.getWorkspaceComponent().getConsumers()) {
+                Iterator producerIterator =  getNetworkPanel().getSelectedModelNeurons().iterator(); // Get our producers
+                for (Consumer consumer : m.getWorkspaceComponent().getConsumers()) { // get other guy's consumers.
                     if (producerIterator.hasNext()) {
                         Coupling coupling = new Coupling(((org.simbrain.workspace.Producer) producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                        // TODO refactor
-//                            m.getCouplingContainer().getCouplings().add(coupling);
+                        desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
                     } else {
                         break;
                     }

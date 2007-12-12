@@ -17,11 +17,11 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Actor Critic</p>
   </div>
   <p><h1>Actor Critic Network</h1></p>
-  <p>Actor critic network implements the temporal difference learning algorithm. This network consistes of 3 layers. The first layer is the state (input) layer. This feeds input into the other two layers: the actor layer and the adaptive critic layer. We will look at the working of these layers, one by one</p>
+  <p>Actor critic network implements the temporal difference learning algorithm. This network consistes of 3 layers. The first layer is the state (input) layer. This feeds input into the other two layers: the actor layer and the adaptive critic layer. The weights between the state and actor layers intuitively map perceptions to actions, and can thus control an agent's behavior in an environment.   The network learns to modify the weights in this layer so that a controlled agent maximizes reward to itself.  We will look at the working of these layers, one by one</p>
 
   <p><span class="heading2">Adaptive Critic</span><br>
-  This layer consists of a single neuron that gets inputs from the state layer. This neurons learns to predict the discounted future reward using associated with the input state. Hence, this layer's working is exactly the same as that of a <a href="../synapse/tdsynapse.html">TDSynapse</a>.
-  The adaptive critic's activation value is equal to the weighted sum of the state input. This activation value represents the critics estimate of the discounted future reward. This value is used to compute the error in reward estimate (delta) as follows:
+  This layer consists of a single neuron that gets inputs from the state layer. This neurons learns to predict the discounted future associated with the input state. Hence, this layer's working is exactly the same as that of a <a href="../synapse/tdsynapse.html">TDSynapse</a>.
+  The adaptive critic's activation value is equal to the weighted sum of the state input. This activation value represents the critic's estimate of the discounted future reward. This value is used to compute the error in the reward estimate (delta) as follows:
   <p span><img src="../equations/td_delta.png" width="350" height="50">
   <p span>In the above equation, delta (error in reward expectation) is being computed for the <em>t<sup>th</sup></em> iteration. V stands for the target neuron's activation value and r stands for the reward value. Gamma is the reward discount factor. This delta value is used to update the connection strength between state and critic as follows:
   <p span><img src="../equations/del_w_crit.png" width="270" height="45">

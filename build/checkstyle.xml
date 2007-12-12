@@ -56,7 +56,9 @@
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
         <module name="RightCurly"/>
-        <module name="AvoidInlineConditionals"/>
+        <module name="AvoidInlineConditionals">
+            <property name="severity" value="ignore"/>
+        </module>
         <module name="DoubleCheckedLocking"/>
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
@@ -77,7 +79,9 @@
             <property name="format" value="[^* ]+.*\s+$"/>
             <property name="message" value="Line has trailing spaces."/>
         </module>
-        <module name="TodoComment"/>
+        <module name="TodoComment">
+            <property name="severity" value="ignore"/>
+        </module>
         <module name="UpperEll"/>
     </module>
     <module name="PackageHtml"/>

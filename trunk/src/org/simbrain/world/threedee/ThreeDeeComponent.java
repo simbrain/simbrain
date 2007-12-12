@@ -117,6 +117,18 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     protected void update() {
-        // TODO Auto-generated method stub
+        for (Bindings bind : bindings) {
+            bind.setOn(true);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void stopped() {
+        for (Bindings bind : bindings) {
+            bind.setOn(false);
+        }
     }
 }

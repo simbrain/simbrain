@@ -117,26 +117,28 @@ public abstract class Moveable implements Viewable {
         speed = 0f;
         upSpeed = 0f;
 
-        /* input is synchronized but we need to lock over the iterator */
-        for (final Collection<? extends Action> input : inputs.values()) {
-            /*
-             * if there are events on this input process them and then
-             * return
-             */
-            synchronized (input) {
-                if (input.size() > 0) {
-                    for (final Action action : input) {
-                        if (action.parent != this) {
-                            throw new IllegalArgumentException(
-                                "actions can only be handled by parent");
+        synchronized (inputs) {
+            /* input is synchronized but we need to lock over the iterator */
+            for (final Collection<? extends Action> input : inputs.values()) {
+                /*
+                 * if there are events on this input process them and then
+                 * return
+                 */
+                synchronized (input) {
+                    if (input.size() > 0) {
+                        for (final Action action : input) {
+                            if (action.parent != this) {
+                                throw new IllegalArgumentException(
+                                    "actions can only be handled by parent");
+                            }
+    
+                            action.doAction();
                         }
-
-                        action.doAction();
+    
+                        doUpdates();
+    
+                        return;
                     }
-
-                    doUpdates();
-
-                    return;
                 }
             }
         }
@@ -171,6 +173,9 @@ public abstract class Moveable implements Viewable {
         /* set the new direction */
         direction.addLocal(sumQuat.getRotationColumn(2)).normalizeLocal();
 
+        LOGGER.trace("speed: " + speed);
+        LOGGER.trace("upSpeed: " + upSpeed);
+        
         /*
          * update the location by adding a vector that is defined by the current
          * direction multiplied by the current speed
@@ -236,8 +241,8 @@ public abstract class Moveable implements Viewable {
      *
      * @return an action for turning left.
      */
-    public Action left() {
-        return new Action() {
+    public final Action left() {
+        return new Action("left") {
             @Override
             void doAction() {
                 LOGGER.trace("left: " + super.value);
@@ -251,11 +256,11 @@ public abstract class Moveable implements Viewable {
      *
      * @return an action for turning right.
      */
-    public Action right() {
-        return new Action() {
+    public final Action right() {
+        return new Action("right") {
             @Override
             void doAction() {
-                LOGGER.trace("right");
+                LOGGER.trace("right: " + super.value);
                 leftRightRot -= getValue() * rotationSpeed;
             }
         };
@@ -266,12 +271,12 @@ public abstract class Moveable implements Viewable {
      *
      * @return an action for moving forwards.
      */
-    public Action forward() {
-        return new Action() {
+    public final Action forward() {
+        return new Action("forward") {
             @Override
             void doAction() {
-                LOGGER.trace("forward");
-                speed = getValue() * movementSpeed;
+                LOGGER.trace("forward: " + super.value);
+                speed += getValue() * movementSpeed;
             }
         };
     }
@@ -282,11 +287,11 @@ public abstract class Moveable implements Viewable {
      * @return an action for moving backwards.
      */
     public final Action backward() {
-        return new Action() {
+        return new Action("backward") {
             @Override
             void doAction() {
-                LOGGER.trace("backward");
-                speed = 0f - (getValue() * movementSpeed);
+                LOGGER.trace("backward: " + super.value);
+                speed -= getValue() * movementSpeed;
             }
         };
     }
@@ -297,11 +302,11 @@ public abstract class Moveable implements Viewable {
      * @return an action for rising straight up regardless of orientation.
      */
     public final Action rise() {
-        return new Action() {
+        return new Action("rise") {
             @Override
             void doAction() {
-                LOGGER.trace("rise");
-                upSpeed = getValue() * movementSpeed;
+                LOGGER.trace("rise: " + super.value);
+                upSpeed += getValue() * movementSpeed;
             }
         };
     }
@@ -312,11 +317,11 @@ public abstract class Moveable implements Viewable {
      * @return an action for falling straight down regardless of orientation.
      */
     public final Action fall() {
-        return new Action() {
+        return new Action("fall") {
             @Override
             void doAction() {
-                LOGGER.trace("fall");
-                upSpeed = 0 - (getValue() * movementSpeed);
+                LOGGER.trace("fall: " + super.value);
+                upSpeed -= getValue() * movementSpeed;
             }
         };
     }
@@ -327,10 +332,10 @@ public abstract class Moveable implements Viewable {
      * @return an action for nosing down.
      */
     public final Action down() {
-        return new Action() {
+        return new Action("down") {
             @Override
             void doAction() {
-                LOGGER.trace("down");
+                LOGGER.trace("down: " + super.value);
                 upDownRot += getValue() * rotationSpeed;
             }
         };
@@ -342,10 +347,10 @@ public abstract class Moveable implements Viewable {
      * @return an action for nosing up.
      */
     public final Action up() {
-        return new Action() {
+        return new Action("up") {
             @Override
             void doAction() {
-                LOGGER.trace("up");
+                LOGGER.trace("up: " + super.value);
                 upDownRot -= getValue() * rotationSpeed;
             }
         };
@@ -357,6 +362,18 @@ public abstract class Moveable implements Viewable {
      * @author Matt Watson
      */
     public abstract class Action {
+        /** The name of this action for debugging purposes. */
+        private final String name;
+        
+        /**
+         * Creates a new action with the given name.
+         * 
+         * @param name The name of the action.
+         */
+        private Action(final String name) {
+            this.name = name;
+        }
+        
         /**
          * Method all action instances use. Not meant to be called this from
          * outside this class.
@@ -379,6 +396,7 @@ public abstract class Moveable implements Viewable {
          * @param amount the amount to move.
          */
         public void setValue(final float amount) {
+            LOGGER.trace("setting value for " + name + ": " + amount);
             this.value = amount;
         }
 

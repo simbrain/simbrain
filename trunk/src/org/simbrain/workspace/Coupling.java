@@ -1,5 +1,6 @@
 package org.simbrain.workspace;
 
+import org.apache.log4j.Logger;
 
 /**
  * Coupling between a producing attribute and a consuming attribute.
@@ -7,7 +8,10 @@ package org.simbrain.workspace;
  * @param <E> coupling attribute value type
  */
 public final class Coupling<E> {
-
+    
+    /** The static logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(Coupling.class);
+    
     /** Producing attribute for this coupling. */
     private ProducingAttribute<E> producingAttribute;
 
@@ -37,7 +41,10 @@ public final class Coupling<E> {
      */
     public Coupling(final ProducingAttribute<E> producingAttribute,
                     final ConsumingAttribute<E> consumingAttribute) {
-
+        LOGGER.debug("new Coupling");
+        LOGGER.debug("producing " + producingAttribute.getAttributeDescription());
+        LOGGER.debug("consuming " + consumingAttribute.getAttributeDescription());
+        
         this.producingAttribute = producingAttribute;
         this.consumingAttribute = consumingAttribute;
     }
@@ -48,6 +55,8 @@ public final class Coupling<E> {
      */
     public void setBuffer() {
         buffer = producingAttribute.getValue();
+        
+        LOGGER.debug("buffer set: " + buffer);
     }
 
     /**
@@ -56,7 +65,9 @@ public final class Coupling<E> {
     public void update() {
         if ((consumingAttribute != null) && (producingAttribute != null)) {
             consumingAttribute.setValue(buffer);
-            //System.out.println(consumingAttribute.getParent().getConsumerDescription() + " just consumed " + producingAttribute.getValue() + " from " + producingAttribute.getParent().getProducerDescription());
+            LOGGER.debug(consumingAttribute.getParent().getDescription()
+                + " just consumed " + producingAttribute.getValue() + " from "
+                + producingAttribute.getParent().getDescription());
         }
     }
 
@@ -72,7 +83,7 @@ public final class Coupling<E> {
     /**
      * @param producingAttribute the producingAttribute to set
      */
-    public void setProducingAttribute(ProducingAttribute<E> producingAttribute) {
+    public void setProducingAttribute(final ProducingAttribute<E> producingAttribute) {
         this.producingAttribute = producingAttribute;
     }
 
@@ -85,7 +96,9 @@ public final class Coupling<E> {
     }
 
     /**
-     * Used by GUI.
+     * Returns the string representation of this coupling.
+     * 
+     * @return The string representation of this coupling.
      */
     public String toString() {
         String producerString;

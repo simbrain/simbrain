@@ -21,13 +21,22 @@ package org.simbrain.workspace;
 import javax.swing.SwingUtilities;
 
 /**
- * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
+ * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons
+ * in the  network panel.
  */
 public class WorkspaceThread extends Thread {
-
+    /** The time to sleep between updates. */
+    private static final int SLEEP_INTERVAL = 10;
+    
+    /** The parent workspace. */
     private final Workspace workspace;
     
-    public WorkspaceThread(Workspace workspace) {
+    /**
+     * Creates a new instance.
+     * 
+     * @param workspace The parent Workspace.
+     */
+    public WorkspaceThread(final Workspace workspace) {
         this.workspace = workspace;
     }
     
@@ -38,13 +47,22 @@ public class WorkspaceThread extends Thread {
      * Updated the network.
      */
     private Runnable updateNetwork = new Runnable() {
-            public void run() {
-                workspace.globalUpdate();
-            }
-        };
-
-    /* (non-Javadoc)
-     * @see java.lang.Runnable#run()
+        public void run() {
+            workspace.globalUpdate();
+        }
+    };
+    
+    /**
+     * Updated the network.
+     */
+    private Runnable stopNetwork = new Runnable() {
+        public void run() {
+            workspace.updateStopped();
+        }
+    };
+    
+    /**
+     * {@inheritDoc}
      */
     public void run() {
         try {
@@ -55,11 +73,13 @@ public class WorkspaceThread extends Thread {
                 SwingUtilities.invokeLater(updateNetwork);
 
                 while (!workspace.isUpdateCompleted()) {
-                    sleep(10);
+                    sleep(SLEEP_INTERVAL);
                 }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            SwingUtilities.invokeLater(stopNetwork);
         }
     }
 

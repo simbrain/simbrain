@@ -43,7 +43,7 @@ class WorkspaceKeyAdapter extends KeyAdapter {
         int keycode = e.getKeyCode();
         switch (keycode) {
         case KeyEvent.VK_U:
-            workspace.globalUpdate();
+            workspace.singleUpdate();
             break;
         default:
             break;

@@ -35,6 +35,11 @@ class Bindings implements Consumer, Producer {
     /** The default consuming attribute for this set of Bindings. */
     private ConsumingAttribute<?> defaultConsumingAttribute = null;
 
+    /** Whether the bindings should be applied to the agent. */
+    private volatile boolean on = false;
+    /** Once on has been set, the bindings remain on until the next iterator call is made. */
+    private volatile boolean bind = false;
+    
     /**
      * Creates a new bindings object for the given agent
      * and component.
@@ -50,35 +55,56 @@ class Bindings implements Consumer, Producer {
         consumers.add(new ConsumingBinding("forward", agent.forward()));
         consumers.add(new ConsumingBinding("backward", agent.backward()));
         defaultConsumingAttribute = consumers.get(0);
-
+        
         agent.addInput(PRIORITY, new AbstractCollection<Action>() {
             @Override
             public Iterator<Action> iterator() {
-                final Iterator<ConsumingBinding> internal = consumers.iterator();
-
-                return new Iterator<Action>() {
-
-                  public boolean hasNext() {
-                      return internal.hasNext();
-                  }
-
-                  public Action next() {
-                      return internal.next().action;
-                  }
-
-                  public void remove() {
-                      throw new UnsupportedOperationException();
-                  }
-               };
+                if (bind) {
+                    /*
+                     * set the bind value to the on parameter.  This is not done until
+                     * the iterator it to be created to ensure at least one iterator
+                     * is returned every time the bindings are turned on.
+                     */
+                    bind = on;
+                    
+                    final Iterator<ConsumingBinding> internal = consumers.iterator();
+    
+                    return new Iterator<Action>() {
+    
+                      public boolean hasNext() {
+                          return internal.hasNext();
+                      }
+    
+                      public Action next() {
+                          return internal.next().action;
+                      }
+    
+                      public void remove() {
+                          throw new UnsupportedOperationException();
+                      }
+                   };
+                } else {
+                    return Collections.<Action>emptySet().iterator();
+                }
             }
 
             @Override
             public int size() {
-                return consumers.size();
+                return bind ? consumers.size() : 0;
             }
         });
     }
 
+    /**
+     * Turns the bindings on or off depending on the value of on.
+     * 
+     * @param on True to turn on and false to turn off.
+     */
+    public void setOn(final boolean on) {
+        this.on = on;
+        if (!bind) { bind = on; }
+    }
+    
     /**
      * Binds to a single Action on an Agent.
      *

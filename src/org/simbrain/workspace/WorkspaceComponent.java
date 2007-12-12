@@ -26,13 +26,15 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 
 /**
- * Represents a window in the Simbrain desktop.   Services relating to
- * couplings and relations between are handled.  We may want to abstract
- * out some of the coupling management since much of this is focused on
- * the GUI aspects of the JInternalFrames.
+ * Represents a component model in a Simbrain workspace.  Services relating to
+ * couplings and relations between are handled.  Implementations of this class
+ * should not be bound to a user interface.
+ * 
+ * @param <E> The type of the workspace listener associated with this
+ * component.
  */
 public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
-
+    /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(WorkspaceComponent.class);
     
     /** Log4j logger. */
@@ -44,13 +46,15 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
 
-    /** the workspace that 'owns' this component */
+    /** The workspace that 'owns' this component. */
     private Workspace workspace;
     
     /**
      * Construct a workspace component.
+     * 
+     * @param name The name of the component.
      */
-    public WorkspaceComponent(String name) {
+    public WorkspaceComponent(final String name) {
         this.name = name;
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
@@ -84,31 +88,63 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public abstract void close();
 
     /**
-     * called by Workspace to update the state of the component
+     * called by Workspace to update the state of the component.
      */
     protected abstract void update();
+    
+    /**
+     * called by Workspace to notify that updates have stopped.
+     */
+    protected void stopped() {
+        /* no default implementation */
+    }
     
     /**
      * Update that goes beyond updating couplings.
      * Called when global workspace update is called.
      */
-    void doUpdate() {
+    final void doUpdate() {
         update();
         
-        for (E listener : listeners) listener.componentUpdated();
+        for (E listener : listeners) {
+            listener.componentUpdated();
+        }
     }
     
-    Collection<E> listeners = new HashSet<E>();
+    /**
+     * Called after a global update ends.
+     */
+    final void doStopped() {
+        stopped();
+    }
     
+    /** The set of all listeners on this component. */
+    private Collection<E> listeners = new HashSet<E>();
+    
+    /**
+     * Returns the listeners on this component.
+     * 
+     * @return The listeners on this component.
+     */
     protected Collection<? extends E> getListeners() {
         return Collections.unmodifiableCollection(listeners);
     }
     
-    public void addListener(E listener) {
+    /**
+     * Adds a listener to this component.
+     * 
+     * @param listener the Listener to add.
+     */
+    public void addListener(final E listener) {
         listeners.add(listener);
     }
     
-    public void removeListener(E listener) {
+    /**
+     * Removes a listener to this component.
+     * 
+     * @param listener the Listener to add.
+     */
+    public void removeListener(final E listener) {
         listeners.add(listener);
     }
     
@@ -121,12 +157,17 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
 
     /**
-     * @return the name
+     * Returns the name of this component.
+     * 
+     * @return The name of this component.
      */
     public String getName() {
         return name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return name;
@@ -172,18 +213,39 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         return simpleName;
     }
 
+    /**
+     * Returns the consumers associated with this component.
+     * 
+     * @return The consumers associated with this component.
+     */
     public Collection<? extends Consumer> getConsumers() {
         return Collections.emptySet();
     }
 
+    /**
+     * Returns the producers associated with this component.
+     * 
+     * @return The producers associated with this component.
+     */
     public Collection<? extends Producer> getProducers() {
         return Collections.emptySet();
     }
 
-    void setWorkspace(Workspace workspace) {
+    /**
+     * Sets the workspace for this component.  Called by the
+     * workspace right after this component is created.
+     * 
+     * @param workspace The workspace for this component.
+     */
+    void setWorkspace(final Workspace workspace) {
         this.workspace = workspace;
     }
 
+    /**
+     * Returns the workspace associated with this component.
+     * 
+     * @return The workspace associated with this component.
+     */
     public Workspace getWorkspace() {
         return workspace;
     }

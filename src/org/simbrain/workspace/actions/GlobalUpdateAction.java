@@ -52,6 +52,6 @@ public final class GlobalUpdateAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.globalUpdate();
+        workspace.singleUpdate();
     }
 }

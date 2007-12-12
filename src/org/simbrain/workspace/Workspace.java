@@ -32,10 +32,12 @@ import org.apache.log4j.Logger;
  */
 public class Workspace {
     
+    /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
-
+    /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
     
+    /** The coupling manager for this workspace. */
     private final CouplingManager manager = new CouplingManager();
     
     /** List of workspace components. */
@@ -53,25 +55,33 @@ public class Workspace {
     /** Thread which runs workspace. */
     private WorkspaceThread workspaceThread;
 
+    /** Listeners on this workspace. */
     private Set<WorkspaceListener> listeners = new HashSet<WorkspaceListener>();
     
     /**
-     * Default constructor.
+     * Adds a listener to the workspace.
+     * 
+     * @param listener the Listener to add.
      */
-    public Workspace() {
-        
-    }
-    
-    public void addListener(WorkspaceListener listener) {
+    public void addListener(final WorkspaceListener listener) {
         listeners.add(listener);
     }
     
-    public void removeListener(WorkspaceListener listener) {
+    /**
+     * Removes the listener from the workspace.
+     * 
+     * @param listener The listener to remove.
+     */
+    public void removeListener(final WorkspaceListener listener) {
         listeners.remove(listener);
     }
 
-    public void addWorkspaceComponent(WorkspaceComponent<?> component)
-    {
+    /**
+     * Adds a workspace component to the workspace.
+     * 
+     * @param component The component to add.
+     */
+    public void addWorkspaceComponent(final WorkspaceComponent<?> component) {
         LOGGER.debug("adding component: " + component);
         componentList.add(component);
         component.setWorkspace(this);
@@ -83,9 +93,9 @@ public class Workspace {
     }
     
     /**
-     * Remove the specified window.
+     * Remove the specified component.
      *
-     * @param window
+     * @param component The component to remove.
      */
     public void removeWorkspaceComponent(final WorkspaceComponent<?> component) {
         LOGGER.debug("removing component: " + component);
@@ -97,11 +107,12 @@ public class Workspace {
         this.setWorkspaceChanged(true);
     }
     
+    // TODO: Add other update methods.
+    
     /**
      * Update all couplings on all components.  Currently use a buffering method.
-     * TODO: Add other update methods.
      */
-    public void globalUpdate() {
+    void globalUpdate() {
         manager.updateAllCouplings();
         
         for (WorkspaceComponent<?> component : componentList) {
@@ -110,8 +121,30 @@ public class Workspace {
         
         updateCompleted = true;
     }
-
-    public void addCoupling(Coupling<?> coupling) {
+    
+    /**
+     * Should be called when updating is stopped.
+     */
+    void updateStopped() {
+        for (WorkspaceComponent<?> component : componentList) {
+            component.doStopped();
+        }
+    }
+    
+    /**
+     * Update all couplings on all components once.
+     */
+    public void singleUpdate() {
+        globalUpdate();
+        updateStopped();
+    }
+    
+    /**
+     * Adds a coupling to the CouplingManager.
+     * 
+     * @param coupling The coupling to add.
+     */
+    public void addCoupling(final Coupling<?> coupling) {
         manager.addCoupling(coupling);
     }
     
@@ -121,7 +154,7 @@ public class Workspace {
 //        } else if (component.getCouplingContainer().getCouplings() == null) {
 //            return false;
 //        }
-//        
+//
 //        return true;
 //    }
 
@@ -155,7 +188,7 @@ public class Workspace {
     public void clearWorkspace() {
         if (changesExist()) {
             for (WorkspaceListener listener : listeners) {
-                if (!listener.clearWorkspace()) return;
+                if (!listener.clearWorkspace()) { return; }
             }
         }
         workspaceChanged = false;
@@ -248,18 +281,28 @@ public class Workspace {
     }
 
     /**
-     * @return the workspaceThread.
+     * Returns the workspaceThread.
+     * 
+     * @return The workspaceThread.
      */
     public WorkspaceThread getWorkspaceThread() {
-        if (workspaceThread == null) workspaceThread = new WorkspaceThread(this);
+        if (workspaceThread == null) { workspaceThread = new WorkspaceThread(this); }
         
         return workspaceThread;
     }
     
+    /**
+     * Clears the workspace thread.
+     */
     private void clearWorkspaceThread() {
         workspaceThread = null;
     }
 
+    /**
+     * Returns the coupling manager for this workspace.
+     * 
+     * @return The coupling manager for this workspace.
+     */
     public CouplingManager getManager() {
         return manager;
     }

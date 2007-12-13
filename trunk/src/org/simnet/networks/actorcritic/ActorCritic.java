@@ -55,16 +55,17 @@ public class ActorCritic extends Network {
     /** Simbrain representation of actionsNetwork. */
     private StandardNetwork actionsNetwork = null;
 
-    /** Simbrain representation of critic. */
+    //TODO: Give critic[0] and critic[1] meaningful names and use those names
+    /** Simbrain representation of critic (two nodes: anticipated and current reward). */
     private StandardNetwork critic = null;
 
-    /** Buffers to hold the last activation stateNetwork of the network. */
+    /** Buffers to hold the last activation state of the state network. */
     private double[] lastState = null;
 
-    /** Buffers to hold the last activation stateNetwork of the network. */
+    /** Buffers to hold the last activation state of the action network. */
     private double[] lastActions = null;
 
-    /** Buffers to hold the last activation stateNetwork of the network. */
+    /** Buffers to hold the last activation state of the critic network. */
     private double[] lastCritic = null;
 
     /** Actor learning rate. */
@@ -123,8 +124,8 @@ public class ActorCritic extends Network {
         }
         for (int i = 0; i < actorUnits; i++) {
             this.lastActions[i] = 0;
-        this.lastCritic[0] = 0;
         }
+        this.lastCritic[0] = 0;
         this.lastCritic[1] = 0;
     }
 

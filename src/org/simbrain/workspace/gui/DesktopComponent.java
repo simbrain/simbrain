@@ -56,9 +56,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
     /** Current directory. So when re-opening this type of component the app remembers where to look. */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
-    /** The name of this component.  Used in the title, in saving, etc. */
-    private String name  = "";
-
     /** The path to the saved representation for this component. Used in persisting the workspace. */
     private String path;
 
@@ -190,24 +187,16 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         }
     }
 
-    /**
-     * @return the name
-     */
     public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+        return workspaceComponent.getName();
     }
 
     /**
      * @param name the name to set
      */
     public void setName(final String name) {
+        workspaceComponent.setName(name);
         setTitle(name);
-        this.name = name;
     }
 
     /**

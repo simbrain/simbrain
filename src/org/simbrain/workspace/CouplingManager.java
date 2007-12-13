@@ -26,22 +26,51 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Manages all the couplings for a Workspace instance.
+ * 
+ * @author Matt Watson
+ */
 public class CouplingManager {
-
+    /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
-
+    /** All couplings for the workspace. */
     private List<Coupling<?>> all = new ArrayList<Coupling<?>>();
-
-    private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings = new HashMap<SourceTarget, List<Coupling<?>>>();
-
+    /** The couplings indexed by the source and target combination. */
+    private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings
+        = new HashMap<SourceTarget, List<Coupling<?>>>();
+    /** The couplings indexed by source. */
+    private Map<WorkspaceComponent<?>, List<Coupling<?>>> sourceCouplings
+        = new HashMap<WorkspaceComponent<?>, List<Coupling<?>>>();
+    /** The couplings indexed by target. */
+    private Map<WorkspaceComponent<?>, Coupling<?>> targetCouplings
+        = new HashMap<WorkspaceComponent<?>, Coupling<?>>();
+    
+    /**
+     * Returns an unmodifiable list of all the couplings.
+     * 
+     * @return An unmodifiable list of all the couplings.
+     */
     public List<? extends Coupling<?>> getCouplings() {
         return Collections.unmodifiableList(all);
     }
 
-    public List<? extends Coupling<?>> getCouplings(WorkspaceComponent source, WorkspaceComponent target) {
-        return Collections.unmodifiableList(sourceTargetCouplings.get(new SourceTarget(source, target)));
+    /**
+     * Returns all couplings from the given source to the given target.
+     * 
+     * @param source The source to use in the search.
+     * @param target The target to use in the search.
+     * @return A list of the couplings between the provided source and target.
+     */
+    public List<? extends Coupling<?>> getCouplings(
+            final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
+        return Collections.unmodifiableList(sourceTargetCouplings.get(
+            new SourceTarget(source, target)));
     }
 
+    /**
+     * Updates all couplings in the workspace.
+     */
     void updateAllCouplings() {
         LOGGER.debug("updating all couplings");
         for (Coupling<?> coupling : getCouplings()) {
@@ -54,50 +83,159 @@ public class CouplingManager {
         }
     }
 
+    /**
+     * Finds a coupling for the provided ids.
+     * 
+     * @param sourceId The source ID.
+     * @param targetId The target ID.
+     * @return The coupling associated with the ids.
+     */
     //TODO implement findCoupling
-    Coupling<?> findCoupling(String sourceId, String targetId) {
+    Coupling<?> findCoupling(final String sourceId, final String targetId) {
         return null;
     }
 
-    public boolean containsCoupling(Coupling<?> coupling) {
+    /**
+     * returns whether the coupling is referenced by this manager.
+     * 
+     * @param coupling The coupling to search for.
+     * @return whether the coupling is referenced by this manager.
+     */
+    public boolean containsCoupling(final Coupling<?> coupling) {
        return all.contains(coupling);
     }
 
-    public void addCoupling(Coupling<?> coupling) {
+    /**
+     * Adds a coupling to this instance.
+     * 
+     * @param coupling The coupling to add.
+     */
+    public void addCoupling(final Coupling<?> coupling) {
         all.add(coupling);
-        SourceTarget sourceTarget = new SourceTarget(
-            coupling.getConsumingAttribute().getParent().getParentComponent(),
-            coupling.getProducingAttribute().getParent().getParentComponent());
+        
+        WorkspaceComponent<?> source = coupling.getProducingAttribute()
+            .getParent().getParentComponent();
+        WorkspaceComponent<?> target = coupling.getConsumingAttribute()
+            .getParent().getParentComponent();
+        
+        SourceTarget sourceTarget = new SourceTarget(source, target);
 
         List<Coupling<?>> couplings = sourceTargetCouplings.get(sourceTarget);
         
-        if (couplings == null) {
-            couplings = new ArrayList<Coupling<?>>();
-            sourceTargetCouplings.put(sourceTarget, couplings);
-        }
+        sourceTargetCouplings.put(sourceTarget, addCouplingToList(
+            sourceTargetCouplings.get(sourceTarget), coupling));
+        sourceCouplings.put(source, addCouplingToList(sourceTargetCouplings.get(source), coupling));
+        // TODO is this the way to do this?
+        targetCouplings.put(target, coupling);
         
         couplings.add(coupling);
     }
     
-    void removeCoupling(Coupling<?> coupling) {
-        all.remove(coupling);
+    /**
+     * Adds a coupling to the provided list.  If the list is null, a new list
+     * is created.  The list that the coupling is added to is returned.
+     * 
+     * @param list The list to add to.
+     * @param coupling The coupling to add.
+     * @return The passed in list or a new list if null was provided.
+     */
+    private List<Coupling<?>> addCouplingToList(final List<Coupling<?>> list,
+            final Coupling<?> coupling) {
+        List<Coupling<?>> local = list;
         
-        SourceTarget sourceTarget = new SourceTarget(
-            coupling.getConsumingAttribute().getParent().getParentComponent(),
-            coupling.getProducingAttribute().getParent().getParentComponent());
-            
-        List<Coupling<?>> couplings = sourceTargetCouplings.get(sourceTarget);
+        if (local == null) {
+            local = new ArrayList<Coupling<?>>();
+        }
         
-        if (couplings != null) couplings.remove(coupling);
+        local.add(coupling);
+        
+        return local;
     }
     
-    private class SourceTarget {
-        WorkspaceComponent source;
-        WorkspaceComponent target;
+    /**
+     * Removes a coupling from the manager.
+     * 
+     * @param coupling The coupling to remove.
+     */
+    void removeCoupling(final Coupling<?> coupling) {
+        WorkspaceComponent<?> source = coupling.getProducingAttribute()
+            .getParent().getParentComponent();
+        WorkspaceComponent<?> target = coupling.getConsumingAttribute()
+            .getParent().getParentComponent();
         
-        SourceTarget(WorkspaceComponent source, WorkspaceComponent target) {
+        SourceTarget sourceTarget = new SourceTarget(source, target);
+        
+        all.remove(coupling);
+        
+        removeCouplingFromList(sourceTargetCouplings.get(sourceTarget), coupling);
+        removeCouplingFromList(sourceCouplings.get(source), coupling);
+        targetCouplings.remove(target);
+    }
+    
+    /**
+     * Removes a coupling from the provided list.  If the list is null nothing is done.
+     * 
+     * @param list The list to remove from.
+     * @param coupling The coupling to remove.
+     */
+    private void removeCouplingFromList(final List<Coupling<?>> list,
+            final Coupling<?> coupling) {
+        if (list != null) {
+            list.remove(coupling);
+        }
+    }
+    
+//    public void removeCoupling(WorkspaceComponent<?> target) {
+//        List<Coupling<?>> couplings = targetCouplings.get(target);
+//
+//        if (couplings != null) { couplings.remove(index)
+//    }
+    
+    /**
+     * A Simple holder for linking a source and a target.
+     * 
+     * @author Matt Watson
+     */
+    private static class SourceTarget {
+        /** An arbitrary prime used to improve hashing distribution. */
+        private static final int ARBITRARY_PRIME = 57;
+        
+        /** The source component. */
+        private final WorkspaceComponent<?> source;
+        /** The target component. */
+        private final WorkspaceComponent<?> target;
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param source The source.
+         * @param target The target.
+         */
+        SourceTarget(final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
             this.source = source;
             this.target = target;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(final Object o) {
+            if (o instanceof SourceTarget) {
+                SourceTarget other = (SourceTarget) o;
+                
+                return other.source == source && other.target == target;
+            } else {
+                return false;
+            }
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            return source.hashCode() + (ARBITRARY_PRIME * target.hashCode());
         }
     }
 }

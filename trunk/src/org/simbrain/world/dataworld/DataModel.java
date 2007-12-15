@@ -46,7 +46,12 @@ public class DataModel<E> {
     /** List of producers. */
     private ArrayList<Producer> producers = new ArrayList<Producer>();
 
-    DataModel() {
+    /** The parent component of this model. */
+    private final DataWorldComponent parent;
+    
+    DataModel(DataWorldComponent parent) {
+        this.parent = parent;
+        
         for (int i = 0; i < height; i++) {
             data.add((List<E>) newRow());
         }
@@ -57,6 +62,10 @@ public class DataModel<E> {
         }
     }
 
+    public DataWorldComponent getParent() {
+        return parent;
+    }
+    
     public void addListener(Listener listener) {
         listeners.add(listener);
     }

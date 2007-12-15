@@ -72,7 +72,7 @@ public class Test {
         
         KeyHandler handler = getHandler(agent);
         
-        agent.addInput(0, handler.input);
+//        agent.addInput(0, handler.input);
         
         innerFrame.addKeyListener(handler);
         innerFrame.setSize(width, height);
@@ -98,7 +98,7 @@ public class Test {
         
         KeyHandler handler = getHandler(bird);
         
-        bird.addInput(0, handler.input);
+//        bird.addInput(0, handler.input);
         
         innerFrame.addKeyListener(handler);
         innerFrame.setSize(width, height);

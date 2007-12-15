@@ -5,8 +5,10 @@ import java.lang.reflect.Type;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
- * Wraps a column of the table with a consumer object, so other components 
+ * Wraps a column of the table with a consumer object, so other components
  * can write numerical data to a data world column.
+ * 
+ * @param <E> The type that this column handles.
  */
 public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
 
@@ -17,7 +19,10 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
     private DataModel<E> tableModel;
 
     /**
-     * @param columnNumber
+     * Creates a new instance.
+     * 
+     * @param table The table this column is a member of.
+     * @param columnNumber The number of this column.
      */
     public ConsumingColumn(final DataModel<E> table, final int columnNumber) {
         this.tableModel = table;
@@ -25,7 +30,7 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
     }
 
     /**
-     * From consuming attribute.
+     * {@inheritDoc}
      */
     public String getAttributeDescription() {
         return "Column " + (columnNumber + 1);
@@ -34,7 +39,7 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
     /**
      * {@inheritDoc}
      */
-    public void setValue(E value) {
+    public void setValue(final E value) {
         tableModel.set(columnNumber, value);
     }
 
@@ -45,12 +50,17 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
         return "Column " + (columnNumber + 1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Type getType() {
         return Double.TYPE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DataWorldComponent getParentComponent() {
-        // TODO Auto-generated method stub
-        return null;
+        return tableModel.getParent();
     }
 }

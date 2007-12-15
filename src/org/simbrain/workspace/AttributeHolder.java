@@ -1,7 +1,7 @@
 package org.simbrain.workspace;
 
 public interface AttributeHolder {
-    WorkspaceComponent getParentComponent();
+    WorkspaceComponent<?> getParentComponent();
     
     String getDescription();
 }

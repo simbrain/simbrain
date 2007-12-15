@@ -34,11 +34,18 @@ import org.simbrain.workspace.WorkspaceComponentListener;
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
 public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+    
+    /** The stastic logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private final DataModel<Double> dataModel = new DataModel<Double>();
+    private final DataModel<Double> dataModel = new DataModel<Double>(this);
 
+    /**
+     * Returns the data model for this component.
+     * 
+     * @return The data model for this component.
+     */
     DataModel<Double> getDataModel() {
         return dataModel;
     }
@@ -96,13 +103,16 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
      // TODO implement
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getFileExtension() {
        return "xml";
     }
 
 //    @Override
-//    public void setCurrentDirectory(final String currentDirectory) {        
+//    public void setCurrentDirectory(final String currentDirectory) {
 //        super.setCurrentDirectory(currentDirectory);
 //        DataWorldPreferences.setCurrentDirectory(currentDirectory);
 //    }
@@ -112,21 +122,33 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 //        return DataWorldPreferences.getCurrentDirectory();
 //    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<? extends Consumer> getConsumers() {
         return dataModel.getConsumers();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<? extends Producer> getProducers() {
         return dataModel.getProducers();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void update() {
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
     }

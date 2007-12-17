@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public abstract class Group {
 
     /** Network delegate which serves here as a utilty class to keep track of references to network objects. */
-    protected RootNetwork referenceNetwork = new RootNetwork();
+    protected RootNetwork referenceNetwork;
 
     /** Reference to the network this group is a part of. */
     private RootNetwork parent;
@@ -46,6 +46,7 @@ public abstract class Group {
      */
     public Group(final RootNetwork net) {
         parent = net;
+        referenceNetwork = new RootNetwork(net.getParent());
     }
 
     /**

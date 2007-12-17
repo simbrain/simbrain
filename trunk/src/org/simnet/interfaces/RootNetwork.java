@@ -29,6 +29,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simnet.NetworkThread;
@@ -120,12 +121,19 @@ public class RootNetwork extends Network {
     /** Name generator. */
     private SimpleId neuronIdGenerator = new SimpleId("Neuron", 1);
 
+    private final NetworkComponent component;
+    
+    public NetworkComponent getParent() {
+        return component;
+    }
+    
     /**
      * Used to create an instance of network (Default constructor).
      */
-    public RootNetwork() {
+    public RootNetwork(NetworkComponent parent) {
         super();
         setRootNetwork(this);
+        this.component = parent;
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
         this.setId("Root-network");

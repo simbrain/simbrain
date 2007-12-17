@@ -306,7 +306,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             JMenu producerMenu = desktopComponent.getDesktop().getProducerMenu(popUpMenuListener);
             producerMenu.setText("Set input source");
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = desktopComponent.getDesktop().getConsumerMenu(popUpMenuListener);
+//            JMenu consumerMenu = desktopComponent.getDesktop().getConsumerMenu(popUpMenuListener);
+            JMenu consumerMenu = desktopComponent.getDesktop().getConsumerMenu(this.neuron.getDefaultProducingAttribute());
             consumerMenu.setText("Set output target");
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();

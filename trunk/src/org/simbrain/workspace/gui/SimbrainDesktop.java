@@ -695,6 +695,31 @@ public class SimbrainDesktop {
         return consumerMenu;
     }
 
+    public JMenu getConsumerMenu(final ProducingAttribute<?> source) {
+        JMenu consumerMenu = new JMenu("Consumers");
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
+            Collection<? extends Consumer> consumers = component.getConsumers();
+            
+            if (consumers.size() > 0) {
+                JMenu componentMenu = new JMenu(component.getName());
+                for (Consumer consumer : component.getConsumers()) {
+                    JMenu consumerItem = new JMenu(consumer.getDescription());
+                    for (ConsumingAttribute<?> target : consumer.getConsumingAttributes()) {
+//                        CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                        SingleCouplingMenuItem item = new SingleCouplingMenuItem(workspace, 
+                            target.getAttributeDescription(), source, target);
+                        
+//                        attributeItem.addActionListener(listener);
+                        consumerItem.add(item);
+                    }
+                    componentMenu.add(consumerItem);
+                }
+                consumerMenu.add(componentMenu);
+            }
+        }
+        return consumerMenu;
+    }
+    
     /**
      * Get a menu representing all components which have lists of producers,
      * which returns such a list.

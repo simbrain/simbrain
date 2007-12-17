@@ -148,6 +148,15 @@ public class Workspace {
         manager.addCoupling(coupling);
     }
     
+    /**
+     * Removes a coupling from the CouplingManager.
+     * 
+     * @param coupling The coupling to remove.
+     */
+    public void removeCoupling(final Coupling<?> coupling) {
+        manager.removeCoupling(coupling);
+    }
+    
 //    private boolean hasCouplings(WorkspaceComponent component) {
 //        if (component.getCouplingContainer() == null) {
 //            return false;

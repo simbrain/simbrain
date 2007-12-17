@@ -972,8 +972,7 @@ public abstract class Neuron implements Producer, Consumer {
     }
 
     public WorkspaceComponent getParentComponent() {
-        // TODO add implementation
-        return null;
+        return parent.getRootNetwork().getParent();
     }
 
 }

@@ -12,6 +12,9 @@ public final class Coupling<E> {
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Coupling.class);
     
+    /** An arbitrary prime for creating better hash distributions. */
+    private static final int ARBITRARY_PRIME = 59;
+    
     /** Producing attribute for this coupling. */
     private ProducingAttribute<E> producingAttribute;
 
@@ -108,5 +111,26 @@ public final class Coupling<E> {
             producerString = producingAttribute.getParent().getDescription();
         }
         return consumingAttribute.getParent().getDescription() + "[" + producerString + "]";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals(final Object o) {
+        if (o instanceof Coupling) {
+            Coupling<?> other = (Coupling<?>) o;
+            
+            return other.producingAttribute == producingAttribute
+                && other.consumingAttribute == consumingAttribute;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int hashCode() {
+        return producingAttribute.hashCode() + (ARBITRARY_PRIME * consumingAttribute.hashCode());
     }
 }

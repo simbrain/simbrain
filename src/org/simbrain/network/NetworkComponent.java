@@ -32,7 +32,7 @@ import org.simnet.interfaces.RootNetwork;
  */
 public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
-    private RootNetwork rootNetwork = new RootNetwork();
+    private RootNetwork rootNetwork = new RootNetwork(this);
     
     /**
      * Create a new network frame.

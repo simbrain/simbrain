@@ -1,6 +1,6 @@
 package org.simbrain.workspace.gui;
 
-import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
@@ -9,10 +9,11 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Packages an object with a jmenu item to make it easy to pass them along
  * through action events.
- *
+ * 
  */
-public class CouplingMenuItem extends JMenuItem {
+public class CouplingMenuItem extends JCheckBoxMenuItem {
 
+    /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
@@ -22,41 +23,60 @@ public class CouplingMenuItem extends JMenuItem {
     private ConsumingAttribute<?> consumingAttribute = null;
 
     /** Reference to a coupling container. */
-    private WorkspaceComponent component = null;
-    
+    private WorkspaceComponent<?> component = null;
+
     /**
-     * The type of menu item being created.  These items can be used to draw
+     * The type of menu item being created. These items can be used to draw
      * information from a single producer or consumer, or lists of either.
      */
-    public enum EventType { SINGLE_PRODUCER, SINGLE_CONSUMER, PRODUCER_LIST, CONSUMER_LIST}
+    public enum EventType {
+        /** Identifies a single consumer event. */
+        SINGLE_PRODUCER,
+        /** Identifies a single producer event. */
+        SINGLE_CONSUMER,
+        /** Identifies a single producer list event. */
+        PRODUCER_LIST,
+        /** Identifies a single consumer list event. */
+        CONSUMER_LIST
+    }
 
     /** The event type for this event. */
-    private final EventType eventType; 
-    
+    private final EventType eventType;
+
     /**
-     * @param container
+     * Creates a new instance.
+     * 
+     * @param component The component that this menuItem belongs to.
+     * @param type The type of event this menuItem should fire.
      */
-    public CouplingMenuItem(final WorkspaceComponent component, final EventType type) {
+    public CouplingMenuItem(final WorkspaceComponent<?> component, final EventType type) {
         this.component = component;
-        this.eventType = type; 
+        this.eventType = type;
+        setSelected(true);
     }
 
     /**
-     * @param consumingAttribute
+     * Creates a new instance as a single consumer item.
+     * 
+     * @param consumingAttribute The consuming attribute this meunItem is associated with.
      */
     public CouplingMenuItem(final ConsumingAttribute<?> consumingAttribute) {
         super(consumingAttribute.getAttributeDescription());
         this.eventType = EventType.SINGLE_CONSUMER;
         this.consumingAttribute = consumingAttribute;
+        setSelected(true);
     }
 
     /**
-     * @param producingAttribute
+     * Creates a new instance as a single producer item.
+     * 
+     * @param producingAttribute The producing attribute this meunItem is associated with.
      */
     public CouplingMenuItem(final ProducingAttribute<?> producingAttribute) {
         super(producingAttribute.getAttributeDescription());
         this.eventType = EventType.SINGLE_PRODUCER;
         this.producingAttribute = producingAttribute;
+        setSelected(true);
     }
 
     /**
@@ -94,11 +114,10 @@ public class CouplingMenuItem extends JMenuItem {
         return component;
     }
 
-	/**
-	 * @return the eventType
-	 */
-	public EventType getEventType() {
-		return eventType;
-	}
-
+    /**
+     * @return the eventType
+     */
+    public EventType getEventType() {
+        return eventType;
+    }
 }

@@ -7,8 +7,10 @@ import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.SingleAttributeProducer;
 
 /**
- * Wraps a column of the table with a producer object, so other components 
+ * Wraps a column of the table with a producer object, so other components
  * can write read data from a data world column.
+ * 
+ * @param <E> The type this producer produces.
  */
 public class ProducingColumn<E> extends SingleAttributeProducer<E> {
 
@@ -31,6 +33,8 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
 
     /**
      * From consuming attribute.  Should not be used.
+     * 
+     * @return The name of the attribute.
      */
     public String getAttributeDescription() {
         return "Column " + (columnNumber + 1);
@@ -53,7 +57,7 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
     /**
      * {@inheritDoc}
      */
-    public void setDefaultProducingAttribute(ProducingAttribute<?> consumingAttribute) {
+    public void setDefaultProducingAttribute(final ProducingAttribute<?> consumingAttribute) {
         // TODO
     }
 
@@ -64,12 +68,17 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
         return this;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Type getType() {
         return Double.TYPE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DataWorldComponent getParentComponent() {
-        // TODO Auto-generated method stub
-        return null;
+        return tableModel.getParent();
     }
 }

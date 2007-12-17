@@ -19,6 +19,7 @@
 package org.simbrain.workspace;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +52,7 @@ public class CouplingManager {
      * 
      * @return An unmodifiable list of all the couplings.
      */
-    public List<? extends Coupling<?>> getCouplings() {
+    public Collection<? extends Coupling<?>> getCouplings() {
         return Collections.unmodifiableList(all);
     }
 
@@ -62,10 +63,16 @@ public class CouplingManager {
      * @param target The target to use in the search.
      * @return A list of the couplings between the provided source and target.
      */
-    public List<? extends Coupling<?>> getCouplings(
+    public Collection<? extends Coupling<?>> getCouplings(
             final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
-        return Collections.unmodifiableList(sourceTargetCouplings.get(
-            new SourceTarget(source, target)));
+        Collection<Coupling<?>> couplings = sourceTargetCouplings.get(
+                new SourceTarget(source, target));
+        
+        if (couplings == null) {
+            return Collections.emptySet();
+        } else {
+            return Collections.unmodifiableCollection(couplings);
+        }
     }
 
     /**
@@ -104,13 +111,15 @@ public class CouplingManager {
     public boolean containsCoupling(final Coupling<?> coupling) {
        return all.contains(coupling);
     }
-
+    
     /**
      * Adds a coupling to this instance.
      * 
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
+        System.out.println("coupling added: " + coupling);
+        
         all.add(coupling);
         
         WorkspaceComponent<?> source = coupling.getProducingAttribute()
@@ -120,15 +129,16 @@ public class CouplingManager {
         
         SourceTarget sourceTarget = new SourceTarget(source, target);
 
-        List<Coupling<?>> couplings = sourceTargetCouplings.get(sourceTarget);
+//        List<Coupling<?>> couplings = sourceTargetCouplings.get(sourceTarget);
         
         sourceTargetCouplings.put(sourceTarget, addCouplingToList(
             sourceTargetCouplings.get(sourceTarget), coupling));
-        sourceCouplings.put(source, addCouplingToList(sourceTargetCouplings.get(source), coupling));
+        sourceCouplings.put(source, addCouplingToList(
+            sourceCouplings.get(source), coupling));
         // TODO is this the way to do this?
         targetCouplings.put(target, coupling);
         
-        couplings.add(coupling);
+//        couplings.add(coupling);
     }
     
     /**
@@ -170,6 +180,10 @@ public class CouplingManager {
         removeCouplingFromList(sourceTargetCouplings.get(sourceTarget), coupling);
         removeCouplingFromList(sourceCouplings.get(source), coupling);
         targetCouplings.remove(target);
+        
+        source.couplingRemoved(coupling);
+        
+        if (target != source) { target.couplingRemoved(coupling); }
     }
     
     /**
@@ -214,6 +228,8 @@ public class CouplingManager {
         SourceTarget(final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
             this.source = source;
             this.target = target;
+            
+            System.out.println("created source-target: " + source + ", " + target);
         }
         
         /**

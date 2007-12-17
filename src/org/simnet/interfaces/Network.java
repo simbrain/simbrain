@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkComponent;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
 import org.simnet.util.SimpleId;
@@ -108,7 +109,7 @@ public abstract class Network {
      * Finish creating a duplicate network.  This copies over most of the
      * objects.  The subclass method takes care of type specific parameters.
      *
-     * @param newNetwork thenew network to finish duplicating.
+     * @param newNetwork the new network to finish duplicating.
      * @return the new network to finish copying.
      */
     public Network duplicate(final Network newNetwork) {

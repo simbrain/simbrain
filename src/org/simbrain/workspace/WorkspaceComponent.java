@@ -249,4 +249,16 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public Workspace getWorkspace() {
         return workspace;
     }
+    
+    /**
+     * Called when a coupling that this workspace owns the target
+     * or source of is removed from the workspace.  This method
+     * will only be called once if the workspace owns both the
+     * source and the target.
+     * 
+     * @param coupling The coupling that has been removed.
+     */
+    protected void couplingRemoved(final Coupling<?> coupling) {
+        /* no default implementation */
+    }
 }

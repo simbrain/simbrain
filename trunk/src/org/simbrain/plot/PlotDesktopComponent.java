@@ -73,24 +73,24 @@ public class PlotDesktopComponent extends DesktopComponent<PlotComponent> {
         this.setSize(500, 400);
     }
     
-    private final ActionListener actionListener = new ActionListener() {
-        /**
-         * {@inheritDoc}
-         */
-        @SuppressWarnings("unchecked")
-        public void actionPerformed(final ActionEvent e) {
-
-            /* Handle Coupling wire-up */
-            CouplingMenuItem m = (CouplingMenuItem) e.getSource();
-            component.couple((ProducingAttribute<Double>) m.getProducingAttribute());
-        }
-    };
+//    private final ActionListener actionListener = new ActionListener() {
+//        /**
+//         * {@inheritDoc}
+//         */
+//        @SuppressWarnings("unchecked")
+//        public void actionPerformed(final ActionEvent e) {
+//
+//            /* Handle Coupling wire-up */
+//            CouplingMenuItem m = (CouplingMenuItem) e.getSource();
+//            component.couple((ProducingAttribute<Double>) m.getProducingAttribute());
+//        }
+//    };
     
     /**
      * Set up the coupling menu.
      */
     private void setCouplingMenuItem() {
-        couplingMenuItem = getDesktop().getProducerMenu(actionListener);
+        couplingMenuItem = getDesktop().getProducerMenu(component.getVariable());
         couplingMenuItem.setText("Set plotter source");
     }
 

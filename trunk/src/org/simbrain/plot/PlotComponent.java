@@ -70,9 +70,13 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
         // TODO Auto-generated method stub
     }
 
-    void couple(ProducingAttribute<Double> attribute) {
-      Coupling<Double> coupling = new Coupling<Double>(attribute, variable);
-      getWorkspace().addCoupling(coupling);
+//    void couple(ProducingAttribute<Double> attribute) {
+//      Coupling<Double> coupling = new Coupling<Double>(attribute, variable);
+//      getWorkspace().addCoupling(coupling);
+//    }
+    
+    Variable getVariable() {
+        return variable;
     }
     
     /**

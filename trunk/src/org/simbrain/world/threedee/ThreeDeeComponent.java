@@ -1,11 +1,11 @@
 package org.simbrain.world.threedee;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import org.simbrain.workspace.Consumer;
@@ -31,7 +31,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * The bindings that allow agents to be be wrapped as producers
      * and consumers.
      */
-    private Map<Agent, Bindings> bindings = new HashMap<Agent, Bindings>();
+    private List<Bindings> bindings = new ArrayList<Bindings>();
     
     /**
      * Creates a new ThreeDeeComponent with the given name.
@@ -59,7 +59,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
     public Agent createAgent() {
         Agent agent = new Agent("" + agents.size());
         agents.add(agent);
-        bindings.put(agent, new Bindings(agent, this));
+        bindings.add(new Bindings(agent, this));
         environment.add(agent);
         
         return agent;
@@ -70,7 +70,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public Collection<? extends Producer> getProducers() {
-        return Collections.unmodifiableCollection(bindings.values());
+        return Collections.unmodifiableCollection(bindings);
     }
     
     /**
@@ -78,7 +78,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public Collection<? extends Consumer> getConsumers() {
-        return Collections.unmodifiableCollection(bindings.values());
+        return Collections.unmodifiableCollection(bindings);
     }
     
     /**
@@ -119,7 +119,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     protected void update() {
-        for (Bindings bind : bindings.values()) {
+        for (Bindings bind : bindings) {
             bind.setOn(true);
         }
     }
@@ -129,7 +129,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     protected void stopped() {
-        for (Bindings bind : bindings.values()) {
+        for (Bindings bind : bindings) {
             bind.setOn(false);
         }
     }
@@ -138,11 +138,16 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
+    @Override
     protected void couplingRemoved(final Coupling<?> coupling) {
         ConsumingAttribute<Double> consumingAttribute
             = (ConsumingAttribute<Double>) coupling.getConsumingAttribute();
         
-        if (agents.contains(consumingAttribute.getParent())) {
+        System.out.println("removed: " + consumingAttribute.getParent());
+        
+        
+        if (bindings.contains(consumingAttribute.getParent())) {
+            System.out.println("found");
             consumingAttribute.setValue(0d);
         }
     }

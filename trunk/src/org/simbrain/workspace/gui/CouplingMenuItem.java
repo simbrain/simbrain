@@ -30,10 +30,6 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
      * information from a single producer or consumer, or lists of either.
      */
     public enum EventType {
-        /** Identifies a single consumer event. */
-        SINGLE_PRODUCER,
-        /** Identifies a single producer event. */
-        SINGLE_CONSUMER,
         /** Identifies a single producer list event. */
         PRODUCER_LIST,
         /** Identifies a single consumer list event. */
@@ -52,30 +48,6 @@ public class CouplingMenuItem extends JCheckBoxMenuItem {
     public CouplingMenuItem(final WorkspaceComponent<?> component, final EventType type) {
         this.component = component;
         this.eventType = type;
-        setSelected(true);
-    }
-
-    /**
-     * Creates a new instance as a single consumer item.
-     * 
-     * @param consumingAttribute The consuming attribute this meunItem is associated with.
-     */
-    public CouplingMenuItem(final ConsumingAttribute<?> consumingAttribute) {
-        super(consumingAttribute.getAttributeDescription());
-        this.eventType = EventType.SINGLE_CONSUMER;
-        this.consumingAttribute = consumingAttribute;
-        setSelected(true);
-    }
-
-    /**
-     * Creates a new instance as a single producer item.
-     * 
-     * @param producingAttribute The producing attribute this meunItem is associated with.
-     */
-    public CouplingMenuItem(final ProducingAttribute<?> producingAttribute) {
-        super(producingAttribute.getAttributeDescription());
-        this.eventType = EventType.SINGLE_PRODUCER;
-        this.producingAttribute = producingAttribute;
         setSelected(true);
     }
 

@@ -303,10 +303,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // Add coupling menus
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
-            JMenu producerMenu = desktopComponent.getDesktop().getProducerMenu(popUpMenuListener);
+            JMenu producerMenu = desktopComponent.getDesktop().getProducerMenu(this.neuron.getDefaultConsumingAttribute());
             producerMenu.setText("Set input source");
             contextMenu.add(producerMenu);
-//            JMenu consumerMenu = desktopComponent.getDesktop().getConsumerMenu(popUpMenuListener);
             JMenu consumerMenu = desktopComponent.getDesktop().getConsumerMenu(this.neuron.getDefaultProducingAttribute());
             consumerMenu.setText("Set output target");
             contextMenu.add(consumerMenu);
@@ -677,15 +676,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
             CouplingMenuItem m = (CouplingMenuItem) e.getSource();
 
-            if (m.getEventType() == CouplingMenuItem.EventType.SINGLE_PRODUCER) {
-                LOGGER.debug("single producer");
-                Coupling coupling = new Coupling( m.getProducingAttribute(), getNeuron().getDefaultConsumingAttribute());
-                desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
-            } else if (m.getEventType() == CouplingMenuItem.EventType.SINGLE_CONSUMER) {
-                LOGGER.debug("single consumer");
-                Coupling coupling = new Coupling(getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
-                desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
-            } else if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
+            if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
                 LOGGER.debug("producer list");
                 // Iterate through selected neurons and attach as many producers as possible
                 // TODO: BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?

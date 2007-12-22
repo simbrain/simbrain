@@ -127,20 +127,6 @@ public abstract class Neuron implements Producer, Consumer {
 
     private ConsumingAttribute<?> defaultConsumingAttribute;
 
-    //Iterator 
-//    private SimpleId idGenerator = new SimpleId("Neuron", 1);
-
-    /** List of neuron types. */
-    private static String[] typeList = {AdditiveNeuron.getName(),
-            BinaryNeuron.getName(), ClampedNeuron.getName(),
-            DecayNeuron.getName(), IACNeuron.getName(),
-            IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
-            LinearNeuron.getName(), LMSNeuron.getName(), LogisticNeuron.getName(),
-            NakaRushtonNeuron.getName(), PointNeuron.getName(), RandomNeuron.getName(),
-            RunningAverageNeuron.getName(), SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-            StochasticNeuron.getName(), ThreeValuedNeuron.getName(),
-            TraceNeuron.getName()};
-
     /**
      * Default constructor needed for external calls which create neurons then
      * set their parameters.
@@ -598,35 +584,6 @@ public abstract class Neuron implements Producer, Consumer {
      */
     public String getType() {
         return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.') + 1);
-    }
-
-    /**
-     * @return Returns the typeList.
-     */
-    public static String[] getTypeList() {
-        return typeList;
-    }
-
-    /**
-     * @param typeList The typeList to set.
-     */
-    public static void setTypeList(final String[] typeList) {
-        Neuron.typeList = typeList;
-    }
-
-    /**
-     * Helper function for combo boxes.  Associates strings with indices.
-     * @param type Type of neuron to get index
-     * @return neuron type index
-     */
-    public static int getNeuronTypeIndex(final String type) {
-        for (int i = 0; i < typeList.length; i++) {
-            if (type.equals(typeList[i])) {
-                return i;
-            }
-        }
-
-        return 0;
     }
 
     /**

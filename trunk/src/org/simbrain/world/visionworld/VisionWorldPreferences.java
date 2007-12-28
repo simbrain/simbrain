@@ -21,7 +21,6 @@ package org.simbrain.world.visionworld;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-
 /**
  * <b>VisionWorldPreferences</b> handles storage and retrieval of user preferences, e.g. current directory.
  */
@@ -30,6 +29,13 @@ public class VisionWorldPreferences {
     private static final String FS = System.getProperty("file.separator");
     /**The main user preference object. */
     private static final Preferences VISION_WORLD_PREFERENCES = Preferences.userRoot().node("/org/simbrain/worlds");
+
+    /**
+     * Private no-arg constructor.
+     */
+    private VisionWorldPreferences() {
+        // empty
+    }
 
     /**
      * Save all user preferences.

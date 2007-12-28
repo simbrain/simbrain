@@ -39,24 +39,19 @@ import org.simbrain.workspace.gui.DesktopComponent;
  */
 public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWorldComponent> {
 
+    /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
     
     /** Vision world. */
     private final VisionWorld visionWorld;
 
-//    /** Listener for vision world component events. */
-//    private final VisionWorldComponentListener listener = new VisionWorldComponentListener() {
-//        public void componentUpdated() {
-//            updateComponent();
-//        }
-//    };
 
     /**
      * Create a new vision world frame with the specified workspace.
      *
      * @param component component, must not be null
      */
-    public VisionWorldDesktopComponent(VisionWorldComponent component) {
+    public VisionWorldDesktopComponent(final VisionWorldComponent component) {
         super(component);
         component.addListener(new BasicComponentListener());
         this.setPreferredSize(new Dimension(400,400));
@@ -102,18 +97,17 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
 
     @Override
     public void close() {
-        // TODO Auto-generated method stub
+        // empty
     }
 
     @Override
     public String getFileExtension() {
-        // TODO Auto-generated method stub
         return null;
     }
     
     @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
+    public void save(final File saveFile) {
+        // empty
     }
 
     /** {@inheritDoc} */

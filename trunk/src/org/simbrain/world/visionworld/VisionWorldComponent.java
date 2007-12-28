@@ -32,29 +32,27 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {//implements CouplingContainer {
 
     /**
-     * Create a new vision world frame with the specified workspace.
+     * Create a new vision world frame with the specified name.
      *
-     * @param workspace workspace, must not be null
+     * @param name name
      */
-    public VisionWorldComponent(String name) {
+    public VisionWorldComponent(final String name) {
         super(name);
     }
 
     @Override
     public void close() {
-        // TODO Auto-generated method stub
+        // empty
     }
 
     @Override
     public String getFileExtension() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
-        
+    public void save(final File saveFile) {
+        // empty
     }
 
     /** {@inheritDoc} */
@@ -63,34 +61,12 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
     }
     
     /** {@inheritDoc} */
-//    public List<Producer> getProducers() {
-//        List<Producer> producers = new ArrayList<Producer>();
-//        VisionWorldModel model = visionWorld.getModel();
-//        SensorMatrix sensorMatrix = model.getSensorMatrix();
-//        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-//            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-//                Sensor sensor = sensorMatrix.getSensor(row, column);
-//                producers.add(sensor);
-//            }
-//        }
-//        return Collections.unmodifiableList(producers);
-//    }
-
-    /** {@inheritDoc} */
     public void update() {
-//        VisionWorldModel model = visionWorld.getModel();
-//        PixelMatrix pixelMatrix = model.getPixelMatrix();
-//        SensorMatrix sensorMatrix = model.getSensorMatrix();
-//        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-//            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-//                Sensor sensor = sensorMatrix.getSensor(row, column);
-//                sensor.sample(pixelMatrix);
-//            }
-//        }
+        // empty
     }
 
     @Override
     public void open(File openFile) {
-        // TODO Auto-generated method stub
+        // empty
     }
 }

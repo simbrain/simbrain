@@ -31,7 +31,6 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
-import javax.swing.JMenuItem;
 
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -46,8 +45,6 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 import org.apache.commons.lang.SystemUtils;
 
 import org.simbrain.util.StrokeUtils;
-
-import org.simbrain.workspace.ProducingAttribute;
 
 import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.VisionWorld;
@@ -143,16 +140,9 @@ abstract class AbstractSensorNode
         sb.append("\n  Location:  (");
         sb.append(sensor.getReceptiveField().getX());
         sb.append(")");
-        sb.append(sensor.getReceptiveField().getY());        
+        sb.append(sensor.getReceptiveField().getY());
         sb.append("\n  Value: " + sensor.getLastSample());
         sb.append("\n");
-//        for (ProducingAttribute attr : sensor.getProducingAttributes()) {
-//            sb.append("  ");
-//            sb.append(attr.getAttributeDescription());
-//            sb.append(":  ");
-//            sb.append(attr.getValue());
-//            sb.append("\n");
-//        }
         return sb.toString();
     }
 
@@ -196,7 +186,7 @@ abstract class AbstractSensorNode
     /**
      * Set to true if the mouse is over this sensor node.
      *
-     * @param true if the mouse is over this sensor node
+     * @param mouseover true if the mouse is over this sensor node
      */
     protected final void setMouseover(final boolean mouseover) {
         this.mouseover = mouseover;

@@ -39,8 +39,6 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
@@ -149,7 +147,7 @@ public final class VisionWorld
         selectionListener = new SensorSelectionListener()
             {
                 /** {@inheritDoc} */
-                public void selectionChanged(SensorSelectionEvent e) {
+                public void selectionChanged(final SensorSelectionEvent e) {
                     updateSelection(e);
                 }
             };
@@ -179,7 +177,7 @@ public final class VisionWorld
      *
      * @param event sensor selection event
      */
-    private void updateSelection(SensorSelectionEvent event) {
+    private void updateSelection(final SensorSelectionEvent event) {
         Set<Sensor> selection = event.getSelection();
         Set<Sensor> oldSelection = event.getOldSelection();
         Set<Sensor> difference = new HashSet<Sensor>(oldSelection);
@@ -322,7 +320,7 @@ public final class VisionWorld
             selectionEventHandlerInstalled = true;
             addInputEventListener(selectionEventHandler);
         }
-        centerCamera();        
+        centerCamera();
     }
 
     /**

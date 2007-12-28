@@ -72,10 +72,8 @@ public final class RandomFilterEditor
     /**
      * Create a new random filter editor.
      */
-    public RandomFilterEditor()
-    {
+    public RandomFilterEditor() {
         super();
-
         initComponents();
         layoutComponents();
     }

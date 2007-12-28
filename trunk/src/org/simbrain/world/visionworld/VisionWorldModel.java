@@ -18,8 +18,6 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.util.List;
-
 /**
  * A vision world model has exactly one pixel matrix and exactly
  * one sensor matrix.  Interested classes may receive notification

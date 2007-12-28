@@ -55,10 +55,8 @@ public final class Sensor implements Producer {
     /** Producer description. */
     private final String producerDescription;
 
+    /** Sample attribute for this sensor. */
     private final SampleAttribute attribute = new SampleAttribute();
-
-    /** List of producing attributes. */
-//    private final List<ProducingAttribute<Double>> producingAttributes = Collections.singletonList((ProducingAttribute<Double>) new SampleAttribute());
 
     /** No filter. */
     private static final Filter NO_FILTER = new Filter()
@@ -131,6 +129,11 @@ public final class Sensor implements Producer {
         return sample;
     }
 
+    /**
+     * Return the last sample value for this sensor.
+     *
+     * @return the last sample value for this sensor
+     */
     public double getLastSample() {
         return sample;
     }
@@ -280,12 +283,13 @@ public final class Sensor implements Producer {
         }
     }
 
+    /** {@inheritDoc} */
     public WorkspaceComponent getParentComponent() {
-        // TODO Auto-generated method stub
         return null;
     }
 
-    public void setDefaultProducingAttribute(
-            ProducingAttribute<?> producingAttribute) {        
+    /** {@inheritDoc} */
+    public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {        
+        // empty
     }
 }

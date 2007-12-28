@@ -37,8 +37,7 @@ public final class UniformFilter
      *
      * @param value value for this uniform filter
      */
-    public UniformFilter(final double value)
-    {
+    public UniformFilter(final double value) {
         this.value = value;
     }
 

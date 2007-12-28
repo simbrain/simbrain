@@ -41,8 +41,13 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
     private final Set<Sensor> selection;
 
 
+    /**
+     * Create a new sensor selection model with the specified vision world.
+     *
+     * @param visionWorld vision world for this sensor selection model,
+     *    must not be null
+     */
     SensorSelectionModel(final VisionWorld visionWorld) {
-
         if (visionWorld == null) {
             throw new IllegalArgumentException("visionWorld must not be null");
         }
@@ -51,10 +56,19 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         listenerList = new EventListenerList();
     }
 
+
+    /**
+     * Return the number of selected sensors for this sensor selection model.
+     *
+     * @return the number of selected sensors for this sensor selection model
+     */
     public int size() {
         return selection.size();
     }
 
+    /**
+     * Clear this sensor selection model.
+     */
     public void clear() {
         Set<Sensor> oldSelection = new HashSet<Sensor>(selection);
         selection.clear();
@@ -63,10 +77,20 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
     }
 
+    /**
+     * Return true if this sensor selection model is empty.
+     *
+     * @return true if this sensor selection model is empty
+     */
     public boolean isEmpty() {
         return selection.isEmpty();
     }
 
+    /**
+     * Add the specified sensor to this sensor selection model.
+     *
+     * @param sensor sensor to add
+     */
     public void add(final Sensor sensor) {
         Set<Sensor> oldSelection = new HashSet<Sensor>(selection);
         boolean rv = selection.add(sensor);
@@ -75,6 +99,11 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
     }
 
+    /**
+     * Add all of the specified collection of sensors to this sensor selection model.
+     *
+     * @param sensors collection of sensors to add
+     */
     public void addAll(final Collection<Sensor> sensors) {
         Set<Sensor> oldSelection = new HashSet<Sensor>(selection);
         boolean rv = selection.addAll(sensors);
@@ -83,6 +112,11 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
     }
 
+    /**
+     * Remove the specified sensor from this sensor selection model.
+     *
+     * @param sensor sensor to remove
+     */
     public void remove(final Sensor sensor) {
         Set<Sensor> oldSelection = new HashSet<Sensor>(selection);
         boolean rv = selection.remove(sensor);
@@ -91,6 +125,11 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
     }
 
+    /**
+     * Remove all of the specified collection of sensors from this sensor selection model.
+     *
+     * @param sensors collection of sensors to remove
+     */
     public void removeAll(final Collection<Sensor> sensors) {
         Set<Sensor> oldSelection = new HashSet<Sensor>(selection);
         boolean rv = selection.removeAll(sensors);
@@ -99,10 +138,20 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
     }
 
+    /**
+     * Return true if the specified sensor is selected.
+     *
+     * @return true if the specified sensor is selected
+     */
     public boolean isSelected(final Sensor sensor) {
         return selection.contains(sensor);
     }
 
+    /**
+     * Toggle the selection state for the specified sensor.
+     *
+     * @param sensor sensor to toggle
+     */
     public void toggleSelection(final Sensor sensor) {
         if (isSelected(sensor)) {
             remove(sensor);
@@ -112,14 +161,30 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
     }
 
+    /**
+     * Return an iterator over the selected sensors.
+     *
+     * @return an iterator over the selected sensors
+     */
     public Iterator<Sensor> iterator() {
         return getSelection().iterator();
     }
 
+    /**
+     * Return an unmodifiable collection of selected sensors.
+     *
+     * @return an unmodifiable collection of selected sensors
+     */
     public Collection<Sensor> getSelection() {
         return Collections.unmodifiableSet(selection);
     }
 
+    /**
+     * Set the selection for this sensor selection model to the specified
+     * collection of sensors.
+     *
+     * @param sensors collection of selected sensors
+     */
     public void setSelection(final Collection<Sensor> sensors) {
         if (selection.isEmpty() && sensors.isEmpty()) {
             return;
@@ -132,14 +197,30 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
     }
 
-    public void addSensorSelectionListener(SensorSelectionListener listener) {
+    /**
+     * Add the specified sensor selection listener.
+     *
+     * @param listener listener to add
+     */
+    public void addSensorSelectionListener(final SensorSelectionListener listener) {
         listenerList.add(SensorSelectionListener.class, listener);
     }
 
+    /**
+     * Remove the specified sensor selection listener.
+     *
+     * @param listener listener to remove
+     */
     public void removeSensorSelectionListener(SensorSelectionListener listener) {
         listenerList.remove(SensorSelectionListener.class, listener);
     }
 
+    /**
+     * Fire a selection changed event.
+     *
+     * @param oldSelection old selection
+     * @param selection new selection
+     */
     public void fireSelectionChanged(final Set<Sensor> oldSelection, final Set<Sensor> selection) {
         Object[] listeners = listenerList.getListenerList();
         SensorSelectionEvent e = null;

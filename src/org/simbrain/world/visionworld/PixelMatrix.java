@@ -80,7 +80,8 @@ public interface PixelMatrix {
      * View this pixel matrix, returning an image for the specified receptive field.
      * The image will not be null.
      *
-     * @param receptiveField receptive field through which to view this pixel matrix, must not be null
+     * @param receptiveField receptive field through which to view this pixel matrix,
+     *    must not be null
      * @return an image for the specified receptive field
      */
     // todo:  using BufferedImage may be inappropriate here, maybe a DoubleMatrix2D instead?

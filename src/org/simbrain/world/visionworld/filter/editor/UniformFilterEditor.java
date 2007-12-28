@@ -66,10 +66,8 @@ public final class UniformFilterEditor
     /**
      * Create a new uniform filter editor.
      */
-    public UniformFilterEditor()
-    {
+    public UniformFilterEditor() {
         super();
-
         initComponents();
         layoutComponents();
     }

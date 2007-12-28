@@ -184,11 +184,12 @@ public final class BufferedImagePixelMatrixEditor
 
     /**
      * Sets the current directory for class and persistence.
+     *
      * @param dir current directory
      */
-    protected void setCurrentDirectory(String dir) {
+    protected void setCurrentDirectory(final String dir) {
         this.currentDirectory = dir;
-        VisionWorldPreferences.setCurrentDirectory(dir);        
+        VisionWorldPreferences.setCurrentDirectory(dir);
     }
 
 

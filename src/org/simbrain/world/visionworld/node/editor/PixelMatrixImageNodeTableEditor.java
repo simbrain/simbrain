@@ -74,12 +74,18 @@ public final class PixelMatrixImageNodeTableEditor
     private class PaintCellRenderer
         implements TableCellRenderer {
 
-        JPanel panel;
+        /** Paint cell renderer component. */
+        private JPanel panel;
 
+
+        /**
+         * Create a new paint cell renderer.
+         */
         public PaintCellRenderer() {
             panel = new JPanel();
             panel.setOpaque(true);
         }
+
 
         /** {@inheritDoc} */
         public Component getTableCellRendererComponent(final JTable table,
@@ -100,12 +106,18 @@ public final class PixelMatrixImageNodeTableEditor
     private class ColorCellRenderer
         implements TableCellRenderer {
 
-        JPanel panel;
+        /** Color cell renderer component. */
+        private JPanel panel;
 
+
+        /**
+         * Create a new color cell renderer.
+         */
         public ColorCellRenderer() {
             panel = new JPanel();
             panel.setOpaque(true);
         }
+
 
         /** {@inheritDoc} */
         public Component getTableCellRendererComponent(final JTable table,
@@ -126,12 +138,17 @@ public final class PixelMatrixImageNodeTableEditor
     private class StrokeCellRenderer
         implements TableCellRenderer {
 
-        JPanel panel;
+        /** Stroke cell renderer component. */
+        private JPanel panel;
 
+        /**
+         * Create a new stroke cell renderer.
+         */
         public StrokeCellRenderer() {
             panel = new JPanel();
             panel.setOpaque(true);
         }
+
 
         /** {@inheritDoc} */
         public Component getTableCellRendererComponent(final JTable table,

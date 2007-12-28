@@ -103,7 +103,7 @@ public final class BufferedImagePixelMatrix
      * @throws ArrayIndexOutOfBoundsException if either of the specified coordinates
      *    are outside the bounds of this pixel matrix
      */
-    private final void checkCoordinates(final int x, final int y) {
+    private void checkCoordinates(final int x, final int y) {
         if (x < 0) {
             throw new ArrayIndexOutOfBoundsException("x must be greater than 0, was " + x);
         }

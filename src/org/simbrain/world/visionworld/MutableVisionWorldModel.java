@@ -120,7 +120,8 @@ public final class MutableVisionWorldModel
 
         /** {@inheritDoc} */
         public void setPixel(final int x, final int y, final Color color) {
-            throw new UnsupportedOperationException("setPixel operation not supported by this pixel matrix");
+            throw new UnsupportedOperationException("setPixel operation not supported"
+                                                    + " by this pixel matrix");
         }
 
         /** {@inheritDoc} */

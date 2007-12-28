@@ -52,8 +52,7 @@ public final class RandomFilter
      * @throws IllegalArgumentException if <code>minimumValue</code>
      *    is greater than <code>maximumValue</code>
      */
-    public RandomFilter(final double minimumValue, final double maximumValue)
-    {
+    public RandomFilter(final double minimumValue, final double maximumValue) {
         if (minimumValue > maximumValue) {
             throw new IllegalArgumentException("maximumValue must be >= minimumValue");
         }

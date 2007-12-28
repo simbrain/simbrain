@@ -38,6 +38,7 @@ public final class SensorSelectionEvent
     /**
      * Create a new sensor selection event with the specified source.
      *
+     * @param source source of this event
      * @param oldSelection old set of selected sensors, must not be null
      * @param selection set of selected sensors, must not be null
      */

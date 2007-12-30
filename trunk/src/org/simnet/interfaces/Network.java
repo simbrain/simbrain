@@ -755,11 +755,11 @@ public abstract class Network {
 
         rootNetwork.fireNeuronChanged(oldNeuron, newNeuron);
 
-        for (Synapse s : oldNeuron.getFanIn()) {
+        for (Synapse s : new ArrayList<Synapse>(oldNeuron.getFanIn())) {
             s.setTarget(newNeuron);
         }
 
-        for (Synapse s : oldNeuron.getFanOut()) {
+        for (Synapse s : new ArrayList<Synapse>(oldNeuron.getFanOut())) {
             s.setSource(newNeuron);
         }
 

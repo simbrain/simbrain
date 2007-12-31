@@ -77,61 +77,85 @@ public class NeuronDialog extends StandardDialog {
     static {
         Association association;
         
-        association = new Association("Binary", BinaryNeuron.class, BinaryNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
         association = new Association("Additive", AdditiveNeuron.class,
-            AdditiveNeuronPanel.class, true);
+                AdditiveNeuronPanel.class, true);
         ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Linear", LinearNeuron.class, LinearNeuronPanel.class, false);
+
+        association = new Association("Binary", BinaryNeuron.class,
+                BinaryNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Sigmoidal", SigmoidalNeuron.class,
-            SigmoidalNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Random", RandomNeuron.class, RandomNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
+       
         association = new Association("Clamped", ClampedNeuron.class,
-            ClampedNeuronPanel.class, false);
+                ClampedNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Stochastic", StochasticNeuron.class,
-            StochasticNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Logistic", LogisticNeuron.class,
-            LogisticNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Integrate and fire", IntegrateAndFireNeuron.class,
-            IntegrateAndFireNeuronPanel.class, true);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Sinusoidal", SinusoidalNeuron.class,
-            SinusoidalNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Izhikevich", IzhikevichNeuron.class,
-            IzhikevichNeuronPanel.class, true);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Naka-Rushton", NakaRushtonNeuron.class,
-            NakaRushtonNeuronPanel.class, true);
-        ASSOCIATIONS.put(association.clazz, association);
+
         association = new Association("Decay", DecayNeuron.class, DecayNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("IAC", IACNeuron.class, IACNeuronPanel.class, false);
+
+        association = new Association("Exponential decay", ExponentialDecayNeuron.class,
+                ExponentialDecayNeuronPanel.class, true);
         ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("IAC", IACNeuron.class,
+                IACNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Integrate and fire", IntegrateAndFireNeuron.class,
+                IntegrateAndFireNeuronPanel.class, true);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Izhikevich", IzhikevichNeuron.class,
+                IzhikevichNeuronPanel.class, true);
+        ASSOCIATIONS.put(association.clazz, association);
+ 
+        association = new Association("Linear", LinearNeuron.class,
+                LinearNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("LMS", LMSNeuron.class, LMSNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+      
+        association = new Association("Logistic", LogisticNeuron.class,
+                LogisticNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Naka-Rushton", NakaRushtonNeuron.class,
+                NakaRushtonNeuronPanel.class, true);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Point", PointNeuron.class, PointNeuronPanel.class, true);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Random", RandomNeuron.class, RandomNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Running Average", RunningAverageNeuron.class,
+                RunningAverageNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Sigmoidal", SigmoidalNeuron.class,
+                SigmoidalNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+                
+        association = new Association("Sinusoidal", SinusoidalNeuron.class,
+                SinusoidalNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Stochastic", StochasticNeuron.class,
+                StochasticNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+             
+        association = new Association("Temporal Difference", TemporalDifferenceNeuron.class,
+                TemporalDifferenceNeuronPanel.class, false);
+            ASSOCIATIONS.put(association.clazz, association);
+
         association = new Association("Three valued", ThreeValuedNeuron.class,
             ThreeValuedNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("LMS", LMSNeuron.class, LMSNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
+        
         association = new Association("Trace", TraceNeuron.class, TraceNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Exponential decay", ExponentialDecayNeuron.class,
-            ExponentialDecayNeuronPanel.class, true);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Running Average", RunningAverageNeuron.class,
-            RunningAverageNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Temporal Difference", TemporalDifferenceNeuron.class,
-            TemporalDifferenceNeuronPanel.class, false);
-        ASSOCIATIONS.put(association.clazz, association);
-        association = new Association("Point", PointNeuron.class, PointNeuronPanel.class, true);
-        ASSOCIATIONS.put(association.clazz, association);
+
     }
     
     /** Null string. */

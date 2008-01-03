@@ -23,41 +23,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simnet.NetworkPreferences;
-import org.simnet.neurons.AdditiveNeuron;
-import org.simnet.neurons.BinaryNeuron;
-import org.simnet.neurons.ClampedNeuron;
-import org.simnet.neurons.DecayNeuron;
-import org.simnet.neurons.IACNeuron;
-import org.simnet.neurons.IntegrateAndFireNeuron;
-import org.simnet.neurons.IzhikevichNeuron;
-import org.simnet.neurons.LMSNeuron;
-import org.simnet.neurons.LinearNeuron;
-import org.simnet.neurons.LogisticNeuron;
-import org.simnet.neurons.NakaRushtonNeuron;
-import org.simnet.neurons.PointNeuron;
-import org.simnet.neurons.RandomNeuron;
-import org.simnet.neurons.RunningAverageNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
-import org.simnet.neurons.SinusoidalNeuron;
-import org.simnet.neurons.StochasticNeuron;
-import org.simnet.neurons.ThreeValuedNeuron;
-import org.simnet.neurons.TraceNeuron;
 import org.simnet.synapses.SignalSynapse;
 
-
 /**
- * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the neural network occurs here, in
- * the update function.  Subclasses must override update and duplicate (for copy / paste) and cloning generally.
+ * <b>Neuron</b> represents a node in the neural network.  Most of the "logic"
+ * of the neural network occurs here, in the update function.  Subclasses must
+ * override update and duplicate (for copy / paste) and cloning generally.
  */
 public abstract class Neuron implements Producer, Consumer {
 
+    /** The maximum number of digits to display in the tool tip. */
+    private static final int MAX_DIGITS = 9;
+    
     /** A unique id for this neuron. */
     private String id = null;
 
@@ -110,21 +94,21 @@ public abstract class Neuron implements Producer, Consumer {
      */
     private int updatePriority = 0;
 
-    /**
-     * Target / reward value (not all neurons will use this).
-     * "Value" added to disambiguate from synapse's target neuron.
-     */
-    // private double targetValue = 0;
-
     /** Signal synapse.  Used for neurons with target values. */
     private SignalSynapse targetValueSynapse = null;
     
-    private ArrayList<ProducingAttribute<?>> producingAttributes = new ArrayList<ProducingAttribute<?>>();
+    /** The producing attributes. */
+    private ArrayList<ProducingAttribute<?>> producingAttributes
+        = new ArrayList<ProducingAttribute<?>>();
 
-    private ArrayList<ConsumingAttribute<?>> consumingAttributes = new ArrayList<ConsumingAttribute<?>>();
+    /** The consuming attributes. */
+    private ArrayList<ConsumingAttribute<?>> consumingAttributes
+        = new ArrayList<ConsumingAttribute<?>>();
 
+    /** The default producing attribute. */
     private ProducingAttribute<?> defaultProducingAttribute;
 
+    /** The default consuming attribute. */
     private ConsumingAttribute<?> defaultConsumingAttribute;
 
     /**
@@ -156,6 +140,9 @@ public abstract class Neuron implements Producer, Consumer {
         setAttributeLists();
     }
 
+    /**
+     * Initialization method called by constructors.
+     */
     private void setAttributeLists() {
         defaultProducingAttribute = new ActivationAttribute();
         producingAttributes.add(defaultProducingAttribute);
@@ -172,7 +159,7 @@ public abstract class Neuron implements Producer, Consumer {
      * @param n Neuron to duplicate
      * @return duplicate neuron
      */
-    protected Neuron duplicate(Neuron n) {
+    protected Neuron duplicate(final Neuron n) {
         n.setParentNetwork(this.getParentNetwork());
         n.setActivation(this.getActivation());
         n.setUpperBound(this.getUpperBound());
@@ -203,30 +190,10 @@ public abstract class Neuron implements Producer, Consumer {
 
 
     /**
-     * Perform any initialization required when creating a neuron, but after the parent network has been added.
+     * Perform any initialization required when creating a neuron, but after
+     * the parent network has been added.
      */
     public void postUnmarshallingInit() {
-    }
-
-    /**
-     * Just here until workspace refactoring occurs.
-     */
-    public void initCouplings() {
-//        if (getSensoryCoupling() != null) {
-//            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
-//
-//            if (a != null) {
-//                setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
-//            }
-//        }
-//
-//        if (getMotorCoupling() != null) {
-//            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getMotorCoupling());
-//
-//            if (a != null) {
-//                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
-//            }
-//        }
     }
 
     /**
@@ -244,11 +211,6 @@ public abstract class Neuron implements Producer, Consumer {
      */
     public double getActivation() {
         return activation;
-    }
-
-    /** @see GaugeSource */
-    public double getGaugeValue() {
-        return getActivation();
     }
 
     /**
@@ -400,7 +362,7 @@ public abstract class Neuron implements Producer, Consumer {
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
-                if(w.isSendWeightedInput()) {
+                if (w.isSendWeightedInput()) {
                     wtdSum += w.getValue();
                 }
             }
@@ -432,9 +394,9 @@ public abstract class Neuron implements Producer, Consumer {
         setBuffer(getRandomValue());
     }
 
-    /**
-     * Update all neurons n this neuron is connected to, by adding current activation times the connection-weight  NOT
-     * CURRENTLY USED.
+    /*
+     * Update all neurons n this neuron is connected to, by adding current activation
+     * times the connection-weight  NOT CURRENTLY USED.
      */
 //    public void updateConnectedOutward() {
 //        // Update connected weights
@@ -482,7 +444,7 @@ public abstract class Neuron implements Producer, Consumer {
     /**
      * Round the activation level of this neuron off to a specified precision.
      *
-     * @param precision precision to round this neuron's activaion off to
+     * @param precision precision to round this neuron's activation off to
      */
     public void round(final int precision) {
         setActivation(Network.round(getActivation(), precision));
@@ -548,8 +510,8 @@ public abstract class Neuron implements Producer, Consumer {
     }
 
     /**
-     * Temporary buffer which can be used for algorithms which should not  depend on the order in which  neurons are
-     * updated.
+     * Temporary buffer which can be used for algorithms which should not depend on
+     * the order in which  neurons are updated.
      *
      * @param d temporary value
      */
@@ -614,7 +576,7 @@ public abstract class Neuron implements Producer, Consumer {
         // Determine number of active (greater than 0) input lines
         
         
-        for (Synapse incoming: fanIn) {
+        for (Synapse incoming : fanIn) {
             if (incoming.getSource().getActivation() > threshold) {
                 numActiveLines++;
             }
@@ -745,14 +707,12 @@ public abstract class Neuron implements Producer, Consumer {
     }
 
     /**
-     * @see Object
+     * {@inheritDoc}
      */
     public String toString() {
-        String ret = new String();
-        ret += ("Neuron " + this.getId());
-        ret += ("  Activation = " + this.getActivation());
-        ret += ("  Location = (" + this.x +"," + this.y + ")");
-        return ret;
+        return "Neuron " + this.getId()
+            + "  Activation = " + this.getActivation()
+            + "  Location = (" + this.x + "," + this.y + ")";
     }
 
 
@@ -762,41 +722,30 @@ public abstract class Neuron implements Producer, Consumer {
     public void clear() {
        activation = 0;
     }
-
+    
     /**
      * Returns string for tool tip or short description.
      * @return tool tip text
      */
     public String getToolTipText() {
-        return " Activation: " + Utils.round(this.getActivation(), 9);
+        return " Activation: " + Utils.round(this.getActivation(), MAX_DIGITS);
     }
 
     /**
      * @return the targetValue
      */
     public double getTargetValue() {
-
-        // Use signal synapse for target value
-        if (targetValueSynapse != null) {
-            return targetValueSynapse.getSource().getActivation();
-        }else
-            return 0;
-
-        // Return externally set target value via coupling...
-
-        // return targetValue;
+        /* Use signal synapse for target value */
+        return targetValueSynapse != null ? targetValueSynapse.getSource().getActivation() : 0;
     }
 
     /**
      * @return the hasTargetValue
      */
     public boolean hasTargetValue() {
-        // Todo: isInput should be the new external coupling thing
-        if ((targetValueSynapse != null)){ // || (isInput())) {
-            return true;
-        }
-        // Add check for external coupling also
-        return false;
+        // TODO isInput should be the new external coupling thing
+        return targetValueSynapse != null;
+        // TODO Add check for external coupling also
     }
 
     /**
@@ -839,53 +788,111 @@ public abstract class Neuron implements Producer, Consumer {
     }
 
     /**
-     * @param clamped the clamped to set
+     * Toggles whether this neuron is clamped.
+     * 
+     * @param clamped Whether this neuron is to be clamped.
      */
-    public void setClamped(boolean clamped) {
+    public void setClamped(final boolean clamped) {
         this.clamped = clamped;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public List<ProducingAttribute<?>> getProducingAttributes() {
         return producingAttributes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<ConsumingAttribute<?>> getConsumingAttributes() {
         return consumingAttributes;
     }
 
-    private class ActivationAttribute implements ProducingAttribute<Double>, ConsumingAttribute<Double>{
+    /**
+     * Implements the Activation attribute.
+     * 
+     * @author Matt Watson
+     */
+    private class ActivationAttribute implements ProducingAttribute<Double>,
+            ConsumingAttribute<Double> {
+        
+        /**
+         * {@inheritDoc}
+         */
         public String getAttributeDescription() {
             return "Activation";
         }
+        
+        /**
+         * {@inheritDoc}
+         */
         public Double getValue() {
             return getParent().getActivation();
         }
-        public void setValue(Double value) {
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void setValue(final Double value) {
             getParent().setInputValue(value == null ? 0 : value);
         }
+        
+        /**
+         * {@inheritDoc}
+         */
         public Neuron getParent() {
             return Neuron.this;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public Type getType() {
             return Double.TYPE;
         }
     }
     
-    private class UpperBoundAttribute implements ProducingAttribute<Double>, ConsumingAttribute<Double>{
+    /**
+     * Implements the Upper bound attribute.
+     * 
+     * @author Matt Watson
+     */
+    private class UpperBoundAttribute implements ProducingAttribute<Double>,
+            ConsumingAttribute<Double> {
+        
+        /**
+         * {@inheritDoc}
+         */
         public String getAttributeDescription() {
             return "UpperBound";
         }
+        
+        /**
+         * {@inheritDoc}
+         */
         public Double getValue() {
             return upperBound;
         }
-        public void setValue(Double value) {
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void setValue(final Double value) {
             upperBound = value;
         }
+        
+        /**
+         * {@inheritDoc}
+         */
         public Neuron getParent() {
             return Neuron.this;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public Type getType() {
             return Double.TYPE;
         }
@@ -902,7 +909,7 @@ public abstract class Neuron implements Producer, Consumer {
      * @param defaultConsumingAttribute the defaultConsumingAttribute to set
      */
     public void setDefaultConsumingAttribute(
-            ConsumingAttribute defaultConsumingAttribute) {
+            final ConsumingAttribute<?> defaultConsumingAttribute) {
         this.defaultConsumingAttribute = defaultConsumingAttribute;
     }
 
@@ -917,19 +924,25 @@ public abstract class Neuron implements Producer, Consumer {
      * @param defaultProducingAttribute the defaultProducingAttribute to set
      */
     public void setDefaultProducingAttribute(
-            ProducingAttribute defaultProducingAttribute) {
+            final ProducingAttribute<?> defaultProducingAttribute) {
         this.defaultProducingAttribute = defaultProducingAttribute;
     }
 
     /**
-     * Describes this as a consumer.
+     * Returns the id of the neuron.
+     * 
+     * @return the id of the neuron.
      */
     public String getDescription() {
         return getId();
     }
 
-    public WorkspaceComponent getParentComponent() {
+    /**
+     * Returns the parent component.
+     * 
+     * @return the parent component.
+     */
+    public NetworkComponent getParentComponent() {
         return parent.getRootNetwork().getParent();
     }
-
 }

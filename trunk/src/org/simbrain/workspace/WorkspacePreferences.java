@@ -23,15 +23,24 @@ import java.util.prefs.Preferences;
 
 
 /**
- * <b>WorkspacePreferences</b> handles storage and retrieval of user preferences, e.g. current directory.
+ * <b>WorkspacePreferences</b> handles storage and retrieval of user preferences,
+ * e.g. current directory.
  */
-public class WorkspacePreferences {
+public final class WorkspacePreferences {
     /** File system property. */
     private static final String FS = System.getProperty("file.separator");
 
     /** The main user preference object. */
-    private static final Preferences THE_PREFS = Preferences.userRoot().node("org/simbrain/workspace");
+    private static final Preferences THE_PREFS = Preferences.userRoot().node(
+        "org/simbrain/workspace");
 
+    /**
+     * This class should not be instantiated.
+     */
+    private WorkspacePreferences() {
+        /* no implementation */
+    }
+    
     /**
      * Save all user preferences.
      */

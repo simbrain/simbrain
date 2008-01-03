@@ -18,28 +18,27 @@
  */
 package org.simnet.interfaces;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.NetworkComponent;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
-import org.simnet.util.SimpleId;
-import org.simnet.util.UniqueID;
-
 
 /**
- * <b>Network</b> provides core neural network functionality and is the the main API for external calls. Network
- * objects are sets of neurons and  weights connecting them. Much of the  actual update and  learning logic occurs
- * (currently) in the individual nodes.
+ * <b>Network</b> provides core neural network functionality and is the the main API
+ * for external calls. Network objects are sets of neurons and  weights connecting them.
+ * Much of the  actual update and  learning logic occurs (currently) in the individual nodes.
  */
 public abstract class Network {
 
+    /** The initial time-step for the network. */
+    private static final double DEFAULT_TIME_STEP = .01;
+    
     /** Logger. */
-    Logger logger = Logger.getLogger(Network.class);
+    private Logger logger = Logger.getLogger(Network.class);
 
     /** Reference to root network. */
     private RootNetwork rootNetwork = null;
@@ -57,7 +56,7 @@ public abstract class Network {
     private ArrayList<Network> networkList = new ArrayList<Network>();
 
     /** Time step. */
-    private double timeStep = .01;
+    private double timeStep = DEFAULT_TIME_STEP;
 
     /** Whether to round off neuron values. */
     private boolean roundOffActivationValues = false;
@@ -114,7 +113,7 @@ public abstract class Network {
      */
     public Network duplicate(final Network newNetwork) {
         newNetwork.setRootNetwork(this.getRootNetwork());
-        ArrayList copy = CopyFactory.getCopy(this.getObjectList());
+        List<?> copy = CopyFactory.getCopy(this.getObjectList());
         newNetwork.addObjects(copy, true);
         newNetwork.setUpdatePriority(this.getUpdatePriority());
         return newNetwork;
@@ -122,12 +121,12 @@ public abstract class Network {
 
     /**
      * Adds a list of network elements to this network.
-     * Used in copy paste and tuned to that usage.  
+     * Used in copy paste and tuned to that usage.
      *
      * @param toAdd list of objects to add.
      * @param notify whether to fire a notification event.
      */
-    private void addObjects(final ArrayList toAdd, final boolean notify) {
+    private void addObjects(final List<?> toAdd, final boolean notify) {
         for (Object object : toAdd) {
             if (object instanceof Neuron) {
                 Neuron neuron = (Neuron) object;
@@ -151,7 +150,7 @@ public abstract class Network {
      *
      * @param toAdd objects to add.
      */
-    public void addObjects(final ArrayList toAdd) {
+    public void addObjects(final ArrayList<?> toAdd) {
         addObjects(toAdd, true);
     }
 
@@ -160,7 +159,7 @@ public abstract class Network {
      *
      * @param toAdd objects to add.
      */
-    public void addObjectReferences(final ArrayList toAdd) {
+    public void addObjectReferences(final ArrayList<?> toAdd) {
         addObjects(toAdd, false);
     }
 
@@ -178,9 +177,9 @@ public abstract class Network {
     }
 
     /**
-     * Perform intialization required after opening saved networks.
+     * Perform initialization required after opening saved networks.
      */
-    protected void postUnmarshallingInit(){
+    protected void postUnmarshallingInit() {
 
         logger = Logger.getLogger(RootNetwork.class);
 
@@ -358,7 +357,8 @@ public abstract class Network {
     }
 
     /**
-     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
+     * Adds a weight to the neuron network, where that weight already has designated
+     * source and target neurons.
      *
      * @param synapse the weight object to add
      * @param notify whether to fire a synapse added event
@@ -379,7 +379,8 @@ public abstract class Network {
     }
 
     /**
-     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
+     * Adds a weight to the neuron network, where that weight already has designated
+     * source and target neurons.
      *
      * @param weight the weight object to add
      */
@@ -423,11 +424,12 @@ public abstract class Network {
     }
 
     /**
-     * Calls {@link Neuron#checkBounds} for each neuron, which makes sure the neuron has not exceeded its upper bound
-     * or gone below its lower bound.   TODO: Add or replace with normalization within bounds?
+     * Calls {@link Neuron#checkBounds} for each neuron, which makes sure the neuron has not
+     * exceeded its upper bound or gone below its lower bound.   TODO: Add or replace with
+     * normalization within bounds?
      */
     public void checkAllBounds() {
-    	for (Neuron n : neuronList) {
+        for (Neuron n : neuronList) {
             n.checkBounds();
         }
 
@@ -441,7 +443,7 @@ public abstract class Network {
      * Round activations of to intergers; for testing.
      */
     public void roundAll() {
-    	for (Neuron n : neuronList) {
+        for (Neuron n : neuronList) {
             n.round(precision);
         }
     }
@@ -536,7 +538,8 @@ public abstract class Network {
     }
 
     /**
-     * Returns the "state" of the network--the activation level of its neurons.  Used by the gauge component
+     * Returns the "state" of the network--the activation level of its neurons.
+     * Used by the gauge component.
      *
      * @return an array representing the activation levels of all the neurons in this network
      */
@@ -573,10 +576,10 @@ public abstract class Network {
      * Randomizes all weights.
      */
     public void randomizeWeights() {
-    	for (Synapse s : synapseList) {
+        for (Synapse s : synapseList) {
             s.randomize();
         }
-        //Must make this symmetrical
+        // TODO Make this symmetrical
     }
 
     /**
@@ -588,18 +591,11 @@ public abstract class Network {
      * @return rounded number
      */
     public static double round(final double value, final int decimalPlace) {
-        double powerOfTen = 1;
-        int place = decimalPlace;
-
-        while (place-- > 0) {
-            powerOfTen *= 10.0;
-        }
-
-        return Math.round(value * powerOfTen) / powerOfTen;
+        return new BigDecimal(value).setScale(decimalPlace, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     /**
-     * @see Object
+     * {@inheritDoc}
      */
     public String toString() {
         String ret = new String();
@@ -687,9 +683,9 @@ public abstract class Network {
      * Add an array of neurons and set their parents to this.
      *
      * @param neurons list of neurons to add
-     * @notify whether to notify listeners that these neurons were added.
+     * @param notify whether to notify listeners that these neurons were added.
      */
-    protected void addNeuronList(final ArrayList<Neuron> neurons, boolean notify) {
+    protected void addNeuronList(final ArrayList<Neuron> neurons, final boolean notify) {
         for (Neuron n : neurons) {
             n.setParentNetwork(this);
             addNeuron(n,  notify);
@@ -883,7 +879,7 @@ public abstract class Network {
      *
      * @param network network to add.
      */
-    public void addNetworkReference (final Network network) {
+    public void addNetworkReference(final Network network) {
         addNetwork(network, false);
     }
     /**
@@ -968,9 +964,8 @@ public abstract class Network {
      *
      * @param networks list of neurons to add
      */
-    public void addNetworkList(final ArrayList networks) {
-        for (int i = 0; i < networks.size(); i++) {
-            Network n = (Network) networks.get(i);
+    public void addNetworkList(final ArrayList<Network> networks) {
+        for (Network n : networks) {
             addNetwork(n);
         }
     }
@@ -1011,7 +1006,8 @@ public abstract class Network {
     }
 
     /**
-     * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses.
+     * Create "flat" list of synapses, which includes the top-level synapses plus
+     * all subnet synapses.
      *
      * @return the flat list
      */
@@ -1031,6 +1027,11 @@ public abstract class Network {
         return ret;
     }
 
+    /**
+     * Returns a list containing all neurons, synapses and networks.
+     * 
+     * @return A list containing all neurons, synapses and networks.
+     */
     public ArrayList<Object> getObjectList() {
         ArrayList<Object> ret = new ArrayList<Object>();
         ret.addAll(getNeuronList());
@@ -1061,49 +1062,19 @@ public abstract class Network {
     }
 
     /**
-     * Update all ids. Basically prettifies the ids.  Not currently used.
-     */
-//    public void updateIds() {
-//
-//        if (this instanceof RootNetwork) {
-//            setId("root_net");
-//        }
-//
-//        // Update neteworkids
-//        int netIndex = 1;
-//        for (Iterator networks = getNetworkList().iterator(); networks.hasNext(); netIndex++) {
-//            Network network = (Network) networks.next();
-//            network.setId("net_" + netIndex);
-//        }
-//
-//        // Update neuron ids
-//        int nIndex = 1;
-//        for (Iterator neurons = getFlatNeuronList().iterator(); neurons.hasNext(); nIndex++) {
-//            Neuron neuron = (Neuron) neurons.next();
-//            neuron.setId("n_" + nIndex);
-//        }
-//
-//        // Update synapse ids
-//        int sIndex = 1;
-//        for (Iterator synapses = getFlatSynapseList().iterator(); synapses.hasNext(); sIndex++) {
-//            Synapse synapse = (Synapse) synapses.next();
-//            synapse.setId("s_" + sIndex);
-//        }
-//    }
-
-    /**
      * Returns all Input Neurons.
      *
      * @return list of input neurons;
      */
-    public Collection getInputNeurons() {
+    public Collection<Neuron> getInputNeurons() {
         ArrayList<Neuron> inputs = new ArrayList<Neuron>();
-        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext(); ) {
-            Neuron neuron = (Neuron) i.next();
+        
+        for (Neuron neuron : getFlatNeuronList()) {
             if (neuron.isInput()) {
                 inputs.add(neuron);
             }
         }
+        
         return inputs;
     }
 
@@ -1112,14 +1083,15 @@ public abstract class Network {
      *
      * @return list of output neurons;
      */
-    public Collection getOutputNeurons() {
+    public Collection<Neuron> getOutputNeurons() {
         ArrayList<Neuron> outputs = new ArrayList<Neuron>();
-        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext(); ) {
-            Neuron neuron = (Neuron) i.next();
+        
+        for (Neuron neuron : getFlatNeuronList()) {
             if (neuron.isOutput()) {
                 outputs.add(neuron);
             }
         }
+        
         return outputs;
     }
 
@@ -1131,9 +1103,11 @@ public abstract class Network {
     }
 
     /**
+     * Sets the root network.
+     * 
      * @param rootNetwork The rootNetwork to set.
      */
-    public void setRootNetwork(RootNetwork rootNetwork) {
+    public void setRootNetwork(final RootNetwork rootNetwork) {
         this.rootNetwork = rootNetwork;
     }
 

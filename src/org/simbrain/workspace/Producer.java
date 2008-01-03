@@ -13,19 +13,19 @@ public interface Producer extends AttributeHolder {
      *
      * @return an unmodifiable list of producing attributes for this producer
      */
-    public abstract List<? extends ProducingAttribute<?>> getProducingAttributes();
+    List<? extends ProducingAttribute<?>> getProducingAttributes();
 
     /**
      * Returns the default attribute for this producer.
      *
      * @return the default attribute
      */
-    public abstract ProducingAttribute<?> getDefaultProducingAttribute();
+    ProducingAttribute<?> getDefaultProducingAttribute();
 
     /**
      * Sets the default producing attribute for this producer.
      *
      * @param producingAttribute the default producing attribute to set.
      */
-    public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
+    void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
 }

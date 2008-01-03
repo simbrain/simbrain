@@ -8,7 +8,7 @@ package org.simbrain.workspace;
 public interface ProducingAttribute<E> extends Attribute {
 
     /**
-     * Return a reference to the parent of this attribute
+     * Return a reference to the parent of this attribute.
      *
      * @return the parent reference
      */

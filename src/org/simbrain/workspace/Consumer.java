@@ -13,19 +13,19 @@ public interface Consumer extends AttributeHolder {
      *
      * @return an unmodifiable list of consuming attributes for this consumer
      */
-    public abstract List<? extends ConsumingAttribute<?>> getConsumingAttributes();
+    List<? extends ConsumingAttribute<?>> getConsumingAttributes();
 
     /**
      * Returns the default attribute for this consumer.
      *
      * @return the default attribute
      */
-    public abstract ConsumingAttribute<?> getDefaultConsumingAttribute();
+    ConsumingAttribute<?> getDefaultConsumingAttribute();
 
     /**
      * Sets the default consuming attribute for this consumer.
      *
      * @param consumingAttribute the default consuming attribute to set.
      */
-    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute);
+    void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute);
 }

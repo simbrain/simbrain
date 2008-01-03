@@ -230,7 +230,7 @@ public class NeuronDialog extends StandardDialog {
     }
 
     /**
-     * Initialises the components on the panel.
+     * Initializes the components on the panel.
      */
     private void init() {
         setTitle("Neuron Dialog");

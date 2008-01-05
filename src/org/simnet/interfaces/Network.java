@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.CouplingManager;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
 
@@ -764,13 +766,50 @@ public abstract class Network {
         for (Neuron neuron : getNeuronList()) {
             neuron.setParentNetwork(this);
         }
-
+        
         // If the neuron is a spiker, add spikeResponders to target weights, else remove them
         for (Synapse s : newNeuron.getFanOut()) {
             s.initSpikeResponder();
         }
 
+        CouplingManager manager = rootNetwork.getParent().getWorkspace().getManager();
+        
+        for (Attribute oldAttr : oldNeuron.getConsumingAttributes()) {
+            Attribute newAttr = find(oldAttr.getAttributeDescription(),
+                newNeuron.getConsumingAttributes());
+            
+            if (newAttr != null) {
+                manager.replaceCouplings(oldAttr, newAttr);
+            }
+        }
+        
+        for (Attribute oldAttr : oldNeuron.getProducingAttributes()) {
+            Attribute newAttr = find(oldAttr.getAttributeDescription(),
+                newNeuron.getProducingAttributes());
+            
+            if (newAttr != null) {
+                manager.replaceCouplings(oldAttr, newAttr);
+            }
+        }
+        
         rootNetwork.updateTimeType();
+    }
+    
+    /**
+     * Helper method for finding attributes with matching names.
+     * 
+     * @param name The name of the attribute to search for.
+     * @param toSearch The list to search.
+     * @return The found attribute if any.
+     */
+    private static Attribute find(final String name, final List<? extends Attribute> toSearch) {
+        for (Attribute consuming : toSearch) {
+            if (consuming.getAttributeDescription().equals(name)) {
+                return consuming;
+            }
+        }
+        
+        return null;
     }
 
     /**

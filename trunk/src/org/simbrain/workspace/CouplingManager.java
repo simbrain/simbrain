@@ -38,14 +38,22 @@ public class CouplingManager {
     /** All couplings for the workspace. */
     private List<Coupling<?>> all = new ArrayList<Coupling<?>>();
     /** The couplings indexed by the source and target combination. */
-    private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings
-        = new HashMap<SourceTarget, List<Coupling<?>>>();
+    private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings = newMap();
     /** The couplings indexed by source. */
-    private Map<WorkspaceComponent<?>, List<Coupling<?>>> sourceCouplings
-        = new HashMap<WorkspaceComponent<?>, List<Coupling<?>>>();
+    private Map<WorkspaceComponent<?>, List<Coupling<?>>> sourceCouplings = newMap();
     /** The couplings indexed by target. */
-    private Map<WorkspaceComponent<?>, Coupling<?>> targetCouplings
-        = new HashMap<WorkspaceComponent<?>, Coupling<?>>();
+    private Map<WorkspaceComponent<?>, Coupling<?>> targetCouplings = newMap();
+    
+    /**
+     * Helper method to cleanup nasty generics declarations.
+     * 
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @return A new HashMap.
+     */
+    private static <K, V> Map<K, V> newMap() {
+        return new HashMap<K, V>();
+    }
     
     /**
      * Returns an unmodifiable list of all the couplings.
@@ -98,7 +106,7 @@ public class CouplingManager {
      * @return The coupling associated with the ids.
      */
     //TODO implement findCoupling
-    Coupling<?> findCoupling(final String sourceId, final String targetId) {
+    public Coupling<?> findCoupling(final String sourceId, final String targetId) {
         return null;
     }
 
@@ -118,8 +126,6 @@ public class CouplingManager {
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
-        System.out.println("coupling added: " + coupling);
-        
         all.add(coupling);
         
         WorkspaceComponent<?> source = coupling.getProducingAttribute()
@@ -129,16 +135,44 @@ public class CouplingManager {
         
         SourceTarget sourceTarget = new SourceTarget(source, target);
 
-//        List<Coupling<?>> couplings = sourceTargetCouplings.get(sourceTarget);
-        
         sourceTargetCouplings.put(sourceTarget, addCouplingToList(
             sourceTargetCouplings.get(sourceTarget), coupling));
         sourceCouplings.put(source, addCouplingToList(
             sourceCouplings.get(source), coupling));
         // TODO is this the way to do this?
         targetCouplings.put(target, coupling);
-        
-//        couplings.add(coupling);
+    }
+    
+    /**
+     * Replaces any couplings where the old attribute is the source or
+     * target with a new coupling with the new attribute in the source
+     * and/or target.
+     * 
+     * @param oldAttr the attribute to be replaced.
+     * @param newAttr the attribute to replace it with.
+     */
+    @SuppressWarnings("unchecked")
+    public void replaceCouplings(final Attribute oldAttr, final Attribute newAttr) {
+        for (Coupling<?> coupling : all) {
+            boolean replace = false;
+            ProducingAttribute producer = coupling.getProducingAttribute();
+            ConsumingAttribute consumer = coupling.getConsumingAttribute();
+            
+            if (consumer == oldAttr) {
+                replace = true;
+                consumer = (ConsumingAttribute) newAttr;
+            }
+            
+            if (producer == oldAttr) {
+                replace = true;
+                producer = (ProducingAttribute) newAttr;
+            }
+            
+            if (replace) {
+                removeCoupling(coupling);
+                addCoupling(new Coupling(producer, consumer));
+            }
+        }
     }
     
     /**
@@ -199,12 +233,6 @@ public class CouplingManager {
         }
     }
     
-//    public void removeCoupling(WorkspaceComponent<?> target) {
-//        List<Coupling<?>> couplings = targetCouplings.get(target);
-//
-//        if (couplings != null) { couplings.remove(index)
-//    }
-    
     /**
      * A Simple holder for linking a source and a target.
      * 
@@ -228,8 +256,6 @@ public class CouplingManager {
         SourceTarget(final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
             this.source = source;
             this.target = target;
-            
-            System.out.println("created source-target: " + source + ", " + target);
         }
         
         /**

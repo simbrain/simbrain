@@ -23,7 +23,7 @@ public final class Coupling<E> {
 
     /** Value of buffer. */
     private E buffer;
-
+    
     /**
      * Create a coupling between a specified consuming attribute, without yet specifying
      * the corresponding producing attribute.

@@ -153,7 +153,7 @@ public class CouplingManager {
      */
     @SuppressWarnings("unchecked")
     public void replaceCouplings(final Attribute oldAttr, final Attribute newAttr) {
-        for (Coupling<?> coupling : all) {
+        for (Coupling<?> coupling : new ArrayList<Coupling<?>>(all)) {
             boolean replace = false;
             ProducingAttribute producer = coupling.getProducingAttribute();
             ConsumingAttribute consumer = coupling.getConsumingAttribute();

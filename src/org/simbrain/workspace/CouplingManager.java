@@ -201,7 +201,7 @@ public class CouplingManager {
      * 
      * @param coupling The coupling to remove.
      */
-    void removeCoupling(final Coupling<?> coupling) {
+    public void removeCoupling(final Coupling<?> coupling) {
         WorkspaceComponent<?> source = coupling.getProducingAttribute()
             .getParent().getParentComponent();
         WorkspaceComponent<?> target = coupling.getConsumingAttribute()

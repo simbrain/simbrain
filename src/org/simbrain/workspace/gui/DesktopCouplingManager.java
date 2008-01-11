@@ -63,8 +63,6 @@ import org.simbrain.workspace.CouplingManager;
  */
 public class DesktopCouplingManager extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
-    private static final long serialVersionUID = 1L;
-
     /** Reference to coupling manager. */
     private final CouplingManager manager;
 
@@ -128,7 +126,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         consumerComboBox.addActionListener(this);
         if (consumerComboBox.getModel().getSize() > 0) {
             consumerComboBox.setSelectedIndex(0);
-           this.refreshComponentList((WorkspaceComponent<?>)componentList.getElementAt(0), consumerComboBox);
+            refreshComponentList((WorkspaceComponent<?>)componentList.getElementAt(0), consumerComboBox);
         }
         leftPanel.add("North", consumerComboBox);
         leftPanel.add("Center", leftScrollPane);
@@ -206,7 +204,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setActionCommand("cancel");
         cancelButton.addActionListener(this);
-        bottomPanel.add(applyButton);
+        //bottomPanel.add(applyButton);
         bottomPanel.add(okButton);
         bottomPanel.add(cancelButton);
 
@@ -530,7 +528,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             if (button.getActionCommand().equalsIgnoreCase("apply")) {
                 applyChanges();
             } else if (button.getActionCommand().equalsIgnoreCase("ok")) {
-                this.applyChanges();
+                applyChanges();
                 frame.dispose();
             } else if (button.getActionCommand().equalsIgnoreCase("cancel")) {
                 frame.dispose();
@@ -613,6 +611,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
        CouplingTray.CouplingList list = (CouplingTray.CouplingList) couplingTray.getModel();
        for (Coupling coupling : toDelete) {
            list.remove(coupling);
+           manager.removeCoupling(coupling);
        }
     }
 

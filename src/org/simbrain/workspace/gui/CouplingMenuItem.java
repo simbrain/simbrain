@@ -1,6 +1,6 @@
 package org.simbrain.workspace.gui;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
 
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
@@ -11,7 +11,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  * through action events.
  * 
  */
-public class CouplingMenuItem extends JCheckBoxMenuItem {
+public class CouplingMenuItem extends JMenuItem {
 
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;

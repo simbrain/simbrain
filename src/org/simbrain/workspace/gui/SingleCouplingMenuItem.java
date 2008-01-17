@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
 
-import org.jdesktop.swingx.util.SwingWorker;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.ProducingAttribute;
@@ -45,7 +44,8 @@ public class SingleCouplingMenuItem extends JCheckBoxMenuItem {
     public SingleCouplingMenuItem(final Workspace workspace, final String description,
             final ProducingAttribute<?> source,
             final ConsumingAttribute<?> target) {
-        super(description);
+        super(description,
+                workspace.getManager().containsCoupling(new Coupling(source, target)));
         this.workspace = workspace;
         this.source = source;
         this.target = target;
@@ -54,11 +54,9 @@ public class SingleCouplingMenuItem extends JCheckBoxMenuItem {
         
         coupling = new Coupling(source, target);
         
-        if (workspace.getManager().containsCoupling(coupling)) {
-            setSelected(true);
-        }
+        System.out.println("set: " + isSelected());
     }
-
+    
     /**
      * @return the consumingAttribute
      */

@@ -115,7 +115,7 @@ public abstract class Neuron implements Producer, Consumer {
      * Default constructor needed for external calls which create neurons then
      * set their parameters.
      */
-    public Neuron() {
+    protected Neuron() {
         setAttributeLists();
     }
 
@@ -144,11 +144,12 @@ public abstract class Neuron implements Producer, Consumer {
      * Initialization method called by constructors.
      */
     private void setAttributeLists() {
-        defaultProducingAttribute = new ActivationAttribute();
-        producingAttributes.add(defaultProducingAttribute);
-        producingAttributes.add(new UpperBoundAttribute());
-        defaultConsumingAttribute = new ActivationAttribute();
-        consumingAttributes.add(defaultConsumingAttribute);
+        ActivationAttribute activationAttribute = new ActivationAttribute();
+        defaultProducingAttribute = activationAttribute;
+        producingAttributes().add(activationAttribute);
+        producingAttributes().add(new UpperBoundAttribute());
+        defaultConsumingAttribute = activationAttribute;
+        consumingAttributes().add(activationAttribute);
     }
 
     /**
@@ -173,6 +174,26 @@ public abstract class Neuron implements Producer, Consumer {
         return n;
     }
 
+    /**
+     * Provides writable access to subclasses.  Avoid making
+     * this public.  Subclasses can override this method.
+     * 
+     * @return the producing attributes for this instance.
+     */
+    protected List<ConsumingAttribute<?>> consumingAttributes() {
+        return consumingAttributes;
+    }
+    
+    /**
+     * Provides writable access to subclasses.  Avoid making
+     * this public.  Subclasses can override this method.
+     * 
+     * @return the consuming attributes for this instance.
+     */
+    protected List<ProducingAttribute<?>> producingAttributes() {
+        return producingAttributes;
+    }
+    
     /**
      * @return the time type.
      */
@@ -799,15 +820,15 @@ public abstract class Neuron implements Producer, Consumer {
     /**
      * {@inheritDoc}
      */
-    public List<ProducingAttribute<?>> getProducingAttributes() {
-        return producingAttributes;
+    public final List<? extends ProducingAttribute<?>> getProducingAttributes() {
+        return producingAttributes();
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<ConsumingAttribute<?>> getConsumingAttributes() {
-        return consumingAttributes;
+    public final List<? extends ConsumingAttribute<?>> getConsumingAttributes() {
+        return consumingAttributes();
     }
 
     /**

@@ -751,7 +751,7 @@ public abstract class Neuron implements Producer, Consumer {
      * @return tool tip text
      */
     public String getToolTipText() {
-        return " Activation: " + Utils.round(this.getActivation(), MAX_DIGITS);
+        return "(" + id + ") Activation: " + Utils.round(this.getActivation(), MAX_DIGITS);
     }
 
     /**

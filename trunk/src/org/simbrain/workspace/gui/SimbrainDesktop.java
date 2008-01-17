@@ -708,6 +708,7 @@ public class SimbrainDesktop {
      * @return A new menu instance.
      */
     public JMenu getProducerMenu(final ConsumingAttribute<?> target) {
+        System.out.println("getProducerMenu");
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
 

@@ -37,7 +37,7 @@ public class AdditiveNeuron extends Neuron {
     private RandomSource noiseGenerator = new RandomSource();
     /** For adding noise to the neuron. */
     private boolean addNoise = false;
-
+    
     /**
      * @return the time type.
      */

@@ -24,22 +24,27 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simnet.interfaces.Neuron;
 
-
 /**
  * <b>StochasticNeuron</b>.
  */
 public class StochasticNeuron extends Neuron {
+    /** The default firing probability for the Neuron. */
+    private static final double DEFAULT_FIRING_PROBABILITY = .5;
+    
     /** Probability the neuron will fire. */
-    private double firingProbability = .5;
+    private double firingProbability = DEFAULT_FIRING_PROBABILITY;
 
-    private void addConsumer(Neuron n) {
-        n.getConsumingAttributes().add(new ConsumingAttribute<Double>() {
+    /**
+     * Adds a consuming attributes to this neuron.
+     */
+    private void addConsumerAttributes() {
+        consumingAttributes().add(new ConsumingAttribute<Double>() {
 
             public Consumer getParent() {
                 return StochasticNeuron.this;
             }
 
-            public void setValue(Double value){
+            public void setValue(final Double value) {
                 firingProbability = value;
             }
 
@@ -49,13 +54,16 @@ public class StochasticNeuron extends Neuron {
 
             public Type getType() {
                 return StochasticNeuron.class;
-            }});
+            }
+        });
     }
+
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
+     * Default constructor needed for external calls which create neurons then
+     * set their parameters.
      */
     public StochasticNeuron() {
-        addConsumer(this);
+        addConsumerAttributes();
     }
 
     /**
@@ -66,13 +74,15 @@ public class StochasticNeuron extends Neuron {
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type Only values common to different types of neuron
+     * are copied.
+     * 
      * @param n Neuron to be made type.
      */
     public StochasticNeuron(final Neuron n) {
         super(n);
-        addConsumer(n);
+        addConsumerAttributes();
     }
 
     /**

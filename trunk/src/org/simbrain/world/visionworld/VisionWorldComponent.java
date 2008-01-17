@@ -19,10 +19,12 @@
 package org.simbrain.world.visionworld;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -31,6 +33,9 @@ import org.simbrain.workspace.WorkspaceComponentListener;
  */
 public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {//implements CouplingContainer {
 
+    /** Vision world. */
+    private final VisionWorld visionWorld;
+
     /**
      * Create a new vision world frame with the specified name.
      *
@@ -38,6 +43,9 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
      */
     public VisionWorldComponent(final String name) {
         super(name);
+        VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
+        visionWorld = new VisionWorld(visionWorldModel);
+
     }
 
     @Override
@@ -59,14 +67,42 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
     public List<Consumer> getConsumers() {
         return Collections.<Consumer>emptyList();
     }
-    
     /** {@inheritDoc} */
+    public List<Producer> getProducers() {
+        List<Producer> producers = new ArrayList<Producer>();
+        VisionWorldModel model = visionWorld.getModel();
+        SensorMatrix sensorMatrix = model.getSensorMatrix();
+        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                Sensor sensor = sensorMatrix.getSensor(row, column);
+                sensor.setParentComponent(this);
+                producers.add(sensor);
+            }
+        }
+        return Collections.unmodifiableList(producers);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public void update() {
-        // empty
+        // Possibly change this later so only sensors with couplings are updated.
+        VisionWorldModel model = visionWorld.getModel();
+        PixelMatrix pixelMatrix = model.getPixelMatrix();
+        SensorMatrix sensorMatrix = model.getSensorMatrix();
+        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                Sensor sensor = sensorMatrix.getSensor(row, column);
+                sensor.sample(pixelMatrix);
+            }
+        }
     }
 
     @Override
     public void open(File openFile) {
         // empty
+    }
+
+    public VisionWorld getVisionWorld() {
+        return visionWorld;
     }
 }

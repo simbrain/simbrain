@@ -42,8 +42,6 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
     
-    /** Vision world. */
-    private final VisionWorld visionWorld;
 
 
     /**
@@ -56,14 +54,12 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         component.addListener(new BasicComponentListener());
         this.setPreferredSize(new Dimension(400,400));
 
-        VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
-        visionWorld = new VisionWorld(visionWorldModel);
 
         JMenuBar menuBar = new JMenuBar();
         JToolBar toolBar = new JToolBar();
 
         JMenu file = new JMenu("File");
-        for (Action action : visionWorld.getFileMenuActions()) {
+        for (Action action : component.getVisionWorld().getFileMenuActions()) {
             file.add(action);
             toolBar.add(action);
         }
@@ -71,7 +67,7 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         toolBar.addSeparator();
 
         JMenu edit = new JMenu("Edit");
-        for (Action action : visionWorld.getEditMenuActions()) {
+        for (Action action : component.getVisionWorld().getEditMenuActions()) {
             edit.add(action);
             toolBar.add(action);
         }
@@ -79,7 +75,7 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         toolBar.addSeparator();
 
         JMenu view = new JMenu("View");
-        for (Action action : visionWorld.getViewMenuActions()) {
+        for (Action action : component.getVisionWorld().getViewMenuActions()) {
             view.add(action);
             toolBar.add(action);
         }
@@ -92,7 +88,7 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         JPanel contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add("North", toolBar);
-        contentPane.add("Center", visionWorld);
+        contentPane.add("Center", component.getVisionWorld());
     }
 
     @Override
@@ -108,36 +104,6 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
     @Override
     public void save(final File saveFile) {
         // empty
-    }
-
-    /** {@inheritDoc} */
-    public List<Producer> getProducers() {
-        List<Producer> producers = new ArrayList<Producer>();
-        VisionWorldModel model = visionWorld.getModel();
-        SensorMatrix sensorMatrix = model.getSensorMatrix();
-        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-                Sensor sensor = sensorMatrix.getSensor(row, column);
-                producers.add(sensor);
-            }
-        }
-        return Collections.unmodifiableList(producers);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void update() {
-        super.update();
-        // Possibly change this later so only sensors with couplings are updated.
-        VisionWorldModel model = visionWorld.getModel();
-        PixelMatrix pixelMatrix = model.getPixelMatrix();
-        SensorMatrix sensorMatrix = model.getSensorMatrix();
-        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-                Sensor sensor = sensorMatrix.getSensor(row, column);
-                sensor.sample(pixelMatrix);
-            }
-        }
     }
 
     @Override

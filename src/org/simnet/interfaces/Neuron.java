@@ -397,7 +397,9 @@ public abstract class Neuron implements Producer, Consumer {
      */
     public void randomize() {
         setActivation(getRandomValue());
-        this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
+        if (this.getParentNetwork() != null) {
+            this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
+        }
     }
 
     /**

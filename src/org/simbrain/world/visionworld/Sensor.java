@@ -33,12 +33,13 @@ import java.util.List;
 
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Sensor.
  */
-public final class Sensor implements Producer {
+public final class Sensor extends SingleAttributeProducer<Double> {
 
     /** Filter for this sensor. */
     private Filter filter;
@@ -54,9 +55,10 @@ public final class Sensor implements Producer {
 
     /** Producer description. */
     private final String producerDescription;
+    
+    /** Reference to parent workspace component. */
+    private WorkspaceComponent parentComponent;
 
-    /** Sample attribute for this sensor. */
-    private final SampleAttribute attribute = new SampleAttribute();
 
     /** No filter. */
     private static final Filter NO_FILTER = new Filter()
@@ -237,59 +239,37 @@ public final class Sensor implements Producer {
     }
 
     /** {@inheritDoc} */
-    public List<ProducingAttribute<Double>> getProducingAttributes() {
-        return Collections.singletonList((ProducingAttribute<Double>) attribute);
-    }
-
-    /** {@inheritDoc} */
-    public ProducingAttribute<Double> getDefaultProducingAttribute() {
-        return attribute;
-    }
-
-    /** {@inheritDoc} */
-//    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
-//        // ignore
-//    }
-
-    /** {@inheritDoc} */
-    public String getDescription() {
-        return producerDescription;
-    }
-
-    /**
-     * Sample attribute.
-     */
-    private class SampleAttribute
-        implements ProducingAttribute<Double> {
-
-        /** {@inheritDoc} */
-        public Producer getParent() {
-            return Sensor.this;
-        }
-
-        /** {@inheritDoc} */
-        public String getAttributeDescription() {
-            return "Sample";
-        }
-
-        /** {@inheritDoc} */
-        public Double getValue() {
-            return sample;
-        }
-
-        /** {@inheritDoc} */
-        public Type getType() {
-            return Double.TYPE;
-        }
-    }
-
-    /** {@inheritDoc} */
     public WorkspaceComponent getParentComponent() {
-        return null;
+        return parentComponent;
     }
 
     /** {@inheritDoc} */
     public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {        
         // empty
     }
+
+    public Producer getParent() {
+        return this;
+    }
+
+    public String getAttributeDescription() {
+        return "sample";
+    }
+
+    public Type getType() {
+        return Double.TYPE;
+    }
+
+    public String getDescription() {
+        return "(" + receptiveField.getCenterX() + "," + receptiveField.getCenterY() + ")";
+    }
+
+    public Double getValue() {
+        return Double.valueOf(sample);
+    }
+
+    public void setParentComponent(WorkspaceComponent parentComponent) {
+        this.parentComponent = parentComponent;
+    }
+
 }

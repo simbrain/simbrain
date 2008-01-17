@@ -173,6 +173,9 @@ public class NeuronDialog extends StandardDialog {
     /** Neuron type combo box. */
     private JComboBox cbNeuronType = new JComboBox(ASSOCIATIONS.values().toArray());
 
+    /** Id Field */
+    private JLabel idLabel = new JLabel();
+
     /** Activation field. */
     private JTextField tfActivation = new JTextField();
 
@@ -243,6 +246,7 @@ public class NeuronDialog extends StandardDialog {
         this.addButton(helpButton);
         cbNeuronType.addActionListener(listener);
 
+        topPanel.addItem("Id:", idLabel);            
         topPanel.addItem("Activation", tfActivation);
         topPanel.addItem("Increment", tfIncrement);
         topPanel.addItem("Update priority", tfUpdatePriority);
@@ -347,7 +351,12 @@ public class NeuronDialog extends StandardDialog {
      * Set the initial values of dialog components.
      */
     private void fillFieldValues() {
-        Neuron neuronRef = (Neuron) neuronList.get(0);
+        Neuron neuronRef = neuronList.get(0);
+        if (neuronList.size() == 1) {
+            idLabel.setText(neuronRef.getId());
+        } else {
+            idLabel.setText(NULL_STRING);
+        }
         tfActivation.setText(Double.toString(neuronRef.getActivation()));
         tfIncrement.setText(Double.toString(neuronRef.getIncrement()));
         tfUpdatePriority.setText(Integer.toString(neuronRef.getUpdatePriority()));

@@ -204,7 +204,19 @@ public final class EditSensorDialog
         c.gridx = 0;
         c.gridy++;
         c.weightx = 0.33f;
-        panel.add(new JLabel("Filter"), c);
+        panel.add(new JLabel("Current filter"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        panel.add(new JLabel(sensor.getFilter().toString()), c);
+
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0.33f;
+        panel.add(new JLabel("New filter"), c);
 
         c.insets = FIELD_INSETS;
         c.gridx = 1;

@@ -67,6 +67,11 @@ public final class Sensor extends SingleAttributeProducer<Double> {
             public double filter(final BufferedImage image) {
                 return 0.0d;
             }
+
+            /** {@inheritDoc} */
+            public String toString() {
+                return "None";
+            }
         };
 
 

@@ -28,6 +28,9 @@ import org.simbrain.world.visionworld.Filter;
 public final class PixelAccumulator
     implements Filter {
 
+    /** Display name. */
+    private static final String DISPLAY_NAME = "Pixel accumulator";
+
     /** {@inheritDoc} */
     public double filter(final BufferedImage image) {
         int pixels = 0;
@@ -50,5 +53,10 @@ public final class PixelAccumulator
             }
         }
         return pixels;
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return DISPLAY_NAME;
     }
 }

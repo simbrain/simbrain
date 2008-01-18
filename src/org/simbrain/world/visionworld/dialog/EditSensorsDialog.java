@@ -29,6 +29,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -101,7 +103,7 @@ public final class EditSensorsDialog
         }
         this.sensors = sensors;
 
-        setTitle("Edit " + sensors.size() + " Sensors:");
+        setTitle("Edit " + sensors.size() + " Sensor(s):");
         initComponents();
         layoutComponents();
     }
@@ -182,7 +184,30 @@ public final class EditSensorsDialog
         c.gridy = 0;
         c.weightx = 0.33f;
         c.weighty = 0;
-        panel.add(new JLabel("Filter"), c);
+        panel.add(new JLabel("Current filter(s)"), c);
+
+        SortedSet<String> filterNames = new TreeSet<String>();
+        for (Sensor sensor : sensors) {
+            filterNames.add(sensor.getFilter().toString());
+        }
+        boolean addNewLine = false;
+        for (String filterName : filterNames) {
+            c.insets = FIELD_INSETS;
+            c.gridx = 1;
+            if (addNewLine) {
+                c.gridy++;
+            }
+            c.weightx = 0.66f;
+            panel.add(new JLabel(filterName), c);
+            addNewLine = true;
+        }
+
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0.33f;
+        panel.add(new JLabel("New filter"), c);
 
         c.insets = FIELD_INSETS;
         c.gridx = 1;

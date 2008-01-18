@@ -195,7 +195,6 @@ public class RootNetwork extends Network {
      */
     public void updateRootNetworkStandard() {
 
-
         //Update Time
         updateTime();
 
@@ -358,11 +357,11 @@ public class RootNetwork extends Network {
      */
     public void clearInputs() {
 
-        Iterator it = getInputNeurons().iterator();
-
-        while (it.hasNext()) {
-            Neuron n = (Neuron) it.next();
-            n.setInputValue(0);
+        //TODO: Is there a more efficient way to handle this?
+        // i.e. a way to get a list of neurons that (1) are coupled or better,
+        // (2) have input values which consume.
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            neuron.setInputValue(0);
         }
     }
 

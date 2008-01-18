@@ -574,7 +574,7 @@ public abstract class Neuron implements Producer, Consumer {
     /**
      * Returns the sum of the strengths of the weights attaching to this neuron.
      *
-     * @return the sum of the incoming weights to this nueron.
+     * @return the sum of the incoming weights to this neuron.
      */
     public double getSummedIncomingWeights() {
         double ret = 0;

@@ -59,8 +59,7 @@ public final class UniformFilter
         return value;
     }
 
-    /** {@inheritDoc} */
-    public String toString() {
+    public String getDescription() {
         return DISPLAY_NAME + ", value=" + value;
     }
 }

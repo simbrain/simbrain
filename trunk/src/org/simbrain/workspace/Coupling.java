@@ -19,7 +19,7 @@ public final class Coupling<E> {
     private ProducingAttribute<E> producingAttribute;
 
     /** Consuming attribute for this coupling. */
-    private final ConsumingAttribute<E> consumingAttribute;
+    private ConsumingAttribute<E> consumingAttribute;
 
     /** Value of buffer. */
     private E buffer;
@@ -34,6 +34,18 @@ public final class Coupling<E> {
         super();
         this.consumingAttribute = consumingAttribute;
     }
+
+    /**
+     * Create a coupling between a specified producing attribute, without yet specifying
+     * the corresponding consuming attribute.
+     *
+     * @param producingAttribute the attribute that produces.
+     */
+    public Coupling(final ProducingAttribute<E> producingAttribute) {
+        super();
+        this.producingAttribute = producingAttribute;
+    }
+
 
     /**
      * Create a new coupling between the specified producing attribute
@@ -90,6 +102,13 @@ public final class Coupling<E> {
         this.producingAttribute = producingAttribute;
     }
 
+    /**
+     * @param consumingAttribute the consumingAttribute to set
+     */
+    public void setConsumingAttribute(final ConsumingAttribute<E>consumingAttribute) {
+        this.consumingAttribute = consumingAttribute;
+    }
+
 
     /**
      * @return the consumingAttribute
@@ -105,13 +124,27 @@ public final class Coupling<E> {
      */
     public String toString() {
         String producerString;
-        if (producingAttribute   == null) {
-            producerString = "Unbound";
+        String consumerString;
+        if (producingAttribute == null) {
+            producerString = "Null";
         } else {
-            producerString = producingAttribute.getParent().getDescription();
+            if (producingAttribute instanceof SingleAttributeProducer) {
+                producerString = producingAttribute.getParent().getDescription();
+            } else {
+                producerString = producingAttribute.getParent().getDescription() + ":" + producingAttribute.getAttributeDescription();
+            }
         }
-        return consumingAttribute.getParent().getDescription() + "[" + producerString + "]";
-    }
+        if (consumingAttribute == null) {
+            consumerString = "Null";
+        } else {
+            if (consumingAttribute instanceof SingleAttributeConsumer) {
+                consumerString = consumingAttribute.getParent().getDescription();
+            } else {
+                consumerString = consumingAttribute.getParent().getDescription() + ":" + consumingAttribute.getAttributeDescription();
+            }
+        }
+        return producerString + ">" + consumerString;
+     }
     
     /**
      * {@inheritDoc}

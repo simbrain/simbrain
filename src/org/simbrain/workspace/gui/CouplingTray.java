@@ -31,6 +31,7 @@ import javax.swing.JList;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
@@ -98,12 +99,11 @@ public class CouplingTray extends JList implements DropTargetListener {
                     (TransferrableCouplingList) transferable.getTransferData(ListData.LIST_DATA_FLAVOR);
                 ArrayList list = tcl.getList();
 
-                if (tcl.getProducerOrConsumer().equalsIgnoreCase("consumers")) {
-                    // Create unbound consumers
+                if (tcl.getProducerOrConsumer().equalsIgnoreCase("producers")) {
+                    // Create unbound producers
                     int index = this.getSelectedIndex();
                     for (int i = 0; i < list.size(); i++) {
-                        Coupling coupling = new Coupling(((Consumer) list.get(i)).
-                                getDefaultConsumingAttribute());
+                        Coupling coupling = new Coupling(((Producer) list.get(i)).getDefaultProducingAttribute());
                         if (index > -1) {
                             ((ModifiableListModel<Coupling>) this.getModel()).
                             insertElementAt(coupling, index + 1);
@@ -120,13 +120,13 @@ public class CouplingTray extends JList implements DropTargetListener {
                     }
                     for (int i = 0; i < list.size(); i++) {
                         //TODO: Here and above!
-                        ProducingAttribute producer = (((Producer) list.get(i)).
-                                getDefaultProducingAttribute());
+                        ConsumingAttribute consumer = (((Consumer) list.get(i)).
+                                getDefaultConsumingAttribute());
                         index = start + i;
                         if (index >= this.getModel().getSize()) {
                             break;
                         } else {
-                            ((CouplingList) this.getModel()).bindElementAt(producer, index);
+                            ((CouplingList) this.getModel()).bindElementAt(consumer, index);
                         }
                     }
                 }
@@ -227,6 +227,16 @@ public class CouplingTray extends JList implements DropTargetListener {
          */
         public void bindElementAt(final ProducingAttribute producer, final int index) {
             getElementAt(index).setProducingAttribute(producer);
+            this.fireContentsChanged(this, 0, getSize());
+        }
+        
+        /**
+         * Position to bind a consumer.
+         * @param consumer to be bound
+         * @param index of location to bind
+         */
+        public void bindElementAt(final ConsumingAttribute consumer, final int index) {
+            getElementAt(index).setConsumingAttribute(consumer);
             this.fireContentsChanged(this, 0, getSize());
         }
     }

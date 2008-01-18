@@ -35,6 +35,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.visionworld.filter.UniformFilter;
 
 /**
  * Sensor.
@@ -61,21 +62,9 @@ public final class Sensor extends SingleAttributeProducer<Double> {
 
 
     /** No filter. */
-    private static final Filter NO_FILTER = new Filter()
-        {
-            /** {@inheritDoc} */
-            public double filter(final BufferedImage image) {
-                return 0.0d;
-            }
+    private static final Filter NO_FILTER = new UniformFilter(0);
 
-            /** {@inheritDoc} */
-            public String toString() {
-                return "None";
-            }
-        };
-
-
-    /** 
+    /**
      * Create a new sensor with the specified receptive field and no filter.
      *
      * @param receptiveField receptive field for this sensor, must not be null
@@ -266,7 +255,7 @@ public final class Sensor extends SingleAttributeProducer<Double> {
     }
 
     public String getDescription() {
-        return "(" + receptiveField.getCenterX() + "," + receptiveField.getCenterY() + ")";
+        return getFilter().getDescription() + " at (" + receptiveField.getCenterX() + "," + receptiveField.getCenterY() + ")";
     }
 
     public Double getValue() {

@@ -55,8 +55,8 @@ public final class PixelAccumulator
         return pixels;
     }
 
-    /** {@inheritDoc} */
-    public String toString() {
+    public String getDescription() {
         return DISPLAY_NAME;
     }
+    
 }

@@ -80,6 +80,7 @@ public class SimbrainDesktop {
     
     /** The x offset for popup menus. */
     private static final int MENU_X_OFFSET = 5;
+
     /** The y offset for popup menus. */
     private static final int MENU_Y_OFFSET = 53;
     

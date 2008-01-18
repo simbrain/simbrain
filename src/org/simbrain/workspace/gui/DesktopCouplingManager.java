@@ -107,11 +107,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         JPanel leftPanel = new JPanel(new BorderLayout());
         JPanel leftButtonTray = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JScrollPane leftScrollPane = new JScrollPane(consumerJList);
-        JButton jbLeftAddAll = new JButton("Add All >>");
-        jbLeftAddAll.setActionCommand("addAllConsumers");
+        JButton jbLeftAddAll = new JButton("Bind All");
+        jbLeftAddAll.setActionCommand("bindAllConsumers");
         jbLeftAddAll.addActionListener(this);
-        JButton jbLeftAdd = new JButton("Add Selected >");
-        jbLeftAdd.setActionCommand("addSelectedConsumers");
+        JButton jbLeftAdd = new JButton("Bind Selected");
+        jbLeftAdd.setActionCommand("bindSelectedConsumers");
         jbLeftAdd.addActionListener(this);
         leftButtonTray.add(jbLeftAdd);
         leftButtonTray.add(jbLeftAddAll);
@@ -162,13 +162,13 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         // PRODUCERS //
         ///////////////
         JPanel rightPanel = new JPanel(new BorderLayout());
-        JPanel rightButtonTray = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel rightButtonTray = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JScrollPane rightScrollPane = new JScrollPane(producerJList);
-        JButton jbRightAddAll = new JButton("<< Bind All");
-        jbRightAddAll.setActionCommand("bindAllProducers");
+        JButton jbRightAddAll = new JButton("Add All");
+        jbRightAddAll.setActionCommand("addAllProducers");
         jbRightAddAll.addActionListener(this);
-        JButton jbRightAdd = new JButton("< Bind Selected");
-        jbRightAdd.setActionCommand("bindSelectedProducers");
+        JButton jbRightAdd = new JButton("Add Selected");
+        jbRightAdd.setActionCommand("addSelectedProducers");
         jbRightAdd.addActionListener(this);
         rightButtonTray.add(jbRightAddAll);
         rightButtonTray.add(jbRightAdd);
@@ -214,9 +214,9 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         // MAIN PANEL //
         ////////////////
         JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
-        centerPanel.add(leftPanel);
+        centerPanel.add(rightPanel); //TODO: right and left have been swapped, so the naming is confusing; fix naming
         centerPanel.add(middlePanel);
-        centerPanel.add(rightPanel);
+        centerPanel.add(leftPanel);
         centerPanel.setPreferredSize(new Dimension(800, 400));
         this.setLayout(new BorderLayout());
         this.add("Center", centerPanel);
@@ -544,33 +544,33 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
                 frame.dispose();
             } else if (button.getActionCommand().equalsIgnoreCase("remove")) {
                 deleteSelectedCouplings();
-            } else if (button.getActionCommand().equalsIgnoreCase("addAllConsumers")) {
-                GenericListModel<Consumer> consumerList = (GenericListModel<Consumer>) consumerJList.getModel();
-                for (Consumer consumer : consumerList) {
-                    trayModel.addElement(new Coupling(consumer.getDefaultConsumingAttribute()));
-                }
-            } else if (button.getActionCommand().equalsIgnoreCase("addSelectedConsumers")) {
-                ArrayList<Consumer> consumerList = this.getSelectedConsumers();
-                for (Consumer consumer : consumerList) {
-                    trayModel.addElement(new Coupling(consumer.getDefaultConsumingAttribute()));
-                }
-            } else if (button.getActionCommand().equalsIgnoreCase("bindAllProducers")) {
+            } else if (button.getActionCommand().equalsIgnoreCase("addAllProducers")) {
                 GenericListModel<Producer> producerList = (GenericListModel<Producer>) producerJList.getModel();
+                for (Producer producer : producerList) {
+                    trayModel.addElement(new Coupling(producer.getDefaultProducingAttribute()));
+                }
+            } else if (button.getActionCommand().equalsIgnoreCase("addSelectedProducers")) {
+                ArrayList<Producer> producerList = this.getSelectedProducers();
+                for (Producer producer : producerList) {
+                    trayModel.addElement(new Coupling(producer.getDefaultProducingAttribute()));
+                }
+            } else if (button.getActionCommand().equalsIgnoreCase("bindAllConsumers")) {
+                GenericListModel<Consumer> consumerList = (GenericListModel<Consumer>) consumerJList.getModel();
                 int i = couplingTray.getSelectedIndex();
                 if (i == -1) {
                     return;
                 }
-                for (Producer producer : producerList) {
+                for (Consumer consumer : consumerList) {
                     if (i < trayModel.getSize()) {
-                        trayModel.bindElementAt(producer.getDefaultProducingAttribute(), i++);
+                        trayModel.bindElementAt(consumer.getDefaultConsumingAttribute(), i++);
                     }
                 }
-            } else if (button.getActionCommand().equalsIgnoreCase("bindSelectedProducers")) {
-                ArrayList<Producer> producerList = getSelectedProducers();
+            } else if (button.getActionCommand().equalsIgnoreCase("bindSelectedConsumers")) {
+                ArrayList<Consumer> consumerList = getSelectedConsumers();
                 int i = couplingTray.getSelectedIndex();
-                for (Producer producer : producerList) {
+                for (Consumer consumer : consumerList) {
                     if (i < trayModel.getSize()) {
-                        trayModel.bindElementAt(producer.getDefaultProducingAttribute(), i++);
+                        trayModel.bindElementAt(consumer.getDefaultConsumingAttribute(), i++);
                     }
                 }
             }

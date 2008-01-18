@@ -32,4 +32,11 @@ public interface Filter {
      * @return value for the specified image
      */
     double filter(BufferedImage image);
+    
+    /**
+     * Text description of filter.
+     *
+     * @return text description
+     */
+    String getDescription();
 }

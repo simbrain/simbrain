@@ -25,6 +25,8 @@ import java.awt.image.BufferedImage;
 
 import java.beans.PropertyChangeListener;
 
+import org.simbrain.world.visionworld.filter.UniformFilter;
+
 /**
  * Mutable implementation of VisionWorldModel.
  */
@@ -183,12 +185,7 @@ public final class MutableVisionWorldModel
 
         /** {@inheritDoc} */
         public Filter getDefaultFilter() {
-            return new Filter() {
-                    /** {@inheritDoc} */
-                    public double filter(final BufferedImage image) {
-                        return 0.0d;
-                    }
-                };
+            return new UniformFilter(0);
         }
 
         /** {@inheritDoc} */

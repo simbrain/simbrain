@@ -91,8 +91,8 @@ public final class RandomFilter
         return value;
     }
 
-    /** {@inheritDoc} */
-    public String toString() {
+
+    public String getDescription() {
         return DISPLAY_NAME + ", min=" + minimumValue + ", max=" + maximumValue;
     }
 }

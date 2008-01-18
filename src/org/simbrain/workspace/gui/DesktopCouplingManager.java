@@ -54,6 +54,8 @@ import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.SingleAttributeConsumer;
+import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.CouplingManager;
@@ -249,7 +251,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)
                     super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Consumer consumer = (Consumer) object;
-            renderer.setText(consumer.getDescription() + ":" + consumer.getDefaultConsumingAttribute().getAttributeDescription());
+            if (consumer instanceof SingleAttributeConsumer) {
+                renderer.setText(consumer.getDescription());
+            } else {
+                renderer.setText(consumer.getDescription() + ":" + consumer.getDefaultConsumingAttribute().getAttributeDescription());                
+            }
             return renderer;
        }
     }
@@ -368,9 +374,13 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         public java.awt.Component getListCellRendererComponent(final JList list, final Object object,
                 final int index, final boolean isSelected, final boolean cellHasFocus) {
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)
-                    super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
+            super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Producer producer = (Producer) object;
-            renderer.setText(producer.getDescription() + ":" + producer.getDefaultProducingAttribute().getAttributeDescription());
+            if (producer instanceof SingleAttributeProducer) {
+                renderer.setText(producer.getDescription());
+            } else {
+                renderer.setText(producer.getDescription() + ":" + producer.getDefaultProducingAttribute().getAttributeDescription());                
+            }
             return renderer;
        }
     }

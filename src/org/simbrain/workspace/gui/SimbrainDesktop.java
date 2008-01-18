@@ -51,6 +51,8 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.SingleAttributeConsumer;
+import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -717,13 +719,20 @@ public class SimbrainDesktop {
             if (producers.size() > 0) {
                 JMenu componentMenu = new JMenu(component.getName());
                 for (Producer producer : component.getProducers()) {
-                    JMenu producerItem = new JMenu(producer.getDescription());
-                    for (ProducingAttribute<?> source : producer.getProducingAttributes()) {
-                        SingleCouplingMenuItem item = new SingleCouplingMenuItem(workspace,
-                            source.getAttributeDescription(), source, target);
-                        producerItem.add(item);
+                    if (producer instanceof SingleAttributeProducer) {
+                        SingleCouplingMenuItem item = 
+                                new SingleCouplingMenuItem(workspace, producer.getDescription(), 
+                        producer.getDefaultProducingAttribute(), target);
+                        componentMenu.add(item);
+                    } else {
+                        JMenu producerItem = new JMenu(producer.getDescription());
+                        for (ProducingAttribute<?> source : producer.getProducingAttributes()) {
+                            SingleCouplingMenuItem item = 
+                                new SingleCouplingMenuItem(workspace,source.getAttributeDescription(), source, target);
+                            producerItem.add(item);
+                            componentMenu.add(producerItem);
+                        }
                     }
-                    componentMenu.add(producerItem);
                 }
                 producerMenu.add(componentMenu);
             }
@@ -745,13 +754,19 @@ public class SimbrainDesktop {
             if (consumers.size() > 0) {
                 JMenu componentMenu = new JMenu(component.getName());
                 for (Consumer consumer : component.getConsumers()) {
-                    JMenu consumerItem = new JMenu(consumer.getDescription());
-                    for (ConsumingAttribute<?> target : consumer.getConsumingAttributes()) {
-                        SingleCouplingMenuItem item = new SingleCouplingMenuItem(workspace,
-                            target.getAttributeDescription(), source, target);
-                        consumerItem.add(item);
+                        if (consumer instanceof SingleAttributeConsumer) {
+                            SingleCouplingMenuItem item = new SingleCouplingMenuItem(workspace, consumer.getDescription(), 
+                                    source, consumer.getDefaultConsumingAttribute());
+                            componentMenu.add(item);
+                        } else {
+                            JMenu consumerItem = new JMenu(consumer.getDescription());
+                            for (ConsumingAttribute<?> target : consumer.getConsumingAttributes()) {
+                                SingleCouplingMenuItem item = new SingleCouplingMenuItem(workspace,
+                                        target.getAttributeDescription(), source, target);
+                                consumerItem.add(item);
+                            }
+                            componentMenu.add(consumerItem);
                     }
-                    componentMenu.add(consumerItem);
                 }
                 consumerMenu.add(componentMenu);
             }

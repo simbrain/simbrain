@@ -32,6 +32,9 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
 
@@ -55,6 +58,9 @@ public final class SparseSensorMatrixEditor
 
     /** Receptive field width. */
     private JTextField receptiveFieldWidth;
+
+    /** Effective size. */
+    private JLabel effectiveSize;
 
     /** Display name. */
     private static final String DISPLAY_NAME = "Sparse sensor matrix";
@@ -103,6 +109,28 @@ public final class SparseSensorMatrixEditor
         columns = new JTextField();
         receptiveFieldHeight = new JTextField();
         receptiveFieldWidth = new JTextField();
+        effectiveSize = new JLabel();
+        DocumentListener updateEffectiveSize = new DocumentListener() {
+                /** {@inheritDoc} */
+                public void changedUpdate(final DocumentEvent event) {
+                    updateEffectiveSize();
+                }
+
+                /** {@inheritDoc} */
+                public void insertUpdate(final DocumentEvent event) {
+                    updateEffectiveSize();
+                }
+
+                /** {@inheritDoc} */
+                public void removeUpdate(final DocumentEvent event) {
+                    updateEffectiveSize();
+                }
+            };
+
+        rows.getDocument().addDocumentListener(updateEffectiveSize);
+        columns.getDocument().addDocumentListener(updateEffectiveSize);
+        receptiveFieldHeight.getDocument().addDocumentListener(updateEffectiveSize);
+        receptiveFieldWidth.getDocument().addDocumentListener(updateEffectiveSize);
     }
 
     /**
@@ -163,6 +191,17 @@ public final class SparseSensorMatrixEditor
         c.weightx = 0.66f;
         add(receptiveFieldWidth, c);
 
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0.33f;
+        add(new JLabel("Effective size"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(effectiveSize, c);
+
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -172,6 +211,22 @@ public final class SparseSensorMatrixEditor
         c.weightx = 1.0f;
         c.weighty = 1.0f;
         add(Box.createGlue(), c);
+    }
+
+    /**
+     * Update the effective size label.
+     */
+    private void updateEffectiveSize() {
+        try {
+            int r = Integer.valueOf(rows.getText());
+            int c = Integer.valueOf(columns.getText());
+            int h = Integer.valueOf(receptiveFieldHeight.getText());
+            int w = Integer.valueOf(receptiveFieldWidth.getText());
+            effectiveSize.setText((c * w) + "x" + (r * h));
+        }
+        catch (NumberFormatException e) {
+            effectiveSize.setText("...");
+        }
     }
 
     /** {@inheritDoc} */

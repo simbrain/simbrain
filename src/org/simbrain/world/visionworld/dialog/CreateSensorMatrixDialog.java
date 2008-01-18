@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.simbrain.world.visionworld.Filter;
+import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
 
@@ -209,6 +210,50 @@ public final class CreateSensorMatrixDialog
         c.gridy = 0;
         c.weightx = 0.33f;
         c.weighty = 0;
+        panel.add(new JLabel("Pixel matrix"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        PixelMatrix pixelMatrix = visionWorld.getModel().getPixelMatrix();
+        panel.add(new JLabel(pixelMatrix.getWidth() + "x" + pixelMatrix.getHeight()), c);
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = EMPTY_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 1.0f;
+        panel.add(Box.createVerticalStrut(6), c);
+
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridy++;
+        c.weightx = 0.33f;
+        panel.add(new JLabel("Sensor matrix"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        panel.add(sensorMatrices, c);
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 1.0f;
+        sensorMatrixEditorPlaceholder.add("Center", sensorMatrixEditor.getEditorComponent());
+        panel.add(sensorMatrixEditorPlaceholder, c);
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = EMPTY_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 1.0f;
+        panel.add(Box.createVerticalStrut(6), c);
+
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridy++;
+        c.weightx = 0.33f;
         panel.add(new JLabel("Default filter"), c);
 
         c.insets = FIELD_INSETS;
@@ -227,33 +272,6 @@ public final class CreateSensorMatrixDialog
         c.gridy++;
         filterEditorPlaceholder.add("Center", filterEditor.getEditorComponent());
         panel.add(filterEditorPlaceholder, c);
-
-        c.insets = EMPTY_INSETS;
-        c.gridy++;
-        panel.add(Box.createVerticalStrut(6), c);
-
-        c.gridwidth = GridBagConstraints.RELATIVE;
-        c.insets = LABEL_INSETS;
-        c.gridy++;
-        c.weightx = 0.33f;
-        panel.add(new JLabel("Sensor matrix"), c);
-
-        c.insets = FIELD_INSETS;
-        c.gridx = 1;
-        c.weightx = 0.66f;
-        panel.add(sensorMatrices, c);
-
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.insets = EMPTY_INSETS;
-        c.gridx = 0;
-        c.gridy++;
-        c.weightx = 1.0f;
-        panel.add(Box.createVerticalStrut(6), c);
-
-        c.insets = FIELD_INSETS;
-        c.gridy++;
-        sensorMatrixEditorPlaceholder.add("Center", sensorMatrixEditor.getEditorComponent());
-        panel.add(sensorMatrixEditorPlaceholder, c);
 
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;

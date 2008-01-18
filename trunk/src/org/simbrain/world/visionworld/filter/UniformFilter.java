@@ -28,6 +28,9 @@ import org.simbrain.world.visionworld.Filter;
 public final class UniformFilter
     implements Filter {
 
+    /** Display name. */
+    private static final String DISPLAY_NAME = "Uniform filter";
+
     /** Value. */
     private final double value;
 
@@ -54,5 +57,10 @@ public final class UniformFilter
     /** {@inheritDoc} */
     public double filter(final BufferedImage image) {
         return value;
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return DISPLAY_NAME + ", value=" + value;
     }
 }

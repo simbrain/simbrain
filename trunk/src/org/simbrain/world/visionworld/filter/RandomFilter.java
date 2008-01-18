@@ -30,6 +30,9 @@ import org.simbrain.world.visionworld.Filter;
 public final class RandomFilter
     implements Filter {
 
+    /** Display name. */
+    private static final String DISPLAY_NAME = "Random filter";
+
     /** Minimum value. */
     private final double minimumValue;
 
@@ -86,5 +89,10 @@ public final class RandomFilter
         double r = random.nextDouble();
         double value = minimumValue + (r * difference);
         return value;
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return DISPLAY_NAME + ", min=" + minimumValue + ", max=" + maximumValue;
     }
 }

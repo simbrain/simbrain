@@ -132,7 +132,7 @@ abstract class AbstractSensorNode
         StringBuffer sb = new StringBuffer();
         sb.append("Sensor");
         sb.append("\n  Filter:  ");
-        sb.append(sensor.getFilter().getClass().getSimpleName());
+        sb.append(sensor.getFilter().toString());
         sb.append("\n  Receptive field:  ");
         sb.append(sensor.getReceptiveField().getWidth());
         sb.append("x");
@@ -210,8 +210,7 @@ abstract class AbstractSensorNode
         this.selected = selected;
     }
 
-    // todo:  add context menu, tooltip text
-    // todo:  add action methods, edit sensor, add coupling, edit properties, etc.
+    // TODO:  add action methods, add coupling, edit properties, etc.
 
     /**
      * Return the mouseover paint for this sensor node.
@@ -328,15 +327,11 @@ abstract class AbstractSensorNode
 
         /** {@inheritDoc} */
         public void mouseEntered(final PInputEvent event) {
-            //event.setHandled(true);
-            //setMouseover(true);
             ((PCanvas) event.getComponent()).setToolTipText(getToolTipText());
         }
 
         /** {@inheritDoc} */
         public void mouseExited(final PInputEvent event) {
-            //event.setHandled(true);
-            //setMouseover(false);
             ((PCanvas) event.getComponent()).setToolTipText(null);
         }
     }
@@ -354,7 +349,6 @@ abstract class AbstractSensorNode
          * @param event event
          */
         private void showContextMenu(final PInputEvent event) {
-            //event.setHandled(true);
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
             contextMenu.show((PCanvas) event.getComponent(), (int) canvasPosition.getX(), (int) canvasPosition.getY());

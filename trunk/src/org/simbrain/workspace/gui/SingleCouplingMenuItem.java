@@ -53,8 +53,6 @@ public class SingleCouplingMenuItem extends JCheckBoxMenuItem {
         addActionListener(listener);
         
         coupling = new Coupling(source, target);
-        
-        System.out.println("set: " + isSelected());
     }
     
     /**
@@ -79,15 +77,11 @@ public class SingleCouplingMenuItem extends JCheckBoxMenuItem {
     private final ActionListener listener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             if (getState()) {
-                System.out.println("state is true");
                 workspace.addCoupling(coupling);
                 setSelected(true);
-//                setState(true);
             } else {
-                System.out.println("state is false");
                 workspace.removeCoupling(coupling);
                 setSelected(false);
-//                setState(false);
             }
         }
     };

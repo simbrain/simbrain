@@ -42,7 +42,9 @@ public class CouplingManager {
     /** The couplings indexed by source. */
     private Map<WorkspaceComponent<?>, List<Coupling<?>>> sourceCouplings = newMap();
     /** The couplings indexed by target. */
-    private Map<WorkspaceComponent<?>, Coupling<?>> targetCouplings = newMap();
+    private Map<WorkspaceComponent<?>, List<Coupling<?>>> targetCouplings = newMap();
+    /** The couplings indexed by consuming attribute, which is unique. */
+    private Map<ConsumingAttribute<?>, Coupling<?>> consumingAttributes = newMap();
     
     /**
      * Helper method to cleanup nasty generics declarations.
@@ -126,6 +128,17 @@ public class CouplingManager {
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
+        Coupling<?> old = consumingAttributes.get(coupling.getConsumingAttribute());
+        
+        // TODO warning that old was deleted
+        
+        if (old != null) {
+            System.out.println("removing old coupling: " + old);
+            removeCoupling(old);
+        }
+        
+        consumingAttributes.put(coupling.getConsumingAttribute(), coupling);
+        
         all.add(coupling);
         
         WorkspaceComponent<?> source = coupling.getProducingAttribute()
@@ -140,7 +153,8 @@ public class CouplingManager {
         sourceCouplings.put(source, addCouplingToList(
             sourceCouplings.get(source), coupling));
         // TODO is this the way to do this?
-        targetCouplings.put(target, coupling);
+        targetCouplings.put(target, addCouplingToList(
+            targetCouplings.get(source), coupling));
     }
     
     /**
@@ -209,11 +223,13 @@ public class CouplingManager {
         
         SourceTarget sourceTarget = new SourceTarget(source, target);
         
+        consumingAttributes.remove(coupling.getConsumingAttribute());
+        
         all.remove(coupling);
         
         removeCouplingFromList(sourceTargetCouplings.get(sourceTarget), coupling);
         removeCouplingFromList(sourceCouplings.get(source), coupling);
-        targetCouplings.remove(target);
+        removeCouplingFromList(targetCouplings.get(target), coupling);
         
         source.couplingRemoved(coupling);
         

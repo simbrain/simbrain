@@ -112,17 +112,23 @@ public class RootNetwork extends Network {
      */
     private SortedSet<Integer> updatePriorities = null;
 
-    /** List of couplings. */
-//    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
-
-    /** Name generator. */
+    /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Netork", 1);
 
-    /** Name generator. */
+    /** Neuron Id generator. */
     private SimpleId neuronIdGenerator = new SimpleId("Neuron", 1);
 
+    /** Synapse Id generator. */
+    private SimpleId synapseIdGenerator = new SimpleId("Synapse", 1);
+
+    /** Network Component. */
     private final NetworkComponent component;
     
+    /**
+     * Returns reference to parent.
+     *
+     * @return reference to parent
+     */
     public NetworkComponent getParent() {
         return component;
     }
@@ -875,6 +881,15 @@ public class RootNetwork extends Network {
      */
     public SimpleId getNetworkIdGenerator() {
         return networkIdGenerator;
+    }
+    
+    /**
+     * Return the generator for synapse ids.
+     *
+     * @return the generator.
+     */
+    public SimpleId getSynapseIdGenerator() {
+        return synapseIdGenerator;
     }
 
 }

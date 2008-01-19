@@ -378,6 +378,7 @@ public abstract class Network {
         if ((rootNetwork != null) && (notify)) {
             rootNetwork.fireSynapseAdded(synapse);
         }
+        synapse.setId(rootNetwork.getSynapseIdGenerator().getId());
     }
 
     /**
@@ -895,6 +896,7 @@ public abstract class Network {
      * @param id the new id.
      */
     public void setId(final String id) {
+        System.out.println("Here");
         this.id = id;
     }
 
@@ -910,7 +912,7 @@ public abstract class Network {
         if (notify) {
             getRootNetwork().fireSubnetAdded(n);
         }
-        setId(getRootNetwork().getNetworkIdGenerator().getId());
+        n.setId(getRootNetwork().getNetworkIdGenerator().getId());
     }
 
     /**

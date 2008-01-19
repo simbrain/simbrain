@@ -558,7 +558,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
                 GenericListModel<Consumer> consumerList = (GenericListModel<Consumer>) consumerJList.getModel();
                 int i = couplingTray.getSelectedIndex();
                 if (i == -1) {
-                    return;
+                    i = 0;
                 }
                 for (Consumer consumer : consumerList) {
                     if (i < trayModel.getSize()) {
@@ -630,7 +630,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      */
     private void applyChanges() {
         for (Coupling coupling : trayModel) {
-            if (!manager.containsCoupling(coupling)) {
+            if ((!manager.containsCoupling(coupling)) && (coupling.getConsumingAttribute() != null)) {
                 manager.addCoupling(coupling);
             }
         }

@@ -86,16 +86,17 @@ public abstract class Neuron implements Producer, Consumer {
 
     /** If true then do not update this neuron. */
     private boolean clamped = false;
+    
+    /** Target value. */
+    private double targetValue = 0;
 
-    /** Sequence in which the update function should be called
+    /**
+     *  Sequence in which the update function should be called
      *  for this neuron. By default, this is set to 0 for all
      *  the neurons. If you want a subset of neurons to fire
      *  before other neurons, assign it a smaller priority value.
      */
     private int updatePriority = 0;
-
-    /** Signal synapse.  Used for neurons with target values. */
-    private SignalSynapse targetValueSynapse = null;
     
     /** The producing attributes. */
     private ArrayList<ProducingAttribute<?>> producingAttributes
@@ -136,7 +137,6 @@ public abstract class Neuron implements Producer, Consumer {
         setX(n.getX());
         setY(n.getY());
         setUpdatePriority(n.getUpdatePriority());
-        setTargetValueSynapse(n.getTargetValueSynapse());
         setAttributeLists();
     }
 
@@ -144,12 +144,24 @@ public abstract class Neuron implements Producer, Consumer {
      * Initialization method called by constructors.
      */
     private void setAttributeLists() {
+        
         ActivationAttribute activationAttribute = new ActivationAttribute();
-        defaultProducingAttribute = activationAttribute;
         producingAttributes().add(activationAttribute);
-        producingAttributes().add(new UpperBoundAttribute());
-        defaultConsumingAttribute = activationAttribute;
         consumingAttributes().add(activationAttribute);
+        defaultProducingAttribute = activationAttribute;
+        defaultConsumingAttribute = activationAttribute;
+
+        UpperBoundAttribute upperBoundAttribute = new UpperBoundAttribute();
+        producingAttributes().add(upperBoundAttribute);
+        consumingAttributes().add(upperBoundAttribute);
+
+        LowerBoundAttribute lowerBoundAttribute = new LowerBoundAttribute();
+        producingAttributes().add(lowerBoundAttribute);
+        consumingAttributes().add(lowerBoundAttribute);
+
+        TargetValueAttribute targetValueAttribute = new TargetValueAttribute();
+        producingAttributes().add(targetValueAttribute);
+        consumingAttributes().add(targetValueAttribute);
     }
 
     /**
@@ -169,7 +181,6 @@ public abstract class Neuron implements Producer, Consumer {
         n.setX(this.getX());
         n.setY(this.getY());
         n.setUpdatePriority(this.getUpdatePriority());
-        n.setTargetValueSynapse(this.getTargetValueSynapse());
 
         return n;
     }
@@ -758,17 +769,7 @@ public abstract class Neuron implements Producer, Consumer {
      * @return the targetValue
      */
     public double getTargetValue() {
-        /* Use signal synapse for target value */
-        return targetValueSynapse != null ? targetValueSynapse.getSource().getActivation() : 0;
-    }
-
-    /**
-     * @return the hasTargetValue
-     */
-    public boolean hasTargetValue() {
-        // TODO isInput should be the new external coupling thing
-        return targetValueSynapse != null;
-        // TODO Add check for external coupling also
+        return targetValue;
     }
 
     /**
@@ -787,20 +788,6 @@ public abstract class Neuron implements Producer, Consumer {
         if (this.updatePriority != 0 && this.getParentNetwork() != null) {
             this.getParentNetwork().getRootNetwork().setPriorityUpdate(updatePriority);
         }
-    }
-
-    /**
-     * @return the targetValueSynapse
-     */
-    public SignalSynapse getTargetValueSynapse() {
-        return targetValueSynapse;
-    }
-
-    /**
-     * @param targetValueSynapse the targetValueSynapse to set
-     */
-    public void setTargetValueSynapse(final SignalSynapse targetValueSynapse) {
-        this.targetValueSynapse = targetValueSynapse;
     }
 
     /**
@@ -904,6 +891,92 @@ public abstract class Neuron implements Producer, Consumer {
          */
         public void setValue(final Double value) {
             upperBound = value;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public Neuron getParent() {
+            return Neuron.this;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public Type getType() {
+            return Double.TYPE;
+        }
+    }
+
+    /**
+     * Implements the Lower bound attribute.
+     * 
+     * @author Matt Watson
+     */
+    private class LowerBoundAttribute implements ProducingAttribute<Double>,
+            ConsumingAttribute<Double> {
+        
+        /**
+         * {@inheritDoc}
+         */
+        public String getAttributeDescription() {
+            return "LowerBound";
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public Double getValue() {
+            return lowerBound;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void setValue(final Double value) {
+            lowerBound = value;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public Neuron getParent() {
+            return Neuron.this;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public Type getType() {
+            return Double.TYPE;
+        }
+    }
+
+    /**
+     * Implements the Target Value attribute.
+     */
+    private class TargetValueAttribute implements ProducingAttribute<Double>,
+            ConsumingAttribute<Double> {
+        
+        /**
+         * {@inheritDoc}
+         */
+        public String getAttributeDescription() {
+            return "TargetValue";
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public Double getValue() {
+            return targetValue;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void setValue(final Double value) {
+            targetValue = value;
         }
         
         /**

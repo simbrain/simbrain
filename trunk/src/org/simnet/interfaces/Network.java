@@ -369,10 +369,6 @@ public abstract class Network {
         synapse.setParentNetwork(this);
         Neuron target = (Neuron) synapse.getTarget();
 
-        if (synapse instanceof SignalSynapse) {
-            target.setTargetValueSynapse((SignalSynapse) synapse);
-        }
-
         synapse.initSpikeResponder();
         synapseList.add(synapse);
         if ((rootNetwork != null) && (notify)) {
@@ -525,9 +521,6 @@ public abstract class Network {
      * @param toDelete the weight to delete
      */
     public void deleteSynapse(final Synapse toDelete) {
-        if (toDelete == toDelete.getTarget().getTargetValueSynapse()) {
-            toDelete.getTarget().setTargetValueSynapse(null);
-        }
         deleteSynapse(toDelete, true);
     }
 

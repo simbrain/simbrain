@@ -71,10 +71,8 @@ public class GeneRec extends Group {
 
         // Compute plus phase
         for (Neuron neuron : getFlatNeuronList()) {
-            if (neuron.hasTargetValue()) {
-                neuron.setActivation(neuron.getTargetValue());
-                neuron.setClamped(true);
-            }
+            neuron.setActivation(neuron.getTargetValue());
+            neuron.setClamped(true);
         }
         for (int i = 0; i < numUpdates; i++) {
             referenceNetwork.update();

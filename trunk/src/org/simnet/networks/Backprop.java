@@ -55,7 +55,7 @@ public class Backprop extends Network {
     /** Learning rate. */
     private double eta = .5;
 
-    /** Bias learning rate */
+    /** Bias learning rate. */
     private double biasEta = 0;
 
     /** Momentum. */
@@ -72,9 +72,6 @@ public class Backprop extends Network {
 
     /** Simbrain representation of output layer. */
     private StandardNetwork outputLayer;
-
-    /** Simbrain representation of target layer. */
-    private StandardNetwork targetLayer;
 
     /** last weight change for momentum. */
     double [][] last_delW_out = null;
@@ -161,11 +158,9 @@ public class Backprop extends Network {
         inputLayer = new StandardNetwork(this.getRootNetwork());
         hiddenLayer = new StandardNetwork(this.getRootNetwork());
         outputLayer = new StandardNetwork(this.getRootNetwork());
-        targetLayer = new StandardNetwork(this.getRootNetwork());
         inputLayer.setParentNetwork(this);
         hiddenLayer.setParentNetwork(this);
         outputLayer.setParentNetwork(this);
-        targetLayer.setParentNetwork(this);
         for (int i = 0; i < nInputs; i++) {
             // Using a LinearNeuron so that it could read the activations from
             // the worlds (like the data world)
@@ -180,14 +175,9 @@ public class Backprop extends Network {
             outputLayer.addNeuron(getDefaultNeuron());
         }
 
-        for (int i = 0; i < nOutputs; i++) {
-            targetLayer.addNeuron(new LinearNeuron());
-        }
-
         addNetworkReference(inputLayer);
         addNetworkReference(hiddenLayer);
         addNetworkReference(outputLayer);
-        addNetworkReference(targetLayer);
 
     }
 
@@ -248,11 +238,6 @@ public class Backprop extends Network {
             outputLayer.getNeuron(i).update();
             outputLayer.getNeuron(i).setActivation(outputLayer.getNeuron(i).getBuffer());
         }
-        // update the target layer activation
-        for (int i = 0; i < targetLayer.getNeuronCount(); i++) {
-            targetLayer.getNeuron(i).update();
-            targetLayer.getNeuron(i).setActivation(targetLayer.getNeuron(i).getBuffer());
-        }
 
     // update the weights
     if (this.train) {
@@ -276,7 +261,7 @@ public class Backprop extends Network {
 
     // compute delta for the output layer
     for (int i = 0; i < nOutputs; i++) {
-        delta_out[i] = (targetLayer.getNeuron(i).getActivation() - outputLayer.getNeuron(i).getActivation())
+        delta_out[i] = (outputLayer.getNeuron(i).getTargetValue() - outputLayer.getNeuron(i).getActivation())
         * (1 - outputLayer.getNeuron(i).getActivation()) * outputLayer.getNeuron(i).getActivation();
     }
     // compute delta for the hidden layer
@@ -531,20 +516,6 @@ public class Backprop extends Network {
      */
     public void setOutputLayer(final StandardNetwork outputLayer) {
         this.outputLayer = outputLayer;
-    }
-
-    /**
-     * @return the targetLayer
-     */
-    public StandardNetwork getTargetLayer() {
-        return targetLayer;
-    }
-
-    /**
-     * @param targetLayer the targetLayer to set
-     */
-    public void setTargetLayer(final StandardNetwork targetLayer) {
-        this.targetLayer = targetLayer;
     }
 
 }

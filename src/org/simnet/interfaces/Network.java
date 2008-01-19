@@ -896,7 +896,6 @@ public abstract class Network {
      * @param id the new id.
      */
     public void setId(final String id) {
-        System.out.println("Here");
         this.id = id;
     }
 

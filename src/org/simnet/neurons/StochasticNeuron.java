@@ -35,30 +35,6 @@ public class StochasticNeuron extends Neuron {
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
 
     /**
-     * Adds a consuming attributes to this neuron.
-     */
-    private void addConsumerAttributes() {
-        consumingAttributes().add(new ConsumingAttribute<Double>() {
-
-            public Consumer getParent() {
-                return StochasticNeuron.this;
-            }
-
-            public void setValue(final Double value) {
-                firingProbability = value;
-            }
-
-            public String getAttributeDescription() {
-                return "Firing Probability";
-            }
-
-            public Type getType() {
-                return StochasticNeuron.class;
-            }
-        });
-    }
-
-    /**
      * Default constructor needed for external calls which create neurons then
      * set their parameters.
      */
@@ -129,4 +105,29 @@ public class StochasticNeuron extends Neuron {
     public static String getName() {
         return "Stochastic";
     }
+
+    /**
+     * Make firing probability a consuming attribute
+     */
+    private void addConsumerAttributes() {
+        consumingAttributes().add(new ConsumingAttribute<Double>() {
+
+            public Consumer getParent() {
+                return StochasticNeuron.this;
+            }
+
+            public void setValue(final Double value) {
+                firingProbability = value;
+            }
+
+            public String getAttributeDescription() {
+                return "Firing Probability";
+            }
+
+            public Type getType() {
+                return StochasticNeuron.class;
+            }
+        });
+    }
+
 }

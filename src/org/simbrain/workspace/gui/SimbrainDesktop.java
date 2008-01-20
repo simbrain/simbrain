@@ -38,6 +38,8 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
+import org.simbrain.console.ConsoleComponent;
+import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.gauge.GaugeDesktopComponent;
 import org.simbrain.network.NetworkComponent;
@@ -184,6 +186,7 @@ public class SimbrainDesktop {
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
         registerComponent(ThreeDeeComponent.class, MainConsole.class);
+        registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
         
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);

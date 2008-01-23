@@ -118,7 +118,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
         }
     }
 
-    @Override
+    /** @Override */
     public void actionPerformed(ActionEvent arg0) {
         // TODO Auto-generated method stub
         

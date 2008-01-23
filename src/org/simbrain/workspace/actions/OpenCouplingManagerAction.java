@@ -24,7 +24,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.DesktopCouplingManager;
+import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**

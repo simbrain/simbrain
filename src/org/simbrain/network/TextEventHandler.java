@@ -19,6 +19,8 @@
 package org.simbrain.network;
 
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 
 import org.simbrain.network.nodes.TextObject;
@@ -32,9 +34,9 @@ import edu.umd.cs.piccolox.event.PStyledTextEventHandler;
 import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
- * Text Event Handeler.
+ * Text Event Handler.
  */
-public class TextEventHandler extends PStyledTextEventHandler {
+public class TextEventHandler extends PStyledTextEventHandler implements ActionListener {
 
     /** Reference to parent network. */
     private NetworkPanel net;
@@ -114,6 +116,12 @@ public class TextEventHandler extends PStyledTextEventHandler {
 
             return (editMode.isText() && super.acceptsEvent(event, type));
         }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

@@ -132,15 +132,16 @@ abstract class AbstractSensorNode
         StringBuffer sb = new StringBuffer();
         sb.append("Sensor");
         sb.append("\n  Filter:  ");
-        sb.append(sensor.getFilter().toString());
+        sb.append(sensor.getFilter().getDescription());
         sb.append("\n  Receptive field:  ");
         sb.append(sensor.getReceptiveField().getWidth());
         sb.append("x");
         sb.append(sensor.getReceptiveField().getHeight());
         sb.append("\n  Location:  (");
         sb.append(sensor.getReceptiveField().getX());
-        sb.append(")");
+        sb.append(", ");
         sb.append(sensor.getReceptiveField().getY());
+        sb.append(")");
         sb.append("\n  Value: " + sensor.getLastSample());
         sb.append("\n");
         return sb.toString();

@@ -188,7 +188,7 @@ public final class EditSensorsDialog
 
         SortedSet<String> filterNames = new TreeSet<String>();
         for (Sensor sensor : sensors) {
-            filterNames.add(sensor.getFilter().toString());
+            filterNames.add(sensor.getFilter().getDescription());
         }
         boolean addNewLine = false;
         for (String filterName : filterNames) {

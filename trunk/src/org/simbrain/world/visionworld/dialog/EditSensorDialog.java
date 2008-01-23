@@ -209,7 +209,7 @@ public final class EditSensorDialog
         c.insets = FIELD_INSETS;
         c.gridx = 1;
         c.weightx = 0.66f;
-        panel.add(new JLabel(sensor.getFilter().toString()), c);
+        panel.add(new JLabel(sensor.getFilter().getDescription()), c);
 
         c.gridwidth = GridBagConstraints.RELATIVE;
         c.insets = LABEL_INSETS;

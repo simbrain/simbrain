@@ -1,6 +1,7 @@
 package org.simbrain.plot;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -8,10 +9,11 @@ import javax.swing.JMenuItem;
 
 import org.jfree.data.xy.XYSeries;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
@@ -37,6 +39,32 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
         variable = new Variable(this);
     }
 
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        // TODO omit fields
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PlotComponent open(final InputStream input) {
+        return (PlotComponent) getXStream().fromXML(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
+    }
+    
     XYSeries getSeries() {
         return series;
     }
@@ -49,20 +77,9 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     }
 
     @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean isChangedSinceLastSave() {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -84,11 +101,6 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
      */
     public Collection<? extends Consumer> getConsumers() {
         return Collections.singleton(variable);
-    }
-
-    @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
     }
 
     @Override

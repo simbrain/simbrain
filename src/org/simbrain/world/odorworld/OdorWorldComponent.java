@@ -18,13 +18,18 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.dataworld.DataWorldComponent;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
@@ -42,14 +47,35 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     }
 
     /**
-     * Read a world.
-     *
-     * @param theFile the wld file containing world information
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
      */
-    public void open(final File theFile) {
-        // TODO implement
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.setMode(XStream.ID_REFERENCES);
+        xstream.omitField(OdorWorldEntity.class, "theImage");
+        xstream.omitField(OdorWorldAgent.class, "effectorList");
+        xstream.omitField(OdorWorldAgent.class, "sensorList");
+        xstream.omitField(OdorWorld.class, "couplings");
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OdorWorldComponent open(final InputStream input) {
+        return (OdorWorldComponent) getXStream().fromXML(input);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
+    }
+    
     OdorWorld getWorld() {
         return world;
     }
@@ -68,24 +94,15 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 //        return xstream;
 //    }
 
-    /**
-     * Save a specified file  Called by "save".
-     *
-     * @param theFile the file to save to
-     */
-    public void save(final File theFile) {
-     // TODO implement
-    }
-
     @Override
     public void close() {
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public String getFileExtension() {
-        return "wld";
-    }
+//    @Override
+//    public String getFileExtension() {
+//        return "wld";
+//    }
     
     @Override
     public List<? extends Consumer> getConsumers() {

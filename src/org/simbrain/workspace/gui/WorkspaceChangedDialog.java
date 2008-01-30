@@ -113,7 +113,8 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         for (WorkspaceComponent<?> component : desktop.getWorkspace().getComponentList()) {
             if (component.isChangedSinceLastSave()) {
                 JCheckBox checker = new JCheckBox();
-                panel.addItem(component.getName() + "." + component.getFileExtension(), checker);
+                // TODO
+//                panel.addItem(component.getName() + "." + component.getFileExtension(), checker);
                 checkBoxList.add(i++, checker);
             }
         }
@@ -147,7 +148,8 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         int i = 0;
         for (JCheckBox checkBox : checkBoxList) {
             if (checkBox.isSelected()) {
-                workspace.getComponentList().get(i).save();
+                // TODO call save dialog
+//                workspace.getComponentList().get(i).save();
             }
             i++;
         }

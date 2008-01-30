@@ -18,10 +18,12 @@
  */
 package org.simbrain.workspace;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -63,24 +65,31 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * Used when saving a workspace.  All changed workspace components are saved using
      * this method.
      *
-     * @param saveFile the file to save.
+     * @param output the stream of data to write the data to.
      */
-    public abstract void save(File saveFile);
+    public abstract void save(OutputStream output);
 
     /**
      * When workspaces are opened, a path to a file is passed in.
      * So, all components which can be saved should have this.
      *
-     * @param openFile file representing saved component.
+     * @param input stream of data representing saved component.
+     * 
+     * @return The new instance.
      */
-    public abstract void open(File openFile);
+    public abstract WorkspaceComponent<?> open(InputStream input);
 
     /**
-     * The file extension for a component type, e.g. ".net".
-     *
-     * @return the file extension
+     * Returns a list of the formats that this component supports.
+     * 
+     * <p>The default behavior is to return an empty list.  This means
+     * that there is one format.
+     * 
+     * @return a list of the formats that this component supports.
      */
-    public abstract String getFileExtension();
+    public List<? extends String> getFormats() {
+        return Collections.emptyList();
+    }
 
     /**
      * Perform cleanup after closing.
@@ -147,14 +156,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public void removeListener(final E listener) {
         listeners.add(listener);
     }
-    
-    /**
-     * Save vs. save-as.  Saves the currentfile.
-     */
-    public void save() {
-        //TODO
-//        save(currentFile);
-    }
 
     /**
      * Returns the name of this component.
@@ -179,10 +180,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public void setName(final String name) {
         this.name = name;
     }
-
-//    public void accceptProducers(final ArrayList<Producer> list) {
-//
-//    }
 
     /**
      * @param changedSinceLastSave the changedSinceLastSave to set

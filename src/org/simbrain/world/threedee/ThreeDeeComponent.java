@@ -1,6 +1,7 @@
 package org.simbrain.world.threedee;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +16,9 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.world.threedee.environment.Environment;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * A representing a 3D world in a workspace.
@@ -40,6 +44,32 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public ThreeDeeComponent(final String name) {
         super(name);
+    }
+    
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        // omit fields
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ThreeDeeComponent open(final InputStream input) {
+        return (ThreeDeeComponent) getXStream().fromXML(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
     }
     
     /**
@@ -85,32 +115,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * {@inheritDoc}
      */
     @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void open(final File openFile) {
-        // TODO Auto-generated method stub
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void close() {
-        // TODO Auto-generated method stub
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void save(final File saveFile) {
         // TODO Auto-generated method stub
     }
     

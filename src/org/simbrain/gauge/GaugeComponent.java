@@ -18,18 +18,24 @@
  */
 package org.simbrain.gauge;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.core.Variable;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also
@@ -67,14 +73,14 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-//    private XStream getXStream() {
-//        XStream xstream = new XStream(new DomDriver());
-//        xstream.omitField(Projector.class, "logger");
-//        xstream.omitField(Dataset.class, "logger");
-//        xstream.omitField(Dataset.class, "distances");
-//        xstream.omitField(Dataset.class, "dataset");
-//        return xstream;
-//    }
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(Projector.class, "logger");
+        xstream.omitField(Dataset.class, "logger");
+        xstream.omitField(Dataset.class, "distances");
+        xstream.omitField(Dataset.class, "dataset");
+        return xstream;
+    }
 
     /**
      * Update couplings.
@@ -148,26 +154,15 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
      * {@inheritDoc}
      */
     @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
+    public GaugeComponent open(final InputStream input) {
+        return (GaugeComponent) getXStream().fromXML(input);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void open(final File openFile) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void save(final File saveFile) {
-        // TODO Auto-generated method stub
-        
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
     }
 }

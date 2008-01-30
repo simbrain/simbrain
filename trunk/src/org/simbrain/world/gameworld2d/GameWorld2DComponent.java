@@ -1,10 +1,15 @@
 package org.simbrain.world.gameworld2d;
 
 import java.awt.Dimension;
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.dataworld.DataWorldComponent;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
@@ -22,6 +27,32 @@ public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentL
         world.initEngineApplet(30,30,10,10,null,null,null);
         world.setPreferredSize(new Dimension(450,400));
     }
+    
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        // TODO omit fields
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DataWorldComponent open(final InputStream input) {
+        return (DataWorldComponent) getXStream().fromXML(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
+    }
 
     /**
      * @return Returns the world.
@@ -30,32 +61,8 @@ public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentL
         return world;
     }
 
-//    /**
-//     * @param world The world to set.
-//     */
-//    public void setWorld(GameWorld2D world) {
-//        this.world = world;
-//    }
-
     @Override
     public void close() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void open(File openFile) {
         // TODO Auto-generated method stub
     }
 
@@ -63,11 +70,4 @@ public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentL
     public void update() {
         
     }
-
-//
-//    public CouplingContainer getCouplingContainer() {
-//        return this;
-//    }
-
-
 }

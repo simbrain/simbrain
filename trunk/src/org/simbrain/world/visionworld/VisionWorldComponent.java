@@ -18,7 +18,8 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,9 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Vision world frame.
@@ -48,18 +52,34 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
 
     }
 
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        // omit fields
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public VisionWorldComponent open(final InputStream input) {
+        return (VisionWorldComponent) getXStream().fromXML(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
+    }
+    
     @Override
     public void close() {
-        // empty
-    }
-
-    @Override
-    public String getFileExtension() {
-        return null;
-    }
-
-    @Override
-    public void save(final File saveFile) {
         // empty
     }
 
@@ -95,11 +115,6 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
                 sensor.sample(pixelMatrix);
             }
         }
-    }
-
-    @Override
-    public void open(File openFile) {
-        // empty
     }
 
     public VisionWorld getVisionWorld() {

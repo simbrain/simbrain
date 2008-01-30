@@ -18,7 +18,8 @@
  */
 package org.simbrain.world.dataworld;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +30,9 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -57,6 +61,35 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         super(name);
     }
 
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+//        xstream.omitField(TableModel.class, "consumers");
+//        xstream.omitField(TableModel.class, "producers");
+//        xstream.omitField(TableModel.class, "couplingList");
+//        xstream.omitField(TableModel.class, "model");
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DataWorldComponent open(final InputStream input) {
+        return (DataWorldComponent) getXStream().fromXML(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
+    }
+    
     @SuppressWarnings("unchecked")
     void wireCouplings(Collection<? extends Producer> producers) {
         /* Handle Coupling wire-up */
@@ -73,15 +106,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     }
 
     /**
-     * Read a world from a world-xml file.
-     *
-     * @param theFile the xml file containing world information
-     */
-    public void open(final File theFile) {
-        // TODO implement
-    }
-
-    /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
@@ -94,22 +118,13 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 //        return xstream;
 //    }
 
-    /**
-     * Save a specified file.
-     *
-     * @param worldFile File to save world
-     */
-    public void save(final File worldFile) {
-     // TODO implement
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getFileExtension() {
-       return "xml";
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public String getFileExtension() {
+//       return "xml";
+//    }
 
 //    @Override
 //    public void setCurrentDirectory(final String currentDirectory) {

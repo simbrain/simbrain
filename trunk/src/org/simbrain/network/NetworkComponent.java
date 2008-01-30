@@ -18,14 +18,18 @@
  */
 package org.simbrain.network;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simnet.interfaces.RootNetwork;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Network frame.
@@ -41,19 +45,34 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
         super(name);
     }
 
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        // TODO omit fields
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NetworkComponent open(final InputStream input) {
+        return (NetworkComponent) getXStream().fromXML(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
+    }
+    
     RootNetwork getRootNetwork() {
         return rootNetwork;
-    }
-
-    @Override
-    public void save(File saveFile) {
-//        networkPanel.saveNetwork(saveFile);
-    }
-
-    @Override
-    public void open(File openFile) {
-//        this.setName(openFile.getName());
-//        this.getNetworkPanel().openNetwork(openFile);
     }
 
     @Override
@@ -64,11 +83,6 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     @Override
     public void close() {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String getFileExtension() {
-        return "net";
     }
     
     @Override

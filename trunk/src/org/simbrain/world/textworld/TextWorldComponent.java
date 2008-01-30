@@ -18,13 +18,17 @@
  */
 package org.simbrain.world.textworld;
 
-import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>TextWorldComponent</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
@@ -39,19 +43,34 @@ public class TextWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         super(name);
     }
 
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        // omit fields
+        return xstream;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TextWorldComponent open(final InputStream input) {
+        return (TextWorldComponent) getXStream().fromXML(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output) {
+        getXStream().toXML(output);
+    }
+    
     @Override
     public void close() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void save(File saveFile) {
         // TODO Auto-generated method stub
     }
 
@@ -63,11 +82,6 @@ public class TextWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public List<Producer> getProducers() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
     }
 
     @Override

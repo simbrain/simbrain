@@ -242,7 +242,7 @@ public class SimbrainDesktop {
 
         /* World menu button. */
         JButton button = new JButton();
-        button.setIcon(ResourceManager.getImageIcon("World.gif"));
+        button.setIcon(ResourceManager.getImageIcon("World.png"));
         final JPopupMenu worldMenu = new JPopupMenu();
         for (Action action : actionManager.getNewWorldActions()) {
             worldMenu.add(action);

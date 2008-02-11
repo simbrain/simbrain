@@ -22,6 +22,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -145,21 +147,30 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
     private void doSaves() {
         Workspace workspace = desktop.getWorkspace();
         
-        int i = 0;
-        for (JCheckBox checkBox : checkBoxList) {
-            if (checkBox.isSelected()) {
-                // TODO call save dialog
-//                workspace.getComponentList().get(i).save();
-            }
-            i++;
+        WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
+        
+        try {
+            serializer.serialize(new FileOutputStream("workspace.zip"));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        if (workspaceChecker.isSelected()) {
-            if (workspace.getCurrentFile() != null) {
-                new WorkspaceSerializer(workspace).writeWorkspace(workspace.getCurrentFile());
-            } else {
-                desktop.saveWorkspace();
-            }
-        }
+        
+//        int i = 0;
+//        for (JCheckBox checkBox : checkBoxList) {
+//            if (checkBox.isSelected()) {
+//                // TODO call save dialog
+////                workspace.getComponentList().get(i).save();
+//            }
+//            i++;
+//        }
+//        if (workspaceChecker.isSelected()) {
+//            if (workspace.getCurrentFile() != null) {
+//                new WorkspaceSerializer(workspace).writeWorkspace(workspace.getCurrentFile());
+//            } else {
+//                desktop.saveWorkspace();
+//            }
+//        }
     }
 
     /**

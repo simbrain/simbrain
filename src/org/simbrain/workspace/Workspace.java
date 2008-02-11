@@ -76,6 +76,12 @@ public class Workspace {
         listeners.remove(listener);
     }
 
+    private boolean fireEvents = true;
+    
+    void toggleEvents(boolean on) {
+        this.fireEvents = on;
+    }
+    
     /**
      * Adds a workspace component to the workspace.
      * 
@@ -87,8 +93,10 @@ public class Workspace {
         component.setWorkspace(this);
         workspaceChanged = true;
         
-        for (WorkspaceListener listener : listeners) {
-            listener.componentAdded(component);
+        if (fireEvents) {
+            for (WorkspaceListener listener : listeners) {
+                listener.componentAdded(component);
+            }
         }
     }
     

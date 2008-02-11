@@ -7,6 +7,9 @@ import java.util.List;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 public class DataModel<E> {
 
     /** Default initial number of rows. */
@@ -16,7 +19,7 @@ public class DataModel<E> {
     private static final int DEFAULT_COLUMN_COUNT = 5;
 
     /** The data. */
-    private List<List<E>> data = new ArrayList<List<E>>();
+    private List<List<E>> rowData = new ArrayList<List<E>>();
 
     /** Number of columns. */
     private int width = DEFAULT_COLUMN_COUNT;
@@ -38,32 +41,73 @@ public class DataModel<E> {
 
     private int currentRow = 0;
 
-    private List<Listener> listeners = new ArrayList<Listener>();
+    private List<Listener> listeners;
 
+    boolean initialized = false;
+    
     /** List of consumers. */
-    private ArrayList<Consumer> consumers = new ArrayList<Consumer>();
+    private ArrayList<Consumer> consumers;
 
     /** List of producers. */
-    private ArrayList<Producer> producers = new ArrayList<Producer>();
+    private ArrayList<Producer> producers;
 
     /** The parent component of this model. */
-    private final DataWorldComponent parent;
+    private DataWorldComponent parent;
     
     DataModel(DataWorldComponent parent) {
         this.parent = parent;
-        
+
         for (int i = 0; i < height; i++) {
-            data.add((List<E>) newRow());
+            rowData.add((List<E>) newRow());
         }
+        
+//        for (int i = 0; i < width; i++) {
+//            consumers.add(new ConsumingColumn<E>(this, i));
+//            producers.add(new ProducingColumn<E>(this, i));
+//        }
+        
+        init();
+    }
+
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        
+        xstream.omitField(DataModel.class, "consumers");
+        xstream.omitField(DataModel.class, "producers");
+        xstream.omitField(DataModel.class, "listeners");
+        xstream.omitField(DataModel.class, "parent");
+        xstream.omitField(DataModel.class, "initialized");
+        
+        return xstream;
+    }
+    
+    private Object readResolve() {
+        init();
+        initialized = true;
+        return this;
+    }
+    
+    private void init() {
+        listeners = new ArrayList<Listener>();
+        consumers = new ArrayList<Consumer>();
+        producers = new ArrayList<Producer>();
         
         for (int i = 0; i < width; i++) {
             consumers.add(new ConsumingColumn<E>(this, i));
             producers.add(new ProducingColumn<E>(this, i));
         }
     }
-
+    
     public DataWorldComponent getParent() {
         return parent;
+    }
+    
+    void setParent(DataWorldComponent parent) {
+        this.parent = parent;
     }
     
     public void addListener(Listener listener) {
@@ -92,12 +136,12 @@ public class DataModel<E> {
     }
 
     public void set(int row, int column, E value) {
-        data.get(row).set(column, value);
+        rowData.get(row).set(column, value);
         for (Listener listener : listeners) listener.itemChanged(row, column);
     }
 
     public E get(int row, int column) {
-        return data.get(row).get(column);
+        return rowData.get(row).get(column);
     }
 
     public void set(int column, E value) {
@@ -172,52 +216,52 @@ public class DataModel<E> {
 
     public void addNewRow() {
         height++;
-        data.add(newRow());
+        rowData.add(newRow());
         for (Listener listener : listeners) listener.rowAdded(height - 1);
     }
 
     public void insertNewRow(int at) {
         height++;
-        data.add(at, newRow());
+        rowData.add(at, newRow());
         for (Listener listener : listeners) listener.rowAdded(at);
     }
     
     public void addNewColumn() {
         width++;
-        for (List<E> row : data) row.add(null);
+        for (List<E> row : rowData) row.add(null);
         consumers.add(new ConsumingColumn<E>(this, width - 1));
         for (Listener listener : listeners) listener.columnAdded(width - 1);
     }
 
     public void insertNewColumn(int at) {
         width++;
-        for (List<E> row : data) row.add(at, null);
+        for (List<E> row : rowData) row.add(at, null);
         consumers.add(new ConsumingColumn<E>(this, at));
         for (Listener listener : listeners) listener.columnAdded(at);
     }
 
     public void removeLastRow() {
         height--;
-        data.remove(height);
+        rowData.remove(height);
         for (Listener listener : listeners) listener.rowRemoved(height);
     }
     
     public void removeRow(int at) {
         height--;
-        data.remove(at);
+        rowData.remove(at);
         for (Listener listener : listeners) listener.rowRemoved(at);
     }
     
     public void removeLastColumn() {
         width--;
-        for (List<E> row : data) row.remove(width);
+        for (List<E> row : rowData) row.remove(width);
         consumers.add(new ConsumingColumn<E>(this, width));
         for (Listener listener : listeners) listener.columnRemoved(width);
     }
     
     public void removeColumn(int at) {
         width--;
-        for (List<E> row : data) row.remove(at);
+        for (List<E> row : rowData) row.remove(at);
         consumers.add(new ConsumingColumn<E>(this, at));
         for (Listener listener : listeners) listener.columnRemoved(at);
     }
@@ -230,11 +274,18 @@ public class DataModel<E> {
         return height;
     }
     
+    public void initValues(E value) {
+        if (!initialized) {
+            fill(value);
+            initialized = true;
+        }
+    }
+    
     /**
      * Fills the table with the given value.
      */
     public void fill(E value) {
-        for (List<E> row : data) {
+        for (List<E> row : rowData) {
             Collections.fill(row, value);
         }
     }
@@ -243,7 +294,7 @@ public class DataModel<E> {
      * Same as fill, but only fills the last column.
      */
     public void fillNew(E value) {
-        for (List<E> row : data) {
+        for (List<E> row : rowData) {
             row.set(width - 1, value);
         }
     }

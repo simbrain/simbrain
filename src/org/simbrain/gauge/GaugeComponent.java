@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.simbrain.console.ConsoleComponent;
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Projector;
@@ -73,7 +74,7 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
+    private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         xstream.omitField(Projector.class, "logger");
         xstream.omitField(Dataset.class, "logger");
@@ -150,11 +151,7 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
         
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GaugeComponent open(final InputStream input) {
+    public static GaugeComponent open(InputStream input, final String name, final String format) {
         return (GaugeComponent) getXStream().fromXML(input);
     }
 
@@ -162,7 +159,7 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
      * {@inheritDoc}
      */
     @Override
-    public void save(final OutputStream output) {
+    public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
 }

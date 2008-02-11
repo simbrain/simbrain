@@ -110,7 +110,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         super(component);
         component.addListener(new BasicComponentListener());
         world = new DataWorld(this, component.getDataModel());
-        component.getDataModel().fill(new Double(0));
+        component.getDataModel().initValues(new Double(0));
         checkIterationMode();
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add("Center", worldScroller);

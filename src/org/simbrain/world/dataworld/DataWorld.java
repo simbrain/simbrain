@@ -116,6 +116,11 @@ public class DataWorld extends JPanel {
         table.setRowSelectionAllowed(true);
     }
 
+    private void init()
+    {
+        
+    }
+    
     private ActionListener addRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             if (getSelectedPoint().x < (getTable().getRowHeight() * getTable().getRowCount())) {

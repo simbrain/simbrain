@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -49,17 +50,13 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
+    private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         // TODO omit fields
         return xstream;
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NetworkComponent open(final InputStream input) {
+    public static NetworkComponent open(InputStream input, final String name, final String format) {
         return (NetworkComponent) getXStream().fromXML(input);
     }
 
@@ -67,7 +64,7 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
      * {@inheritDoc}
      */
     @Override
-    public void save(final OutputStream output) {
+    public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
     

@@ -15,6 +15,7 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.textworld.TextWorldComponent;
 import org.simbrain.world.threedee.environment.Environment;
 
 import com.thoughtworks.xstream.XStream;
@@ -50,17 +51,21 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
+    private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         // omit fields
         return xstream;
     }
     
     /**
-     * {@inheritDoc}
+     * Recreates an instance of this class from a saved component.
+     * 
+     * @param input
+     * @param name
+     * @param format
+     * @return
      */
-    @Override
-    public ThreeDeeComponent open(final InputStream input) {
+    public static ThreeDeeComponent open(InputStream input, String name, String format) {
         return (ThreeDeeComponent) getXStream().fromXML(input);
     }
 
@@ -68,7 +73,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * {@inheritDoc}
      */
     @Override
-    public void save(final OutputStream output) {
+    public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
     

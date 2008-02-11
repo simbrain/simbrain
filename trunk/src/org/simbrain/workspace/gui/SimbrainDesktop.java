@@ -16,6 +16,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashMap;
@@ -98,6 +101,8 @@ public class SimbrainDesktop {
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
+    private static final Map<Workspace, SimbrainDesktop> INSTANCES = new HashMap<Workspace, SimbrainDesktop>();
+    
     /** Desktop pane. */
     private JDesktopPane desktop;
 
@@ -138,12 +143,18 @@ public class SimbrainDesktop {
     private Map<WorkspaceComponent<?>, DesktopComponent<?>> components
         = new LinkedHashMap<WorkspaceComponent<?>, DesktopComponent<?>>();
     
+    // TODO this should be addressed at a higher level
+    public static SimbrainDesktop getDesktop(Workspace workspace) {
+        return INSTANCES.get(workspace);
+    }
+    
     /**
      * Default constructor.
      * 
      * @param workspace The workspace for this desktop.
      */
     public SimbrainDesktop(final Workspace workspace) {
+        INSTANCES.put(workspace, this);
         this.workspace = workspace;
         this.workspaceSerializer = new WorkspaceSerializer(workspace);
         frame = new JFrame("Simbrain");
@@ -475,34 +486,8 @@ public class SimbrainDesktop {
             /* set this as the parent desktop for the desktop component */
             component.setDesktop(SimbrainDesktop.this);
             
-            /* HANDLE COMPONENT BOUNDS */
+            addComponent(workspaceComponent, component);
             
-            if (lastClickedPoint != null) {
-                component.setBounds((int) lastClickedPoint.getX(),
-                    (int) lastClickedPoint.getY(),
-                    (int) component.getPreferredSize().getWidth(),
-                    (int) component.getPreferredSize().getHeight());
-                guiChanged = true;
-            } else if (components.size() == 0) {
-                component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
-                    (int) component.getPreferredSize().getWidth(),
-                    (int) component.getPreferredSize().getHeight());
-                guiChanged = true;
-            } else {
-                DesktopComponent<?> dc = null;
-                
-                for (DesktopComponent<?> next : components.values()) {
-                    dc = next;
-                }
-                
-                int lastX = dc.getX();
-                int lastY = dc.getY();
-                component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
-                    (int) component.getPreferredSize().getWidth(),
-                    (int) component.getPreferredSize().getHeight());
-                guiChanged = true;
-            }
-
             /* HANDLE COMPONENT NAMING */
             
             /*
@@ -523,17 +508,12 @@ public class SimbrainDesktop {
 
             /* FINISH ADDING COMPONENT */
 
-            components.put(workspaceComponent, component);
-            desktop.add(component);
-            component.setVisible(true);
-
             try {
                 component.setSelected(true);
             } catch (java.beans.PropertyVetoException e) {
                 System.out.print(e.getStackTrace());
             }
 
-            component.addComponentListener(componentListener);
             lastClickedPoint = null;
             component.postAddInit();
         }
@@ -548,33 +528,67 @@ public class SimbrainDesktop {
     };
     
     /**
+     * Add a new <c>SimbrainComponent</c>.
+     *
+     * @param component
+     */
+    @SuppressWarnings("unchecked")
+    public void addComponent(final WorkspaceComponent workspaceComponent,
+            final DesktopComponent component) {
+        /* set this as the parent desktop for the desktop component */
+        component.setDesktop(SimbrainDesktop.this);
+
+        /* HANDLE COMPONENT NAMING */
+        
+        // TODO component name comes from component
+
+        /* FINISH ADDING COMPONENT */
+
+        components.put(workspaceComponent, component);
+        desktop.add(component);
+        component.setVisible(true);
+
+        component.addComponentListener(componentListener);
+//        lastClickedPoint = null;
+//        component.postAddInit();
+    }
+    
+    /**
      * Shows the dialog for opening a workspace file.
      */
     public void openWorkspace() {
 
-        if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+//        if (changesExist()) {
+//            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+//
+//            if (theDialog.hasUserCancelled()) {
+//                return;
+//            }
+//        }
+//        // TODO ?
+////        workspaceChanged = false;
+//
+//        String currentDirectory = WorkspacePreferences.getCurrentDirectory();
+//        
+//        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
+//        File simFile = simulationChooser.showOpenDialog();
+//
+//        if (simFile != null) {
+//            workspaceSerializer.readWorkspace(simFile, false);
+//            currentFile = simFile;
+//            currentDirectory = simulationChooser.getCurrentLocation();
+//            WorkspacePreferences.setCurrentDirectory(currentDirectory);
+//            WorkspacePreferences.setDefaultFile(currentFile.toString());
+//        }
 
-            if (theDialog.hasUserCancelled()) {
-                return;
-            }
-        }
-        // TODO ?
-//        workspaceChanged = false;
-
-        String currentDirectory = WorkspacePreferences.getCurrentDirectory();
         
-        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
-        File simFile = simulationChooser.showOpenDialog();
-
-        if (simFile != null) {
-            workspaceSerializer.readWorkspace(simFile, false);
-            currentFile = simFile;
-            currentDirectory = simulationChooser.getCurrentLocation();
-            WorkspacePreferences.setCurrentDirectory(currentDirectory);
-            WorkspacePreferences.setDefaultFile(currentFile.toString());
+        WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
+        
+        try {
+            serializer.deserialize(new FileInputStream("workspace.zip"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
     /**

@@ -28,6 +28,7 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.dataworld.DataWorldComponent;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -56,17 +57,21 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
+    private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         // omit fields
         return xstream;
     }
     
     /**
-     * {@inheritDoc}
+     * Recreates an instance of this class from a saved component.
+     * 
+     * @param input
+     * @param name
+     * @param format
+     * @return
      */
-    @Override
-    public VisionWorldComponent open(final InputStream input) {
+    public static VisionWorldComponent open(InputStream input, String name, String format) {
         return (VisionWorldComponent) getXStream().fromXML(input);
     }
 
@@ -74,7 +79,7 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
      * {@inheritDoc}
      */
     @Override
-    public void save(final OutputStream output) {
+    public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
     

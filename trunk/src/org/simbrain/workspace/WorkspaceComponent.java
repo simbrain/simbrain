@@ -67,7 +67,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      *
      * @param output the stream of data to write the data to.
      */
-    public abstract void save(OutputStream output);
+    public abstract void save(OutputStream output, String format);
 
     /**
      * When workspaces are opened, a path to a file is passed in.
@@ -77,7 +77,9 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * 
      * @return The new instance.
      */
-    public abstract WorkspaceComponent<?> open(InputStream input);
+//    public static WorkspaceComponent<?> open(InputStream input, String name, String format) {
+//        
+//    }
 
     /**
      * Returns a list of the formats that this component supports.

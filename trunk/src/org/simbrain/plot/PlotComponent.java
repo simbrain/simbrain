@@ -8,6 +8,7 @@ import java.util.Collections;
 import javax.swing.JMenuItem;
 
 import org.jfree.data.xy.XYSeries;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
@@ -43,17 +44,13 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
+    private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         // TODO omit fields
         return xstream;
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PlotComponent open(final InputStream input) {
+    public static PlotComponent open(InputStream input, final String name, final String format) {
         return (PlotComponent) getXStream().fromXML(input);
     }
 
@@ -61,7 +58,7 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
      * {@inheritDoc}
      */
     @Override
-    public void save(final OutputStream output) {
+    public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
     

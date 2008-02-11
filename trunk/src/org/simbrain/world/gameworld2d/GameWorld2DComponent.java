@@ -32,25 +32,29 @@ public class GameWorld2DComponent extends WorkspaceComponent<WorkspaceComponentL
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
-    private XStream getXStream() {
+    private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         // TODO omit fields
         return xstream;
     }
     
     /**
-     * {@inheritDoc}
+     * Recreates an instance of this class from a saved component.
+     * 
+     * @param input
+     * @param name
+     * @param format
+     * @return
      */
-    @Override
-    public DataWorldComponent open(final InputStream input) {
-        return (DataWorldComponent) getXStream().fromXML(input);
+    public static GameWorld2DComponent open(InputStream input, String name, String format) {
+        return (GameWorld2DComponent) getXStream().fromXML(input);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void save(final OutputStream output) {
+    public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
 

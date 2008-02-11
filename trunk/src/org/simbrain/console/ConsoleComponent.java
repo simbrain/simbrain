@@ -20,6 +20,8 @@ package org.simbrain.console;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.swing.JInternalFrame;
 
@@ -49,20 +51,13 @@ public class ConsoleComponent extends  WorkspaceComponent<WorkspaceComponentList
         
     }
 
-    @Override
-    public String getFileExtension() {
+    public static ConsoleComponent open(InputStream input, final String name, final String format) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void save(File saveFile) {
+    public void save(OutputStream output, final String format) {
         // TODO Auto-generated method stub
         
     }

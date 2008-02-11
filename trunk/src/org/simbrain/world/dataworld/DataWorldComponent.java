@@ -18,7 +18,10 @@
  */
 package org.simbrain.world.dataworld;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
@@ -39,11 +42,11 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
     
-    /** The stastic logger for this class. */
+    /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private final DataModel<Double> dataModel = new DataModel<Double>(this);
+    private final DataModel<Double> dataModel;
 
     /**
      * Returns the data model for this component.
@@ -57,41 +60,55 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     /**
      * This method is the default constructor.
      */
-    public DataWorldComponent(String name) {
+    public DataWorldComponent(final String name) {
         super(name);
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    private XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-//        xstream.omitField(TableModel.class, "consumers");
-//        xstream.omitField(TableModel.class, "producers");
-//        xstream.omitField(TableModel.class, "couplingList");
-//        xstream.omitField(TableModel.class, "model");
-        return xstream;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DataWorldComponent open(final InputStream input) {
-        return (DataWorldComponent) getXStream().fromXML(input);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void save(final OutputStream output) {
-        getXStream().toXML(output);
+        dataModel = new DataModel<Double>(this);
     }
     
     @SuppressWarnings("unchecked")
-    void wireCouplings(Collection<? extends Producer> producers) {
+    private DataWorldComponent(final String name, final DataModel<?> dataModel) {
+        super(name);
+        this.dataModel = (DataModel<Double>) dataModel;
+        this.dataModel.setParent(this);
+    }
+    
+    /**
+     * Recreates an instance of this class from a saved component.
+     * 
+     * @param input
+     * @param name
+     * @param format
+     * @return
+     */
+    public static DataWorldComponent open(InputStream input, String name, String format) {
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+//        
+//        try {
+//            for (String line; (line = reader.readLine()) != null;) {
+//                System.out.println(line);
+//            }
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+        
+        DataModel<?> model = (DataModel<?>) DataModel.getXStream().fromXML(input);
+        
+        System.out.println("model: " + model);
+        
+        return new DataWorldComponent(name,  model);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(final OutputStream output, final String format) {
+        DataModel.getXStream().toXML(dataModel, output);
+    }
+    
+    @SuppressWarnings("unchecked")
+    void wireCouplings(final Collection<? extends Producer> producers) {
         /* Handle Coupling wire-up */
         LOGGER.debug("wiring " + producers.size() + " producers");
 
@@ -99,32 +116,12 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 
         for (Consumer consumer : getConsumers()) {
             if (producerIterator.hasNext()) {
-                Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                Coupling<?> coupling = new Coupling(producerIterator.next()
+                    .getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
                 getWorkspace().addCoupling(coupling);
             }
         }
     }
-
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-//    private XStream getXStream() {
-//        XStream xstream = new XStream(new DomDriver());
-//        xstream.omitField(TableModel.class, "consumers");
-//        xstream.omitField(TableModel.class, "producers");
-//        xstream.omitField(TableModel.class, "couplingList");
-//        xstream.omitField(TableModel.class, "model");
-//        return xstream;
-//    }
-
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public String getFileExtension() {
-//       return "xml";
-//    }
 
 //    @Override
 //    public void setCurrentDirectory(final String currentDirectory) {

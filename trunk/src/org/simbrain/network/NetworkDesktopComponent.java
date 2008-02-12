@@ -85,6 +85,11 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         setJMenuBar(menuBar);
     }
 
+    public void postAddInit() {
+        setSize(450, 400);
+        setVisible(true);
+    }
+    
     /**
      * Return the network panel for this network frame.
      *

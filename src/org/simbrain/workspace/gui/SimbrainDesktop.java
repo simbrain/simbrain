@@ -253,7 +253,7 @@ public class SimbrainDesktop {
 
         /* World menu button. */
         JButton button = new JButton();
-        button.setIcon(ResourceManager.getImageIcon("World.png"));
+        button.setIcon(ResourceManager.getImageIcon("World.gif"));
         final JPopupMenu worldMenu = new JPopupMenu();
         for (Action action : actionManager.getNewWorldActions()) {
             worldMenu.add(action);
@@ -482,14 +482,40 @@ public class SimbrainDesktop {
             LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
             DesktopComponent<?> component = getDesktopComponent(workspaceComponent);
-            
+
             /* set this as the parent desktop for the desktop component */
             component.setDesktop(SimbrainDesktop.this);
-            
-            addComponent(workspaceComponent, component);
-            
+
+            /* HANDLE COMPONENT BOUNDS */
+
+            if (lastClickedPoint != null) {
+                component.setBounds((int) lastClickedPoint.getX(),
+                    (int) lastClickedPoint.getY(),
+                    (int) component.getPreferredSize().getWidth(),
+                    (int) component.getPreferredSize().getHeight());
+                guiChanged = true;
+            } else if (components.size() == 0) {
+                component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
+                    (int) component.getPreferredSize().getWidth(),
+                    (int) component.getPreferredSize().getHeight());
+                guiChanged = true;
+            } else {
+                DesktopComponent<?> dc = null;
+
+                for (DesktopComponent<?> next : components.values()) {
+                    dc = next;
+                }
+
+                int lastX = dc.getX();
+                int lastY = dc.getY();
+                component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
+                    (int) component.getPreferredSize().getWidth(),
+                    (int) component.getPreferredSize().getHeight());
+                guiChanged = true;
+            }
+
             /* HANDLE COMPONENT NAMING */
-            
+
             /*
              * Names take the form (ClassName - "Component") + index, where index
              * iterates as new components are added. e.g. Network 1, Network 2, etc.
@@ -500,7 +526,7 @@ public class SimbrainDesktop {
                 int index = componentNameIndices.get(component.getClass());
                 componentNameIndices.put(component.getClass(), index + 1);
             }
-            
+
             component.setName("" + component.getSimpleName()
                 + componentNameIndices.get(component.getClass()));
             component.setTitle("" + component.getSimpleName() + " "
@@ -508,12 +534,17 @@ public class SimbrainDesktop {
 
             /* FINISH ADDING COMPONENT */
 
+            components.put(workspaceComponent, component);
+            desktop.add(component);
+            component.setVisible(true);
+
             try {
                 component.setSelected(true);
             } catch (java.beans.PropertyVetoException e) {
                 System.out.print(e.getStackTrace());
             }
 
+            component.addComponentListener(componentListener);
             lastClickedPoint = null;
             component.postAddInit();
         }

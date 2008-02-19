@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
@@ -825,8 +826,8 @@ public abstract class Neuron implements Producer, Consumer {
      * 
      * @author Matt Watson
      */
-    private class ActivationAttribute implements ProducingAttribute<Double>,
-            ConsumingAttribute<Double> {
+    private class ActivationAttribute extends AbstractAttribute 
+            implements ProducingAttribute<Double>, ConsumingAttribute<Double> {
         
         /**
          * {@inheritDoc}
@@ -869,7 +870,7 @@ public abstract class Neuron implements Producer, Consumer {
      * 
      * @author Matt Watson
      */
-    private class UpperBoundAttribute implements ProducingAttribute<Double>,
+    private class UpperBoundAttribute extends AbstractAttribute implements ProducingAttribute<Double>,
             ConsumingAttribute<Double> {
         
         /**
@@ -913,7 +914,7 @@ public abstract class Neuron implements Producer, Consumer {
      * 
      * @author Matt Watson
      */
-    private class LowerBoundAttribute implements ProducingAttribute<Double>,
+    private class LowerBoundAttribute extends AbstractAttribute implements ProducingAttribute<Double>,
             ConsumingAttribute<Double> {
         
         /**
@@ -955,7 +956,7 @@ public abstract class Neuron implements Producer, Consumer {
     /**
      * Implements the Target Value attribute.
      */
-    private class TargetValueAttribute implements ProducingAttribute<Double>,
+    private class TargetValueAttribute extends AbstractAttribute implements ProducingAttribute<Double>,
             ConsumingAttribute<Double> {
         
         /**

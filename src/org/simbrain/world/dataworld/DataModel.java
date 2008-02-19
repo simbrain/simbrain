@@ -76,8 +76,8 @@ public class DataModel<E> {
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         
-        xstream.omitField(DataModel.class, "consumers");
-        xstream.omitField(DataModel.class, "producers");
+//        xstream.omitField(DataModel.class, "consumers");
+//        xstream.omitField(DataModel.class, "producers");
         xstream.omitField(DataModel.class, "listeners");
         xstream.omitField(DataModel.class, "parent");
         xstream.omitField(DataModel.class, "initialized");

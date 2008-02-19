@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @param <E> the type that the attribute holds.
  */
-public abstract class SingleAttributeProducer<E> implements Producer, ProducingAttribute<E> {
+public abstract class SingleAttributeProducer<E> extends AbstractAttribute implements Producer, ProducingAttribute<E> {
 
     /**
      * Returns this object.

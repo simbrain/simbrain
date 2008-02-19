@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +37,8 @@ import org.apache.log4j.Logger;
  * component.
  */
 public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
+    private static final Set<String> NAMES = new HashSet<String>();
+    
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(WorkspaceComponent.class);
     
@@ -58,7 +61,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public WorkspaceComponent(final String name) {
         this.name = name;
-        logger.trace(this.getClass().getCanonicalName() + " created");
+        logger.trace(this.getClass().getCanonicalName() + ": " + name + " created");
     }
 
     /**

@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @param <E> the type that the attribute holds.
  */
-public abstract class SingleAttributeConsumer<E> implements Consumer, ConsumingAttribute<E> {
+public abstract class SingleAttributeConsumer<E> extends AbstractAttribute implements Consumer, ConsumingAttribute<E> {
 
     /**
      * Returns this object.

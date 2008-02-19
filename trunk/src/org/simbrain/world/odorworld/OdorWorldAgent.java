@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
@@ -508,7 +509,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         return temp;
     }
     
-    abstract class Sensor implements ProducingAttribute<Double> {
+    abstract class Sensor extends AbstractAttribute implements ProducingAttribute<Double> {
         /** Which dimension of the stimulus to read. */
         private final int stimulusDimension;
 
@@ -610,7 +611,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     /**
      * <b>Effectors</b> represent commands which move an agent around.
      */
-    abstract class Effector implements ConsumingAttribute<Double> {
+    abstract class Effector extends AbstractAttribute implements ConsumingAttribute<Double> {
 
         /** The motor command. Right, Left, etc. */
         private String name;

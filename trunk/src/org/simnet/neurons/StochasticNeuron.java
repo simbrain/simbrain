@@ -20,6 +20,7 @@ package org.simnet.neurons;
 
 import java.lang.reflect.Type;
 
+import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simnet.interfaces.Neuron;
@@ -110,24 +111,25 @@ public class StochasticNeuron extends Neuron {
      * Make firing probability a consuming attribute
      */
     private void addConsumerAttributes() {
-        consumingAttributes().add(new ConsumingAttribute<Double>() {
-
-            public Consumer getParent() {
-                return StochasticNeuron.this;
-            }
-
-            public void setValue(final Double value) {
-                firingProbability = value;
-            }
-
-            public String getAttributeDescription() {
-                return "Firing Probability";
-            }
-
-            public Type getType() {
-                return StochasticNeuron.class;
-            }
-        });
+        consumingAttributes().add(new StochasticConsumingAttribute());
     }
+    
+    private class StochasticConsumingAttribute extends AbstractAttribute
+           implements ConsumingAttribute<Double> {
+        public Consumer getParent() {
+            return StochasticNeuron.this;
+        }
 
+        public void setValue(final Double value) {
+            firingProbability = value;
+        }
+
+        public String getAttributeDescription() {
+            return "Firing Probability";
+        }
+
+        public Type getType() {
+            return StochasticNeuron.class;
+        }
+    }
 }

@@ -150,7 +150,13 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
         
         try {
-            serializer.serialize(new FileOutputStream("workspace.zip"));
+            FileOutputStream ostream = new FileOutputStream("workspace.zip");
+            
+            try {
+                serializer.serialize(ostream);
+            } finally {
+                ostream.close();
+            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

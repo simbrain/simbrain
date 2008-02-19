@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
@@ -110,7 +111,7 @@ class Bindings implements Consumer, Producer {
      *
      * @author Matt Watson
      */
-    private abstract class Binding implements Attribute {
+    private abstract class Binding extends AbstractAttribute {
         /** The description for this Binding. */
         private final String description;
 

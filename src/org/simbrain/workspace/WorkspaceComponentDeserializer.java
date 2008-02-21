@@ -42,7 +42,15 @@ public class WorkspaceComponentDeserializer {
             for (Consumer consumer : component.getConsumers()) {
                 for (Attribute attribute : consumer.getConsumingAttributes()) {
                     int id = attribute.getId();
-                    
+                    System.out.println("consumer: " + id);
+                    if (id >= 0) attributes.put(attribute.getId(), attribute);
+                }
+            }
+            
+            for (Producer producer : component.getProducers()) {
+                for (Attribute attribute : producer.getProducingAttributes()) {
+                    int id = attribute.getId();
+                    System.out.println("producer: " + id);
                     if (id >= 0) attributes.put(attribute.getId(), attribute);
                 }
             }

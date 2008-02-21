@@ -46,10 +46,10 @@ public class DataModel<E> {
     boolean initialized = false;
     
     /** List of consumers. */
-    private ArrayList<Consumer> consumers;
+    private ArrayList<Consumer> consumers = new ArrayList<Consumer>();
 
     /** List of producers. */
-    private ArrayList<Producer> producers;
+    private ArrayList<Producer> producers = new ArrayList<Producer>();
 
     /** The parent component of this model. */
     private DataWorldComponent parent;
@@ -61,10 +61,12 @@ public class DataModel<E> {
             rowData.add((List<E>) newRow());
         }
         
-//        for (int i = 0; i < width; i++) {
-//            consumers.add(new ConsumingColumn<E>(this, i));
-//            producers.add(new ProducingColumn<E>(this, i));
-//        }
+        for (int i = 0; i < width; i++) {
+            consumers.add(new ConsumingColumn<E>(this, i));
+            producers.add(new ProducingColumn<E>(this, i));
+        }
+        
+        listeners = new ArrayList<Listener>();
         
         init();
     }
@@ -76,8 +78,6 @@ public class DataModel<E> {
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         
-//        xstream.omitField(DataModel.class, "consumers");
-//        xstream.omitField(DataModel.class, "producers");
         xstream.omitField(DataModel.class, "listeners");
         xstream.omitField(DataModel.class, "parent");
         xstream.omitField(DataModel.class, "initialized");
@@ -86,20 +86,13 @@ public class DataModel<E> {
     }
     
     private Object readResolve() {
-        init();
+        listeners = new ArrayList<Listener>();
         initialized = true;
         return this;
     }
     
     private void init() {
         listeners = new ArrayList<Listener>();
-        consumers = new ArrayList<Consumer>();
-        producers = new ArrayList<Producer>();
-        
-        for (int i = 0; i < width; i++) {
-            consumers.add(new ConsumingColumn<E>(this, i));
-            producers.add(new ProducingColumn<E>(this, i));
-        }
     }
     
     public DataWorldComponent getParent() {

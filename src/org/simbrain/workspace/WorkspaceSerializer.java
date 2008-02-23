@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -102,7 +103,7 @@ public class WorkspaceSerializer {
         while ((entry = zip.getNextEntry()) != null) {
             byte[] data = entries.get(entry.getName());
             
-            zip.read(data);
+            read(zip, data);
         }
         
         contents = (ArchiveContents) ArchiveContents.xstream().fromXML(
@@ -110,6 +111,12 @@ public class WorkspaceSerializer {
         
         if (contents.components != null) {
             for (ArchiveContents.Component component : contents.components) {
+                FileOutputStream ostream = new FileOutputStream(component.name);
+                
+                ostream.write(entries.get(component.uri));
+                
+                ostream.close();
+                
                 WorkspaceComponent<?> wc = componentDeserializer.deserializeWorkspaceComponent(
                     component.className, new ByteArrayInputStream(
                     entries.get(component.uri)), "name", null);
@@ -125,5 +132,17 @@ public class WorkspaceSerializer {
                     (ConsumingAttribute<?>) componentDeserializer.getAttribute(coupling.target)));
             }
         }
+    }
+    
+    private static void read(InputStream istream, byte[] bytes) throws IOException {
+        int pos = 0;
+        
+        while (pos < bytes.length) {
+            int read = istream.read(bytes, pos, bytes.length - pos);
+            
+            if (read < 0) throw new RuntimeException("premature EOF");
+            
+            pos += read;
+        } 
     }
 }

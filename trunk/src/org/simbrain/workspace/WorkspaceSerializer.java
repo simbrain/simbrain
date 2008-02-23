@@ -111,12 +111,6 @@ public class WorkspaceSerializer {
         
         if (contents.components != null) {
             for (ArchiveContents.Component component : contents.components) {
-                FileOutputStream ostream = new FileOutputStream(component.name);
-                
-                ostream.write(entries.get(component.uri));
-                
-                ostream.close();
-                
                 WorkspaceComponent<?> wc = componentDeserializer.deserializeWorkspaceComponent(
                     component.className, new ByteArrayInputStream(
                     entries.get(component.uri)), "name", null);

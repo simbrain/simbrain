@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.visionworld.VisionWorld;
 
 /**
@@ -45,6 +46,8 @@ public final class PaintViewAction
             throw new IllegalArgumentException("visionWorld must not be null");
         }
         this.visionWorld = visionWorld;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("PaintView.png"));
+        putValue(SHORT_DESCRIPTION, "Paint View");
     }
 
 

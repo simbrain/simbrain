@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.visionworld.VisionWorld;
 
 /**
@@ -44,6 +45,7 @@ public final class NormalViewAction
         if (visionWorld == null) {
             throw new IllegalArgumentException("visionWorld must not be null");
         }
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
         this.visionWorld = visionWorld;
     }
 

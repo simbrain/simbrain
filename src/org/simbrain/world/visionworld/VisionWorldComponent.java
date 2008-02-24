@@ -41,6 +41,7 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
     /** Vision world. */
     private final VisionWorld visionWorld;
 
+
     /**
      * Create a new vision world frame with the specified name.
      *
@@ -87,6 +88,8 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
     public void close() {
         // empty
     }
+     
+
 
     /** {@inheritDoc} */
     public List<Consumer> getConsumers() {

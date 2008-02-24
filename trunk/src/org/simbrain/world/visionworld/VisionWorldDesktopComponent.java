@@ -91,6 +91,11 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         contentPane.add("Center", component.getVisionWorld());
     }
 
+    public void postAddInit() { 
+        setSize(450, 400); 
+        setVisible(true); 
+     } 
+
     @Override
     public void close() {
         // empty

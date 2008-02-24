@@ -3,4 +3,11 @@ help_simbrain() {
    print("Currently there is one system variable: workspace\n");
    print("You can create networks, etc. and run them.  All classes in org.simnet are available.");
    print("");
+	
+  print("---- SOME COMMANDS ----");
+  print("workspace.globalUpdate();");
+  print("workspace.globalRun();");
+  print("workspace.globalStop();");
+  print("getNetwork(NAME).randomizeNeurons()");
+
 }

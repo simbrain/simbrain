@@ -68,7 +68,7 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
         getXStream().toXML(output);
     }
     
-    RootNetwork getRootNetwork() {
+    public RootNetwork getRootNetwork() {
         return rootNetwork;
     }
 

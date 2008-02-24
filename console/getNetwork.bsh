@@ -1,3 +1,8 @@
-getNetwork() {
-	return workspace.getLastNetwork().getNetworkPanel().getRootNetwork();
+import org.simbrain.network.*;
+import org.simnet.interfaces.*;
+
+RootNetwork getNetwork(String in) {
+
+	return ((NetworkComponent) workspace.getComponent(in)).getRootNetwork();
 }
+

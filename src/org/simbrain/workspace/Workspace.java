@@ -269,6 +269,22 @@ public class Workspace {
     }
     
     /**
+     * Get a component using its name id.  Used in terminal mode.
+     *
+     * @param id name of component
+     * @return Workspace Component
+     */
+    public WorkspaceComponent getComponent(String id) {
+        for (WorkspaceComponent component : componentList) {
+            if (component.getName().equalsIgnoreCase(id)) {
+                return component;
+            }
+        }
+        return null;
+    }
+
+    
+    /**
      * Used by Network thread to ensure that an update cycle is complete before
      * updating again.
      *

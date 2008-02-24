@@ -1,7 +1,7 @@
 printBanner() {
    addClassPath("console");
    print("Simbrain console");
-   print("Enter \"help();\" for help");
+   print("Enter \"help(); or \"tips();\" for help");q
    print();
    print("----------------------------------------------");
 }

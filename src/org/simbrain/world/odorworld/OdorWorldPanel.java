@@ -405,7 +405,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      * Adds a wall to the world.
      */
     public void addWall() {
-        final Wall newWall = new Wall(this.getWorld(), this);
+        final Wall newWall = new Wall(this.getWorld());
         final Point upperLeft = determineUpperLeft(getWallPoint1(), getWallPoint2());
 
         newWall.setWidth(Math.abs(getWallPoint2().x - getWallPoint1().x));

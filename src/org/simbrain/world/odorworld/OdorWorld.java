@@ -8,6 +8,9 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 //TODO: Model view
 public class OdorWorld {
 
@@ -52,13 +55,18 @@ public class OdorWorld {
     private String worldName;
     
     /**
-     * {@inheritDoc}
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
      */
-    public void postUnmarshallInit() {
-        for (OdorWorldEntity entity : this.getEntityList()) {
-            entity.setImage(ResourceManager.getImage(entity.getImageName()));
-        }
+    static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.setMode(XStream.ID_REFERENCES);
+        xstream.omitField(OdorWorldEntity.class, "image");
+        xstream.omitField(OdorWorldAgent.class, "component");
+        xstream.omitField(Wall.class, "parent");
+        return xstream;
     }
+   
 
     /**
      * Clears all entities from the world.

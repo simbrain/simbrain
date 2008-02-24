@@ -35,7 +35,7 @@ import org.simbrain.resource.ResourceManager;
 public class OdorWorldEntity extends AbstractEntity {
 
     /** Icon renderer. */
-    private final ImageIcon image = new ImageIcon();
+    private ImageIcon image = new ImageIcon();
 
     /** Images to be made into icons. */
     private static ImageIcon[] images;
@@ -267,6 +267,7 @@ public class OdorWorldEntity extends AbstractEntity {
      * @param theImage The image to be set.
      */
     void setImage(final Image theImage) {
+        image = new ImageIcon();
         this.image.setImage(theImage);
     }
 

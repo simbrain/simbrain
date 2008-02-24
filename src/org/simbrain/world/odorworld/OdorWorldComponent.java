@@ -22,10 +22,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.dataworld.DataModel;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.gameworld2d.GameWorld2DComponent;
 
@@ -46,21 +48,14 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public OdorWorldComponent(String name) {
         super(name);
     }
-
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.setMode(XStream.ID_REFERENCES);
-        xstream.omitField(OdorWorldEntity.class, "theImage");
-        xstream.omitField(OdorWorldAgent.class, "effectorList");
-        xstream.omitField(OdorWorldAgent.class, "sensorList");
-        xstream.omitField(OdorWorld.class, "couplings");
-        return xstream;
-    }
     
+    @SuppressWarnings("unchecked")
+    private OdorWorldComponent(final String name, final OdorWorld world) {
+        super(name);
+        this.world = world;
+    }
+
+
     /**
      * Recreates an instance of this class from a saved component.
      * 
@@ -70,34 +65,31 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
      * @return
      */
     public static OdorWorldComponent open(InputStream input, String name, String format) {
-        return (OdorWorldComponent) getXStream().fromXML(input);
+        OdorWorld newWorld = (OdorWorld) OdorWorld.getXStream().fromXML(input);
+        return new OdorWorldComponent(name, newWorld);
+        
     }
 
     /**
      * {@inheritDoc}
      */
+    public void postUnmarshallInit() {
+        for (OdorWorldEntity entity : world.getEntityList()) {
+            entity.setImage(ResourceManager.getImage(entity.getImageName()));
+        }
+    }
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        OdorWorld.getXStream().toXML(world, output);
     }
     
     OdorWorld getWorld() {
         return world;
     }
     
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-//    private static XStream getXStream() {
-//        XStream xstream = new XStream(new DomDriver());
-//        xstream.setMode(XStream.ID_REFERENCES);
-//        xstream.omitField(OdorWorldEntity.class, "theImage");
-//        xstream.omitField(OdorWorldAgent.class, "effectorList");
-//        xstream.omitField(OdorWorldAgent.class, "sensorList");
-//        xstream.omitField(OdorWorld.class, "couplings");
-//        return xstream;
-//    }
 
     @Override
     public void close() {

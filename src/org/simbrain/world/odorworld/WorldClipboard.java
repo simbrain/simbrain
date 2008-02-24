@@ -120,7 +120,7 @@ public final class WorldClipboard {
      * @param wall Wall to copy
      */
     public static void copyWall(final Wall wall) {
-        Wall temp = new Wall(wall.getParent(), wall.getPanel());
+        Wall temp = new Wall(wall.getParent());
         temp.setWidth(wall.getWidth());
         temp.setHeight(wall.getHeight());
         setClipboardEntity(temp);

@@ -489,10 +489,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     public void setWhiskerLength(final double whiskerLength) {
         this.whiskerLength = whiskerLength;
     }
-
-    public OdorWorldComponent getParentComponent() {
-        return component;
-    }
+    
+        public OdorWorldComponent getParentComponent() {
+            return component;
+        }
     
     public OdorWorldAgent copy() {
         OdorWorldAgent temp = new OdorWorldAgent(component);

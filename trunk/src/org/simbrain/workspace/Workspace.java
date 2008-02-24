@@ -120,7 +120,7 @@ public class Workspace {
     /**
      * Update all couplings on all components.  Currently use a buffering method.
      */
-    void globalUpdate() {
+    public void globalUpdate() {
         manager.updateAllCouplings();
         
         for (WorkspaceComponent<?> component : componentList) {
@@ -164,17 +164,8 @@ public class Workspace {
     public void removeCoupling(final Coupling<?> coupling) {
         manager.removeCoupling(coupling);
     }
-    
-//    private boolean hasCouplings(WorkspaceComponent component) {
-//        if (component.getCouplingContainer() == null) {
-//            return false;
-//        } else if (component.getCouplingContainer().getCouplings() == null) {
-//            return false;
-//        }
-//
-//        return true;
-//    }
 
+    
     /**
      * Iterates all couplings on all components until halted by user.
      */
@@ -276,7 +267,7 @@ public class Workspace {
     public List<? extends WorkspaceComponent<?>> getComponentList() {
         return Collections.unmodifiableList(componentList);
     }
-
+    
     /**
      * Used by Network thread to ensure that an update cycle is complete before
      * updating again.

@@ -37,8 +37,6 @@ public class Wall extends AbstractEntity {
     private int height;
     /** Width value. */
     private int width;
-    /** the parent panel */
-    final OdorWorldPanel panel;
     /** Parent world. */
     private OdorWorld parent;
     /** Stimulus. */
@@ -77,9 +75,8 @@ public class Wall extends AbstractEntity {
      *
      * @param parentWorld Current world
      */
-    public Wall(final OdorWorld parentWorld, final OdorWorldPanel panel) {
+    public Wall(final OdorWorld parentWorld) {
         parent = parentWorld;
-        this.panel = panel;
     }
 
     /**
@@ -182,21 +179,12 @@ public class Wall extends AbstractEntity {
     }
 
     /**
-     * Returns the parent panel
-     *  
-     * @return the parent panel
-     */
-    public OdorWorldPanel getPanel() {
-        return panel;
-    }
-    
-    /**
      * Implements abstract paintThis() from AbstractEntity.
      *
      * @param g the world graphics object
      */
     public void paintThis(final Graphics g) {
-        g.setColor(panel.getWallColor());
+//        g.setColor(parent.getWa());
         g.fillRect(getX(), getY(), getWidth(), getHeight());
     }
     

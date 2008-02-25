@@ -63,9 +63,18 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
                 this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_");
             }
             
+            DesktopComponent addDesktopComponent(org.simbrain.workspace.gui.DesktopComponent<?> dc) {
+                return desktopComponent = new DesktopComponent(dc);
+            }
+            
             class DesktopComponent {
-                String className;
-                String uri;
+                final String className;
+                final String uri;
+                
+                DesktopComponent(org.simbrain.workspace.gui.DesktopComponent<?> dc) {
+                    this.className = dc.getClass().getCanonicalName();
+                    this.uri = "guis/" + id + '_' + name.replaceAll("\\s", "_");
+                }
             }
         }
         

@@ -18,7 +18,12 @@
  */
 package org.simbrain.workspace.gui;
 
+import java.awt.Rectangle;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -165,7 +170,20 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
             save(currentFile);
         }
     }
-
+    
+    public void save(OutputStream ostream) throws IOException {
+        Writer writer = new OutputStreamWriter(ostream);
+        
+        Rectangle bounds = getBounds();
+        
+        writer.write("<DesktopComponent name='" + getName() + "'>");
+        writer.write("<bounds x='" + getX() + "' y='" + getY() 
+            + "' height='" + getHeight() + "' width='" + getWidth() + "'/>");
+        writer.write("</DesktopComponent>");
+        
+        writer.flush();
+    }
+    
     /**
      * Checks to see if anything has changed and then offers to save if true.
      */

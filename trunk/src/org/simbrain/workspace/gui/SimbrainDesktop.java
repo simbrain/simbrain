@@ -104,7 +104,7 @@ public class SimbrainDesktop {
     private static final Map<Workspace, SimbrainDesktop> INSTANCES = new HashMap<Workspace, SimbrainDesktop>();
     
     /** Desktop pane. */
-    private JDesktopPane desktop;
+    JDesktopPane desktop;
 
     /** Cached context menu. */
     private JPopupMenu contextMenu;
@@ -147,6 +147,8 @@ public class SimbrainDesktop {
     public static SimbrainDesktop getDesktop(Workspace workspace) {
         return INSTANCES.get(workspace);
     }
+    
+    
     
     /**
      * Default constructor.
@@ -211,6 +213,10 @@ public class SimbrainDesktop {
     public Workspace getWorkspace() {
         return workspace;
     }
+    
+//    public DesktopComponent getDesktopComponent(WorkspaceComponent component) {
+//        return components.get(component);
+//    }
     
     /**
      * Returns the main frame for the desktop.
@@ -425,7 +431,7 @@ public class SimbrainDesktop {
      * @return A new desktop component wrapping the provided component.
      */
     @SuppressWarnings("unchecked")
-    private DesktopComponent<?> getDesktopComponent(final WorkspaceComponent<?> component) {
+    private DesktopComponent<?> createDesktopComponent(final WorkspaceComponent<?> component) {        
         Class<? extends WorkspaceComponent<?>> componentClass
             = (Class<? extends WorkspaceComponent<?>>) component.getClass();
         Class<? extends DesktopComponent<?>> guiClass = wrappers.get(componentClass);
@@ -444,6 +450,10 @@ public class SimbrainDesktop {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public DesktopComponent<?> getDesktopComponent(final WorkspaceComponent<?> component) {
+        return components.get(component);
     }
     
     /** Listener on the workspace. */
@@ -481,7 +491,7 @@ public class SimbrainDesktop {
         public void componentAdded(final WorkspaceComponent workspaceComponent) {
             LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
-            DesktopComponent<?> component = getDesktopComponent(workspaceComponent);
+            DesktopComponent<?> component = createDesktopComponent(workspaceComponent);
 
             /* set this as the parent desktop for the desktop component */
             component.setDesktop(SimbrainDesktop.this);

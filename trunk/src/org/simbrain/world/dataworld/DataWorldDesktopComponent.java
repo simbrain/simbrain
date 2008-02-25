@@ -98,8 +98,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
 
     /** Determines whether iteration mode uses last column. */
     private JCheckBoxMenuItem columnIteration = new JCheckBoxMenuItem("Use last column");
-
-
+    
     /**
      * Default constructor.
      *
@@ -108,6 +107,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     public DataWorldDesktopComponent(final DataWorldComponent component) {
 
         super(component);
+        
         component.addListener(new BasicComponentListener());
         world = new DataWorld(this, component.getDataModel());
         component.getDataModel().initValues(new Double(0));

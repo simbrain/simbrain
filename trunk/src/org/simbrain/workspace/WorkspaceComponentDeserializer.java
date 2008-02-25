@@ -54,8 +54,6 @@ public class WorkspaceComponentDeserializer {
                     if (id >= 0) attributes.put(attribute.getId(), attribute);
                 }
             }
-            component.postUnmarshallInit();
-                    
             return component;
         } catch (RuntimeException e) {
             throw e;

@@ -40,12 +40,13 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
+    /** Reference to model world. */
     private OdorWorld world = new OdorWorld();
     
     /**
      * Default constructor.
      */
-    public OdorWorldComponent(String name) {
+    public OdorWorldComponent(final String name) {
         super(name);
     }
     
@@ -73,14 +74,6 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     /**
      * {@inheritDoc}
      */
-    public void postUnmarshallInit() {
-        for (OdorWorldEntity entity : world.getEntityList()) {
-            entity.setImage(ResourceManager.getImage(entity.getImageName()));
-        }
-    }
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         OdorWorld.getXStream().toXML(world, output);
@@ -95,11 +88,6 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public void close() {
         // TODO Auto-generated method stub
     }
-
-//    @Override
-//    public String getFileExtension() {
-//        return "wld";
-//    }
     
     @Override
     public List<? extends Consumer> getConsumers() {

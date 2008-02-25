@@ -185,6 +185,9 @@ public class OdorWorld {
         for (OdorWorldEntity entity : getEntityList()) {
             entity.setImage(ResourceManager.getImage(entity.getImageName()));
             entity.setParent(this);
+            if (entity instanceof OdorWorldAgent) {
+                ((OdorWorldAgent)entity).initEffectorsAndSensors();
+            }
         }
         return this;
     }

@@ -11,7 +11,10 @@ import org.simbrain.workspace.Producer;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-//TODO: Model view
+/**
+ * Core model class of Odor World, which contains a list of entities in the world.
+ * This is the class that is currently serialized.
+ */
 public class OdorWorld {
 
     /** The increment of a manual turn. */
@@ -60,8 +63,8 @@ public class OdorWorld {
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        xstream.setMode(XStream.ID_REFERENCES);
         xstream.omitField(OdorWorldEntity.class, "image");
+        xstream.omitField(OdorWorldEntity.class, "parent");
         xstream.omitField(OdorWorldAgent.class, "component");
         xstream.omitField(Wall.class, "parent");
         return xstream;
@@ -169,7 +172,23 @@ public class OdorWorld {
 
         return ret;
     }
-
+    
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        for (OdorWorldEntity entity : getEntityList()) {
+            entity.setImage(ResourceManager.getImage(entity.getImageName()));
+            entity.setParent(this);
+        }
+        return this;
+    }
+    
     /**
      * Remove the entity from the dead, return it to the living, and set its bite counter back to a default value.
      *

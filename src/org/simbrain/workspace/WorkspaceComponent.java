@@ -263,10 +263,4 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     protected void couplingRemoved(final Coupling<?> coupling) {
         /* no default implementation */
     }
-
-    /**
-     * Called after deserializing
-     */
-    public void postUnmarshallInit() {        
-    }
 }

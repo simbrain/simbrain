@@ -39,10 +39,13 @@ public class DataModel<E> {
     /** Randomization lower bound. */
     private int lowerBound = 0;
 
+    /** Current row. */
     private int currentRow = 0;
 
+    /** Listeners. */
     private List<Listener> listeners;
 
+    // TODO: Document this.
     boolean initialized = false;
     
     /** List of consumers. */
@@ -85,6 +88,14 @@ public class DataModel<E> {
         return xstream;
     }
     
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
+     */
     private Object readResolve() {
         listeners = new ArrayList<Listener>();
         initialized = true;

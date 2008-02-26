@@ -57,8 +57,14 @@ public class OdorWorld {
     /** Name of world. */
     private String worldName;
     
+    /** Reference to parent component. */
     private OdorWorldComponent parent;
     
+    /**
+     * Default constructor.
+     *
+     * @param parent reference to parent.
+     */
     OdorWorld(final OdorWorldComponent parent) {
         setParent(parent);
     }
@@ -71,8 +77,7 @@ public class OdorWorld {
         XStream xstream = new XStream(new DomDriver());
         xstream.omitField(OdorWorldEntity.class, "image");
         xstream.omitField(OdorWorldEntity.class, "parent");
-        xstream.omitField(OdorWorldAgent.class, "component");
-        xstream.omitField(Wall.class, "parent");
+        xstream.omitField(OdorWorld.class, "parent");
         return xstream;
     }
     

@@ -57,6 +57,12 @@ public class OdorWorld {
     /** Name of world. */
     private String worldName;
     
+    private OdorWorldComponent parent;
+    
+    OdorWorld(final OdorWorldComponent parent) {
+        setParent(parent);
+    }
+    
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
@@ -69,8 +75,15 @@ public class OdorWorld {
         xstream.omitField(Wall.class, "parent");
         return xstream;
     }
-   
-
+    
+    void setParent(final OdorWorldComponent parent) {
+        this.parent = parent;
+    }
+    
+    OdorWorldComponent getParent() {
+        return parent;
+    }
+    
     /**
      * Clears all entities from the world.
      */
@@ -185,9 +198,14 @@ public class OdorWorld {
         for (OdorWorldEntity entity : getEntityList()) {
             entity.setImage(ResourceManager.getImage(entity.getImageName()));
             entity.setParent(this);
-            if (entity instanceof OdorWorldAgent) {
-                ((OdorWorldAgent)entity).initEffectorsAndSensors();
-            }
+            
+//            if (entity instanceof OdorWorldAgent) {
+//                for (Object o : ((OdorWorldAgent) entity).getConsumingAttributes()) {
+//                    System.out.println(((OdorWorldAgent.Effector) o).getAttributeDescription());
+//                    System.out.println(((OdorWorldAgent.Effector) o).getParent());
+//                ((OdorWorldAgent)entity).initEffectorsAndSensors();
+//                }
+//            }
         }
         return this;
     }

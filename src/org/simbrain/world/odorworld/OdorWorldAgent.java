@@ -75,13 +75,12 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     /** Default sensor. */
     private ProducingAttribute<Double> defaultSensor = new CenterSensor(1);
 
-    private final OdorWorldComponent component;
+//    private final OdorWorldComponent component;
 
     /**
      * Default constructor.
      */
-    private OdorWorldAgent(OdorWorldComponent component) {
-        this.component = component;
+    private OdorWorldAgent() {
         initEffectorsAndSensors();
     }
 
@@ -95,11 +94,11 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
      * @param y Position
      * @param ori Orientation
      */
-    public OdorWorldAgent(final OdorWorldComponent component, final String nm,
+    public OdorWorldAgent(OdorWorldComponent component, final String nm,
             final String type, final int x, final int y, final double ori) {
         super(component.getWorld(), type, x, y);
         super.setName(nm);
-        this.component = component;
+//        this.component = component;
         setOrientation(ori);
         initEffectorsAndSensors();
 
@@ -490,12 +489,12 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         this.whiskerLength = whiskerLength;
     }
     
-        public OdorWorldComponent getParentComponent() {
-            return component;
-        }
+    public OdorWorldComponent getParentComponent() {
+        return getParent().getParent();
+    }
     
     public OdorWorldAgent copy() {
-        OdorWorldAgent temp = new OdorWorldAgent(component);
+        OdorWorldAgent temp = new OdorWorldAgent();
         temp.setImageName(getImageName());
         temp.setMovementIncrement(getMovementIncrement());
         temp.setName("Copy of " + getName());
@@ -636,6 +635,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
          * {@inheritDoc}
          */
         public Consumer getParent() {
+            System.out.println(getAttributeDescription() + ": " + OdorWorldAgent.this);
             return OdorWorldAgent.this;
         }
 

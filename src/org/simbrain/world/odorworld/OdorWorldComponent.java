@@ -41,7 +41,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Reference to model world. */
-    private OdorWorld world = new OdorWorld();
+    private OdorWorld world = new OdorWorld(this);
     
     /**
      * Default constructor.
@@ -54,6 +54,7 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     private OdorWorldComponent(final String name, final OdorWorld world) {
         super(name);
         this.world = world;
+        world.setParent(this);
     }
 
 
@@ -68,7 +69,6 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public static OdorWorldComponent open(InputStream input, String name, String format) {
         OdorWorld newWorld = (OdorWorld) OdorWorld.getXStream().fromXML(input);
         return new OdorWorldComponent(name, newWorld);
-        
     }
 
     /**

@@ -185,11 +185,7 @@ public abstract class Network {
 
         logger = Logger.getLogger(RootNetwork.class);
 
-        for (Network network : getNetworkList()) {
-            network.postUnmarshallingInit();
-        }
         for (Neuron neuron : getNeuronList()) {
-            neuron.postUnmarshallingInit();
             this.getRootNetwork().fireNeuronAdded(neuron);
         }
         for (Synapse synapse : getSynapseList()) {

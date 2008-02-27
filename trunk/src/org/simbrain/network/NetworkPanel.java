@@ -181,9 +181,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Color of "zero" weights. */
     private Color zeroWeightColor = new Color(NetworkPreferences.getZeroWeightColor());
 
-    /** Network serializer. */
-    private NetworkSerializer serializer;
-
     /** Temporary storage of persistent nodes; used by Castor. */
     private ArrayList nodeList = new ArrayList();
 
@@ -268,10 +265,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public NetworkPanel(RootNetwork rootNetwork, NetworkDesktopComponent desktopComponent) {
         super();
-        
+
         this.desktopComponent = desktopComponent;
         this.rootNetwork = rootNetwork;
-        
+
         // always render in high quality
         setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
@@ -282,7 +279,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMode = DEFAULT_BUILD_MODE;
         selectionModel = new NetworkSelectionModel(this);
         actionManager = new NetworkActionManager(this);
-        serializer = new NetworkSerializer(this);
 
         createContextMenu();
         // createContextMenuAlt();
@@ -1705,7 +1701,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param file the file describing the rootNetwork to open
      */
     public void openNetwork(final File file) {
-        serializer.readNetwork(file);
+//        serializer.readNetwork(file);
         setChangedSinceLastSave(false);
     }
 
@@ -1715,7 +1711,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param networkFile the file to save the rootNetwork to.
      */
     public void saveNetwork(final File networkFile) {
-        serializer.writeNet(networkFile);
+ //       serializer.writeNet(networkFile);
     }
 
     /**

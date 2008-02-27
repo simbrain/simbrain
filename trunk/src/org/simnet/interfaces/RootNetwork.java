@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -34,6 +33,9 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simnet.NetworkThread;
 import org.simnet.util.SimpleId;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -113,7 +115,7 @@ public class RootNetwork extends Network {
     private SortedSet<Integer> updatePriorities = null;
 
     /** Network Id generator. */
-    private SimpleId networkIdGenerator = new SimpleId("Netork", 1);
+    private SimpleId networkIdGenerator = new SimpleId("Network", 1);
 
     /** Neuron Id generator. */
     private SimpleId neuronIdGenerator = new SimpleId("Neuron", 1);
@@ -144,30 +146,64 @@ public class RootNetwork extends Network {
         this.updatePriorities.add(new Integer(0));
         this.setId("Root-network");
     }
-
+    
     /**
-     * Perform initialization required after opening saved networks.
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
      */
-    public void postUnmarshallingInit(NetworkListener listener) {
-
-        logger = Logger.getLogger(RootNetwork.class);
-
-        neuronIdGenerator = new SimpleId("Neuron", 1);
-        networkIdGenerator = new SimpleId("Netork", 1);
-
-        if (this instanceof RootNetwork) {
-            listenerList = new HashSet<NetworkListener>();
-            this.addNetworkListener(listener);
-        }
-        super.postUnmarshallingInit();
-        // Only add top level networks
-        for (Network subnet : getNetworkList()) {
-            this.fireSubnetAdded(subnet);
-        }
+    public static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(RootNetwork.class, "logger");
+        xstream.omitField(RootNetwork.class, "component");
+        xstream.omitField(RootNetwork.class, "listenerList");
+        xstream.omitField(RootNetwork.class, "updateCompleted");
+        xstream.omitField(RootNetwork.class, "neuronIdGenerator");
+        xstream.omitField(RootNetwork.class, "networkIdGenerator");
+        xstream.omitField(RootNetwork.class, "synapseIdGenerator");
+        xstream.omitField(RootNetwork.class, "networkThread");
+        xstream.omitField(Network.class, "logger");
+        xstream.omitField(Network.class, "rootNetwork");
+        xstream.omitField(Network.class, "parentNetwork");
+        return xstream;
     }
 
     /**
-     * Externally called update function which coordiantes input and output neurons and
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        logger = Logger.getLogger(RootNetwork.class);
+        listenerList = new HashSet<NetworkListener>();
+        
+        setRootNetwork(this);
+        this.updatePriorities = new TreeSet<Integer>();
+        this.updatePriorities.add(new Integer(0));
+        this.setId("Root-network");
+        networkIdGenerator = new SimpleId("Network", 1);
+        neuronIdGenerator = new SimpleId("Neuron", 1);
+        networkIdGenerator = new SimpleId("Netork", 1);
+
+        // Only add top level networks
+        for (Network subnet : getNetworkList()) {
+            this.fireSubnetAdded(subnet);
+            subnet.postUnmarshallingInit();
+        }
+        super.postUnmarshallingInit(); // This inits the root network elements
+        
+        return this;
+    }
+    
+    public void addListener(final NetworkListener listener) {
+        listenerList.add(listener);
+    }
+    
+
+    /**
+     * Externally called update function which coordinates input and output neurons and
      * connections with worlds and gauges.
      */
     public void updateRootNetwork() {

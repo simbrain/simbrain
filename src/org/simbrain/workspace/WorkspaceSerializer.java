@@ -27,6 +27,8 @@ public class WorkspaceSerializer {
     /** The current workspace. */
     private final Workspace workspace;
     
+    private final SimbrainDesktop desktop;
+    
     /**
      * Creates a new serializer.
      * 
@@ -34,6 +36,7 @@ public class WorkspaceSerializer {
      */
     public WorkspaceSerializer(final Workspace workspace) {
         this.workspace = workspace;
+        this.desktop = SimbrainDesktop.getDesktop(workspace);
     }
     
     public void exportWorkspace() {
@@ -76,7 +79,8 @@ public class WorkspaceSerializer {
                 .getDesktopComponent(component);
             
             if (desktopComponent != null) {
-                ArchiveContents.Component.DesktopComponent dc = archiveComp.addDesktopComponent(desktopComponent);
+                ArchiveContents.Component.DesktopComponent dc
+                    = archiveComp.addDesktopComponent(desktopComponent);
                 entry = new ZipEntry(dc.uri);
                 zipStream.putNextEntry(entry);
                 desktopComponent.save(zipStream);
@@ -136,7 +140,21 @@ public class WorkspaceSerializer {
                     component.className, new ByteArrayInputStream(
                     entries.get(component.uri)), "name", null);
     
+                if (component.desktopComponent != null) {
+                    workspace.toggleEvents(false);
+                }
+                
                 workspace.addWorkspaceComponent(wc);
+                
+                if (component.desktopComponent != null) {
+                    DesktopComponent dc = componentDeserializer.deserializeDesktopComponent(
+                        component.desktopComponent.className, wc, new ByteArrayInputStream(
+                        entries.get(component.desktopComponent.uri)), component.name);
+                    
+                    desktop.addComponent(wc, dc);
+                    
+                    workspace.toggleEvents(true);
+                }
             }
         }
         

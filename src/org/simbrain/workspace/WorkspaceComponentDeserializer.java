@@ -64,13 +64,14 @@ public class WorkspaceComponentDeserializer {
     
     @SuppressWarnings("unchecked")
     DesktopComponent<?> deserializeDesktopComponent(final String className,
-            final InputStream input, final String name) {
+            final WorkspaceComponent component, final InputStream input, final String name) {
         try {
             Class<WorkspaceComponent<?>> clazz 
                 = (Class<WorkspaceComponent<?>>) Class.forName(className);
-            Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
+            Method method = clazz.getMethod("open", WorkspaceComponent.class,
+                InputStream.class, String.class);
             
-            return (DesktopComponent<?>) method.invoke(null, input, name);
+            return (DesktopComponent<?>) method.invoke(null, component, input, name);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

@@ -21,6 +21,7 @@ package org.simbrain.workspace.gui;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -36,6 +37,9 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspacePreferences;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Represents a window in the Simbrain desktop.   Services relating to
@@ -171,17 +175,34 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         }
     }
     
-    public void save(OutputStream ostream) throws IOException {
-        Writer writer = new OutputStreamWriter(ostream);
+    /**
+     * Writes the bounds of this desktop component to the provided stream.
+     * 
+     * @param ostream the stream to write to
+     * @throws IOException if an IO error occurs
+     */
+    public void save(final OutputStream ostream) throws IOException {
+        new XStream(new DomDriver()).toXML(getBounds(), ostream);
+    }
+    
+    /**
+     * Creates a new desktop component from the provided stream.
+     * 
+     * @param component the component to create the desktop component for.
+     * @param istream the inputstream containing the serialized data.
+     * @param name the name of the desktop component.
+     * @return a new component.
+     */
+    public static DesktopComponent<?> open(final WorkspaceComponent<?> component,
+            final InputStream istream, final String name) {
+        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
+        DesktopComponent<?> dc = desktop.createDesktopComponent(component);
+        Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
         
-        Rectangle bounds = getBounds();
+        dc.setName(name);
+        dc.setBounds(bounds);
         
-        writer.write("<DesktopComponent name='" + getName() + "'>");
-        writer.write("<bounds x='" + getX() + "' y='" + getY() 
-            + "' height='" + getHeight() + "' width='" + getWidth() + "'/>");
-        writer.write("</DesktopComponent>");
-        
-        writer.flush();
+        return dc;
     }
     
     /**

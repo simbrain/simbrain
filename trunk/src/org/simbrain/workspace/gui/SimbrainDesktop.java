@@ -101,7 +101,8 @@ public class SimbrainDesktop {
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
-    private static final Map<Workspace, SimbrainDesktop> INSTANCES = new HashMap<Workspace, SimbrainDesktop>();
+    private static final Map<Workspace, SimbrainDesktop> INSTANCES
+        = new HashMap<Workspace, SimbrainDesktop>();
     
     /** Desktop pane. */
     JDesktopPane desktop;
@@ -147,8 +148,6 @@ public class SimbrainDesktop {
     public static SimbrainDesktop getDesktop(Workspace workspace) {
         return INSTANCES.get(workspace);
     }
-    
-    
     
     /**
      * Default constructor.
@@ -431,7 +430,7 @@ public class SimbrainDesktop {
      * @return A new desktop component wrapping the provided component.
      */
     @SuppressWarnings("unchecked")
-    private DesktopComponent<?> createDesktopComponent(final WorkspaceComponent<?> component) {        
+    DesktopComponent<?> createDesktopComponent(final WorkspaceComponent<?> component) {
         Class<? extends WorkspaceComponent<?>> componentClass
             = (Class<? extends WorkspaceComponent<?>>) component.getClass();
         Class<? extends DesktopComponent<?>> guiClass = wrappers.get(componentClass);
@@ -568,6 +567,10 @@ public class SimbrainDesktop {
         }
     };
     
+//    public void addComponent(WorkspaceComponent workspaceComponent, DesktopComponent component) {
+//        components.put(workspaceComponent, component);
+//    }
+    
     /**
      * Add a new <c>SimbrainComponent</c>.
      *
@@ -610,7 +613,7 @@ public class SimbrainDesktop {
 ////        workspaceChanged = false;
 //
 //        String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-//        
+//
 //        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
 //        File simFile = simulationChooser.showOpenDialog();
 //
@@ -779,15 +782,16 @@ public class SimbrainDesktop {
                 JMenu componentMenu = new JMenu(component.getName());
                 for (Producer producer : component.getProducers()) {
                     if (producer instanceof SingleAttributeProducer) {
-                        SingleCouplingMenuItem item = 
-                                new SingleCouplingMenuItem(workspace, producer.getDescription(), 
+                        SingleCouplingMenuItem item =
+                            new SingleCouplingMenuItem(workspace, producer.getDescription(),
                         producer.getDefaultProducingAttribute(), target);
                         componentMenu.add(item);
                     } else {
                         JMenu producerItem = new JMenu(producer.getDescription());
                         for (ProducingAttribute<?> source : producer.getProducingAttributes()) {
                             SingleCouplingMenuItem item = 
-                                new SingleCouplingMenuItem(workspace,source.getAttributeDescription(), source, target);
+                                new SingleCouplingMenuItem(
+                                    workspace,source.getAttributeDescription(), source, target);
                             producerItem.add(item);
                             componentMenu.add(producerItem);
                         }

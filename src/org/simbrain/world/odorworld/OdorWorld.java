@@ -203,14 +203,6 @@ public class OdorWorld {
         for (OdorWorldEntity entity : getEntityList()) {
             entity.setImage(ResourceManager.getImage(entity.getImageName()));
             entity.setParent(this);
-            
-//            if (entity instanceof OdorWorldAgent) {
-//                for (Object o : ((OdorWorldAgent) entity).getConsumingAttributes()) {
-//                    System.out.println(((OdorWorldAgent.Effector) o).getAttributeDescription());
-//                    System.out.println(((OdorWorldAgent.Effector) o).getParent());
-//                ((OdorWorldAgent)entity).initEffectorsAndSensors();
-//                }
-//            }
         }
         return this;
     }

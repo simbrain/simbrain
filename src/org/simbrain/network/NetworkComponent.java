@@ -40,24 +40,25 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     private RootNetwork rootNetwork = new RootNetwork(this);
     
     /**
-     * Create a new network frame.
+     * Create a new network component.
      */
     public NetworkComponent(String name) {
         super(name);
     }
-
+    
+    
     /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
+     * Create a new network component.
      */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        // TODO omit fields
-        return xstream;
+    public NetworkComponent(String name, RootNetwork network) {
+        super(name);
+        this.rootNetwork = network;
     }
+
     
     public static NetworkComponent open(InputStream input, final String name, final String format) {
-        return (NetworkComponent) getXStream().fromXML(input);
+        RootNetwork newNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(input);
+        return new NetworkComponent(name, newNetwork);
     }
 
     /**
@@ -65,7 +66,7 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        RootNetwork.getXStream().toXML(rootNetwork, output);
     }
     
     public RootNetwork getRootNetwork() {

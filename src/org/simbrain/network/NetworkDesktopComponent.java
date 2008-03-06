@@ -28,6 +28,10 @@ import javax.swing.JPanel;
 
 import org.simbrain.workspace.gui.DesktopComponent;
 
+import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
+
 /**
  * Network frame.
  */
@@ -45,13 +49,32 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
      * Create a new network frame.
      */
     public NetworkDesktopComponent(NetworkComponent component) {
-
         super(component);
         this.setPreferredSize(new Dimension(450,400));
 
         networkPanel = new NetworkPanel(component.getRootNetwork(), this);
-        component.getRootNetwork().addListener(networkPanel);
         
+        // -------------------------------------------
+        for (Network network : component.getRootNetwork().getNetworkList()) {
+            networkPanel.subnetAdded(network);
+            
+            for (Neuron neuron : network.getNeuronList()) {
+                networkPanel.neuronAdded(neuron);
+            }
+            for (Synapse synapse : network.getSynapseList()) {
+                networkPanel.synapseAdded(synapse);
+            }
+        }
+        
+        for (Neuron neuron : component.getRootNetwork().getNeuronList()) {
+            networkPanel.neuronAdded(neuron);
+        }
+        for (Synapse synapse : component.getRootNetwork().getSynapseList()) {
+            networkPanel.synapseAdded(synapse);
+        }
+        // -------------------------------------------
+        
+        component.getRootNetwork().addListener(networkPanel);
 
         // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         JPanel buffer = new JPanel();

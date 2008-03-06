@@ -1260,9 +1260,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         repaint();
     }
 
-    /** @inheritDoc org.simnet.interfaces.NetworkListener#neuronAdded */
     public void neuronAdded(final NetworkEvent e) {
-        NeuronNode node = new NeuronNode(this, e.getNeuron(), desktopComponent);
+        neuronAdded(e.getNeuron());
+    }
+    
+    /** @inheritDoc org.simnet.interfaces.NetworkListener#neuronAdded */
+    public void neuronAdded(final Neuron neuron) {
+        NeuronNode node = new NeuronNode(this, neuron, desktopComponent);
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
         setChangedSinceLastSave(true);
@@ -1294,13 +1298,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener */
     public void synapseAdded(final NetworkEvent e) {
-        NeuronNode source = findNeuronNode(e.getSynapse().getSource());
-        NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
+        synapseAdded(e.getSynapse());
+    }
+    
+    /** @see NetworkListener */
+    public void synapseAdded(final Synapse synapse) {
+        NeuronNode source = findNeuronNode(synapse.getSource());
+        NeuronNode target = findNeuronNode(synapse.getTarget());
         if ((source == null) || (target == null)) {
             return;
         }
 
-        SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
+        SynapseNode node = new SynapseNode(this, source, target, synapse);
         getLayer().addChild(node);
         node.moveToBack();
         setChangedSinceLastSave(true);
@@ -1412,10 +1421,14 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
+        subnetAdded(e.getSubnet());
+    }
+    
+    public void subnetAdded(final Network network) {
 
         // Make a list of neuron nodes
         ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
-        for (Neuron neuron : e.getSubnet().getFlatNeuronList()) {
+        for (Neuron neuron : network.getFlatNeuronList()) {
             NeuronNode node = findNeuronNode(neuron);
             if (node != null) {
                 neuronNodes.add(node);
@@ -1425,7 +1438,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // Find the upper left corner of these nodes and created sbunetwork node
         Point2D upperLeft = getUpperLeft(neuronNodes);
         SubnetworkNode subnetwork = getSubnetworkNodeFromSubnetwork(upperLeft,
-                e.getSubnet());
+                network);
 
         // Populate subnetwork node and add it
         for (NeuronNode node : neuronNodes) {
@@ -1440,7 +1453,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         subnetwork.init();
 
         // Add synapses
-        for (Synapse synapse : e.getSubnet().getFlatSynapseList()) {
+        for (Synapse synapse : network.getFlatSynapseList()) {
             SynapseNode node = findSynapseNode(synapse);
             if (node != null) {
                 this.getLayer().addChild(node);

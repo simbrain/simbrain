@@ -54,6 +54,25 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
 
         networkPanel = new NetworkPanel(component.getRootNetwork(), this);
         
+        // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
+        JPanel buffer = new JPanel();
+        buffer.setLayout(new BorderLayout());
+
+        // Construct toolbar pane
+        FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
+        flow.setHgap(0);
+        flow.setVgap(0);
+        toolbars.setLayout(flow);
+        toolbars.add(networkPanel.getMainToolBar());
+        toolbars.add(networkPanel.getEditToolBar());
+        toolbars.add(networkPanel.getClampToolBar());
+
+        // Put it all together
+        buffer.add("North", toolbars);
+        buffer.add("Center", networkPanel);
+        setContentPane(buffer);
+        createAndAttachMenus();
+        
         // -------------------------------------------
         for (Network network : component.getRootNetwork().getNetworkList()) {
             networkPanel.subnetAdded(network);
@@ -75,25 +94,6 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         // -------------------------------------------
         
         component.getRootNetwork().addListener(networkPanel);
-
-        // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
-        JPanel buffer = new JPanel();
-        buffer.setLayout(new BorderLayout());
-
-        // Construct toolbar pane
-        FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
-        flow.setHgap(0);
-        flow.setVgap(0);
-        toolbars.setLayout(flow);
-        toolbars.add(networkPanel.getMainToolBar());
-        toolbars.add(networkPanel.getEditToolBar());
-        toolbars.add(networkPanel.getClampToolBar());
-
-        // Put it all together
-        buffer.add("North", toolbars);
-        buffer.add("Center", networkPanel);
-        setContentPane(buffer);
-        createAndAttachMenus();
     }
 
     /**

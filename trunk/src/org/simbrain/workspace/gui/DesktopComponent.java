@@ -94,6 +94,10 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         /* no implementation */
     }
 
+    public String getDefaultFormatKey() {
+        return "xml";
+    }
+    
     /**
      * Used when saving a workspace.  All changed workspace components are saved using
      * this method.

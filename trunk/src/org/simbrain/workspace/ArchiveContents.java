@@ -2,6 +2,8 @@ package org.simbrain.workspace;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -14,6 +16,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
      */
     class ArchiveContents {
 //        SimbrainDesktop desktop;
+        transient Map<WorkspaceComponent, String> componentUris = new HashMap<WorkspaceComponent, String>();
         final ArrayList<Component> components = new ArrayList<Component>();
         ArrayList<Coupling> couplings = new ArrayList<Coupling>();
         final WorkspaceComponentSerializer serializer;
@@ -25,6 +28,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
         Component addComponent(WorkspaceComponent<?> workspaceComponent) {
             Component component = new Component(serializer, workspaceComponent);
             components.add(component);
+            
+            componentUris.put(workspaceComponent, component.uri);
+            
+            System.out.println("uri in: " + component.uri);
             
             return component;
         }
@@ -38,7 +45,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
         }
         
         Coupling addCoupling(org.simbrain.workspace.Coupling<?> coupling) {
-            Coupling c = new Coupling(serializer, coupling);
+            Coupling c = new Coupling(this, coupling);
             
             couplings.add(c);
             
@@ -54,40 +61,59 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
             final String name;
             final String uri;
             final int id;
+            final String format;
             DesktopComponent desktopComponent;
             
             Component(WorkspaceComponentSerializer serializer, WorkspaceComponent<?> component) {
                 this.className = component.getClass().getCanonicalName();
                 this.id = serializer.getId(component);
                 this.name = component.getName();
-                this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_");
+                this.format = component.getDefaultFormatKey();
+                this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_") + '.' + format;
             }
             
             DesktopComponent addDesktopComponent(org.simbrain.workspace.gui.DesktopComponent<?> dc) {
-                return desktopComponent = new DesktopComponent(dc);
+                return desktopComponent = new DesktopComponent(this, dc);
             }
             
-            class DesktopComponent {
+            static class DesktopComponent {
                 final String className;
                 final String uri;
+                final String format;
                 
-                DesktopComponent(org.simbrain.workspace.gui.DesktopComponent<?> dc) {
+                DesktopComponent(Component parent, org.simbrain.workspace.gui.DesktopComponent<?> dc) {
                     this.className = dc.getClass().getCanonicalName();
-                    this.uri = "guis/" + id + '_' + name.replaceAll("\\s", "_");
+                    this.format = dc.getDefaultFormatKey();
+                    this.uri = "guis/" + parent.id + '_' + parent.name.replaceAll("\\s", "_") + '.' + format;
                 }
             }
         }
         
-        static class Coupling {            
-            final int source;
-            final int target;
+        static class Coupling {
             
-            Coupling(WorkspaceComponentSerializer serializer, org.simbrain.workspace.Coupling<?> coupling) {
+            final Attribute source;
+            final Attribute target;
+            
+            Coupling(ArchiveContents parent, org.simbrain.workspace.Coupling<?> coupling) {
                 ProducingAttribute<?> producing = coupling.getProducingAttribute();
                 ConsumingAttribute<?> consuming = coupling.getConsumingAttribute();
                 
-                this.source = serializer.assignId(producing);
-                this.target = serializer.assignId(consuming);
+                this.source = new Attribute(parent, producing);
+                this.target = new Attribute(parent, consuming);
+            }
+            
+            static class Attribute {
+                final String uri;
+                final String key;
+                
+                Attribute(ArchiveContents parent, org.simbrain.workspace.Attribute attribute) {
+                    WorkspaceComponent<?> comp = attribute.getParent().getParentComponent();
+                    
+                    this.uri = parent.componentUris.get(comp);
+                    this.key = comp.getKeyForAttribute(attribute);
+                    
+                    System.out.println("uri: " + uri);
+                }
             }
         }
         

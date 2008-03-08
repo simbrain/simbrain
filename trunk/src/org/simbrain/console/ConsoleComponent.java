@@ -58,8 +58,7 @@ public class ConsoleComponent extends  WorkspaceComponent<WorkspaceComponentList
 
     @Override
     public void save(OutputStream output, final String format) {
-        // TODO Auto-generated method stub
-        
+        // TODO implement
     }
 
     @Override

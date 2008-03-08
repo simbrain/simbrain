@@ -3,9 +3,15 @@ package org.simbrain.world.dataworld;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.SingleAttributeConsumer;
+import org.simbrain.workspace.SingleAttributeProducer;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -49,10 +55,10 @@ public class DataModel<E> {
     boolean initialized = false;
     
     /** List of consumers. */
-    private ArrayList<Consumer> consumers = new ArrayList<Consumer>();
+    private ArrayList<SingleAttributeConsumer<?>> consumers;
 
     /** List of producers. */
-    private ArrayList<Producer> producers = new ArrayList<Producer>();
+    private ArrayList<SingleAttributeProducer<?>> producers;
 
     /** The parent component of this model. */
     private DataWorldComponent parent;
@@ -64,16 +70,21 @@ public class DataModel<E> {
             rowData.add((List<E>) newRow());
         }
         
+        init();
+    }
+
+    private void init() {
+        consumers = new ArrayList<SingleAttributeConsumer<?>>();
+        producers = new ArrayList<SingleAttributeProducer<?>>();
+        
         for (int i = 0; i < width; i++) {
             consumers.add(new ConsumingColumn<E>(this, i));
             producers.add(new ProducingColumn<E>(this, i));
         }
         
         listeners = new ArrayList<Listener>();
-        
-        init();
     }
-
+    
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
@@ -84,6 +95,8 @@ public class DataModel<E> {
         xstream.omitField(DataModel.class, "listeners");
         xstream.omitField(DataModel.class, "parent");
         xstream.omitField(DataModel.class, "initialized");
+        xstream.omitField(DataModel.class, "consumers");
+        xstream.omitField(DataModel.class, "producers");
         
         return xstream;
     }
@@ -97,13 +110,40 @@ public class DataModel<E> {
      * @return Initialized object.
      */
     private Object readResolve() {
-        listeners = new ArrayList<Listener>();
+        init();
         initialized = true;
         return this;
     }
     
-    private void init() {
-        listeners = new ArrayList<Listener>();
+    public String getKey(Attribute attribute) {
+        int index;
+        
+        if ((index = consumers.indexOf(attribute)) >= 0) {
+            return "consumer:" + index;
+        } else if ((index = producers.indexOf(attribute)) >= 0) {
+            return "producer:" + index;
+        }
+        
+        return null;
+    }
+    
+    public Attribute getAttribute(String key) {
+        Matcher matcher = Pattern.compile("(\\w+):(\\d+)").matcher(key);
+        
+        if (!matcher.matches()) return null;
+        
+        List<? extends Attribute> list;
+        String type = matcher.group(1);
+        
+        if (type.equals("consumer")) {
+            list = consumers;
+        } else if (type.equals("producer")) {
+            list = producers;
+        } else {
+            throw new IllegalArgumentException("unknown type: " + type);
+        }
+        
+        return list.get(Integer.parseInt(matcher.group(2)));
     }
     
     public DataWorldComponent getParent() {

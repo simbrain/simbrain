@@ -23,6 +23,8 @@ public interface Attribute {
      */
     Type getType();
     
+    AttributeHolder getParent();
+    
     /**
      * Sets the id for this Attribute.  This is used for
      * serialization.  Most Attributes can extend AbstractAttribute
@@ -31,7 +33,7 @@ public interface Attribute {
      * 
      * @param id The id for this attribute.
      */
-    void setId(int id);
+//    void setId(int id);
     
     /**
      * Returns the id for this Attribute.  This is used for
@@ -40,5 +42,5 @@ public interface Attribute {
      * 
      * @return The id for this attribute.
      */
-    int getId();
+//    int getId();
 }

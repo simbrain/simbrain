@@ -63,10 +63,6 @@ public class WorkspaceSerializer {
         
         WorkspaceComponentSerializer serializer = new WorkspaceComponentSerializer();
         ArchiveContents archive = new ArchiveContents(serializer);
-
-        for (Coupling<?> coupling : workspace.getManager().getCouplings()) {
-            archive.addCoupling(coupling);
-        }
         
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
             ArchiveContents.Component archiveComp = archive.addComponent(component);
@@ -85,6 +81,10 @@ public class WorkspaceSerializer {
                 zipStream.putNextEntry(entry);
                 desktopComponent.save(zipStream);
             }
+        }
+        
+        for (Coupling<?> coupling : workspace.getManager().getCouplings()) {
+            archive.addCoupling(coupling);
         }
         
         ZipEntry entry = new ZipEntry("contents.xml");
@@ -137,8 +137,7 @@ public class WorkspaceSerializer {
         if (contents.components != null) {
             for (ArchiveContents.Component component : contents.components) {
                 WorkspaceComponent<?> wc = componentDeserializer.deserializeWorkspaceComponent(
-                    component.className, new ByteArrayInputStream(
-                    entries.get(component.uri)), "name", null);
+                    component, new ByteArrayInputStream(entries.get(component.uri)));
     
                 if (component.desktopComponent != null) {
                     workspace.toggleEvents(false);
@@ -160,9 +159,15 @@ public class WorkspaceSerializer {
         
         if (contents.couplings != null) {
             for (ArchiveContents.Coupling coupling : contents.couplings) {
-                workspace.addCoupling(new Coupling(
-                    (ProducingAttribute<?>) componentDeserializer.getAttribute(coupling.source),
-                    (ConsumingAttribute<?>) componentDeserializer.getAttribute(coupling.target)));
+                System.out.println("coupling source: " + coupling.source.uri + " " + coupling.source.key);
+                System.out.println("coupling target: " + coupling.target.uri + " " + coupling.target.key);
+                
+                WorkspaceComponent<?> sourceComponent = componentDeserializer.getComponent(coupling.source.uri);
+                WorkspaceComponent<?> targetComponent = componentDeserializer.getComponent(coupling.target.uri);
+                
+                workspace.addCoupling(new Coupling(    
+                    (ProducingAttribute<?>) sourceComponent.getAttributeForKey(coupling.source.key),
+                    (ConsumingAttribute<?>) targetComponent.getAttributeForKey(coupling.target.key)));
             }
         }
     }

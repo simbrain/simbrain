@@ -18,24 +18,19 @@
  */
 package org.simbrain.world.dataworld;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -123,6 +118,16 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         }
     }
 
+    @Override
+    public Attribute getAttributeForKey(String key) {
+        return dataModel.getAttribute(key);
+    }
+
+    @Override
+    public String getKeyForAttribute(Attribute attribute) {
+        return dataModel.getKey(attribute);
+    }
+    
 //    @Override
 //    public void setCurrentDirectory(final String currentDirectory) {
 //        super.setCurrentDirectory(currentDirectory);

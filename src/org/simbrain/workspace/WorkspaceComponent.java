@@ -69,9 +69,25 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * this method.
      *
      * @param output the stream of data to write the data to.
+     * @param format a key used to define the requested format.
+     * @return a short key for the format such as 'xml'.
      */
     public abstract void save(OutputStream output, String format);
+    
+    public String getDefaultFormatKey() {
+        return "xml";
+    }
+    
+    public String getKeyForAttribute(Attribute attribute) {
+        // TODO abstract
+        return null;
+    }
 
+    public Attribute getAttributeForKey(String key) {
+        // TODO abstract
+        return null;
+    }
+    
     /**
      * When workspaces are opened, a path to a file is passed in.
      * So, all components which can be saved should have this.

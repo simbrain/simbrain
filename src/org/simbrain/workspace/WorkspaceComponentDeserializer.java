@@ -3,16 +3,15 @@ package org.simbrain.workspace;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.simbrain.workspace.gui.DesktopComponent;
 
 public class WorkspaceComponentDeserializer {
-//    private final Map<Integer, WorkspaceComponent<?>> componentIds 
-//        = new HashMap<Integer, WorkspaceComponent<?>>();
-    private final Map<Integer, Attribute> attributes 
-        = new HashMap<Integer, Attribute>();
+    private final Map<String, WorkspaceComponent<?>> componentKeys 
+        = new HashMap<String, WorkspaceComponent<?>>();
+//    private final Map<Integer, Attribute> attributes 
+//        = new HashMap<Integer, Attribute>();
     
 //    int getId(final WorkspaceComponent<?> component) {
 //        Integer id = componentIds.get(component);
@@ -25,36 +24,45 @@ public class WorkspaceComponentDeserializer {
 //        return id;
 //    }
     
-    Attribute getAttribute(final int id) {
-        return attributes.get(id);
+    
+//    Attribute getAttribute(ArchiveContents.Coupling coupling) {
+//        return attributes.get(id);
+//    }
+    
+    WorkspaceComponent<?> getComponent(String uri) {
+        return componentKeys.get(uri);
     }
     
+    
     @SuppressWarnings("unchecked")
-    WorkspaceComponent<?> deserializeWorkspaceComponent(final String className,
-            final InputStream input, final String name, final String format) {
+    WorkspaceComponent<?> deserializeWorkspaceComponent(ArchiveContents.Component component,
+            final InputStream input) {
         try {
             Class<WorkspaceComponent<?>> clazz 
-                = (Class<WorkspaceComponent<?>>) Class.forName(className);
+                = (Class<WorkspaceComponent<?>>) Class.forName(component.className);
             Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
             
-            WorkspaceComponent<?> component = (WorkspaceComponent<?>) method.invoke(null, input, name, format); 
+            WorkspaceComponent<?> wc = (WorkspaceComponent<?>) method.invoke(null, input, component.name, null);//component.format); 
             
-            for (Consumer consumer : component.getConsumers()) {
+            for (Consumer consumer : wc.getConsumers()) {
                 for (Attribute attribute : consumer.getConsumingAttributes()) {
-                    int id = attribute.getId();
-                    System.out.println("consumer: " + id);
-                    if (id >= 0) attributes.put(attribute.getId(), attribute);
+                    String key = wc.getKeyForAttribute(attribute);
+                    System.out.println("consumer: " + key);
+//                    if (id >= 0) attributes.put(attribute.getId(), attribute);
                 }
             }
             
-            for (Producer producer : component.getProducers()) {
+            for (Producer producer : wc.getProducers()) {
                 for (Attribute attribute : producer.getProducingAttributes()) {
-                    int id = attribute.getId();
-                    System.out.println("producer: " + id);
-                    if (id >= 0) attributes.put(attribute.getId(), attribute);
+                    String key = wc.getKeyForAttribute(attribute);
+                    System.out.println("producer: " + key);
+//                    if (id >= 0) attributes.put(attribute.getId(), attribute);
                 }
             }
-            return component;
+            
+            componentKeys.put(component.uri, wc);
+            
+            return wc;
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

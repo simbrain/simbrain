@@ -26,19 +26,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simnet.NetworkThread;
 import org.simnet.util.SimpleId;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 import bsh.EvalError;
 import bsh.Interpreter;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 
 /**
@@ -51,6 +54,8 @@ import bsh.Interpreter;
  */
 public class RootNetwork extends Network {
 
+    public static final String NEURON_ID_PREFIX = "Neuron";
+    
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(RootNetwork.class);
 
@@ -118,13 +123,13 @@ public class RootNetwork extends Network {
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
 
     /** Neuron Id generator. */
-    private SimpleId neuronIdGenerator = new SimpleId("Neuron", 1);
+    private SimpleId neuronIdGenerator = new SimpleId(NEURON_ID_PREFIX, 1);
 
     /** Synapse Id generator. */
     private SimpleId synapseIdGenerator = new SimpleId("Synapse", 1);
 
     /** Network Component. */
-    private final NetworkComponent component;
+    private NetworkComponent component;
     
     /**
      * Returns reference to parent.
@@ -145,6 +150,13 @@ public class RootNetwork extends Network {
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
         this.setId("Root-network");
+    }
+    
+    /**
+     * Only to be called by NetworkComponent
+     */
+    public void setParent(NetworkComponent component) {
+        this.component = component;
     }
     
     /**
@@ -909,7 +921,37 @@ public class RootNetwork extends Network {
     public SimpleId getNeuronIdGenerator() {
         return neuronIdGenerator;
     }
-
+    
+    public Attribute getAttribute(String id) {
+        System.out.println("id: " + id);
+        
+        Matcher matcher = Pattern.compile('(' + NEURON_ID_PREFIX + "_\\d+):(\\w+)").matcher(id);
+        
+        if (!matcher.matches()) return null;
+        
+        String parent = matcher.group(1);
+        String attribute = matcher.group(2);
+        
+        System.out.println("parent: " + parent);
+        System.out.println("attribute: " + attribute);
+        
+        for (Neuron n : getFlatNeuronList()) {
+            if (n.getId().equals(parent)) {
+                for (Attribute a : n.consumingAttributes()) {
+                    System.out.println("\tchecking: " + a.getAttributeDescription());
+                    if (a.getAttributeDescription().equals(attribute)) return a;
+                }
+                
+                for (Attribute a : n.producingAttributes()) {
+                    System.out.println("\tchecking: " + a.getAttributeDescription());
+                    if (a.getAttributeDescription().equals(attribute)) return a;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
     /**
      * Return the generator for network ids.
      *

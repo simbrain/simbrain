@@ -1033,7 +1033,7 @@ public abstract class Network {
 
         return ret;
     }
-
+    
     /**
      * Create "flat" list of synapses, which includes the top-level synapses plus
      * all subnet synapses.

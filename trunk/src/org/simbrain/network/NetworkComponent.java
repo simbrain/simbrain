@@ -23,11 +23,14 @@ import java.io.OutputStream;
 import java.util.Collection;
 
 import org.simbrain.gauge.GaugeComponent;
+import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
+import org.simnet.interfaces.Synapse;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -46,13 +49,13 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
         super(name);
     }
     
-    
     /**
      * Create a new network component.
      */
-    public NetworkComponent(String name, RootNetwork network) {
+    private NetworkComponent(String name, RootNetwork network) {
         super(name);
         this.rootNetwork = network;
+        rootNetwork.setParent(this);
     }
 
     
@@ -67,6 +70,24 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     @Override
     public void save(final OutputStream output, final String format) {
         RootNetwork.getXStream().toXML(rootNetwork, output);
+    }
+    
+    public String getKeyForAttribute(Attribute attribute) {
+        String prefix;
+        
+        if (attribute.getParent() instanceof Neuron) {
+            prefix = ((Neuron) attribute.getParent()).getId();
+        } else if (attribute instanceof Neuron) {
+            prefix = ((Synapse) attribute.getParent()).getId();
+        } else {
+            return null;
+        }
+        
+        return prefix + ':' + attribute.getAttributeDescription();
+    }
+
+    public Attribute getAttributeForKey(String key) {
+        return rootNetwork.getAttribute(key);
     }
     
     public RootNetwork getRootNetwork() {

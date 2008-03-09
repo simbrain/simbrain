@@ -270,6 +270,9 @@ public class CouplingManager {
          * @param target The target.
          */
         SourceTarget(final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
+            if (source == null) throw new IllegalArgumentException("source cannot be null");
+            if (target == null) throw new IllegalArgumentException("target cannot be null");
+            
             this.source = source;
             this.target = target;
         }

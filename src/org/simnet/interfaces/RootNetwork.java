@@ -201,6 +201,7 @@ public class RootNetwork extends Network {
 
         // Only add top level networks
         for (Network subnet : getNetworkList()) {
+            subnet.setRootNetwork(this);
             this.fireSubnetAdded(subnet);
             subnet.postUnmarshallingInit();
         }

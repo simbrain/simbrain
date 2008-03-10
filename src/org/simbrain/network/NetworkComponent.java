@@ -73,17 +73,12 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     }
     
     public String getKeyForAttribute(Attribute attribute) {
-        String prefix;
-        
         if (attribute.getParent() instanceof Neuron) {
-            prefix = ((Neuron) attribute.getParent()).getId();
-        } else if (attribute instanceof Neuron) {
-            prefix = ((Synapse) attribute.getParent()).getId();
+            String prefix = ((Neuron) attribute.getParent()).getId();
+            return prefix + ':' + attribute.getAttributeDescription();
         } else {
             return null;
         }
-        
-        return prefix + ':' + attribute.getAttributeDescription();
     }
 
     public Attribute getAttributeForKey(String key) {

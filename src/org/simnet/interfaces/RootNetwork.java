@@ -197,7 +197,7 @@ public class RootNetwork extends Network {
         this.setId("Root-network");
         networkIdGenerator = new SimpleId("Network", 1);
         neuronIdGenerator = new SimpleId("Neuron", 1);
-        networkIdGenerator = new SimpleId("Netork", 1);
+        synapseIdGenerator = new SimpleId("Synapse", 1);
 
         // Only add top level networks
         for (Network subnet : getNetworkList()) {

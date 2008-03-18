@@ -56,6 +56,7 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
         super(name);
         this.rootNetwork = network;
         rootNetwork.setParent(this);
+        setChangedSinceLastSave(false);
     }
 
     

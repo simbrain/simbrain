@@ -65,6 +65,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         super(name);
         this.dataModel = (DataModel<Double>) dataModel;
         this.dataModel.setParent(this);
+        setChangedSinceLastSave(false);
     }
     
     /**

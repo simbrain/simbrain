@@ -46,7 +46,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
     /** Whether this component has changed since last save. */
-    private boolean changedSinceLastSave = false;
+    private boolean changedSinceLastSave = true;
 
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";

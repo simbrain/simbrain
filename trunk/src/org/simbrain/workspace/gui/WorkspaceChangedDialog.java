@@ -19,21 +19,23 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import javax.swing.SpringLayout;
 
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceSerializer;
@@ -43,32 +45,27 @@ import org.simbrain.workspace.WorkspaceSerializer;
  * <b>WorkspaceChangedDialog</b> tells the user what components have changed
  * since the last time they saved.
  */
-public class WorkspaceChangedDialog extends JDialog implements ActionListener {
-
+public class WorkspaceChangedDialog extends JDialog {
+    /** The default serial version Id. */
     private static final long serialVersionUID = 1L;
-
-//    private final Workspace workspace;
+    /** The parent desktop. */
     private final SimbrainDesktop desktop;
     
     /**
      * Constructor for workspace changed dialog.
+     * 
+     * @param desktop The parent desktop.
      */
-    public WorkspaceChangedDialog(SimbrainDesktop desktop) {
+    public WorkspaceChangedDialog(final SimbrainDesktop desktop) {
         this.desktop = desktop;
         init();
     }
     
     /** Main Panel. */
-    private LabelledItemPanel panel = new LabelledItemPanel();
+    private JPanel panel;
 
-    /** Whether the user has cancelled out of this dialog. */
+    /** Whether the user has canceled out of this dialog. */
     private boolean userCancelled = false;
-
-    /** List of checkboxes. */
-    private ArrayList<JCheckBox> checkBoxList = new ArrayList<JCheckBox>();
-
-    /** Whether the workspace as a whole has changed. */
-    private JCheckBox workspaceChecker = new JCheckBox();
 
     /**
      * Initialize the panel.
@@ -78,26 +75,21 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
         this.getContentPane().setLayout(new BorderLayout());
 
-        JButton ok = new JButton("OK");
-        JButton cancel = new JButton("Cancel");
-        getRootPane().setDefaultButton(ok);
-        getContentPane().add(ok);
-        getContentPane().add(cancel);
-        ok.addActionListener(this);
-        ok.setActionCommand("ok");
-        cancel.addActionListener(this);
-        cancel.setActionCommand("cancel");
-
+        JButton yesButton = new JButton(yes);
+        JButton noButton = new JButton(no);
+        JButton cancelButton = new JButton(cancel);
+        getRootPane().setDefaultButton(yesButton);
         getContentPane().add(BorderLayout.CENTER, panel);
 
         JPanel northPanel = new JPanel(new GridLayout(2, 0));
-        northPanel.add(new JLabel(" The following resources have not been saved,  "));
-        northPanel.add(new JLabel(" check the ones you want to save:"));
+        northPanel.add(new JLabel("The current workspace has changed."));
+        northPanel.add(new JLabel("Would you like to save it?"));
         getContentPane().add(BorderLayout.NORTH, northPanel);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(ok);
-        buttonPanel.add(cancel);
+        buttonPanel.add(yesButton);
+        buttonPanel.add(noButton);
+        buttonPanel.add(cancelButton);
         getContentPane().add(BorderLayout.SOUTH, buttonPanel);
 
         setTitle("Save Resources");
@@ -107,41 +99,101 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         setVisible(true);
     }
 
-    /**
-     * Display information about which components have changed.
-     */
     public void initPanel() {
-
-        int i = 0;
-        for (WorkspaceComponent<?> component : desktop.getWorkspace().getComponentList()) {
-            if (component.isChangedSinceLastSave()) {
-                JCheckBox checker = new JCheckBox();
-                // TODO
-//                panel.addItem(component.getName() + "." + component.getFileExtension(), checker);
-                checkBoxList.add(i++, checker);
+        panel = new JPanel();
+        
+        BorderLayout layout = new BorderLayout();
+        panel.setLayout(layout);
+        
+        JPanel north = new JPanel();
+        north.setLayout(new FlowLayout(FlowLayout.LEFT));
+        
+        panel.add(north, BorderLayout.NORTH);
+        
+        final JToggleButton button = new JToggleButton();
+        
+        north.add(button);
+        
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (button.isSelected()) {
+                    addCheckboxPanel();
+                } else {
+                    removeCheckboxPanel();
+                }
             }
+        });
+    }
+    
+    JPanel checkboxes;
+    
+    public void addCheckboxPanel() {
+        checkboxes = new JPanel();
+        SpringLayout layout = new SpringLayout();
+        JCheckBox last = null;
+        
+        checkboxes.setLayout(layout);
+        
+        for (WorkspaceComponent<?> component : desktop.getWorkspace().getComponentList()) {
+            JLabel label = new JLabel(component.getName());
+            JCheckBox checkbox = new JCheckBox();
+            checkbox.setSelected(true);
+            
+            checkboxes.add(checkbox);
+            checkboxes.add(label);
+            
+            if (last == null) {
+                layout.putConstraint(SpringLayout.NORTH, checkbox,
+                    5, SpringLayout.NORTH, checkboxes);
+            } else {
+                layout.putConstraint(SpringLayout.NORTH, checkbox,
+                    5, SpringLayout.SOUTH, last);
+            }
+            
+            layout.putConstraint(SpringLayout.WEST, checkbox,
+                20, SpringLayout.WEST, checkboxes);
+            layout.putConstraint(SpringLayout.WEST, label,
+                5, SpringLayout.EAST, checkbox);
+            layout.putConstraint(SpringLayout.SOUTH, label,
+                0, SpringLayout.SOUTH, checkbox);
+        
+            last = checkbox;
         }
         
-        // TODO fix
-//        if (Workspace.getInstance().hasWorkspaceChanged()) {
-//            panel.addItem("Workspace (" + Workspace.getInstance().getTitle() + ")", workspaceChecker);
-//        }
+        layout.putConstraint(SpringLayout.SOUTH, checkboxes,
+                5, SpringLayout.SOUTH, last);
+        
+        panel.add(checkboxes, BorderLayout.CENTER);
+        
+        pack();
+    }
+    
+    void removeCheckboxPanel() {
+        panel.remove(checkboxes);
+        pack();
     }
 
-    /**
-     * Responds to actions performed.
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-        if (e.getActionCommand().equals("cancel")) {
-            userCancelled = true;
-            dispose();
-        } else if (e.getActionCommand().equals("ok")) {
+    private final Action yes = new AbstractAction("Yes") {
+        public void actionPerformed(ActionEvent e) {
             doSaves();
             dispose();
         }
-    }
-
+    };
+    
+    private final Action no = new AbstractAction("No") {
+        public void actionPerformed(ActionEvent e) {
+            userCancelled = false;
+            dispose();
+        }
+    };
+    
+    private final Action cancel = new AbstractAction("Cancel") {
+        public void actionPerformed(ActionEvent e) {
+            userCancelled = true;
+            dispose();
+        }
+    };
+    
     /**
      * Save all checked components.
      */

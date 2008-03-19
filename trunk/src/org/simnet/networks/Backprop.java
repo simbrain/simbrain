@@ -145,13 +145,6 @@ public class Backprop extends Network {
     }
 
     /**
-     * Intialize post unmarshalling.
-     */
-    protected void postUnmarshallingInit() {
-        super.postUnmarshallingInit();
-    }
-
-    /**
      * Create neurons.
      */
     protected void createNeurons() {
@@ -175,9 +168,9 @@ public class Backprop extends Network {
             outputLayer.addNeuron(getDefaultNeuron());
         }
 
-        addNetworkReference(inputLayer);
-        addNetworkReference(hiddenLayer);
-        addNetworkReference(outputLayer);
+        addNetwork(inputLayer);
+        addNetwork(hiddenLayer);
+        addNetwork(outputLayer);
 
     }
 
@@ -245,6 +238,8 @@ public class Backprop extends Network {
     }
     }
 
+    //TODO: Below breaks when the network is manually changed.
+    
     /**
      * update the weights.
      *

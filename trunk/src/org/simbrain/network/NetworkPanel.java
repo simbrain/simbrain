@@ -1263,9 +1263,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void neuronAdded(final NetworkEvent e) {
         neuronAdded(e.getNeuron());
     }
-    
+
     /** @inheritDoc org.simnet.interfaces.NetworkListener#neuronAdded */
     public void neuronAdded(final Neuron neuron) {
+        if (this.findNeuronNode(neuron) != null) {
+            return;
+        }
+
         NeuronNode node = new NeuronNode(this, neuron, desktopComponent);
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
@@ -1300,9 +1304,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void synapseAdded(final NetworkEvent e) {
         synapseAdded(e.getSynapse());
     }
-    
+
     /** @see NetworkListener */
     public void synapseAdded(final Synapse synapse) {
+        if (this.findSynapseNode(synapse) != null) {
+            return;
+        }
+
         NeuronNode source = findNeuronNode(synapse.getSource());
         NeuronNode target = findNeuronNode(synapse.getTarget());
         if ((source == null) || (target == null)) {
@@ -1424,11 +1432,36 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         subnetAdded(e.getSubnet());
     }
     
+    public void syncToModel() {
+        for (Network network : rootNetwork.getNetworkList()) {
+            subnetAdded(network);
+            for (Neuron neuron : network.getNeuronList()) {
+                neuronAdded(neuron);
+            }
+            for (Synapse synapse : network.getSynapseList()) {
+                synapseAdded(synapse);
+            }
+        }
+        for (Neuron neuron : rootNetwork.getNeuronList()) {
+            neuronAdded(neuron);
+        }
+        for (Synapse synapse : rootNetwork.getSynapseList()) {
+            synapseAdded(synapse);
+        }
+    }
+    
     public void subnetAdded(final Network network) {
+
+        // Only top-level subnets are added.  Special graphical representation
+        //   for subnetworks of subnets is contained in org.simbrain.network.nodes.subnetworks
+        if (network.getDepth() > 1) {
+            return;
+        }
 
         // Make a list of neuron nodes
         ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
         for (Neuron neuron : network.getFlatNeuronList()) {
+            neuronAdded(neuron);
             NeuronNode node = findNeuronNode(neuron);
             if (node != null) {
                 neuronNodes.add(node);
@@ -1454,6 +1487,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         // Add synapses
         for (Synapse synapse : network.getFlatSynapseList()) {
+            synapseAdded(synapse);
             SynapseNode node = findSynapseNode(synapse);
             if (node != null) {
                 this.getLayer().addChild(node);

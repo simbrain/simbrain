@@ -107,12 +107,7 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
 
     @Override
     public String getFileExtension() {
-        return "net";
-    }
-
-    @Override
-    public void save(File saveFile) {
-        networkPanel.saveNetwork(saveFile);
+        return "xml";
     }
 
     @Override
@@ -121,15 +116,9 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
     }
 
     @Override
-    public void setCurrentDirectory(String currentDirectory) {        
-//        super.setCurrentDirectory(currentDirectory);
-//        NetworkPreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    @Override
-    public String getCurrentDirectory() {
-        return null;
-//        return NetworkPreferences.getCurrentDirectory();
+    public void save(File saveFile) {
+        networkPanel.saveNetwork(saveFile);
+        setName(saveFile.getName());
     }
 
     @Override

@@ -19,8 +19,13 @@
 
 package org.simnet.networks.actorcritic;
 
+import java.util.HashSet;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 import org.simnet.connections.AllToAll;
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
@@ -28,6 +33,7 @@ import org.simnet.layouts.Layout;
 import org.simnet.networks.StandardNetwork;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.synapses.SimpleSynapse;
+import org.simnet.util.SimpleId;
 
 /**
  * <b>ActorCritic</b>. Implements Temporal Difference learning. This network
@@ -130,11 +136,16 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * Init castor.
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
      */
-    protected void postUnmarshallingInit() {
-        super.postUnmarshallingInit();
+    private Object readResolve() {
         initVariables();
+        return this;
     }
 
     /**
@@ -158,9 +169,9 @@ public class ActorCritic extends Network {
         for (int i = 0; i < 2; i++) {
             this.critic.addNeuron(new LinearNeuron());
         }
-        addNetworkReference(stateNetwork);
-        addNetworkReference(actionsNetwork);
-        addNetworkReference(critic);
+        addNetwork(stateNetwork);
+        addNetwork(actionsNetwork);
+        addNetwork(critic);
     }
 
     /**

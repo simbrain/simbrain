@@ -151,7 +151,7 @@ public class WorkspaceSerializer {
                         entries.get(component.desktopComponent.uri)), component.name);
                     
                     desktop.addComponent(wc, dc);
-                    
+                    dc.postAddInit();
                     workspace.toggleEvents(true);
                 }
             }

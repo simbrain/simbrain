@@ -21,13 +21,16 @@ package org.simnet.interfaces;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.CouplingManager;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
+import org.simnet.util.SimpleId;
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the main API
@@ -82,7 +85,7 @@ public abstract class Network {
      */
     public Network() {
     }
-
+    
     /**
      * Update the network.
      */
@@ -92,10 +95,11 @@ public abstract class Network {
      * Updates all networks.
      */
     public void updateAllNetworks() {
-        logger.debug("updating " + networkList.size() + " networks");
+        //TODO: Unable to init logger after deserialize
+//        logger.debug("updating " + networkList.size() + " networks");
 
         for (Network network : networkList) {
-            logger.debug("updating network: " + network);
+  //          logger.debug("updating network: " + network);
             network.update();
         }
     }
@@ -116,7 +120,7 @@ public abstract class Network {
     public Network duplicate(final Network newNetwork) {
         newNetwork.setRootNetwork(this.getRootNetwork());
         List<?> copy = CopyFactory.getCopy(this.getObjectList());
-        newNetwork.addObjects(copy, true);
+        newNetwork.addObjects(copy);
         newNetwork.setUpdatePriority(this.getUpdatePriority());
         return newNetwork;
     }
@@ -126,23 +130,18 @@ public abstract class Network {
      * Used in copy paste and tuned to that usage.
      *
      * @param toAdd list of objects to add.
-     * @param notify whether to fire a notification event.
      */
-    private void addObjects(final List<?> toAdd, final boolean notify) {
+    private void addObjects(final List<?> toAdd) {
         for (Object object : toAdd) {
             if (object instanceof Neuron) {
                 Neuron neuron = (Neuron) object;
-                addNeuron(neuron, notify);
+                addNeuron(neuron);
             } else if (object instanceof Synapse) {
                 Synapse synapse = (Synapse) object;
-                addSynapse(synapse, notify);
+                addSynapse(synapse);
             } else if (object instanceof Network) {
                 Network net = (Network) object;
-                if (net.getParentNetwork() == this) {
-                    addNetwork(net, notify);
-                } else {
-                    addNetwork(net, false);
-                }
+                addNetwork(net);
             }
         }
     }
@@ -153,7 +152,7 @@ public abstract class Network {
      * @param toAdd objects to add.
      */
     public void addObjects(final ArrayList<?> toAdd) {
-        addObjects(toAdd, true);
+        addObjects(toAdd);
     }
 
     /**
@@ -162,7 +161,7 @@ public abstract class Network {
      * @param toAdd objects to add.
      */
     public void addObjectReferences(final ArrayList<?> toAdd) {
-        addObjects(toAdd, false);
+        addObjects(toAdd);
     }
 
     /**
@@ -175,21 +174,6 @@ public abstract class Network {
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.setX(neuron.getX() + offsetX);
             neuron.setY(neuron.getY() + offsetY);
-        }
-    }
-
-    /**
-     * Perform initialization required after opening saved networks.
-     */
-    protected void postUnmarshallingInit() {
-
-        logger = Logger.getLogger(RootNetwork.class);
-
-        for (Neuron neuron : getNeuronList()) {
-            this.getRootNetwork().fireNeuronAdded(neuron);
-        }
-        for (Synapse synapse : getSynapseList()) {
-            this.getRootNetwork().fireSynapseAdded(synapse);
         }
     }
 
@@ -320,22 +304,11 @@ public abstract class Network {
      * @param neuron Type of neuron to add
      */
     public void addNeuron(final Neuron neuron) {
-        addNeuron(neuron, true);
-    }
-
-    /**
-     * Adds a new neuron.
-     *
-     * @param neuron Type of neuron to add
-     * @param notify whether to fire a synapse added event
-     */
-    private void addNeuron(final Neuron neuron, final boolean notify) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
-        if ((rootNetwork != null) && (notify)) {
+        if ((rootNetwork != null)) {
             rootNetwork.fireNeuronAdded(neuron);
         }
-        neuron.postUnmarshallingInit();
         neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
     }
 
@@ -359,29 +332,18 @@ public abstract class Network {
      * source and target neurons.
      *
      * @param synapse the weight object to add
-     * @param notify whether to fire a synapse added event
      */
-    private void addSynapse(final Synapse synapse, final boolean notify) {
+    public void addSynapse(final Synapse synapse) {
         synapse.setParentNetwork(this);
-        Neuron target = (Neuron) synapse.getTarget();
 
         synapse.initSpikeResponder();
         synapseList.add(synapse);
-        if ((rootNetwork != null) && (notify)) {
+        if ((rootNetwork != null)) {
             rootNetwork.fireSynapseAdded(synapse);
         }
         synapse.setId(rootNetwork.getSynapseIdGenerator().getId());
     }
 
-    /**
-     * Adds a weight to the neuron network, where that weight already has designated
-     * source and target neurons.
-     *
-     * @param weight the weight object to add
-     */
-    public void addSynapse(final Synapse weight) {
-        addSynapse(weight, true);
-    }
 
     /**
      * Calls {@link Neuron#update} for each neuron.
@@ -675,22 +637,12 @@ public abstract class Network {
      * Add an array of neurons and set their parents to this.
      *
      * @param neurons list of neurons to add
-     * @param notify whether to notify listeners that these neurons were added.
      */
-    protected void addNeuronList(final ArrayList<Neuron> neurons, final boolean notify) {
+    protected void addNeuronList(final ArrayList<Neuron> neurons) {
         for (Neuron n : neurons) {
             n.setParentNetwork(this);
-            addNeuron(n,  notify);
+            addNeuron(n);
         }
-    }
-
-    /**
-     * Add an array of neurons and set their parents to this.
-     *
-     * @param neurons list of neurons to add
-     */
-    public void addNeuronList(final ArrayList<Neuron> neurons) {
-        addNeuronList(neurons, true);
     }
 
     /**
@@ -813,7 +765,7 @@ public abstract class Network {
 //        newSynapse.setTarget(oldSynapse.getTarget());
 //        newSynapse.setSource(oldSynapse.getSource());
         deleteSynapse(oldSynapse, false);
-        addSynapse(newSynapse, false);
+        addSynapse(newSynapse);
 
         rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
     }
@@ -893,31 +845,12 @@ public abstract class Network {
      * @param n Network type to add.
      * @param notify whether to fire a synapse added event
      */
-    private void addNetwork(final Network n, final boolean notify) {
+    public void addNetwork(final Network n) {
         networkList.add(n);
         n.setParentNetwork(this);
         n.setRootNetwork(rootNetwork);
-        if (notify) {
-            getRootNetwork().fireSubnetAdded(n);
-        }
+        getRootNetwork().fireSubnetAdded(n);
         n.setId(getRootNetwork().getNetworkIdGenerator().getId());
-    }
-
-    /**
-     * Add a new network.
-     *
-     * @param network network to add.
-     */
-    public void addNetworkReference(final Network network) {
-        addNetwork(network, false);
-    }
-    /**
-     * Add a new network.
-     *
-     * @param network network to add.
-     */
-    public void addNetwork(final Network network) {
-        addNetwork(network, true);
     }
 
     /**

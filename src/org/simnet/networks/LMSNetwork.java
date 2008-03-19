@@ -114,8 +114,8 @@ public class LMSNetwork extends Network {
             outputLayer.addNeuron(getDefaultNeuron());
         }
 
-        addNetworkReference(inputLayer);
-        addNetworkReference(outputLayer);
+        addNetwork(inputLayer);
+        addNetwork(outputLayer);
     }
 
     /**

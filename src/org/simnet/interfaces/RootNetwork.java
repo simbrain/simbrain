@@ -174,7 +174,7 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "synapseIdGenerator");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
-        xstream.omitField(Network.class, "rootNetwork");
+        xstream.omitField(Network.class, "rootNetwork"); //TODO: Try removing?
         xstream.omitField(Network.class, "parentNetwork");
         return xstream;
     }
@@ -198,15 +198,11 @@ public class RootNetwork extends Network {
         networkIdGenerator = new SimpleId("Network", 1);
         neuronIdGenerator = new SimpleId("Neuron", 1);
         synapseIdGenerator = new SimpleId("Synapse", 1);
-
-        // Only add top level networks
-        for (Network subnet : getNetworkList()) {
-            subnet.setRootNetwork(this);
-            this.fireSubnetAdded(subnet);
-            subnet.postUnmarshallingInit();
-        }
-        super.postUnmarshallingInit(); // This inits the root network elements
         
+        for (Network network : this.getFlatNetworkList()) {
+            network.setRootNetwork(this);
+        }
+
         return this;
     }
     

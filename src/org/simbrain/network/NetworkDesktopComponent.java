@@ -72,27 +72,7 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         buffer.add("Center", networkPanel);
         setContentPane(buffer);
         createAndAttachMenus();
-        
-        // -------------------------------------------
-        for (Network network : component.getRootNetwork().getNetworkList()) {
-            networkPanel.subnetAdded(network);
-            
-            for (Neuron neuron : network.getNeuronList()) {
-                networkPanel.neuronAdded(neuron);
-            }
-            for (Synapse synapse : network.getSynapseList()) {
-                networkPanel.synapseAdded(synapse);
-            }
-        }
-        
-        for (Neuron neuron : component.getRootNetwork().getNeuronList()) {
-            networkPanel.neuronAdded(neuron);
-        }
-        for (Synapse synapse : component.getRootNetwork().getSynapseList()) {
-            networkPanel.synapseAdded(synapse);
-        }
-        // -------------------------------------------
-        
+        networkPanel.syncToModel();
         component.getRootNetwork().addListener(networkPanel);
     }
 
@@ -113,6 +93,7 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
     public void postAddInit() {
         setSize(450, 400);
         setVisible(true);
+        networkPanel.centerCamera();
     }
     
     /**

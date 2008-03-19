@@ -151,7 +151,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      * Show the dialog for saving a workspace component.
      */
     public void showSaveFileDialog() {
-        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
+        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getDefaultFormatKey());
         
         if (getCurrentFile() != null) {
             chooser.setSelectedFile(getCurrentFile());
@@ -314,6 +314,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      * @return the currentDirectory
      */
     public String getCurrentDirectory() {
+        System.out.println(currentDirectory);
         return currentDirectory;
     }
 

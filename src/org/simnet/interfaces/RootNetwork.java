@@ -174,8 +174,6 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "synapseIdGenerator");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
-        xstream.omitField(Network.class, "rootNetwork"); //TODO: Try removing?
-        xstream.omitField(Network.class, "parentNetwork");
         return xstream;
     }
 
@@ -190,19 +188,11 @@ public class RootNetwork extends Network {
     private Object readResolve() {
         logger = Logger.getLogger(RootNetwork.class);
         listenerList = new HashSet<NetworkListener>();
-        
-        setRootNetwork(this);
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
-        this.setId("Root-network");
         networkIdGenerator = new SimpleId("Network", 1);
         neuronIdGenerator = new SimpleId("Neuron", 1);
         synapseIdGenerator = new SimpleId("Synapse", 1);
-        
-        for (Network network : this.getFlatNetworkList()) {
-            network.setRootNetwork(this);
-        }
-
         return this;
     }
     

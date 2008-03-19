@@ -24,6 +24,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1750,23 +1754,41 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @param file the file describing the rootNetwork to open
      */
-    public void openNetwork(final File file) {
-//        serializer.readNetwork(file);
+    public void openNetwork(final File theFile) {
+        getLayer().removeAllChildren();
+        FileReader reader;
+        try {
+            reader = new FileReader(theFile);
+            rootNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(reader);
+            syncToModel();
+            rootNetwork.addListener(this);
+            repaint();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         setChangedSinceLastSave(false);
     }
 
     /**
      * Save rootNetwork to specified file.
-     *
-     * @param networkFile the file to save the rootNetwork to.
+     * 
+     * @param networkFile
+     *            the file to save the rootNetwork to.
      */
-    public void saveNetwork(final File networkFile) {
- //       serializer.writeNet(networkFile);
+    public void saveNetwork(final File theFile) {
+        String xml = RootNetwork.getXStream().toXML(rootNetwork);
+        try {
+            FileWriter writer = new FileWriter(theFile);
+            writer.write(xml);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Return height bottom toolbar is taking up.
-     *
+     * 
      * @return height bottom toolbar is taking up
      */
     private double getToolbarOffset() {

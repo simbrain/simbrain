@@ -458,7 +458,7 @@ public abstract class Network {
      * @param toDelete the weight to delete
      * @param notify whether to fire a synapse deleted event
      */
-    private void deleteSynapse(final Synapse toDelete, final boolean notify) {
+    public void deleteSynapse(final Synapse toDelete) {
 
         Group group = getRootNetwork().containedInGroup(toDelete);
         if (group != null) {
@@ -467,19 +467,8 @@ public abstract class Network {
                 this.getRootNetwork().deleteGroup(group);
             }
         }
-        if (notify) {
-            this.getRootNetwork().fireSynapseDeleted(toDelete);
-        }
+        this.getRootNetwork().fireSynapseDeleted(toDelete);
         toDelete.delete();
-    }
-
-    /**
-     * Delete a specified weight.
-     *
-     * @param toDelete the weight to delete
-     */
-    public void deleteSynapse(final Synapse toDelete) {
-        deleteSynapse(toDelete, true);
     }
 
     /**
@@ -764,7 +753,7 @@ public abstract class Network {
     public void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
 //        newSynapse.setTarget(oldSynapse.getTarget());
 //        newSynapse.setSource(oldSynapse.getSource());
-        deleteSynapse(oldSynapse, false);
+        deleteSynapse(oldSynapse);
         addSynapse(newSynapse);
 
         rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
@@ -843,7 +832,6 @@ public abstract class Network {
     /**
      * Adds a new network.
      * @param n Network type to add.
-     * @param notify whether to fire a synapse added event
      */
     public void addNetwork(final Network n) {
         networkList.add(n);

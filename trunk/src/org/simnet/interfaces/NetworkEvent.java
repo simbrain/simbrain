@@ -21,173 +21,72 @@ package org.simnet.interfaces;
 import java.util.EventObject;
 
 /**
- * Network event.  Currently adding or deleting a neuron.
+ * Network event which holds an old and new version of some type of object.
+ *
+ * @param <T> The type of the object involved in the event.
  */
-public final class NetworkEvent
+public final class NetworkEvent<T>
     extends EventObject {
 
-    /** default serial id */
-	private static final long serialVersionUID = 1L;
+    /** New version of object */
+	private T theObject;
 
-	/** Reference to neuron. */
-    private Neuron neuron;
+	/** Previous version of object. */
+	private T oldObject;
 
-    /** Reference to neuron. */
-    private Neuron oldNeuron;
-
-    /** Reference to neuron. */
-    private Synapse synapse;
-
-    /** Reference to neuron. */
-    private Synapse oldSynapse;
-
-    /** Reference to subnetwork. */
-    private Network subnet;
-
-    /** Reference to group. */
-    private Group group;
-
-    /** Reference to group. */
-    private Group oldGroup;
-
-    /**
-     * Create a new model event.
-     *
-     * @param net reference to network firing event
-     * @param neuron reference to the neuron this event concerns
-     */
-    public NetworkEvent(final Network net, final Neuron neuron) {
+	/**
+	 * Create a network event with a new and old object.
+	 *
+     * @param net reference to parent network.
+     * @param oldThing old version of object.
+	 * @param theThing reference to relevant object.
+	 */
+    public NetworkEvent(Network net, final T oldThing, final T theThing) {
         super(net);
-        this.neuron = neuron;
+        this.theObject = theThing;
+        this.oldObject = oldThing;
     }
-
+    
     /**
-     * Create a new model event.
+     * Create a network event with a new object only.
      *
-     * @param net reference to network firing event
-     * @param synapse reference to the synapse this event concerns
+     * @param net reference to parent network.
+     * @param theThing reference to relevant object.
      */
-    public NetworkEvent(final Network net, final Synapse synapse) {
+    public NetworkEvent(Network net, final T theThing) {
         super(net);
-        this.synapse = synapse;
+        this.theObject = theThing;
+    }
+
+
+    /**
+     * @return the newObject
+     */
+    public T getObject() {
+        return theObject;
     }
 
     /**
-     * Create a new model event.
-     *
-     * @param net reference to network firing event
-     * @param neuron refrence to to the neuron this event concerns
-     * @param oldNeuron reference to the old neuron this event concerns
+     * @param newObject the newObject to set
      */
-    public NetworkEvent(final Network net, final Neuron oldNeuron,  final Neuron neuron) {
-        super(net);
-        this.neuron = neuron;
-        this.oldNeuron = oldNeuron;
+    public void setObject(T newObject) {
+        this.theObject = newObject;
     }
 
     /**
-     * Create a new model event.
-     *
-     * @param net reference to network firing event
-     * @param synapse reference to the synapse this event concerns
-     * @param oldSynapse reference to the old synapse this event concerns
+     * @return the oldObject
      */
-    public NetworkEvent(final Network net, final Synapse oldSynapse, final Synapse synapse) {
-        super(net);
-        this.synapse = synapse;
-        this.oldSynapse = oldSynapse;
-    }
-
-   /**
-    * Create a new model event.
-    *
-    * @param parentNet reference to network firing event
-    * @param added reference to the new subnetwork being added
-    */
-    public NetworkEvent(final Network parentNet, final Network added) {
-        super(parentNet);
-        this.subnet = added;
+    public T getOldObject() {
+        return oldObject;
     }
 
     /**
-     * Group delted or added.
-     * 
-     * @param parentNet network firing the event
-     * @param added group added or delete
+     * @param oldObject the oldObject to set
      */
-    public NetworkEvent(final Network parentNet, final Group added) {
-        super(parentNet);
-        this.group = added;
+    public void setOldObject(T oldObject) {
+        this.oldObject = oldObject;
     }
 
-    /**
-     * Group event.
-     *
-     * @param parentNet network firing event.
-     * @param oldGroup old group.
-     * @param group new group.
-     */
-    public NetworkEvent(final Network parentNet, final Group oldGroup, final Group group) {
-        super(parentNet);
-        this.group = group;
-        this.oldGroup = oldGroup;
-    }
-
-    /**
-     * @return Returns the neuron.
-     */
-    public Neuron getNeuron() {
-        return neuron;
-    }
-
-    /**
-     * @return Returns the synapse.
-     */
-    public Synapse getSynapse() {
-        return synapse;
-    }
-
-    /**
-     * @return Returns the oldNeuron.
-     */
-    public Neuron getOldNeuron() {
-        return oldNeuron;
-    }
-
-    /**
-     * @return Returns the oldSynapse.
-     */
-    public Synapse getOldSynapse() {
-        return  oldSynapse;
-    }
-
-    /**
-     * @return Returns the subnet.
-     */
-    public Network getSubnet() {
-        return subnet;
-    }
-
-    /**
-     * @param subnet The subnet to set.
-     */
-    public void setSubnet(final Network subnet) {
-        this.subnet = subnet;
-    }
-
-    /**
-     * @return the group
-     */
-    public Group getGroup() {
-        return group;
-    }
-
-    /**
-     * @return the oldGroup
-     */
-    public Group getOldGroup() {
-        return oldGroup;
-    }
 
 
 }

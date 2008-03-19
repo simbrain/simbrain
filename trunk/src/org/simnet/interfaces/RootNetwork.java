@@ -535,17 +535,6 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Fire a coupling changed event to all registered model listeners.
-     *
-     * @param n the Neuron whose coupling has changed.
-     */
-    public void fireCouplingChanged(final Neuron n) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.couplingChanged(new NetworkEvent(this, n));
-        }
-    }
-
-    /**
      * Fire a network changed event to all registered model listeners.
      */
     public void fireNetworkChanged() {
@@ -722,7 +711,7 @@ public class RootNetwork extends Network {
      */
     public void fireSubnetAdded(final Network added) {
         for (NetworkListener listener : getListenerList()) {
-            listener.subnetAdded(new NetworkEvent(this, added));
+            listener.subnetAdded(new NetworkEvent<Network>(this, added));
         }
     }
 
@@ -733,7 +722,7 @@ public class RootNetwork extends Network {
      */
     public void fireGroupAdded(final Group added) {
         for (NetworkListener listener : getListenerList()) {
-            listener.groupAdded(new NetworkEvent(this, added));
+            listener.groupAdded(new NetworkEvent<Group>(this, added));
         }
     }
 
@@ -745,7 +734,7 @@ public class RootNetwork extends Network {
      */
     public void fireGroupChanged(final Group old, final Group changed) {
         for (NetworkListener listener : getListenerList()) {
-            listener.groupChanged(new NetworkEvent(this, old, changed));
+            listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
         }
     }
 

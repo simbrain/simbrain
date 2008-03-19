@@ -15,77 +15,91 @@ public interface NetworkListener extends EventListener {
     void networkChanged();
 
     /**
-     * Notify this listener of a CouplingChanged event.
-     * Pass in a reference to the neuron on which the coupling changed.
-     * @param e Network event
-     */
-    void couplingChanged(NetworkEvent e);
-
-    /**
      * Notify this listener of a NeuronChanged event.
      *
      * @param e event
      */
-    void neuronChanged(NetworkEvent e);
+    void neuronChanged(NetworkEvent<Neuron> e);
 
     /**
      * Notify this listener of a Neuron added event.
      *
      * @param e event
      */
-    void neuronAdded(NetworkEvent e);
+    void neuronAdded(NetworkEvent<Neuron> e);
 
     /**
      * Notify this listener of a Neuron moved event.
      *
      * @param e event
      */
-    void neuronMoved(NetworkEvent e);
+    void neuronMoved(NetworkEvent<Neuron> e);
 
     /**
      * Notify this listener of a Neuron removed event.
      *
      * @param e event
      */
-    void neuronRemoved(NetworkEvent e);
+    void neuronRemoved(NetworkEvent<Neuron> e);
 
     /**
      * Notify this listener of a Neuron removed event.
      *
      * @param e event
      */
-    void synapseRemoved(NetworkEvent e);
+    void synapseRemoved(NetworkEvent<Synapse> e);
 
     /**
      * Notify this listener of a Neuron removed event.
      *
      * @param e event
      */
-    void synapseAdded(NetworkEvent e);
+    void synapseAdded(NetworkEvent<Synapse> e);
 
     /**
      * Notify this listener of a Neuron removed event.
      *
      * @param e event
      */
-    void synapseChanged(NetworkEvent e);
+    void synapseChanged(NetworkEvent<Synapse> e);
 
     /**
      * Notify this listener of a subnetwork added event.
      *
      * @param e event
      */
-    void subnetAdded(NetworkEvent e);
+    void subnetAdded(NetworkEvent<Network> e);
 
     /**
      * Notify this listener of a subnetwork removed event.
      *
      * @param e event
      */
-    void subnetRemoved(NetworkEvent e);
+    void subnetRemoved(NetworkEvent<Network> e);
 
     /**
-     * Notify listeners of a clamp changed event, when the statu
+     * A group has been added.
+     *
+     * @param event the event, which contains a reference to the new group.
+     */
+    void groupAdded(NetworkEvent<Group> event);
+
+    /**
+     * A group has been changed.
+     *
+     * @param event the event, which contains a reference to the old and changed group.
+     */
+    void groupChanged(NetworkEvent<Group> event);
+
+    /**
+     * A group has been removed.
+     *
+     * @param event the event, which contains a reference to the group to be removed.
+     */
+    void groupRemoved(NetworkEvent<Group> event);
+
+    /**
+     * Notify listeners of a clamp changed event, when the status
      * of the "clamp fields" changes.
      * 
      * TODO: Perhaps later this can be generaliezd to "parameter change" events, if there are more such parameters.
@@ -94,10 +108,4 @@ public interface NetworkListener extends EventListener {
     void clampMenuChanged();
 
     void clampBarChanged();
-
-    void groupAdded(NetworkEvent event);
-    
-    void groupChanged(NetworkEvent event);
-    
-    void groupRemoved(NetworkEvent event);
 }

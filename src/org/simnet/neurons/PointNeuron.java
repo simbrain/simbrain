@@ -512,8 +512,8 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     /**
      * @inheritDoc org.simnet.interfaces.NetworkListener
      */
-    public void synapseRemoved(final NetworkEvent e) {
-        if (this.isConnected(e.getSynapse())) {
+    public void synapseRemoved(final NetworkEvent<Synapse> e) {
+        if (this.isConnected(e.getObject())) {
             this.setInputLists();
         }
     }
@@ -521,8 +521,8 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     /**
      * @inheritDoc org.simnet.interfaces.NetworkListener
      */
-    public void synapseAdded(final NetworkEvent e) {
-        if (this.isConnected(e.getSynapse())) {
+    public void synapseAdded(final NetworkEvent<Synapse> e) {
+        if (this.isConnected(e.getObject())) {
             this.setInputLists();            
         }
     }
@@ -530,8 +530,8 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     /**
      * @inheritDoc org.simnet.interfaces.NetworkListener
      */
-    public void synapseChanged(final NetworkEvent e) {
-        if (this.isConnected(e.getSynapse())) {
+    public void synapseChanged(final NetworkEvent<Synapse> e) {
+        if (this.isConnected(e.getObject())) {
             this.setInputLists();
         }
     }

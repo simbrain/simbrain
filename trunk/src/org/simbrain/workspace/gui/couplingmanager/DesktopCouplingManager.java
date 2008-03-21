@@ -512,6 +512,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             for (Consumer consumer : item.getSelectedConsumerList()) {
                 consumer.setDefaultConsumingAttribute(item.getConsumingAttribute());
             }
+            consumerJList.repaint();
         }
 
         // Handle producer attribute setting events
@@ -520,6 +521,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             for (Producer producer : item.getSelectedProducerList()) {
                 producer.setDefaultProducingAttribute(item.getProducingAttribute());
             }
+            producerJList.repaint();
         }
 
         // Handle coupling tray menu items
@@ -707,7 +709,15 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     /**
      * {@inheritDoc}
      */
-    public void mouseClicked(final MouseEvent arg0) {
+    public void mouseClicked(final MouseEvent event) {
+        // Prevent right clicks from deselecting things
+        if (producerJList.hasFocus()) {
+            int index = producerJList.locationToIndex(event.getPoint());
+            producerJList.addSelectionInterval(index, index);                 
+        } else if (consumerJList.hasFocus()) {
+            int index = consumerJList.locationToIndex(event.getPoint());
+            consumerJList.addSelectionInterval(index, index);                             
+        }
     }
 
     /**

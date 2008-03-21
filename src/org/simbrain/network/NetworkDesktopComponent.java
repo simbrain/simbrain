@@ -94,6 +94,7 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         setSize(450, 400);
         setVisible(true);
         networkPanel.repaint();
+        networkPanel.clearSelection();
     }
     
     /**

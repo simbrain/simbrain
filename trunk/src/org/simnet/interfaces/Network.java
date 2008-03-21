@@ -131,7 +131,7 @@ public abstract class Network {
      *
      * @param toAdd list of objects to add.
      */
-    private void addObjects(final List<?> toAdd) {
+    public void addObjects(final List<?> toAdd) {
         for (Object object : toAdd) {
             if (object instanceof Neuron) {
                 Neuron neuron = (Neuron) object;
@@ -146,23 +146,6 @@ public abstract class Network {
         }
     }
 
-    /**
-     * Adds a list of objects and fires a notification event for views, etc.
-     *
-     * @param toAdd objects to add.
-     */
-    public void addObjects(final ArrayList<?> toAdd) {
-        addObjects(toAdd);
-    }
-
-    /**
-     * Adds a list of objects and fires a notification event for views, etc.
-     *
-     * @param toAdd objects to add.
-     */
-    public void addObjectReferences(final ArrayList<?> toAdd) {
-        addObjects(toAdd);
-    }
 
     /**
      * Translate all neurons (the only objects with position information).

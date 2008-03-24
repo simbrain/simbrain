@@ -19,10 +19,19 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -31,10 +40,14 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SpringLayout;
+import javax.swing.filechooser.FileFilter;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -62,7 +75,7 @@ public class WorkspaceChangedDialog extends JDialog {
     }
     
     /** Main Panel. */
-    private JPanel panel;
+//    private JPanel panel;
 
     /** Whether the user has canceled out of this dialog. */
     private boolean userCancelled = false;
@@ -71,107 +84,192 @@ public class WorkspaceChangedDialog extends JDialog {
      * Initialize the panel.
      */
     public void init() {
-        initPanel();
-
-        this.getContentPane().setLayout(new BorderLayout());
-
+//        initPanel();
+        SpringLayout layout = new SpringLayout();
+        Container container = getContentPane();
+        
+        container.setLayout(layout);//new BorderLayout());
+        
         JButton yesButton = new JButton(yes);
         JButton noButton = new JButton(no);
         JButton cancelButton = new JButton(cancel);
         getRootPane().setDefaultButton(yesButton);
-        getContentPane().add(BorderLayout.CENTER, panel);
-
-        JPanel northPanel = new JPanel(new GridLayout(2, 0));
-        northPanel.add(new JLabel("The current workspace has changed."));
-        northPanel.add(new JLabel("Would you like to save it?"));
-        getContentPane().add(BorderLayout.NORTH, northPanel);
-
-        JPanel buttonPanel = new JPanel();
+//        getContentPane().add(BorderLayout.CENTER, addBrowsePanel());
+        
+        JPanel textPanel = new JPanel(new GridLayout(2, 0));
+        textPanel.add(new JLabel("The current workspace has changed."));
+        textPanel.add(new JLabel("Would you like to save it?"));
+//        getContentPane().add(BorderLayout.NORTH, northPanel);
+        getContentPane().add(textPanel);
+        
+        JPanel browsePanel = addBrowsePanel();
+        getContentPane().add(browsePanel);
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(yesButton);
         buttonPanel.add(noButton);
         buttonPanel.add(cancelButton);
-        getContentPane().add(BorderLayout.SOUTH, buttonPanel);
-
+//        getContentPane().add(BorderLayout.SOUTH, buttonPanel);
+        getContentPane().add(buttonPanel);
+        
+        layout.putConstraint(SpringLayout.NORTH, container,
+                -5, SpringLayout.NORTH, textPanel);
+        layout.putConstraint(SpringLayout.SOUTH, container,
+                5, SpringLayout.SOUTH, buttonPanel);
+        layout.putConstraint(SpringLayout.WEST, container,
+                -5, SpringLayout.WEST, browsePanel);
+        layout.putConstraint(SpringLayout.EAST, container,
+                5, SpringLayout.EAST, browsePanel);
+        layout.putConstraint(SpringLayout.WEST, textPanel,
+                5, SpringLayout.WEST, container);
+        layout.putConstraint(SpringLayout.NORTH, browsePanel,
+                5, SpringLayout.SOUTH, textPanel);
+        layout.putConstraint(SpringLayout.NORTH, buttonPanel,
+                5, SpringLayout.SOUTH, browsePanel);
+        
         setTitle("Save Resources");
-        pack();
+        
         setLocationRelativeTo(null);
         setModal(true);
+        
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                cancel();
+            }
+        });
+        
+        pack();
+        height = getSize().height;
+        
+        this.addComponentListener(listener);
+        
         setVisible(true);
     }
-
-    public void initPanel() {
-        panel = new JPanel();
+    
+    int height;
+    
+    ComponentListener listener = new ComponentAdapter() {
+       public void componentResized( ComponentEvent ce ) {
+           Dimension size = getSize();
+           if (size.height != height) {
+               size.height = height;
+               setSize(size);
+               invalidate();
+               validate();
+           }
+       }
+    };
+    
+    public JPanel addBrowsePanel() {
+        JPanel panel = new JPanel();
+        SpringLayout layout = new SpringLayout();
         
-        BorderLayout layout = new BorderLayout();
         panel.setLayout(layout);
         
-        JPanel north = new JPanel();
-        north.setLayout(new FlowLayout(FlowLayout.LEFT));
+        final JTextField location = new JTextField("", 25);
+        JButton browse = new JButton("Browse");
         
-        panel.add(north, BorderLayout.NORTH);
+        panel.add(browse);
+        panel.add(location);
         
-        final JToggleButton button = new JToggleButton();
-        
-        north.add(button);
-        
-        button.addActionListener(new ActionListener() {
+        layout.putConstraint(SpringLayout.NORTH, location,
+                5, SpringLayout.NORTH, panel);
+        layout.putConstraint(SpringLayout.NORTH, browse,
+                5, SpringLayout.NORTH, panel);
+        layout.putConstraint(SpringLayout.WEST, panel,
+                -5, SpringLayout.WEST, location);
+        layout.putConstraint(SpringLayout.WEST, location,
+                5, SpringLayout.WEST, panel);
+        layout.putConstraint(SpringLayout.EAST, panel,
+                0, SpringLayout.EAST, browse);
+        layout.putConstraint(SpringLayout.WEST, browse,
+                5, SpringLayout.EAST, location);
+        layout.putConstraint(SpringLayout.SOUTH, panel,
+                0, SpringLayout.SOUTH, browse);
+         
+        browse.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if (button.isSelected()) {
-                    addCheckboxPanel();
-                } else {
-                    removeCheckboxPanel();
+                JFileChooser chooser = new JFileChooser(location.getText());
+                
+                chooser.addChoosableFileFilter(new Filter("zip", "Simbrain Archives"));
+                
+                switch (chooser.showOpenDialog(WorkspaceChangedDialog.this)) {
+                
+                case JFileChooser.APPROVE_OPTION:
+                    location.setText(chooser.getSelectedFile().getAbsolutePath());
                 }
             }
         });
+        
+        return panel;
     }
     
-    JPanel checkboxes;
-    
-    public void addCheckboxPanel() {
-        checkboxes = new JPanel();
-        SpringLayout layout = new SpringLayout();
-        JCheckBox last = null;
+    private class Filter extends FileFilter {
+        String extension;
+        String description;
         
-        checkboxes.setLayout(layout);
-        
-        for (WorkspaceComponent<?> component : desktop.getWorkspace().getComponentList()) {
-            JLabel label = new JLabel(component.getName());
-            JCheckBox checkbox = new JCheckBox();
-            checkbox.setSelected(true);
-            
-            checkboxes.add(checkbox);
-            checkboxes.add(label);
-            
-            if (last == null) {
-                layout.putConstraint(SpringLayout.NORTH, checkbox,
-                    5, SpringLayout.NORTH, checkboxes);
-            } else {
-                layout.putConstraint(SpringLayout.NORTH, checkbox,
-                    5, SpringLayout.SOUTH, last);
-            }
-            
-            layout.putConstraint(SpringLayout.WEST, checkbox,
-                20, SpringLayout.WEST, checkboxes);
-            layout.putConstraint(SpringLayout.WEST, label,
-                5, SpringLayout.EAST, checkbox);
-            layout.putConstraint(SpringLayout.SOUTH, label,
-                0, SpringLayout.SOUTH, checkbox);
-        
-            last = checkbox;
+        Filter(String extension, String description) {
+            this.extension = extension;
+            this.description = description;
         }
         
-        layout.putConstraint(SpringLayout.SOUTH, checkboxes,
-                5, SpringLayout.SOUTH, last);
-        
-        panel.add(checkboxes, BorderLayout.CENTER);
-        
-        pack();
+        public boolean accept(File f) {
+            return f.getName().endsWith('.' + extension);
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }    
     }
     
-    void removeCheckboxPanel() {
-        panel.remove(checkboxes);
-        pack();
-    }
+//    JPanel checkboxes;
+//    
+//    public void addCheckboxPanel() {
+//        checkboxes = new JPanel();
+//        SpringLayout layout = new SpringLayout();
+//        JCheckBox last = null;
+//        
+//        checkboxes.setLayout(layout);
+//        
+//        for (WorkspaceComponent<?> component : desktop.getWorkspace().getComponentList()) {
+//            JLabel label = new JLabel(component.getName());
+//            JCheckBox checkbox = new JCheckBox();
+//            checkbox.setSelected(true);
+//            
+//            checkboxes.add(checkbox);
+//            checkboxes.add(label);
+//            
+//            if (last == null) {
+//                layout.putConstraint(SpringLayout.NORTH, checkbox,
+//                    5, SpringLayout.NORTH, checkboxes);
+//            } else {
+//                layout.putConstraint(SpringLayout.NORTH, checkbox,
+//                    5, SpringLayout.SOUTH, last);
+//            }
+//            
+//            layout.putConstraint(SpringLayout.WEST, checkbox,
+//                20, SpringLayout.WEST, checkboxes);
+//            layout.putConstraint(SpringLayout.WEST, label,
+//                5, SpringLayout.EAST, checkbox);
+//            layout.putConstraint(SpringLayout.SOUTH, label,
+//                0, SpringLayout.SOUTH, checkbox);
+//        
+//            last = checkbox;
+//        }
+//        
+//        layout.putConstraint(SpringLayout.SOUTH, checkboxes,
+//                5, SpringLayout.SOUTH, last);
+//        
+//        panel.add(checkboxes, BorderLayout.CENTER);
+//        
+//        pack();
+//    }
+    
+//    void removeCheckboxPanel() {
+//        panel.remove(checkboxes);
+//        pack();
+//    }
 
     private final Action yes = new AbstractAction("Yes") {
         public void actionPerformed(ActionEvent e) {
@@ -189,10 +287,14 @@ public class WorkspaceChangedDialog extends JDialog {
     
     private final Action cancel = new AbstractAction("Cancel") {
         public void actionPerformed(ActionEvent e) {
-            userCancelled = true;
-            dispose();
+            cancel();
         }
     };
+    
+    private void cancel() {
+        userCancelled = true;
+        dispose();
+    }
     
     /**
      * Save all checked components.

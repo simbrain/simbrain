@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -23,10 +25,9 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 public class WorkspaceSerializer {
     /** The number of bytes to attempt to read at a time from an InputStream. */
     private static final int BUFFER_SIZE = 1024;
-    
     /** The current workspace. */
     private final Workspace workspace;
-    
+    /** The desktop component for the workspace. */
     private final SimbrainDesktop desktop;
     
     /**
@@ -39,15 +40,26 @@ public class WorkspaceSerializer {
         this.desktop = SimbrainDesktop.getDesktop(workspace);
     }
     
+    /**
+     * Does nothing.
+     */
     public void exportWorkspace() {
         
     }
     
+    /**
+     * Does nothing.
+     */
     public void importWorkspace() {
         
     }
     
-    public void writeWorkspace(File file)
+    /**
+     * Does nothing.
+     * 
+     * @param file A file.
+     */
+    public void writeWorkspace(final File file)
     {
         
     }
@@ -95,13 +107,26 @@ public class WorkspaceSerializer {
     }
     
     /**
+     * Deserializes all the entries in the provided stream.
+     * 
+     * @param stream The input stream.
+     * @throws IOException If an IO error occurs.
+     */
+    public void deserialize(final InputStream stream) throws IOException {
+        Collection<? extends String> empty = Collections.emptySet();
+        deserialize(stream, empty);
+    }
+    
+    /**
      * Creates a workspace from a zip compressed input stream.
      * 
-     * @param stream the stream to read from.  This is expected to be zip compressed.
+     * @param stream The stream to read from.  This is expected to be zip compressed.
+     * @param exclude The list of uris to ignore on import.
      * @throws IOException if an IO error occurs.
      */
     @SuppressWarnings("unchecked")
-    public void deserialize(final InputStream stream) throws IOException {
+    public void deserialize(final InputStream stream,
+            final Collection<? extends String> exclude) throws IOException {
         Map<String, byte[]> entries = new HashMap<String, byte[]>();
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         
@@ -134,8 +159,10 @@ public class WorkspaceSerializer {
         contents = (ArchiveContents) ArchiveContents.xstream().fromXML(
             new ByteArrayInputStream(entries.get("contents.xml")));
         
-        if (contents.components != null) {
-            for (ArchiveContents.Component component : contents.components) {
+        if (contents.getComponents() != null) {
+            for (ArchiveContents.Component component : contents.getComponents()) {
+                if (exclude.contains(component.uri)) continue;
+                
                 WorkspaceComponent<?> wc = componentDeserializer.deserializeWorkspaceComponent(
                     component, new ByteArrayInputStream(entries.get(component.uri)));
     
@@ -157,17 +184,23 @@ public class WorkspaceSerializer {
             }
         }
         
-        if (contents.couplings != null) {
-            for (ArchiveContents.Coupling coupling : contents.couplings) {
-                System.out.println("coupling source: " + coupling.source.uri + " " + coupling.source.key);
-                System.out.println("coupling target: " + coupling.target.uri + " " + coupling.target.key);
+        if (contents.getCouplings() != null) {
+            for (ArchiveContents.Coupling coupling : contents.getCouplings()) {
+                if (exclude.contains(coupling.source.uri)
+                || exclude.contains(coupling.target.uri)) {
+                    continue;
+                }
                 
-                WorkspaceComponent<?> sourceComponent = componentDeserializer.getComponent(coupling.source.uri);
-                WorkspaceComponent<?> targetComponent = componentDeserializer.getComponent(coupling.target.uri);
+                WorkspaceComponent<?> sourceComponent
+                    = componentDeserializer.getComponent(coupling.source.uri);
+                WorkspaceComponent<?> targetComponent
+                    = componentDeserializer.getComponent(coupling.target.uri);
                 
-                workspace.addCoupling(new Coupling(    
-                    (ProducingAttribute<?>) sourceComponent.getAttributeForKey(coupling.source.key),
-                    (ConsumingAttribute<?>) targetComponent.getAttributeForKey(coupling.target.key)));
+                workspace.addCoupling(new Coupling(
+                    (ProducingAttribute<?>) sourceComponent
+                        .getAttributeForKey(coupling.source.key),
+                    (ConsumingAttribute<?>) targetComponent
+                        .getAttributeForKey(coupling.target.key)));
             }
         }
     }

@@ -21,9 +21,9 @@ class ArchiveContents {
     private transient Map<WorkspaceComponent<?>, String> componentUris
         = new HashMap<WorkspaceComponent<?>, String>();
     /** All of the components in the archive. */
-    private final ArrayList<Component> components = new ArrayList<Component>();
+    private List<Component> components = new ArrayList<Component>();
     /** All of the couplings in the archive. */
-    private final ArrayList<Coupling> couplings = new ArrayList<Coupling>();
+    private List<Coupling> couplings = new ArrayList<Coupling>();
     /** The serializer for this archive. */
     private final WorkspaceComponentSerializer serializer;
     
@@ -57,6 +57,8 @@ class ArchiveContents {
      * @return An immutable list of the components in this archive.
      */
     List<? extends Component> getComponents() {
+        if (components == null) components = Collections.emptyList();
+        
         return Collections.unmodifiableList(components);
     }
     
@@ -66,6 +68,7 @@ class ArchiveContents {
      * @return An immutable list of the couplings in this archive.
      */
     List<? extends Coupling> getCouplings() {
+        if (couplings == null) couplings = Collections.emptyList();
         return Collections.unmodifiableList(couplings);
     }
     

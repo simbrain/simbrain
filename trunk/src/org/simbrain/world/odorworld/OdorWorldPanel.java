@@ -107,14 +107,14 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     final ActionListener cutListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             WorldClipboard.cutItem(selectedEntity, OdorWorldPanel.this);
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
     final ActionListener pasteListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             WorldClipboard.pasteItem(selectedPoint, OdorWorldPanel.this);
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
@@ -122,7 +122,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         public void actionPerformed(ActionEvent e) {
             world.clearAllEntities();
             getParentFrame().repaint();
-            getParentFrame().setChangedSinceLastSave(true);   
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);   
         }
     };
     
@@ -130,7 +130,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         public void actionPerformed(ActionEvent e) {
             world.removeEntity(selectedEntity);
             getParentFrame().repaint();
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
         
@@ -138,14 +138,14 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         public void actionPerformed(ActionEvent e) {
             world.addEntity(selectedPoint);
             getParentFrame().repaint();
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         } 
     };
     
     final ActionListener propsListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             showGeneralDialog();
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
         
@@ -153,7 +153,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         public void actionPerformed(ActionEvent e) {
             showEntityDialog((OdorWorldEntity) selectedEntity);
             getParentFrame().repaint();
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
@@ -168,7 +168,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             
             world.addAgent(a);
             getParentFrame().repaint();
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
         
@@ -176,7 +176,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         public void actionPerformed(ActionEvent e) {
             drawingWalls = true;
             getParentFrame().repaint();
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
         
@@ -184,7 +184,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         public void actionPerformed(ActionEvent e) {
             showWallDialog((Wall) selectedEntity);
             getParentFrame().repaint();
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
@@ -284,7 +284,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
                     showEntityDialog((OdorWorldEntity) selectedEntity);
                 }
 
-                getParentFrame().setChangedSinceLastSave(true);
+                getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
             }
 
             final java.awt.Container container = getParent().getParent();
@@ -300,7 +300,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
                 setWallPoint2(mouseEvent.getPoint());
                 addWall();
                 draggingPoint = null;
-                getParentFrame().setChangedSinceLastSave(true);
+                getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
             }
         }
     };
@@ -322,7 +322,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
                 selectedEntity.setX(test.x);
                 selectedEntity.setY(test.y);
                 repaint();
-                getParentFrame().setChangedSinceLastSave(true);
+                getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
             }
         }
     };
@@ -372,7 +372,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         }
 
         repaint();
-        this.getParentFrame().setChangedSinceLastSave(true);
+        this.getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
     }
 
     /**

@@ -26,6 +26,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -49,8 +50,7 @@ import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.*;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simnet.interfaces.Neuron;
@@ -302,6 +302,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         }
 
         // Add coupling menus
+        
+        contextMenu.add(desktopComponent.getDesktop().getComponentMenu(popUpMenuListener, this.getNetworkPanel().getParentComponent().getWorkspaceComponent()));
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
             JMenu producerMenu = desktopComponent.getDesktop().getProducerMenu(this.neuron.getDefaultConsumingAttribute());
             producerMenu.setText("Set input source");
@@ -674,36 +676,17 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         public void actionPerformed(ActionEvent e) {
             LOGGER.debug("pop up producer / consumer menu event");
 
+            if (!(e.getSource() instanceof CouplingMenuItem)) {
+                return;
+            }
             CouplingMenuItem m = (CouplingMenuItem) e.getSource();
 
             if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
                 LOGGER.debug("producer list");
-                // Iterate through selected neurons and attach as many producers as possible
-                // TODO: BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
-                // TODO: Move this code to networkpanel and make it more general than neurons.
-                Iterator producerIterator = m.getWorkspaceComponent().getProducers().iterator(); // Get the other guy's producers
-                for (Neuron neuron : getNetworkPanel().getSelectedModelNeurons()) { // Iterate through our consumers
-                    if (producerIterator.hasNext()) {
-                        Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), neuron.getDefaultConsumingAttribute());
-                        desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
-                    } else {
-                        break;
-                    }
-                }
+                desktopComponent.getDesktop().getWorkspace().coupleSpecific(m.getWorkspaceComponent(), getNetworkPanel().getSelectedConsumingAttributes());
             } else if (m.getEventType() == CouplingMenuItem.EventType.CONSUMER_LIST) {
-                LOGGER.debug("consumer list");
-                // Send our producers over to their consumers
-                // TODO refactor
-//                    m.getCouplingContainer().getCouplings().clear(); //TODO: need some form of reset also
-                Iterator producerIterator =  getNetworkPanel().getSelectedModelNeurons().iterator(); // Get our producers
-                for (Consumer consumer : m.getWorkspaceComponent().getConsumers()) { // get other guy's consumers.
-                    if (producerIterator.hasNext()) {
-                        Coupling coupling = new Coupling(((org.simbrain.workspace.Producer) producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                        desktopComponent.getDesktop().getWorkspace().addCoupling(coupling);
-                    } else {
-                        break;
-                    }
-                }
+                LOGGER.debug("consumer list");                
+                desktopComponent.getDesktop().getWorkspace().coupleSpecific(getNetworkPanel().getSelectedProducingAttributes(), m.getWorkspaceComponent());
             }
         }
         

@@ -1,5 +1,6 @@
 package org.simbrain.plot;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -74,7 +75,7 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     }
 
     @Override
-    public boolean isChangedSinceLastSave() {
+    public boolean hasChangedSinceLastSave() {
         // TODO Auto-generated method stub
         return false;
     }

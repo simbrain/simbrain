@@ -242,6 +242,7 @@ public class OdorWorldEntity extends AbstractEntity {
         this.theStimulus = theStimulus;
     }
 
+    
     /**
      * @return Returns the name.
      */

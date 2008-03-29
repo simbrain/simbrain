@@ -89,7 +89,7 @@ public final class WorkspacePreferences {
      * @return default current directory
      */
     public static String getDefaultCurrentDirectory() {
-        return "." + FS + "simulations" + FS + "sims";
+        return ".";
     }
 
     /**
@@ -116,6 +116,6 @@ public final class WorkspacePreferences {
      * @return the default default file
      */
     public static String getDefaultDefaultFile() {
-        return "." + FS + "simulations" + FS + "sims" + FS + "vehicles" + FS  + "two_agents.sim";
+        return "." + FS + "workspace.zip";
     }
 }

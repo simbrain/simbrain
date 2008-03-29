@@ -68,7 +68,7 @@ public class Dictionary extends Hashtable {
      * Loads an existing dictioary from a file.
      */
     public void loadDictionary() {
-        SFileChooser chooser = new SFileChooser(worldFrame.getCurrentDirectory(), "csv");
+        SFileChooser chooser = new SFileChooser(".", "csv"); // TODO: Use getCurrentDirectory
         File theFile = chooser.showOpenDialog();
 
         if (theFile == null) {

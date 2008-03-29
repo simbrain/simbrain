@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.dataworld;
 
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -41,7 +42,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private final DataModel<Double> dataModel;
+    private DataModel<Double> dataModel;
 
     /**
      * Returns the data model for this component.
@@ -65,7 +66,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         super(name);
         this.dataModel = (DataModel<Double>) dataModel;
         this.dataModel.setParent(this);
-        setChangedSinceLastSave(false);
     }
     
     /**
@@ -77,22 +77,19 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
      * @return
      */
     public static DataWorldComponent open(InputStream input, String name, String format) {
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-//        
-//        try {
-//            for (String line; (line = reader.readLine()) != null;) {
-//                System.out.println(line);
-//            }
-//        } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-        
         DataModel<?> model = (DataModel<?>) DataModel.getXStream().fromXML(input);
-        
-        System.out.println("model: " + model);
-        
         return new DataWorldComponent(name,  model);
+    }
+
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {        
+        super.setCurrentDirectory(currentDirectory);
+        DataWorldPreferences.setCurrentDirectory(currentDirectory);
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+        return DataWorldPreferences.getCurrentDirectory();
     }
 
     /**
@@ -128,17 +125,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public String getKeyForAttribute(Attribute attribute) {
         return dataModel.getKey(attribute);
     }
-    
-//    @Override
-//    public void setCurrentDirectory(final String currentDirectory) {
-//        super.setCurrentDirectory(currentDirectory);
-//        DataWorldPreferences.setCurrentDirectory(currentDirectory);
-//    }
-//
-//    @Override
-//    public String getCurrentDirectory() {
-//        return DataWorldPreferences.getCurrentDirectory();
-//    }
 
     /**
      * {@inheritDoc}
@@ -148,26 +134,28 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         return dataModel.getConsumers();
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<? extends Producer> getProducers() {
         return dataModel.getProducers();
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public void update() {
-        
+    public void update() {  
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void close() {
     }
+    
+    @Override
+    public String getXML() {
+        return DataModel.getXStream().toXML(dataModel);
+    }
+
+    @Override
+    public void deserializeFromReader(FileReader reader) {
+        dataModel = (DataModel<Double>) DataModel.getXStream().fromXML(reader);
+        dataModel.setParent(this);
+    }
+
 }

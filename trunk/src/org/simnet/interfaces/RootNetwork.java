@@ -522,6 +522,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronRemoved(new NetworkEvent(this, deleted));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -531,6 +532,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.networkChanged();
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -541,6 +543,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronMoved(new NetworkEvent(this, moved));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -551,6 +554,7 @@ public class RootNetwork extends Network {
             listener.clampMenuChanged();
             listener.clampBarChanged();
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
 
@@ -563,6 +567,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronAdded(new NetworkEvent(this, added));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -575,6 +580,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronChanged(new NetworkEvent(this, old, changed));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -586,6 +592,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.synapseAdded(new NetworkEvent(this, added));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -597,6 +604,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.synapseRemoved(new NetworkEvent(this, deleted));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -609,6 +617,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.synapseChanged(new NetworkEvent(this, old, changed));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -681,6 +690,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.subnetAdded(new NetworkEvent(this, added));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -692,6 +702,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.subnetRemoved(new NetworkEvent(this, deleted));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -703,6 +714,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.subnetAdded(new NetworkEvent<Network>(this, added));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -714,6 +726,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.groupAdded(new NetworkEvent<Group>(this, added));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -726,6 +739,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
         }
+        getParent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -737,6 +751,7 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.groupRemoved(new NetworkEvent(this, deleted));
         }
+        getParent().setChangedSinceLastSave(true);
     }
     /**
      * Add the specified network listener.

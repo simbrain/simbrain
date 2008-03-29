@@ -85,23 +85,6 @@ public class ConsoleDesktopComponent extends  DesktopComponent<ConsoleComponent>
         
     }
 
-    @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
-        
-    }
 
     @Override
     protected void update() {

@@ -25,11 +25,9 @@ import javax.swing.Action;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
-import org.simbrain.workspace.actions.ExportWorkspaceAction;
 import org.simbrain.workspace.actions.GlobalRunAction;
 import org.simbrain.workspace.actions.GlobalStopAction;
 import org.simbrain.workspace.actions.GlobalUpdateAction;
-import org.simbrain.workspace.actions.ImportWorkspaceAction;
 import org.simbrain.workspace.actions.NewConsoleAction;
 import org.simbrain.workspace.actions.NewDataWorldAction;
 import org.simbrain.workspace.actions.NewGameWorld2dAction;
@@ -97,12 +95,6 @@ public class WorkspaceActionManager {
     /** Clear workspace action. */
     private final Action clearWorkspaceAction;
 
-    /** Export workspace action. */
-    private final Action exportWorkspaceAction;
-
-    /** Import workspace action. */
-    private final Action importWorkspaceAction;
-
     /** Open data world action. */
     private final Action openDataWorldAction;
 
@@ -151,9 +143,6 @@ public class WorkspaceActionManager {
     public WorkspaceActionManager(SimbrainDesktop desktop) {
         Workspace workspace = desktop.getWorkspace();
         clearWorkspaceAction = new ClearWorkspaceAction(workspace);
-
-        importWorkspaceAction = new ImportWorkspaceAction(desktop);
-        exportWorkspaceAction = new ExportWorkspaceAction(workspace);
 
         openDataWorldAction = new OpenDataWorldAction();
         openGaugeAction = new OpenGaugeAction();
@@ -227,14 +216,6 @@ public class WorkspaceActionManager {
     }
 
     /**
-     * @return Import/Export workspace actions.
-     */
-    public List<Action> getImportExportActions() {
-        return Arrays.asList(new Action[] {importWorkspaceAction,
-                                           exportWorkspaceAction});
-    }
-
-    /**
      * @return Simbrain gauge actions.
      */
     public List<Action> getGaugeActions() {
@@ -303,20 +284,6 @@ public class WorkspaceActionManager {
      */
     public Action getClearWorkspaceAction() {
         return clearWorkspaceAction;
-    }
-
-    /**
-     * @return the exportWorkspaceAction.
-     */
-    public Action getExportWorkspaceAction() {
-        return exportWorkspaceAction;
-    }
-
-    /**
-     * @return the importWorkspaceAction.
-     */
-    public Action getImportWorkspaceAction() {
-        return importWorkspaceAction;
     }
 
     /**

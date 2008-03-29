@@ -74,6 +74,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
 
     /** Default sensor. */
     private ProducingAttribute<Double> defaultSensor = new CenterSensor(1);
+    
 
 //    private final OdorWorldComponent component;
 

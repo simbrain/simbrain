@@ -23,6 +23,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  * @author Matt Watson
  */
 public class WorkspaceSerializer {
+
     /** The number of bytes to attempt to read at a time from an InputStream. */
     private static final int BUFFER_SIZE = 1024;
     /** The current workspace. */
@@ -38,30 +39,6 @@ public class WorkspaceSerializer {
     public WorkspaceSerializer(final Workspace workspace) {
         this.workspace = workspace;
         this.desktop = SimbrainDesktop.getDesktop(workspace);
-    }
-    
-    /**
-     * Does nothing.
-     */
-    public void exportWorkspace() {
-        
-    }
-    
-    /**
-     * Does nothing.
-     */
-    public void importWorkspace() {
-        
-    }
-    
-    /**
-     * Does nothing.
-     * 
-     * @param file A file.
-     */
-    public void writeWorkspace(final File file)
-    {
-        
     }
     
     /**

@@ -100,19 +100,4 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
     public void close() {
         // empty
     }
-
-    @Override
-    public String getFileExtension() {
-        return null;
-    }
-    
-    @Override
-    public void save(final File saveFile) {
-        // empty
-    }
-
-    @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
-    }
 }

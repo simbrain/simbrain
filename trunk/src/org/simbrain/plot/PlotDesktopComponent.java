@@ -95,29 +95,7 @@ public class PlotDesktopComponent extends DesktopComponent<PlotComponent> {
     }
 
     @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isChangedSinceLastSave() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public void close() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void open(File openFile) {
         // TODO Auto-generated method stub
     }
 

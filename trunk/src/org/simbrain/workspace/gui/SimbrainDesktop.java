@@ -15,9 +15,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
@@ -32,6 +34,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -119,17 +123,11 @@ public class SimbrainDesktop {
     /** Used to track whether the gui has been modified since the last save. */
     private boolean guiChanged = false;
     
-    /** Current workspace file. */
-    private File currentFile = new File(WorkspacePreferences.getDefaultFile());
-
     /** Last clicked point. */
     private Point lastClickedPoint = null;
     
     /** The workspace this desktop wraps. */
     private final Workspace workspace;
-    
-    /** The serializer used to persist the workspace. */
-    private final WorkspaceSerializer workspaceSerializer;
     
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
@@ -157,7 +155,6 @@ public class SimbrainDesktop {
     public SimbrainDesktop(final Workspace workspace) {
         INSTANCES.put(workspace, this);
         this.workspace = workspace;
-        this.workspaceSerializer = new WorkspaceSerializer(workspace);
         frame = new JFrame("Simbrain");
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -212,10 +209,6 @@ public class SimbrainDesktop {
     public Workspace getWorkspace() {
         return workspace;
     }
-    
-//    public DesktopComponent getDesktopComponent(WorkspaceComponent component) {
-//        return components.get(component);
-//    }
     
     /**
      * Returns the main frame for the desktop.
@@ -317,9 +310,6 @@ public class SimbrainDesktop {
             fileMenu.add(action);
         }
         fileMenu.addSeparator();
-        for (Action action : actionManager.getImportExportActions()) {
-            fileMenu.add(action);
-        }
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getClearWorkspaceAction());
         fileMenu.addSeparator();
@@ -451,6 +441,11 @@ public class SimbrainDesktop {
         }
     }
     
+    /**
+     * Return a workspace component.
+     * @param component component to return
+     * @return component.
+     */
     public DesktopComponent<?> getDesktopComponent(final WorkspaceComponent<?> component) {
         return components.get(component);
     }
@@ -458,22 +453,13 @@ public class SimbrainDesktop {
     /** Listener on the workspace. */
     private final WorkspaceListener listener = new WorkspaceListener() {
         public boolean clearWorkspace() {
-            if (changesExist()) {
-                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(SimbrainDesktop.this);
-
-                return !dialog.hasUserCancelled();
-            }
-            
+            save();
             return true;
         }
         
         public void workspaceCleared() {
             if (changesExist()) {
-                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(SimbrainDesktop.this);
-
-                if (dialog.hasUserCancelled()) {
-                    return;
-                }
+                save();
             }
             
             frame.setTitle("Simbrain");
@@ -566,11 +552,7 @@ public class SimbrainDesktop {
             components.remove(component);
         }
     };
-    
-//    public void addComponent(WorkspaceComponent workspaceComponent, DesktopComponent component) {
-//        components.put(workspaceComponent, component);
-//    }
-    
+
     /**
      * Add a new <c>SimbrainComponent</c>.
      *
@@ -601,90 +583,80 @@ public class SimbrainDesktop {
      * Shows the dialog for opening a workspace file.
      */
     public void openWorkspace() {
-
-//        if (changesExist()) {
-//            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
-//
-//            if (theDialog.hasUserCancelled()) {
-//                return;
-//            }
-//        }
-//        // TODO ?
-////        workspaceChanged = false;
-//
-//        String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-//
-//        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
-//        File simFile = simulationChooser.showOpenDialog();
-//
-//        if (simFile != null) {
-//            workspaceSerializer.readWorkspace(simFile, false);
-//            currentFile = simFile;
-//            currentDirectory = simulationChooser.getCurrentLocation();
-//            WorkspacePreferences.setCurrentDirectory(currentDirectory);
-//            WorkspacePreferences.setDefaultFile(currentFile.toString());
-//        }
-
-        
+        SFileChooser simulationChooser = new SFileChooser(workspace.getCurrentDirectory(), "zip");
+        File simFile = simulationChooser.showOpenDialog();
+        if (simFile != null) {
+            openWorkspace(simFile);
+        }
+    }
+    
+    /**
+     * Open a workspace from a file.
+     *
+     * @param file the file to use.
+     */
+    private void openWorkspace(File file) {
         WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
-        
         try {
-            serializer.deserialize(new FileInputStream("workspace.zip"));
+            workspace.clearWorkspace();
+            serializer.deserialize(new FileInputStream(file));
+            workspace.setCurrentFile(file);
+            frame.setTitle(file.getName());
+            workspace.setWorkspaceChanged(false);
+            guiChanged = false;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Shows the dialog for saving a workspace file.
-     */
-    public void saveWorkspace() {
-        
-        String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
-        // TODO ?
-//        workspaceChanged = false;
-
-        if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
-
-            if (theDialog.hasUserCancelled()) {
-                return;
-            }
-        }
-
-        File simFile = simulationChooser.showSaveDialog();
-
-        if (simFile != null) {
-            workspaceSerializer.writeWorkspace(simFile);
-            currentFile = simFile;
-            currentDirectory = simulationChooser.getCurrentLocation();
-            WorkspacePreferences.setCurrentDirectory(currentDirectory);
-            WorkspacePreferences.setDefaultFile(simFile.toString());
-        }
-    }
 
     /**
-     * Show the save dialog.
+     * If changes exist, show a change dialog, otherwise just save the current file.
      */
     public void save() {
-        if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 
-            if (theDialog.hasUserCancelled()) {
-                return;
+        // Ignore the save command if there are no changes
+        if (changesExist()) {
+            if (workspace.getCurrentFile() != null) {
+                try {
+                    FileOutputStream ostream = new FileOutputStream(workspace.getCurrentFile());
+                    try {
+                        WorkspaceSerializer serializer = new WorkspaceSerializer(this.getWorkspace());
+                        serializer.serialize(ostream);
+                        frame.setTitle(workspace.getCurrentFile().getName());
+                        workspace.setWorkspaceChanged(false);
+                        guiChanged = false;
+                    } finally {
+                        ostream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
-        if (currentFile != null) {
-            workspaceSerializer.writeWorkspace(currentFile);
-            frame.setTitle(currentFile.getName());
+    }
+    
+    /**
+     * Show a save dialog.
+     */
+    public void saveAs() {
+        SFileChooser chooser = new SFileChooser(workspace.getCurrentDirectory(), "zip");
+        if (workspace.getCurrentFile() != null) {
+            chooser.setSelectedFile(workspace.getCurrentFile());
+        } else {
+            chooser.setSelectedFile(new File("workspace"));
+        }
+        File theFile = chooser.showSaveDialog();
+        if (theFile != null) {
+            workspace.setCurrentFile(theFile);
+            workspace.setCurrentDirectory(chooser.getCurrentLocation());
+            save();
         }
     }
 
     /**
-     * Create the GUI and show it. For thread safety, this method
-     * should be invoked from the event-dispatching thread.
+     * Create the GUI and show it. For thread safety, this method should be
+     * invoked from the event-dispatching thread.
      */
     private void createAndShowGUI() {
         /*
@@ -696,8 +668,9 @@ public class SimbrainDesktop {
 
         /* Display the window. */
         frame.setVisible(true);
+        
+        openWorkspace(workspace.getCurrentFile());
 
-        //workspaceSerializer.readWorkspace(new File(WorkspacePreferences.getDefaultFile()), false);
     }
 
 
@@ -715,54 +688,36 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Open a specific workspace component (network, world, etc).
-     *
-     * @param type the type of the component to open.
+     * Checks to see if anything has changed and then offers to save if true.
      */
-//    public void openWorkspaceComponent(final Class<?> type) {
-//        try {
-//            String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-//            WorkspaceComponent component = (WorkspaceComponent) type.newInstance();
-//            SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(),
-//                component.getFileExtension());
-//            File theFile = chooser.showOpenDialog();
-//
-//            if (theFile != null) {
-//                workspace.addWorkspaceComponent(component);
-//                component.open(theFile);
-//                component.setCurrentDirectory(chooser.getCurrentLocation());
-//                WorkspacePreferences.setCurrentDirectory(currentDirectory.toString());
-//            }
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
-//    }
-    
-    /**
-     * Returns all windows which have changed.
-     *
-     * @return all windows which have changed.
-     */
-//    public ArrayList<WorkspaceComponent> getChangedWindows() {
-//        ArrayList<WorkspaceComponent> ret = new ArrayList<WorkspaceComponent>();
-//        for (WorkspaceComponent window : workspace.getComponentList()) {
-//            if (window.isChangedSinceLastSave()) {
-//                ret.add(window);
-//            }
-//        }
-//        return ret;
-//    }
+    private void showHasChangedDialog() {
+        Object[] options = {"Save", "Don't Save", "Cancel" };
+        int s = JOptionPane.showOptionDialog(frame,
+                 "The workspace has changed since last save,\nWould you like to save these changes?",
+                 "Workspace Has Changed", JOptionPane.YES_NO_OPTION,
+                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
+        if (s == JOptionPane.OK_OPTION) {
+            this.save();
+            quit(true);
+        } else if (s == JOptionPane.NO_OPTION) {
+            quit(true);
+        } else if (s == JOptionPane.CANCEL_OPTION) {
+            return;
+        }
+    }
+    
     /**
      * Quit application.
      */
-    public void quit() {
-        //ensures that frameClosing events are called
-        workspace.removeAllComponents();
-
-        System.exit(0);
+    public void quit(boolean forceQuit) {
+                
+        if (changesExist() && (forceQuit == false)) {
+            showHasChangedDialog();
+        } else {
+            workspace.removeAllComponents();
+            System.exit(0);
+        }
     }
 
     /**
@@ -809,6 +764,28 @@ public class SimbrainDesktop {
      * @param source the producing attribute.
      * @return A new menu instance.
      */
+    public JMenu getComponentMenu(final ActionListener listener, final WorkspaceComponent targetComponent) {
+        JMenu componentMenu = new JMenu("Components");
+        for (final WorkspaceComponent<?> sourceComponent : workspace.getComponentList()) {
+            JMenuItem componentMenuItem = new JMenuItem(sourceComponent.getName());
+            componentMenuItem.addActionListener(listener);
+            componentMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    workspace.couple(targetComponent, sourceComponent);
+                }
+            });
+            componentMenu.add(componentMenuItem);
+        }
+        return componentMenu;
+    }
+
+    
+    /**
+     * Creates a consumer oriented menu for coupling to the given source.
+     * 
+     * @param source the producing attribute.
+     * @return A new menu instance.
+     */
     public JMenu getConsumerMenu(final ProducingAttribute<?> source) {
         JMenu consumerMenu = new JMenu("Consumers");
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
@@ -818,7 +795,7 @@ public class SimbrainDesktop {
                 JMenu componentMenu = new JMenu(component.getName());
                 for (Consumer consumer : component.getConsumers()) {
                         if (consumer instanceof SingleAttributeConsumer) {
-                            SingleCouplingMenuItem item = new SingleCouplingMenuItem(workspace, consumer.getDescription(), 
+                            SingleCouplingMenuItem item = new SingleCouplingMenuItem(workspace, consumer.getDescription(),
                                     source, consumer.getDefaultConsumingAttribute());
                             componentMenu.add(item);
                         } else {
@@ -898,15 +875,7 @@ public class SimbrainDesktop {
          * @param arg0 Window event
          */
         public void windowClosing(final WindowEvent arg0) {
-            if (changesExist()) {
-                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(SimbrainDesktop.this);
-
-                if (dialog.hasUserCancelled()) {
-                    return;
-                }
-            }
-
-            quit();
+            quit(false);
         }
     };
     

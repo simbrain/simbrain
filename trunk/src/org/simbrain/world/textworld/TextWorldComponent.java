@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.textworld;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;

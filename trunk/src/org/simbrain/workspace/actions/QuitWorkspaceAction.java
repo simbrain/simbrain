@@ -27,7 +27,6 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.WorkspaceChangedDialog;
 
 /**
  * Clear the current workspace.
@@ -51,15 +50,7 @@ public final class QuitWorkspaceAction extends DesktopAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         Workspace workspace = desktop.getWorkspace();
-        if (workspace.changesExist()) {
-            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(desktop);
-            if (!dialog.hasUserCancelled()) {
-                workspace.removeAllComponents();
-                System.exit(0);
-            } else {
-                return;
-            }
-        }
+        desktop.save();
         workspace.removeAllComponents();
         System.exit(0);
     }

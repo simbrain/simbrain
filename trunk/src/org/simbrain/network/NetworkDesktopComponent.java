@@ -72,8 +72,6 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         buffer.add("Center", networkPanel);
         setContentPane(buffer);
         createAndAttachMenus();
-        networkPanel.syncToModel();
-        component.getRootNetwork().addListener(networkPanel);
     }
 
     /**
@@ -89,8 +87,15 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         menuBar.add(networkPanel.createHelpMenu());
         setJMenuBar(menuBar);
     }
-
+    
+    @Override
     public void postAddInit() {
+        networkPanel.getLayer().removeAllChildren(); // Maybe in a reset method?
+        if (networkPanel.getRootNetwork() != this.getWorkspaceComponent().getRootNetwork()) {
+            networkPanel.setRootNetwork(this.getWorkspaceComponent().getRootNetwork().getRootNetwork());            
+        }
+        networkPanel.getRootNetwork().addListener(networkPanel);
+        networkPanel.syncToModel();
         networkPanel.repaint();
         networkPanel.clearSelection();
     }
@@ -105,24 +110,8 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
     }
 
     @Override
-    public String getFileExtension() {
-        return "xml";
-    }
-
-    @Override
     public void close() {
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void save(File saveFile) {
-        networkPanel.saveNetwork(saveFile);
-        setName(saveFile.getName());
-    }
-
-    @Override
-    public void open(File openFile) {
-        this.setName(openFile.getName());
-        this.getNetworkPanel().openNetwork(openFile);
-    }
 }

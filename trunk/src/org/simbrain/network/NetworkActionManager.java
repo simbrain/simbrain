@@ -27,7 +27,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 
-import org.simbrain.network.actions.AddGaugeAction;
 import org.simbrain.network.actions.AlignHorizontalAction;
 import org.simbrain.network.actions.AlignVerticalAction;
 import org.simbrain.network.actions.ClampNeuronsAction;
@@ -168,9 +167,6 @@ public final class NetworkActionManager {
 
     /** Close network action. */
     private final Action closeNetworkAction;
-
-    /** Add gauge action. */
-    private final Action addGaugeAction;
 
     /** Align vertical action. */
     private final Action alignVerticalAction;
@@ -322,8 +318,6 @@ public final class NetworkActionManager {
         saveNetworkAction = new SaveNetworkAction(networkPanel);
         saveAsNetworkAction = new SaveAsNetworkAction(networkPanel);
         closeNetworkAction = new CloseNetworkAction(networkPanel);
-
-        addGaugeAction = new AddGaugeAction(networkPanel);
 
         alignVerticalAction = new AlignVerticalAction(networkPanel);
         alignHorizontalAction = new AlignHorizontalAction(networkPanel);
@@ -747,15 +741,6 @@ public final class NetworkActionManager {
      */
     public Action getSelectAllWeightsAction() {
         return selectAllWeightsAction;
-    }
-
-    /**
-     * Return the add gauge action.
-     *
-     * @return the add gauge action
-     */
-    public Action getAddGaugeAction() {
-        return addGaugeAction;
     }
 
     /**

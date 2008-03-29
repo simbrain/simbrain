@@ -102,7 +102,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     private final ActionListener prefsListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             parentFrame.getWorldPanel().showGeneralDialog();
-            parentFrame.setChangedSinceLastSave(true);
+            parentFrame.getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
@@ -199,9 +199,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      */
     public void menuSelected(final MenuEvent e) {
         if (e.getSource().equals(getFileMenu())) {
-            if (parentFrame.isChangedSinceLastSave()) {
+            if (parentFrame.getWorkspaceComponent().hasChangedSinceLastSave()) {
                 getSaveItem().setEnabled(true);
-            } else if (!parentFrame.isChangedSinceLastSave()) {
+            } else if (!parentFrame.getWorkspaceComponent().hasChangedSinceLastSave()) {
                 getSaveItem().setEnabled(false);
             }
         }

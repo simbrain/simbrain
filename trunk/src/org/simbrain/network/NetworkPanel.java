@@ -80,6 +80,10 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Comparator;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.ProducingAttribute;
 import org.simnet.groups.GeneRec;
 import org.simnet.interfaces.Group;
 import org.simnet.interfaces.Network;
@@ -399,7 +403,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         insertMenu.add(createNewNetworkMenu());
         insertMenu.add(actionManager.getNewNeuronAction());
-        insertMenu.add(actionManager.getAddGaugeAction());
 
         return insertMenu;
     }
@@ -474,17 +477,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create and return a new Gauge menu for this rootNetwork panel.
-     *
-     * @return a new Gauge menu for this rootNetwork panel
-     */
-    JMenu createGaugeMenu() {
-        JMenu gaugeMenu = new JMenu("Gauge");
-        gaugeMenu.add(actionManager.getAddGaugeAction());
-        return gaugeMenu;
-    }
-
-    /**
      * Create and return a new Help menu for this rootNetwork panel.
      *
      * @return a new Help menu for this rootNetwork panel
@@ -553,8 +545,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         mainTools.addSeparator();
         mainTools.add(actionManager.getClearNeuronsAction());
         mainTools.add(actionManager.getRandomizeObjectsAction());
-        mainTools.addSeparator();
-        mainTools.add(actionManager.getAddGaugeAction());
         mainTools.addSeparator();
 
         return mainTools;
@@ -1020,6 +1010,26 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         return ret;
     }
+    
+    public ArrayList<ProducingAttribute> getSelectedProducingAttributes() {
+        ArrayList ret = new ArrayList();
+        for (PNode e : getSelection()) {
+            if (e instanceof NeuronNode) {
+                ret.add(((NeuronNode) e).getNeuron().getDefaultProducingAttribute());
+            }
+        }
+        return ret;
+    }
+    
+    public ArrayList<ConsumingAttribute> getSelectedConsumingAttributes() {
+        ArrayList ret = new ArrayList();
+        for (PNode e : getSelection()) {
+            if (e instanceof NeuronNode) {
+                ret.add(((NeuronNode) e).getNeuron().getDefaultConsumingAttribute());
+            }
+        }
+        return ret;
+    }
 
     /**
      * Returns model rootNetwork elements corresponding to selected screen elements.
@@ -1277,7 +1287,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode node = new NeuronNode(this, neuron, desktopComponent);
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1285,7 +1294,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode node = findNeuronNode(e.getObject());
         node.removeFromParent();
         centerCamera();
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1301,7 +1309,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             node.update();
         }
         resetColors();
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1324,7 +1331,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         SynapseNode node = new SynapseNode(this, source, target, synapse);
         getLayer().addChild(node);
         node.moveToBack();
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1335,7 +1341,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             toDelete.getSource().getConnectedSynapses().remove(toDelete);
             getLayer().removeChild(toDelete);
         }
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1428,7 +1433,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void groupRemoved(final NetworkEvent<Group> event) {
         ModelGroupNode node = findModelGroupNode(event.getObject());
         node.removeFromParent();
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1502,7 +1506,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
         }
         clearSelection();
-        setChangedSinceLastSave(true);
     }
 
     /**
@@ -1576,7 +1579,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode changed = findNeuronNode(e.getObject());
         changed.updateInLabel();
         changed.updateOutLabel();
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1585,10 +1587,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             // The underlying object has changed
             findSynapseNode(e.getOldObject()).setSynapse(e.getObject());
         }
-
-        setChangedSinceLastSave(true);
         resetColors();
-        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener */
@@ -1749,42 +1748,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return backgroundColor;
     }
 
-    /**
-     * Open the specified rootNetwork.
-     *
-     * @param file the file describing the rootNetwork to open
-     */
-    public void openNetwork(final File theFile) {
-        getLayer().removeAllChildren();
-        FileReader reader;
-        try {
-            reader = new FileReader(theFile);
-            rootNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(reader);
-            syncToModel();
-            rootNetwork.addListener(this);
-            repaint();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        setChangedSinceLastSave(false);
-    }
-
-    /**
-     * Save rootNetwork to specified file.
-     * 
-     * @param networkFile
-     *            the file to save the rootNetwork to.
-     */
-    public void saveNetwork(final File theFile) {
-        String xml = RootNetwork.getXStream().toXML(rootNetwork);
-        try {
-            FileWriter writer = new FileWriter(theFile);
-            writer.write(xml);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Return height bottom toolbar is taking up.
@@ -2073,7 +2036,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
         }
         timeLabel.update();
-        setChangedSinceLastSave(true);
+        rootNetwork.getParent().setChangedSinceLastSave(true);
         repaint();
     }
 
@@ -2185,34 +2148,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         getRootNetwork().removeNetworkListener(this);
         getRootNetwork().close();
     }
-
-    /**
-     * Add a gauge which by default gauges all neurons of current rootNetwork.
-     */
-    public void addGauge() {
-//        getWorkspace().addGauge(true);
-//        GaugeComponent gauge = getWorkspace().getLastGauge();
-//        // By default gauge all neurons of the current rootNetwork
-//        gauge.setVariables(getRootNetwork().getFlatNeuronList(), getNetworkFrame().getTitle());
-    }
-
-    /**
-     * Set to true if this rootNetwork frame has changed since it was last saved.
-     * @param changedSinceLastSave true if this rootNetwork frame has changed since
-     *    it was last saved
-     */
-    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        this.getParentComponent().setChangedSinceLastSave(changedSinceLastSave);
-        actionManager.getSaveNetworkAction().setEnabled(changedSinceLastSave);
-    }
-
-    /**
-     * @return Returns the hasChangedSinceLastSave.
-     */
-    public boolean isChangedSinceLastSave() {
-        return this.getParentComponent().isChangedSinceLastSave();
-    }
-
 
     /**
      * @return Returns the edit tool bar.

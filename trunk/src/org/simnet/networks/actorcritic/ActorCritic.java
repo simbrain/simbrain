@@ -238,7 +238,7 @@ public class ActorCritic extends Network {
             actionsNetwork.getNeuron(i).update();
             a[i] = actionsNetwork.getNeuron(i).getBuffer();
         }
-        this.explorationPolicy.selectAction(a);
+//        this.explorationPolicy.selectAction(a);
         for (int i = 0; i < actionsNetwork.getNeuronCount(); i++) {
             actionsNetwork.getNeuron(i).setActivation(a[i]);
         }

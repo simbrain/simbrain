@@ -28,4 +28,6 @@ public interface Producer extends AttributeHolder {
      * @param producingAttribute the default producing attribute to set.
      */
     void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
+    
+    
 }

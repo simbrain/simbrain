@@ -18,11 +18,11 @@
  */
 package org.simbrain.network;
 
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 
-import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -30,10 +30,6 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
-import org.simnet.interfaces.Synapse;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Network frame.
@@ -65,9 +61,6 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
         return new NetworkComponent(name, newNetwork);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         RootNetwork.getXStream().toXML(rootNetwork, output);
@@ -108,5 +101,27 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     @Override
     public Collection<? extends Producer> getProducers() {
         return rootNetwork.getProducers();
+    }
+    
+    @Override
+    public String getXML() {
+        return RootNetwork.getXStream().toXML(rootNetwork);
+    }
+
+    @Override
+    public void deserializeFromReader(FileReader reader) {
+        rootNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(reader);
+        rootNetwork.setParent(this);
+    }
+    
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {
+        super.setCurrentDirectory(currentDirectory);
+        NetworkPreferences.setCurrentDirectory(currentDirectory);
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+       return NetworkPreferences.getCurrentDirectory();
     }
 }

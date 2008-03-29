@@ -215,28 +215,4 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void open(final File openFile) {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void save(final File saveFile) {
-        // TODO Auto-generated method stub
-    }
 }

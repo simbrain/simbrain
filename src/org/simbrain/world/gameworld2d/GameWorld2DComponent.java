@@ -1,6 +1,7 @@
 package org.simbrain.world.gameworld2d;
 
 import java.awt.Dimension;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 

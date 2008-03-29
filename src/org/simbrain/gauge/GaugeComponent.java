@@ -18,6 +18,9 @@
  */
 package org.simbrain.gauge;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.odorworld.OdorWorld;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -85,7 +89,7 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
 
     /**
      * Update couplings.
-     *
+     * TODO Think about this...
      * @param dims dimensions to update
      */
     public void resetCouplings(final int dims) {
@@ -155,11 +159,35 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
         return (GaugeComponent) getXStream().fromXML(input);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
+    }
+    
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {
+        super.setCurrentDirectory(currentDirectory);
+        GaugePreferences.setCurrentDirectory(currentDirectory);
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+        return GaugePreferences.getCurrentDirectory();
+    }
+
+    @Override
+    public void save(File openFile) {
+        gauge.getCurrentProjector().preSaveInit();
+        super.save(openFile);
+    }
+    
+    @Override
+    public String getXML() {
+        return getXStream().toXML(gauge.getCurrentProjector());
+    }
+
+    @Override
+    public void deserializeFromReader(FileReader reader) {
+        gauge.setCurrentProjector((Projector) getXStream().fromXML(reader));
     }
 }

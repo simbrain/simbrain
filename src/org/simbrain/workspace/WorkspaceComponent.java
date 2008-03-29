@@ -18,8 +18,8 @@
  */
 package org.simbrain.workspace;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.simbrain.gauge.core.Projector;
 
 /**
  * Represents a component model in a Simbrain workspace.  Services relating to
@@ -37,7 +38,11 @@ import org.apache.log4j.Logger;
  * component.
  */
 public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
+
     private static final Set<String> NAMES = new HashSet<String>();
+    
+    /** The workspace that 'owns' this component. */
+    private Workspace workspace;
     
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(WorkspaceComponent.class);
@@ -50,10 +55,25 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
 
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
-
-    /** The workspace that 'owns' this component. */
-    private Workspace workspace;
     
+    /** How to order a list of attributes. */
+    public enum Strategy {TOTAL, DEFAULT_EACH, CUSTOM };
+    
+    /** Current Strategy for this component. */
+    private Strategy strategy;
+
+    /**
+     * Current directory. So when re-opening this type of component the appremembers where to look. 
+     * Subclasses can provide a default value using User Preferences.
+     */
+    private String currentDirectory;
+
+    /**
+     * Current file.  Used when "saving" a component.
+     * Subclasses can provide a default value using User Preferences.
+     */
+    private File currentFile;
+
     /**
      * Construct a workspace component.
      * 
@@ -62,6 +82,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public WorkspaceComponent(final String name) {
         this.name = name;
         logger.trace(this.getClass().getCanonicalName() + ": " + name + " created");
+        strategy = Strategy.DEFAULT_EACH;
     }
 
     /**
@@ -70,35 +91,22 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      *
      * @param output the stream of data to write the data to.
      * @param format a key used to define the requested format.
-     * @return a short key for the format such as 'xml'.
      */
     public abstract void save(OutputStream output, String format);
     
-    public String getDefaultFormatKey() {
-        return "xml";
-    }
-    
+    /**
+     * Subclasses should override this; used in coupling serialization.
+     */
     public String getKeyForAttribute(Attribute attribute) {
-        // TODO abstract
         return null;
     }
 
+    /**
+     * Subclasses should override this; used in coupling serialization.
+     */
     public Attribute getAttributeForKey(String key) {
-        // TODO abstract
         return null;
     }
-    
-    /**
-     * When workspaces are opened, a path to a file is passed in.
-     * So, all components which can be saved should have this.
-     *
-     * @param input stream of data representing saved component.
-     * 
-     * @return The new instance.
-     */
-//    public static WorkspaceComponent<?> open(InputStream input, String name, String format) {
-//        
-//    }
 
     /**
      * Returns a list of the formats that this component supports.
@@ -203,21 +211,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
 
     /**
-     * @param changedSinceLastSave the changedSinceLastSave to set
-     */
-    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        LOGGER.debug("component changed");
-        this.changedSinceLastSave = changedSinceLastSave;
-    }
-
-    /**
-     * @return the changedSinceLastSave
-     */
-    public boolean isChangedSinceLastSave() {
-        return changedSinceLastSave;
-    }
-
-    /**
      * Retrieves a simple version of a component name from its class,
      * e.g. "Network" from "org.simbrain.network.NetworkComponent"/
      *
@@ -240,6 +233,107 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         return Collections.emptySet();
     }
 
+    /**
+     * Return producing attributes in a particular order, for use in creating couplings.
+     * Can create customized orderings by overriding this method.
+     * 
+     * @return custom list of producing attributes.
+     */
+    public ArrayList<ProducingAttribute<?>> getCustomListOfProducingAttributes() {
+        
+        ArrayList<ProducingAttribute<?>> list = new ArrayList<ProducingAttribute<?>>();
+    
+        if (strategy.equals(Strategy.DEFAULT_EACH)) {
+            for (Producer producer : this.getProducers()) {
+                list.add(producer.getDefaultProducingAttribute());
+            }
+        } else if (strategy.equals(Strategy.TOTAL)) {
+            for (Producer producer : this.getProducers()) {
+                for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
+                    list.add(attribute);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Return consuming attributes in a particular order, for use in creating couplings.
+     * Can create customized orderings by overriding this method.
+     * 
+     * @return custom list of producing attributes.
+     */
+    public ArrayList<ConsumingAttribute<?>> getCustomListOfConsumingAttributes() {
+        
+        ArrayList<ConsumingAttribute<?>> list = new ArrayList<ConsumingAttribute<?>>();
+        if (strategy.equals(Strategy.DEFAULT_EACH)) {
+            for (Consumer consumer : this.getConsumers()) {
+                list.add(consumer.getDefaultConsumingAttribute());
+            }
+        } else if (strategy.equals(Strategy.TOTAL)) {
+            for (Consumer consumer : this.getConsumers()) {
+                for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
+                    list.add(attribute);
+                }
+
+            }
+        }
+        return list;
+    }
+    
+    /**
+     * Save a workspace component to a file. Currently assumes xml.
+     *
+     * @param saveFile the file to save.
+     */
+    public void save(final File saveFile) {
+        setCurrentFile(saveFile);
+        String xml = getXML();
+        try {
+            FileWriter writer  = new FileWriter(saveFile);
+            writer.write(xml);
+            writer.close();
+            setChangedSinceLastSave(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+        
+    /**
+     * Open a workspace component from a file.  Currently assumes xml.
+     *
+     * @param openFile file representing saved component.
+     */
+    public void open(final File openFile) {
+        setCurrentFile(openFile);
+        FileReader reader;
+        try {
+            reader = new FileReader(openFile);
+            deserializeFromReader(reader);
+            setChangedSinceLastSave(false);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Override for use with open service.
+     *
+     * @return xml string representing stored file.
+     */
+    public String getXML() {
+        return null;
+    }
+
+    /**
+     * Override for use with save service.
+     * @param reader
+     */
+    public void deserializeFromReader(final FileReader reader) {
+        // no implementation
+    }
+
+    
     /**
      * Returns the producers associated with this component.
      * 
@@ -279,4 +373,75 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     protected void couplingRemoved(final Coupling<?> coupling) {
         /* no default implementation */
     }
+
+    public Strategy getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(Strategy strategy) {
+        this.strategy = strategy;
+    }
+    
+
+    /**
+     * The file extension for a component type, e.g. By default, "xml".
+     *
+     * @return the file extension
+     */
+    public String getFileExtension() {
+        return "xml";
+    }
+    
+    /**
+     * Set to true when a component changes, set to false after a component is saved.
+     *
+     * @param changedSinceLastSave whether this component has changed since the last save.
+     */
+    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
+        LOGGER.debug("component changed");
+        this.changedSinceLastSave = changedSinceLastSave;
+    }
+
+    /**
+     * Returns true if it's changed since the last save.
+     *
+     * @return the changedSinceLastSave
+     */
+    public boolean hasChangedSinceLastSave() {
+        return changedSinceLastSave;
+    }
+
+    /**
+     * This should be overridden if there are user preferences to get.
+     *
+     * @return the currentDirectory
+     */
+    public String getCurrentDirectory() {
+        return currentDirectory;
+    }
+
+    /**
+     *
+     * This should be overridden if there are user preferences to set.
+     *
+     * @param currentDirectory the currentDirectory to set
+     */
+    public void setCurrentDirectory(final String currentDirectory) {
+        this.currentDirectory = currentDirectory;
+    }
+
+    /**
+     * @return the currentFile
+     */
+    public File getCurrentFile() {
+        return currentFile;
+    }
+
+    /**
+     * @param currentFile the currentFile to set
+     */
+    public void setCurrentFile(final File currentFile) {
+        this.currentFile = currentFile;
+    }
+
 }

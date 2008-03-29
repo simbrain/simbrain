@@ -253,6 +253,7 @@ public class NeuronDialog extends StandardDialog {
         topPanel.addItemLabel(upperLabel, tfUpBound);
         topPanel.addItemLabel(lowerLabel, tfLowBound);
         topPanel.addItem("Neuron type", cbNeuronType);
+        //topPanel.addItem("Attribute type", cbNeuronType);
 
         mainPanel.add(topPanel);
         mainPanel.add(neuronPanel);

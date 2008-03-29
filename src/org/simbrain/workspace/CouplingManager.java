@@ -65,6 +65,13 @@ public class CouplingManager {
     public Collection<? extends Coupling<?>> getCouplings() {
         return Collections.unmodifiableList(all);
     }
+    
+    /**
+     * Clear all couplings.
+     */
+    public void clearCouplings() {
+        all.clear();
+    }
 
     /**
      * Returns all couplings from the given source to the given target.
@@ -84,7 +91,7 @@ public class CouplingManager {
             return Collections.unmodifiableCollection(couplings);
         }
     }
-
+    
     /**
      * Updates all couplings in the workspace.
      */
@@ -134,7 +141,7 @@ public class CouplingManager {
         
         if (old != null) {
             System.out.println("removing old coupling: " + old);
-            removeCoupling(old);
+//            removeCoupling(old);
         }
         
         consumingAttributes.put(coupling.getConsumingAttribute(), coupling);

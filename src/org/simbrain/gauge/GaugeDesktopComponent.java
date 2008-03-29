@@ -51,6 +51,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
 
     /** The initial height for the internal frame. */
     private static final int INITIAL_HEIGHT = 300;
+
     /** The initial width for the internal frame. */
     private static final int INITIAL_WIDTH = 300;
     
@@ -143,7 +144,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
         super(component);
         this.component = component;
         component.addListener(listener);
-        this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
+        component.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
         this.setPreferredSize(new Dimension(INITIAL_HEIGHT, INITIAL_WIDTH));
         gauge = component.getGauge();
         gaugePanel = new GaugePanel(gauge);
@@ -162,6 +163,11 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
     @Override
     public void postAddInit() {
         setUpMenus();
+        gauge.getCurrentProjector().postOpenInit();
+        gauge.setCurrentProjector(gauge.getCurrentProjector());
+        gaugePanel.updateGraphics();
+        component.resetCouplings(gauge.getCurrentProjector().getUpstairs().getDimensions());
+
     }
     
     /**
@@ -280,52 +286,12 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
     }
 
     /**
-     * Saves network information to the specified file.
-     * @param theFile File to write
-     */
-    public void open(final File theFile) {
-        setCurrentFile(theFile);
-        FileReader reader;
-        try {
-            reader = new FileReader(theFile);
-            Projector projector = (Projector) getXStream().fromXML(reader);
-            projector.postOpenInit();
-            gauge.setCurrentProjector(projector);
-            gaugePanel.updateGraphics();
-            component.resetCouplings(projector.getUpstairs().getDimensions());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        setStringReference(theFile);
-        setChangedSinceLastSave(false);
-    }
-
-    /**
-     * Reads gauge files.
-     * @param f Gauge file to read
-     */
-    public void save(final File f) {
-        setCurrentFile(f);
-        gauge.getCurrentProjector().preSaveInit();
-        String xml = getXStream().toXML(gauge.getCurrentProjector());
-        try {
-            FileWriter writer  = new FileWriter(f);
-            writer.write(xml);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        setStringReference(f);
-        setChangedSinceLastSave(false);
-    }
-
-    /**
      * Import data from csv (comma-separated-values) file.
      */
     public void importCSV() {
         gaugePanel.resetGauge();
 
-        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), "csv");
+        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "csv");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
@@ -334,7 +300,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
             gauge.getCurrentProjector().project();
             gaugePanel.centerCamera();
             gaugePanel.updateGraphics();
-            setCurrentDirectory(chooser.getCurrentLocation());
+            component.setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
 
@@ -342,12 +308,12 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      * Export high dimensional data to csv (comma-separated-values).
      */
     public void exportHigh() {
-        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), "csv");
+        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             gauge.getUpstairs().saveData(theFile);
-            setCurrentDirectory(chooser.getCurrentLocation());
+            component.setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
 
@@ -355,12 +321,12 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      * Export low-dimensional data to csv (comma-separated-values).
      */
     public void exportLow() {
-        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), "csv");
+        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             gauge.getDownstairs().saveData(theFile);
-            setCurrentDirectory(chooser.getCurrentLocation());
+            component.setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
 
@@ -369,7 +335,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      */
     public void close() {
         gaugePanel.stopThread();
-        GaugePreferences.setCurrentDirectory(getCurrentDirectory());
+        GaugePreferences.setCurrentDirectory(component.getCurrentDirectory());
     }
 
     /**  Menu Listener. */
@@ -386,9 +352,9 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
          */
         public void menuSelected(final MenuEvent arg0) {
             if (arg0.getSource().equals(fileMenu)) {
-                if (GaugeDesktopComponent.this.isChangedSinceLastSave()) {
+                if (component.hasChangedSinceLastSave()) {
                     save.setEnabled(true);
-                } else if (!GaugeDesktopComponent.this.isChangedSinceLastSave()) {
+                } else if (!component.hasChangedSinceLastSave()) {
                     save.setEnabled(false);
                 }
             } else if (arg0.getSource().equals(prefsMenu)) {
@@ -416,28 +382,4 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
         }
     };
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getFileExtension() {
-        return "gdf";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
-        GaugePreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getCurrentDirectory() {
-        return GaugePreferences.getCurrentDirectory();
-    }
 }

@@ -43,6 +43,6 @@ public final class SaveWorkspaceAsAction extends DesktopAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        desktop.saveWorkspace();
+        desktop.saveAs();
     }
 }

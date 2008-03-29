@@ -170,19 +170,4 @@ public class TextWorldDesktopComponent extends DesktopComponent<TextWorldCompone
         
     }
 
-    @Override
-    public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
-    }
 }

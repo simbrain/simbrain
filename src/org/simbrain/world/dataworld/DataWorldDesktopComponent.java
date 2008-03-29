@@ -51,7 +51,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     private JScrollPane worldScroller = new JScrollPane();
 
     /** Data world. */
-    private final DataWorld world;
+    private DataWorld world;
 
     /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
@@ -135,7 +135,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         save.addActionListener(saveListener);
         save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveAs.addActionListener(saveListener);
+        saveAs.addActionListener(saveAsListener);
         close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
         randomize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit
@@ -186,65 +186,18 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         }
     }
 
-    /**
-     * Read a world from a world-xml file.
-     *
-     * @param theFile the xml file containing world information
-     */
-    public void open(final File theFile) {
-//        setCurrentFile(theFile);
-//        FileReader reader;
-//        try {
-//            reader = new FileReader(theFile);
-//            TableModel model = (TableModel) getXStream().fromXML(reader);
-//            model.postOpenInit();
-//            world.setTableModel(model);
-//            pack();
-//            setStringReference(theFile);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-//    private XStream getXStream() {
-//        XStream xstream = new XStream(new DomDriver());
-//        xstream.omitField(TableModel.class, "consumers");
-//        xstream.omitField(TableModel.class, "producers");
-//        xstream.omitField(TableModel.class, "couplingList");
-//        xstream.omitField(TableModel.class, "model");
-//        return xstream;
-//    }
-
-    /**
-     * Save a specified file.
-     *
-     * @param worldFile File to save world
-     */
-    public void save(final File worldFile) {
-//        setCurrentFile(worldFile);
-//        world.getTableModel().preSaveInit();
-//        String xml = getXStream().toXML(world.getTableModel());
-//        try {
-//            FileWriter writer  = new FileWriter(worldFile);
-//            writer.write(xml);
-//            writer.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        setStringReference(worldFile);
-//        setChangedSinceLastSave(false);
-    }
-
     private ActionListener openListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             showOpenFileDialog();
         }
     };
 
+    private ActionListener saveAsListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            showSaveFileDialog();
+        }
+    };
+    
     private ActionListener saveListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             save();
@@ -254,7 +207,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     private ActionListener addRowListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().addNewRow();
-            setChangedSinceLastSave(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
     };
@@ -263,7 +216,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().addNewColumn();
             world.getDataModel().fillNew(new Double(0));
-            setChangedSinceLastSave(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
     };
@@ -271,7 +224,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     private ActionListener remRowListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().removeLastRow();
-            setChangedSinceLastSave(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
     };
@@ -279,7 +232,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     private ActionListener remColListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().removeLastColumn();
-            setChangedSinceLastSave(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
     };
@@ -287,7 +240,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     private ActionListener zeroFillListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().fill(new Double(0));
-            setChangedSinceLastSave(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
@@ -307,15 +260,14 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
                     model.set(i , j, value);                    
                 }
             }
-
-            setChangedSinceLastSave(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
     private ActionListener randomPropsListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             world.displayRandomizeDialog();
-            setChangedSinceLastSave(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
@@ -340,9 +292,9 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
          */
         public void menuSelected(final MenuEvent e) {
             if (e.getSource().equals(file)) {
-                if (isChangedSinceLastSave()) {
+                if (getWorkspaceComponent().hasChangedSinceLastSave()) {
                     save.setEnabled(true);
-                } else if (!isChangedSinceLastSave()) {
+                } else if (!getWorkspaceComponent().hasChangedSinceLastSave()) {
                     save.setEnabled(false);
                 }
             }
@@ -356,26 +308,9 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     };
 
     @Override
-    public String getFileExtension() {
-       return "xml";
-    }
-
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {        
-        super.setCurrentDirectory(currentDirectory);
-        DataWorldPreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    @Override
-    public String getCurrentDirectory() {
-        return DataWorldPreferences.getCurrentDirectory();
-    }
-
-    @Override
     protected void update() {
         // TODO refactor
         world.getDataModel().update();
-//        this.getWorld().getTableModel().fireTableDataChanged();
         world.completedInputRound();
         super.update();
     }
@@ -390,4 +325,13 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         setMaximumSize(new Dimension((int) getMaximumSize().getWidth(), (int) getSize().getHeight()));
         repaint();
     }
+    
+    @Override
+    public void postAddInit() {
+        world = new DataWorld(this, this.getWorkspaceComponent().getDataModel());
+        worldScroller.setViewportView(world);
+        world.setParentFrame(this);
+        repaint();
+    }
+
 }

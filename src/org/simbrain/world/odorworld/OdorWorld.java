@@ -81,6 +81,14 @@ public class OdorWorld {
         return xstream;
     }
     
+    public OdorWorldAgent findAgent(final String name) {
+        for (OdorWorldAgent entity : this.getAgentList()) {
+            if (entity.getName().equals(name)) {
+                return entity;
+            }
+        }
+        return null;
+    }
     void setParent(final OdorWorldComponent parent) {
         this.parent = parent;
     }

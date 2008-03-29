@@ -43,34 +43,19 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Represents a window in the Simbrain desktop.   Services relating to
- * couplings and relations between are handled.  We may want to abstract
- * out some of the coupling management since much of this is focused on
- * the GUI aspects of the JInternalFrames.
+ * couplings and relations between are handled
  */
 public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends JInternalFrame {
 
+    /** Logger. */
     private static final Logger LOGGER = Logger.getLogger(DesktopComponent.class);
     
+    /** Reference to workspace component. */
     private final E workspaceComponent;
     
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(DesktopComponent.class);
-
-    /** File system separator. */
-    public static final String FS = System.getProperty("file.separator");
-
-    /** Whether this component has changed since last save. */
-    private boolean changedSinceLastSave = false;
-
-    /** Current directory. So when re-opening this type of component the app remembers where to look. */
-    private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-
-    /** The path to the saved representation for this component. Used in persisting the workspace. */
-    private String path;
-
-    /** Current file.  For save (vs. save-as). */
-    private File currentFile;
-
+   
     /**
      * Construct a workspace component.
      */
@@ -94,36 +79,9 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         /* no implementation */
     }
 
-    public String getDefaultFormatKey() {
-        return "xml";
-    }
-    
-    /**
-     * Used when saving a workspace.  All changed workspace components are saved using
-     * this method.
-     *
-     * @param saveFile the file to save.
-     */
-    public abstract void save(File saveFile);
-
-    /**
-     * When workspaces are opened, a path to a file is passed in.
-     * So, all components which can be saved should have this.
-     *
-     * @param openFile file representing saved component.
-     */
-    public abstract void open(File openFile);
-
-
-    /**
-     * The file extension for a component type, e.g. ".net".
-     *
-     * @return the file extension
-     */
-    public abstract String getFileExtension();
-
-    /**
-     * Perform cleanup after closing.
+   /**
+    * Perform cleanup after closing.
+    * TODO: Move to model?
     */
     public abstract void close();
 
@@ -139,11 +97,13 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      * Calls up a dialog for opening a workspace component.
      */
     public void showOpenFileDialog() {
-        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
+        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), workspaceComponent.getFileExtension());
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            open(theFile);
-            setCurrentDirectory(chooser.getCurrentLocation());
+            workspaceComponent.open(theFile);
+            workspaceComponent.setName(theFile.getName());
+            setTitle(workspaceComponent.getName());
+            postAddInit();
         }
     }
 
@@ -151,20 +111,21 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      * Show the dialog for saving a workspace component.
      */
     public void showSaveFileDialog() {
-        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getDefaultFormatKey());
+        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), workspaceComponent.getFileExtension());
         
-        if (getCurrentFile() != null) {
-            chooser.setSelectedFile(getCurrentFile());
+        if (workspaceComponent.getCurrentFile() != null) {
+            chooser.setSelectedFile(workspaceComponent.getCurrentFile());
         } else {
-            chooser.setSelectedFile(new File(getName() + "." + getFileExtension()));
+            chooser.setSelectedFile(new File(getName()));
         }
         
         File theFile = chooser.showSaveDialog();
         
         if (theFile != null) {
-            save(theFile);
-            setCurrentDirectory(chooser.getCurrentLocation());
-            setChangedSinceLastSave(false);
+            workspaceComponent.save(theFile);
+            workspaceComponent.setCurrentDirectory(chooser.getCurrentLocation());
+            workspaceComponent.setName(theFile.getName());
+            setTitle(workspaceComponent.getName());
         }
     }
 
@@ -172,10 +133,10 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      * Save vs. save-as.  Saves the currentfile.
      */
     public void save() {
-        if (getCurrentFile() == null) {
+        if (workspaceComponent.getCurrentFile() == null) {
             showSaveFileDialog();
         } else {
-            save(currentFile);
+            workspaceComponent.save(workspaceComponent.getCurrentFile());
         }
     }
     
@@ -220,12 +181,12 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
                  "Component Has Changed", JOptionPane.YES_NO_OPTION,
                  JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
-        if (s == 0) {
-            this.showSaveFileDialog();
+        if (s == JOptionPane.OK_OPTION) {
+            this.save();
             dispose();
-        } else if (s == 1) {
+        } else if (s == JOptionPane.NO_OPTION) {
             dispose();
-        } else if (s == 2) {
+        } else if (s == JOptionPane.CANCEL_OPTION) {
             return;
         }
     }
@@ -243,38 +204,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
     }
 
     /**
-     * @return the path
-     */
-//    public String getPath() {
-//        return path;
-//    }
-
-    /**
-     * @param path path of file.
-     */
-//    public void setPath(final String path) {
-//        this.path = path;
-//    }
-
-    /**
-     * Sets a string path to this network in a manner independent of OS.  Used in persistence.
-     *
-     * @param theFile the path for this component
-     */
-    public void setStringReference(final File theFile) {
-        String localDir = new String(System.getProperty("user.dir"));
-        String thePath = Utils.getRelativePath(localDir, theFile.getAbsolutePath());
-        if (thePath.length() > 2) {
-            if (thePath.charAt(2) == '.') {
-                thePath = path.substring(2, path.length());
-            }
-        }
-        thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
-        this.path = thePath;
-        setName(theFile.getName());
-    }
-
-    /**
      * Manage cleanup when a component is closed.
      */
     private class WindowFrameListener extends InternalFrameAdapter {
@@ -282,7 +211,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         public void internalFrameClosing(final InternalFrameEvent e) {
             // NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
 
-            if (isChangedSinceLastSave()) {
+            if (workspaceComponent.hasChangedSinceLastSave()) {
                 showHasChangedDialog();
             } else {
                 dispose();
@@ -293,55 +222,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         }
     }
 
-    /**
-     * @param changedSinceLastSave the changedSinceLastSave to set
-     */
-    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        LOGGER.debug("component changed");
-        this.changedSinceLastSave = changedSinceLastSave;
-    }
-
-    /**
-     * @return the changedSinceLastSave
-     */
-    public boolean isChangedSinceLastSave() {
-        return changedSinceLastSave;
-    }
-
-    /**
-     * This should be overridden if there are user preferences to get.
-     *
-     * @return the currentDirectory
-     */
-    public String getCurrentDirectory() {
-        System.out.println(currentDirectory);
-        return currentDirectory;
-    }
-
-    /**
-     *
-     * This should be overridden if there are user preferences to set.
-     *
-     * @param currentDirectory the currentDirectory to set
-     */
-    public void setCurrentDirectory(final String currentDirectory) {
-        this.currentDirectory = currentDirectory;
-        WorkspacePreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    /**
-     * @return the currentFile
-     */
-    public File getCurrentFile() {
-        return currentFile;
-    }
-
-    /**
-     * @param currentFile the currentFile to set
-     */
-    public void setCurrentFile(final File currentFile) {
-        this.currentFile = currentFile;
-    }
 
     /**
      * Retrieves a simple version of a component name from its class,

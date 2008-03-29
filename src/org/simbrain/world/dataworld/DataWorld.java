@@ -128,7 +128,7 @@ public class DataWorld extends JPanel {
             } else {
                 getDataModel().addNewRow();
             }
-            ws.setChangedSinceLastSave(true);
+            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
             ws.pack();
         }
     };
@@ -137,7 +137,7 @@ public class DataWorld extends JPanel {
         public void actionPerformed(final ActionEvent e) {
             getDataModel().insertNewColumn(getSelectedColumn());
             getDataModel().fillNew(new Double(0));
-            ws.setChangedSinceLastSave(true);
+            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
             ws.pack();
         }
     };
@@ -145,7 +145,7 @@ public class DataWorld extends JPanel {
     private ActionListener remRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             getDataModel().removeRow(getSelectedRow());
-            ws.setChangedSinceLastSave(true);
+            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
             ws.pack();
         }
     };
@@ -153,7 +153,7 @@ public class DataWorld extends JPanel {
     private ActionListener remColHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             getDataModel().removeColumn(getSelectedColumn());
-            ws.setChangedSinceLastSave(true);
+            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
             ws.pack();
         }
     };
@@ -337,7 +337,7 @@ public class DataWorld extends JPanel {
          * @param arg0 Key event
          */
         public void keyTyped(final KeyEvent arg0) {
-            getParentFrame().setChangedSinceLastSave(true);
+            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
 

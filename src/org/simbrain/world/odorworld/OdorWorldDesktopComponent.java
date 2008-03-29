@@ -21,6 +21,10 @@ package org.simbrain.world.odorworld;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JScrollPane;
@@ -96,63 +100,12 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
     public OdorWorldPanel getWorldPanel() {
         return worldPanel;
     }
-
-    /**
-     * Read a world.
-     *
-     * @param theFile the wld file containing world information
-     */
-    public void open(final File theFile) {
-//        this.setCurrentFile(theFile);
-//        worldPanel.setParentFrame(this);
-//        FileReader reader;
-//        try {
-//            reader = new FileReader(theFile);
-//            worldPanel.setWorld((OdorWorld) getXStream().fromXML(reader));
-//            worldPanel.getWorld().postUnmarshallInit();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        setStringReference(theFile);
-//        worldPanel.repaint();
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    @SuppressWarnings("unused")
-    private static XStream getXStream() {
-//        XStream xstream = new XStream(new DomDriver());
-//        xstream.setMode(XStream.ID_REFERENCES);
-//        xstream.omitField(OdorWorldEntity.class, "theImage");
-//        xstream.omitField(OdorWorldAgent.class, "effectorList");
-//        xstream.omitField(OdorWorldAgent.class, "sensorList");
-//        xstream.omitField(OdorWorld.class, "couplings");
-//        return xstream;
-        return null;
-    }
-
-    /**
-     * Save a specified file  Called by "save".
-     *
-     * @param theFile the file to save to
-     */
-    public void save(final File theFile) {
-//        setCurrentFile(theFile);
-//        String xml = getXStream().toXML(worldPanel.getWorld());
-//        try {
-//            FileWriter writer  = new FileWriter(theFile);
-//            writer.write(xml);
-//            writer.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        setStringReference(theFile);
-//        setChangedSinceLastSave(false);
-    }
-
     
+    @Override
+    public void postAddInit() {
+        worldPanel.setWorld(this.getWorkspaceComponent().getWorld());
+        worldPanel.repaint();
+    }
 
     /**
      * Return the arraylist of agents.
@@ -183,23 +136,7 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public String getFileExtension() {
-        return "wld";
-    }
-
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {        
-        super.setCurrentDirectory(currentDirectory);
-        OdorWorldPreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    @Override
-    public String getCurrentDirectory() {
-        return OdorWorldPreferences.getCurrentDirectory();
-    }
-
     public void componentUpdated() {
-        worldPanel.repaint();
+        worldPanel.repaint();        
     }
 }

@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ public class Workspace {
     
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
+
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
     
@@ -49,7 +51,10 @@ public class Workspace {
     /** Current workspace file. */
     private File currentFile = new File(WorkspacePreferences.getDefaultFile());
 
-    /** Whether network has been updated yet; used by thread. */
+    /** Current directory. So when re-opening this type of component the app remembers where to look. */
+    private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
+
+    /** Whether workspace has been updated yet; used by thread. */
     private volatile boolean updateCompleted;
 
     /** Thread which runs workspace. */
@@ -57,6 +62,9 @@ public class Workspace {
 
     /** Listeners on this workspace. */
     private Set<WorkspaceListener> listeners = new HashSet<WorkspaceListener>();
+    
+    private boolean fireEvents = true;
+
     
     /**
      * Adds a listener to the workspace.
@@ -76,12 +84,60 @@ public class Workspace {
         listeners.remove(listener);
     }
 
-    private boolean fireEvents = true;
     
-    void toggleEvents(boolean on) {
+    void toggleEvents(final boolean on) {
         this.fireEvents = on;
     }
     
+    /**
+     * Couple producing attributes in the source component to consuming attributes in the target component.
+     *
+     * @param source reference to source component.
+     * @param target reference to target component.
+     */
+    public void couple(final WorkspaceComponent source, final WorkspaceComponent target) {        
+        //TODO: Add strategies
+        // Below is 1-1
+        Iterator<ConsumingAttribute> consumer = target.getCustomListOfConsumingAttributes().iterator();
+        for (ProducingAttribute producer : (ArrayList<ProducingAttribute>)source.getCustomListOfProducingAttributes()) {
+            if (consumer.hasNext()) {
+                this.addCoupling(new Coupling(producer, consumer.next()));
+            }
+        }
+    }
+    
+    
+    /**
+     * Couple a specified set of producing attributes to the consuming attributes in a target component.
+     */
+    public void coupleSpecific(final ArrayList<ProducingAttribute> sourceProducers, final WorkspaceComponent<?> targetComponent) {
+        
+        Iterator consumerIterator =  ((ArrayList<ConsumingAttribute>)targetComponent.getCustomListOfConsumingAttributes()).iterator();
+        for (ProducingAttribute producingAttribute : sourceProducers) {
+            if (consumerIterator.hasNext()) {
+                Coupling coupling = new Coupling(producingAttribute, (ConsumingAttribute) consumerIterator.next());
+                addCoupling(coupling);
+            } else {
+                break;
+            }
+        }
+        
+    }
+    /**
+     * Couple producing attributes in a source component with specified consuming attributes.
+     */
+    public void coupleSpecific(final WorkspaceComponent<?> sourceComponent, final ArrayList<ConsumingAttribute> targetConsumers) {
+        Iterator consumerIterator = targetConsumers.iterator();
+        for (ProducingAttribute producingAttribute :  ((ArrayList<ProducingAttribute>)sourceComponent.getCustomListOfProducingAttributes())) {
+            if (consumerIterator.hasNext()) {
+                Coupling coupling = new Coupling(producingAttribute, (ConsumingAttribute) consumerIterator.next());
+                addCoupling(coupling);
+            } else {
+                break;
+            }
+        }
+    }
+
     /**
      * Adds a workspace component to the workspace.
      * 
@@ -205,6 +261,7 @@ public class Workspace {
         for (WorkspaceListener listener : listeners) {
             listener.workspaceCleared();
         }
+        manager.clearCouplings();
     }
 
     /**
@@ -231,7 +288,7 @@ public class Workspace {
         } else {
             boolean hasChanged = false;
             for (WorkspaceComponent<?> window : componentList) {
-                if (window.isChangedSinceLastSave()) {
+                if (window.hasChangedSinceLastSave()) {
                     hasChanged = true;
                 }
             }
@@ -245,6 +302,21 @@ public class Workspace {
      */
     public void setWorkspaceChanged(final boolean workspaceChanged) {
         this.workspaceChanged = workspaceChanged;
+    }
+
+    /**
+     * @return the currentDirectory
+     */
+    public String getCurrentDirectory() {
+        return currentDirectory;
+    }
+
+    /**
+     * @param currentDirectory the currentDirectory to set
+     */
+    public void setCurrentDirectory(final String currentDirectory) {
+        this.currentDirectory = currentDirectory;
+        WorkspacePreferences.setCurrentDirectory(currentDirectory);
     }
 
     /**
@@ -274,7 +346,7 @@ public class Workspace {
      * @param id name of component
      * @return Workspace Component
      */
-    public WorkspaceComponent getComponent(String id) {
+    public WorkspaceComponent getComponent(final String id) {
         for (WorkspaceComponent component : componentList) {
             if (component.getName().equalsIgnoreCase(id)) {
                 return component;

@@ -209,7 +209,6 @@ final class SelectionEventHandler
                     if (screenElement.isDraggable()) {
                         screenElement.localToParent(delta);
                         screenElement.offset(delta.getWidth(), delta.getHeight());
-                        networkPanel.setChangedSinceLastSave(true);
                     }
                 }
             }

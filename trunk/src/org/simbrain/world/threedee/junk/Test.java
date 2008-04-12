@@ -15,6 +15,7 @@ import javax.swing.UIManager;
 
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
+import org.simbrain.world.threedee.Entity;
 import org.simbrain.world.threedee.Moveable;
 import org.simbrain.world.threedee.environment.Environment;
 import org.simbrain.world.threedee.gui.FreeBirdView;
@@ -57,7 +58,7 @@ public class Test {
     }
     
     private static AwtView createView1(String title, int width, int height) {
-        Agent agent = new Agent("" + ++x);
+        Agent agent = null;//new Agent("" + ++x, new Entity.Odor("agent", 10));
         environment.add(agent);
         AwtView view = new AwtView(agent, environment, width, height);
         CanvasHelper canvas = new CanvasHelper(width, height, view);

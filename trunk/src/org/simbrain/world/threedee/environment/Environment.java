@@ -45,6 +45,9 @@ public class Environment {
     /** All the views on this environment. */
     private final List<Viewable> views = new ArrayList<Viewable>();
 
+    /** The odors in this environment. */
+    private final Odors odors = new Odors();
+    
     /** The size of the environment. */
     private final int size = 256;
     
@@ -179,6 +182,10 @@ public class Environment {
         }
     }
 
+    public Odors getOdors() {
+        return odors;
+    }
+    
     /**
      * Helper class for managing collision data temporarily creates the
      * collision data objects for both elements involved in the collision.

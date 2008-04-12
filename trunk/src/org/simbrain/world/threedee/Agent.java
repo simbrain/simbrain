@@ -1,6 +1,10 @@
 package org.simbrain.world.threedee;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedee.environment.Environment;
 
 import com.jme.math.Vector3f;
@@ -11,7 +15,7 @@ import com.jme.math.Vector3f;
  *
  * @author Matt Watson
  */
-public class Agent extends Moveable {
+public class Agent extends Moveable implements Entity {
     /** the radius used to determine whether this agent has collided with another. */
     private static final float COLLISION_RADIUS = 0.5f;
     /** the height that the agent 'hovers' above the terrain. */
@@ -19,38 +23,34 @@ public class Agent extends Moveable {
 
     /** the name of this agent. */
     private final String name;
-
     /** a logger based on this class and the agent name. */
     private final Logger logger;
-
     /** the environment this agent lives in. */
     private Environment environment;
-
     /** the current location. */
     private volatile Vector3f direction;
-
     /** the current direction. */
     private volatile Vector3f location;
-
     /** tentative location. */
     private volatile Vector3f tenativeLocation;
-
     /** tentative direction. */
     private volatile Vector3f tenativeDirection;
-
     /** determines the limits (x, z) of the world. */
     private int limit;
-
+    /** */
+    private Bindings bindings;
+    
     /**
      * Create a new Agent with the given name.
      *
      * @param name the agents name
      */
-    public Agent(final String name) {
+    public Agent(final String name, WorkspaceComponent<?> component) {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
         this.name = name;
-
+        this.bindings = new AgentBindings(this, component);
+        
         logger.debug("created new Agent: " + name);
 
         direction = new Vector3f(0, 0, 0);
@@ -93,7 +93,7 @@ public class Agent extends Moveable {
      * @return the current location.
      */
     @Override
-    protected Vector3f getLocation() {
+    public Vector3f getLocation() {
         return location;
     }
 
@@ -200,5 +200,17 @@ public class Agent extends Moveable {
      */
     public void setEnvironment(final Environment environment) {
         this.environment = environment;
+    }
+    
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public List<Odor> getOdors() {
+        return Collections.singletonList(new Odor("red", 10, this));
+    }
+    
+    Bindings getBindings() {
+        return bindings;
     }
 }

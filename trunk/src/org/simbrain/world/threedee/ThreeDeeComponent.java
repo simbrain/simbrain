@@ -1,6 +1,5 @@
 package org.simbrain.world.threedee;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.world.textworld.TextWorldComponent;
 import org.simbrain.world.threedee.environment.Environment;
 
 import com.thoughtworks.xstream.XStream;
@@ -93,9 +91,9 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * @return The newly created Agent.
      */
     public Agent createAgent() {
-        Agent agent = new Agent("" + agents.size());
+        Agent agent = new Agent("" + agents.size(), this);
         agents.add(agent);
-        bindings.add(new Bindings(agent, this));
+        bindings.add(agent.getBindings());//new Bindings(agent, this));
         environment.add(agent);
         
         return agent;

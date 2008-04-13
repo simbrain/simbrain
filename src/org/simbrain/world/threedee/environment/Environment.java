@@ -82,6 +82,8 @@ public class Environment {
         views.add(agent);
         agent.setEnvironment(this);
         agent.setLimit((size * 2) - 1);
+        
+        odors.addOdors(agent);
     }
 
     /**

@@ -46,6 +46,7 @@ class AgentBindings extends Bindings {
         consumers.add(new ConsumingBinding("forward", agent.forward()));
         consumers.add(new ConsumingBinding("backward", agent.backward()));
         setDefaultConsumingAttribute(consumers.get(0));
+        setDefaultProducingAttribute(new ProducingBinding(new Smell(agent.getOdors().get(0).getName(), agent)));
         
         agent.addInput(PRIORITY, new AbstractCollection<Action>() {
             @Override

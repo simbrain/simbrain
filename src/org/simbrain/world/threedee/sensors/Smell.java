@@ -1,6 +1,7 @@
 package org.simbrain.world.threedee.sensors;
 
 import org.simbrain.world.threedee.Agent;
+import org.simbrain.world.threedee.Entity;
 import org.simbrain.world.threedee.Sensor;
 import org.simbrain.world.threedee.Entity.Odor;
 
@@ -22,6 +23,10 @@ public class Smell implements Sensor {
      * @param agent The agent this sensor applies to.
      */
     public Smell(final String odor, final Agent agent) {
+        if (agent == null || odor == null) {
+            throw new IllegalArgumentException("neither agent nor smell can be null");
+        }
+        
         this.odorName = odor;
         this.agent = agent;
     }
@@ -33,7 +38,11 @@ public class Smell implements Sensor {
         double total = 0;
         
         for (Odor odor : agent.getEnvironment().getOdors().getOdors(odorName)) {
-            double distance = agent.getLocation().distance(odor.getParent().getLocation());
+            Entity odorParent = odor.getParent();
+            
+            if (odorParent == agent) continue;
+            
+            double distance = agent.getLocation().distance(odorParent.getLocation());
             
             total += odor.getStrength() / distance;
         }
@@ -52,5 +61,19 @@ public class Smell implements Sensor {
 
     public String getDescription() {
         return odorName + " smell";
+    }
+
+    @Override
+    public int hashCode() {
+        return agent.hashCode() + 97 * odorName.toLowerCase().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Smell)) return false;
+        
+        Smell other = (Smell) obj;
+        
+        return agent.equals(other.agent) && odorName.equalsIgnoreCase(other.odorName);
     }
 }

@@ -11,8 +11,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Object used for building and reading the TOC of an
- * archive.
+ * Instances of this class are used for building and reading the 
+ * TOC of an archive.
  * 
  * @author Matt Watson
  */

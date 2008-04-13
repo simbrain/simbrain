@@ -174,6 +174,20 @@ abstract class Bindings implements Consumer, Producer {
         public Double getValue() {
             return sensor.getValue();
         }
+        
+        @Override
+        public int hashCode() {
+            return 29 * sensor.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ProducingBinding)) return false;
+            
+            ProducingBinding other = (ProducingBinding) obj;
+            
+            return sensor.equals(other.sensor);
+        }
     }
     
     /**

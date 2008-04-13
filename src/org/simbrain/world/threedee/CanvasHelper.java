@@ -16,7 +16,7 @@ import com.jmex.awt.lwjgl.LWJGLCanvas;
  */
 public class CanvasHelper {
     /** The number of milliseconds between refreshes. */
-    public static final int REFRESH_WAIT = 10;
+    public static final int REFRESH_WAIT = 50;
 
     /** The canvas that is created. */
     private final LWJGLCanvas canvas;

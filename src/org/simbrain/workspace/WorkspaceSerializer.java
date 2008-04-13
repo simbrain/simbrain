@@ -49,28 +49,10 @@ public class WorkspaceSerializer {
      */
     public void serialize(final OutputStream output) throws IOException {
         ZipOutputStream zipStream = new ZipOutputStream(output);
-        
-        WorkspaceComponentSerializer serializer = new WorkspaceComponentSerializer();
+        WorkspaceComponentSerializer serializer = new WorkspaceComponentSerializer(zipStream);
         ArchiveContents archive = new ArchiveContents(serializer);
         
-        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-            ArchiveContents.Component archiveComp = archive.addComponent(component);
-            
-            ZipEntry entry = new ZipEntry(archiveComp.uri);
-            zipStream.putNextEntry(entry);
-            serializer.serializeComponent(component, zipStream);
-            
-            DesktopComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace)
-                .getDesktopComponent(component);
-            
-            if (desktopComponent != null) {
-                ArchiveContents.Component.DesktopComponent dc
-                    = archiveComp.addDesktopComponent(desktopComponent);
-                entry = new ZipEntry(dc.uri);
-                zipStream.putNextEntry(entry);
-                desktopComponent.save(zipStream);
-            }
-        }
+        serializeComponents(serializer, archive, zipStream);
         
         for (Coupling<?> coupling : workspace.getManager().getCouplings()) {
             archive.addCoupling(coupling);
@@ -81,6 +63,40 @@ public class WorkspaceSerializer {
         archive.toXml(zipStream);
         
         zipStream.finish();
+    }
+    
+    /**
+     * Serializes all the components to the given archive and zipstream.
+     * 
+     * @param serializer The serializer for the components.
+     * @param archive The archive contents to update.
+     * @param zipStream The zipstream to write to.
+     * @throws IOException If there is an IO error.
+     */
+    private void serializeComponents(final WorkspaceComponentSerializer serializer,
+            final ArchiveContents archive, final ZipOutputStream zipStream) throws IOException {
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
+            ArchiveContents.Component archiveComp = archive.addComponent(component);
+            
+            ZipEntry entry = new ZipEntry(archiveComp.uri);
+            zipStream.putNextEntry(entry);
+            serializer.serializeComponent(component);
+            
+            DesktopComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace)
+                .getDesktopComponent(component);
+            
+            /*
+             * If there is a desktop component associated with the component
+             * it's serialized here.
+             */
+            if (desktopComponent != null) {
+                ArchiveContents.Component.DesktopComponent dc
+                    = archiveComp.addDesktopComponent(desktopComponent);
+                entry = new ZipEntry(dc.uri);
+                zipStream.putNextEntry(entry);
+                desktopComponent.save(zipStream);
+            }
+        }
     }
     
     /**

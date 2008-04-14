@@ -37,6 +37,11 @@ public class Odors {
         }
     }
     
+    /**
+     * Returns the set of odors stored in this object.
+     * 
+     * @return The set of odors stored in this object.
+     */
     public Set<String> getOdorTypes() {
         return odorMap.keySet();
     }

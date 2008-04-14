@@ -43,4 +43,23 @@ public class SpatialData {
     public float radius() {
         return radius;
     }
+    
+    /**
+     * Returns whether this object intersects with the given object.
+     * 
+     * @param other The other spatialData.
+     * @return Whether this object intersects with the given object.
+     */
+    public boolean intersects(final SpatialData other) {
+        if (other == null) { return false; }
+
+        final Vector3f aCenter = this.centerPoint();
+        final float aRadius = this.radius();
+        final Vector3f bCenter = other.centerPoint();
+        final float bRadius = other.radius();
+
+        final float distance = aCenter.distance(bCenter);
+
+        return distance <= (aRadius + bRadius);
+    }
 }

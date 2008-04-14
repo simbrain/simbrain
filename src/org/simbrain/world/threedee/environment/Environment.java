@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -79,10 +80,45 @@ public class Environment {
             element.init(parent.getKey(), parent.getValue());
         }
         
+        Random random = new Random();
         views.add(agent);
         agent.setEnvironment(this);
-        agent.setLimit((size * 2) - 1);
         
+        int limit = (size * 2) - 1;
+        
+        agent.setLimit(limit);
+        
+        agent.commit();
+        
+        boolean collided;
+        
+        do {
+            collided = false;
+//            element.update();
+            agent.setHeight();
+            
+            for (Element other : elements) {
+                if (other == element) continue;
+//                other.update();
+                
+//                SpatialData elementT = element.getTentative();
+//                SpatialData otherT = other.getTentative();
+                
+//                System.out.println("element: " + elementT.centerPoint());
+//                System.out.println("other: " + (otherT == null ? null : otherT.centerPoint()));
+                
+                if (element.getTentative().intersects(other.getTentative())) {
+//                    System.out.println("collision");
+                    agent.getLocation().setX(random.nextFloat() % limit);
+                    agent.getLocation().setZ(random.nextFloat() % limit);
+                    
+                    collided = true;
+                    break;
+                }
+            }
+        } while (collided);
+        
+        element.commit();
         odors.addOdors(agent);
     }
 
@@ -151,23 +187,14 @@ public class Environment {
 
             if (aData == null) { continue; }
 
-            final Vector3f aCenter = aData.centerPoint();
-            final float aRadius = aData.radius();
-
             for (int j = i + 1; j < elements.size(); j++) {
                 final Element b = elements.get(j);
                 final SpatialData bData = b.getTentative();
 
                 if (bData == null) { continue; }
 
-                final Vector3f bCenter = bData.centerPoint();
-                final float bRadius = bData.radius();
-
-                final float distance = aCenter.distance(bCenter);
-
-                if (distance <= (aRadius + bRadius)) {
-                    final CollisionData data = new CollisionData(a, aCenter, aRadius, b, bCenter,
-                            bRadius);
+                if (aData.intersects(bData)) {
+                    final CollisionData data = new CollisionData(a, b);
 
                     a.collision(data.collisionA);
                     b.collision(data.collisionB);
@@ -183,7 +210,12 @@ public class Environment {
             view.updateView();
         }
     }
-
+    
+    /**
+     * Returns the odors in this environment.
+     * 
+     * @return The odors in this environment.
+     */
     public Odors getOdors() {
         return odors;
     }
@@ -204,14 +236,9 @@ public class Environment {
          * Creates a new CollisionData instance.
          * 
          * @param a The first element.
-         * @param aCenter The first element's center.
-         * @param aRadius The radius of the first element.
          * @param b The second element.
-         * @param bCenter The second element's center.
-         * @param bRadius The radius of the second element.
          */
-        CollisionData(final Element a, final Vector3f aCenter, final float aRadius,
-                final Element b, final Vector3f bCenter, final float bRadius) {
+        CollisionData(final Element a, final Element b) {
             /**
              * Inner class for collision calculations.
              * 
@@ -259,11 +286,14 @@ public class Environment {
                 }
 
             }
-
+            
+            float aRadius = a.getTentative().radius();
+            float bRadius = b.getTentative().radius();
+            
             final float total = aRadius + bRadius;
 
-            collisionA = new CollisionLocal(b, aCenter, total / aRadius);
-            collisionB = new CollisionLocal(a, bCenter, total / bRadius);
+            collisionA = new CollisionLocal(b, a.getTentative().centerPoint(), total / aRadius);
+            collisionB = new CollisionLocal(a, b.getTentative().centerPoint(), total / bRadius);
         }
     }
 }

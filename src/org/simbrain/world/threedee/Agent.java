@@ -43,9 +43,10 @@ public class Agent extends Moveable implements Entity {
     /**
      * Create a new Agent with the given name.
      *
-     * @param name the agents name
+     * @param name the agents name.
+     * @param component the parent component.
      */
-    public Agent(final String name, WorkspaceComponent<?> component) {
+    public Agent(final String name, final WorkspaceComponent<?> component) {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
         this.name = name;
@@ -155,7 +156,7 @@ public class Agent extends Moveable implements Entity {
     /**
      * Updates the height based on the environment's terrain.
      */
-    private void setHeight() {
+    public void setHeight() {
         final float height = environment.getFloorHeight(tenativeLocation);
 
         if (!Float.isNaN(height)) { tenativeLocation.setY(height + HOVER_HEIGHT); }
@@ -181,7 +182,7 @@ public class Agent extends Moveable implements Entity {
      *
      * @return the tentative spatial data
      */
-    public SpatialData getTenative() {
+    public SpatialData getTentative() {
         return new SpatialData(tenativeLocation, COLLISION_RADIUS);
     }
 
@@ -192,7 +193,7 @@ public class Agent extends Moveable implements Entity {
         direction = (Vector3f) tenativeDirection.clone();
         location = (Vector3f) tenativeLocation.clone();
     }
-
+    
     /**
      * Sets the environment for the agent.
      *
@@ -202,14 +203,27 @@ public class Agent extends Moveable implements Entity {
         this.environment = environment;
     }
     
+    /**
+     * Returns this agent's environment.
+     * 
+     * @return This agent's environment.
+     */
     public Environment getEnvironment() {
         return environment;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<Odor> getOdors() {
-        return Collections.singletonList(new Odor("red", 10, this));
+        return Collections.singletonList(new Odor("red", this));
     }
     
+    /**
+     * Returns the bindings for this agent.
+     * 
+     * @return The bindings for this agent.
+     */
     Bindings getBindings() {
         return bindings;
     }

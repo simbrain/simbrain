@@ -33,11 +33,12 @@ public class AgentElement extends MultipleViewElement<Node> {
      * Initializes one spatial node.
      *
      * @param renderer the renderer to initialize with.
-     * @param spatial the node to initialize.
+     * @param node the node to initialize.
      */
     @Override
-    public void initSpatial(final Renderer renderer, final Node spatial) {
-        /* no implementation yet */
+    public void initSpatial(final Renderer renderer, final Node node) {
+        node.setLocalTranslation(agent.getLocation());
+        System.out.println(node.getLocalTranslation());
     }
 
     /**
@@ -87,7 +88,7 @@ public class AgentElement extends MultipleViewElement<Node> {
      * @return the tentative spatial data.
      */
     public SpatialData getTentative() {
-        return agent.getTenative();
+        return agent.getTentative();
     }
 
     /**

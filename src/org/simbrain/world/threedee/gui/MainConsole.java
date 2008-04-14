@@ -4,7 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -164,7 +166,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
     private void createView(final Agent agent) {
         AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
         CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
-        JFrame innerFrame = new JFrame("agent " + agent.getName());
+        JFrame innerFrame = new JFrame("Agent " + agent.getName());
         
         views.put(view, innerFrame);
         
@@ -174,7 +176,6 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         innerFrame.getRootPane().add(canvas.getCanvas());
         
         KeyHandler handler = getHandler(agent);
-        
         agent.addInput(0, handler.getInput());
         innerFrame.addKeyListener(handler);
         innerFrame.setSize(WIDTH, HEIGHT);

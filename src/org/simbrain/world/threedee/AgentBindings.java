@@ -19,14 +19,14 @@ import org.simbrain.world.threedee.sensors.Smell;
  */
 class AgentBindings extends Bindings {
     /**
-     * the priority of the agent.  There's nothing special about the number
+     * The priority of the agent.  There's nothing special about the number
      * 10.  It's just sufficiently high to allow others to preempt bindings.
      */
     private static final int PRIORITY = 10;
 
-    /** the consumers for the wrapped agent. */
+    /** The consumers for the wrapped agent. */
     private final List<ConsumingBinding> consumers = new ArrayList<ConsumingBinding>();
-
+    /** The agent for these bindings. */
     private final Agent agent;
     
     /**
@@ -37,7 +37,7 @@ class AgentBindings extends Bindings {
      * @param component the parent component.
      */
     AgentBindings(final Agent agent, final WorkspaceComponent<?> component) {
-        super(component, "3D Agent");
+        super(component, "3D Agent " + agent.getName());
 
         this.agent = agent;
         
@@ -46,7 +46,8 @@ class AgentBindings extends Bindings {
         consumers.add(new ConsumingBinding("forward", agent.forward()));
         consumers.add(new ConsumingBinding("backward", agent.backward()));
         setDefaultConsumingAttribute(consumers.get(0));
-        setDefaultProducingAttribute(new ProducingBinding(new Smell(agent.getOdors().get(0).getName(), agent)));
+        setDefaultProducingAttribute(new ProducingBinding(
+            new Smell(agent.getOdors().get(0).getName(), agent)));
         
         agent.addInput(PRIORITY, new AbstractCollection<Action>() {
             @Override

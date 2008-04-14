@@ -59,12 +59,13 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
     /**
      * Recreates an instance of this class from a saved component.
      * 
-     * @param input
-     * @param name
-     * @param format
-     * @return
+     * @param input The input stream to read from.
+     * @param name The name of the workspace component.
+     * @param format The format of the input.
+     * @return The ThreeDeeComponent created.
      */
-    public static ThreeDeeComponent open(InputStream input, String name, String format) {
+    public static ThreeDeeComponent open(final InputStream input,
+            final String name, final String format) {
         return (ThreeDeeComponent) getXStream().fromXML(input);
     }
 
@@ -91,7 +92,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * @return The newly created Agent.
      */
     public Agent createAgent() {
-        Agent agent = new Agent("" + agents.size(), this);
+        Agent agent = new Agent("" + agents.size() + 1, this);
         agents.add(agent);
         bindings.add(agent.getBindings());//new Bindings(agent, this));
         environment.add(agent);

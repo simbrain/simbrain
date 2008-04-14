@@ -16,6 +16,10 @@ import org.simbrain.world.threedee.Moveable.Action;
  * @author Matt Watson
  */
 abstract class Bindings implements Consumer, Producer {
+    /** An arbitrary prime number. */
+    private static final int ARBITRARY_PRIME = 29;
+    
+    /** The description of the bindings. */
     private final String description;
     
     /** the component associated with this binding. */
@@ -36,10 +40,10 @@ abstract class Bindings implements Consumer, Producer {
      * Creates a new bindings object for the given agent
      * and component.
      *
-     * @param agent the agent to bind to.
-     * @param component the parent component.
+     * @param component The parent component.
+     * @param description The description of these bindings.
      */
-    Bindings(final WorkspaceComponent<?> component, String description) {
+    Bindings(final WorkspaceComponent<?> component, final String description) {
         this.component = component;
         this.description = description;
     }
@@ -50,18 +54,31 @@ abstract class Bindings implements Consumer, Producer {
      * @param on True to turn on and false to turn off.
      */
     public void setOn(final boolean on) {
-//        this.on = on;
+        this.on = on;
         if (!bind) { bind = on; }
     }
     
+    /**
+     * Returns whether these bindings are on.
+     * 
+     * @return Whether these bindings are on.
+     */
     protected boolean isOn() {
         return on;
     }
     
+    /**
+     * Sets bind to the value of on.
+     */
     protected void setBindToOn() {
         this.bind = isOn();
     }
     
+    /**
+     * Returns whether bindings are being executed.
+     * 
+     * @return Whether bindings are being executed.
+     */
     protected boolean doBind() {
         return bind;
     }
@@ -135,6 +152,11 @@ abstract class Bindings implements Consumer, Producer {
             action.setValue(0);
         }
 
+        /**
+         * Returns the action for this Binding.
+         * 
+         * @return The action for this Binding.
+         */
         protected Action getAction() {
             return action;
         }
@@ -159,7 +181,6 @@ abstract class Bindings implements Consumer, Producer {
         /**
          * Creates a new ConsumingBinding.
          * 
-         * @param description The description of the Binding.
          * @param sensor The sensor this Binding is bound to.
          */
         protected ProducingBinding(final Sensor sensor) {
@@ -175,13 +196,19 @@ abstract class Bindings implements Consumer, Producer {
             return sensor.getValue();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int hashCode() {
-            return 29 * sensor.hashCode();
+            return ARBITRARY_PRIME * sensor.hashCode();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (!(obj instanceof ProducingBinding)) return false;
             
             ProducingBinding other = (ProducingBinding) obj;

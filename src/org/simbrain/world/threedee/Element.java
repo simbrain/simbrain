@@ -33,7 +33,7 @@ public interface Element {
      * Signals that the changes in the last updated should be finalized.
      */
     void commit();
-
+    
     /**
      * Gets the tentative data for the element after a collision.
      * 

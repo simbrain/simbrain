@@ -11,6 +11,9 @@ import org.simbrain.world.threedee.Entity.Odor;
  * @author Matt Watson
  */
 public class Smell implements Sensor {
+    /** An arbitrary prime number. */
+    private static final int ARBITRARY_PRIME = 97;
+    
     /** The scent this sensor responds to. */
     private final String odorName;
     /** The parent agent for this sensor. */
@@ -59,17 +62,26 @@ public class Smell implements Sensor {
         return odorName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription() {
         return odorName + " smell";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
-        return agent.hashCode() + 97 * odorName.toLowerCase().hashCode();
+        return agent.hashCode() + (ARBITRARY_PRIME * odorName.toLowerCase().hashCode());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof Smell)) return false;
         
         Smell other = (Smell) obj;

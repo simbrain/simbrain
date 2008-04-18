@@ -36,8 +36,11 @@ public final class FilterEditors {
     /** Pixel accumulator editor. */
     public static final FilterEditor PIXEL_ACCUMULATOR = new PixelAccumulatorEditor();
 
+    /** Pixel accumulator editor. */
+    public static final FilterEditor RGB = new RgbFilterEditor();
+    
     /** Private array of filter editors. */
-    private static final FilterEditor[] values = new FilterEditor[] { PIXEL_ACCUMULATOR, RANDOM, UNIFORM };
+    private static final FilterEditor[] values = new FilterEditor[] { PIXEL_ACCUMULATOR, RANDOM, UNIFORM, RGB };
 
     /** Public list of filter editors. */
     public static final List<FilterEditor> VALUES = Collections.unmodifiableList(Arrays.asList(values));

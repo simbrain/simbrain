@@ -2,8 +2,6 @@ package org.simbrain.world.threedee;
 
 import java.util.List;
 
-import com.jme.math.Vector3f;
-
 /**
  * Abstraction that defines a entity in the environment that agents
  * may interact with.
@@ -26,7 +24,7 @@ public interface Entity {
      *
      * @return the current location
      */
-    Vector3f getLocation();
+    Point getLocation();
     
     /**
      * Holds the name of the odor and it's strength.

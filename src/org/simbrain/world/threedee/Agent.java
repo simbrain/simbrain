@@ -1,5 +1,8 @@
 package org.simbrain.world.threedee;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedee.environment.Environment;
 
-import com.jme.math.Vector3f;
+import com.jme.renderer.Camera;
 
 /**
  * An implementation of Moveable that provides simple collision handling and
@@ -28,13 +31,13 @@ public class Agent extends Moveable implements Entity {
     /** the environment this agent lives in. */
     private Environment environment;
     /** the current location. */
-    private volatile Vector3f direction;
+    private volatile Vector direction;
     /** the current direction. */
-    private volatile Vector3f location;
-    /** tentative location. */
-    private volatile Vector3f tenativeLocation;
+    private volatile Point location;
     /** tentative direction. */
-    private volatile Vector3f tenativeDirection;
+    private volatile Vector tenativeDirection;
+    /** tentative location. */
+    private volatile Point tenativeLocation;
     /** determines the limits (x, z) of the world. */
     private int limit;
     /** */
@@ -54,10 +57,10 @@ public class Agent extends Moveable implements Entity {
         
         logger.debug("created new Agent: " + name);
 
-        direction = new Vector3f(0, 0, 0);
-        location = new Vector3f(0, 0, 0);
-        tenativeLocation = new Vector3f(0, 0, 0);
-        tenativeDirection = new Vector3f(0, 0, 0);
+        direction = new Vector(0, 0, 10).normalize();
+        location = new Point(0, 0, 0);
+        tenativeDirection = direction;
+        tenativeLocation = location;
     }
 
     /**
@@ -84,8 +87,34 @@ public class Agent extends Moveable implements Entity {
      * @return the current direction.
      */
     @Override
-    protected Vector3f getDirection() {
+    public Vector getDirection() {
+//        System.out.println(Thread.currentThread() + " direction: " + direction);
         return direction;
+    }
+    
+    /**
+     * Sets the current direction.
+     *
+     * @param v the new direction.
+     */
+    public void setDirection(final Vector v) {
+//        if (!direction.equals(v)) {
+//            System.out.println(Thread.currentThread() + " direction set to " + v);
+//        
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//          
+//            try {
+//                String line = reader.readLine();
+//                if (line.startsWith("p")) {
+//                    new Exception().printStackTrace();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        
+        this.direction = v;
+        this.tenativeDirection = v;
     }
 
     /**
@@ -94,23 +123,47 @@ public class Agent extends Moveable implements Entity {
      * @return the current location.
      */
     @Override
-    public Vector3f getLocation() {
+    public Point getLocation() {
         return location;
     }
 
+    /**
+     * Sets the current direction.
+     *
+     * @param p The new location.
+     */
+    public void setTentativeLocation(final Point p) {
+        if (!location.equals(p)) System.out.println(Thread.currentThread() + " location set to " + p);
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//        
+//        try {
+//            String line = reader.readLine();
+//            if (line.startsWith("p")) {
+//                new Exception().printStackTrace();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        
+//        this.location = p;
+        this.tenativeLocation = p;
+    }
+    
     /**
      * Sets the current and tentative locations and directions.
      *
      * @param direction the direction vector that controls the view (updateable.)
      * @param location the location of the view (updateable.)
      */
-    @Override
-    public void init(final Vector3f direction, final Vector3f location) {
-        this.direction = direction;
-        this.location = location;
-        tenativeDirection = direction;
-        tenativeLocation = location;
-        setHeight();
+    public void init(Camera cam) {//final Vector direction, final Point location) {
+        cam.setDirection(direction.toVector3f());
+        cam.setLocation(location.toVector3f());
+        
+        //        setDirection(direction);
+//        setLocation(location);
+//        tenativeDirection = direction;
+//        tenativeLocation = location;
+//        setHeight();
     }
 
     /**
@@ -119,7 +172,7 @@ public class Agent extends Moveable implements Entity {
      * @param direction the new tentative direction.
      */
     @Override
-    protected void updateDirection(final Vector3f direction) {
+    protected void updateDirection(final Vector direction) {
         tenativeDirection = direction;
     }
 
@@ -129,7 +182,7 @@ public class Agent extends Moveable implements Entity {
      * @param location the new tentative location.
      */
     @Override
-    protected void updateLocation(final Vector3f location) {
+    protected void updateLocation(final Point location) {
         tenativeLocation = location;
     }
 
@@ -147,10 +200,12 @@ public class Agent extends Moveable implements Entity {
         float x = tenativeLocation.getX();
         float z = tenativeLocation.getZ();
 
-        if (Math.abs(x) > limit) { tenativeLocation.setX(-1 * x); }
-        if (Math.abs(z) > limit) { tenativeLocation.setZ(-1 * z); }
+        if (Math.abs(x) > limit) { x = (-1 * x); }
+        if (Math.abs(z) > limit) { z = (-1 * z); }
 
-        setHeight();
+        tenativeLocation = new Point(x, tenativeLocation.getY(), z);
+        
+        setFloor(environment.getFloorHeight(tenativeLocation));
     }
 
     /**
@@ -159,9 +214,18 @@ public class Agent extends Moveable implements Entity {
     public void setHeight() {
         final float height = environment.getFloorHeight(tenativeLocation);
 
-        if (!Float.isNaN(height)) { tenativeLocation.setY(height + HOVER_HEIGHT); }
+        if (!Float.isNaN(height)) { tenativeLocation = new Point(tenativeLocation.getX(),
+           height + HOVER_HEIGHT, tenativeLocation.getZ()); }
     }
 
+    /**
+     * Updates the height based on the environment's terrain.
+     */
+    public void setFloor(final float height) {
+        if (!Float.isNaN(height)) { tenativeLocation = new Point(tenativeLocation.getX(),
+           height + HOVER_HEIGHT, tenativeLocation.getZ()); }
+    }
+    
     /**
      * Implements the logic for collisions.
      *
@@ -172,8 +236,8 @@ public class Agent extends Moveable implements Entity {
 
         if (speed == 0) { return; }
 
-        tenativeDirection = (Vector3f) direction.clone();
-        tenativeLocation = (Vector3f) location.clone();
+        tenativeDirection = getDirection();
+        tenativeLocation = getLocation();
     }
 
     /**
@@ -190,8 +254,8 @@ public class Agent extends Moveable implements Entity {
      * Sets the location and direction to the tentative values.
      */
     public void commit() {
-        direction = (Vector3f) tenativeDirection.clone();
-        location = (Vector3f) tenativeLocation.clone();
+        direction = tenativeDirection;
+        location = tenativeLocation;
     }
     
     /**

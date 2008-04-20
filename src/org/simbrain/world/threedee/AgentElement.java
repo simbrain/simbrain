@@ -1,5 +1,7 @@
 package org.simbrain.world.threedee;
 
+import java.util.List;
+
 import com.jme.bounding.BoundingBox;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
@@ -37,7 +39,7 @@ public class AgentElement extends MultipleViewElement<Node> {
      */
     @Override
     public void initSpatial(final Renderer renderer, final Node node) {
-        node.setLocalTranslation(agent.getLocation());
+        node.setLocalTranslation(agent.getLocation().toVector3f());
         System.out.println(node.getLocalTranslation());
     }
 
@@ -69,8 +71,8 @@ public class AgentElement extends MultipleViewElement<Node> {
 
         if (agent.getLocation() == null) { return; }
 
-        node.lookAt(agent.getLocation().add(agent.getDirection()), Y_AXIS);
-        node.setLocalTranslation(agent.getLocation());
+        node.lookAt(agent.getLocation().add(agent.getDirection()).toVector3f(), Y_AXIS);
+        node.setLocalTranslation(agent.getLocation().toVector3f());
     }
 
     /**
@@ -96,5 +98,21 @@ public class AgentElement extends MultipleViewElement<Node> {
      */
     public void commit() {
         agent.commit();
+    }
+
+    public void setFloor(float height) {
+        agent.setFloor(height);
+    }
+
+    public Point getLocation() {
+        return agent.getLocation();
+    }
+
+    public void setTentativeLocation(Point point) {
+        agent.setTentativeLocation(point);
+    }
+
+    public List<Odor> getOdors() {
+        return agent.getOdors();
     }
 }

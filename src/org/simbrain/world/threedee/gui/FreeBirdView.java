@@ -1,8 +1,10 @@
 package org.simbrain.world.threedee.gui;
 
 import org.simbrain.world.threedee.Moveable;
+import org.simbrain.world.threedee.Point;
+import org.simbrain.world.threedee.Vector;
 
-import com.jme.math.Vector3f;
+import com.jme.renderer.Camera;
 
 /**
  * A view that can be moved around freely in three dimensions.
@@ -14,16 +16,16 @@ public class FreeBirdView extends Moveable {
     private static final float START_HEIGHT = 25f;
     
     /** The current direction of the view. */
-    private Vector3f direction;
+    private Vector direction;
 
     /** The current location of the view. */
-    private Vector3f location;
+    private Point location;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Vector3f getDirection() {
+    protected Vector getDirection() {
         return direction;
     }
 
@@ -31,24 +33,24 @@ public class FreeBirdView extends Moveable {
      * {@inheritDoc}
      */
     @Override
-    protected Vector3f getLocation() {
+    protected Point getLocation() {
         return location;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void init(final Vector3f direction, final Vector3f location) {
-        this.direction = direction;
-        this.location = location.add(0, START_HEIGHT, 0);
+//    @Override
+    public void init(final Camera cam) {//final Vector direction, final Point location) {
+//        this.direction = direction;
+//        this.location = location.add(new Vector(0, START_HEIGHT, 0));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void updateDirection(final Vector3f direction) {
+    protected void updateDirection(final Vector direction) {
         this.direction = direction;
     }
 
@@ -56,7 +58,7 @@ public class FreeBirdView extends Moveable {
      * {@inheritDoc}
      */
     @Override
-    protected void updateLocation(final Vector3f location) {
+    protected void updateLocation(final Point location) {
         this.location = location;
     }
 }

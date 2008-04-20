@@ -1,9 +1,14 @@
 package org.simbrain.world.threedee.environment;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.threedee.Collision;
 import org.simbrain.world.threedee.MultipleViewElement;
+import org.simbrain.world.threedee.Point;
 import org.simbrain.world.threedee.SpatialData;
+import org.simbrain.world.threedee.Entity.Odor;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.image.Texture;
@@ -150,5 +155,24 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
     public SpatialData getTentative() {
         /* no implementation */
         return null;
+    }
+
+    public Point getLocation() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setTentativeLocation(Point point) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setFloor(float height) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    public List<Odor> getOdors() {
+        return Collections.emptyList();
     }
 }

@@ -84,7 +84,7 @@ public class AwtView extends SimpleCanvasImpl {
         rootNode.setRenderState(cs);
         
         environment.init(getRenderer(), rootNode);
-        viewable.init(cam.getDirection(), cam.getLocation());
+//        viewable.init(cam.getDirection(), cam.getLocation());
     }
 
     /**

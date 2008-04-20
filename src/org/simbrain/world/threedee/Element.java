@@ -8,7 +8,7 @@ import com.jme.scene.Node;
  * 
  * @author Matt Watson
  */
-public interface Element {
+public interface Element extends Entity {
     /**
      * Initializes the element with the given renderer and parent node.
      * 
@@ -40,4 +40,10 @@ public interface Element {
      * @return the tentative spatial data
      */
     SpatialData getTentative();
+    
+    void setFloor(float height);
+    
+    void setTentativeLocation(Point point);
+    
+    Point getLocation();
 }

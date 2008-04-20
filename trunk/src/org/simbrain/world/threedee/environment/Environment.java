@@ -59,6 +59,8 @@ public class Environment {
     /** The terrain for the environment. */
     private final Terrain terrain = new Terrain(size);
 
+    private Random random = new Random();
+    
     /** The sky for the environment. */
 //    private Sky sky = new Sky();
     
@@ -71,7 +73,7 @@ public class Environment {
 //        Random random = new Random();
 //        Point p = new Point(0, 0, 0);
 //        
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
             add(new Plant());
         }
 //            float y = getFloorHeight(p);
@@ -95,8 +97,7 @@ public class Environment {
 
     public void add(Element element) {
         boolean collided;
-        int radius = 10;
-        Random random = new Random();
+        int radius = 100;
         
         do {
             collided = false;

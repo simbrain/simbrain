@@ -2,12 +2,15 @@ package org.simbrain.world.threedee.environment;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.threedee.Collision;
 import org.simbrain.world.threedee.MultipleViewElement;
+import org.simbrain.world.threedee.Point;
 import org.simbrain.world.threedee.SpatialData;
 
 import com.jme.bounding.BoundingBox;
@@ -106,5 +109,24 @@ public class Sky extends MultipleViewElement<SkyDome> {
      */
     public void collision(final Collision collision) {
         /* no implementation */
+    }
+
+    public Point getLocation() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setTentativeLocation(Point point) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setFloor(float height) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public List<Odor> getOdors() {
+        return Collections.emptyList();
     }
 }

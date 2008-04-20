@@ -1,7 +1,5 @@
 package org.simbrain.world.threedee;
 
-import com.jme.math.Vector3f;
-
 /**
  * Interface for proving information about collision events.
  * 
@@ -24,5 +22,5 @@ public interface Collision {
      * @return A vector from the center point of the element identifying the point of
      * contact.
      */
-    Vector3f point();
+    Point point();
 }

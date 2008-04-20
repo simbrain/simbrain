@@ -1,6 +1,5 @@
 package org.simbrain.world.threedee;
 
-import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 
 /**
@@ -15,7 +14,7 @@ public interface Viewable {
      * @param direction the direction
      * @param location the location
      */
-    void init(Vector3f direction, Vector3f location);
+    void init(Camera cam);
 
     /**
      * Updates the view.

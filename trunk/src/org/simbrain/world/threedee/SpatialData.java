@@ -1,6 +1,5 @@
 package org.simbrain.world.threedee;
 
-import com.jme.math.Vector3f;
 
 /**
  * A simple abstraction for holding the temporary spatial data used after
@@ -10,7 +9,7 @@ import com.jme.math.Vector3f;
  */
 public class SpatialData {
     /** The center of the Spatial. */
-    private final Vector3f center;
+    private final Point center;
 
     /** The Radius of the rough bounding sphere for the Spatial. */
     private final float radius;
@@ -21,7 +20,7 @@ public class SpatialData {
      * @param center The center of the Spatial.
      * @param radius The radius of the Spatial's bounding sphere.
      */
-    public SpatialData(final Vector3f center, final float radius) {
+    public SpatialData(final Point center, final float radius) {
         this.center = center;
         this.radius = radius;
     }
@@ -31,7 +30,7 @@ public class SpatialData {
      * 
      * @return the center point
      */
-    public Vector3f centerPoint() {
+    public Point centerPoint() {
         return center;
     }
 
@@ -53,13 +52,17 @@ public class SpatialData {
     public boolean intersects(final SpatialData other) {
         if (other == null) { return false; }
 
-        final Vector3f aCenter = this.centerPoint();
+        final Point aCenter = this.centerPoint();
         final float aRadius = this.radius();
-        final Vector3f bCenter = other.centerPoint();
+        final Point bCenter = other.centerPoint();
         final float bRadius = other.radius();
 
         final float distance = aCenter.distance(bCenter);
 
+//        System.out.println("distance: " + distance);
+//        System.out.println("aRadius: " + aRadius);
+//        System.out.println("bRadius: " + bRadius);
+        
         return distance <= (aRadius + bRadius);
     }
 }

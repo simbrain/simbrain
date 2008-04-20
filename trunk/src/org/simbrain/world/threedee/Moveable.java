@@ -78,7 +78,7 @@ public abstract class Moveable implements Viewable {
      * @param direction the direction
      * @param location the location
      */
-    public abstract void init(Vector3f direction, Vector3f location);
+//    public abstract void init(Vector direction, Point location);
 
     /**
      * Updates the camera direction and location based on getDirection and
@@ -87,22 +87,22 @@ public abstract class Moveable implements Viewable {
      * @param camera determines the perspective of the view
      */
     public void render(final Camera camera) {
-        final Vector3f direction = getDirection();
+        final Vector direction = getDirection();
 
-        camera.setDirection(direction);
+        camera.setDirection(direction.toVector3f());
 
-        Vector3f location = getLocation();
+        Point location = getLocation();
 
         /*
          * move the view up a little and out in front
          * to improve the view
          */
-        location = location.add(0, VIEW_LEAD, 0);
+        location = location.add(new Vector(0, VIEW_LEAD, 0));
         location = location.add(direction);
-        camera.setLocation(location);
+        camera.setLocation(location.toVector3f());
 
-        final Vector3f left = direction.cross(Y_AXIS).normalizeLocal();
-        final Vector3f up = left.cross(direction).normalizeLocal();
+        final Vector3f left = direction.toVector3f().cross(Y_AXIS).normalizeLocal();
+        final Vector3f up = left.cross(direction.toVector3f()).normalizeLocal();
 
         camera.setLeft(left);
         camera.setUp(up);
@@ -164,8 +164,8 @@ public abstract class Moveable implements Viewable {
         upDownQuat.fromAngleAxis(upDownRot * FastMath.DEG_TO_RAD, X_AXIS);
 
         /* get copies of the current direction and location */
-        final Vector3f direction = (Vector3f) getDirection().clone();
-        final Vector3f location = (Vector3f) getLocation().clone();
+        final Vector3f direction = getDirection().toVector3f();
+        final Vector3f location = getLocation().toVector3f();
 
         /* combine the two quaternions */
         final Quaternion sumQuat = leftRightQuat.mult(upDownQuat);
@@ -185,9 +185,9 @@ public abstract class Moveable implements Viewable {
 
         /* update with the new values */
         LOGGER.trace("location: " + location);
-        updateLocation(location);
+        updateLocation(new Point(location.x, location.y, location.z));
         LOGGER.trace("direction: " + direction);
-        updateDirection(direction);
+        updateDirection(new Vector(direction.x, direction.y, direction.z));
     }
 
     /**
@@ -195,28 +195,28 @@ public abstract class Moveable implements Viewable {
      *
      * @return the current location
      */
-    protected abstract Vector3f getLocation();
+    protected abstract Point getLocation();
 
     /**
      * Return the current committed direction.
      *
      * @return the current direction
      */
-    protected abstract Vector3f getDirection();
+    protected abstract Vector getDirection();
 
     /**
      * Update the location tentatively.
      *
      * @param location the new location
      */
-    protected abstract void updateLocation(Vector3f location);
+    protected abstract void updateLocation(Point location);
 
     /**
      * Update the direction tentatively.
      *
      * @param direction the new direction
      */
-    protected abstract void updateDirection(Vector3f direction);
+    protected abstract void updateDirection(Vector direction);
 
     /**
      * Sets the current speed.

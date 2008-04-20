@@ -13,8 +13,12 @@ import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.AgentElement;
 import org.simbrain.world.threedee.Collision;
 import org.simbrain.world.threedee.Element;
+import org.simbrain.world.threedee.Entity;
+import org.simbrain.world.threedee.Point;
 import org.simbrain.world.threedee.SpatialData;
+import org.simbrain.world.threedee.Vector;
 import org.simbrain.world.threedee.Viewable;
+import org.simbrain.world.threedee.entities.Plant;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.math.Vector3f;
@@ -63,9 +67,69 @@ public class Environment {
      */
     public Environment() {
         elements.add(terrain);
+        
+//        Random random = new Random();
+//        Point p = new Point(0, 0, 0);
+//        
+        for (int i = 0; i < 50; i++) {
+            add(new Plant());
+        }
+//            float y = getFloorHeight(p);
+//            
+//            int radius = 10;
+//            Plant plant = new Plant(p.setY(y));
+//            
+//            while (findCollision(plant)) {
+//                int x = random.nextInt(radius);
+//                int z = random.nextInt(radius);
+//                
+//                plant = new Plant(plant.getLocation().setX(x).setZ(z));
+//                
+//                if (radius * 2 < size) radius += radius;
+//            }
+//            
+//            elements.add(plant);
+//        }
 //        elements.add(sky);
     }
 
+    public void add(Element element) {
+        boolean collided;
+        int radius = 10;
+        Random random = new Random();
+        
+        do {
+            collided = false;
+            Point tentative = element.getTentative().centerPoint();
+            element.setFloor(getFloorHeight(tentative));
+            
+            if (findCollision(element)) {
+                float x = random.nextInt(radius);
+                float z = random.nextInt(radius);
+                
+                element.setTentativeLocation(new Point(x, tentative.getY(), z));
+                
+                if (radius * 2 < size) radius += radius;
+                collided = true;
+            }
+        } while (collided);
+        
+        System.out.println("added: " + element);
+        
+        element.commit();
+        
+        elements.add(element);
+        odors.addOdors(element);
+    }
+    
+//    private void setFloor(Element element) {
+//        float y = getFloorHeight(element.getTentative().centerPoint());
+//        
+//        float x = random.nextInt(radius);
+//        float z = random.nextInt(radius);
+//        float y = getFloorHeight(new Point(x, 0f, z));
+//    }
+    
     /**
      * Adds an agent to this environment.
      * 
@@ -74,13 +138,10 @@ public class Environment {
     public void add(final Agent agent) {
         AgentElement element = new AgentElement(agent);
         
-        elements.add(element);
-        
         for (Map.Entry<Renderer, Node> parent : parents.entrySet()) {
             element.init(parent.getKey(), parent.getValue());
         }
         
-        Random random = new Random();
         views.add(agent);
         agent.setEnvironment(this);
         
@@ -88,40 +149,50 @@ public class Environment {
         
         agent.setLimit(limit);
         
-        agent.commit();
+//        agent.commit();
         
-        boolean collided;
+//        Random random = new Random();
+//        boolean collided;
+//        int radius = 10;
+//        
+//        do {
+//            collided = false;
+//            agent.setHeight();
+//            
+//            if (findCollision(element)) {
+//                int x = random.nextInt(radius);
+//                int z = random.nextInt(radius);
+//                
+//                agent.setTentativeLocation(agent.getLocation().setX(x).setZ(z));
+//                
+//                if (radius * 2 < size) radius += radius;
+//                collided = true;
+//            }
+//        } while (collided);
         
-        do {
-            collided = false;
-//            element.update();
-            agent.setHeight();
-            
-            for (Element other : elements) {
-                if (other == element) continue;
-//                other.update();
-                
-//                SpatialData elementT = element.getTentative();
-//                SpatialData otherT = other.getTentative();
-                
-//                System.out.println("element: " + elementT.centerPoint());
-//                System.out.println("other: " + (otherT == null ? null : otherT.centerPoint()));
-                
-                if (element.getTentative().intersects(other.getTentative())) {
-//                    System.out.println("collision");
-                    agent.getLocation().setX(random.nextFloat() % limit);
-                    agent.getLocation().setZ(random.nextFloat() % limit);
-                    
-                    collided = true;
-                    break;
-                }
-            }
-        } while (collided);
+        add(element);
         
-        element.commit();
-        odors.addOdors(agent);
+//        element.commit();
+        
     }
 
+    private boolean findCollision(Element element) {
+        for (Element other : elements) {
+            if (other == element) continue;
+            
+            SpatialData data = other.getTentative();
+            
+//            System.out.println("searching: " + element.getTentative().centerPoint() + " - " + (data == null ? null : data.centerPoint()));
+            
+            if (element.getTentative().intersects(other.getTentative())) {
+//                System.out.println("\tcollided");
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     /**
      * Adds a new view.
      * 
@@ -129,6 +200,7 @@ public class Environment {
      */
     public void addViewable(final Viewable view) {
         views.add(view);
+        view.updateView();
     }
 
     /**
@@ -137,8 +209,8 @@ public class Environment {
      * @param location The location to get the floor height at.
      * @return The floor height at the x and z coordinates of the given point.
      */
-    public float getFloorHeight(final Vector3f location) {
-        return terrain.getHeight(location);
+    public float getFloorHeight(final Point location) {
+        return terrain.getHeight(location.toVector3f());
     }
 
     /**
@@ -248,7 +320,7 @@ public class Environment {
                 /** The other element. */
                 private final Element other;
                 /** The point of impact. */
-                private final Vector3f point;
+                private final Point point;
 
                 /**
                  * Creates a new CollisionLocal instance.
@@ -258,13 +330,13 @@ public class Environment {
                  * @param fraction The the fraction representing the how far from the center
                  *        point to the bounding sphere surface the collision took place.
                  */
-                CollisionLocal(final Element other, final Vector3f center, final float fraction) {
+                CollisionLocal(final Element other, final Point center, final float fraction) {
                     this.other = other;
 
-                    Vector3f point = (Vector3f) center.clone();
-                    point.interpolate(other.getTentative().centerPoint(), fraction);
+                    center.toVector3f().interpolate(other.getTentative().centerPoint()
+                        .toVector3f(), fraction);
 
-                    this.point = point;
+                    this.point = center;
                 }
 
                 /**
@@ -281,7 +353,7 @@ public class Environment {
                  * 
                  * @return The point of impact.
                  */
-                public Vector3f point() {
+                public Point point() {
                     return point;
                 }
 

@@ -29,6 +29,10 @@ public class Vector {
         return new Vector(this.internal.normalize(), false);
     }
     
+    public Vector multiply(float scale) {
+        return new Vector(internal.mult(scale), false);
+    }
+    
     public float getX() {
         return internal.x;
     }

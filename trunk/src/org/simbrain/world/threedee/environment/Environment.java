@@ -115,8 +115,6 @@ public class Environment {
             }
         } while (collided);
         
-        System.out.println("added: " + element);
-        
         element.commit();
         
         elements.add(element);

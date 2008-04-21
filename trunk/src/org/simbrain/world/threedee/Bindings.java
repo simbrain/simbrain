@@ -183,8 +183,8 @@ abstract class Bindings implements Consumer, Producer {
          * 
          * @param sensor The sensor this Binding is bound to.
          */
-        protected ProducingBinding(final Sensor sensor) {
-            super(sensor.getDescription());
+        protected ProducingBinding(final Sensor sensor, String description) {
+            super(description + " " + sensor.getDescription());
 
             this.sensor = sensor;
         }

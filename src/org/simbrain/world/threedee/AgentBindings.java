@@ -47,7 +47,7 @@ class AgentBindings extends Bindings {
         consumers.add(new ConsumingBinding("backward", agent.backward()));
         setDefaultConsumingAttribute(consumers.get(0));
         setDefaultProducingAttribute(new ProducingBinding(
-            new Smell(agent.getOdors().get(0).getName(), agent)));
+            new Smell(agent.getOdors().get(0).getName(), agent, 0.2f), "right"));
         
         agent.addInput(PRIORITY, new AbstractCollection<Action>() {
             @Override
@@ -95,7 +95,8 @@ class AgentBindings extends Bindings {
         List<ProducingBinding> producing = new ArrayList<ProducingBinding>();
         
         for (String odorType : agent.getEnvironment().getOdors().getOdorTypes()) {
-            producing.add(new ProducingBinding(new Smell(odorType, agent)));
+            producing.add(new ProducingBinding(new Smell(odorType, agent, 1f), "right"));
+            producing.add(new ProducingBinding(new Smell(odorType, agent, -1f), "left"));
         }
         
         return producing;

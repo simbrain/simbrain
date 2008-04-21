@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface Entity {
     /** The default odor strength. */
-    double DEFAULT_ODOR_STRENGTH = 10;
+    double DEFAULT_ODOR_STRENGTH = 1;
     
     /**
      * Returns the odors that this entity produces.

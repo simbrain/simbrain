@@ -33,7 +33,7 @@ public abstract class Moveable implements Viewable {
      * processed in an update. That is the input with updates with the highest
      * priority will block events on a lower priority input.
      */
-    private final SortedMap<Integer, Collection<? extends Action>> inputs = Collections
+    private SortedMap<Integer, Collection<? extends Action>> inputs = Collections
       .synchronizedSortedMap(new TreeMap<Integer, Collection<? extends Action>>());
 
     /** The number of degrees each turn event rotates the view. */
@@ -60,6 +60,13 @@ public abstract class Moveable implements Viewable {
     /** Current up speed (may be negative). */
     private float upSpeed = 0f;
 
+    private Object readResolve() {
+        inputs = Collections.synchronizedSortedMap(
+            new TreeMap<Integer, Collection<? extends Action>>());
+        
+        return this;
+    }
+    
     /**
      * Adds an input with the given priority (lower has more priority).
      *

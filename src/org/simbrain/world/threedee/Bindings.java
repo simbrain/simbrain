@@ -23,7 +23,7 @@ abstract class Bindings implements Consumer, Producer {
     private final String description;
     
     /** the component associated with this binding. */
-    private final WorkspaceComponent<?> component;
+    private ThreeDeeComponent component;
     
     /** Whether the bindings should be applied to the agent. */
     private volatile boolean on = false;
@@ -43,11 +43,15 @@ abstract class Bindings implements Consumer, Producer {
      * @param component The parent component.
      * @param description The description of these bindings.
      */
-    Bindings(final WorkspaceComponent<?> component, final String description) {
+    Bindings(final ThreeDeeComponent component, final String description) {
         this.component = component;
         this.description = description;
     }
 
+    void setComponent(ThreeDeeComponent parent) {
+        this.component = parent;
+    }
+    
     /**
      * Turns the bindings on or off depending on the value of on.
      * 

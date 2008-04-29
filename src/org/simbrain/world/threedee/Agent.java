@@ -1,10 +1,9 @@
 package org.simbrain.world.threedee;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.Timer;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -27,7 +26,7 @@ public class Agent extends Moveable implements Entity {
     /** the name of this agent. */
     private final String name;
     /** a logger based on this class and the agent name. */
-    private final Logger logger;
+    private Logger logger;
     /** the environment this agent lives in. */
     private Environment environment;
     /** the current location. */
@@ -49,7 +48,7 @@ public class Agent extends Moveable implements Entity {
      * @param name the agents name.
      * @param component the parent component.
      */
-    public Agent(final String name, final WorkspaceComponent<?> component) {
+    public Agent(final String name, final ThreeDeeComponent component) {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
         this.name = name;
@@ -63,6 +62,12 @@ public class Agent extends Moveable implements Entity {
         tenativeLocation = location;
     }
 
+    private Object readResolve() {
+        logger = Logger.getLogger("" + Agent.class + '.' + name);
+
+        return this;
+    }
+    
     /**
      * returns the name of the agent.
      *

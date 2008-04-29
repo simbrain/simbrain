@@ -8,7 +8,6 @@ import org.simbrain.world.threedee.Collision;
 import org.simbrain.world.threedee.MultipleViewElement;
 import org.simbrain.world.threedee.Point;
 import org.simbrain.world.threedee.SpatialData;
-import org.simbrain.world.threedee.Entity.Odor;
 
 import com.jme.bounding.BoundingBox;
 import com.jme.image.Texture;
@@ -19,6 +18,11 @@ import com.jme.util.TextureManager;
 import com.jmex.terrain.TerrainPage;
 import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
  * A multiple view element that represents the ground in an environment.
@@ -70,6 +74,18 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
         heightBlock = create();
     }
 
+    private Terrain(final String[] elements) {
+        this.size = (int) Math.sqrt(elements.length);
+        heightMap = new MidPointHeightMap(size, 1f);
+        int[] heightMapArray = heightMap.getHeightMap();
+        
+        for (int i = 0; i < heightMapArray.length; i++) {
+            heightMapArray[i] = Integer.parseInt(elements[i]);
+        }
+        
+        heightBlock = create();
+    }
+    
     /**
      * Returns the height at the x and z parts of the given point.
      * 
@@ -174,5 +190,43 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
     
     public List<Odor> getOdors() {
         return Collections.emptyList();
+    }
+    
+    public static class TerrainConverter implements Converter {
+
+        public void marshal(Object value, HierarchicalStreamWriter writer, MarshallingContext context) {
+            Terrain terrain = (Terrain) value;
+            
+            int[] heightMap = terrain.heightMap.getHeightMap();
+            
+            writer.startNode("heightMap");
+            StringBuffer buffer = new StringBuffer();
+            
+            for (int i = 0; i < heightMap.length; i++) {
+                buffer.append(heightMap[i]);
+                if (i < heightMap.length - 1) buffer.append(',');
+            }
+            
+            writer.setValue(buffer.toString());
+            writer.endNode();
+        }
+
+        public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+            reader.moveDown();
+//            System.out.println("getValue");
+            String value = reader.getValue();
+//            System.out.println("split");
+            String[] elements = value.split(",");
+//            System.out.println("construct");
+            reader.moveUp();
+            
+            return new Terrain(elements);
+            
+        }
+
+        public boolean canConvert(Class clazz) {
+            return clazz.equals(Terrain.class);
+        }
+        
     }
 }

@@ -36,7 +36,7 @@ class AgentBindings extends Bindings {
      * @param agent the agent to bind to.
      * @param component the parent component.
      */
-    AgentBindings(final Agent agent, final WorkspaceComponent<?> component) {
+    AgentBindings(final Agent agent, final ThreeDeeComponent component) {
         super(component, "3D Agent " + agent.getName());
 
         this.agent = agent;

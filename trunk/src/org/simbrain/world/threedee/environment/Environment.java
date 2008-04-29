@@ -13,15 +13,12 @@ import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.AgentElement;
 import org.simbrain.world.threedee.Collision;
 import org.simbrain.world.threedee.Element;
-import org.simbrain.world.threedee.Entity;
 import org.simbrain.world.threedee.Point;
 import org.simbrain.world.threedee.SpatialData;
-import org.simbrain.world.threedee.Vector;
 import org.simbrain.world.threedee.Viewable;
 import org.simbrain.world.threedee.entities.Plant;
 
 import com.jme.bounding.BoundingBox;
-import com.jme.math.Vector3f;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 
@@ -39,16 +36,16 @@ public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Environment.class);
 
     /** Timer that fires the update operation. */
-    private Timer timer;
+    private Timer timer = new Timer();
 
     /** The elements in this environment. */
-    private final Map<Renderer, Node> parents = new HashMap<Renderer, Node>();
+    private Map<Renderer, Node> parents = new HashMap<Renderer, Node>();
     
     /** The elements in this environment. */
     private final List<Element> elements = new ArrayList<Element>();
 
     /** All the views on this environment. */
-    private final List<Viewable> views = new ArrayList<Viewable>();
+    private List<Viewable> views = new ArrayList<Viewable>();
 
     /** The odors in this environment. */
     private final Odors odors = new Odors();
@@ -70,31 +67,20 @@ public class Environment {
     public Environment() {
         elements.add(terrain);
         
-//        Random random = new Random();
-//        Point p = new Point(0, 0, 0);
-//        
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             add(new Plant());
         }
-//            float y = getFloorHeight(p);
-//            
-//            int radius = 10;
-//            Plant plant = new Plant(p.setY(y));
-//            
-//            while (findCollision(plant)) {
-//                int x = random.nextInt(radius);
-//                int z = random.nextInt(radius);
-//                
-//                plant = new Plant(plant.getLocation().setX(x).setZ(z));
-//                
-//                if (radius * 2 < size) radius += radius;
-//            }
-//            
-//            elements.add(plant);
-//        }
-//        elements.add(sky);
     }
 
+    private Object readResolve() {
+        timer = new Timer();
+        random = new Random();
+        parents = new HashMap<Renderer, Node>();
+        views = new ArrayList<Viewable>();
+        
+        return this;
+    }
+    
     public void add(Element element) {
         boolean collided;
         int radius = 100;
@@ -121,14 +107,6 @@ public class Environment {
         odors.addOdors(element);
     }
     
-//    private void setFloor(Element element) {
-//        float y = getFloorHeight(element.getTentative().centerPoint());
-//        
-//        float x = random.nextInt(radius);
-//        float z = random.nextInt(radius);
-//        float y = getFloorHeight(new Point(x, 0f, z));
-//    }
-    
     /**
      * Adds an agent to this environment.
      * 
@@ -147,44 +125,15 @@ public class Environment {
         int limit = (size * 2) - 1;
         
         agent.setLimit(limit);
-        
-//        agent.commit();
-        
-//        Random random = new Random();
-//        boolean collided;
-//        int radius = 10;
-//        
-//        do {
-//            collided = false;
-//            agent.setHeight();
-//            
-//            if (findCollision(element)) {
-//                int x = random.nextInt(radius);
-//                int z = random.nextInt(radius);
-//                
-//                agent.setTentativeLocation(agent.getLocation().setX(x).setZ(z));
-//                
-//                if (radius * 2 < size) radius += radius;
-//                collided = true;
-//            }
-//        } while (collided);
-        
+                
         add(element);
-        
-//        element.commit();
-        
     }
 
     private boolean findCollision(Element element) {
         for (Element other : elements) {
             if (other == element) continue;
-            
-            SpatialData data = other.getTentative();
-            
-//            System.out.println("searching: " + element.getTentative().centerPoint() + " - " + (data == null ? null : data.centerPoint()));
-            
+                        
             if (element.getTentative().intersects(other.getTentative())) {
-//                System.out.println("\tcollided");
                 return true;
             }
         }
@@ -231,7 +180,7 @@ public class Environment {
         parent.setModelBound(new BoundingBox());
         parent.updateModelBound();
 
-        timer = new Timer();
+//        timer = new Timer();
 
         timer.schedule(new TimerTask() {
             @Override

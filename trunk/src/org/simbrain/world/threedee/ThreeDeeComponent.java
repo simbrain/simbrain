@@ -5,17 +5,18 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.threedee.Entity.Odor;
 import org.simbrain.world.threedee.environment.Environment;
+import org.simbrain.world.threedee.environment.Terrain;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -26,16 +27,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * @author Matt Watson
  */
 public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentListener> {
-    /** The environment for the 3D world. */
-    private Environment environment = new Environment();
-    /** The set of agents in the environment. */
-    private Set<Agent> agents = new HashSet<Agent>();
-    
-    /**
-     * The bindings that allow agents to be be wrapped as producers
-     * and consumers.
-     */
-    private List<Bindings> bindings = new ArrayList<Bindings>();
+    private final ThreeDeeModel model;
     
     /**
      * Creates a new ThreeDeeComponent with the given name.
@@ -44,6 +36,12 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public ThreeDeeComponent(final String name) {
         super(name);
+        this.model = new ThreeDeeModel();
+    }
+    
+    private ThreeDeeComponent(final String name, final ThreeDeeModel model) {
+        super(name);
+        this.model = model;
     }
     
     /**
@@ -52,7 +50,35 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        // omit fields
+        
+        xstream.registerConverter(new Terrain.TerrainConverter());
+        
+        /* keep */
+        xstream.omitField(Environment.class, "views");
+        /* keep */
+        xstream.omitField(Environment.class, "parents");
+//        xstream.omitField(Environment.class, "terrain");
+        
+        /* keep */
+        xstream.omitField(Environment.class, "timer");
+        
+//        xstream.omitField(Environment.class, "elements");
+        
+        /* keep */
+        xstream.omitField(Environment.class, "random");
+        
+        /* keep */
+        xstream.omitField(Agent.class, "logger");
+        
+        /* keep */
+        xstream.omitField(Moveable.class, "inputs");
+        
+        /* keep */
+        xstream.omitField(Bindings.class, "component");
+        
+//        xstream.omitField(Terrain.class, "heightBlock");
+//        xstream.omitField(Terrain.class, "heightMap");
+        
         return xstream;
     }
     
@@ -66,7 +92,14 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public static ThreeDeeComponent open(final InputStream input,
             final String name, final String format) {
-        return (ThreeDeeComponent) getXStream().fromXML(input);
+        ThreeDeeComponent component = new ThreeDeeComponent(
+            name, (ThreeDeeModel) getXStream().fromXML(input));
+        
+        for (Bindings bindings : component.model.bindings) {
+            bindings.setComponent(component);
+        }
+        
+        return component;
     }
 
     /**
@@ -74,7 +107,37 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        getXStream().toXML(model, output);
+    }
+    
+    @Override
+    public Attribute getAttributeForKey(final String key) {
+        String[] keyParts = key.split(":");
+        
+        for (Bindings b : model.bindings) {
+            if (b.getDescription().equals(keyParts[0])) {
+                List<Attribute> attributes = new ArrayList<Attribute>();
+                
+                attributes.addAll(b.getConsumingAttributes());
+                attributes.addAll(b.getProducingAttributes());
+                
+                for (Attribute a : attributes) {
+                    if (a.getAttributeDescription().equals(keyParts[1])) {
+                        return a;
+                    }
+                }
+                
+                return null;
+            }
+        }
+        
+        return null;
+    }
+
+    @Override
+    public String getKeyForAttribute(final Attribute attribute) {
+        return attribute.getParent().getDescription()
+            + ":" + attribute.getAttributeDescription();
     }
     
     /**
@@ -83,7 +146,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * @return The Environment for this Component.
      */
     public Environment getEnvironment() {
-        return environment;
+        return model.environment;
     }
     
     /**
@@ -92,10 +155,10 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * @return The newly created Agent.
      */
     public Agent createAgent() {
-        Agent agent = new Agent("" + agents.size() + 1, this);
-        agents.add(agent);
-        bindings.add(agent.getBindings());//new Bindings(agent, this));
-        environment.add(agent);
+        Agent agent = new Agent("" + model.agents.size() + 1, this);
+        model.agents.add(agent);
+        model.bindings.add(agent.getBindings());//new Bindings(agent, this));
+        model.environment.add(agent);
         
         return agent;
     }
@@ -105,7 +168,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public Collection<? extends Producer> getProducers() {
-        return Collections.unmodifiableCollection(bindings);
+        return Collections.unmodifiableCollection(model.bindings);
     }
     
     /**
@@ -113,7 +176,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public Collection<? extends Consumer> getConsumers() {
-        return Collections.unmodifiableCollection(bindings);
+        return Collections.unmodifiableCollection(model.bindings);
     }
     
     /**
@@ -129,7 +192,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     protected void update() {
-        for (Bindings bind : bindings) {
+        for (Bindings bind : model.bindings) {
             bind.setOn(true);
         }
     }
@@ -139,7 +202,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     protected void stopped() {
-        for (Bindings bind : bindings) {
+        for (Bindings bind : model.bindings) {
             bind.setOn(false);
         }
     }
@@ -156,7 +219,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
         System.out.println("removed: " + consumingAttribute.getParent());
         
         
-        if (bindings.contains(consumingAttribute.getParent())) {
+        if (model.bindings.contains(consumingAttribute.getParent())) {
             System.out.println("found");
             consumingAttribute.setValue(0d);
         }

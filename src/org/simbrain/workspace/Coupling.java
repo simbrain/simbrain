@@ -131,7 +131,8 @@ public final class Coupling<E> {
             if (producingAttribute instanceof SingleAttributeProducer) {
                 producerString = producingAttribute.getParent().getDescription();
             } else {
-                producerString = producingAttribute.getParent().getDescription() + ":" + producingAttribute.getAttributeDescription();
+                producerString = producingAttribute.getParent().getDescription()
+                    + ":" + producingAttribute.getAttributeDescription();
             }
         }
         if (consumingAttribute == null) {
@@ -140,7 +141,8 @@ public final class Coupling<E> {
             if (consumingAttribute instanceof SingleAttributeConsumer) {
                 consumerString = consumingAttribute.getParent().getDescription();
             } else {
-                consumerString = consumingAttribute.getParent().getDescription() + ":" + consumingAttribute.getAttributeDescription();
+                consumerString = consumingAttribute.getParent().getDescription()
+                    + ":" + consumingAttribute.getAttributeDescription();
             }
         }
         return producerString + ">" + consumerString;
@@ -153,8 +155,8 @@ public final class Coupling<E> {
         if (o instanceof Coupling) {
             Coupling<?> other = (Coupling<?>) o;
             
-            return other.producingAttribute == producingAttribute
-                && other.consumingAttribute == consumingAttribute;
+            return other.producingAttribute.equals(producingAttribute)
+                && other.consumingAttribute.equals(consumingAttribute);
         } else {
             return false;
         }

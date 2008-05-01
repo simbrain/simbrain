@@ -49,14 +49,14 @@ public class WorkspaceComponentDeserializer {
             for (Consumer consumer : wc.getConsumers()) {
                 for (Attribute attribute : consumer.getConsumingAttributes()) {
                     String key = wc.getKeyForAttribute(attribute);
-                    System.out.println("consumer: " + key);
+//                    System.out.println("consumer: " + key);
                 }
             }
 
             for (Producer producer : wc.getProducers()) {
                 for (Attribute attribute : producer.getProducingAttributes()) {
                     String key = wc.getKeyForAttribute(attribute);
-                    System.out.println("producer: " + key);
+//                    System.out.println("producer: " + key);
                 }
             }
             

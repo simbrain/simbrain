@@ -3,6 +3,8 @@ package org.simbrain.world.threedee;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 import com.jme.scene.Spatial;
@@ -17,7 +19,7 @@ import com.jme.scene.Spatial;
  */
 public abstract class MultipleViewElement<T extends Spatial> implements Element {
     /** Holds the spatials, keyed by renderer. */
-    private final Map<Renderer, T> spatials = new HashMap<Renderer, T>();
+    private Map<Renderer, T> spatials = new HashMap<Renderer, T>();
 
     /**
      * Initializes a renderer and parent as a new view on the Element.
@@ -34,6 +36,12 @@ public abstract class MultipleViewElement<T extends Spatial> implements Element 
         parent.updateRenderState();
     }
 
+    private Object readResolve() {
+        spatials = new HashMap<Renderer, T>();
+        
+        return this;
+    }
+    
     /**
      * Initializes a single spatial element.
      * 

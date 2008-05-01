@@ -69,6 +69,10 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         
         getContentPane().add(root);
         
+        for (Agent agent : component.getAgents()) {
+            newAgentPanel(agent);
+        }
+        
         pack();
     }
     
@@ -93,7 +97,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
      * 
      * @param agent The Agent to create the panel for.
      */
-    private void agentPanel(final Agent agent) {
+    private void newAgentPanel(final Agent agent) {
         JPanel panel = new JPanel();
         JButton button = new JButton(new CreateAgentViewAction(agent));
         
@@ -122,7 +126,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         public void actionPerformed(final ActionEvent e) {
             Agent agent = component.createAgent();
             
-            agentPanel(agent);
+            newAgentPanel(agent);
         }
     };
     

@@ -14,7 +14,6 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.world.threedee.Entity.Odor;
 import org.simbrain.world.threedee.environment.Environment;
 import org.simbrain.world.threedee.environment.Terrain;
 
@@ -53,31 +52,13 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
         
         xstream.registerConverter(new Terrain.TerrainConverter());
         
-        /* keep */
-        xstream.omitField(Environment.class, "views");
-        /* keep */
         xstream.omitField(Environment.class, "parents");
-//        xstream.omitField(Environment.class, "terrain");
-        
-        /* keep */
         xstream.omitField(Environment.class, "timer");
-        
-//        xstream.omitField(Environment.class, "elements");
-        
-        /* keep */
         xstream.omitField(Environment.class, "random");
-        
-        /* keep */
         xstream.omitField(Agent.class, "logger");
-        
-        /* keep */
         xstream.omitField(Moveable.class, "inputs");
-        
-        /* keep */
         xstream.omitField(Bindings.class, "component");
-        
-//        xstream.omitField(Terrain.class, "heightBlock");
-//        xstream.omitField(Terrain.class, "heightMap");
+        xstream.omitField(MultipleViewElement.class, "spatials");
         
         return xstream;
     }
@@ -108,6 +89,10 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
     @Override
     public void save(final OutputStream output, final String format) {
         getXStream().toXML(model, output);
+    }
+    
+    public Collection<Agent> getAgents() {
+        return model.agents;
     }
     
     @Override
@@ -216,11 +201,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
         ConsumingAttribute<Double> consumingAttribute
             = (ConsumingAttribute<Double>) coupling.getConsumingAttribute();
         
-        System.out.println("removed: " + consumingAttribute.getParent());
-        
-        
         if (model.bindings.contains(consumingAttribute.getParent())) {
-            System.out.println("found");
             consumingAttribute.setValue(0d);
         }
     }

@@ -4,8 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -23,6 +27,9 @@ import org.simbrain.world.threedee.ThreeDeeComponent;
  * @author Matt Watson
  */
 public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
+    /** The number of milliseconds between refresh events. */
+    public static final int REFRESH_WAIT = 50;
+    
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
     
@@ -42,6 +49,9 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
     private JPanel root;
     /** The panel that hold all the Agent controls. */
     private JPanel agents;
+    
+    /** Timer that fires the update operation. */
+    private Timer timer = new Timer();
     
     /**
      * Creates a new main console.
@@ -165,9 +175,24 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
      * @param agent the agent to create a view for.
      */
     private void createView(final Agent agent) {
-        AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
-        CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
+        final AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
+        final CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
         JFrame innerFrame = new JFrame("Agent " + agent.getName());
+        innerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        final TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                canvas.getCanvas().repaint();
+            }
+        };
+        
+        innerFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosed(final WindowEvent e) {
+                view.close();
+                task.cancel();
+            }
+        });
         
         views.put(view, innerFrame);
         
@@ -175,6 +200,8 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         
         innerFrame.getRootPane().setLayout(layout);
         innerFrame.getRootPane().add(canvas.getCanvas());
+        
+        timer.schedule(task, REFRESH_WAIT, REFRESH_WAIT);
         
         KeyHandler handler = getHandler(agent);
         agent.addInput(0, handler.getInput());
@@ -211,6 +238,8 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
      */
     @Override
     public void close() {
+        component.close();
+        
         for (JFrame frame : views.values()) {
             frame.setVisible(false);
             frame.dispose();

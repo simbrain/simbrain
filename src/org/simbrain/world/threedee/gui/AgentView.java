@@ -76,6 +76,10 @@ public class AgentView extends SimpleCanvasImpl {
         viewable.init(cam);
     }
     
+    public void close() {
+        environment.remove(getRenderer());
+    }
+    
     /**
      * Calls update on the camera.
      */

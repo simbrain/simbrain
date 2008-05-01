@@ -169,7 +169,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public void close() {
-        // TODO Auto-generated method stub
+        model.environment.killTimer();
     }
     
     /**

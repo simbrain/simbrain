@@ -36,7 +36,7 @@ public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Environment.class);
 
     /** Timer that fires the update operation. */
-    private Timer timer = new Timer();
+    private Timer timer;
 
     /** The elements in this environment. */
     private Map<Renderer, Node> parents = new HashMap<Renderer, Node>();
@@ -73,7 +73,6 @@ public class Environment {
     }
 
     private Object readResolve() {
-        timer = new Timer();
         random = new Random();
         parents = new HashMap<Renderer, Node>();
         
@@ -180,16 +179,26 @@ public class Environment {
         parent.setModelBound(new BoundingBox());
         parent.updateModelBound();
 
-//        timer = new Timer();
-
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                update();
-            }
-        }, REFRESH_WAIT, REFRESH_WAIT);
+        if (timer == null) {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    update();
+                }
+            }, REFRESH_WAIT, REFRESH_WAIT);
+        }
     }
-
+    
+    public void remove(Renderer renderer) {
+        parents.remove(renderer);
+    }
+    
+    public void killTimer() {
+        timer.cancel();
+        timer = null;
+    }
+    
     /**
      * Calls updates on all the elements, looks for collisions, fires any
      * collision events, commits the elements, and updates the views.

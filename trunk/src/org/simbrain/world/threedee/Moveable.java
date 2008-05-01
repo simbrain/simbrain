@@ -37,7 +37,7 @@ public abstract class Moveable implements Viewable {
       .synchronizedSortedMap(new TreeMap<Integer, Collection<? extends Action>>());
 
     /** The number of degrees each turn event rotates the view. */
-    private final float rotationSpeed = 2.5f;
+    private final float rotationSpeed = 2.0f;
 
     /** How fast the view moves in a linear direction. */
     private final float movementSpeed = .1f;

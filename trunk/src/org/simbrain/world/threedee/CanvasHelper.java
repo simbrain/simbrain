@@ -15,9 +15,6 @@ import com.jmex.awt.lwjgl.LWJGLCanvas;
  * @author Matt Watson
  */
 public class CanvasHelper {
-    /** The number of milliseconds between refreshes. */
-    public static final int REFRESH_WAIT = 50;
-
     /** The canvas that is created. */
     private final LWJGLCanvas canvas;
 
@@ -56,8 +53,6 @@ public class CanvasHelper {
         /* this prevents issues with LWJGL trying to handle input */
         canvas.setFocusable(false);
         canvas.setUpdateInput(false);
-
-        startRepaintThread();
     }
 
     /**
@@ -67,30 +62,5 @@ public class CanvasHelper {
      */
     public Canvas getCanvas() {
         return canvas;
-    }
-
-    /**
-     * Starts a thread that repaints the canvas.
-     */
-    private void startRepaintThread() {
-        Thread thread = new Thread() {
-            {
-                setDaemon(true);
-            }
-
-            @Override
-            public void run() {
-                while (true) {
-                    canvas.repaint();
-                    try {
-                        sleep(REFRESH_WAIT);
-                    } catch (final InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        
-        thread.start();
     }
 }

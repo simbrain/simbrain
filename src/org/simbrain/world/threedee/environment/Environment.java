@@ -45,7 +45,7 @@ public class Environment {
     private final List<Element> elements = new ArrayList<Element>();
 
     /** All the views on this environment. */
-    private List<Viewable> views = new ArrayList<Viewable>();
+    private final List<Viewable> views = new ArrayList<Viewable>();
 
     /** The odors in this environment. */
     private final Odors odors = new Odors();
@@ -76,7 +76,6 @@ public class Environment {
         timer = new Timer();
         random = new Random();
         parents = new HashMap<Renderer, Node>();
-        views = new ArrayList<Viewable>();
         
         return this;
     }
@@ -119,7 +118,8 @@ public class Environment {
             element.init(parent.getKey(), parent.getValue());
         }
         
-        views.add(agent);
+        addViewable(agent);
+//        views.add(agent);
         agent.setEnvironment(this);
         
         int limit = (size * 2) - 1;

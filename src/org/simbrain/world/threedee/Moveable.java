@@ -60,7 +60,7 @@ public abstract class Moveable implements Viewable {
     /** Current up speed (may be negative). */
     private float upSpeed = 0f;
 
-    private Object readResolve() {
+    protected Object readResolve() {
         inputs = Collections.synchronizedSortedMap(
             new TreeMap<Integer, Collection<? extends Action>>());
         
@@ -76,16 +76,6 @@ public abstract class Moveable implements Viewable {
     public void addInput(final int priority, final Collection<Action> input) {
         inputs.put(priority, input);
     }
-
-    /**
-     * Initializes the implementation with the given direction and location.
-     * This is essentially a suggestion. Implementations can use these objects
-     * and modify them or ignore them.
-     *
-     * @param direction the direction
-     * @param location the location
-     */
-//    public abstract void init(Vector direction, Point location);
 
     /**
      * Updates the camera direction and location based on getDirection and
@@ -127,6 +117,7 @@ public abstract class Moveable implements Viewable {
         synchronized (inputs) {
             /* input is synchronized but we need to lock over the iterator */
             for (final Collection<? extends Action> input : inputs.values()) {
+                
                 /*
                  * if there are events on this input process them and then
                  * return

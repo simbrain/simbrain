@@ -40,7 +40,6 @@ public class AgentElement extends MultipleViewElement<Node> {
     @Override
     public void initSpatial(final Renderer renderer, final Node node) {
         node.setLocalTranslation(agent.getLocation().toVector3f());
-        System.out.println(node.getLocalTranslation());
     }
 
     /**

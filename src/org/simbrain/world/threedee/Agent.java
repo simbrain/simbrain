@@ -2,11 +2,8 @@ package org.simbrain.world.threedee;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.Timer;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedee.environment.Environment;
 
 import com.jme.renderer.Camera;
@@ -62,7 +59,9 @@ public class Agent extends Moveable implements Entity {
         tenativeLocation = location;
     }
 
-    private Object readResolve() {
+    protected Object readResolve() {
+        super.readResolve();
+        
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
         return this;
@@ -93,7 +92,6 @@ public class Agent extends Moveable implements Entity {
      */
     @Override
     public Vector getDirection() {
-//        System.out.println(Thread.currentThread() + " direction: " + direction);
         return direction;
     }
     
@@ -102,22 +100,7 @@ public class Agent extends Moveable implements Entity {
      *
      * @param v the new direction.
      */
-    public void setDirection(final Vector v) {
-//        if (!direction.equals(v)) {
-//            System.out.println(Thread.currentThread() + " direction set to " + v);
-//        
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-//          
-//            try {
-//                String line = reader.readLine();
-//                if (line.startsWith("p")) {
-//                    new Exception().printStackTrace();
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-        
+    public void setDirection(final Vector v) {        
         this.direction = v;
         this.tenativeDirection = v;
     }
@@ -138,19 +121,6 @@ public class Agent extends Moveable implements Entity {
      * @param p The new location.
      */
     public void setTentativeLocation(final Point p) {
-        if (!location.equals(p)) System.out.println(Thread.currentThread() + " location set to " + p);
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-//        
-//        try {
-//            String line = reader.readLine();
-//            if (line.startsWith("p")) {
-//                new Exception().printStackTrace();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        
-//        this.location = p;
         this.tenativeLocation = p;
     }
     
@@ -163,12 +133,6 @@ public class Agent extends Moveable implements Entity {
     public void init(Camera cam) {//final Vector direction, final Point location) {
         cam.setDirection(direction.toVector3f());
         cam.setLocation(location.toVector3f());
-        
-        //        setDirection(direction);
-//        setLocation(location);
-//        tenativeDirection = direction;
-//        tenativeLocation = location;
-//        setHeight();
     }
 
     /**

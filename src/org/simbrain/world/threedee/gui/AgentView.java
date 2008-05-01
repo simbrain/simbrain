@@ -1,8 +1,6 @@
 package org.simbrain.world.threedee.gui;
 
 import org.apache.log4j.Logger;
-import org.simbrain.world.threedee.Point;
-import org.simbrain.world.threedee.Vector;
 import org.simbrain.world.threedee.Viewable;
 import org.simbrain.world.threedee.environment.Environment;
 
@@ -75,7 +73,7 @@ public class AgentView extends SimpleCanvasImpl {
         
         environment.init(getRenderer(), rootNode);
         
-        viewable.init(cam);//new Vector(cam.getDirection()), new Point(cam.getLocation()));
+        viewable.init(cam);
     }
     
     /**

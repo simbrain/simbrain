@@ -18,11 +18,16 @@ public class Smell implements Sensor {
     
     /** The scent this sensor responds to. */
     private final String odorName;
+
     /** The parent agent for this sensor. */
     private final Agent agent;
-    /** */
+
+    /** Offset. */
     private final float offset;
     
+    /** Temporary scaling on how smell diminishes with distance. */
+    private final float SCALE_FACTOR = 4;
+
     /**
      * Creates a new odor sensor for the given type of scent.
      * 
@@ -61,7 +66,7 @@ public class Smell implements Sensor {
             
             if (distance == 0) continue;
             
-            total += odor.getStrength() / distance;
+            total += odor.getStrength() / (distance* SCALE_FACTOR);
         }
         
         return total;

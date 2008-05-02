@@ -26,9 +26,13 @@ class AgentBindings extends Bindings {
 
     /** The consumers for the wrapped agent. */
     private final List<ConsumingBinding> consumers = new ArrayList<ConsumingBinding>();
+
     /** The agent for these bindings. */
     private final Agent agent;
     
+    /** Temporary strength variable. */
+    private final float STRENGTH = 1;
+
     /**
      * Creates a new bindings object for the given agent
      * and component.
@@ -51,7 +55,7 @@ class AgentBindings extends Bindings {
         consumers.add(new ConsumingBinding("backward", agent.backward()));
         setDefaultConsumingAttribute(consumers.get(0));
         setDefaultProducingAttribute(new ProducingBinding(
-            new Smell(agent.getOdors().get(0).getName(), agent, 0.2f), "right"));
+            new Smell(agent.getOdors().get(0).getName(), agent, STRENGTH), "right"));
         
         agent.addInput(PRIORITY, new AbstractCollection<Action>() {
             @Override

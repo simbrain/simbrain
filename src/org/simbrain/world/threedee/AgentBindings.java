@@ -41,6 +41,10 @@ class AgentBindings extends Bindings {
 
         this.agent = agent;
         
+        setInputs();
+    }
+    
+    void setInputs() {
         consumers.add(new ConsumingBinding("left", agent.left()));
         consumers.add(new ConsumingBinding("right", agent.right()));
         consumers.add(new ConsumingBinding("forward", agent.forward()));
@@ -87,7 +91,7 @@ class AgentBindings extends Bindings {
             }
         });
     }
-
+    
     /**
      * {@inheritDoc}
      */

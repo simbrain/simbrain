@@ -51,12 +51,7 @@ public class Smell implements Sensor {
         Vector perpendicular = new Vector(-direction.getZ(), direction.getY(), direction.getX());
         
         Point p = location.add(direction).add(perpendicular.multiply(offset));
-        
-//        System.out.println("location: " + location);
-//        System.out.println("direction: " + direction);
-//        System.out.println("perpendicular: " + perpendicular);
-//        System.out.println("nostril: " + p);
-        
+                
         for (Odor odor : agent.getEnvironment().getOdors().getOdors(odorName)) {
             Entity odorParent = odor.getParent();
             

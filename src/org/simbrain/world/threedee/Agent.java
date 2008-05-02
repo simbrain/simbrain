@@ -37,7 +37,7 @@ public class Agent extends Moveable implements Entity {
     /** determines the limits (x, z) of the world. */
     private int limit;
     /** */
-    private Bindings bindings;
+    private AgentBindings bindings;
     
     /**
      * Create a new Agent with the given name.
@@ -64,6 +64,8 @@ public class Agent extends Moveable implements Entity {
         
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
+        bindings.setInputs();
+        
         return this;
     }
     

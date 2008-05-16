@@ -5,6 +5,7 @@ import org.simbrain.world.threedee.Point;
 import org.simbrain.world.threedee.Vector;
 
 import com.jme.renderer.Camera;
+import com.jme.renderer.Renderer;
 
 /**
  * A view that can be moved around freely in three dimensions.
@@ -41,7 +42,7 @@ public class FreeBirdView extends Moveable {
      * {@inheritDoc}
      */
 //    @Override
-    public void init(final Camera cam) {//final Vector direction, final Point location) {
+    public void init(Renderer renderer, final Camera cam, int width, int height) {//final Vector direction, final Point location) {
 //        this.direction = direction;
 //        this.location = location.add(new Vector(0, START_HEIGHT, 0));
     }

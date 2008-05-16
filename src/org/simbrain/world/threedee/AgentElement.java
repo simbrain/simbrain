@@ -19,6 +19,9 @@ public class AgentElement extends MultipleViewElement<Node> {
     /** The up axis. */
     private static final Vector3f Y_AXIS = new Vector3f(0f, 1f, 0f);
 
+    /** The renderer for the agent */
+    private Renderer renderer;
+    
     /** The agent this element wraps. */
     private final Agent agent;
 
@@ -39,6 +42,7 @@ public class AgentElement extends MultipleViewElement<Node> {
      */
     @Override
     public void initSpatial(final Renderer renderer, final Node node) {
+        this.renderer = renderer;
         node.setLocalTranslation(agent.getLocation().toVector3f());
     }
 
@@ -91,7 +95,7 @@ public class AgentElement extends MultipleViewElement<Node> {
     public SpatialData getTentative() {
         return agent.getTentative();
     }
-
+    
     /**
      * Calls agent.commit.
      */

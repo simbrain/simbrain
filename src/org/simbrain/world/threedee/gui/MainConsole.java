@@ -3,14 +3,21 @@ package org.simbrain.world.threedee.gui;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,6 +27,9 @@ import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
 import org.simbrain.world.threedee.ThreeDeeComponent;
+
+import com.jme.util.GameTaskQueue;
+import com.jme.util.GameTaskQueueManager;
 
 /**
  * The main panel from which the 3D environment can be controlled.
@@ -109,9 +119,47 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
      */
     private void newAgentPanel(final Agent agent) {
         JPanel panel = new JPanel();
-        JButton button = new JButton(new CreateAgentViewAction(agent));
         
-        panel.add(button);
+        panel.add(new JButton(new CreateAgentViewAction(agent)));
+        panel.add(new JButton(new AbstractAction("snap") {
+            public void actionPerformed(ActionEvent e)
+            {
+//                Callable<?> exe = new Callable() {
+//                    public Object call() {
+//                        try {
+//                            BufferedImage image = agent.getSnapshot();
+//                            
+//                            File file = new File("snap.jpg");
+//                            try {
+//                                ImageIO.write(image, "jpg", file);
+//                            } catch (IOException e1) {
+//                                // TODO Auto-generated catch block
+//                                e1.printStackTrace();
+//                            }
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        return null;
+//                    }
+//                };
+//                GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe);
+                
+                new Thread(new Runnable() {
+                    public void run()
+                    {
+                        BufferedImage image = agent.getSnapshot();
+                        
+                        File file = new File("snap.jpg");
+                        try {
+                            ImageIO.write(image, "jpg", file);
+                        } catch (IOException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        }));
         agents.add(panel);
         pack();
     }

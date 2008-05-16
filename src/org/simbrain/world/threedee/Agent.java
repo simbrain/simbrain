@@ -1,12 +1,26 @@
 package org.simbrain.world.threedee;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.simbrain.world.threedee.environment.Environment;
 
 import com.jme.renderer.Camera;
+import com.jme.renderer.Renderer;
+import com.jme.util.GameTaskQueue;
+import com.jme.util.GameTaskQueueManager;
 
 /**
  * An implementation of Moveable that provides simple collision handling and
@@ -38,6 +52,10 @@ public class Agent extends Moveable implements Entity {
     private int limit;
     /** */
     private AgentBindings bindings;
+    /** */
+    private Renderer renderer;
+    private int width;
+    private int height;
     
     /**
      * Create a new Agent with the given name.
@@ -132,9 +150,12 @@ public class Agent extends Moveable implements Entity {
      * @param direction the direction vector that controls the view (updateable.)
      * @param location the location of the view (updateable.)
      */
-    public void init(Camera cam) {//final Vector direction, final Point location) {
+    public void init(Renderer renderer, Camera cam, int width, int height) {//final Vector direction, final Point location) {
         cam.setDirection(direction.toVector3f());
         cam.setLocation(location.toVector3f());
+        this.renderer = renderer;
+        this.width = width;
+        this.height = height;
     }
 
     /**
@@ -261,5 +282,86 @@ public class Agent extends Moveable implements Entity {
      */
     Bindings getBindings() {
         return bindings;
+    }
+    
+    public BufferedImage getSnapshot() {
+        Callable<Matrix> exe = new Callable<Matrix>() {
+            public Matrix call() {
+                Matrix matrix = new Matrix(width, height);
+                renderer.grabScreenContents(matrix.buffer, 0, 0, width, height);
+
+                System.out.println(Thread.currentThread());
+                System.out.println("returning");
+                return matrix;
+            }
+        };
+        
+//        renderer.grabScreenContents(matrix.buffer, 0, 0, width, height);
+        
+//        GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe);
+        Future<Matrix> future = GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe);
+        
+        Matrix matrix;// = future.get();
+        
+        try {
+            System.out.println("getting");
+            matrix = future.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        
+//        try {
+//            while (matrix.getDone()) {
+//                System.out.println("waiting");
+//                Thread.sleep(100);
+//            }
+//        } catch (InterruptedException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+        
+        int xOffset = 5;//(mode.getWidth() - width) / 2;
+        int yOffset = 31;//(mode.getHeight() - height) / 2;
+        
+        BufferedImage image = new BufferedImage(width - xOffset, height - yOffset, BufferedImage.TYPE_INT_RGB);
+        
+        // TODO fix this!
+        // Grab each pixel information and set it to the BufferedImage info.
+        for (int x = 0; x < width - xOffset; x++) {
+            for (int y = 0; y < height - yOffset; y++) {
+                int rgb = matrix.get(x, (height - 1) - y);
+               
+                image.setRGB(x, y, rgb);
+            }
+        }
+        
+        return image;
+    }
+    
+    private static class Matrix {
+        final IntBuffer buffer;
+        final int width;
+        final int height;
+        
+        Matrix(int width, int height) {
+            System.out.println("creating: " + width + ", " + height);
+            this.buffer = ByteBuffer.allocateDirect(width * height * 4)
+                .order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
+            this.width = width;
+            this.height = height;
+        }
+        
+        int get(final int x, final int y) {
+//            System.out.println(x + ", " + y);
+            try {
+                return buffer.get((y * width) + x);
+            } catch (Exception e) {
+                System.err.println(x + ", " + y);
+                e.printStackTrace();
+                throw (RuntimeException) e;
+            }
+        }
     }
 }

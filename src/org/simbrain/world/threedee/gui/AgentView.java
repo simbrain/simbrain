@@ -73,7 +73,7 @@ public class AgentView extends SimpleCanvasImpl {
         
         environment.init(getRenderer(), rootNode);
         
-        viewable.init(cam);
+        viewable.init(renderer, cam, width, height);
     }
     
     public void close() {

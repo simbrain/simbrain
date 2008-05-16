@@ -178,8 +178,8 @@ public final class BufferedImagePixelMatrix
         if (receptiveField == null) {
             throw new IllegalArgumentException("receptiveField must not be null");
         }
-        return image.getSubimage(receptiveField.x, receptiveField.y,
-                                 receptiveField.width, receptiveField.height);
+        return image.getSubimage(receptiveField.getX(), receptiveField.getY(),
+                                 receptiveField.getWidth(), receptiveField.getHeight());
     }
 
     /** {@inheritDoc} */

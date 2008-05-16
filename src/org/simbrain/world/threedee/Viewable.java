@@ -1,6 +1,7 @@
 package org.simbrain.world.threedee;
 
 import com.jme.renderer.Camera;
+import com.jme.renderer.Renderer;
 
 /**
  * Interface of an element that can be the vantage point of a view.
@@ -14,7 +15,7 @@ public interface Viewable {
      * @param direction the direction
      * @param location the location
      */
-    void init(Camera cam);
+    void init(Renderer renderer, Camera cam, int width, int height);
 
     /**
      * Updates the view.

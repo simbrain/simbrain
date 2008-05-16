@@ -23,9 +23,9 @@ import java.awt.Rectangle;
 /**
  * Receptive field.
  */
-public final class ReceptiveField
-    extends Rectangle {
+public final class ReceptiveField {
 
+    private final Rectangle rect;
     /**
      * Create a new receptive field.
      *
@@ -36,6 +36,30 @@ public final class ReceptiveField
      */
     // todo:  can this ctr be kept package private?
     public ReceptiveField(final int x, final int y, final int width, final int height) {
-        super(x, y, width, height);
+        rect = new Rectangle(x, y, width, height);
+    }
+    
+    public int getY() {
+        return rect.y;
+    }
+    
+    public int getX() {
+        return rect.x;
+    }
+    
+    public int getWidth() {
+        return rect.width;
+    }
+    
+    public int getHeight() {
+        return rect.height;
+    }
+    
+    public double getCenterX() {
+        return rect.getCenterX();
+    }
+    
+    public double getCenterY() {
+        return rect.getCenterY();
     }
 }

@@ -112,7 +112,7 @@ public class Workspace {
      */
     public void coupleSpecific(final ArrayList<ProducingAttribute> sourceProducers, final WorkspaceComponent<?> targetComponent) {
         
-        Iterator consumerIterator =  ((ArrayList<ConsumingAttribute>)targetComponent.getCustomListOfConsumingAttributes()).iterator();
+        Iterator consumerIterator =  ((ArrayList<?>)targetComponent.getCustomListOfConsumingAttributes()).iterator();
         for (ProducingAttribute producingAttribute : sourceProducers) {
             if (consumerIterator.hasNext()) {
                 Coupling coupling = new Coupling(producingAttribute, (ConsumingAttribute) consumerIterator.next());
@@ -128,7 +128,7 @@ public class Workspace {
      */
     public void coupleSpecific(final WorkspaceComponent<?> sourceComponent, final ArrayList<ConsumingAttribute> targetConsumers) {
         Iterator consumerIterator = targetConsumers.iterator();
-        for (ProducingAttribute producingAttribute :  ((ArrayList<ProducingAttribute>)sourceComponent.getCustomListOfProducingAttributes())) {
+        for (ProducingAttribute producingAttribute :  sourceComponent.getCustomListOfProducingAttributes()) {
             if (consumerIterator.hasNext()) {
                 Coupling coupling = new Coupling(producingAttribute, (ConsumingAttribute) consumerIterator.next());
                 addCoupling(coupling);

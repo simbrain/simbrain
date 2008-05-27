@@ -57,6 +57,19 @@ public class RgbFilter implements Filter {
     }
     
     /**
+     * Creates a new filter.
+     * 
+     * @param red The red threshold.
+     * @param green The green threshold.
+     * @param blue The blue threshold.
+     * @param lower The lower bound of the results.
+     * @param upper The upper bound of the results.
+     */
+    public RgbFilter(final int red, final int green, final int blue) {
+        this(red, green, blue, 0, 1);
+    }
+    
+    /**
      * {@inheritDoc}
      */
     public double filter(final BufferedImage image) {
@@ -104,9 +117,13 @@ public class RgbFilter implements Filter {
      * @return Whether the given value meets the threshold.
      */
     private boolean eval(final int value, final int threshold) {
+        LOGGER.debug("eval: " + value + ", " + threshold);
+        
         if (threshold < 0) {
+            LOGGER.debug(value < Math.abs(threshold));
             return value < Math.abs(threshold);
         } else {
+            LOGGER.debug(value >= Math.abs(threshold));
             return value >= threshold;
         }
     }

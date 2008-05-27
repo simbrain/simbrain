@@ -15,7 +15,7 @@ import org.simbrain.world.threedee.Moveable.Action;
  * 
  * @author Matt Watson
  */
-abstract class Bindings implements Consumer, Producer {
+public abstract class Bindings implements Consumer, Producer {
     /** An arbitrary prime number. */
     private static final int ARBITRARY_PRIME = 29;
     
@@ -74,7 +74,7 @@ abstract class Bindings implements Consumer, Producer {
     /**
      * Sets bind to the value of on.
      */
-    protected void setBindToOn() {
+    protected void update() {
         this.bind = isOn();
     }
     
@@ -188,7 +188,7 @@ abstract class Bindings implements Consumer, Producer {
          * @param sensor The sensor this Binding is bound to.
          */
         protected ProducingBinding(final Sensor sensor, String description) {
-            super(description + " " + sensor.getDescription());
+            super((description == null ? "" : description + " ") + sensor.getDescription());
 
             this.sensor = sensor;
         }

@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.threedee.Moveable.Action;
+import org.simbrain.world.threedee.sensors.Sight;
 import org.simbrain.world.threedee.sensors.Smell;
 
 /**
@@ -17,7 +17,7 @@ import org.simbrain.world.threedee.sensors.Smell;
  * 
  * @author Matt Watson
  */
-class AgentBindings extends Bindings {
+public class AgentBindings extends Bindings {
     /**
      * The priority of the agent.  There's nothing special about the number
      * 10.  It's just sufficiently high to allow others to preempt bindings.
@@ -33,6 +33,8 @@ class AgentBindings extends Bindings {
     /** Temporary strength variable. */
     private final float STRENGTH = 1;
 
+    private Sight sight;
+    
     /**
      * Creates a new bindings object for the given agent
      * and component.
@@ -45,7 +47,14 @@ class AgentBindings extends Bindings {
 
         this.agent = agent;
         
+        System.out.println(agent);
+//        sight = new Sight(agent);
+        
         setInputs();
+    }
+    
+    public void createSight() {
+        sight = new Sight(agent);
     }
     
     void setInputs() {
@@ -66,7 +75,7 @@ class AgentBindings extends Bindings {
                      * the iterator it to be created to ensure at least one iterator
                      * is returned every time the bindings are turned on.
                      */
-                    setBindToOn();
+                    update();
                     
                     final Iterator<ConsumingBinding> internal = consumers.iterator();
     
@@ -107,9 +116,20 @@ class AgentBindings extends Bindings {
             producing.add(new ProducingBinding(new Smell(odorType, agent, -1f), "left"));
         }
         
+        if (sight != null) {
+            for (Sensor sensor : sight.getProducingAttributes()) {
+                producing.add(new ProducingBinding(sensor, null));
+            }
+        }
+        
         return producing;
     }
 
+    protected void update() {
+        super.update();
+        sight.update();
+    }
+    
     /**
      * {@inheritDoc}
      */

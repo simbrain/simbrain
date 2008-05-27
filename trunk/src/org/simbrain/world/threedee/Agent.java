@@ -154,6 +154,9 @@ public class Agent extends Moveable implements Entity {
         cam.setDirection(direction.toVector3f());
         cam.setLocation(location.toVector3f());
         this.renderer = renderer;
+        
+        System.out.println("setting w, h: " + width + ", " + height);
+        
         this.width = width;
         this.height = height;
     }
@@ -280,7 +283,7 @@ public class Agent extends Moveable implements Entity {
      * 
      * @return The bindings for this agent.
      */
-    Bindings getBindings() {
+    public AgentBindings getBindings() {
         return bindings;
     }
     
@@ -363,5 +366,13 @@ public class Agent extends Moveable implements Entity {
                 throw (RuntimeException) e;
             }
         }
+    }
+
+    public int getWidth() {
+        return width > 5 ? width - 5 : 0;
+    }
+
+    public int getHeight() {
+        return height > 31 ? height - 31 : 0;
     }
 }

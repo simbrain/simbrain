@@ -3,7 +3,6 @@ package org.simbrain.world.threedee.gui;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -14,8 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -27,9 +24,6 @@ import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
 import org.simbrain.world.threedee.ThreeDeeComponent;
-
-import com.jme.util.GameTaskQueue;
-import com.jme.util.GameTaskQueueManager;
 
 /**
  * The main panel from which the 3D environment can be controlled.
@@ -257,6 +251,8 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         innerFrame.setSize(WIDTH, HEIGHT);
         innerFrame.setResizable(false);
         innerFrame.setVisible(true);
+        
+        agent.getBindings().createSight();
     }
     
     /**

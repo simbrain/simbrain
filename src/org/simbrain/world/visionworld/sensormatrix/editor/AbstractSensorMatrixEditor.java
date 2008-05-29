@@ -19,33 +19,30 @@
 package org.simbrain.world.visionworld.sensormatrix.editor;
 
 import java.awt.Component;
-import java.awt.Insets;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
 
-import org.simbrain.world.visionworld.sensormatrix.SparseSensorMatrix;
-
 /**
- * Sparse sensor matrix editor.
+ * Dense sensor matrix editor.
  */
-public final class SparseSensorMatrixEditor
-    extends JPanel
-    implements SensorMatrixEditor {
+public abstract class AbstractSensorMatrixEditor 
+        extends JPanel implements SensorMatrixEditor {
+    /** serial version id */
+    private static final long serialVersionUID = 1L;
 
     /** Rows. */
     private JTextField rows;
@@ -63,22 +60,10 @@ public final class SparseSensorMatrixEditor
     private JLabel effectiveSize;
 
     /** Display name. */
-    private static final String DISPLAY_NAME = "Sparse sensor matrix";
+    private static final String DISPLAY_NAME = "Dense sensor matrix";
 
     /** Description. */
     private static final String DESCRIPTION = null;
-
-    /** Default rows. */
-    private static final int DEFAULT_ROWS = 10;
-
-    /** Default columns. */
-    private static final int DEFAULT_COLUMNS = 10;
-
-    /** Default receptive field height. */
-    private static final int DEFAULT_RECEPTIVE_FIELD_HEIGHT = 10;
-
-    /** Default receptive field width. */
-    private static final int DEFAULT_RECEPTIVE_FIELD_WIDTH = 10;
 
     /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
@@ -89,17 +74,15 @@ public final class SparseSensorMatrixEditor
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
     /**
-     * Create a new sparse sensor matrix editor.
+     * Create a new dense sensor matrix editor.
      */
-    public SparseSensorMatrixEditor() {
+    public AbstractSensorMatrixEditor() {
         super();
 
         initComponents();
         layoutComponents();
     }
-
 
     /**
      * Initialize components.
@@ -230,22 +213,23 @@ public final class SparseSensorMatrixEditor
     }
 
     /** {@inheritDoc} */
-    public Component getEditorComponent() {
-        rows.setText(String.valueOf(DEFAULT_ROWS));
-        columns.setText(String.valueOf(DEFAULT_COLUMNS));
-        receptiveFieldHeight.setText(String.valueOf(DEFAULT_RECEPTIVE_FIELD_HEIGHT));
-        receptiveFieldWidth.setText(String.valueOf(DEFAULT_RECEPTIVE_FIELD_WIDTH));
+    public Component getEditorComponent(int defaultRows, int defaultColumns, int defaultHeight, int defaultWidth) {
+        rows.setText(String.valueOf(defaultRows));
+        columns.setText(String.valueOf(defaultColumns));
+        receptiveFieldHeight.setText(String.valueOf(defaultHeight));
+        receptiveFieldWidth.setText(String.valueOf(defaultWidth));
         return this;
     }
 
     /** {@inheritDoc} */
-    public SensorMatrix createSensorMatrix(final Filter defaultFilter) throws SensorMatrixEditorException {
+    public SensorMatrix createSensorMatrix(final Filter defaultFilter) 
+            throws SensorMatrixEditorException {
         try {
             int r = Integer.valueOf(rows.getText());
             int c = Integer.valueOf(columns.getText());
             int h = Integer.valueOf(receptiveFieldHeight.getText());
             int w = Integer.valueOf(receptiveFieldWidth.getText());
-            return new SparseSensorMatrix(r, c, w, h, defaultFilter);
+            return createSensorMatrix(r, c, w, h, defaultFilter);
         }
         catch (NumberFormatException e) {
             throw new SensorMatrixEditorException(e);
@@ -254,17 +238,12 @@ public final class SparseSensorMatrixEditor
             throw new SensorMatrixEditorException(e);
         }
     }
+    
+    public abstract SensorMatrix createSensorMatrix(int rows, int columns, int width, 
+        int height, Filter defaultFilter) throws SensorMatrixEditorException;
 
     /** {@inheritDoc} */
     public String toString() {
         return DISPLAY_NAME;
-    }
-
-
-    public Component getEditorComponent(int defaultRows, int defaultColumns, int defaultHeight,
-            int defaultWidth)
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

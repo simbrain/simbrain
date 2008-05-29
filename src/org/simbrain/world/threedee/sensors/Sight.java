@@ -2,13 +2,14 @@ package org.simbrain.world.threedee.sensors;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Semaphore;
 
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.Sensor;
+import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
-import org.simbrain.world.visionworld.filter.RgbFilter;
+import org.simbrain.world.visionworld.dialog.AbtractSensorMatrixDialog;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
-import org.simbrain.world.visionworld.sensormatrix.DenseSensorMatrix;
 
 public class Sight {
     Agent agent;
@@ -17,19 +18,48 @@ public class Sight {
     volatile BufferedImagePixelMatrix image;
     SensorMatrix matrix;
     
-    public Sight(Agent agent) {
+    public Sight(final Agent agent) {
         this.agent = agent;
         
         width = agent.getWidth();
         height = agent.getHeight();
         
-        int rWidth = width / 5;
-        int rHeight = height / 5;
+//        int rWidth = width / 5;
+//        int rHeight = height / 5;
         
-        matrix = new DenseSensorMatrix(5, 5, 
-            rWidth, rHeight, new RgbFilter(-50, 200, -50));
+        final Semaphore semaphore = new Semaphore(1);
+        
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        
+        AbtractSensorMatrixDialog dialog = new AbtractSensorMatrixDialog() {
+            /** Serial Version ID */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected PixelMatrix getPixelMatrix() {
+                return new BufferedImagePixelMatrix(agent.getSnapshot());
+            }
+
+            @Override
+            protected void ok(SensorMatrix sensorMatrix) {
+                matrix = sensorMatrix;
+                semaphore.release();
+            }
+        };
+        
+        dialog.setBounds(100, 100, 450, 550);
+        dialog.setVisible(true);
+        
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            
+        }
     }
-     
     
     public Collection<Sensor> getProducingAttributes() {
         Collection<Sensor> attributes = new ArrayList<Sensor>();
@@ -41,11 +71,11 @@ public class Sight {
             this.height = height;
             this.width = width;
             
-            int rWidth = width / 5;
-            int rHeight = height / 5;
+//            int rWidth = width / 5;
+//            int rHeight = height / 5;
             
-            matrix = new DenseSensorMatrix(5, 5, 
-                rWidth, rHeight, new RgbFilter(-50, 200, -50));
+//            matrix = new DenseSensorMatrix(5, 5, 
+//                rWidth, rHeight, new RgbFilter(-50, 200, -50));
             
             new Thread(new Runnable() {
                 public void run() {

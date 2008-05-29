@@ -527,8 +527,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /**
      * Tab node.
      */
-    private class TabNode
-        extends PNode {
+    private static class TabNode extends PNode {
 
         /** Label. */
         private PText label;
@@ -554,8 +553,8 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
             setBounds(0.0d, 0.0d, backgroundWidth, TAB_HEIGHT);
 
-            addChild(background);
-            addChild(label);
+            super.addChild(background);
+            super.addChild(label);
         }
 
 
@@ -615,7 +614,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /**
      * Outline node.
      */
-    private class OutlineNode
+    private static class OutlineNode
         extends PPath {
 
         /**

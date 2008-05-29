@@ -252,7 +252,11 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         innerFrame.setResizable(false);
         innerFrame.setVisible(true);
         
-        agent.getBindings().createSight();
+        new Thread(new Runnable(){
+            public void run() {
+                agent.getBindings().createSight();
+            }
+        }).start();
     }
     
     /**

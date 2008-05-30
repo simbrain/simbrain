@@ -46,11 +46,11 @@ public final class LoadNeuronScriptAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SFileChooser chooser = new SFileChooser(".", "bsh");
-        File theFile = chooser.showOpenDialog();
-        if (theFile != null) {
+//        SFileChooser chooser = new SFileChooser(".", "bsh");
+//        File theFile = chooser.showOpenDialog();
+//        if (theFile != null) {
             //System.out.println("setting i");
             //theNeuron.setCustomUpdateScript(theFile);
-        }
+//        }
     }
 }

@@ -182,10 +182,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
      * Populates the fields with current values.
      */
     public void fillFieldValues() {
-        SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
-
         spikeFunctionPanel.fillFieldValues();
-
     }
 
     /**

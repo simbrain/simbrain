@@ -31,11 +31,7 @@ public class CouplingTransferHandler extends TransferHandler {
      * @return true if data import successful.
      */
     public boolean importData(final JComponent c, final Transferable t) {
-        if (c instanceof JList) {
-             JList list = (JList) c;
-             return true;
-        }
-        return false;
+        return c instanceof JList;
     }
 
     /**

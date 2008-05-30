@@ -94,20 +94,11 @@ public abstract class AbtractSensorMatrixDialog
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
-    /**
-     * Create a new create sensor matrix dialog.
-     *
-     * @param visionWorld vision world, must not be null
-     */
-    public AbtractSensorMatrixDialog() {
-        super();
-        
+    public void init() {
         setTitle("Create Sensor Matrix");
         initComponents();
         layoutComponents();
     }
-
 
     /**
      * Initialize components.

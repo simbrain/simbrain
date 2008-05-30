@@ -21,6 +21,7 @@ package org.simbrain.world.visionworld.dialog;
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
+import org.simbrain.world.visionworld.VisionWorldModel;
 
 /**
  * Create sensor matrix dialog.
@@ -42,7 +43,10 @@ public final class CreateSensorMatrixDialog extends AbtractSensorMatrixDialog {
         if (visionWorld == null) {
             throw new IllegalArgumentException("visionWorld must not be null");
         }
+        
         this.visionWorld = visionWorld;
+        
+        init();
     }
 
     protected PixelMatrix getPixelMatrix() {

@@ -51,6 +51,7 @@ public class Sight {
             }
         };
         
+        dialog.init();
         dialog.setBounds(100, 100, 450, 550);
         dialog.setVisible(true);
         

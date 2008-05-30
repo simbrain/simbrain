@@ -562,11 +562,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     public JPopupMenu buildPopupMenu(final AbstractEntity theEntity) {
         final JPopupMenu ret = new JPopupMenu();
 
-        if (theEntity instanceof AbstractEntity) {
-            ret.add(menu.getCopyItem());
-            ret.add(menu.getCutItem());
-            ret.add(menu.getDeleteItem());
-        }
+        ret.add(menu.getCopyItem());
+        ret.add(menu.getCutItem());
+        ret.add(menu.getDeleteItem());
 
         if (theEntity instanceof OdorWorldEntity) {
             ret.addSeparator();

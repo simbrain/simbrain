@@ -137,7 +137,7 @@ public class SOMDialog extends StandardDialog implements ActionListener {
      * @see java.awt.event.ActionListener
      */
     public void actionPerformed(final ActionEvent e) {
-        String cmd = e.getActionCommand();
+        /* no implementation */
     }
 
 

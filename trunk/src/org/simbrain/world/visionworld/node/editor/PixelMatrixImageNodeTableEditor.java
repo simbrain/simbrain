@@ -302,7 +302,6 @@ public final class PixelMatrixImageNodeTableEditor
         /** {@inheritDoc} */
         public void setValueAt(final Object value, final int row, final int column) {
             if (pixelMatrixImageNode != null) {
-                PixelMatrix pixelMatrix = pixelMatrixImageNode.getPixelMatrix();
                 switch (column) {
                 case 0:
                     break;

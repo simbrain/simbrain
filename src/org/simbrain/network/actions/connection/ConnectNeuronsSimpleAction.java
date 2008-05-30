@@ -51,7 +51,7 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent arg0) {
 
-        if (sourceNeurons.isEmpty() || targetNeuron.equals(null)) {
+        if (sourceNeurons.isEmpty() || targetNeuron == null) {
             return;
         }
 

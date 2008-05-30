@@ -823,10 +823,9 @@ public class Dataset {
     public String[][] getDoubleStrings() {
         int numPoints = getNumPoints();
         String[][] ret = new String[numPoints][dimensions];
-        double[] tempPoint = new double[dimensions];
-
+        
         for (int i = 0; i < numPoints; i++) {
-            tempPoint = (double[]) getPoint(i);
+            double[] tempPoint = (double[]) getPoint(i);
 
             for (int j = 0; j < tempPoint.length; j++) {
                 ret[i][j] = Double.toString(tempPoint[j]);

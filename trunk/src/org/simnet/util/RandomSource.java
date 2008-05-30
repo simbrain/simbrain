@@ -105,8 +105,7 @@ public class RandomSource {
      * @return the duplicated <code>RandomSource</code> object.
      */
     public RandomSource duplicate(final RandomSource dup) {
-        RandomSource rs = new RandomSource();
-        rs = dup;
+        RandomSource rs = dup;
         rs.setLowerBound(getLowerBound());
         rs.setUpperBound(getUpperBound());
         rs.setMean(getMean());

@@ -104,7 +104,6 @@ final class ZoomEventHandler
     protected void drag(final PInputEvent event) {
         super.drag(event);
 
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         Point2D position = event.getPosition();
         PBounds rect = new PBounds();
         rect.add(marqueeStartPosition);

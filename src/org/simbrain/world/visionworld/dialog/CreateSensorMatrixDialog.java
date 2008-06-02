@@ -26,7 +26,7 @@ import org.simbrain.world.visionworld.VisionWorldModel;
 /**
  * Create sensor matrix dialog.
  */
-public final class CreateSensorMatrixDialog extends AbtractSensorMatrixDialog {
+public final class CreateSensorMatrixDialog extends AbstractSensorMatrixDialog {
 
     /** Serial Verison ID */
     private static final long serialVersionUID = 1L;

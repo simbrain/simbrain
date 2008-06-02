@@ -55,7 +55,7 @@ import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditors;
 /**
  * Create sensor matrix dialog.
  */
-public abstract class AbtractSensorMatrixDialog
+public abstract class AbstractSensorMatrixDialog
     extends JDialog {
 
     /** Filters. */

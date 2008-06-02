@@ -14,7 +14,7 @@ import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 import org.simbrain.world.visionworld.VisionWorldModel;
-import org.simbrain.world.visionworld.dialog.AbtractSensorMatrixDialog;
+import org.simbrain.world.visionworld.dialog.AbstractSensorMatrixDialog;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 public class Sight {
@@ -41,7 +41,7 @@ public class Sight {
             throw new RuntimeException(e);
         }
         
-        AbtractSensorMatrixDialog dialog = new AbtractSensorMatrixDialog() {
+        AbstractSensorMatrixDialog dialog = new AbstractSensorMatrixDialog() {
             /** Serial Version ID */
             private static final long serialVersionUID = 1L;
 

@@ -71,6 +71,8 @@ import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.gameworld2d.GameWorld2DComponent;
 import org.simbrain.world.gameworld2d.GameWorld2DDesktopComponent;
+import org.simbrain.world.midiworld.MidiWorldComponent;
+import org.simbrain.world.midiworld.MidiWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.textworld.TextWorldComponent;
@@ -189,6 +191,7 @@ public class SimbrainDesktop {
         registerComponent(DataWorldComponent.class, DataWorldDesktopComponent.class);
         registerComponent(GameWorld2DComponent.class, GameWorld2DDesktopComponent.class);
         registerComponent(GaugeComponent.class, GaugeDesktopComponent.class);
+        registerComponent(MidiWorldComponent.class, MidiWorldDesktopComponent.class);
         registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
         registerComponent(OdorWorldComponent.class, OdorWorldDesktopComponent.class);
         registerComponent(PlotComponent.class, PlotDesktopComponent.class);

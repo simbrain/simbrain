@@ -32,6 +32,7 @@ import org.simbrain.workspace.actions.NewConsoleAction;
 import org.simbrain.workspace.actions.NewDataWorldAction;
 import org.simbrain.workspace.actions.NewGameWorld2dAction;
 import org.simbrain.workspace.actions.NewGaugeAction;
+import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
 import org.simbrain.workspace.actions.NewPlotAction;
@@ -76,6 +77,9 @@ public class WorkspaceActionManager {
 
     /** New game world 2d action. */
     private final Action newGameWorld2dAction;
+
+    /** New MIDI world action. */
+    private final Action newMidiWorldAction;
 
     /** New text world action. */
     private final Action newTextWorldAction;
@@ -159,6 +163,7 @@ public class WorkspaceActionManager {
 
         newDataWorldAction = new NewDataWorldAction(workspace);
         newGameWorld2dAction = new NewGameWorld2dAction(workspace);
+        newMidiWorldAction = new NewMidiWorldAction(workspace);
         newOdorWorldAction = new NewOdorWorldAction(workspace);
         newThreeDeeWorldAction = new NewThreeDeeWorldAction(workspace);
         newTextWorldAction = new NewTextWorldAction(workspace);
@@ -209,6 +214,7 @@ public class WorkspaceActionManager {
     public List<Action> getNewWorldActions() {
         return Arrays.asList(new Action[] {newDataWorldAction,
                                            newGameWorld2dAction,
+                                           newMidiWorldAction,
                                            newOdorWorldAction,
                                            newThreeDeeWorldAction,
                                            newTextWorldAction,

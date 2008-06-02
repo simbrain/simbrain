@@ -111,6 +111,7 @@ abstract class AbstractSensorNode
 
         contextMenu = new JPopupMenu("Context menu");
         contextMenu.add(new EditSensorAction());
+        
         contextMenu.add(visionWorld.getEditSensorsAction());
 
         setPaint(new Color(0, 0, 0, 0));

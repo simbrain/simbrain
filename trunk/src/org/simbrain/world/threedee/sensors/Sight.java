@@ -4,10 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Semaphore;
 
+import org.simbrain.workspace.Workspace;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.Sensor;
+import org.simbrain.world.threedee.ThreeDeeComponent;
+import org.simbrain.world.visionworld.MutableVisionWorldModel;
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
+import org.simbrain.world.visionworld.VisionWorldComponent;
+import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
+import org.simbrain.world.visionworld.VisionWorldModel;
 import org.simbrain.world.visionworld.dialog.AbtractSensorMatrixDialog;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
@@ -18,7 +24,7 @@ public class Sight {
     volatile BufferedImagePixelMatrix image;
     SensorMatrix matrix;
     
-    public Sight(final Agent agent) {
+    public Sight(final Agent agent, final Workspace workspace) {
         this.agent = agent;
         
         width = agent.getWidth();
@@ -41,12 +47,15 @@ public class Sight {
 
             @Override
             protected PixelMatrix getPixelMatrix() {
-                return new BufferedImagePixelMatrix(agent.getSnapshot());
+                return image = new BufferedImagePixelMatrix(agent.getSnapshot());
             }
 
             @Override
             protected void ok(SensorMatrix sensorMatrix) {
                 matrix = sensorMatrix;
+                VisionWorldModel model = new MutableVisionWorldModel(image, matrix);
+                VisionWorldComponent component = new VisionWorldComponent(agent.getName() + " vision", model);
+                workspace.addWorkspaceComponent(component);
                 semaphore.release();
             }
         };
@@ -78,11 +87,13 @@ public class Sight {
 //            matrix = new DenseSensorMatrix(5, 5, 
 //                rWidth, rHeight, new RgbFilter(-50, 200, -50));
             
-            new Thread(new Runnable() {
-                public void run() {
-                    image = new BufferedImagePixelMatrix(agent.getSnapshot());
-                }
-            }).start();
+            if (image == null) {
+                new Thread(new Runnable() {
+                    public void run() {
+                        image = new BufferedImagePixelMatrix(agent.getSnapshot());
+                    }
+                }).start();
+            }
         }
         
         for (int column = 0; column < matrix.columns(); column++) {
@@ -95,7 +106,9 @@ public class Sight {
     }
     
     public void update() {
-        image = new BufferedImagePixelMatrix(agent.getSnapshot());
+//        image = new BufferedImagePixelMatrix(agent.getSnapshot());
+        
+        image.setImage(agent.getSnapshot());
     }
     
     class SightSensor implements Sensor {

@@ -1,8 +1,6 @@
 package org.simbrain.world.threedee;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -11,8 +9,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.simbrain.world.threedee.environment.Environment;
@@ -293,40 +289,23 @@ public class Agent extends Moveable implements Entity {
                 Matrix matrix = new Matrix(width, height);
                 renderer.grabScreenContents(matrix.buffer, 0, 0, width, height);
 
-                System.out.println(Thread.currentThread());
-                System.out.println("returning");
                 return matrix;
             }
         };
         
-//        renderer.grabScreenContents(matrix.buffer, 0, 0, width, height);
-        
-//        GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe);
         Future<Matrix> future = GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe);
-        
-        Matrix matrix;// = future.get();
+        Matrix matrix;
         
         try {
-            System.out.println("getting");
             matrix = future.get();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
-        
-//        try {
-//            while (matrix.getDone()) {
-//                System.out.println("waiting");
-//                Thread.sleep(100);
-//            }
-//        } catch (InterruptedException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-        
-        int xOffset = 5;//(mode.getWidth() - width) / 2;
-        int yOffset = 31;//(mode.getHeight() - height) / 2;
+                
+        int xOffset = 12;//(mode.getWidth() - width) / 2;
+        int yOffset = 34;//(mode.getHeight() - height) / 2;
         
         BufferedImage image = new BufferedImage(width - xOffset, height - yOffset, BufferedImage.TYPE_INT_RGB);
         
@@ -349,7 +328,6 @@ public class Agent extends Moveable implements Entity {
         final int height;
         
         Matrix(int width, int height) {
-            System.out.println("creating: " + width + ", " + height);
             this.buffer = ByteBuffer.allocateDirect(width * height * 4)
                 .order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
             this.width = width;
@@ -357,7 +335,6 @@ public class Agent extends Moveable implements Entity {
         }
         
         int get(final int x, final int y) {
-//            System.out.println(x + ", " + y);
             try {
                 return buffer.get((y * width) + x);
             } catch (Exception e) {

@@ -19,14 +19,13 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.Color;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,6 +33,18 @@ import javax.swing.Action;
 import javax.swing.JToolTip;
 
 import org.simbrain.util.JMultiLineToolTip;
+import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
+import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
+import org.simbrain.world.visionworld.action.EditSensorsAction;
+import org.simbrain.world.visionworld.action.NormalViewAction;
+import org.simbrain.world.visionworld.action.PaintViewAction;
+import org.simbrain.world.visionworld.action.StackedViewAction;
+import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
+import org.simbrain.world.visionworld.dialog.CreateSensorMatrixDialog;
+import org.simbrain.world.visionworld.dialog.EditSensorsDialog;
+import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
+import org.simbrain.world.visionworld.node.SensorMatrixNode;
+import org.simbrain.world.visionworld.node.SensorNode;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -42,26 +53,14 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
-import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
-import org.simbrain.world.visionworld.action.EditSensorsAction;
-import org.simbrain.world.visionworld.action.NormalViewAction;
-import org.simbrain.world.visionworld.action.PaintViewAction;
-import org.simbrain.world.visionworld.action.StackedViewAction;
-
-import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
-import org.simbrain.world.visionworld.dialog.CreateSensorMatrixDialog;
-import org.simbrain.world.visionworld.dialog.EditSensorsDialog;
-
-import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
-import org.simbrain.world.visionworld.node.SensorMatrixNode;
-import org.simbrain.world.visionworld.node.SensorNode;
-
 /**
  * Vision world.
  */
 public final class VisionWorld
     extends PCanvas {
+
+    /** serial version ID */
+    private static final long serialVersionUID = 1L;
 
     /** Model for this vision world. */
     private final VisionWorldModel model;
@@ -118,6 +117,9 @@ public final class VisionWorld
         removeInputEventListener(getPanEventHandler());
         removeInputEventListener(getZoomEventHandler());
 
+        selectionModel = new SensorSelectionModel(this);
+        editSensorsAction = new EditSensorsAction(this);
+        
         createNodes();
         modelListener = new VisionWorldModelListener() {
 
@@ -143,7 +145,7 @@ public final class VisionWorld
 
         this.model.addModelListener(modelListener);
 
-        selectionModel = new SensorSelectionModel(this);
+//        selectionModel = new SensorSelectionModel(this);
         selectionListener = new SensorSelectionListener()
             {
                 /** {@inheritDoc} */
@@ -158,7 +160,7 @@ public final class VisionWorld
         selectionEventHandlerInstalled = true;
         addInputEventListener(selectionEventHandler);
 
-        editSensorsAction = new EditSensorsAction(this);
+//        editSensorsAction = new EditSensorsAction(this);
     }
 
     /**
@@ -196,8 +198,8 @@ public final class VisionWorld
      */
     private void updateSensorNodes() {
         sensorNodes.clear();
-        Collection allNodes = getLayer().getAllNodes();
-        for (Iterator i = allNodes.iterator(); i.hasNext(); ) {
+        Collection<?> allNodes = getLayer().getAllNodes();
+        for (Iterator<?> i = allNodes.iterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof SensorNode) {
                 SensorNode sensorNode = (SensorNode) node;

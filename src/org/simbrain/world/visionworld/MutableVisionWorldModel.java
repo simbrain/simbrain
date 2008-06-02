@@ -20,10 +20,7 @@ package org.simbrain.world.visionworld;
 
 import java.awt.Color;
 import java.awt.Image;
-
 import java.awt.image.BufferedImage;
-
-import java.beans.PropertyChangeListener;
 
 import org.simbrain.world.visionworld.filter.UniformFilter;
 
@@ -55,7 +52,36 @@ public final class MutableVisionWorldModel
         this.sensorMatrix = EMPTY_SENSOR_MATRIX;
     }
 
+    /**
+     * Create a new immutable vision world model with the specified
+     * pixel matrix and sensor matrix.
+     *
+     * @param pixelMatrix pixel matrix for this immutable vision world model,
+     *    must not be null
+     * @param sensorMatrix sensor matrix for this immutable vision world model,
+     *    must not be null
+     */
+    public MutableVisionWorldModel(final PixelMatrix pixelMatrix,
+                                     final SensorMatrix sensorMatrix) {
+        super();
+        if (pixelMatrix == null) {
+            throw new IllegalArgumentException("pixelMatrix must not be null");
+        }
+        if (sensorMatrix == null) {
+            throw new IllegalArgumentException("sensorMatrix must not be null");
+        }
+        this.pixelMatrix = pixelMatrix;
+        this.sensorMatrix = sensorMatrix;
+        
+        pixelMatrix.addListener(listener, true);
+    }
 
+    PixelMatrix.Listener listener = new PixelMatrix.Listener() {
+        public void imageChanged() {
+            firePixelMatrixChanged(pixelMatrix, pixelMatrix);
+        }
+    };
+    
     /** {@inheritDoc} */
     public PixelMatrix getPixelMatrix() {
         return pixelMatrix;
@@ -134,26 +160,12 @@ public final class MutableVisionWorldModel
             return emptyImage;
         }
 
-        /** {@inheritDoc} */
-        public void addPropertyChangeListener(final PropertyChangeListener listener) {
-            // empty
+        public void addListener(Listener listener, boolean weak) {
+            /* no implementation */
         }
 
-        /** {@inheritDoc} */
-        public void addPropertyChangeListener(final String propertyName,
-                                              final PropertyChangeListener listener) {
-            // empty
-        }
-
-        /** {@inheritDoc} */
-        public void removePropertyChangeListener(final PropertyChangeListener listener) {
-            // empty
-        }
-
-        /** {@inheritDoc} */
-        public void removePropertyChangeListener(final String propertyName,
-                                                 final PropertyChangeListener listener) {
-            // empty
+        public void removeListener(Listener listener) {
+            /* no implementation */
         }
     }
 

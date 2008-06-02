@@ -49,12 +49,14 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
      * @param name name
      */
     public VisionWorldComponent(final String name) {
-        super(name);
-        VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
-        visionWorld = new VisionWorld(visionWorldModel);
-
+        this(name, new MutableVisionWorldModel());
     }
 
+    public VisionWorldComponent(final String name, VisionWorldModel model) {
+        super(name);
+        visionWorld = new VisionWorld(model);
+    }
+    
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object

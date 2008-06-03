@@ -34,6 +34,6 @@ final class MidiNoteConsumer
 
     /** {@inheritDoc} */
     public String getDescription() {
-        return "MIDI Note Consumer";
+        return "MIDI Note";
     }
 }

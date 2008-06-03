@@ -13,7 +13,7 @@ final class MidiProgramChangeConsumer
 
 
     /**
-     * Create a new MIDI program cchange consumer with the specified program change
+     * Create a new MIDI program change consumer with the specified program change
      * and MIDI world workspace component.
      *
      * @param programChange MIDI program change, must not be null

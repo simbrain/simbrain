@@ -35,6 +35,7 @@ import org.simbrain.workspace.actions.NewGaugeAction;
 import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
+import org.simbrain.workspace.actions.NewOscWorldAction;
 import org.simbrain.workspace.actions.NewPlotAction;
 import org.simbrain.workspace.actions.NewTextWorldAction;
 import org.simbrain.workspace.actions.NewThreeDeeWorldAction;
@@ -80,6 +81,9 @@ public class WorkspaceActionManager {
 
     /** New MIDI world action. */
     private final Action newMidiWorldAction;
+
+    /** New OSC world action. */
+    private final Action newOscWorldAction;
 
     /** New text world action. */
     private final Action newTextWorldAction;
@@ -165,6 +169,7 @@ public class WorkspaceActionManager {
         newGameWorld2dAction = new NewGameWorld2dAction(workspace);
         newMidiWorldAction = new NewMidiWorldAction(workspace);
         newOdorWorldAction = new NewOdorWorldAction(workspace);
+        newOscWorldAction = new NewOscWorldAction(workspace);
         newThreeDeeWorldAction = new NewThreeDeeWorldAction(workspace);
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
@@ -216,6 +221,7 @@ public class WorkspaceActionManager {
                                            newGameWorld2dAction,
                                            newMidiWorldAction,
                                            newOdorWorldAction,
+                                           newOscWorldAction,
                                            newThreeDeeWorldAction,
                                            newTextWorldAction,
                                            newVisionWorldAction});

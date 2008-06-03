@@ -75,6 +75,8 @@ import org.simbrain.world.midiworld.MidiWorldComponent;
 import org.simbrain.world.midiworld.MidiWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
+import org.simbrain.world.oscworld.OscWorldComponent;
+import org.simbrain.world.oscworld.OscWorldDesktopComponent;
 import org.simbrain.world.textworld.TextWorldComponent;
 import org.simbrain.world.textworld.TextWorldDesktopComponent;
 import org.simbrain.world.threedee.ThreeDeeComponent;
@@ -194,6 +196,7 @@ public class SimbrainDesktop {
         registerComponent(MidiWorldComponent.class, MidiWorldDesktopComponent.class);
         registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
         registerComponent(OdorWorldComponent.class, OdorWorldDesktopComponent.class);
+        registerComponent(OscWorldComponent.class, OscWorldDesktopComponent.class);
         registerComponent(PlotComponent.class, PlotDesktopComponent.class);
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);

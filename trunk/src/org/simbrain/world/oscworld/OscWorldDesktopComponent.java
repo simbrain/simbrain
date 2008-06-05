@@ -6,12 +6,19 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+
+import javax.swing.border.EmptyBorder;
+
+import ca.odell.glazedlists.swing.EventListModel;
 
 import org.simbrain.workspace.gui.DesktopComponent;
 
@@ -24,6 +31,9 @@ public final class OscWorldDesktopComponent
     /** Create OSC message action. */
     private final Action createOscMessageAction;
 
+    /** List of OSC message consumers. */
+    private final JList consumers;
+
 
     /**
      * Create a new OSC world desktop component with the specified OSC world component.
@@ -34,6 +44,7 @@ public final class OscWorldDesktopComponent
         super(oscWorldComponent);
 
         createOscMessageAction = new CreateOscMessageAction();
+        consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
 
         JMenuBar menuBar = new JMenuBar();
         JToolBar toolBar = new JToolBar();
@@ -45,12 +56,17 @@ public final class OscWorldDesktopComponent
         menuBar.add(file);
         setJMenuBar(menuBar);
 
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBorder(new EmptyBorder(11, 4, 4, 4));
+        mainPanel.add("North", new JLabel("OSC messages:"));
+        mainPanel.add("Center", new JScrollPane(consumers));
+
         JPanel contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add("North", toolBar);
-        contentPane.add("Center", new OscWorld());        
+        contentPane.add("Center", mainPanel);
     }
-
 
     /** {@inheritDoc} */
     public void close() {

@@ -11,6 +11,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.GlazedLists;
+
+import ca.odell.glazedlists.event.ListEventListener;
+
 import com.illposed.osc.OSCPortOut;
 
 import org.simbrain.workspace.Consumer;
@@ -27,7 +32,7 @@ public final class OscWorldComponent
     private final OSCPortOut oscPortOut;
 
     /** List of OSC consumers. */
-    private final List<OscMessageConsumer> consumers;
+    private final EventList<OscMessageConsumer> consumers;
 
     /** Default OSC receiver host. */
     //private static final InetAddress DEFAULT_RECEIVER_HOST = InetAddress.getLocalHost();
@@ -52,15 +57,14 @@ public final class OscWorldComponent
         catch (SocketException e) {
             throw new RuntimeException("could not create OSC port out", e);
         }
-        consumers = new ArrayList<OscMessageConsumer>();
-        // TODO: just as an example for now...
-        addMessage("/test");
+        consumers = GlazedLists.eventList(new ArrayList<OscMessageConsumer>());
     }
 
 
     /** {@inheritDoc} */
     public void close() {
         oscPortOut.close();
+        // TODO:  remove consumer list event listeners
     }
 
     /** {@inheritDoc} */
@@ -88,6 +92,29 @@ public final class OscWorldComponent
     }
 
     /**
+     * Add the specified OSC message consumer list event listener.
+     *
+     * @param listener OSC message consumer list event listener to add
+     */
+    void addConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
+        consumers.addListEventListener(listener);
+    }
+
+    /**
+     * Remove the specified OSC message consumer list event listener.
+     *
+     * @param listener OSC message consumer list event listener to remove
+     */
+    void removeConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
+        consumers.removeListEventListener(listener);
+    }
+
+    // TODO:  remove from API
+    EventList<OscMessageConsumer> getConsumersEventList() {
+        return consumers;
+    }
+
+    /**
      * Add a new OSC message with the specified address.
      *
      * @param address OSC message address, must not be null and must start with <code>'/'</code> character
@@ -95,6 +122,5 @@ public final class OscWorldComponent
     void addMessage(final String address) {
         OscMessageConsumer consumer = new OscMessageConsumer(address, this);
         consumers.add(consumer);
-        // fire event?
     }
 }

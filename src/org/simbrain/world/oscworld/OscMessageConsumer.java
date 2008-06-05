@@ -101,6 +101,11 @@ final class OscMessageConsumer
         throw new UnsupportedOperationException("default attribute is not modifiable");
     }
 
+    /** {@inheritDoc} */
+    public String toString() {
+        return address + ", f";
+    }
+
     /**
      * Double attribute.
      */

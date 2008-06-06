@@ -78,6 +78,7 @@ public final class MutableVisionWorldModel
 
     PixelMatrix.Listener listener = new PixelMatrix.Listener() {
         public void imageChanged() {
+//            System.out.println("image changed: " + System.currentTimeMillis());
             firePixelMatrixChanged(pixelMatrix, pixelMatrix);
         }
     };

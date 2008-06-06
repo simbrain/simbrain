@@ -18,6 +18,8 @@
  */
 package org.simbrain.workspace;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.SwingUtilities;
 
 /**
@@ -67,16 +69,23 @@ public class WorkspaceThread extends Thread {
     public void run() {
         try {
             while (isRunning) {
-                workspace.setUpdateCompleted(false);
+//                workspace.setUpdateCompleted(false);
 
+//                System.out.println("run");
                 // SwingUtilities.invokeLater(updateGraphics);
-                SwingUtilities.invokeLater(updateNetwork);
-
-                while (!workspace.isUpdateCompleted()) {
-                    sleep(SLEEP_INTERVAL);
-                }
+//                updateNetwork.run();
+//                System.out.println("before update");
+                SwingUtilities.invokeAndWait(updateNetwork);
+                updateNetwork.run();
+//                System.out.println("after update");
+                Thread.sleep(200);
+//                while (!workspace.isUpdateCompleted()) {
+//                    sleep(SLEEP_INTERVAL);
+//                }
             }
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         } finally {
             SwingUtilities.invokeLater(stopNetwork);

@@ -105,10 +105,22 @@ public class Sight {
         return attributes;
     }
     
+    volatile Runnable next;
+    
     public void update() {
 //        image = new BufferedImagePixelMatrix(agent.getSnapshot());
+//        System.out.println("update");
         
-        image.setImage(agent.getSnapshot());
+        if (next == null) {
+            next = new Runnable() {
+                public void run() {
+                    image.setImage(agent.getSnapshot());
+                    next = null;
+                }
+            };
+            
+            new Thread(next).start();
+        }
     }
     
     class SightSensor implements Sensor {

@@ -47,7 +47,7 @@ public class AgentBindings extends Bindings {
 
         this.agent = agent;
         
-        System.out.println(agent);
+//        System.out.println(agent);
 //        sight = new Sight(agent);
         
         setInputs();
@@ -127,6 +127,9 @@ public class AgentBindings extends Bindings {
 
     protected void update() {
         super.update();
+    }
+    
+    protected void updateExternal() {
         sight.update();
     }
     

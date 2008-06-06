@@ -78,6 +78,11 @@ public abstract class Bindings implements Consumer, Producer {
         this.bind = isOn();
     }
     
+    // TODO find a better name
+    protected void updateExternal() {
+        
+    }
+    
     /**
      * Returns whether bindings are being executed.
      * 

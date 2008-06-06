@@ -179,6 +179,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
     protected void update() {
         for (Bindings bind : model.bindings) {
             bind.setOn(true);
+            bind.updateExternal();
         }
     }
     

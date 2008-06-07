@@ -6,15 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -55,7 +51,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
     private JPanel agents;
     
     /** Timer that fires the update operation. */
-    private Timer timer = new Timer();
+    private final Timer timer;
     
     /**
      * Creates a new main console.
@@ -65,6 +61,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
     public MainConsole(final ThreeDeeComponent component) {
         super(component);
         this.component = component;
+        this.timer = component.getTimer();
     }
 
     /**
@@ -115,41 +112,13 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         JPanel panel = new JPanel();
         
         panel.add(new JButton(new CreateAgentViewAction(agent)));
-        panel.add(new JButton(new AbstractAction("snap") {
-            public void actionPerformed(ActionEvent e)
-            {
-//                Callable<?> exe = new Callable() {
-//                    public Object call() {
-//                        try {
-//                            BufferedImage image = agent.getSnapshot();
-//                            
-//                            File file = new File("snap.jpg");
-//                            try {
-//                                ImageIO.write(image, "jpg", file);
-//                            } catch (IOException e1) {
-//                                // TODO Auto-generated catch block
-//                                e1.printStackTrace();
-//                            }
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                        return null;
-//                    }
-//                };
-//                GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe);
-                
-                new Thread(new Runnable() {
-                    public void run()
-                    {
-                        BufferedImage image = agent.getSnapshot();
-                        
-                        File file = new File("snap.jpg");
-                        try {
-                            ImageIO.write(image, "jpg", file);
-                        } catch (IOException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        }
+        panel.add(new JButton(new AbstractAction("Vision") {
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent e) {
+                new Thread(new Runnable(){
+                    public void run() {
+                        agent.getBindings().createSight();
                     }
                 }).start();
             }
@@ -251,12 +220,6 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         innerFrame.setSize(WIDTH, HEIGHT);
         innerFrame.setResizable(false);
         innerFrame.setVisible(true);
-        
-        new Thread(new Runnable(){
-            public void run() {
-                agent.getBindings().createSight();
-            }
-        }).start();
     }
     
     /**

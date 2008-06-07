@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
 
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
@@ -27,6 +28,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentListener> {
     private final ThreeDeeModel model;
+    private final Timer timer;
     
     /**
      * Creates a new ThreeDeeComponent with the given name.
@@ -35,12 +37,16 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public ThreeDeeComponent(final String name) {
         super(name);
+        this.timer = new Timer();
         this.model = new ThreeDeeModel();
+        this.model.environment.setTimer(timer);
     }
     
     private ThreeDeeComponent(final String name, final ThreeDeeModel model) {
         super(name);
+        this.timer = new Timer();
         this.model = model;
+        this.model.environment.setTimer(timer);
     }
     
     /**
@@ -83,6 +89,10 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
         return component;
     }
 
+    public Timer getTimer() {
+        return timer;
+    }
+    
     /**
      * {@inheritDoc}
      */

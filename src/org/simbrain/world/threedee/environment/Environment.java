@@ -38,6 +38,8 @@ public class Environment {
     /** Timer that fires the update operation. */
     private Timer timer;
 
+    private TimerTask task;
+    
     /** The elements in this environment. */
     private Map<Renderer, Node> parents = new HashMap<Renderer, Node>();
     
@@ -72,6 +74,10 @@ public class Environment {
         }
     }
 
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+    
     private Object readResolve() {
         random = new Random();
         parents = new HashMap<Renderer, Node>();
@@ -179,14 +185,15 @@ public class Environment {
         parent.setModelBound(new BoundingBox());
         parent.updateModelBound();
 
-        if (timer == null) {
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
+        if (task == null) {
+            task = new TimerTask() {
                 @Override
                 public void run() {
                     update();
                 }
-            }, REFRESH_WAIT, REFRESH_WAIT);
+            };
+            
+            timer.schedule(task, REFRESH_WAIT, REFRESH_WAIT);
         }
     }
     
@@ -195,8 +202,8 @@ public class Environment {
     }
     
     public void killTimer() {
-        timer.cancel();
-        timer = null;
+        task.cancel();
+//        timer = null;
     }
     
     /**

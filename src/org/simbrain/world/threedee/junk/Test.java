@@ -15,7 +15,6 @@ import javax.swing.UIManager;
 
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
-import org.simbrain.world.threedee.Entity;
 import org.simbrain.world.threedee.Moveable;
 import org.simbrain.world.threedee.environment.Environment;
 import org.simbrain.world.threedee.gui.FreeBirdView;

@@ -43,8 +43,12 @@ public abstract class Moveable implements Viewable {
     private final float movementSpeed = .1f;
 
     /** Current angle in the y/x plane. */
+    private float upDownChange = 0;
+    /** Current angle in the y/x plane. */
     private float upDownRot = 0;
 
+    /** Current angle in the y/x plane. */
+    private float leftRightChange = 0;
     /** Current angle in the x/z plane. */
     private float leftRightRot = 0;
 
@@ -115,6 +119,10 @@ public abstract class Moveable implements Viewable {
         upSpeed = 0f;
 
         synchronized (inputs) {
+            long now = System.currentTimeMillis();
+            fraction = last == 0 ? FULL : ((float) (now - last)) / FULL;
+            last = now;
+            
             /* input is synchronized but we need to lock over the iterator */
             for (final Collection<? extends Action> input : inputs.values()) {
                 
@@ -142,14 +150,26 @@ public abstract class Moveable implements Viewable {
         }
     }
 
+    private long last = 0;
+    private static final long FULL = 15;
+    private float fraction;
+    
     /**
      * Does the necessary processing for any changes to the view.
      */
     protected void doUpdates() {
+        float speed = this.speed * fraction;
+        float upSpeed = this.upSpeed * fraction;
+        leftRightRot += (leftRightChange * fraction);
+        upDownRot += (upDownChange * fraction);
+        
+        leftRightChange = 0;
+        upDownChange = 0;
+        
         /* these are for doing proper rotations */
         final Quaternion leftRightQuat = new Quaternion();
         final Quaternion upDownQuat = new Quaternion();
-
+        
         /*
          * normalize the left/right angle and then use it to set the left/right
          * quaternion
@@ -244,7 +264,8 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("left: " + super.value);
-                leftRightRot += getValue() * rotationSpeed;
+//                leftRightRot += getValue() * rotationSpeed;
+                leftRightChange = getValue() * rotationSpeed;
             }
         };
     }
@@ -259,7 +280,8 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("right: " + super.value);
-                leftRightRot -= getValue() * rotationSpeed;
+//                leftRightRot -= getValue() * rotationSpeed;
+                leftRightChange = -getValue() * rotationSpeed;
             }
         };
     }
@@ -334,7 +356,8 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("down: " + super.value);
-                upDownRot += getValue() * rotationSpeed;
+//                upDownRot += getValue() * rotationSpeed;
+                upDownChange = getValue() * rotationSpeed;
             }
         };
     }
@@ -349,7 +372,8 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("up: " + super.value);
-                upDownRot -= getValue() * rotationSpeed;
+//                upDownRot -= getValue() * rotationSpeed;
+                upDownChange = -getValue() * rotationSpeed;
             }
         };
     }

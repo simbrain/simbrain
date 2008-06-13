@@ -191,6 +191,7 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
         Set<Sensor> oldSelection = new HashSet<Sensor>(selection);
         selection.clear();
+        
         boolean rv = selection.addAll(sensors);
         if (rv || sensors.isEmpty()) {
             fireSelectionChanged(oldSelection, selection);

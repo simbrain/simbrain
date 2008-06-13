@@ -126,9 +126,11 @@ public final class VisionWorld
                 /** {@inheritDoc} */
                 public void pixelMatrixChanged(final VisionWorldModelEvent event) {
                     getLayer().removeChild(pixelMatrixNode);
+                    getLayer().removeChild(sensorMatrixNode);
                     pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
                     selectionModel.clear();
                     getLayer().addChild(pixelMatrixNode);
+                    getLayer().addChild(sensorMatrixNode);
                     centerCamera();
                 }
 
@@ -160,6 +162,9 @@ public final class VisionWorld
         selectionEventHandlerInstalled = true;
         addInputEventListener(selectionEventHandler);
 
+        /* initialize sensor nodes */
+        updateSensorNodes();
+        
 //        editSensorsAction = new EditSensorsAction(this);
     }
 
@@ -188,6 +193,10 @@ public final class VisionWorld
         for (Sensor sensor : difference) {
             sensorNodes.get(sensor).setSelected(false);
         }
+        
+//        System.out.println("sensors: " + selection);
+//        System.out.println("sensorNodes: " + sensorNodes);
+        
         for (Sensor sensor : selection) {
             sensorNodes.get(sensor).setSelected(true);
         }
@@ -197,6 +206,8 @@ public final class VisionWorld
      * Update the map of sensor to sensor nodes.
      */
     private void updateSensorNodes() {
+//        System.out.println("update sensor nodes");
+        
         sensorNodes.clear();
         Collection<?> allNodes = getLayer().getAllNodes();
         for (Iterator<?> i = allNodes.iterator(); i.hasNext(); ) {

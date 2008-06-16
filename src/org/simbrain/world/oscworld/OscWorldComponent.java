@@ -16,6 +16,7 @@ import ca.odell.glazedlists.GlazedLists;
 
 import ca.odell.glazedlists.event.ListEventListener;
 
+import com.illposed.osc.OSCPortIn;
 import com.illposed.osc.OSCPortOut;
 
 import org.simbrain.workspace.Consumer;
@@ -28,17 +29,34 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 public final class OscWorldComponent
     extends WorkspaceComponent<WorkspaceComponentListener> {
 
+    /** OSC port in. */
+    private final OSCPortIn oscPortIn;
+
     /** OSC port out. */
     private final OSCPortOut oscPortOut;
 
     /** List of OSC consumers. */
     private final EventList<OscMessageConsumer> consumers;
 
-    /** Default OSC receiver host. */
-    //private static final InetAddress DEFAULT_RECEIVER_HOST = InetAddress.getLocalHost();
+    /** Default OSC out host. */
+    private static final InetAddress DEFAULT_OSC_OUT_HOST;
 
-    /** Default OSC receiver port. */
-    private static final int DEFAULT_RECEIVER_PORT = 9999;
+    /** Default OSC in port. */
+    private static final int DEFAULT_OSC_IN_PORT = 9998;
+
+    /** Default OSC out port. */
+    private static final int DEFAULT_OSC_OUT_PORT = 9999;
+
+    static
+    {
+        try
+        {
+            DEFAULT_OSC_OUT_HOST = InetAddress.getLocalHost();
+        }
+        catch (UnknownHostException e) {
+            throw new RuntimeException("could not create default OSC out host", e);
+        }
+    }
 
 
     /**
@@ -49,10 +67,13 @@ public final class OscWorldComponent
     public OscWorldComponent(final String name) {
         super(name);
         try {
-            oscPortOut = new OSCPortOut(InetAddress.getLocalHost(), DEFAULT_RECEIVER_PORT);
+            oscPortIn = new OSCPortIn(DEFAULT_OSC_IN_PORT);
         }
-        catch (UnknownHostException e) {
-            throw new RuntimeException("could not create OSC port out", e);
+        catch (SocketException e) {
+            throw new RuntimeException("could not create OSC port in", e);
+        }
+        try {
+            oscPortOut = new OSCPortOut(DEFAULT_OSC_OUT_HOST, DEFAULT_OSC_OUT_PORT);
         }
         catch (SocketException e) {
             throw new RuntimeException("could not create OSC port out", e);
@@ -63,6 +84,7 @@ public final class OscWorldComponent
 
     /** {@inheritDoc} */
     public void close() {
+        oscPortIn.close();
         oscPortOut.close();
         // TODO:  remove consumer list event listeners
     }
@@ -80,6 +102,32 @@ public final class OscWorldComponent
     /** {@inheritDoc} */
     public Collection<? extends Consumer> getConsumers() {
         return Collections.unmodifiableList(consumers);
+    }
+
+    // TODO:  make these bound properties
+    String getOscInHost() {
+        return DEFAULT_OSC_OUT_HOST.toString();
+    }
+
+    String getOscOutHost() {
+        return DEFAULT_OSC_OUT_HOST.toString();
+    }
+
+    int getOscInPort() {
+        return DEFAULT_OSC_IN_PORT;
+    }
+
+    int getOscOutPort() {
+        return DEFAULT_OSC_OUT_PORT;
+    }
+
+    /**
+     * Return the OSC port in for this OSC world component.
+     *
+     * @return the OSC port in for this OSC world component
+     */
+    OSCPortOut getOscPortIn() {
+        return oscPortOut;
     }
 
     /**

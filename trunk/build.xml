@@ -35,13 +35,22 @@
       </checkstyle>
     </target>
 
-    <target name="console">
- 	<java classname="bsh.Console" fork="yes">
+    <target name="console" depends="compile">
+ 	<java classname="org.simbrain.console.SimbrainConsole" fork="yes">
          <classpath>
         	<fileset dir="${lib}" includes="**/*.jar"/>
 		<pathelement location="${bin}"/>
          </classpath>
 	</java>
+   </target>
+
+    <target name="commandline" depends="compile">
+        <java classname="org.simbrain.console.SimbrainInterpreter" fork="yes">
+         <classpath>
+                <fileset dir="${lib}" includes="**/*.jar"/>
+                <pathelement location="${bin}"/>
+         </classpath>
+        </java>
    </target>
 
     <target name="javadocs" description="Create API documentation">

@@ -1,13 +1,18 @@
 help_simbrain() {
    print("");
    print("Currently there is one system variable: workspace\n");
-   print("You can create networks, etc. and run them.  All classes in org.simnet are available.");
    print("");
 	
-  print("---- SOME COMMANDS ----");
+  print("---- SOME SAMPLE COMMANDS ----");
+  print("print(workspace);");
+  print("Neuron neuron = new Neuron();");
   print("workspace.globalUpdate();");
   print("workspace.globalRun();");
   print("workspace.globalStop();");
   print("getNetwork(NAME).randomizeNeurons()");
+  print("addNetwork(\"Network 1\");");
+  print("LinearNeuron neuron = new LinearNeuron();");
+  print("getNetwork(\"Network 1\").addNeuron(neuron);");
+  print("print(getNetwork(\"Network 1\"));");
 
 }

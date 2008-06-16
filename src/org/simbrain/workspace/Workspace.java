@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
 
 /**
  * <b>Workspace</b> is the container for all Simbrain windows--network, world, and gauge.
@@ -402,4 +405,18 @@ public class Workspace {
     public CouplingManager getManager() {
         return manager;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        String ret = new String();
+        ret = "Number of components: " + componentList.size() + "\n";
+        int i = 0;
+        for (WorkspaceComponent component : componentList) {
+            ret += "Component " + ((i++)+1) + ":" + component.getName() + "\n";     
+        }
+        return ret;
+    }
+    
 }

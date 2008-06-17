@@ -35,6 +35,9 @@ final class MidiProgramChangeConsumer
 
     /** {@inheritDoc} */
     public String getDescription() {
-        return "MIDI Program Change";
+        StringBuffer sb = new StringBuffer();
+        sb.append("MIDI Program Change, number=");
+        sb.append(programChange.getNumber());
+        return sb.toString();
     }
 }

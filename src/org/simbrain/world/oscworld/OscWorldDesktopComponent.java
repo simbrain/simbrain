@@ -191,7 +191,7 @@ public final class OscWorldDesktopComponent
                     /** {@inheritDoc} */
                     public void run() {
                         String address = JOptionPane.showInputDialog(null, "Create a new OSC out message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC out message address:", "Create a new OSC out message", JOptionPane.QUESTION_MESSAGE);
-                        getWorkspaceComponent().addMessage(address);
+                        getWorkspaceComponent().addOutMessage(address);
                     }
                 });
         }

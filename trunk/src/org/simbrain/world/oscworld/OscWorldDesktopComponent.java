@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.Collections;
 
@@ -14,9 +16,11 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 
 import javax.swing.border.EmptyBorder;
@@ -60,6 +64,46 @@ public final class OscWorldDesktopComponent
         createOscOutMessageAction = new CreateOscOutMessageAction();
         consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
         producers = new JList(new EventListModel(GlazedLists.eventList(Collections.emptyList())));
+
+        consumers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        consumers.addMouseListener(new MouseAdapter()
+            {
+                /** {@inheritDoc} */
+                public void mousePressed(final MouseEvent event)
+                {
+                    if (event.isPopupTrigger())
+                    {
+                        showContextMenu(event);
+                    }
+                }
+
+                /** {@inheritDoc} */
+                public void mouseClicked(final MouseEvent event)
+                {
+                    if (event.isPopupTrigger())
+                    {
+                        showContextMenu(event);
+                    }
+                }
+
+                /**
+                 * Show the consumer context menu if a consumer is selected.
+                 *
+                 * @param event mouse event
+                 */
+                private void showContextMenu(final MouseEvent event)
+                {
+                    if (consumers.getSelectedIndex() > -1)
+                    {
+                        JPopupMenu contextMenu = new JPopupMenu();
+                        OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
+                        JMenu producerMenu = getDesktop().getProducerMenu(consumer.getDefaultConsumingAttribute());
+                        producerMenu.setText("Set input source");
+                        contextMenu.add(producerMenu);
+                        contextMenu.show(consumers, event.getX(), event.getY());
+                    }
+                }
+            });
 
         JMenuBar menuBar = new JMenuBar();
         JToolBar toolBar = new JToolBar();

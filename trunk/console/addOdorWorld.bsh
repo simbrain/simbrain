@@ -1,0 +1,7 @@
+import org.simbrain.world.odorworld.*;
+
+addOdorWorld(String name) {
+
+	workspace.addWorkspaceComponent(new OdorWorldComponent(name));
+}
+

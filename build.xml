@@ -45,7 +45,7 @@
    </target>
 
     <target name="commandline" depends="compile">
-        <java classname="org.simbrain.console.SimbrainInterpreter" fork="yes">
+        <java classname="org.simbrain.console.SimbrainInterpreter">
          <classpath>
                 <fileset dir="${lib}" includes="**/*.jar"/>
                 <pathelement location="${bin}"/>

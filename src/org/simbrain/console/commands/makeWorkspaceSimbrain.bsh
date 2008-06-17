@@ -1,5 +1,6 @@
 /**
- * Creates a JConsole in a JInternalFrame and adds it to the desktop 
+ * Creates a JConsole in a JInternalFrame and adds it to the desktop.  
+ * (Modified for Simbrain.)
  *
  * @return this (the workspace scripted object for allowing access to the 
  *          frame, interpreter, etc.)

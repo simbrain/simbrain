@@ -34,6 +34,13 @@ final class MidiNoteConsumer
 
     /** {@inheritDoc} */
     public String getDescription() {
-        return "MIDI Note";
+        StringBuffer sb = new StringBuffer();
+        sb.append("MIDI Note, pitch=");
+        sb.append(note.getPitch());
+        sb.append(" velocity=");
+        sb.append(note.getVelocity());
+        sb.append(" length=");
+        sb.append(note.getNoteLength());
+        return sb.toString();
     }
 }

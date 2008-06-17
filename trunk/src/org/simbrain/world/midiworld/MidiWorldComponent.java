@@ -11,8 +11,11 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
+import promidi.Controller;
 import promidi.MidiIO;
 import promidi.MidiOut;
+import promidi.Note;
+import promidi.ProgramChange;
 
 /**
  * MIDI world component.
@@ -23,8 +26,8 @@ public final class MidiWorldComponent
     /** MIDI out. */
     private final MidiOut midiOut;
 
-    /** List of MIDI note consumers. */
-    private final List<MidiNoteConsumer> consumers;
+    /** List of MIDI consumers. */
+    private final List<AbstractMidiConsumer> consumers;
 
 
     /**
@@ -35,9 +38,10 @@ public final class MidiWorldComponent
     public MidiWorldComponent(final String name) {
         super(name);
         midiOut = MidiIO.getInstance().getMidiOut(0, 0);
-        consumers = new ArrayList<MidiNoteConsumer>();
-        // TODO: just as an example for now...
-        consumers.add(new MidiNoteConsumer(new promidi.Note(40, 80, 600), this));
+        consumers = new ArrayList<AbstractMidiConsumer>();
+
+        // TODO:  just for now...
+        addNote(40, 80, 600);
     }
 
 
@@ -62,11 +66,53 @@ public final class MidiWorldComponent
     }
 
     /**
-     * Return the MIDI out  for this MIDI world component.
+     * Return the MIDI out for this MIDI world component.
      *
      * @return the MIDI out for this MIDI world component
      */
     MidiOut getMidiOut() {
         return midiOut;
+    }
+
+    /**
+     * Add a MIDI controller with the specified number and value.  The controller
+     * can be triggered via a coupling to this MIDI world component.
+     *
+     * @param number MIDI controller number
+     * @param value MIDI controller value
+     */
+    void addController(final int number, final int value) {
+        Controller controller = new Controller(number, value);
+        MidiControllerConsumer consumer = new MidiControllerConsumer(controller, this);
+        consumers.add(consumer);
+        // fire event?
+    }
+
+    /**
+     * Add a MIDI note with the specified pitch, velocity, and length.  The note
+     * can be triggered via a coupling to this MIDI world component.
+     *
+     * @param pitch MIDI note pitch
+     * @param velocity MIDI note velocity
+     * @param length MIDI note length in milliseconds
+     */
+    void addNote(final int pitch, final int velocity, final int length) {
+        Note note = new Note(pitch, velocity, length);
+        MidiNoteConsumer consumer = new MidiNoteConsumer(note, this);
+        consumers.add(consumer);
+        // fire event?
+    }
+
+    /**
+     * Add a MIDI program change with the specified number.  The program change
+     * can be triggered via a coupling to this MIDI world component.
+     *
+     * @param number MIDI program change number
+     */
+    void addProgramChange(final int number) {
+        ProgramChange programChange = new ProgramChange(number);
+        MidiProgramChangeConsumer consumer = new MidiProgramChangeConsumer(programChange, this);
+        consumers.add(consumer);
+        // fire event?
     }
 }

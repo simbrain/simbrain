@@ -34,6 +34,11 @@ final class MidiControllerConsumer
 
     /** {@inheritDoc} */
     public String getDescription() {
-        return "MIDI Controller";
+        StringBuffer sb = new StringBuffer();
+        sb.append("MIDI Controller, number=");
+        sb.append(controller.getNumber());
+        sb.append(" value=");
+        sb.append(controller.getValue());
+        return sb.toString();
     }
 }

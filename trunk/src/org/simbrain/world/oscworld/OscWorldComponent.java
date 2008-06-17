@@ -20,6 +20,7 @@ import com.illposed.osc.OSCPortIn;
 import com.illposed.osc.OSCPortOut;
 
 import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -37,6 +38,9 @@ public final class OscWorldComponent
 
     /** List of OSC consumers. */
     private final EventList<OscMessageConsumer> consumers;
+
+    /** List of OSC producers. */
+    private final EventList<OscMessageProducer> producers;
 
     /** Default OSC out host. */
     private static final InetAddress DEFAULT_OSC_OUT_HOST;
@@ -79,6 +83,7 @@ public final class OscWorldComponent
             throw new RuntimeException("could not create OSC port out", e);
         }
         consumers = GlazedLists.eventList(new ArrayList<OscMessageConsumer>());
+        producers = GlazedLists.eventList(new ArrayList<OscMessageProducer>());
     }
 
 
@@ -102,6 +107,11 @@ public final class OscWorldComponent
     /** {@inheritDoc} */
     public Collection<? extends Consumer> getConsumers() {
         return Collections.unmodifiableList(consumers);
+    }
+
+    /** {@inheritDoc} */
+    public Collection<? extends Producer> getProducers() {
+        return Collections.unmodifiableList(producers);
     }
 
     // TODO:  make these bound properties
@@ -163,11 +173,44 @@ public final class OscWorldComponent
     }
 
     /**
-     * Add a new OSC message with the specified address.
+     * Add the specified OSC message producer list event listener.
      *
-     * @param address OSC message address, must not be null and must start with <code>'/'</code> character
+     * @param listener OSC message producer list event listener to add
      */
-    void addMessage(final String address) {
+    void addProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
+        producers.addListEventListener(listener);
+    }
+
+    /**
+     * Remove the specified OSC message producer list event listener.
+     *
+     * @param listener OSC message producer list event listener to remove
+     */
+    void removeProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
+        producers.removeListEventListener(listener);
+    }
+
+    // TODO:  remove from API
+    EventList<OscMessageProducer> getProducersEventList() {
+        return producers;
+    }
+
+    /**
+     * Add a new OSC in message with the specified address.
+     *
+     * @param address OSC in message address, must not be null and must start with <code>'/'</code> character
+     */
+    void addInMessage(final String address) {
+        OscMessageProducer producer = new OscMessageProducer(address, this);
+        producers.add(producer);
+    }
+
+    /**
+     * Add a new OSC out message with the specified address.
+     *
+     * @param address OSC out message address, must not be null and must start with <code>'/'</code> character
+     */
+    void addOutMessage(final String address) {
         OscMessageConsumer consumer = new OscMessageConsumer(address, this);
         consumers.add(consumer);
     }

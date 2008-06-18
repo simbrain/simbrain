@@ -14,7 +14,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -82,7 +82,7 @@ public class WorkspaceSerializer {
             zipStream.putNextEntry(entry);
             serializer.serializeComponent(component);
             
-            DesktopComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace)
+            GuiComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace)
                 .getDesktopComponent(component);
             
             /*
@@ -166,7 +166,7 @@ public class WorkspaceSerializer {
                 workspace.addWorkspaceComponent(wc);
                 
                 if (component.desktopComponent != null) {
-                    DesktopComponent dc = componentDeserializer.deserializeDesktopComponent(
+                    GuiComponent dc = componentDeserializer.deserializeDesktopComponent(
                         component.desktopComponent.className, wc, new ByteArrayInputStream(
                         entries.get(component.desktopComponent.uri)), component.name);
                     

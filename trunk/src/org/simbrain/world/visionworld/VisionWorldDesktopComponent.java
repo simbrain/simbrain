@@ -32,12 +32,13 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
 /**
  * Vision world frame.
  */
-public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWorldComponent> {
+public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldComponent> {
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -49,8 +50,8 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
      *
      * @param component component, must not be null
      */
-    public VisionWorldDesktopComponent(final VisionWorldComponent component) {
-        super(component);
+    public VisionWorldDesktopComponent(GenericFrame frame, final VisionWorldComponent component) {
+        super(frame, component);
         component.addListener(new BasicComponentListener());
         this.setPreferredSize(new Dimension(400,400));
 
@@ -83,12 +84,11 @@ public final class VisionWorldDesktopComponent extends DesktopComponent<VisionWo
         menuBar.add(file);
         menuBar.add(edit);
         menuBar.add(view);
-        setJMenuBar(menuBar);
+        getParentFrame().setJMenuBar(menuBar);
 
-        JPanel contentPane = (JPanel) getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add("North", toolBar);
-        contentPane.add("Center", component.getVisionWorld());
+        setLayout(new BorderLayout());
+        add("North", toolBar);
+        add("Center", component.getVisionWorld());
     }
 
     public void postAddInit() { 

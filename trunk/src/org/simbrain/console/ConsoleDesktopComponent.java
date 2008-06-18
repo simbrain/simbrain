@@ -34,7 +34,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
 import bsh.Interpreter;
 import bsh.util.JConsole;
@@ -42,18 +43,19 @@ import bsh.util.JConsole;
 /**
  * Component corresponding to a beanshell window.
  */
-public class ConsoleDesktopComponent extends  DesktopComponent<ConsoleComponent> {
+public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
     private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
      */
-    public ConsoleDesktopComponent(ConsoleComponent component) {
-        super(component);
+    public ConsoleDesktopComponent(GenericFrame frame, ConsoleComponent component) {
+        super(frame, component);
+        setPreferredSize(new Dimension(500, 400));
     }
     
     public void postAddInit() {
-        getContentPane().setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
         JConsole console = new JConsole();
         Interpreter interpreter = new Interpreter(console);
         interpreter.getNameSpace().importPackage("org.simnet.neurons");
@@ -74,8 +76,7 @@ public class ConsoleDesktopComponent extends  DesktopComponent<ConsoleComponent>
         } catch (Exception e) {
             e.printStackTrace();
         }
-        getContentPane().add("Center", console);
-        this.setSize(500, 400);
+        add("Center", console);
         new Thread(interpreter).start();
     }
 

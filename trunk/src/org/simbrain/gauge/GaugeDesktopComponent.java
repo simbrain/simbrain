@@ -30,8 +30,7 @@ import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.*;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -41,7 +40,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * 
  * @author Matt Watson
  */
-public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
+public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
 
     /** The default static version Id for this class. */
     private static final long serialVersionUID = 1L;
@@ -140,21 +139,18 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      * 
      * @param component The component this object will wrap.
      */
-    public GaugeDesktopComponent(final GaugeComponent component) {
-        super(component);
+    public GaugeDesktopComponent(GenericFrame frame, final GaugeComponent component) {
+        super(frame, component);
         this.component = component;
         component.addListener(listener);
         component.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
-        this.setPreferredSize(new Dimension(INITIAL_HEIGHT, INITIAL_WIDTH));
         gauge = component.getGauge();
-        gaugePanel = new GaugePanel(gauge);
-
-        JPanel buffer = new JPanel();
-        buffer.setLayout(new BorderLayout());
-        buffer.add("North", gaugePanel.getTheToolBar());
-        buffer.add(gaugePanel);
-        buffer.add("South", gaugePanel.getBottomPanel());
-        setContentPane(buffer);
+        gaugePanel = new GaugePanel(gauge); //TODO: Shouldn't this be the "Gaugepanel?"
+        gaugePanel.setPreferredSize(new Dimension(INITIAL_HEIGHT, INITIAL_WIDTH));
+        setLayout(new BorderLayout());
+        add("North", gaugePanel.getTheToolBar());
+        add(gaugePanel);
+        add("South", gaugePanel.getBottomPanel());
     }
 
     /**
@@ -163,7 +159,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
     @Override
     public void postAddInit() {
         setUpMenus();
-        gauge.getCurrentProjector().postOpenInit();
+        gauge.getCurrentProjector().postOpenInit(); // Ugh...
         gauge.setCurrentProjector(gauge.getCurrentProjector());
         gaugePanel.updateGraphics();
         component.resetCouplings(gauge.getCurrentProjector().getUpstairs().getDimensions());
@@ -174,7 +170,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      * Sets up gauge frame menus.
      */
     private void setUpMenus() {
-        setJMenuBar(mb);
+        getParentFrame().setJMenuBar(mb);
 
         mb.add(fileMenu);
         mb.add(prefsMenu);
@@ -225,7 +221,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
      */
     private void setCouplingMenu() {
         prefsMenu.removeAll();
-        producerListItem = getDesktop().getProducerListMenu(couplingMenuItemListener);
+        producerListItem = CouplingMenus.getProducerListMenu(this.getWorkspaceComponent().getWorkspace(), couplingMenuItemListener);
         prefsMenu.add(producerListItem);
         prefsMenu.addSeparator();
         prefsMenu.add(projectionPrefs);
@@ -265,7 +261,7 @@ public class GaugeDesktopComponent extends DesktopComponent<GaugeComponent> {
                 gaugePanel.setAutoZoom(setAutozoom.isSelected());
                 gaugePanel.repaint();
             } else if (jmi == close) {
-                GaugeDesktopComponent.this.dispose();
+                getParentFrame().dispose();
             } else if (jmi == helpItem) {
                 Utils.showQuickRef("Gauge.html");
             }

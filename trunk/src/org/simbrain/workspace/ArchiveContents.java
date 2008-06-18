@@ -141,7 +141,7 @@ class ArchiveContents {
          * @return The entry for the desktop component.
          */
         DesktopComponent addDesktopComponent(
-                final org.simbrain.workspace.gui.DesktopComponent<?> dc) {
+                final org.simbrain.workspace.gui.GuiComponent<?> dc) {
             return desktopComponent = new DesktopComponent(this, dc);
         }
         
@@ -165,7 +165,7 @@ class ArchiveContents {
              * @param dc The desktop component this instance represents.
              */
             private DesktopComponent(final Component parent,
-                    final org.simbrain.workspace.gui.DesktopComponent<?> dc) {
+                    final org.simbrain.workspace.gui.GuiComponent<?> dc) {
                 this.className = dc.getClass().getCanonicalName();
                 this.format = dc.getWorkspaceComponent().getFileExtension();
                 this.uri = "guis/" + parent.id + '_' + parent.name.replaceAll("\\s", "_")

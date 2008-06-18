@@ -30,13 +30,14 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
 /**
  * <b>TextWorldComponent</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link TextWorld}.
  */
-public class TextWorldDesktopComponent extends DesktopComponent<TextWorldComponent> implements ActionListener {
+public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -83,8 +84,8 @@ public class TextWorldDesktopComponent extends DesktopComponent<TextWorldCompone
      * Creates a new frame of type TextWorld.
      * @param ws Workspace to add frame to
      */
-    public TextWorldDesktopComponent(TextWorldComponent component) {
-        super(component);
+    public TextWorldDesktopComponent(GenericFrame frame, TextWorldComponent component) {
+        super(frame, component);
         this.setPreferredSize(new Dimension(450,400));
         theDictionary = new Dictionary(this);
         init();
@@ -96,8 +97,8 @@ public class TextWorldDesktopComponent extends DesktopComponent<TextWorldCompone
     private void init() {
         world = new TextWorld(this);
         addMenuBar();
-        getContentPane().add(world);
-        pack();
+        add(world);
+        getParentFrame().pack();
     }
 
     /**
@@ -139,7 +140,7 @@ public class TextWorldDesktopComponent extends DesktopComponent<TextWorldCompone
 
         menuBar.add(help);
 
-        setJMenuBar(menuBar);
+        getParentFrame().setJMenuBar(menuBar);
     }
 
     /**

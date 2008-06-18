@@ -14,5 +14,5 @@ help_simbrain() {
   print("LinearNeuron neuron = new LinearNeuron();");
   print("getNetwork(\"Network 1\").addNeuron(neuron);");
   print("print(getNetwork(\"Network 1\"));");
-
+  print("showGUI(getComponent(\"Network 1\"));");
 }

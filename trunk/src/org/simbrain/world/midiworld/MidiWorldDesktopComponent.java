@@ -1,21 +1,25 @@
 package org.simbrain.world.midiworld;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import java.awt.Dimension;
+
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
 /**
  * MIDI world desktop component.
  */
 public final class MidiWorldDesktopComponent
-    extends DesktopComponent<MidiWorldComponent> {    
+    extends GuiComponent<MidiWorldComponent> {    
 
     /**
      * Create a new MIDI world desktop component with the specified MIDI world component.
      *
      * @param midiWorldComponent MIDI world component
      */
-    public MidiWorldDesktopComponent(final MidiWorldComponent midiWorldComponent) {
-        super(midiWorldComponent);
+    public MidiWorldDesktopComponent(GenericFrame frame, final MidiWorldComponent midiWorldComponent) {
+        super(frame, midiWorldComponent);
         add("Center", new MidiWorld());
+        this.setPreferredSize(new Dimension(100,100));
     }
 
 

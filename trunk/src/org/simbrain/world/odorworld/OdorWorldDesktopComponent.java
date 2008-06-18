@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import javax.swing.JScrollPane;
 
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -39,7 +40,7 @@ import com.thoughtworks.xstream.XStream;
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link OdorWorldPanel}.
  */
-public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldComponent> implements WorkspaceComponentListener {
+public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> implements WorkspaceComponentListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -61,8 +62,8 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
     /**
      * Default constructor.
      */
-    public OdorWorldDesktopComponent(OdorWorldComponent component) {
-        super(component);
+    public OdorWorldDesktopComponent(GenericFrame frame, OdorWorldComponent component) {
+        super(frame, component);
         component.addListener(this);
         init();
     }
@@ -71,10 +72,10 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
      * Initializes frame.
      */
     public void init() {
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add("Center", worldScroller);
+        setLayout(new BorderLayout());
+        add("Center", worldScroller);
         worldPanel = new OdorWorldPanel(this);
-        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(),worldPanel.getWorld().getWorldHeight()));
+        setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(),worldPanel.getWorld().getWorldHeight()));
         worldScroller.setViewportView(worldPanel);
         worldScroller.setEnabled(false);
         menu = new OdorWorldFrameMenu(this);

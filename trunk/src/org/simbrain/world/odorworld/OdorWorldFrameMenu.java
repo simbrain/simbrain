@@ -122,7 +122,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      * Sets up menus.
      */
     public void setUpMenus() {
-        parentFrame.setJMenuBar(this);
+        parentFrame.getParentFrame().setJMenuBar(this);
 
         setUpFileMenu();
 

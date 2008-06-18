@@ -43,6 +43,7 @@ import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingMenuItem;
+import org.simbrain.workspace.gui.CouplingMenus;
 
 /**
  * <b>DataWorld</b> is a jpanel which contains a table object and a that table's model object.
@@ -94,7 +95,7 @@ public class DataWorld extends JPanel {
     public DataWorld(final DataWorldDesktopComponent ws, DataModel<Double> model) {
         super(new BorderLayout());
         this.ws = ws;
-        setParentFrame(ws);
+        setParentComponent(ws);
 
         this.dataModel = model;
         tableModel = new DataTableModel(dataModel);
@@ -203,7 +204,7 @@ public class DataWorld extends JPanel {
 
         ret.addSeparator();
 
-        JMenu producerMenu = ws.getDesktop().getProducerListMenu(couplingMenuItemListener);
+        JMenu producerMenu = CouplingMenus.getProducerListMenu(this.getParentComponent().getWorkspaceComponent().getWorkspace(), couplingMenuItemListener);
 
         ret.add(producerMenu);
 
@@ -221,20 +222,20 @@ public class DataWorld extends JPanel {
      * @return Name of data world.
      */
     public String getName() {
-        return this.getParentFrame().getTitle();
+        return this.getParentComponent().getParentFrame().getTitle();
     }
 
     /**
      * @return Returns the parentFrame.
      */
-    public DataWorldDesktopComponent getParentFrame() {
+    public DataWorldDesktopComponent getParentComponent() {
         return parentFrame;
     }
 
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(final DataWorldDesktopComponent parentFrame) {
+    public void setParentComponent(final DataWorldDesktopComponent parentFrame) {
         this.parentFrame = parentFrame;
     }
 
@@ -249,7 +250,7 @@ public class DataWorld extends JPanel {
      * Displays the randomize dialog.
      */
     public void displayRandomizeDialog() {
-        StandardDialog rand = new StandardDialog(ws.getDesktop().getFrame(), "randomize Bounds");
+        StandardDialog rand = new StandardDialog();
         JPanel pane = new JPanel();
         JTextField lower = new JTextField();
         JTextField upper = new JTextField();
@@ -264,7 +265,7 @@ public class DataWorld extends JPanel {
 
         rand.setContentPane(pane);
         rand.pack();
-        rand.setLocationRelativeTo(getParentFrame());
+        rand.setLocationRelativeTo(getParentComponent());
         rand.setVisible(true);
         if (!rand.hasUserCancelled()) {
             dataModel.setLowerBound(Integer.parseInt(lower.getText()));
@@ -337,7 +338,7 @@ public class DataWorld extends JPanel {
          * @param arg0 Key event
          */
         public void keyTyped(final KeyEvent arg0) {
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+            getParentComponent().getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
 

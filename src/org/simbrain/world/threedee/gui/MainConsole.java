@@ -16,7 +16,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
 import org.simbrain.world.threedee.ThreeDeeComponent;
@@ -26,7 +27,7 @@ import org.simbrain.world.threedee.ThreeDeeComponent;
  * 
  * @author Matt Watson
  */
-public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
+public class MainConsole extends GuiComponent<ThreeDeeComponent> {
     /** The number of milliseconds between refresh events. */
     public static final int REFRESH_WAIT = 50;
     
@@ -58,8 +59,8 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
      * 
      * @param component The parent component.
      */
-    public MainConsole(final ThreeDeeComponent component) {
-        super(component);
+    public MainConsole(GenericFrame frame, final ThreeDeeComponent component) {
+        super(frame, component);
         this.component = component;
         this.timer = component.getTimer();
     }
@@ -78,13 +79,13 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
         agents = new JPanel(new GridLayout(0, 1));
         root.add(agents, BorderLayout.CENTER);
         
-        getContentPane().add(root);
+        add(root);
         
         for (Agent agent : component.getAgents()) {
             newAgentPanel(agent);
         }
         
-        pack();
+        getParentFrame().pack();
     }
     
     /**
@@ -124,7 +125,7 @@ public class MainConsole extends DesktopComponent<ThreeDeeComponent> {
             }
         }));
         agents.add(panel);
-        pack();
+        getParentFrame().pack();
     }
     
     /**

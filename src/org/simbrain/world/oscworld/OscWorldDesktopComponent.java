@@ -31,13 +31,15 @@ import ca.odell.glazedlists.swing.EventListModel;
 
 import org.dishevelled.layout.LabelFieldPanel;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.CouplingMenus;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
 /**
  * OSC world desktop component.
  */
 public final class OscWorldDesktopComponent
-    extends DesktopComponent<OscWorldComponent> {
+    extends GuiComponent<OscWorldComponent> {
 
     /** Create OSC in message action. */
     private final Action createOscInMessageAction;
@@ -57,8 +59,8 @@ public final class OscWorldDesktopComponent
      *
      * @param oscWorldComponent OSC world component
      */
-    public OscWorldDesktopComponent(final OscWorldComponent oscWorldComponent) {
-        super(oscWorldComponent);
+    public OscWorldDesktopComponent(GenericFrame frame, final OscWorldComponent oscWorldComponent) {
+        super(frame, oscWorldComponent);
 
         createOscInMessageAction = new CreateOscInMessageAction();
         createOscOutMessageAction = new CreateOscOutMessageAction();
@@ -97,7 +99,7 @@ public final class OscWorldDesktopComponent
                     {
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
-                        JMenu producerMenu = getDesktop().getProducerMenu(consumer.getDefaultConsumingAttribute());
+                        JMenu producerMenu = CouplingMenus.getProducerMenu(oscWorldComponent.getWorkspace(), consumer.getDefaultConsumingAttribute());
                         producerMenu.setText("Set input source");
                         contextMenu.add(producerMenu);
                         contextMenu.show(consumers, event.getX(), event.getY());
@@ -115,7 +117,7 @@ public final class OscWorldDesktopComponent
         toolBar.add(createOscOutMessageAction);
 
         menuBar.add(file);
-        setJMenuBar(menuBar);
+        getParentFrame().setJMenuBar(menuBar);
 
         LabelFieldPanel inPanel = new LabelFieldPanel();
         inPanel.addField("OSC in host:", new JLabel(oscWorldComponent.getOscInHost()));
@@ -137,10 +139,9 @@ public final class OscWorldDesktopComponent
         mainPanel.add(inPanel);
         mainPanel.add(outPanel);
 
-        JPanel contentPane = (JPanel) getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add("North", toolBar);
-        contentPane.add("Center", mainPanel);
+        setLayout(new BorderLayout());
+        add("North", toolBar);
+        add("Center", mainPanel);
     }
 
     /** {@inheritDoc} */

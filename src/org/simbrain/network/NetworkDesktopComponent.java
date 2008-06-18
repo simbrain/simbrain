@@ -26,7 +26,8 @@ import java.io.File;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
@@ -35,7 +36,7 @@ import org.simnet.interfaces.Synapse;
 /**
  * Network frame.
  */
-public final class NetworkDesktopComponent extends DesktopComponent<NetworkComponent> {
+public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent> {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,15 +49,14 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
     /**
      * Create a new network frame.
      */
-    public NetworkDesktopComponent(NetworkComponent component) {
-        super(component);
+    public NetworkDesktopComponent(GenericFrame frame, NetworkComponent component) {
+        super(frame, component);
         this.setPreferredSize(new Dimension(450,400));
 
         networkPanel = new NetworkPanel(component.getRootNetwork(), this);
         
         // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
-        JPanel buffer = new JPanel();
-        buffer.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
         // Construct toolbar pane
         FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
@@ -68,11 +68,12 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         toolbars.add(networkPanel.getClampToolBar());
 
         // Put it all together
-        buffer.add("North", toolbars);
-        buffer.add("Center", networkPanel);
-        setContentPane(buffer);
+        add("North", toolbars);
+        add("Center", networkPanel);
         createAndAttachMenus();
     }
+    
+    
 
     /**
      * Create and attach the menus for this network frame.
@@ -85,7 +86,7 @@ public final class NetworkDesktopComponent extends DesktopComponent<NetworkCompo
         menuBar.add(networkPanel.createInsertMenu());
         menuBar.add(networkPanel.createViewMenu());
         menuBar.add(networkPanel.createHelpMenu());
-        setJMenuBar(menuBar);
+        getParentFrame().setJMenuBar(menuBar);
     }
     
     @Override

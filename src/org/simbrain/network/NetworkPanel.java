@@ -1818,7 +1818,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return a reference to the parent rootNetwork frame
      */
     public NetworkDesktopComponent getParentComponent() {
-        return ((NetworkDesktopComponent) getRootPane().getParent());
+        return desktopComponent;
     }
 
     /**

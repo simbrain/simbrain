@@ -1,0 +1,7 @@
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.*;
+
+void  showGUI(WorkspaceComponent in) {
+	SimbrainDesktop.showJFrame(in);
+}
+

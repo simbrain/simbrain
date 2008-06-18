@@ -26,8 +26,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -45,30 +48,28 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * Represents a window in the Simbrain desktop.   Services relating to
  * couplings and relations between are handled
  */
-public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends JInternalFrame {
+public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPanel {
 
     /** Logger. */
-    private static final Logger LOGGER = Logger.getLogger(DesktopComponent.class);
+    private static final Logger LOGGER = Logger.getLogger(GuiComponent.class);
     
     /** Reference to workspace component. */
     private final E workspaceComponent;
     
+    /** Reference to  parent frame. */
+    private GenericFrame parentFrame;
+
     /** Log4j logger. */
-    private Logger logger = Logger.getLogger(DesktopComponent.class);
+    private Logger logger = Logger.getLogger(GuiComponent.class);
    
     /**
      * Construct a workspace component.
      */
-    public DesktopComponent(E workspaceComponent) {
+    public GuiComponent(GenericFrame frame, E workspaceComponent) {
         super();
-        
+        this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
         logger.trace(this.getClass().getCanonicalName() + " created");
-        setResizable(true);
-        setMaximizable(true);
-        setIconifiable(true);
-        setClosable(true);
-        addInternalFrameListener(new WindowFrameListener());
     }
 
     /**
@@ -102,7 +103,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         if (theFile != null) {
             workspaceComponent.open(theFile);
             workspaceComponent.setName(theFile.getName());
-            setTitle(workspaceComponent.getName());
+            getParentFrame().setTitle(workspaceComponent.getName());
             postAddInit();
         }
     }
@@ -125,7 +126,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
             workspaceComponent.save(theFile);
             workspaceComponent.setCurrentDirectory(chooser.getCurrentLocation());
             workspaceComponent.setName(theFile.getName());
-            setTitle(workspaceComponent.getName());
+            getParentFrame().setTitle(workspaceComponent.getName());
         }
     }
 
@@ -158,10 +159,10 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      * @param name the name of the desktop component.
      * @return a new component.
      */
-    public static DesktopComponent<?> open(final WorkspaceComponent<?> component,
+    public static GuiComponent<?> open(final WorkspaceComponent<?> component,
             final InputStream istream, final String name) {
         SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
-        DesktopComponent<?> dc = desktop.createDesktopComponent(component);
+        GuiComponent<?> dc = desktop.createDesktopComponent(null, component);
         Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
         
         dc.setName(name);
@@ -173,7 +174,7 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
     /**
      * Checks to see if anything has changed and then offers to save if true.
      */
-    private void showHasChangedDialog() {
+    public void showHasChangedDialog() {
         Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane
                 .showInternalOptionDialog(this,
@@ -183,9 +184,9 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
 
         if (s == JOptionPane.OK_OPTION) {
             this.save();
-            dispose();
+            workspaceComponent.close();
         } else if (s == JOptionPane.NO_OPTION) {
-            dispose();
+            workspaceComponent.close();
         } else if (s == JOptionPane.CANCEL_OPTION) {
             return;
         }
@@ -200,27 +201,10 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
      */
     public void setName(final String name) {
         workspaceComponent.setName(name);
-        setTitle(name);
+        getParentFrame().setTitle(name);
     }
 
-    /**
-     * Manage cleanup when a component is closed.
-     */
-    private class WindowFrameListener extends InternalFrameAdapter {
-        /** @see InternalFrameAdapter */
-        public void internalFrameClosing(final InternalFrameEvent e) {
-            // NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
 
-            if (workspaceComponent.hasChangedSinceLastSave()) {
-                showHasChangedDialog();
-            } else {
-                dispose();
-            }
-            close();
-            
-            getDesktop().getWorkspace().removeWorkspaceComponent(workspaceComponent);
-        }
-    }
 
 
     /**
@@ -241,16 +225,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
         return workspaceComponent;
     }
     
-    private SimbrainDesktop desktop;
-    
-    void setDesktop(SimbrainDesktop desktop) {
-        this.desktop = desktop;
-    }
-    
-    public SimbrainDesktop getDesktop() {
-        return desktop;
-    }
-    
     protected class BasicComponentListener implements WorkspaceComponentListener {
         public BasicComponentListener() {
             /* need a public constructor for subclasses */
@@ -260,4 +234,19 @@ public abstract class DesktopComponent<E extends WorkspaceComponent<?>> extends 
             update();
         }
     }
+            
+
+    public void setParentFrame(GenericFrame parentFrame) {
+        this.parentFrame = parentFrame;
+    }
+    
+    public GenericFrame getParentFrame() {
+        return this.parentFrame;
+    }
+
+    
+
+    
+    
+
 }

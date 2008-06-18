@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Class used to assist with deserializing workspace components.
@@ -80,7 +80,7 @@ public class WorkspaceComponentDeserializer {
      * @return The deserialized desktop component.
      */
     @SuppressWarnings("unchecked")
-    DesktopComponent<?> deserializeDesktopComponent(final String className,
+    GuiComponent<?> deserializeDesktopComponent(final String className,
             final WorkspaceComponent component, final InputStream input, final String name) {
         try {
             Class<WorkspaceComponent<?>> clazz
@@ -88,7 +88,7 @@ public class WorkspaceComponentDeserializer {
             Method method = clazz.getMethod("open", WorkspaceComponent.class,
                 InputStream.class, String.class);
             
-            return (DesktopComponent<?>) method.invoke(null, component, input, name);
+            return (GuiComponent<?>) method.invoke(null, component, input, name);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

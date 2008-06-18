@@ -76,7 +76,7 @@ public class Dictionary extends Hashtable {
         }
 
         dictionary = Utils.getStringMatrix(theFile);
-        worldFrame.setTitle(theFile.getName());
+        worldFrame.getParentFrame().setTitle(theFile.getName());
         fillEntries();
         output();
     }

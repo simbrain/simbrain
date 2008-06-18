@@ -3,9 +3,10 @@ package org.simbrain.world.gameworld2d;
 import java.awt.BorderLayout;
 import java.io.File;
 
-import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 
-public class GameWorld2DDesktopComponent extends DesktopComponent<GameWorld2DComponent> {
+public class GameWorld2DDesktopComponent extends GuiComponent<GameWorld2DComponent> {
 
     private static final long serialVersionUID = 1L;
     
@@ -15,11 +16,11 @@ public class GameWorld2DDesktopComponent extends DesktopComponent<GameWorld2DCom
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
      * @param ws the workspace associated with this frame
      */
-    public GameWorld2DDesktopComponent(GameWorld2DComponent component) {
-        super(component);
+    public GameWorld2DDesktopComponent(GenericFrame frame, GameWorld2DComponent component) {
+        super(frame, component);
         this.setLayout(new BorderLayout());
         this.world = component.getWorld();
-        getContentPane().add("Center", world);
+        add("Center", world);
         component.addListener(new BasicComponentListener());
     }
 

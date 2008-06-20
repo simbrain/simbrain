@@ -193,7 +193,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
     }
 
     public String getName() {
-        return workspaceComponent.getName();
+        return (workspaceComponent == null) ? "null" : workspaceComponent.getName();
     }
 
     /**

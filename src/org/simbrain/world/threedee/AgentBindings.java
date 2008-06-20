@@ -25,7 +25,8 @@ public class AgentBindings extends Bindings {
     private static final int PRIORITY = 10;
 
     /** The consumers for the wrapped agent. */
-    private final List<ConsumingBinding> consumers = new ArrayList<ConsumingBinding>();
+    private final List<ConsumingBinding> consumers 
+        = Collections.synchronizedList(new ArrayList<ConsumingBinding>());
 
     /** The agent for these bindings. */
     private final Agent agent;

@@ -1,3 +1,30 @@
 <body>
-The <b>simbrain.network</b> package contains the Piccolo-based zoomable GUI for designing, editing, and running neural networks.
+The <b>simnet</b> package contains the logical representation of neural networks.  High
+level abstract classes are contained in the interfaces package.  Specific network,
+neuron, and synapse descriptions are contained in those packages.
+
+<b>Overview</b>
+
+The model neural network is essentially a graph, a collection of nodes connected by vertices
+(the vertices are neurons and the connections are synapses).  Each node and vertex is an object.
+he whole network has three lists, a list of nodes,  a list of connections, and a list of networks ("subnetworks").   
+The connections have references to the source and target nodes they connect. When a network is updated the program goes  through 
+the list of neurons and call an update function internal to each one, and similarly with the list of synapses.
+Buffers are used so that the whole network can be updated synchronously. 
+
+<b>Subnetworks</b>
+Subnetworks (networks within networks) are themselves network objects, with lists of neurons and nodes, and perhaps additional subnetworks.
+ Subnetworks are used when special rules are required that go beyond what is available locally to the node and connection objects, so that 
+ the update method above won't work.  For example, some networks must have their nodes updated in a special order.   
+ When subnetworks are updated  the "update" method is overridden to capture these special rules.
+
+Connections can exist between any two nodes, at whatever level of the subnetwork hierarchy. 
+Overall, a whole network, including subnetworks, is just a graph.  The subnetworks only serve to  allow for custom updating.
+Special methods are available to any network--getFlatNeuronList and getFlatSynapseList--which collect all the neurons or synapses 
+of all subnetworks and return them as one large list. 
+
+When the top-level network is updated, its nodes and connections are updated, as are its subnetworks.  
+When these subnetworks are updated the process is repeated.
+
+
 </body>

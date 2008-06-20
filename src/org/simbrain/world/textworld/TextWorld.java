@@ -44,7 +44,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
-import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * <b>TextWorld</b> acts as a text interface to neural ntworks, for use in language parsing and other tasks.  Users

@@ -9,7 +9,7 @@ import java.util.Collections;
 import javax.swing.JMenuItem;
 
 import org.jfree.data.xy.XYSeries;
-import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.gui.NetworkComponent;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;

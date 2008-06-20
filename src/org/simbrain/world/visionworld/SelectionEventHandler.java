@@ -36,7 +36,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
-import org.simbrain.network.nodes.SelectionMarquee;
+import org.simbrain.network.gui.nodes.SelectionMarquee;
 
 import org.simbrain.world.visionworld.node.SensorNode;
 

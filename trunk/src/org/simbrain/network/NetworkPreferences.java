@@ -18,589 +18,464 @@
  */
 package org.simbrain.network;
 
-import java.awt.Color;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-
 /**
- * <b>NetworkPreferences</b> handles storage and retrieval of user preferences, e.g.  background color for the network
- * panel, default weight values, etc.
+ * <b>NetworkPreferences</b> handles storage and retrieval of User Preferences for the
+ * neural network.
  */
-public class NetworkPreferences {
-    /** System specific file seperator. */
-    private static final String FS = System.getProperty("file.separator");
-    /**The main user preference object. */
-    private static final Preferences NETWORK_PREFERENCES = Preferences.userRoot().node("/org/simbrain/network");
+public final class NetworkPreferences {
+
+    /** The main user preference object. */
+    private static final Preferences PREFERENCES = Preferences.userRoot().node("/org/simbrain/simnet");
+
+    /** Default activation threshold preference setting. */
+    private static final double DEFAULT_ACTIVATION_THRESHOLD = 0.5d;
+
+    /** Default neuron increment preference setting. */
+    private static final double DEFAULT_NEURON_INCREMENT = 0.1d;
+
+    /** Default neuron lower bound preference setting. */
+    private static final double DEFAULT_NEURON_LOWER_BOUND = -1.0d;
+
+    /** Default neuron upper bound preference setting. */
+    private static final double DEFAULT_NEURON_UPPER_BOUND = 1.0d;
+
+    /** Default output threshold preference setting. */
+    private static final double DEFAULT_OUTPUT_THRESHOLD = 0.5d;
+
+    /** Default activation function preference setting. */
+    private static final String DEFAULT_ACTIVATION_FUNCTION = "Linear";
+
+    /** Default output function preference setting. */
+    private static final String DEFAULT_OUTPUT_FUNCTION = "Threshold";
+
+    /** Default weight increment preference setting. */
+    private static final double DEFAULT_WEIGHT_INCREMENT = 0.1d;
+
+    /** Default weight increment preference setting. */
+    private static final double DEFAULT_WEIGHT_LOWER_BOUND = -1.0d;
+
+    /** Default weight increment preference setting. */
+    private static final double DEFAULT_WEIGHT_UPPER_BOUND = 1.0d;
+
+    /** Default weight learning rule preference setting. */
+    private static final String DEFAULT_LEARNING_RULE = "Hebbian";
+
+    /** Default momentum preference setting. */
+    private static final double DEFAULT_MOMENTUM = 0.2d;
+
+    /** Default connection setting. */
+    private static final String DEFAULT_CONNECTION_TYPE = "All to All";
+
+    /** Default sparse excitatory probility. */
+    private static final double DEFAULT_EXCITATORY_PROBABILITY = .8;
+
+    /** Default sparse inhibitory probility. */
+    private static final double DEFAULT_INHIBITORY_PROBABILITY = .5;
+
+
+    /**
+     * Private default constructor.
+     */
+    private NetworkPreferences() {
+        // empty
+    }
+
 
     /**
      * Save all user preferences.
      */
     public static void saveAll() {
         try {
-            NETWORK_PREFERENCES.flush();
+            PREFERENCES.flush();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
     }
 
+    //------------ Neuron Preferences --------------------//
+
     /**
-     * Restores defaults.
+     * Return the activation function preference setting.
+     * Defaults to <code>&quot;Linear&quot;</code>.
      *
+     * @return the activation function preference setting
      */
-    public static void restoreDefaults() {
-        setBackgroundColor(getDefaultBackgroundColor());
-        setLineColor(getDefaultLineColor());
-        setHotColor(getDefaultHotColor());
-        setCoolColor(getDefaultCoolColor());
-        setExcitatoryColor(getDefaultExcitatoryColor());
-        setInhibitoryColor(getDefaultInhibitoryColor());
-        setLassoColor(getDefaultLassoColor());
-        setSelectionColor(getDefaultSelectionColor());
-        setSignalColor(getDefaultSignalColor());
-        setSpikingColor(getDefaultSpikingColor());
-        setZeroWeightColor(getDefaultZeroWeightColor());
-        setMaxDiameter(getDefaultMaxDiameter());
-        setMinDiameter(getDefaultMinDiameter());
-        setTimeStep(getDefaultTimeStep());
-        setTimeUnits(getDefaultTimeUnits());
-        setPrecision(getDefaultPrecision());
-        setWeightValues(getDefaultWeightValues());
-        setUsingIndent(getDefaultUsingIndent());
-        setNudgeAmount(getDefaultNudgeAmount());
-        setCurrentDirectory(getDefaultCurrentDirectory());
+    public static String getActivationFunction() {
+        return PREFERENCES.get("activationFunction", DEFAULT_ACTIVATION_FUNCTION);
     }
 
-    //////////////////////////////////////////////////////////////////
-    // Getters and setters for user preferences                     //
-    // Note that default values for preferences are stored in the   //
-    // second argument of the getter method                         //
-    //////////////////////////////////////////////////////////////////
     /**
-     * Network background color.
-     * @param rgbColor Color to be used as background
+     * Set the activation function preference setting to <code>s</code>.
+     *
+     * @param s activation function preference setting
      */
-    public static void setBackgroundColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("NetworkBackgroundColor", rgbColor);
+    public static void setActivationFunction(final String s) {
+        PREFERENCES.put("activationFunction", s);
     }
 
     /**
-     * Network background color.
-     * @return Perferred background color
+     * Return the output function preference setting.
+     * Defaults to <code>&quot;Threshold&quot;</code>.
+     *
+     * @return the output function preference setting
      */
-    public static int getBackgroundColor() {
-        return NETWORK_PREFERENCES.getInt("NetworkBackgroundColor", getDefaultBackgroundColor());
+    public static String getOutputFunction() {
+        return PREFERENCES.get("outputFunction", DEFAULT_OUTPUT_FUNCTION);
     }
 
     /**
-     * Network background color.
-     * @return Default background color
+     * Set the output function preference setting to <code>s</code>.
+     *
+     * @param s output function preference setting
      */
-    public static int getDefaultBackgroundColor() {
-        return Color.WHITE.getRGB();
+    public static void setOutputFunction(final String s) {
+        PREFERENCES.put("outputFunction", s);
     }
 
     /**
-     * Network line color.
-     * @param rgbColor Color of line
+     * Return the activation preference setting.
+     * Defaults to <code>0.0d</code>.
+     *
+     * @return the activation preference setting
      */
-    public static void setLineColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("NetworkLineColor", rgbColor);
+    public static double getActivation() {
+        return PREFERENCES.getDouble("Activation", 0.0d);
     }
 
     /**
-     * Network line color.
-     * @return Perferred line color
+     * Set the activation preference setting to <code>d</code>.
+     *
+     * @param d activation preference setting
      */
-    public static int getLineColor() {
-        return NETWORK_PREFERENCES.getInt("NetworkLineColor", getDefaultLineColor());
+    public static void setActivation(final double d) {
+        PREFERENCES.putDouble("Activation", d);
     }
 
     /**
-     * Network line color.
-     * @return Default line color
+     * Return the activation threshold preference setting.
+     * Defaults to <code>0.5d</code>.
+     *
+     * @return the activation threshold preference setting
      */
-    public static int getDefaultLineColor() {
-        return Color.BLACK.getRGB();
+    public static double getActivationThreshold() {
+        return PREFERENCES.getDouble("activationThreshold", DEFAULT_ACTIVATION_THRESHOLD);
     }
 
     /**
-     * Network hot node color.
-     * @param theColor Color of hot node
+     * Set the activation preference setting to <code>d</code>.
+     *
+     * @param d activation preference setting
      */
-    public static void setHotColor(final float theColor) {
-        NETWORK_PREFERENCES.putFloat("NetworkHotColor", theColor);
+    public static void setActivationThreshold(final double d) {
+        PREFERENCES.putDouble("activationThreshold", d);
     }
 
     /**
-     * Network hot node color.
-     * @return Perferred hot node color
+     * Return the bias preference setting.
+     * Defaults to <code>0.0d</code>.
+     *
+     * @return the bias preference setting
      */
-    public static float getHotColor() {
-        return NETWORK_PREFERENCES.getFloat("NetworkHotColor", getDefaultHotColor());
+    public static double getBias() {
+        return PREFERENCES.getDouble("Bias", 0.0d);
     }
 
     /**
-     * Network hot node color.
-     * @return Default hot node color
+     * Set the bias preference setting to <code>d</code>.
+     *
+     * @param d bias preference setting
      */
-    public static float getDefaultHotColor() {
-        return Color.RGBtoHSB(255, 0, 0, null)[0];
+    public static void setBias(final double d) {
+        PREFERENCES.putDouble("Bias", d);
     }
 
     /**
-     * Network cool node color.
-     * @param theColor Color of cool node
+     * Return the decay preference setting.
+     * Defaults to <code>0.0d</code>.
+     *
+     * @return the decay preference setting
      */
-    public static void setCoolColor(final float theColor) {
-        NETWORK_PREFERENCES.putFloat("NetworkCoolColor", theColor);
+    public static double getDecay() {
+        return PREFERENCES.getDouble("Decay", 0.0d);
     }
 
     /**
-     * Network cool node color.
-     * @return Perferred cool node color
+     * Set the decay preference setting to <code>d</code>.
+     *
+     * @param d decay preference setting
      */
-    public static float getCoolColor() {
-        return NETWORK_PREFERENCES.getFloat("NetworkCoolColor", getDefaultCoolColor());
+    public static void setDecay(final double d) {
+        PREFERENCES.putDouble("Decay", d);
     }
 
     /**
-     * Network cool node color.
-     * @return Default cool node color
+     * Return the neuron increment preference setting.
+     * Defaults to <code>0.1d</code>.
+     *
+     * @return the neuron increment preference setting
      */
-    public static float getDefaultCoolColor() {
-        return Color.RGBtoHSB(0, 0, 255, null)[0];
+    public static double getNrnIncrement() {
+        return PREFERENCES.getDouble("nrnIncrement", DEFAULT_NEURON_INCREMENT);
     }
 
     /**
-     * Network excitatory color.
-     * @param rgbColor Excitatory neuron color
+     * Set the neuron increment preference setting to <code>d</code>.
+     *
+     * @param d neuron increment preference setting
      */
-    public static void setExcitatoryColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("NetworkExcitatoryColor", rgbColor);
+    public static void setNrnIncrement(final double d) {
+        PREFERENCES.putDouble("nrnIncrement", d);
     }
 
     /**
-     * Network excitatory color.
-     * @return Perferred excitatory neuron color
+     * Return the neuron lower bound preference setting.
+     * Defaults to <code>-1.0d</code>.
+     *
+     * @return the neuron lower bound preference setting
      */
-    public static int getExcitatoryColor() {
-        return NETWORK_PREFERENCES.getInt("NetworkExcitatoryColor", getDefaultExcitatoryColor());
+    public static double getNrnLowerBound() {
+        return PREFERENCES.getDouble("nrnLowerBound", DEFAULT_NEURON_LOWER_BOUND);
     }
 
     /**
-     * Network excitatory color.
-     * @return Default excitatory neuron color
+     * Set the neuron lower bound preference setting to <code>d</code>.
+     *
+     * @param d neuron lower bound preference setting
      */
-    public static int getDefaultExcitatoryColor() {
-        return Color.RED.getRGB();
+    public static void setNrnLowerBound(final double d) {
+        PREFERENCES.putDouble("nrnLowerBound", d);
     }
 
     /**
-     * Network inhibitory color.
-     * @param rgbColor Inhibitory neuron color
+     * Return the output signal preference setting.
+     * Defaults to <code>1.0d</code>.
+     *
+     * @return the output signal preference setting
      */
-    public static void setInhibitoryColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("NetworkInhibitoryColor", rgbColor);
+    public static double getOutputSignal() {
+        return PREFERENCES.getDouble("outputSignal", 1.0d);
     }
 
     /**
-     * Network inhibitory color.
-     * @return Perferred inhibitory neuron color
+     * Set the output signal preference setting to <code>d</code>.
+     *
+     * @param d output signal preference setting
      */
-    public static int getInhibitoryColor() {
-        return NETWORK_PREFERENCES.getInt("NetworkInhibitoryColor", getDefaultInhibitoryColor());
+    public static void setOutputSignal(final double d) {
+        PREFERENCES.putDouble("outputSignal", d);
     }
 
     /**
-     * Network inhibitory color.
-     * @return Default inhibitory color
+     * Return the output threshold preference setting.
+     * Defaults to <code>0.5d</code>.
+     *
+     * @return the output threshold preference setting
      */
-    public static int getDefaultInhibitoryColor() {
-        return Color.BLUE.getRGB();
+    public static double getOutputThreshold() {
+        return PREFERENCES.getDouble("outputThreshold", DEFAULT_OUTPUT_THRESHOLD);
     }
 
     /**
-     * Network lasso color.
-     * @param rgbColor Color of lasso
+     * Set the output threshold preference setting to <code>d</code>.
+     *
+     * @param d output threshold preference setting
      */
-    public static void setLassoColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("NetworkLassoColor", rgbColor);
+    public static void setOutputThreshold(final double d) {
+        PREFERENCES.putDouble("outputThreshold", d);
     }
 
     /**
-     * Network lasso color.
-     * @return Perferred lasso color
+     * Return the neuron upper bound preference setting.
+     * Defaults to <code>1.0d</code>.
+     *
+     * @return the neuron upper bound preference setting
      */
-    public static int getLassoColor() {
-        return NETWORK_PREFERENCES.getInt("NetworkLassoColor", getDefaultLassoColor());
+    public static double getNrnUpperBound() {
+        return PREFERENCES.getDouble("nrnUpperBound", DEFAULT_NEURON_UPPER_BOUND);
     }
 
     /**
-     * Network lasso color.
-     * @return Default lasso color
+     * Set the neuron upper bound preference setting to <code>d</code>.
+     *
+     * @param d neuron upper bound preference setting
      */
-    public static int getDefaultLassoColor() {
-        return Color.GREEN.getRGB();
+    public static void setNrnUpperBound(final double d) {
+        PREFERENCES.putDouble("nrnUpperBound", d);
     }
 
-    /**
-     * Network selection color.
-     * @param rgbColor Color of selection
-     */
-    public static void setSelectionColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("NetworkSelectionColor", rgbColor);
-    }
-
-    /**
-     * Network selection color.
-     * @return Perferred selection color
-     */
-    public static int getSelectionColor() {
-        return NETWORK_PREFERENCES.getInt("NetworkSelectionColor", getDefaultSelectionColor());
-    }
-
-    /**
-     * Network selection color.
-     * @return Default selection color
-     */
-    public static int getDefaultSelectionColor() {
-        return Color.GREEN.getRGB();
-    }
-
-    /**
-     * Network signal synapse color.
-     * @param rgbColor Color of signal synapse
-     */
-    public static void setSignalColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("SignalSynapse", rgbColor);
-    }
-
-    /**
-     * Network signal synapse color.
-     * @return Perferred signal synapse color
-     */
-    public static int getSignalColor() {
-        return NETWORK_PREFERENCES.getInt("SignalSynapse", getDefaultSignalColor());
-    }
-
-    /**
-     * Network signal synapse color.
-     * @return Default signal synapse color
-     */
-    public static int getDefaultSignalColor() {
-        return Color.GREEN.getRGB();
-    }
-
-    /**
-     * Network zero weight color.
-     * @param rgbColor Color of zero weight
-     */
-    public static void setZeroWeightColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("ZeroWeight", rgbColor);
-    }
-
-    /**
-     * Network zero weight color.
-     * @return Perferred zero weight color
-     */
-    public static int getZeroWeightColor() {
-        return NETWORK_PREFERENCES.getInt("ZeroWeight", getDefaultZeroWeightColor());
-    }
-
-    /**
-     * Network zero weight color.
-     * @return Default zero weight color
-     */
-    public static int getDefaultZeroWeightColor() {
-        return Color.LIGHT_GRAY.getRGB();
-    }
-
-    /**
-     * Network max node radius.
-     * @param sizeMax Maximum node radius
-     */
-    public static void setMaxDiameter(final int sizeMax) {
-        NETWORK_PREFERENCES.putInt("NetworkSizeMax", sizeMax);
-    }
-
-    /**
-     * Network max node radius.
-     * @return Maximum node radius
-     */
-    public static int getMaxDiameter() {
-        return NETWORK_PREFERENCES.getInt("NetworkSizeMax", getDefaultMaxDiameter());
-    }
-
-    /**
-     * Network max node radius.
-     * @return Default maximum node radius
-     */
-    public static int getDefaultMaxDiameter() {
-        return 20;
-    }
-
-    /**
-     * Network min node radius.
-     * @param sizeMin Minimum node radius
-     */
-    public static void setMinDiameter(final int sizeMin) {
-        NETWORK_PREFERENCES.putInt("NetworkSizeMin", sizeMin);
-    }
-
-    /**
-     * Network min node radius.
-     * @return Minumum node radius
-     */
-    public static int getMinDiameter() {
-        return NETWORK_PREFERENCES.getInt("NetworkSizeMin", getDefaultMinDiameter());
-    }
-
-    /**
-     * Network min node radius.
-     * @return Default minimum node radius
-     */
-    public static int getDefaultMinDiameter() {
-        return 15;
-    }
-
-    /**
-     * Netowork time step.
-     * @param step Time step
-     */
-    public static void setTimeStep(final double step) {
-        NETWORK_PREFERENCES.putDouble("TimeStep", step);
-    }
-
-    /**
-     * Netowork time step.
-     * @return Perferred time step
-     */
-    public static double getTimeStep() {
-        return NETWORK_PREFERENCES.getDouble("TimeStep", getDefaultTimeStep());
-    }
-
-    /**
-     * Netowork time step.
-     * @return Default time step
-     */
-    public static double getDefaultTimeStep() {
-        return .01;
-    }
-
-    /**
-     * Network time units.
-     * @param units Time units
-     */
-    public static void setTimeUnits(final int units) {
-        NETWORK_PREFERENCES.putInt("TimeUnits", units);
-    }
-
-    /**
-     * Network time units.
-     * @return Perferred time units
-     */
-    public static int getTimeUnits() {
-        return NETWORK_PREFERENCES.getInt("TimeUnits", getDefaultTimeUnits());
-    }
-
-    /**
-     * Network time units.
-     * @return Default time units
-     */
-    public static int getDefaultTimeUnits() {
-        return 0;
-    }
-
-    /**
-     * Network precision.
-     * @param precision Precision
-     */
-    public static void setPrecision(final int precision) {
-        NETWORK_PREFERENCES.putInt("NetworkPrecision", precision);
-    }
-
-    /**
-     * Network precision.
-     * @return Perferred precision
-     */
-    public static int getPrecision() {
-        return NETWORK_PREFERENCES.getInt("NetworkPrecision", getDefaultPrecision());
-    }
+    //------------ Weight Preferences --------------------//
 
     /**
-     * Network precision.
-     * @return Default precision
+     * Return the learning rule preference setting.
+     * Defaults to <code>&quot;Hebbian&quot;</code>.
+     *
+     * @return the learning rule preference setting
      */
-    public static int getDefaultPrecision() {
-        return 0;
-    }
-
-    /**
-     * Network weight values.
-     * @param weightValues Use weight values
-     */
-    public static void setWeightValues(final boolean weightValues) {
-        NETWORK_PREFERENCES.putBoolean("NetworkWeightValues", weightValues);
-    }
-
-    /**
-     * Network weight values.
-     * @return Use weight values
-     */
-    public static boolean getWeightValues() {
-        return NETWORK_PREFERENCES.getBoolean("NetworkWeightValues", getDefaultWeightValues());
-    }
-
-    /**
-     * Network weight values.
-     * @return Default use weight values
-     */
-    public static boolean getDefaultWeightValues() {
-        return false;
-    }
-
-   /**
-    * Network files indenting.
-    * @param indent Use indenting
-    */
-    public static void setUsingIndent(final boolean indent) {
-        NETWORK_PREFERENCES.putBoolean("NetworkIndent", indent);
+    public static String getLearningRule() {
+        return PREFERENCES.get("learningRule", DEFAULT_LEARNING_RULE);
     }
 
     /**
-     * Network files indenting.
-     * @return Indenet preference
+     * Set the learning rule preference setting to <code>s</code>.
+     *
+     * @param s learning rule preference setting
      */
-    public static boolean getUsingIndent() {
-        return NETWORK_PREFERENCES.getBoolean("NetworkIndent", getDefaultUsingIndent());
+    public static void setLearningRule(final String s) {
+        PREFERENCES.put("learningRule", s);
     }
 
     /**
-     * Network files indenting.
-     * @return Default indenting
+     * Return the strength preference setting.
+     * Defaults to <code>&quot;1.0d&quot;</code>.
+     *
+     * @return the strength preference setting
      */
-    public static boolean getDefaultUsingIndent() {
-        return true;
+    public static double getStrength() {
+        return PREFERENCES.getDouble("strength", 1.0d);
     }
 
     /**
-     * Network nudging.
-     * @param nudge Nudge amount
+     * Set the strength preference setting to <code>d</code>.
+     *
+     * @param d strength preference setting
      */
-    public static void setNudgeAmount(final double nudge) {
-        NETWORK_PREFERENCES.putDouble("NetworkNudgeAmount", nudge);
+    public static void setStrength(final double d) {
+        PREFERENCES.putDouble("strength", d);
     }
 
     /**
-     * Network nudging.
-     * @return Perferred nudge amount
+     * Return the momentum preference setting.
+     * Defaults to <code>&quot;0.2d&quot;</code>.
+     *
+     * @return the momentum preference setting
      */
-    public static double getNudgeAmount() {
-        return NETWORK_PREFERENCES.getDouble("NetworkNudgeAmount", getDefaultNudgeAmount());
+    public static double getMomentum() {
+        return PREFERENCES.getDouble("momentum", DEFAULT_MOMENTUM);
     }
 
     /**
-     * Network nudging.
-     * @return Default nudge amount
+     * Set the momentum preference setting to <code>d</code>.
+     *
+     * @param d momentum preference setting
      */
-    public static double getDefaultNudgeAmount() {
-        return 2;
+    public static void setMomentum(final double d) {
+        PREFERENCES.putDouble("momentum", d);
     }
 
     /**
-     * Current network files directory.
-     * @param dir Current directory
+     * Return the weight increment preference setting.
+     * Defaults to <code>&quot;0.1d&quot;</code>.
+     *
+     * @return the weight increment preference setting
      */
-    public static void setCurrentDirectory(final String dir) {
-        NETWORK_PREFERENCES.put("CurrentDirectory", dir);
+    public static double getWtIncrement() {
+        return PREFERENCES.getDouble("wtIncrement", DEFAULT_WEIGHT_INCREMENT);
     }
 
     /**
-     * Current network files directory.
-     * @return Current directory
+     * Set the weight increment preference setting to <code>d</code>.
+     *
+     * @param d weight increment  preference setting
      */
-    public static String getCurrentDirectory() {
-        return NETWORK_PREFERENCES.get("CurrentDirectory", getDefaultCurrentDirectory());
+    public static void setWtIncrement(final double d) {
+        PREFERENCES.putDouble("wtIncrement", d);
     }
 
     /**
-     * Current network files directory.
-     * @return Default current directory
+     * Return the weight lower bound preference setting.
+     * Defaults to <code>&quot;-1.0d&quot;</code>.
+     *
+     * @return the weight lower bound preference setting
      */
-    public static String getDefaultCurrentDirectory() {
-        return "." + FS + "simulations" + FS + "networks";
+    public static double getWtLowerBound() {
+        return PREFERENCES.getDouble("wtLowerBound", DEFAULT_WEIGHT_LOWER_BOUND);
     }
 
     /**
-     * Current backprop files directory.
-     * @param dir Current directory
+     * Set the weight lower bound preference setting to <code>d</code>.
+     *
+     * @param d weight lower bound preference setting
      */
-    public static void setCurrentBackpropDirectory(final String dir) {
-        NETWORK_PREFERENCES.put("BackpropDirectory", dir);
+    public static void setWtLowerBound(final double d) {
+        PREFERENCES.putDouble("wtLowerBound", d);
     }
 
     /**
-     * Current backprop files directory.
-     * @return Current directory
+     * Return the weight increment preference setting.
+     * Defaults to <code>&quot;1.0d&quot;</code>.
+     *
+     * @return the weight increment preference setting
      */
-    public static String getCurrentBackpropDirectory() {
-        return NETWORK_PREFERENCES.get("BackpropDirectory", getDefaultBackpropDirectory());
+    public static double getWtUpperBound() {
+        return PREFERENCES.getDouble("wtUpperBound", DEFAULT_WEIGHT_UPPER_BOUND);
     }
 
     /**
-     * Current backprop files directory.
-     * @return Default backprop directory
+     * Set the weight upper bound preference setting to <code>d</code>.
+     *
+     * @param d weight upper bound preference setting
      */
-    public static String getDefaultBackpropDirectory() {
-        return "." + FS + "simulations" + FS + "networks" + FS + "bp" + FS + "training";
+    public static void setWtUpperBound(final double d) {
+        PREFERENCES.putDouble("wtUpperBound", d);
     }
 
     /**
-     * Current SOM files directory.
-     * @param dir Current directory
+     * Return the neuron connection type setting.
+     * Defaults to <code>&quot;All to All&quot;</code>.
+     *
+     * @return the neuron connection type setting
      */
-    public static void setCurrentSOMDirectory(final String dir) {
-        NETWORK_PREFERENCES.put("SOMDirectory", dir);
+    public static String getConnectionType() {
+        return PREFERENCES.get("connectionType", DEFAULT_CONNECTION_TYPE);
     }
 
     /**
-     * Current SOM files directory.
-     * @return Current directory
+     * Set the neuron connection type to <code>type</code>.
+     *
+     * @param type neuron connection type
      */
-    public static String getCurrentSOMDirectory() {
-        return NETWORK_PREFERENCES.get("SOMDirectory", getDefaultSOMDirectory());
+    public static void setConnectionType(final String type) {
+        PREFERENCES.put("connectionType", type);
     }
 
     /**
-     * Current SOM files directory.
-     * @return Default backprop directory
+     * Return the sparse connection excitatory probability.
+     * Defaults to <code>&quot;.8&quot;</code>.
+     *
+     * @return the sparse connection excitatory probability
      */
-    public static String getDefaultSOMDirectory() {
-        return "." + FS + "simulations" + FS + "networks" + FS + "bp" + FS + "training";
+    public static double getExcitatoryProbability() {
+        return PREFERENCES.getDouble("excitatoryProbability", DEFAULT_EXCITATORY_PROBABILITY);
     }
 
     /**
-     * Sets the spiking syanapse color.
-     * @param rgbColor Color to set spiking syanapse
+     * Sets the sparse connection excitatory probability.
+     *
+     * @param value excitatory probability
      */
-    public static void setSpikingColor(final int rgbColor) {
-        NETWORK_PREFERENCES.putInt("SpikingColor", rgbColor);
+    public static void setExcitatoryProbability(final double value) {
+        PREFERENCES.putDouble("excitatoryProbability", value);
     }
 
     /**
-     * Returns the current spiking synapse color.
-     * @return Current spiking synapse color
+     * Return the sparse connection inhibitory probability.
+     * Defaults to <code>&quot;.5&quot;</code>.
+     *
+     * @return the sparse connection inhibitory probability
      */
-    public static int getSpikingColor() {
-        return NETWORK_PREFERENCES.getInt("SpikingColor", getDefaultSpikingColor());
+    public static double getInhibitoryProbability() {
+        return PREFERENCES.getDouble("inhibitoryProbability", DEFAULT_INHIBITORY_PROBABILITY);
     }
 
     /**
-     * Returns the default spiking synapse color.
-     * @return Default spiking syanpse color
+     * Sets the sparse connection inhibitory probability.
+     *
+     * @param value inhibitory probability
      */
-    public static int getDefaultSpikingColor() {
-        return Color.YELLOW.getRGB();
+    public static void setInhibitoryProbability(final double value) {
+        PREFERENCES.putDouble("inhibitoryProbability", value);
     }
 }

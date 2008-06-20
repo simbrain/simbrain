@@ -15,13 +15,13 @@ public class SimbrainInterpreter extends bsh.Interpreter {
     public static void main(final String[] args) {
         CommandLineReader in = new CommandLineReader(new InputStreamReader(System.in));
         Interpreter interpreter = new Interpreter(in, System.out, System.err, true);
-        interpreter.getNameSpace().importPackage("org.simnet.neurons");
-        interpreter.getNameSpace().importPackage("org.simnet.connections");
-        interpreter.getNameSpace().importPackage("org.simnet.layouts");
-        interpreter.getNameSpace().importPackage("org.simnet.networks");
-        interpreter.getNameSpace().importPackage("org.simnet.interfaces");
-        interpreter.getNameSpace().importPackage("org.simnet.groups");
-        interpreter.getNameSpace().importPackage("org.simnet.synapses");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.neurons");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.connections");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.layouts");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.networks");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.interfaces");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.groups");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.synapses");
         interpreter.getNameSpace().importPackage("org.simbrain.workspace");
         interpreter.getNameSpace().importCommands(".");
         interpreter.getNameSpace().importCommands("org.simbrain.console.commands");

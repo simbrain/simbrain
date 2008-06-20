@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.simnet.interfaces.Network;
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.Synapse;
+import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.Synapse;
 
 /**
  * <b>Workspace</b> is the container for all Simbrain windows--network, world, and gauge.

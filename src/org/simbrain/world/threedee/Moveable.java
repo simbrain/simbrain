@@ -1,7 +1,9 @@
 package org.simbrain.world.threedee;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -33,9 +35,35 @@ public abstract class Moveable implements Viewable {
      * processed in an update. That is the input with updates with the highest
      * priority will block events on a lower priority input.
      */
-    private SortedMap<Integer, Collection<? extends Action>> inputs = Collections
-      .synchronizedSortedMap(new TreeMap<Integer, Collection<? extends Action>>());
+    private List<Holder> inputs = Collections.synchronizedList(new ArrayList<Holder>());
 
+    private class Holder implements Comparable<Holder>
+    {
+        final int priority;
+        final Collection<? extends Action> input;
+
+        private Holder(int priority, Collection<? extends Action> input)
+        {
+            this.priority = priority;
+            this.input = input;
+        }
+        
+        public int compareTo(Holder other)
+        {
+            return priority - other.priority;
+        }
+        
+        public int hashCode()
+        {
+            return priority;
+        }
+        
+        public boolean equals(Object other)
+        {
+            return other instanceof Holder && ((Holder) other).priority == priority;
+        }
+    }
+    
     /** The number of degrees each turn event rotates the view. */
     private final float rotationSpeed = 2.0f;
 
@@ -65,8 +93,7 @@ public abstract class Moveable implements Viewable {
     private float upSpeed = 0f;
 
     protected Object readResolve() {
-        inputs = Collections.synchronizedSortedMap(
-            new TreeMap<Integer, Collection<? extends Action>>());
+        Collections.synchronizedList(new ArrayList<Holder>());
         
         return this;
     }
@@ -77,8 +104,14 @@ public abstract class Moveable implements Viewable {
      * @param priority the priority of the input provided
      * @param input the input for this view
      */
-    public void addInput(final int priority, final Collection<Action> input) {
-        inputs.put(priority, input);
+    public void addInput(final int priority, final Collection<? extends Action> input) {
+        Holder holder = new Holder(priority, input);
+        
+        int index = Collections.binarySearch(inputs, holder);
+        
+        if (index < 0) index = -(index + 1);
+        
+        inputs.add(index, holder);
     }
 
     /**
@@ -124,15 +157,15 @@ public abstract class Moveable implements Viewable {
             last = now;
             
             /* input is synchronized but we need to lock over the iterator */
-            for (final Collection<? extends Action> input : inputs.values()) {
+            for (Holder holder : inputs) {
                 
                 /*
                  * if there are events on this input process them and then
                  * return
                  */
-                synchronized (input) {
-                    if (input.size() > 0) {
-                        for (final Action action : input) {
+                synchronized (holder.input) {
+                    if (holder.input.size() > 0) {
+                        for (final Action action : holder.input) {
                             if (action.parent != this) {
                                 throw new IllegalArgumentException(
                                     "actions can only be handled by parent");

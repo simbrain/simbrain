@@ -131,7 +131,7 @@ public class AgentBindings extends Bindings {
     }
     
     protected void updateExternal() {
-        sight.update();
+        if (sight != null) sight.update();
     }
     
     /**

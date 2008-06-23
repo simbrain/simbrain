@@ -54,8 +54,10 @@ public class AgentBindings extends Bindings {
         setInputs();
     }
     
-    public void createSight() {
+    public Sight createSight() {
         sight = new Sight(agent, getParentComponent().getWorkspace());
+        
+        return sight;
     }
     
     void setInputs() {

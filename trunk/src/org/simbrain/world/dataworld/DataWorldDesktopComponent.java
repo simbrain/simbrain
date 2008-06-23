@@ -318,7 +318,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     }
 
     @Override
-    public void close() {
+    public void closing() {
     }
 
     /** @see javax.swing.JFrame */

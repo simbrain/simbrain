@@ -150,7 +150,7 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
      * {@inheritDoc}
      */
     @Override
-    public void close() {
+    public void closing() {
         // TODO Auto-generated method stub
         
     }

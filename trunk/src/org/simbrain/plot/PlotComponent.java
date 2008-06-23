@@ -81,7 +81,7 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     }
 
     @Override
-    public void close() {
+    public void closing() {
         // TODO Auto-generated method stub
     }
 

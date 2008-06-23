@@ -18,16 +18,19 @@
  */
 package org.simbrain.workspace;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.simbrain.gauge.core.Projector;
 
 /**
  * Represents a component model in a Simbrain workspace.  Services relating to
@@ -39,8 +42,6 @@ import org.simbrain.gauge.core.Projector;
  */
 public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
 
-    private static final Set<String> NAMES = new HashSet<String>();
-    
     /** The workspace that 'owns' this component. */
     private Workspace workspace;
     
@@ -120,10 +121,16 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         return Collections.emptyList();
     }
 
+    public final void close() {
+        closing();
+        
+        workspace.removeWorkspaceComponent(this);
+    }
+    
     /**
      * Perform cleanup after closing.
     */
-    public abstract void close();
+    protected abstract void closing();
 
     /**
      * called by Workspace to update the state of the component.

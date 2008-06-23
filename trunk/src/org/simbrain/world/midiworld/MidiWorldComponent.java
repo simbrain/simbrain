@@ -46,7 +46,7 @@ public final class MidiWorldComponent
 
 
     /** {@inheritDoc} */
-    public void close() {
+    public void closing() {
         // empty
     }
 

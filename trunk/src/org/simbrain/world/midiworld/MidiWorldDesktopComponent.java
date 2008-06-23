@@ -24,7 +24,7 @@ public final class MidiWorldDesktopComponent
 
 
     /** {@inheritDoc} */
-    public void close() {
+    public void closing() {
         // empty
     }
 }

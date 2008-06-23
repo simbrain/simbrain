@@ -88,7 +88,7 @@ public final class OscWorldComponent
 
 
     /** {@inheritDoc} */
-    public void close() {
+    public void closing() {
         oscPortIn.close();
         oscPortOut.close();
         // TODO:  remove consumer list event listeners

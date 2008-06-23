@@ -133,7 +133,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     }
 
     @Override
-    public void close() {
+    public void closing() {
         // TODO Auto-generated method stub
     }
 

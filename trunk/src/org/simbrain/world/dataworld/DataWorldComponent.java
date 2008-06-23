@@ -144,7 +144,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     }
 
     @Override
-    public void close() {
+    public void closing() {
     }
     
     @Override

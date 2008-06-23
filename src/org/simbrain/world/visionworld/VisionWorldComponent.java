@@ -88,7 +88,7 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
     }
     
     @Override
-    public void close() {
+    public void closing() {
         // empty
     }
      

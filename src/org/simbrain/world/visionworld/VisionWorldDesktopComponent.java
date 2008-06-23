@@ -97,7 +97,7 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
      } 
 
     @Override
-    public void close() {
+    public void closing() {
         // empty
     }
 }

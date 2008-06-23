@@ -111,7 +111,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     }
 
     @Override
-    public void close() {
+    public void closing() {
         // TODO Auto-generated method stub
     }
 

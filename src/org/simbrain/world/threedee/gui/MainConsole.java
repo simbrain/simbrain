@@ -21,6 +21,7 @@ import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
 import org.simbrain.world.threedee.ThreeDeeComponent;
+import org.simbrain.world.threedee.sensors.Sight;
 
 /**
  * The main panel from which the 3D environment can be controlled.
@@ -104,6 +105,8 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         return panel;
     }
     
+    Map<Agent, JPanel> panels = new HashMap<Agent, JPanel>();
+    
     /**
      * Creates a new Agent panel for the provided panel.
      * 
@@ -112,18 +115,26 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
     private void newAgentPanel(final Agent agent) {
         JPanel panel = new JPanel();
         
+        panels.put(agent, panel);
+        
         panel.add(new JButton(new CreateAgentViewAction(agent)));
-        panel.add(new JButton(new AbstractAction("Vision") {
-            private static final long serialVersionUID = 1L;
-
-            public void actionPerformed(ActionEvent e) {
-                new Thread(new Runnable(){
-                    public void run() {
-                        agent.getBindings().createSight();
-                    }
-                }).start();
-            }
-        }));
+//        panel.add(new JButton(new AbstractAction("Vision") {
+//            private static final long serialVersionUID = 1L;
+//
+//            public void actionPerformed(ActionEvent e) {
+//                new Thread(new Runnable(){
+//                    public void run() {
+//                        final Sight sight = agent.getBindings().createSight();
+//                        
+//                        innerFrame.addWindowListener(new WindowAdapter() {
+//                            public void windowClosed(final WindowEvent e) {
+//                                sight.close();
+//                            }
+//                        });
+//                    }
+//                }).start();
+//            }
+//        }));
         agents.add(panel);
         getParentFrame().pack();
     }
@@ -181,6 +192,8 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         }
     };
     
+    JFrame innerFrame;
+    
     /**
      * Creates a new view for an agent.
      * 
@@ -189,7 +202,7 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
     private void createView(final Agent agent) {
         final AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
         final CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
-        JFrame innerFrame = new JFrame("Agent " + agent.getName());
+        innerFrame = new JFrame("Agent " + agent.getName());
         innerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         final TimerTask task = new TimerTask() {
@@ -221,6 +234,36 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         innerFrame.setSize(WIDTH, HEIGHT);
         innerFrame.setResizable(false);
         innerFrame.setVisible(true);
+        
+        final JButton button = new JButton(new AbstractAction("Vision") {
+            private static final long serialVersionUID = 1L;
+            
+            public void actionPerformed(ActionEvent e) {
+                new Thread(new Runnable(){
+                    public void run() {
+                        final Sight sight = agent.getBindings().createSight();
+                        
+                        innerFrame.addWindowListener(new WindowAdapter() {
+                            public void windowClosed(final WindowEvent e) {
+                                System.out.println("closed");
+                                sight.close();
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
+        
+        panels.get(agent).add(button);
+        
+        innerFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosed(final WindowEvent e) {
+                panels.get(agent).remove(button);
+                getParentFrame().pack();
+            }
+        });
+        
+        getParentFrame().pack();
     }
     
     /**
@@ -249,8 +292,8 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
      * {@inheritDoc}
      */
     @Override
-    public void close() {
-        component.close();
+    public void closing() {
+//        component.closing();
         
         for (JFrame frame : views.values()) {
             frame.setVisible(false);

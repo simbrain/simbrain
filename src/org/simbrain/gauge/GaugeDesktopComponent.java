@@ -329,7 +329,7 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
     /**
      * Cleans-up and closes the Gauge panel.
      */
-    public void close() {
+    public void closing() {
         gaugePanel.stopThread();
         GaugePreferences.setCurrentDirectory(component.getCurrentDirectory());
     }

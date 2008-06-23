@@ -178,7 +178,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * {@inheritDoc}
      */
     @Override
-    public void close() {
+    public void closing() {
         model.environment.killTimer();
     }
     

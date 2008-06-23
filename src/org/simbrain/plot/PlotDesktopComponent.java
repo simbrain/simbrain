@@ -96,7 +96,7 @@ public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
     }
 
     @Override
-    public void close() {
+    public void closing() {
         // TODO Auto-generated method stub
     }
 

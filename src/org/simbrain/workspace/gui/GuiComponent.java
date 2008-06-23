@@ -80,11 +80,16 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         /* no implementation */
     }
 
+    public void close() {
+        closing();
+        workspaceComponent.close();
+    }
+    
    /**
     * Perform cleanup after closing.
     * TODO: Move to model?
     */
-    public abstract void close();
+    protected abstract void closing();
 
     /**
      * Update that goes beyond updating couplings.

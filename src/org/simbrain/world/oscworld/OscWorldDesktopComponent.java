@@ -145,7 +145,7 @@ public final class OscWorldDesktopComponent
     }
 
     /** {@inheritDoc} */
-    public void close() {
+    public void closing() {
         // empty
     }
 

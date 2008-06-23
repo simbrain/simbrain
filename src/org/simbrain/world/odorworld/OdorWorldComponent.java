@@ -106,7 +106,7 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     
 
     @Override
-    public void close() {
+    public void closing() {
         // TODO Auto-generated method stub
     }
     

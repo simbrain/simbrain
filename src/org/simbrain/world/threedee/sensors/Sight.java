@@ -1,5 +1,6 @@
 package org.simbrain.world.threedee.sensors;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Semaphore;
@@ -21,6 +22,7 @@ public class Sight {
     int width;
     volatile BufferedImagePixelMatrix image;
     SensorMatrix matrix;
+    WeakReference<VisionWorldComponent> component = new WeakReference<VisionWorldComponent>(null);
     
     public Sight(final Agent agent, final Workspace workspace) {
         this.agent = agent;
@@ -53,6 +55,9 @@ public class Sight {
                 matrix = sensorMatrix;
                 VisionWorldModel model = new MutableVisionWorldModel(image, matrix);
                 VisionWorldComponent component = new VisionWorldComponent(agent.getName() + " vision", model);
+                
+                Sight.this.component = new WeakReference<VisionWorldComponent>(component);
+                
                 workspace.addWorkspaceComponent(component);
                 semaphore.release();
             }
@@ -67,6 +72,14 @@ public class Sight {
         } catch (InterruptedException e) {
             
         }
+    }
+    
+    public void close() {
+        VisionWorldComponent component = this.component.get();
+        
+        System.out.println("component: " + component);
+        
+        if (component != null) component.close();
     }
     
     public Collection<Sensor> getProducingAttributes() {

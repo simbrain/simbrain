@@ -37,7 +37,7 @@ public class GameWorld2DDesktopComponent extends GuiComponent<GameWorld2DCompone
     }
 
     @Override
-    public void close() {
+    public void closing() {
         // TODO Auto-generated method stub
     }
 

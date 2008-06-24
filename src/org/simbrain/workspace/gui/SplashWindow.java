@@ -153,14 +153,13 @@ public final class SplashWindow extends Window {
     public void paint(final Graphics g) {
         g.drawImage(image, 0, 0, this);
 
+        synchronized (this) {
         // Notify method splash that the window
         // has been painted.
         // Note: To improve performance we do not enter
         // the synchronized block unless we have to.
-        if (!paintCalled) {
-            paintCalled = true;
-
-            synchronized (this) {
+            if (!paintCalled) {
+                paintCalled = true;
                 notifyAll();
             }
         }

@@ -26,7 +26,7 @@ public class Smell implements Sensor {
     private final float offset;
     
     /** Temporary scaling on how smell diminishes with distance. */
-    private final float SCALE_FACTOR = 4;
+    private static final float SCALE_FACTOR = 4;
 
     /**
      * Creates a new odor sensor for the given type of scent.

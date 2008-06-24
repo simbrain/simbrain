@@ -65,6 +65,8 @@ public class AgentBindings extends Bindings {
         consumers.add(new ConsumingBinding("right", agent.right()));
         consumers.add(new ConsumingBinding("forward", agent.forward()));
         consumers.add(new ConsumingBinding("backward", agent.backward()));
+        consumers.add(new ConsumingBinding("up", agent.up()));
+        consumers.add(new ConsumingBinding("down", agent.down()));
         setDefaultConsumingAttribute(consumers.get(0));
         setDefaultProducingAttribute(new ProducingBinding(
             new Smell(agent.getOdors().get(0).getName(), agent, STRENGTH), "right"));

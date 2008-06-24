@@ -280,6 +280,8 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         handler.addBinding(KeyEvent.VK_RIGHT, agent.right());
         handler.addBinding(KeyEvent.VK_UP, agent.forward());
         handler.addBinding(KeyEvent.VK_DOWN, agent.backward());
+        handler.addBinding(KeyEvent.VK_Z, agent.up());
+        handler.addBinding(KeyEvent.VK_A, agent.down());
 //        handler.addBinding(KeyEvent.VK_A, Moveable.Action.DOWN);
 //        handler.addBinding(KeyEvent.VK_Z, Moveable.Action.UP);
 //        handler.addBinding(KeyEvent.VK_U, Moveable.Action.RISE);

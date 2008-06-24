@@ -527,7 +527,7 @@ public class Dataset {
         logger.debug("checking for uniqueness with tolerance: " + tolerance);
         
         if (toCheck.length != dimensions) {
-            throw new IllegalArgumentException("point to check has " + toCheck 
+            throw new IllegalArgumentException("point to check has " + toCheck.length 
                     + " dimensions.  This dataset requires " + dimensions);
         }
         return dataset.isUnique(toCheck, tolerance);

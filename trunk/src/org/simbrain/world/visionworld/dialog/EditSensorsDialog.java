@@ -289,7 +289,7 @@ public final class EditSensorsDialog
     /**
      * Filter editors combo box model.
      */
-    private class FilterEditorsComboBoxModel
+    private static class FilterEditorsComboBoxModel
         extends AbstractListModel
         implements ComboBoxModel {
 

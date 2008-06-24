@@ -161,7 +161,7 @@ public final class PixelMatrixImageNode
     /**
      * Image node that paints images without antialiasing.
      */
-    private class NonAntialiasingImageNode
+    private static class NonAntialiasingImageNode
         extends PNode {
 
         /** Image for this non-antialiasing image node. */

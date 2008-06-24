@@ -204,7 +204,7 @@ public class WorkspaceChangedDialog extends JDialog {
         return panel;
     }
     
-    private class Filter extends FileFilter {
+    private static class Filter extends FileFilter {
         String extension;
         String description;
         

@@ -237,7 +237,7 @@ public final class CreatePixelMatrixDialog
     /**
      * Pixel matrix editors combo box model.
      */
-    private class PixelMatrixEditorsComboBoxModel
+    private static class PixelMatrixEditorsComboBoxModel
         extends AbstractListModel
         implements ComboBoxModel {
 

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -187,6 +185,9 @@ public abstract class Moveable implements Viewable {
     private static final long FULL = 15;
     private float fraction;
     
+    private static final int UP_LIMIT = 345;
+    private static final int DOWN_LIMIT = 10;
+    
     /**
      * Does the necessary processing for any changes to the view.
      */
@@ -212,6 +213,15 @@ public abstract class Moveable implements Viewable {
 
         /* normalize the up/down angle and then use it to set the up/down quaternion */
         upDownRot = (upDownRot + ROT_CALC_BUFFER) % DEGREES_IN_A_CIRCLE;
+        
+        if (upDownRot <= UP_LIMIT && upDownRot >= DOWN_LIMIT) {
+            if (upDownRot < 180) {
+                upDownRot = DOWN_LIMIT;
+            } else {
+                upDownRot = UP_LIMIT;
+            }
+        }
+        
         upDownQuat.fromAngleAxis(upDownRot * FastMath.DEG_TO_RAD, X_AXIS);
 
         /* get copies of the current direction and location */

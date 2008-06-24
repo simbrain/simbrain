@@ -508,7 +508,7 @@ public class SimbrainDesktop {
      * @author jyoshimi
      *
      */
-    private class DesktopInternalFrame extends GenericJInternalFrame {
+    private static class DesktopInternalFrame extends GenericJInternalFrame {
         
         WorkspaceComponent workspaceComponent;
         GuiComponent guiComponent;
@@ -559,7 +559,7 @@ public class SimbrainDesktop {
 
         LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
-        DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
+        final DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
         
         // When deserializing it is provided
         if (guiComponent == null) {
@@ -617,14 +617,12 @@ public class SimbrainDesktop {
         guiComponent.postAddInit();
    
         // Forces last component of the desktop to the front
-        if (componentFrame instanceof JInternalFrame) {
-                try {
-                    ((JInternalFrame)componentFrame).setSelected(true);
-                } catch (PropertyVetoException e) {
-                    e.printStackTrace();
-                }
+        
+        try {
+            ((JInternalFrame)componentFrame).setSelected(true);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
         }
-    
     }
     
     /**

@@ -229,7 +229,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * Custom consumer cell renderer which shows default attribute
      * name.
      */
-    private class ConsumerCellRenderer extends DefaultListCellRenderer {
+    private static class ConsumerCellRenderer extends DefaultListCellRenderer {
 
         private static final long serialVersionUID = 1L;
 
@@ -288,7 +288,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     /**
      * Packages a coupling into a menu item.
      */
-    private class ConsumerMenuItem extends JMenuItem {
+    private static class ConsumerMenuItem extends JMenuItem {
 
         private static final long serialVersionUID = 1L;
 
@@ -354,7 +354,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * Custom producer cell renderer which shows default attribute
      * name.
      */
-    private class ProducerCellRenderer extends DefaultListCellRenderer {
+    private static class ProducerCellRenderer extends DefaultListCellRenderer {
 
         private static final long serialVersionUID = 1L;
 
@@ -413,7 +413,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     /**
      * Packages a coupling into a menu item.
      */
-    private class ProducerMenuItem extends JMenuItem {
+    private static class ProducerMenuItem extends JMenuItem {
 
         private static final long serialVersionUID = 1L;
 
@@ -680,7 +680,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     /**
      * Packages a coupling into a menu item.
      */
-    private class CouplingTrayMenuItem extends JMenuItem {
+    private static class CouplingTrayMenuItem extends JMenuItem {
 
         /** Coupling list. */
         private ArrayList<Coupling> couplingList;

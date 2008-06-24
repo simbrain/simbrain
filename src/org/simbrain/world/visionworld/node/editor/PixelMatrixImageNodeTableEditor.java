@@ -71,7 +71,7 @@ public final class PixelMatrixImageNodeTableEditor
     /**
      * Paint cell renderer.
      */
-    private class PaintCellRenderer
+    private static class PaintCellRenderer
         implements TableCellRenderer {
 
         /** Paint cell renderer component. */
@@ -103,7 +103,7 @@ public final class PixelMatrixImageNodeTableEditor
     /**
      * Color cell renderer.
      */
-    private class ColorCellRenderer
+    private static class ColorCellRenderer
         implements TableCellRenderer {
 
         /** Color cell renderer component. */
@@ -135,7 +135,7 @@ public final class PixelMatrixImageNodeTableEditor
     /**
      * Stroke cell renderer.
      */
-    private class StrokeCellRenderer
+    private static class StrokeCellRenderer
         implements TableCellRenderer {
 
         /** Stroke cell renderer component. */

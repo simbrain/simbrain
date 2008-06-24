@@ -354,7 +354,7 @@ public abstract class AbstractSensorMatrixDialog
     /**
      * Filter editors combo box model.
      */
-    private class FilterEditorsComboBoxModel
+    private static class FilterEditorsComboBoxModel
         extends AbstractListModel
         implements ComboBoxModel {
 
@@ -395,7 +395,7 @@ public abstract class AbstractSensorMatrixDialog
     /**
      * Sensor matrix editors combo box model.
      */
-    private class SensorMatrixEditorsComboBoxModel
+    private static class SensorMatrixEditorsComboBoxModel
         extends AbstractListModel
         implements ComboBoxModel {
 

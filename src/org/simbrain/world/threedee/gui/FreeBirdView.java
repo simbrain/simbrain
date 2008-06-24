@@ -14,7 +14,7 @@ import com.jme.renderer.Renderer;
  */
 public class FreeBirdView extends Moveable {
     /** The height at which the free-bird starts. */
-    private static final float START_HEIGHT = 25f;
+//    private static final float START_HEIGHT = 25f;
     
     /** The current direction of the view. */
     private Vector direction;

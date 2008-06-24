@@ -35,7 +35,7 @@ public abstract class Moveable implements Viewable {
      */
     private List<Holder> inputs = Collections.synchronizedList(new ArrayList<Holder>());
 
-    private class Holder implements Comparable<Holder>
+    private static class Holder implements Comparable<Holder>
     {
         final int priority;
         final Collection<? extends Action> input;

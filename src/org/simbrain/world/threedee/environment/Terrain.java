@@ -224,6 +224,7 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
             
         }
 
+        @SuppressWarnings("unchecked")
         public boolean canConvert(Class clazz) {
             return clazz.equals(Terrain.class);
         }

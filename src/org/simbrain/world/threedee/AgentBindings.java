@@ -32,7 +32,7 @@ public class AgentBindings extends Bindings {
     private final Agent agent;
     
     /** Temporary strength variable. */
-    private final float STRENGTH = 1;
+    private static final float STRENGTH = 1;
 
     private Sight sight;
     

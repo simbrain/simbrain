@@ -97,7 +97,7 @@ import org.simbrain.network.networks.actorcritic.ActorCritic;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.Comparator;
+import org.simbrain.util.NeuronComparator;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.workspace.Consumer;
@@ -779,7 +779,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             return;
         }
         ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
-        Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_X));
+        Collections.sort(sortedNeurons, new NeuronComparator(NeuronComparator.Type.COMPARE_X));
 
         double min = sortedNeurons.get(0).getX();
         double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getX();
@@ -802,7 +802,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             return;
         }
         ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
-        Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_Y));
+        Collections.sort(sortedNeurons, new NeuronComparator(NeuronComparator.Type.COMPARE_Y));
 
         double min = sortedNeurons.get(0).getY();
         double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getY();

@@ -23,41 +23,46 @@ import org.simbrain.network.interfaces.Neuron;
 /**
  * <b>Comparator</b> is used to compare positions of PNodes.
  */
-public class Comparator implements java.util.Comparator {
+public class NeuronComparator implements java.util.Comparator<Neuron> {
 
-    /** Compare PNodes by their x dimension. */
-    public static final int COMPARE_X = 1;
-
-    /** Compare PNodes by their y dimension. */
-    public static final int COMPARE_Y = 2;
-
+    public enum Type {
+        COMPARE_X, COMPARE_Y
+    }
+    
     /** How to compare the PNodes. */
-    private int comparisonType;
+    private Type comparisonType;
 
     /**
      * Constructor for Comparator.
      *
      * @param comparison whether to compare by x or y dimension.
      */
-    public Comparator(final int comparison) {
+    public NeuronComparator(final Type comparison) {
+        if (comparison != null) throw new RuntimeException("comparison type cannot be null");
+        
         comparisonType = comparison;
     }
 
     /**
-     * @see Comparator
+     * @see NeuronComparator
      */
-    public int compare(final Object o1, final Object o2) {
-        Neuron p1 = (Neuron) o1;
-        Neuron p2 = (Neuron) o2;
-        Double d1, d2;
-        if (comparisonType == COMPARE_X) {
-            d1 = new Double(p1.getX());
-            d2 = new Double(p2.getX());
-        } else {
-            d1 = new Double(p1.getY());
-            d2 = new Double(p2.getY());
+    public int compare(final Neuron p1, final Neuron p2) {
+        double d1;
+        double d2;
+        
+        switch (comparisonType) {
+        case COMPARE_X:
+            d1 = p1.getX();
+            d2 = p2.getX();
+            break;
+        case COMPARE_Y:
+            d1 = p1.getX();
+            d2 = p2.getX();
+            break;
+        default:
+            throw new IllegalArgumentException("unknown: " + comparisonType);
         }
 
-        return d1.compareTo(d2);
+        return Double.valueOf(d1).compareTo(d2);
     }
 }

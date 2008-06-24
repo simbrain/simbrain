@@ -773,10 +773,10 @@ public class Dataset {
             }
 
             pastGreatest[greatest] = true;
-            ret.add(new Integer(greatest));
+            ret.add(greatest);
         }
 
-        return ((Integer) ret.get(n)).intValue();
+        return ret.get(n);
     }
 
     /**

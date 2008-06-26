@@ -8,6 +8,7 @@ import java.util.concurrent.Semaphore;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.Sensor;
+import org.simbrain.world.threedee.gui.AgentView;
 import org.simbrain.world.visionworld.MutableVisionWorldModel;
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
@@ -17,18 +18,18 @@ import org.simbrain.world.visionworld.dialog.AbstractSensorMatrixDialog;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 public class Sight {
-    Agent agent;
+    AgentView agent;
     int height;
     int width;
     volatile BufferedImagePixelMatrix image;
     SensorMatrix matrix;
     WeakReference<VisionWorldComponent> component = new WeakReference<VisionWorldComponent>(null);
     
-    public Sight(final Agent agent, final Workspace workspace) {
+    public Sight(final AgentView agent, final String name, final Workspace workspace) {
         this.agent = agent;
         
-        width = agent.getWidth();
-        height = agent.getHeight();
+//        width = agent.getWidth();
+//        height = agent.getHeight();
         
 //        int rWidth = width / 5;
 //        int rHeight = height / 5;
@@ -54,7 +55,7 @@ public class Sight {
             protected void ok(SensorMatrix sensorMatrix) {
                 matrix = sensorMatrix;
                 VisionWorldModel model = new MutableVisionWorldModel(image, matrix);
-                VisionWorldComponent component = new VisionWorldComponent(agent.getName() + " vision", model);
+                VisionWorldComponent component = new VisionWorldComponent(name + " vision", model);
                 
                 Sight.this.component = new WeakReference<VisionWorldComponent>(component);
                 

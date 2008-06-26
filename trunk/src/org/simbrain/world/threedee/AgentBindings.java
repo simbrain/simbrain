@@ -9,6 +9,7 @@ import java.util.List;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.world.threedee.Moveable.Action;
+import org.simbrain.world.threedee.gui.AgentView;
 import org.simbrain.world.threedee.sensors.Sight;
 import org.simbrain.world.threedee.sensors.Smell;
 
@@ -54,8 +55,8 @@ public class AgentBindings extends Bindings {
         setInputs();
     }
     
-    public Sight createSight() {
-        sight = new Sight(agent, getParentComponent().getWorkspace());
+    public Sight createSight(AgentView view) {
+        sight = new Sight(view, agent.getName(), getParentComponent().getWorkspace());
         
         return sight;
     }

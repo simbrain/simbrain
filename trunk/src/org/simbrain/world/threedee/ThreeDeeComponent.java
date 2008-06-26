@@ -150,7 +150,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * @return The newly created Agent.
      */
     public Agent createAgent() {
-        Agent agent = new Agent("" + model.agents.size() + 1, this);
+        Agent agent = new Agent("" + (model.agents.size() + 1), this);
         model.agents.add(agent);
         model.bindings.add(agent.getBindings());//new Bindings(agent, this));
         model.environment.add(agent);

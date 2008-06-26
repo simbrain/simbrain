@@ -1,7 +1,15 @@
 package org.simbrain.world.threedee.gui;
 
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
 import org.apache.log4j.Logger;
-import org.simbrain.world.threedee.Viewable;
+import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.environment.Environment;
 
 import com.jme.renderer.Renderer;
@@ -14,6 +22,8 @@ import com.jmex.awt.SimpleCanvasImpl;
  * @author Matt Watson
  */
 public class AgentView extends SimpleCanvasImpl {
+   
+    
     /** The static logger for the class. */
     private static final Logger LOGGER = Logger.getLogger(AgentView.class);
     /** The default serial version ID. */
@@ -23,7 +33,7 @@ public class AgentView extends SimpleCanvasImpl {
     private final Environment environment;
     
     /** The viewable that controls what is seen. */
-    private final Viewable viewable;
+    private final Agent agent;
     
     /**
      * Constructs an instance with the provided Viewable and Environment at the
@@ -34,12 +44,20 @@ public class AgentView extends SimpleCanvasImpl {
      * @param width the width
      * @param height the height
      */
-    AgentView(final Viewable viewable, final Environment environment,
+    AgentView(final Agent viewable, final Environment environment,
             final int width, final int height) {
         super(width, height);
     
         this.environment = environment;
-        this.viewable = viewable;
+        this.agent = viewable;
+    }
+    
+    public int getWidth() {
+        return width;
+    }
+    
+    public int getHeight() {
+        return height;
     }
     
     /**
@@ -71,9 +89,7 @@ public class AgentView extends SimpleCanvasImpl {
         cs.setCullMode(CullState.CS_BACK);
         rootNode.setRenderState(cs);
         
-        environment.init(getRenderer(), rootNode);
-        
-        viewable.init(renderer, cam, width, height);
+        environment.init(agent, getRenderer(), rootNode);
     }
     
     public void close() {
@@ -93,6 +109,75 @@ public class AgentView extends SimpleCanvasImpl {
      */
     @Override
     public void simpleRender() {
-        viewable.render(cam);
+        agent.render(cam);
+    }
+    
+    @Override
+    public void doRender() {
+        super.doRender();
+        if (grab != null) grab.run();
+    }
+    
+    private volatile FutureTask<Matrix> grab;
+    
+    public BufferedImage getSnapshot() {
+        Callable<Matrix> exe = new Callable<Matrix>() {
+            public Matrix call() {
+                Matrix matrix = new Matrix(width, height);
+                renderer.grabScreenContents(matrix.buffer, 0, 0, width, height);
+
+                return matrix;
+            }
+        };
+        
+        grab = new FutureTask<Matrix>(exe);
+        Matrix matrix;
+        
+        try {
+            matrix = grab.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+                
+        int xOffset = 12;//(mode.getWidth() - width) / 2;
+        int yOffset = 34;//(mode.getHeight() - height) / 2;
+        
+        BufferedImage image = new BufferedImage(width - xOffset, height - yOffset, BufferedImage.TYPE_INT_RGB);
+
+        /* Grab each pixel information and set it to the BufferedImage info. */
+        for (int x = 0; x < width - xOffset; x++) {
+            for (int y = 0; y < height - yOffset; y++) {
+                int rgb = matrix.get(x, (height - 1) - y);
+               
+                image.setRGB(x, y, rgb);
+            }
+        }
+        
+        return image;
+    }
+    
+    private static class Matrix {
+        final IntBuffer buffer;
+        final int width;
+        final int height;
+        
+        Matrix(int width, int height) {
+            this.buffer = ByteBuffer.allocateDirect(width * height * 4)
+                .order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
+            this.width = width;
+            this.height = height;
+        }
+        
+        int get(final int x, final int y) {
+            try {
+                return buffer.get((y * width) + x);
+            } catch (Exception e) {
+                System.err.println(x + ", " + y);
+                e.printStackTrace();
+                throw (RuntimeException) e;
+            }
+        }
     }
 }

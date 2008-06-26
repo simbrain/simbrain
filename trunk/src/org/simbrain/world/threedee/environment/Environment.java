@@ -172,14 +172,17 @@ public class Environment {
      * @param renderer the renderer
      * @param parent the parent node
      */
-    public void init(final Renderer renderer, final Node parent) {
+    public void init(final Agent agent, final Renderer renderer, final Node parent) {
         LOGGER.debug("init: " + renderer);
 
         parents.put(renderer, parent);
         
         for (final Element element : elements) {
             LOGGER.debug("element: " + element);
-            element.init(renderer, parent);
+            if (!(element instanceof AgentElement
+            && ((AgentElement) element).getAgent() == agent)) {
+                element.init(renderer, parent);
+            }
         }
 
         parent.setModelBound(new BoundingBox());

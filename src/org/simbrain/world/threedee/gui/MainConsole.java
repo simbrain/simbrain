@@ -241,7 +241,7 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
             public void actionPerformed(ActionEvent e) {
                 new Thread(new Runnable(){
                     public void run() {
-                        final Sight sight = agent.getBindings().createSight();
+                        final Sight sight = agent.getBindings().createSight(view);
                         
                         innerFrame.addWindowListener(new WindowAdapter() {
                             public void windowClosed(final WindowEvent e) {

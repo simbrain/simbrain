@@ -125,12 +125,8 @@ public abstract class Moveable implements Viewable {
 
         Point location = getLocation();
 
-        /*
-         * move the view up a little and out in front
-         * to improve the view
-         */
+        /* move the view up a little to improve the view */
         location = location.add(new Vector(0, VIEW_LEAD, 0));
-        location = location.add(direction);
         camera.setLocation(location.toVector3f());
 
         final Vector3f left = direction.toVector3f().cross(Y_AXIS).normalizeLocal();

@@ -31,6 +31,10 @@ public class AgentElement extends MultipleViewElement<Node> {
         this.agent = agent;
     }
 
+    public Agent getAgent() {
+        return agent;
+    }
+    
     /**
      * Initializes one spatial node.
      *

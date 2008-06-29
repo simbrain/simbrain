@@ -6,7 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -118,23 +120,6 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         panels.put(agent, panel);
         
         panel.add(new JButton(new CreateAgentViewAction(agent)));
-//        panel.add(new JButton(new AbstractAction("Vision") {
-//            private static final long serialVersionUID = 1L;
-//
-//            public void actionPerformed(ActionEvent e) {
-//                new Thread(new Runnable(){
-//                    public void run() {
-//                        final Sight sight = agent.getBindings().createSight();
-//                        
-//                        innerFrame.addWindowListener(new WindowAdapter() {
-//                            public void windowClosed(final WindowEvent e) {
-//                                sight.close();
-//                            }
-//                        });
-//                    }
-//                }).start();
-//            }
-//        }));
         agents.add(panel);
         getParentFrame().pack();
     }
@@ -188,83 +173,76 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
          * {@inheritDoc}
          */
         public void actionPerformed(final ActionEvent e) {
-            createView(agent);
+            this.setEnabled(false);
+            final AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
+            final CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
+            final JFrame innerFrame = new JFrame("Agent " + agent.getName());
+                    
+            innerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            
+            final TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    canvas.getCanvas().repaint();
+                }
+            };
+            
+            innerFrame.addWindowListener(new WindowAdapter() {
+                public void windowClosed(final WindowEvent e) {
+                    view.close();
+                    task.cancel();
+                }
+            });
+            
+            views.put(view, innerFrame);
+            
+            BorderLayout layout = new BorderLayout();
+            
+            innerFrame.getRootPane().setLayout(layout);
+            innerFrame.getRootPane().add(canvas.getCanvas());
+            
+            timer.schedule(task, REFRESH_WAIT, REFRESH_WAIT);
+            
+            KeyHandler handler = getHandler(agent);
+            agent.addInput(0, handler.getInput());
+            innerFrame.addKeyListener(handler);
+            innerFrame.setSize(WIDTH, HEIGHT);
+            innerFrame.setResizable(false);
+            innerFrame.setVisible(true);
+            
+            JPanel panel = panels.get(agent);
+            
+            final JButton button = new JButton(new AbstractAction("Vision") {
+                private static final long serialVersionUID = 1L;
+                
+                public void actionPerformed(ActionEvent e) {
+                    new Thread(new Runnable(){
+                        public void run() {
+                            final Sight sight = agent.getBindings().createSight(view);
+                            
+                            innerFrame.addWindowListener(new WindowAdapter() {
+                                public void windowClosed(final WindowEvent e) {
+                                    sight.close();
+                                }
+                            });
+                        }
+                    }).start();
+                }
+            });
+            
+            panel.add(button);
+            
+            innerFrame.addWindowListener(new WindowAdapter() {
+                public void windowClosed(final WindowEvent e) {
+                    panels.get(agent).remove(button);
+                    CreateAgentViewAction.this.setEnabled(true);
+                    getParentFrame().pack();
+                }
+            });
+            
+            getParentFrame().pack();
         }
     };
-    
-    JFrame innerFrame;
-    
-    /**
-     * Creates a new view for an agent.
-     * 
-     * @param agent the agent to create a view for.
-     */
-    private void createView(final Agent agent) {
-        final AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
-        final CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
-        innerFrame = new JFrame("Agent " + agent.getName());
-        innerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
-        final TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                canvas.getCanvas().repaint();
-            }
-        };
-        
-        innerFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosed(final WindowEvent e) {
-                view.close();
-                task.cancel();
-            }
-        });
-        
-        views.put(view, innerFrame);
-        
-        BorderLayout layout = new BorderLayout();
-        
-        innerFrame.getRootPane().setLayout(layout);
-        innerFrame.getRootPane().add(canvas.getCanvas());
-        
-        timer.schedule(task, REFRESH_WAIT, REFRESH_WAIT);
-        
-        KeyHandler handler = getHandler(agent);
-        agent.addInput(0, handler.getInput());
-        innerFrame.addKeyListener(handler);
-        innerFrame.setSize(WIDTH, HEIGHT);
-        innerFrame.setResizable(false);
-        innerFrame.setVisible(true);
-        
-        final JButton button = new JButton(new AbstractAction("Vision") {
-            private static final long serialVersionUID = 1L;
-            
-            public void actionPerformed(ActionEvent e) {
-                new Thread(new Runnable(){
-                    public void run() {
-                        final Sight sight = agent.getBindings().createSight(view);
-                        
-                        innerFrame.addWindowListener(new WindowAdapter() {
-                            public void windowClosed(final WindowEvent e) {
-                                System.out.println("closed");
-                                sight.close();
-                            }
-                        });
-                    }
-                }).start();
-            }
-        });
-        
-        panels.get(agent).add(button);
-        
-        innerFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosed(final WindowEvent e) {
-                panels.get(agent).remove(button);
-                getParentFrame().pack();
-            }
-        });
-        
-        getParentFrame().pack();
-    }
     
     /**
      * Gets a key handler for an agent.
@@ -282,10 +260,6 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         handler.addBinding(KeyEvent.VK_DOWN, agent.backward());
         handler.addBinding(KeyEvent.VK_Z, agent.up());
         handler.addBinding(KeyEvent.VK_A, agent.down());
-//        handler.addBinding(KeyEvent.VK_A, Moveable.Action.DOWN);
-//        handler.addBinding(KeyEvent.VK_Z, Moveable.Action.UP);
-//        handler.addBinding(KeyEvent.VK_U, Moveable.Action.RISE);
-//        handler.addBinding(KeyEvent.VK_J, Moveable.Action.FALL);
         
         return handler;
     }
@@ -295,8 +269,6 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
      */
     @Override
     public void closing() {
-//        component.closing();
-        
         for (JFrame frame : views.values()) {
             frame.setVisible(false);
             frame.dispose();

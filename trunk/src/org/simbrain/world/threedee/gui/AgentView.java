@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
@@ -22,8 +23,6 @@ import com.jmex.awt.SimpleCanvasImpl;
  * @author Matt Watson
  */
 public class AgentView extends SimpleCanvasImpl {
-   
-    
     /** The static logger for the class. */
     private static final Logger LOGGER = Logger.getLogger(AgentView.class);
     /** The default serial version ID. */
@@ -34,6 +33,10 @@ public class AgentView extends SimpleCanvasImpl {
     
     /** The viewable that controls what is seen. */
     private final Agent agent;
+    
+    private final ConcurrentLinkedQueue<FutureTask<Matrix>> queue 
+      = new ConcurrentLinkedQueue<FutureTask<Matrix>>();
+  
     
     /**
      * Constructs an instance with the provided Viewable and Environment at the
@@ -115,10 +118,11 @@ public class AgentView extends SimpleCanvasImpl {
     @Override
     public void doRender() {
         super.doRender();
-        if (grab != null) grab.run();
+        
+        for (FutureTask<Matrix> grab; (grab = queue.poll()) != null;) {
+            grab.run();
+        }
     }
-    
-    private volatile FutureTask<Matrix> grab;
     
     public BufferedImage getSnapshot() {
         Callable<Matrix> exe = new Callable<Matrix>() {
@@ -130,7 +134,9 @@ public class AgentView extends SimpleCanvasImpl {
             }
         };
         
-        grab = new FutureTask<Matrix>(exe);
+        FutureTask<Matrix> grab = new FutureTask<Matrix>(exe);
+        
+        queue.add(grab);
         Matrix matrix;
         
         try {

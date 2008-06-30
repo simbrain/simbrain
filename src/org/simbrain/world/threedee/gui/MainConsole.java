@@ -222,6 +222,7 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
                             
                             innerFrame.addWindowListener(new WindowAdapter() {
                                 public void windowClosed(final WindowEvent e) {
+                                    System.out.println("closing");
                                     sight.close();
                                 }
                             });

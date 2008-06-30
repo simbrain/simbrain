@@ -78,8 +78,6 @@ public class Sight {
     public void close() {
         VisionWorldComponent component = this.component.get();
         
-        System.out.println("component: " + component);
-        
         if (component != null) component.close();
     }
     

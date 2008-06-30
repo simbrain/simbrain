@@ -542,9 +542,9 @@ public class SimbrainDesktop {
             public void internalFrameClosing(final InternalFrameEvent e) {
                 if (workspaceComponent.hasChangedSinceLastSave()) {
                     guiComponent.showHasChangedDialog();
-                } else {
-                   guiComponent.close();
                 }
+                
+                guiComponent.close();
             }
         }
     }

@@ -145,10 +145,26 @@ public class RootNetwork extends Network {
      */
     public RootNetwork(NetworkComponent parent) {
         super();
-        setRootNetwork(this);
         this.component = parent;
+        init();
+    }
+    
+    /**
+     * When using from a console.
+     * 
+     * @param id String id of this network
+     */
+    public RootNetwork() {
+        init();
+    }
+    
+    /**
+     * Local initialization
+     */
+    private void init() {
+        setRootNetwork(this);
         this.updatePriorities = new TreeSet<Integer>();
-        this.updatePriorities.add(new Integer(0));
+        this.updatePriorities.add(new Integer(0));  
         this.setId("Root-network");
     }
     
@@ -522,7 +538,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronRemoved(new NetworkEvent(this, deleted));
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
     /**
@@ -532,7 +550,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.networkChanged();
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
     /**
@@ -543,7 +563,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronMoved(new NetworkEvent(this, moved));
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
     /**
@@ -554,7 +576,9 @@ public class RootNetwork extends Network {
             listener.clampMenuChanged();
             listener.clampBarChanged();
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
 
@@ -567,7 +591,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronAdded(new NetworkEvent(this, added));
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);            
+        }
     }
 
     /**
@@ -580,7 +606,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.neuronChanged(new NetworkEvent(this, old, changed));
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
     /**
@@ -592,7 +620,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.synapseAdded(new NetworkEvent(this, added));
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
     /**
@@ -604,7 +634,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.synapseRemoved(new NetworkEvent(this, deleted));
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
     /**
@@ -617,7 +649,9 @@ public class RootNetwork extends Network {
         for (NetworkListener listener : getListenerList()) {
             listener.synapseChanged(new NetworkEvent(this, old, changed));
         }
-        getParent().setChangedSinceLastSave(true);
+        if (getParent() != null) {
+            getParent().setChangedSinceLastSave(true);
+        }
     }
 
     /**
@@ -873,7 +907,27 @@ public class RootNetwork extends Network {
      * @see Object
      */
     public String toString() {
-        String ret = super.toString();
+        
+        String ret = "Root Network \n================= \n";
+        ret+= "Update method: " + this.getUpdateMethod() + "\t Iterations:" + this.getTime() + "\n";
+        
+        for (Neuron n : this.getNeuronList()) {
+            ret += (getIndents() + n + "\n");
+        }
+        
+        if (this.getSynapseList().size() > 0) {
+            for (int i = 0; i < getSynapseList().size(); i++) {
+                Synapse tempRef = (Synapse) getSynapseList().get(i);
+                ret += (getIndents() + tempRef);
+            }
+        }
+
+        for (int i = 0; i < getNetworkList().size(); i++) {
+            Network net = (Network) getNetworkList().get(i);
+            ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
+            ret += (getIndents() + "--------------------------------\n");
+            ret += net.toString();
+        }
         for (int i = 0; i < groupList.size(); i++) {
             Group group = (Group) groupList.get(i);
             ret += ("\n" + getIndents() + "Group " + (i + 1));

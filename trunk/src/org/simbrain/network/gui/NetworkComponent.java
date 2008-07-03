@@ -48,7 +48,7 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     /**
      * Create a new network component.
      */
-    private NetworkComponent(String name, RootNetwork network) {
+    public NetworkComponent(String name, RootNetwork network) {
         super(name);
         this.rootNetwork = network;
         rootNetwork.setParent(this);

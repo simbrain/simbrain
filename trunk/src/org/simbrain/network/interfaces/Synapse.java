@@ -543,7 +543,7 @@ public abstract class Synapse {
      */
     public String toString() {
         String ret =  new String();
-        ret += ("Weight [" + getId() + "]: " + getStrength());
+        ret += ("Synapse [" + getId() + "]: " + getStrength());
         ret += ("  Connects neuron " + getSource().getId() + " to neuron "
                            + getTarget().getId() + "\n");
         return ret;

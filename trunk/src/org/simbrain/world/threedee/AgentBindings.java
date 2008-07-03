@@ -56,7 +56,11 @@ public class AgentBindings extends Bindings {
     }
     
     public Sight createSight(AgentView view) {
-        sight = new Sight(view, agent.getName(), getParentComponent().getWorkspace());
+        if (sight == null) {
+            sight = new Sight(view, agent.getName(), getParentComponent().getWorkspace());
+        } else {
+            sight.createVisionWorld();
+        }
         
         return sight;
     }

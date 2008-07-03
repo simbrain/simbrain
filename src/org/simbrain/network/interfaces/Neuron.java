@@ -257,7 +257,7 @@ public abstract class Neuron implements Producer, Consumer {
      * Sets the id of the neuron.
      * @param theName Neuron id
      */
-    void setId(final String theName) {
+    public void setId(final String theName) {
         id = theName;
     }
 
@@ -745,7 +745,7 @@ public abstract class Neuron implements Producer, Consumer {
      * {@inheritDoc}
      */
     public String toString() {
-        return "Neuron " + this.getId()
+        return "Neuron [" + getId() + "] " 
             + "  Activation = " + this.getActivation()
             + "  Location = (" + this.x + "," + this.y + ")";
     }

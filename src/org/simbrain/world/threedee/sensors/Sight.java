@@ -3,10 +3,10 @@ package org.simbrain.world.threedee.sensors;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.Sensor;
 import org.simbrain.world.threedee.gui.AgentView;
 import org.simbrain.world.visionworld.MutableVisionWorldModel;
@@ -18,22 +18,29 @@ import org.simbrain.world.visionworld.dialog.AbstractSensorMatrixDialog;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 public class Sight {
-    AgentView agent;
+    final AgentView agent;
     int height;
     int width;
     volatile BufferedImagePixelMatrix image;
     SensorMatrix matrix;
-    WeakReference<VisionWorldComponent> component = new WeakReference<VisionWorldComponent>(null);
+    List<WeakReference<VisionWorldComponent>> components = new ArrayList<WeakReference<VisionWorldComponent>>();
+    final Workspace workspace;
     
     public Sight(final AgentView agent, final String name, final Workspace workspace) {
         this.agent = agent;
+        this.workspace = workspace;
         
 //        width = agent.getWidth();
 //        height = agent.getHeight();
         
 //        int rWidth = width / 5;
 //        int rHeight = height / 5;
+        image = new BufferedImagePixelMatrix(agent.getSnapshot());
         
+        createVisionWorld();
+    }
+    
+    public void createVisionWorld() {
         final Semaphore semaphore = new Semaphore(1);
         
         try {
@@ -48,16 +55,16 @@ public class Sight {
 
             @Override
             protected PixelMatrix getPixelMatrix() {
-                return image = new BufferedImagePixelMatrix(agent.getSnapshot());
+                return image;// = new BufferedImagePixelMatrix(agent.getSnapshot());
             }
 
             @Override
             protected void ok(SensorMatrix sensorMatrix) {
                 matrix = sensorMatrix;
                 VisionWorldModel model = new MutableVisionWorldModel(image, matrix);
-                VisionWorldComponent component = new VisionWorldComponent(name + " vision", model);
+                VisionWorldComponent component = new VisionWorldComponent(getName() + " vision", model);
                 
-                Sight.this.component = new WeakReference<VisionWorldComponent>(component);
+                components.add(new WeakReference<VisionWorldComponent>(component));
                 
                 workspace.addWorkspaceComponent(component);
                 semaphore.release();
@@ -76,9 +83,11 @@ public class Sight {
     }
     
     public void close() {
-        VisionWorldComponent component = this.component.get();
-        
-        if (component != null) component.close();
+        for (WeakReference<VisionWorldComponent> ref : components) {
+            VisionWorldComponent component = ref.get();
+            
+            if (component != null) component.close();
+        }
     }
     
     public Collection<Sensor> getProducingAttributes() {

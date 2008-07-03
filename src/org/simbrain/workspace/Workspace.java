@@ -27,14 +27,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
 
 /**
  * <b>Workspace</b> is the container for all Simbrain windows--network, world, and gauge.
  */
 public class Workspace {
+    /** The time to sleep between updates. */
+    private static final int SLEEP_INTERVAL = 200;
     
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
@@ -46,7 +45,7 @@ public class Workspace {
     private final CouplingManager manager = new CouplingManager();
     
     /** List of workspace components. */
-    private ArrayList<WorkspaceComponent<?>> componentList = new ArrayList<WorkspaceComponent<?>>();
+    private List<WorkspaceComponent<?>> componentList = Collections.synchronizedList(new ArrayList<WorkspaceComponent<?>>());
 
     /** Sentinel for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
@@ -56,9 +55,6 @@ public class Workspace {
 
     /** Current directory. So when re-opening this type of component the app remembers where to look. */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-
-    /** Whether workspace has been updated yet; used by thread. */
-    private volatile boolean updateCompleted;
 
     /** Thread which runs workspace. */
     private WorkspaceThread workspaceThread;
@@ -182,19 +178,28 @@ public class Workspace {
     public void globalUpdate() {
         manager.updateAllCouplings();
         
-        for (WorkspaceComponent<?> component : componentList) {
-            component.doUpdate();
+        synchronized (componentList) {
+            for (WorkspaceComponent<?> component : componentList) {
+//                long time = System.nanoTime();
+                component.doUpdate();
+//                System.out.println(component + ": " + (System.nanoTime() - time));
+                try {
+                    Thread.sleep(SLEEP_INTERVAL);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        
-        updateCompleted = true;
     }
     
     /**
      * Should be called when updating is stopped.
      */
     void updateStopped() {
-        for (WorkspaceComponent<?> component : componentList) {
-            component.doStopped();
+        synchronized (componentList) {
+            for (WorkspaceComponent<?> component : componentList) {
+                component.doStopped();
+            }
         }
     }
     
@@ -271,13 +276,15 @@ public class Workspace {
      * Disposes all Simbrain Windows.
      */
     public void removeAllComponents() {
-        for (WorkspaceComponent<?> component : componentList) {
-            for (WorkspaceListener listener : listeners) {
-                listener.componentRemoved(component);
+        synchronized (componentList) {
+            for (WorkspaceComponent<?> component : componentList) {
+                for (WorkspaceListener listener : listeners) {
+                    listener.componentRemoved(component);
+                }
             }
+            
+            componentList.clear();
         }
-        
-        componentList.clear();
     }
 
     /**
@@ -290,9 +297,11 @@ public class Workspace {
             return true;
         } else {
             boolean hasChanged = false;
-            for (WorkspaceComponent<?> window : componentList) {
-                if (window.hasChangedSinceLastSave()) {
-                    hasChanged = true;
+            synchronized (componentList) {
+                for (WorkspaceComponent<?> window : componentList) {
+                    if (window.hasChangedSinceLastSave()) {
+                        hasChanged = true;
+                    }
                 }
             }
             return hasChanged;
@@ -349,36 +358,17 @@ public class Workspace {
      * @param id name of component
      * @return Workspace Component
      */
-    public WorkspaceComponent getComponent(final String id) {
-        for (WorkspaceComponent component : componentList) {
-            if (component.getName().equalsIgnoreCase(id)) {
-                return component;
+    public WorkspaceComponent<?> getComponent(final String id) {
+        synchronized (componentList) {
+            for (WorkspaceComponent<?> component : componentList) {
+                if (component.getName().equalsIgnoreCase(id)) {
+                    return component;
+                }
             }
         }
         return null;
     }
-
     
-    /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @return whether the network has been updated or not
-     */
-    public boolean isUpdateCompleted() {
-        return updateCompleted;
-    }
-
-    /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @param b whether the network has been updated or not.
-     */
-    public void setUpdateCompleted(final boolean b) {
-        updateCompleted = b;
-    }
-
     /**
      * Returns the workspaceThread.
      * 
@@ -410,13 +400,14 @@ public class Workspace {
      * {@inheritDoc}
      */
     public String toString() {
-        String ret = new String();
-        ret = "Number of components: " + componentList.size() + "\n";
+        StringBuilder builder = new StringBuilder("Number of components: " + componentList.size() + "\n");
         int i = 0;
-        for (WorkspaceComponent component : componentList) {
-            ret += "Component " + ((i++)+1) + ":" + component.getName() + "\n";     
+        synchronized (componentList) {
+            for (WorkspaceComponent<?> component : componentList) {
+                builder.append("Component " + ((i++)+1) + ":" + component.getName() + "\n");
+            }
         }
-        return ret;
+        return builder.toString();
     }
     
 }

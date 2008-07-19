@@ -45,8 +45,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Represents a window in the Simbrain desktop.   Services relating to
- * couplings and relations between are handled
+ * A gui view on a  {@link org.simbrain.workspace.WorkspaceComponent}.
  */
 public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPanel {
 

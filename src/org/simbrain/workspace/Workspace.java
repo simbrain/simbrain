@@ -29,7 +29,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
- * <b>Workspace</b> is the container for all Simbrain windows--network, world, and gauge.
+ * A collection of components which interact via couplings.   Neural networks, datatables, gauges, and scripts are examples of components in a Simbrain workspace.
+ * Essentially, an instance of a workspace corresponds to a single simulation (though at some point it will be possible to link multiple workspaces on different machines together).
+ * 
+ * A workspace can be visualized via a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
+ * 
+ * @see org.simbrain.workspace.Coupling
+ *
  */
 public class Workspace {
     /** The time to sleep between updates. */

@@ -33,9 +33,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- * Represents a component model in a Simbrain workspace.  Services relating to
- * couplings and relations between are handled.  Implementations of this class
- * should not be bound to a user interface.
+ * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}. Extend this class to create
+ * your own component type.  Gui representations of a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
  * 
  * @param <E> The type of the workspace listener associated with this
  * component.
@@ -64,7 +63,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     private Strategy strategy;
 
     /**
-     * Current directory. So when re-opening this type of component the appremembers where to look. 
+     * Current directory. So when re-opening this type of component the app remembers where to look. 
      * Subclasses can provide a default value using User Preferences.
      */
     private String currentDirectory;

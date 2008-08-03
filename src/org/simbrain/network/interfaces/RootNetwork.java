@@ -30,8 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.NetworkThread;
-import org.simbrain.network.gui.NetworkComponent;
 import org.simbrain.network.util.SimpleId;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;

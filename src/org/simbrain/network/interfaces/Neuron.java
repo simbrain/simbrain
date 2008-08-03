@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.gui.NetworkComponent;
 import org.simbrain.network.synapses.SignalSynapse;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AbstractAttribute;

@@ -25,7 +25,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.gui.NetworkComponent;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 

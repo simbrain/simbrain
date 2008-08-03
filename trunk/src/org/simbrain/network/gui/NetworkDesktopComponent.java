@@ -26,6 +26,7 @@ import java.io.File;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;

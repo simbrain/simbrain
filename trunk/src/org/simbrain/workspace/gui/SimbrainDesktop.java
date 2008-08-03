@@ -53,7 +53,7 @@ import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.gauge.GaugeDesktopComponent;
-import org.simbrain.network.gui.NetworkComponent;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.gui.NetworkDesktopComponent;
 import org.simbrain.plot.PlotComponent;
 import org.simbrain.plot.PlotDesktopComponent;

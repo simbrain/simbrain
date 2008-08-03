@@ -16,13 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui;
+package org.simbrain.network;
 
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.simbrain.network.gui.NetworkPreferences;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.workspace.Attribute;

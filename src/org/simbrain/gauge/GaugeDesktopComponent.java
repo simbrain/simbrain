@@ -132,6 +132,9 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
         public void dimensionsChanged(final int newDimensions) {
             gaugePanel.resetGauge();
         }
+
+        public void setName(String name) {
+        }
     };
     
     /**

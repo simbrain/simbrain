@@ -112,7 +112,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         super(frame, component);
         
         component.addListener(new BasicComponentListener());
-        world = new DataWorld(this, component.getDataModel());
+        world = new DataWorld(this);
         component.getDataModel().initValues(new Double(0));
         checkIterationMode();
         setLayout(new BorderLayout());
@@ -330,7 +330,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     
     @Override
     public void postAddInit() {
-        world = new DataWorld(this, this.getWorkspaceComponent().getDataModel());
+        world = new DataWorld(this);
         worldScroller.setViewportView(world);
         world.setParentComponent(this);
         repaint();

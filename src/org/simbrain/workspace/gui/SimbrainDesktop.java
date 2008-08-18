@@ -34,6 +34,7 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -41,6 +42,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
@@ -171,19 +173,33 @@ public class SimbrainDesktop {
         frame.setBounds(WORKSPACE_INSET, WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2),
                 screenSize.height - (WORKSPACE_INSET * 2));
 
-        //Set up the GUI.
-        desktop = new JDesktopPane(); //a specialized layered pane
 
+        //Action
         actionManager = new WorkspaceActionManager(this);
         
+        // Menus
         createAndAttachMenus();
 
+        // Toolbar
         wsToolBar = createToolBar();
-
-        JPanel mainPanel = new JPanel(new BorderLayout());
+       
+        // Left panel
+        JPanel leftPanel = new JPanel();
+        leftPanel.add(new JList());
+        
+        // Main workspace
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        desktop = new JDesktopPane(); //a specialized layered pane
         JScrollPane workspaceScroller = new JScrollPane();
+        rightPanel.add("Center", workspaceScroller);
+
+        // High level panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JSplitPane splitterPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                leftPanel, rightPanel);
         mainPanel.add("North", wsToolBar);
-        mainPanel.add("Center", workspaceScroller);
+        mainPanel.add("Center", splitterPanel);
+        
         frame.setContentPane(mainPanel);
         workspaceScroller.setViewportView(desktop);
 
@@ -311,11 +327,21 @@ public class SimbrainDesktop {
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createInsertMenu());
+        menuBar.add(createScriptMenu());
         menuBar.add(createCoupleMenu());
         menuBar.add(createHelpMenu());
         frame.setJMenuBar(menuBar);
     }
 
+    private JMenu createScriptMenu() {
+        JMenu scriptMenu = new JMenu("Scripts");
+        scriptMenu.addMenuListener(menuListener);
+        for (Action action : actionManager.getScriptActions(this.getWorkspace())) {
+            scriptMenu.add(action);
+        }
+        return scriptMenu;
+    }
+    
     /**
      * Create the workspace file menu.
      *
@@ -728,10 +754,12 @@ public class SimbrainDesktop {
          */
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
+        /** Open a default workspace */
+        //openWorkspace(workspace.getCurrentFile());
+        
         /* Display the window. */
         frame.setVisible(true);
         
-        openWorkspace(workspace.getCurrentFile());
 
     }
 

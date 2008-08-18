@@ -92,15 +92,17 @@ public class DataWorld extends JPanel {
      *
      * @param ws World frame to create a new data world within
      */
-    public DataWorld(final DataWorldDesktopComponent ws, DataModel<Double> model) {
+    public DataWorld(final DataWorldDesktopComponent ws) {
         super(new BorderLayout());
         this.ws = ws;
         setParentComponent(ws);
 
-        this.dataModel = model;
+        this.dataModel = ws.getWorkspaceComponent().getDataModel();
+
         tableModel = new DataTableModel(dataModel);
         table = new JXTable(tableModel);
 
+        
         addRow.addActionListener(addRowHereListener);
 //        addRow.setActionCommand("addRowHere");
         addCol.addActionListener(addColHereListener);

@@ -47,7 +47,7 @@ public class UpdateStatusLabel extends PText {
 
         standardUpdateAction = new AbstractAction("Standard update") {
             public void actionPerformed(final ActionEvent event) {
-                netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.DEFAULT);
+                netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.BUFFERED);
                 netPanel.getRootNetwork().setCustomUpdateScript(null);
                 update();
             }

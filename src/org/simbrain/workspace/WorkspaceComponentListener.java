@@ -10,4 +10,6 @@ public interface WorkspaceComponentListener {
      * Called when the target workspace component is updated.
      */
     void componentUpdated();
+    
+    void setName(String name);
 }

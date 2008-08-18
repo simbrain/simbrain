@@ -100,7 +100,7 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         OdorWorld.getXStream().toXML(world, output);
     }
     
-    OdorWorld getWorld() {
+    public OdorWorld getWorld() {
         return world;
     }
     

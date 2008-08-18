@@ -1,0 +1,101 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.layouts.LayersLayout;
+import org.simbrain.network.networks.Backprop;
+import org.simbrain.plot.PlotComponent;
+import org.simbrain.workspace.*;
+import org.simbrain.world.dataworld.DataWorldComponent;
+
+{
+        // Create Network
+        NetworkComponent network = new NetworkComponent("Backprop Network");
+        workspace.addWorkspaceComponent(network);
+        LayersLayout layout = new LayersLayout(40, 40, LayersLayout.HORIZONTAL);  // TODO: This should not be needed
+        Backprop bp = new Backprop(network.getRootNetwork(), 3, 5, 3, layout);
+        network.getRootNetwork().addNetwork(bp);
+        bp.randomize();
+
+        // Create Training Data
+        DataWorldComponent trainingData = new DataWorldComponent("Training Data", 3, 3);
+        workspace.addWorkspaceComponent(trainingData);
+        trainingData.getDataModel().setIterationMode(true);
+        trainingData.getDataModel().fill(new Double(0));
+        trainingData.getDataModel().set(0, 0, new Double(1));
+        trainingData.getDataModel().set(1, 1, new Double(1));
+        trainingData.getDataModel().set(2, 2, new Double(1));
+        trainingData.setName("Training Data");
+        
+        // Create input table
+        DataWorldComponent inputData = new DataWorldComponent("Input Data",3,3);
+        workspace.addWorkspaceComponent(inputData);
+        inputData.getDataModel().setIterationMode(true);
+        inputData.getDataModel().set(0, 0, new Double(1));
+        inputData.getDataModel().set(1, 1, new Double(1));
+        inputData.getDataModel().set(2, 2, new Double(1));
+        inputData.setName("Input Data");
+        
+        // Coupling input table columns to input neurons of backprop network
+        ProducingAttribute column1 = inputData.getSingleProducingAttribute("Column 1");
+        ProducingAttribute column2 = inputData.getSingleProducingAttribute("Column 2");
+        ProducingAttribute column3 = inputData.getSingleProducingAttribute("Column 3");
+        ConsumingAttribute inputNeuron1 = network.getConsumingAttribute("Neuron_1", "Activation"); 
+        ConsumingAttribute inputNeuron2 = network.getConsumingAttribute("Neuron_2", "Activation"); 
+        ConsumingAttribute inputNeuron3 = network.getConsumingAttribute("Neuron_3", "Activation");
+        workspace.getManager().addCoupling(new Coupling(column1, inputNeuron1));
+        workspace.getManager().addCoupling(new Coupling(column2, inputNeuron2));
+        workspace.getManager().addCoupling(new Coupling(column3, inputNeuron3));
+        
+ 
+        // Couple training table columns to  target values
+        ProducingAttribute train1 = trainingData.getSingleProducingAttribute("Column 1");
+        ProducingAttribute train2 = trainingData.getSingleProducingAttribute("Column 2");
+        ProducingAttribute train3 = trainingData.getSingleProducingAttribute("Column 3");
+        ConsumingAttribute target1 = network.getConsumingAttribute("Neuron_9", "TargetValue"); 
+        ConsumingAttribute target2 = network.getConsumingAttribute("Neuron_10", "TargetValue"); 
+        ConsumingAttribute target3 = network.getConsumingAttribute("Neuron_11", "TargetValue"); 
+        workspace.getManager().addCoupling(new Coupling(train1, target1));
+        workspace.getManager().addCoupling(new Coupling(train2, target2));
+        workspace.getManager().addCoupling(new Coupling(train3, target3));
+
+        // Create Plot component
+        PlotComponent errorPlot = new PlotComponent("Error Rate");
+        workspace.addWorkspaceComponent(errorPlot);
+
+        // Train network
+        int epochs = Integer.parseInt(JOptionPane.showInputDialog("Number of epochs"));
+        bp.setTrain(true);
+        for(int i = 0; i < epochs; i++) {
+            errorPlot.setValue(bp.getError());    
+            workspace.globalUpdate();    
+        }
+        bp.setTrain(false);
+
+        
+        // Create the custom updating method
+        class BackpropUpdate extends CustomUpdate {
+
+            NetworkComponent network;
+            DataWorldComponent inputData;
+            
+            public BackpropUpdate(NetworkComponent net, DataWorldComponent data) {
+                network = net;
+                inputData = data;
+            }
+            
+            public void update(Workspace workspace) {
+                
+                inputData.doUpdate();
+                workspace.getManager().updateAllCouplings();
+                network.doUpdate();
+            }
+            
+        }
+        workspace.setUpdateMethod(Workspace.UpdateMethod.CUSTOM);
+        workspace.setCustomUpdateMethod(new BackpropUpdate(network, inputData));
+
+        // Close training data window
+        trainingData.close();
+        
+        // Display Debug Info
+        System.out.println(workspace);
+}
+ 

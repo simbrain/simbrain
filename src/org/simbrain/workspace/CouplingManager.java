@@ -32,7 +32,8 @@ import org.apache.log4j.Logger;
  * 
  * @author Matt Watson
  */
-public class CouplingManager {
+public class CouplingManager implements UpdatePriority {
+
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
     /** All couplings for the workspace. */
@@ -45,7 +46,11 @@ public class CouplingManager {
     private Map<WorkspaceComponent<?>, List<Coupling<?>>> targetCouplings = newMap();
     /** The couplings indexed by consuming attribute, which is unique. */
     private Map<ConsumingAttribute<?>, Coupling<?>> consumingAttributes = newMap();
-    
+    /** Default priority. */
+    private static final int DEFAULT_PRIORITY = 0;
+    /** Priority of this component; used in priorty based workspace update. */
+    private int priority = DEFAULT_PRIORITY;
+
     /**
      * Helper method to cleanup nasty generics declarations.
      * 
@@ -95,7 +100,7 @@ public class CouplingManager {
     /**
      * Updates all couplings in the workspace.
      */
-    void updateAllCouplings() {
+    public void updateAllCouplings() {
         LOGGER.debug("updating all couplings");
         for (Coupling<?> coupling : getCouplings()) {
             LOGGER.trace(coupling.getClass());
@@ -305,5 +310,19 @@ public class CouplingManager {
         public int hashCode() {
             return source.hashCode() + (ARBITRARY_PRIME * target.hashCode());
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int getPriority() {
+        return priority;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setPriority(int value) {
+        priority = value;
     }
 }

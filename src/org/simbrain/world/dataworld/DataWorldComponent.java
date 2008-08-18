@@ -49,7 +49,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
      * 
      * @return The data model for this component.
      */
-    DataModel<Double> getDataModel() {
+    public DataModel<Double> getDataModel() {
         return dataModel;
     }
 
@@ -60,6 +60,15 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         super(name);
         dataModel = new DataModel<Double>(this);
     }
+
+    /**
+     * This method is the default constructor.
+     */
+    public DataWorldComponent(final String name, int columns, int rows) {
+        super(name);
+        dataModel = new DataModel<Double>(this, columns, rows);
+    }
+
     
     @SuppressWarnings("unchecked")
     private DataWorldComponent(final String name, final DataModel<?> dataModel) {

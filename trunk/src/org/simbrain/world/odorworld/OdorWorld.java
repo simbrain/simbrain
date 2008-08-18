@@ -181,6 +181,10 @@ public class OdorWorld {
         we.getStimulus().setStimulusVector(new double[] {stimInitVal, stimInitVal, 0, 0, 0, 0, 0, 0 });
         abstractEntityList.add(we);
     }
+    
+    public void addEntity(final OdorWorldEntity entity) {
+        abstractEntityList.add(entity);
+    }
 
     /**
      * @return Returns the agentList.

@@ -73,6 +73,18 @@ public class DataModel<E> {
         init();
     }
 
+    DataModel(DataWorldComponent parent, int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.parent = parent;
+
+        for (int i = 0; i < height; i++) {
+            rowData.add((List<E>) newRow());
+        }
+        
+        init();
+    }
+
     private void init() {
         consumers = new ArrayList<SingleAttributeConsumer<?>>();
         producers = new ArrayList<SingleAttributeProducer<?>>();
@@ -157,7 +169,7 @@ public class DataModel<E> {
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
-    
+
     public void removeListener(Listener listener) {
         listeners.remove(listener);
     }

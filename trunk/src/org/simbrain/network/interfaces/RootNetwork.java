@@ -95,6 +95,7 @@ public class RootNetwork extends Network {
     /** Used to temporarily hold weights at their current value. */
     private boolean clampNeurons = false;
 
+    // TODO: Remove this case?
     /** Custom update script written in beanshell (www.beanshell.org). */
     private File customUpdateScript = null;
 
@@ -102,16 +103,16 @@ public class RootNetwork extends Network {
     private boolean usingTabs = true;
 
     /** Enumeration for the update methods
-     *  DEFAULT: default update method
+     *  BUFFER: default update method; based on buffering
      *  PRIORITYBASED: user sets the priority for each neuron,
      *  sub-neuron and synapse. Default priority value is 0.
      *  Elements with smaller priority value are updated first.
      *  SCRIPT: update is handled by a script
      */
-    public enum UpdateMethod { PRIORITYBASED, SCRIPTBASED, DEFAULT }
+    public enum UpdateMethod { PRIORITYBASED, SCRIPTBASED, BUFFERED }
 
     /** Current update method. */
-    private UpdateMethod updateMethod = UpdateMethod.DEFAULT;
+    private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
 
     /**
      * The updatePriority values used by neurons and sub-layers
@@ -317,7 +318,8 @@ public class RootNetwork extends Network {
         }
     }
 
-    /** this function is used to update the neuron
+    /** 
+     * This function is used to update the neuron
      * and sub-network activation values if the user
      * chooses to set different priority values for
      * a subset of neurons and sub-networks. The
@@ -331,7 +333,7 @@ public class RootNetwork extends Network {
             return;
         }
         for (Integer i : this.getUpdatePriorities()) {
-            System.out.print(i.intValue() + "\n");
+            //System.out.print(i.intValue() + "\n");
             // update neurons with priority level i
             if (!this.getClampNeurons()) {
                 // First update the activation buffers

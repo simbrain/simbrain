@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * @param <E> The type of the workspace listener associated with this
  * component.
  */
-public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
+public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> implements UpdatePriority {
 
     /** The workspace that 'owns' this component. */
     private Workspace workspace;
@@ -55,6 +55,12 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
 
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
+    
+    /** Default priority. */
+    private static final int DEFAULT_PRIORITY = 0;
+    
+    /** Priority of this component; used in priorty based workspace update. */
+    private int priority = DEFAULT_PRIORITY;
     
     /** How to order a list of attributes. */
     public enum Strategy {TOTAL, DEFAULT_EACH, CUSTOM };
@@ -74,6 +80,10 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     private File currentFile;
 
+    
+    /** The set of all listeners on this component. */
+    private Collection<E> listeners = new HashSet<E>();
+    
     /**
      * Construct a workspace component.
      * 
@@ -147,7 +157,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * Update that goes beyond updating couplings.
      * Called when global workspace update is called.
      */
-    final void doUpdate() {
+    public final void doUpdate() {
         update();
         
         for (E listener : listeners) {
@@ -161,9 +171,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     final void doStopped() {
         stopped();
     }
-    
-    /** The set of all listeners on this component. */
-    private Collection<E> listeners = new HashSet<E>();
     
     /**
      * Returns the listeners on this component.
@@ -214,6 +221,9 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public void setName(final String name) {
         this.name = name;
+        for (WorkspaceComponentListener listener : this.getListeners()) {
+            listener.setName(name);
+        }
     }
 
     /**
@@ -348,7 +358,86 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public Collection<? extends Producer> getProducers() {
         return Collections.emptySet();
     }
+    
+    /**
+     * Get a SingleConsumingAttribute by name
+     *
+     * @param consumerId id of single consuming attribute
+     * @return the attribute
+     */
+    public ConsumingAttribute getSingleConsumingAttribute(String consumerId) {
+        for (Consumer consumer : getConsumers()) {
+            if (consumer instanceof SingleAttributeConsumer) {
+                if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
+                    return consumer.getDefaultConsumingAttribute();
+                }
+            }
+        }
+        return null;
+    }
 
+
+    /**
+     * Get a SingleProducingAttribute by id
+     *
+     * @param producerId id of single producing attribute
+     * @return the attribute
+     */
+    public ProducingAttribute getSingleProducingAttribute(String producerId) {
+        for (Producer producer : getProducers()) {
+            if (producer instanceof SingleAttributeProducer) {
+                if (producer.getDescription().equalsIgnoreCase(producerId)) {
+                    return producer.getDefaultProducingAttribute();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get a consuming attribute, using the id of the attribute holder and the attribute itself.
+     *
+     * @param consumerId the name of the consumer (attribute holder)
+     * @param attributeId the name of the attribute
+     * @return the consuming attribute
+     */
+    public ConsumingAttribute getConsumingAttribute(String consumerId, String attributeId) {
+        for (Consumer consumer : getConsumers()) {
+            if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
+                   for(ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
+                       //System.out.println(attribute.getAttributeDescription());
+                          if (attribute.getAttributeDescription().equalsIgnoreCase(attributeId)) {
+                              return attribute;
+                          }
+                   }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get a producing attribute, using the id of the attribute holder and the attribute itself.
+     *
+     * @param producerId the name of the producing (attribute holder)
+     * @param attributeId the name of the attribute
+     * @return the producing attribute
+     */
+    public ProducingAttribute getProducingAttribute(String producerId, String attributeId) {
+        for (Producer producer : getProducers()) {
+            //System.out.println(producer.getDescription());            
+            if (producer.getDescription().equalsIgnoreCase(producerId)) {
+                   for(ProducingAttribute attribute : producer.getProducingAttributes()) {
+                       //System.out.println(attribute.getAttributeDescription());
+                          if (attribute.getAttributeDescription().equalsIgnoreCase(attributeId)) {
+                              return attribute;
+                          }
+                   }
+            }
+        }
+        return null;
+    }
+
+    
     /**
      * Sets the workspace for this component.  Called by the
      * workspace right after this component is created.
@@ -448,6 +537,20 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int getPriority() {
+        return priority;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setPriority(int value) {
+        priority = value;
     }
 
 }

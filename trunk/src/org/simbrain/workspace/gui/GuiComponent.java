@@ -237,6 +237,10 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         public void componentUpdated() {
             update();
         }
+
+        public void setName(String name) {
+            parentFrame.setTitle(name);
+        }
     }
             
 

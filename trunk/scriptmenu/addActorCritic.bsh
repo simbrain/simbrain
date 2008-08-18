@@ -1,0 +1,75 @@
+import java.awt.Point;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.layouts.MultipathLayout;
+import org.simbrain.network.networks.actorcritic.ActorCritic;
+import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.OdorWorldAgent;
+import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.OdorWorldEntity;
+{
+
+        // Make a 2-d environment
+        OdorWorldComponent odorWorld = new OdorWorldComponent("Odor World");
+        workspace.addWorkspaceComponent(odorWorld);
+        OdorWorldAgent mouse = new OdorWorldAgent(odorWorld, "MightyMouse", "Mouse.gif", 200,200, OdorWorld.INIT_ORIENTATION);
+        mouse.getStimulus().setStimulusVector(new double[] {1, 1, 0, 0, 0, 0, 0, 0 });
+        odorWorld.getWorld().addAgent(mouse);
+        OdorWorldEntity cheese = new OdorWorldEntity(odorWorld.getWorld(), "Swiss.gif", 200, 100);
+        cheese.getStimulus().setStimulusVector(new double[] {1, 1, 0, 0, 0, 0, 0, 0 });
+        odorWorld.getWorld().addEntity(cheese);
+       // Above should be easier.
+        //  entity = new entity(image, location)
+        //  entity.setStimulusVector(new double...))
+        //  entity.setGausianDiffusion
+        
+        
+        // Populate with objects and reward levels, with gradient dispersion
+        
+        
+        // Create Network
+        NetworkComponent network = new NetworkComponent("Adaptive Critic Network");
+        workspace.addWorkspaceComponent(network);
+        MultipathLayout layout = new MultipathLayout(40, 80, 2, MultipathLayout.HORIZONTAL);
+        layout.setInitialLocation(new Point(10,10));
+        ActorCritic ac = new ActorCritic(network.getRootNetwork(), 2, 3, layout);
+        network.getRootNetwork().addNetwork(ac);
+        
+        //Couple Mouse Whiskers to adaptive critic neurons
+        ProducingAttribute leftWhisker = odorWorld.getProducingAttribute("MightyMouse","Left[1]");
+        ProducingAttribute rightWhisker = odorWorld.getProducingAttribute("MightyMouse","Right[1]");
+        ConsumingAttribute inputNeuron1 = network.getConsumingAttribute("Neuron_1", "Activation"); 
+        ConsumingAttribute inputNeuron2 = network.getConsumingAttribute("Neuron_2", "Activation"); 
+        workspace.getManager().addCoupling(new Coupling(leftWhisker, inputNeuron1));
+        workspace.getManager().addCoupling(new Coupling(rightWhisker, inputNeuron2));
+ 
+        //Couple Output Neurons to motion
+        ProducingAttribute actor1 = network.getProducingAttribute("Neuron_3", "Activation"); 
+        ProducingAttribute actor2 = network.getProducingAttribute("Neuron_4", "Activation"); 
+        ProducingAttribute actor3 = network.getProducingAttribute("Neuron_5", "Activation"); 
+        ConsumingAttribute turnLeft = odorWorld.getConsumingAttribute("MightyMouse", "Left"); 
+        ConsumingAttribute goStraight = odorWorld.getConsumingAttribute("MightyMouse", "Forward"); 
+        ConsumingAttribute turnRight = odorWorld.getConsumingAttribute("MightyMouse", "Right"); 
+        workspace.getManager().addCoupling(new Coupling(actor1, turnLeft));
+        workspace.getManager().addCoupling(new Coupling(actor2, goStraight));
+        workspace.getManager().addCoupling(new Coupling(actor3, turnRight));
+        
+        //Couple left and right Reward sensors to reward neurons in Actor-critic network
+        ProducingAttribute leftReward = odorWorld.getProducingAttribute("MightyMouse","Left[2]");
+        ProducingAttribute rightReward = odorWorld.getProducingAttribute("MightyMouse","Right[2]");
+        ConsumingAttribute ac1 = network.getConsumingAttribute("Neuron_6", "Activation"); 
+        ConsumingAttribute ac2 = network.getConsumingAttribute("Neuron_7", "Activation"); 
+        workspace.getManager().addCoupling(new Coupling(leftReward, ac1));
+        workspace.getManager().addCoupling(new Coupling(rightReward, ac2));
+
+        
+        // Train the actor critic network
+        for(int counter = 0; counter < 5; counter++) {
+            ac.setTrain(true);
+            workspace.globalUpdate();
+        }
+        ac.setTrain(false);
+}

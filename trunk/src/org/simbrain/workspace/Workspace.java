@@ -25,8 +25,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 
 /**
  * A collection of components which interact via couplings.   Neural networks, datatables, gauges, and scripts are examples of components in a Simbrain workspace.
@@ -39,7 +42,7 @@ import org.apache.log4j.Logger;
  */
 public class Workspace {
     /** The time to sleep between updates. */
-    private static final int SLEEP_INTERVAL = 200;
+    private static final int SLEEP_INTERVAL = 1;
     
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
@@ -67,7 +70,30 @@ public class Workspace {
 
     /** Listeners on this workspace. */
     private Set<WorkspaceListener> listeners = new HashSet<WorkspaceListener>();
+
+    /**
+     *  Enumeration for the update methods
+     *  BUFFER: default update method; based on buffering
+     *  PRIORITYBASED: user sets the priority for each component and the coupling manager
+     *  Elements with smaller priority number (i.e., higher priority)
+     *   are updated first.
+     */
+    public static enum UpdateMethod { BUFFERED, PRIORITY_BASED, CUSTOM}
+
+    /** Current update method. */
+    private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
     
+    /** Custom update method; null if none. */
+    private CustomUpdate customUpdateMethod = null;
+    
+    /**
+     * Used in prioirty based update.
+     */
+    private SortedSet<Integer> updatePriorities =  new TreeSet<Integer>();
+;
+
+    
+    // TODO: Add docs
     private boolean fireEvents = true;
 
     
@@ -88,11 +114,11 @@ public class Workspace {
     public void removeListener(final WorkspaceListener listener) {
         listeners.remove(listener);
     }
-
     
     void toggleEvents(final boolean on) {
         this.fireEvents = on;
     }
+    
     
     /**
      * Couple producing attributes in the source component to consuming attributes in the target component.
@@ -162,6 +188,16 @@ public class Workspace {
     }
     
     /**
+     * Adds a workspace component to the workspace with a priority
+     * 
+     * @param component The component to add.
+     */
+    public void addWorkspaceComponent(final WorkspaceComponent<?> component, int priority) {
+        updatePriorities.add(new Integer(priority));
+        addWorkspaceComponent(component);
+    }
+    
+    /**
      * Remove the specified component.
      *
      * @param component The component to remove.
@@ -182,19 +218,34 @@ public class Workspace {
      * Update all couplings on all components.  Currently use a buffering method.
      */
     public void globalUpdate() {
-        manager.updateAllCouplings();
-        
-        synchronized (componentList) {
-            for (WorkspaceComponent<?> component : componentList) {
-//                long time = System.nanoTime();
-                component.doUpdate();
-//                System.out.println(component + ": " + (System.nanoTime() - time));
-                try {
-                    Thread.sleep(SLEEP_INTERVAL);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
+        if (updateMethod == UpdateMethod.BUFFERED) {
+                manager.updateAllCouplings();
+                synchronized (componentList) {
+                for (WorkspaceComponent<?> component : componentList) {
+                    component.doUpdate();
+                    //System.out.println(component + ": " + (System.nanoTime() - time));
+                    try {
+                        Thread.sleep(SLEEP_INTERVAL);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+        } else if (updateMethod == UpdateMethod.PRIORITY_BASED) {
+            for (Integer i : updatePriorities) {
+                // TODO!
+            }
+
+        } else if (updateMethod == UpdateMethod.CUSTOM) {
+               if (customUpdateMethod == null) {
+                   // TODO: Throw Exception
+               } else {
+                   synchronized (componentList) {
+                       customUpdateMethod.update(this);
+                   }
+
+               }
         }
     }
     
@@ -414,6 +465,22 @@ public class Workspace {
             }
         }
         return builder.toString();
+    }
+
+    public UpdateMethod getUpdateMethod() {
+        return updateMethod;
+    }
+
+    public void setUpdateMethod(UpdateMethod updateMethod) {
+        this.updateMethod = updateMethod;
+    }
+
+    public CustomUpdate getCustomUpdateMethod() {
+        return customUpdateMethod;
+    }
+
+    public void setCustomUpdateMethod(CustomUpdate customUpdateMethod) {
+        this.customUpdateMethod = customUpdateMethod;
     }
     
 }

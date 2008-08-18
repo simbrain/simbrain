@@ -241,70 +241,93 @@ public class Backprop extends Network {
     //TODO: Below breaks when the network is manually changed.
     
     /**
-     * update the weights.
-     *
+     * Update the weights.
      */
     private void updateWeights() {
 
-    if (last_delW_hid == null) {
-        initVariables();
-    }
-
-    double [] delta_out = new double[nOutputs];
-    double [] delta_hidden = new double[nHidden];
-    double delW;
-
-    // compute delta for the output layer
-    for (int i = 0; i < nOutputs; i++) {
-        delta_out[i] = (outputLayer.getNeuron(i).getTargetValue() - outputLayer.getNeuron(i).getActivation())
-        * (1 - outputLayer.getNeuron(i).getActivation()) * outputLayer.getNeuron(i).getActivation();
-    }
-    // compute delta for the hidden layer
-    for (int h = 0; h < nHidden; h++) {
-        delta_hidden[h] = 0;
-        for (int o = 0; o < nOutputs; o++) {
-            delta_hidden[h] += delta_out[o] * this.getSynapse(this.hiddenLayer.getNeuron(h),
-                    this.outputLayer.getNeuron(o)).getStrength();
+        if (last_delW_hid == null) {
+            initVariables();
         }
-        delta_hidden[h] *= this.hiddenLayer.getNeuron(h).getActivation()
-        * (1 - this.hiddenLayer.getNeuron(h).getActivation());
-    }
 
-    // update the weights from the hidden layer to the output layer
-    for (int h = 0; h < nHidden; h++) {
-        for (int o = 0; o < nOutputs; o++) {
-        delW = this.eta * delta_out[o] * hiddenLayer.getNeuron(h).getActivation() + this.mu * last_delW_out[h][o];
-        last_delW_out[h][o] = delW;
-        this.getSynapse(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).setStrength(
-            this.getSynapse(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).getStrength() +
-            delW);
+        double[] delta_out = new double[nOutputs];
+        double[] delta_hidden = new double[nHidden];
+        double delW;
+        double temp_err;
+        error = 0;
+        
+        // compute delta for the output layer
+        for (int i = 0; i < nOutputs; i++) {
+            
+            temp_err = outputLayer.getNeuron(i).getTargetValue() - outputLayer.getNeuron(i).getActivation();
+            delta_out[i] = (temp_err
+                    * (1 - outputLayer.getNeuron(i).getActivation())
+                    * outputLayer.getNeuron(i).getActivation());
+            error+=Math.pow(temp_err, 2);
         }
-    }
-    // update the output layer bias weights
-    for (int o = 0; o < nOutputs; o++) {
-        delW = this.biasEta * delta_out[o] + this.mu * last_delB_out[o];
-        last_delB_out[o] = delW;
-        ((SigmoidalNeuron) this.outputLayer.getNeuron(o)).setBias(((SigmoidalNeuron)
-                this.outputLayer.getNeuron(o)).getBias() + delW);
-    }
 
-    // update the weights from the input layer to the hidden layer
-    for (int i = 0; i < nInputs; i++) {
+        error = Math.sqrt(error / nOutputs);
+        //org.simbrain.util.SimbrainMath.printVector(delta_out);
+
+        // compute delta for the hidden layer
         for (int h = 0; h < nHidden; h++) {
-        delW = this.eta * delta_hidden[h] * inputLayer.getNeuron(i).getActivation() + this.mu * last_delW_hid[i][h];
-        last_delW_hid[i][h] = delW;
-        this.getSynapse(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).setStrength(
-            this.getSynapse(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).getStrength() +
-            delW);
+            delta_hidden[h] = 0;
+            for (int o = 0; o < nOutputs; o++) {
+                delta_hidden[h] += delta_out[o]
+                        * this.getSynapse(this.hiddenLayer.getNeuron(h),
+                                this.outputLayer.getNeuron(o)).getStrength();
+            }
+            delta_hidden[h] *= this.hiddenLayer.getNeuron(h).getActivation()
+                    * (1 - this.hiddenLayer.getNeuron(h).getActivation());
         }
-    }
-    // update the hidden layer bias weights
-    for (int h = 0; h < nHidden; h++) {
-        delW = this.biasEta * delta_hidden[h] + this.mu * last_delB_hid[h];
-        last_delB_hid[h] = delW;
-        ((SigmoidalNeuron) this.hiddenLayer.getNeuron(h)).setBias(((SigmoidalNeuron)
-                this.hiddenLayer.getNeuron(h)).getBias() + delW);
-    }
+        //org.simbrain.util.SimbrainMath.printVector(delta_hidden);
+
+        // update the weights from the hidden layer to the output layer
+        for (int h = 0; h < nHidden; h++) {
+            for (int o = 0; o < nOutputs; o++) {
+                delW = this.eta * delta_out[o]
+                        * hiddenLayer.getNeuron(h).getActivation() + this.mu
+                        * last_delW_out[h][o];
+                last_delW_out[h][o] = delW;
+                this.getSynapse(this.hiddenLayer.getNeuron(h),
+                        this.outputLayer.getNeuron(o)).setStrength(
+                        this.getSynapse(this.hiddenLayer.getNeuron(h),
+                                this.outputLayer.getNeuron(o)).getStrength()
+                                + delW);
+            }
+        }
+        // update the output layer bias weights
+        for (int o = 0; o < nOutputs; o++) {
+            delW = this.biasEta * delta_out[o] + this.mu * last_delB_out[o];
+            last_delB_out[o] = delW;
+            ((SigmoidalNeuron) this.outputLayer.getNeuron(o))
+                    .setBias(((SigmoidalNeuron) this.outputLayer.getNeuron(o))
+                            .getBias()
+                            + delW);
+        }
+
+        // update the weights from the input layer to the hidden layer
+        for (int i = 0; i < nInputs; i++) {
+            for (int h = 0; h < nHidden; h++) {
+                delW = this.eta * delta_hidden[h]
+                        * inputLayer.getNeuron(i).getActivation() + this.mu
+                        * last_delW_hid[i][h];
+                last_delW_hid[i][h] = delW;
+                this.getSynapse(this.inputLayer.getNeuron(i),
+                        this.hiddenLayer.getNeuron(h)).setStrength(
+                        this.getSynapse(this.inputLayer.getNeuron(i),
+                                this.hiddenLayer.getNeuron(h)).getStrength()
+                                + delW);
+            }
+        }
+        // update the hidden layer bias weights
+        for (int h = 0; h < nHidden; h++) {
+            delW = this.biasEta * delta_hidden[h] + this.mu * last_delB_hid[h];
+            last_delB_hid[h] = delW;
+            ((SigmoidalNeuron) this.hiddenLayer.getNeuron(h))
+                    .setBias(((SigmoidalNeuron) this.hiddenLayer.getNeuron(h))
+                            .getBias()
+                            + delW);
+        }
     }
 
     /**

@@ -363,7 +363,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         weightSizeMaxSlider.setValue(networkPanel.getMaxDiameter());
         weightSizeMinSlider.setValue(networkPanel.getMinDiameter());
         indentNetworkFilesBox.setSelected(networkPanel.getRootNetwork().getUsingTabs());
-        if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.DEFAULT)) {
+        if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.BUFFERED)) {
             cbUpdateMethod.setSelectedIndex(0);
         } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.PRIORITYBASED)) {
             cbUpdateMethod.setSelectedIndex(1);
@@ -381,7 +381,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         networkPanel.getRootNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         switch (cbUpdateMethod.getSelectedIndex()) {
             case 0:
-                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.DEFAULT);
+                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.BUFFERED);
                 break;
             case 1:
                 networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.PRIORITYBASED);

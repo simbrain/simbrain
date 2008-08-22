@@ -65,16 +65,19 @@ public final class OscWorldDesktopComponent
         createOscInMessageAction = new CreateOscInMessageAction();
         createOscOutMessageAction = new CreateOscOutMessageAction();
         consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
-        producers = new JList(new EventListModel(GlazedLists.eventList(Collections.emptyList())));
+        producers = new JList(new EventListModel(oscWorldComponent.getProducersEventList()));
 
+        // TODO:  these context menu listeners are not working at the moment
         consumers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         consumers.addMouseListener(new MouseAdapter()
             {
                 /** {@inheritDoc} */
                 public void mousePressed(final MouseEvent event)
                 {
+                    System.out.println("heard consumers mousePressed");
                     if (event.isPopupTrigger())
                     {
+                        System.out.println("   is popup trigger");
                         showContextMenu(event);
                     }
                 }
@@ -82,8 +85,10 @@ public final class OscWorldDesktopComponent
                 /** {@inheritDoc} */
                 public void mouseClicked(final MouseEvent event)
                 {
+                    System.out.println("heard consumers mousePressed");
                     if (event.isPopupTrigger())
                     {
+                        System.out.println("   is popup trigger");
                         showContextMenu(event);
                     }
                 }
@@ -95,14 +100,62 @@ public final class OscWorldDesktopComponent
                  */
                 private void showContextMenu(final MouseEvent event)
                 {
+                    System.out.println("   might show consumer context menu");
                     if (consumers.getSelectedIndex() > -1)
                     {
+                        System.out.println("   showing consumer context menu");
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
                         JMenu producerMenu = CouplingMenus.getProducerMenu(oscWorldComponent.getWorkspace(), consumer.getDefaultConsumingAttribute());
                         producerMenu.setText("Set input source");
                         contextMenu.add(producerMenu);
                         contextMenu.show(consumers, event.getX(), event.getY());
+                    }
+                }
+            });
+
+        producers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        producers.addMouseListener(new MouseAdapter()
+            {
+                /** {@inheritDoc} */
+                public void mousePressed(final MouseEvent event)
+                {
+                    System.out.println("heard producers mousePressed");
+                    if (event.isPopupTrigger())
+                    {
+                        System.out.println("   is popup trigger");
+                        showContextMenu(event);
+                    }
+                }
+
+                /** {@inheritDoc} */
+                public void mouseClicked(final MouseEvent event)
+                {
+                    System.out.println("heard producers mouseClicked");
+                    if (event.isPopupTrigger())
+                    {
+                        System.out.println("   is popup trigger");
+                        showContextMenu(event);
+                    }
+                }
+
+                /**
+                 * Show the consumer context menu if a consumer is selected.
+                 *
+                 * @param event mouse event
+                 */
+                private void showContextMenu(final MouseEvent event)
+                {
+                    System.out.println("   might show producer context menu");
+                    if (producers.getSelectedIndex() > -1)
+                    {
+                        System.out.println("   showing producer context menu");
+                        JPopupMenu contextMenu = new JPopupMenu();
+                        OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
+                        JMenu consumerMenu = CouplingMenus.getConsumerMenu(oscWorldComponent.getWorkspace(), producer.getDefaultProducingAttribute());
+                        consumerMenu.setText("Set output target");
+                        contextMenu.add(consumerMenu);
+                        contextMenu.show(producers, event.getX(), event.getY());
                     }
                 }
             });
@@ -161,13 +214,18 @@ public final class OscWorldDesktopComponent
         CreateOscInMessageAction() {
             super("Create OSC in message");
             putValue(Action.LONG_DESCRIPTION, "Create a new OSC in message");
-            setEnabled(false);
         }
 
 
         /** {@inheritDoc} */
         public void actionPerformed(final ActionEvent event) {
-            // empty
+            SwingUtilities.invokeLater(new Runnable() {
+                    /** {@inheritDoc} */
+                    public void run() {
+                        String address = JOptionPane.showInputDialog(null, "Create a new OSC in message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC in message address:", "Create a new OSC in message", JOptionPane.QUESTION_MESSAGE);
+                        getWorkspaceComponent().addInMessage(address);
+                    }
+                });
         }
     }
 

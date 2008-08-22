@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import ca.odell.glazedlists.EventList;
@@ -72,6 +73,7 @@ public final class OscWorldComponent
         super(name);
         try {
             oscPortIn = new OSCPortIn(DEFAULT_OSC_IN_PORT);
+            oscPortIn.startListening();
         }
         catch (SocketException e) {
             throw new RuntimeException("could not create OSC port in", e);
@@ -89,6 +91,9 @@ public final class OscWorldComponent
 
     /** {@inheritDoc} */
     public void closing() {
+        // TODO:  throws one SocketException to stdout/err
+        //    might have to wait a bit after stopListening() to let run() stop correctly
+        oscPortIn.stopListening();
         oscPortIn.close();
         oscPortOut.close();
         // TODO:  remove consumer list event listeners
@@ -136,8 +141,8 @@ public final class OscWorldComponent
      *
      * @return the OSC port in for this OSC world component
      */
-    OSCPortOut getOscPortIn() {
-        return oscPortOut;
+    OSCPortIn getOscPortIn() {
+        return oscPortIn;
     }
 
     /**

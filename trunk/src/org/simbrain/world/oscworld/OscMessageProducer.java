@@ -6,8 +6,10 @@ import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 
 import org.simbrain.workspace.Producer;
@@ -26,6 +28,9 @@ final class OscMessageProducer
 
     /** Last matching OSC message argument. */
     private Double argument = Double.valueOf(0.0d);
+
+    /** OSC listener. */
+    private final OSCListener listener;
 
     /** OSC world component. */
     private final OscWorldComponent component;
@@ -53,20 +58,18 @@ final class OscMessageProducer
         this.address = address;
         this.component = component;
         attribute = new DoubleAttribute();
+        listener = new OSCListener() {
+                /** {@inheritDoc} */
+                public void acceptMessage(final Date time, final OSCMessage message) {
+                    // TODO:  if (date is null or time previous to now)
+                    dispatch(message);
+                    // otherwise queue until time is reached
+                }
+            };
+
+        this.component.getOscPortIn().addListener(this.address, listener);
     }
 
-
-    /**
-     * Return true if the specified incoming OSC message matches the address of this
-     * OSC message producer.  Note the matching rules of the OSC specification.
-     *
-     * @see http://opensoundcontrol.org/spec-1_0
-     * @return true if the specified incoming OSC message matches the address of this
-     *    OSC message producer
-     */
-    boolean matches(final OSCMessage message) {
-        return false;
-    }
 
     /**
      * Dispatch the specified incoming OSC message to this OSC message producer.
@@ -74,9 +77,19 @@ final class OscMessageProducer
      * @param message incoming OSC message to dispatch
      */
     void dispatch(final OSCMessage message) {
-        //this.argument = message.getArgument(); ...
+        if (message.getArguments().length > 0) {
+            try {
+                Float f = (Float) message.getArguments()[0];
+                argument = Double.valueOf(f.doubleValue());
+            }
+            catch (ClassCastException e) {
+                // ignore
+            }
+            catch (NullPointerException e) {
+                // ignore
+            }
+        }
     }
-
 
     /** {@inheritDoc} */
     public String getDescription() {

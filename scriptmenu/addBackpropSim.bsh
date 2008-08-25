@@ -64,7 +64,7 @@ import org.simbrain.world.dataworld.DataWorldComponent;
         int epochs = Integer.parseInt(JOptionPane.showInputDialog("Number of epochs"));
         bp.setTrain(true);
         for(int i = 0; i < epochs; i++) {
-            errorPlot.setValue(bp.getError());    
+            errorPlot.getConsumers().get(0).setValue(bp.getError());    
             workspace.globalUpdate();    
         }
         bp.setTrain(false);

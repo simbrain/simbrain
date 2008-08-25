@@ -402,6 +402,7 @@ public class SimbrainDesktop {
         JMenu coupleMenu = new JMenu("Couplings");
         coupleMenu.add(actionManager.getOpenCouplingManagerAction());
         coupleMenu.add(actionManager.getGlobalUpdateAction());
+        coupleMenu.add(actionManager.getOpenCouplingListAction());
         return coupleMenu;
     }
 

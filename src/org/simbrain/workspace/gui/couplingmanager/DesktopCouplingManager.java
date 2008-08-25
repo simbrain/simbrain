@@ -54,6 +54,7 @@ import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.SingleAttributeConsumer;
 import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -83,14 +84,14 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     CouplingTray.CouplingList trayModel = new CouplingTray.CouplingList();
 
     /** Reference of parent frame. */
-    private final JFrame frame;
+    private final GenericFrame frame;
 
     /**
      * Creates and displays the coupling manager.
      *
      * @param frame parent of panel.
      */
-    public DesktopCouplingManager(final SimbrainDesktop desktop, final JFrame frame) {
+    public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericFrame frame) {
         super();
 
         this.manager = desktop.getWorkspace().getManager();
@@ -217,7 +218,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         this.setLayout(new BorderLayout());
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
-        frame.getRootPane().setDefaultButton(okButton);
+        //frame.getRootPane().setDefaultButton(okButton);
     }
 
     ///////////////////////////////////////////////////////////////////

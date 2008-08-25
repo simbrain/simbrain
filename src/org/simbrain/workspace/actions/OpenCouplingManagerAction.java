@@ -22,9 +22,11 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
+import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -50,12 +52,12 @@ public final class OpenCouplingManagerAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        JFrame frame = new JFrame();
+        GenericJInternalFrame frame = new GenericJInternalFrame();
         DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
         frame.setContentPane(cm);
         frame.setSize(850, 420);
-        frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
+        desktop.addInternalFrame(frame);
     }
 }

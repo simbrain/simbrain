@@ -247,6 +247,8 @@ public class Workspace {
 
                }
         }
+        
+        time++;
     }
     
     /**
@@ -481,6 +483,13 @@ public class Workspace {
 
     public void setCustomUpdateMethod(CustomUpdate customUpdateMethod) {
         this.customUpdateMethod = customUpdateMethod;
+    }
+
+    /** Provisional global time implementation. */
+    private int time = 0;
+    
+    public Number getTime() {
+        return time;
     }
     
 }

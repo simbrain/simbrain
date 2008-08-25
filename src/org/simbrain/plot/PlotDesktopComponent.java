@@ -17,11 +17,13 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.CouplingMenus;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.jfree.data.xy.XYSeries;
 
 public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
 
@@ -51,14 +53,18 @@ public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
         setCouplingMenuItem();
         JMenu couplingMenu = new JMenu("Couplings");
         couplingMenu.addMenuListener(menuListener);
-        couplingMenu.add(couplingMenuItem);
+        //couplingMenu.add(couplingMenuItem);
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(couplingMenu);
         getParentFrame().setJMenuBar(menuBar);
+
         // Add the series to your data set
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(component.getSeries());
-        //         Generate the graph
+        for (DataSource consumer : component.getConsumers()) {
+            dataset.addSeries(consumer.getXySeries());       
+        }
+        
+        // Generate the graph
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Time series", // Title
             "iterations", // x-axis Label
@@ -91,8 +97,8 @@ public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
      * Set up the coupling menu.
      */
     private void setCouplingMenuItem() {
-        couplingMenuItem = CouplingMenus.getProducerMenu(this.getWorkspaceComponent().getWorkspace(), component.getVariable());
-        couplingMenuItem.setText("Set plotter source");
+//        couplingMenuItem = CouplingMenus.getProducerMenu(this.getWorkspaceComponent().getWorkspace(), component.getVariable());
+//        couplingMenuItem.setText("Set plotter source");
     }
 
     @Override

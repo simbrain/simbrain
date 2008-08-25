@@ -55,6 +55,7 @@ import org.simbrain.workspace.actions.NewPlotAction;
 import org.simbrain.workspace.actions.NewTextWorldAction;
 import org.simbrain.workspace.actions.NewThreeDeeWorldAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
+import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
 import org.simbrain.workspace.actions.OpenDataWorldAction;
 import org.simbrain.workspace.actions.OpenGaugeAction;
@@ -165,9 +166,13 @@ public class WorkspaceActionManager {
     /** Global workspace stop action. */
     private final Action globalStopAction;
 
+    /** Opens the coupling list. */
+    private final Action openCouplingListAction;
+
     /** Location of script menu directory. */
     private final static String SCRIPT_MENU_DIRECTORY = "." + System.getProperty("file.separator") + "scriptmenu";
     
+
     /**
      * Create a new workspace action manager for the specified workspace.
      * 
@@ -210,6 +215,7 @@ public class WorkspaceActionManager {
         globalStopAction = new GlobalStopAction(workspace);
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
+        openCouplingListAction = new OpenCouplingListAction(desktop);
     }
 
     /**
@@ -473,4 +479,11 @@ public class WorkspaceActionManager {
     public Action getGlobalStopAction() {
         return globalStopAction;
     }
+
+    /**
+     * @return the openCouplingListAction.
+     */
+	public Action getOpenCouplingListAction() {
+		return openCouplingListAction;
+	}
 }

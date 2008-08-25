@@ -218,7 +218,7 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Creat mappings from components to their GUI wrappers
+     * Create mappings from components to their GUI wrappers
      */
     private static void registerComponents() {
         // TODO use a configuration file
@@ -573,6 +573,16 @@ public class SimbrainDesktop {
                 guiComponent.close();
             }
         }
+    }
+    
+    /**
+     * Utility class for adding internal frames, which are not
+     * wrappers for WorkspaceComponents.
+     *
+     * @param internalFrame the frame to add.
+     */
+    public void addInternalFrame(JInternalFrame internalFrame) {
+        desktop.add(internalFrame);
     }
 
     /**

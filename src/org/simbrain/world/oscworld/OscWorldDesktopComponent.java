@@ -67,28 +67,23 @@ public final class OscWorldDesktopComponent
         consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
         producers = new JList(new EventListModel(oscWorldComponent.getProducersEventList()));
 
-        // TODO:  these context menu listeners are not working at the moment
         consumers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         consumers.addMouseListener(new MouseAdapter()
             {
                 /** {@inheritDoc} */
                 public void mousePressed(final MouseEvent event)
                 {
-                    System.out.println("heard consumers mousePressed");
                     if (event.isPopupTrigger())
                     {
-                        System.out.println("   is popup trigger");
                         showContextMenu(event);
                     }
                 }
 
                 /** {@inheritDoc} */
-                public void mouseClicked(final MouseEvent event)
+                public void mouseReleased(final MouseEvent event)
                 {
-                    System.out.println("heard consumers mousePressed");
                     if (event.isPopupTrigger())
                     {
-                        System.out.println("   is popup trigger");
                         showContextMenu(event);
                     }
                 }
@@ -100,10 +95,8 @@ public final class OscWorldDesktopComponent
                  */
                 private void showContextMenu(final MouseEvent event)
                 {
-                    System.out.println("   might show consumer context menu");
                     if (consumers.getSelectedIndex() > -1)
                     {
-                        System.out.println("   showing consumer context menu");
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
                         JMenu producerMenu = CouplingMenus.getProducerMenu(oscWorldComponent.getWorkspace(), consumer.getDefaultConsumingAttribute());
@@ -120,21 +113,17 @@ public final class OscWorldDesktopComponent
                 /** {@inheritDoc} */
                 public void mousePressed(final MouseEvent event)
                 {
-                    System.out.println("heard producers mousePressed");
                     if (event.isPopupTrigger())
                     {
-                        System.out.println("   is popup trigger");
                         showContextMenu(event);
                     }
                 }
 
                 /** {@inheritDoc} */
-                public void mouseClicked(final MouseEvent event)
+                public void mouseReleased(final MouseEvent event)
                 {
-                    System.out.println("heard producers mouseClicked");
                     if (event.isPopupTrigger())
                     {
-                        System.out.println("   is popup trigger");
                         showContextMenu(event);
                     }
                 }
@@ -146,10 +135,8 @@ public final class OscWorldDesktopComponent
                  */
                 private void showContextMenu(final MouseEvent event)
                 {
-                    System.out.println("   might show producer context menu");
                     if (producers.getSelectedIndex() > -1)
                     {
-                        System.out.println("   showing producer context menu");
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
                         JMenu consumerMenu = CouplingMenus.getConsumerMenu(oscWorldComponent.getWorkspace(), producer.getDefaultProducingAttribute());

@@ -33,11 +33,8 @@ import org.simbrain.workspace.Coupling;
  */
 public class CouplingListPanel extends JPanel {
 
-    /** Panel for displaying couplingins. */
-    private JPanel couplingPanel;
-
     /** List of network couplings. */
-    private JList couplingList = new JList();
+    private JList couplings = new JList();
 
     /** Simbrain desktop reference. */
     private final SimbrainDesktop desktop;
@@ -48,31 +45,22 @@ public class CouplingListPanel extends JPanel {
      * @param desktop
      * @param couplingsList
      */
-    public CouplingListPanel(final SimbrainDesktop desktop, final Vector<Coupling> couplingsList) {
+    public CouplingListPanel(final SimbrainDesktop desktop, final Vector<Coupling> couplingList) {
+        //Layout manager for the JPanel.
+        super(new BorderLayout());
+
+        // Reference to the simbrain desktop
         this.desktop = desktop;
-        couplingList.setListData(couplingsList);
-        init();
-    }
 
-    /**
-     * Initializes all relevant data needed for creation of frame.
-     */
-    private void init() {
+        //Populates the coupling list with data.
+        couplings.setListData(couplingList);
 
-        createFrame();
-
-    }
-
-    /**
-     * Creates the frame for the display of couplings.
-     */
-    private void createFrame() {
-        couplingPanel = new JPanel(new BorderLayout());
-        JScrollPane listScroll = new JScrollPane(couplingList);
+        //Scroll pane for showing lists larger than viewing window
+        JScrollPane listScroll = new JScrollPane(couplings);
         listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        couplingPanel.add("Center", listScroll);
-        this.add(couplingPanel);
+        add(listScroll, BorderLayout.CENTER);
         
     }
+
 }

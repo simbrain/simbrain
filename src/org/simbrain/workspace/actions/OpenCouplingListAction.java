@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.simbrain.resource.ResourceManager;
@@ -30,7 +31,7 @@ import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
- * Opens and displays a list of the current couplingsw.
+ * Opens and displays a list of the current couplings.
  */
 public final class OpenCouplingListAction extends AbstractAction {
 
@@ -54,7 +55,7 @@ public final class OpenCouplingListAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         JFrame frame = new JFrame();
-        CouplingListPanel cl = new CouplingListPanel(desktop, new Vector(desktop.getWorkspace().getManager().getCouplings()));
+        JComponent cl = new CouplingListPanel(desktop, new Vector(desktop.getWorkspace().getManager().getCouplings()));
         frame.setContentPane(cl);
         frame.setSize(new Dimension(200, 300));
         frame.setLocationRelativeTo(null);

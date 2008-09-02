@@ -208,7 +208,7 @@ public class Gauge {
     }
 
     /**
-     * @param proj the new projection algorithm
+     * @param newProj the new projection algorithm
      */
     public void setCurrentProjector(final Projector newProj) {
         currentProjector = newProj;

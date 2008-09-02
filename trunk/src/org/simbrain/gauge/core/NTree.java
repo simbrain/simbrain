@@ -231,27 +231,27 @@ public class NTree implements Iterable<double[]> {
             } else {
                 return 0;
             }
-        }  
+        }
     }
     
     /**
      * 
-     * @param index
-     * @return
+     * @param index of element to return.
+     * @return Array of element at index location
      */
-    public double[] get(int index) {
+    public double[] get(final int index) {
         return list.get(index);
     }
     
     /**
      * checks whether the given point already exists in the tree
-     * with the specified tolerance
+     * with the specified tolerance.
      * 
      * @param point the point to search for
      * @param tolerance the tolerance for determining uniqueness
      * @return whether the point is unique
      */
-    public boolean isUnique(double[] point, double tolerance) {
+    public boolean isUnique(final double[] point, final double tolerance) {
         return isUnique(root, point, tolerance);
     }
     

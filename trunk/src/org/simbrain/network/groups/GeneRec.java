@@ -24,7 +24,7 @@ public class GeneRec extends Group {
     /** For matching plusPhases to MinusPhases. */
     private Hashtable<Neuron, Double> plusToMinusMapping = new Hashtable<Neuron, Double>();
 
-    /** @see Group. */
+    /** @see Group */
     public GeneRec(final RootNetwork net, final ArrayList<Object> items) {
         super(net);
         this.addObjectReferences(items);
@@ -46,7 +46,10 @@ public class GeneRec extends Group {
         }
     }
 
-   /** @Override. */
+   /**
+    * Overrides the base classes' update method.
+    */
+    @Override
     public void update() {
 
         if (!this.isOn()) {

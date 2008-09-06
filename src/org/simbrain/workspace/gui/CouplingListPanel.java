@@ -39,9 +39,18 @@ public class CouplingListPanel extends JPanel {
     /** Simbrain desktop reference. */
     private final SimbrainDesktop desktop;
 
-    /** Maximum number of cells to show. */
-    private final int maxCellsVisible = 45;
+    /** Vertical screen resolution. */
+    private final double screenHeight = java.awt.Toolkit.getDefaultToolkit().
+            getScreenSize().getHeight();
 
+    /** Height of an individual cell in pixels. */
+    private final int cellHeight = 17;
+
+    /** Percentage of screen for window to utilize. */
+    private final double windowPercentage = 0.86;
+
+    /** Maximum number of cells to be visible for a given screen resolution. */
+    private final double maxCellsVisible = screenHeight / cellHeight * windowPercentage;
 
     /**
      * Creates a new coupling list panel using the applicable desktop and coupling lists.
@@ -57,7 +66,11 @@ public class CouplingListPanel extends JPanel {
 
         //Populates the coupling list with data.
         couplings.setListData(couplingList);
-        couplings.setVisibleRowCount(Math.min(couplingList.size(), maxCellsVisible));
+
+        // Sets the height of the cells.
+        couplings.setFixedCellHeight(cellHeight);
+        // Dynamically sets the number of rows that are visible.
+        couplings.setVisibleRowCount(Math.min(couplingList.size(), (int) maxCellsVisible));
 
         //Scroll pane for showing lists larger than viewing window and setting maximum size
         JScrollPane listScroll = new JScrollPane(couplings);

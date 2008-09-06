@@ -90,8 +90,6 @@ public class Workspace {
      * Used in prioirty based update.
      */
     private SortedSet<Integer> updatePriorities =  new TreeSet<Integer>();
-;
-
     
     // TODO: Add docs
     private boolean fireEvents = true;

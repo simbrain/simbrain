@@ -124,10 +124,13 @@ public final class Coupling<E> {
      */
     public String toString() {
         String producerString;
+        String producerComponent = "";
         String consumerString;
+        String consumerComponent = "";
         if (producingAttribute == null) {
             producerString = "Null";
         } else {
+            producerComponent =  "[" + producingAttribute.getParent().getParentComponent().toString() +"]";
             if (producingAttribute instanceof SingleAttributeProducer) {
                 producerString = producingAttribute.getParent().getDescription();
             } else {
@@ -138,6 +141,7 @@ public final class Coupling<E> {
         if (consumingAttribute == null) {
             consumerString = "Null";
         } else {
+            consumerComponent = "[" + consumingAttribute.getParent().getParentComponent().toString() +"]";
             if (consumingAttribute instanceof SingleAttributeConsumer) {
                 consumerString = consumingAttribute.getParent().getDescription();
             } else {
@@ -145,7 +149,7 @@ public final class Coupling<E> {
                     + ":" + consumingAttribute.getAttributeDescription();
             }
         }
-        return producerString + ">" + consumerString;
+        return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
      }
     
     /**

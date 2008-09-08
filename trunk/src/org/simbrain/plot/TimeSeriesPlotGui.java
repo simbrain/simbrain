@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.plot;
 
 import java.awt.BorderLayout;
@@ -25,20 +43,18 @@ import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.jfree.data.xy.XYSeries;
 
-public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
+/**
+ * Display a TimeSeriesPlot.
+ */
+public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
 
-    private static final long serialVersionUID = 1L;
+    /** The underlying plot component. */
+    private final TimeSeriesPlotComponent component;
 
-    /** Coupling menu item. Must be reset every time.  */
-    JMenuItem couplingMenuItem;
-    
-    private final PlotComponent component;
-    
     /**
-     * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
-     * @param ws the workspace associated with this frame
+     * Construct a time series plot gui.
      */
-    public PlotDesktopComponent(GenericFrame frame, PlotComponent component) {
+    public TimeSeriesPlotGui(final GenericFrame frame, final TimeSeriesPlotComponent component) {
         super(frame, component);
         this.component = component;
         setPreferredSize(new Dimension(500, 400));
@@ -50,25 +66,22 @@ public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
     @Override
     public void postAddInit() {
         setLayout(new BorderLayout());
-        setCouplingMenuItem();
         JMenu couplingMenu = new JMenu("Couplings");
-        couplingMenu.addMenuListener(menuListener);
-        //couplingMenu.add(couplingMenuItem);
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(couplingMenu);
         getParentFrame().setJMenuBar(menuBar);
 
         // Add the series to your data set
         XYSeriesCollection dataset = new XYSeriesCollection();
-        for (DataSource consumer : component.getConsumers()) {
-            dataset.addSeries(consumer.getXySeries());       
+        for (TimeSeriesConsumer consumer : component.getConsumers()) {
+            dataset.addSeries(consumer.getXySeries());
         }
         
         // Generate the graph
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Time series", // Title
-            "iterations", // x-axis Label
-            "value", // y-axis Label
+            "Iterations", // x-axis Label
+            "Value(s)", // y-axis Label
             dataset, // Dataset
             PlotOrientation.VERTICAL, // Plot Orientation
             true, // Show Legend
@@ -77,28 +90,7 @@ public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
         );
         
         ChartPanel panel = new ChartPanel(chart);
-        add("Center", panel);       
-    }
-    
-//    private final ActionListener actionListener = new ActionListener() {
-//        /**
-//         * {@inheritDoc}
-//         */
-//        @SuppressWarnings("unchecked")
-//        public void actionPerformed(final ActionEvent e) {
-//
-//            /* Handle Coupling wire-up */
-//            CouplingMenuItem m = (CouplingMenuItem) e.getSource();
-//            component.couple((ProducingAttribute<Double>) m.getProducingAttribute());
-//        }
-//    };
-    
-    /**
-     * Set up the coupling menu.
-     */
-    private void setCouplingMenuItem() {
-//        couplingMenuItem = CouplingMenus.getProducerMenu(this.getWorkspaceComponent().getWorkspace(), component.getVariable());
-//        couplingMenuItem.setText("Set plotter source");
+        add("Center", panel);
     }
 
     @Override
@@ -110,18 +102,5 @@ public class PlotDesktopComponent extends GuiComponent<PlotComponent> {
     public void update() {
         
     }
-    
-    private final MenuListener menuListener = new MenuListener() {
-        public void menuCanceled(MenuEvent arg0) {
-            /* no implementation */
-        }
-    
-        public void menuDeselected(MenuEvent arg0) {
-            /* no implementation */
-        }
-    
-        public void menuSelected(MenuEvent arg0) {
-            setCouplingMenuItem();
-        }
-    };
+   
 }

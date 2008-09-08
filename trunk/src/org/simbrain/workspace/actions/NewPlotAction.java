@@ -22,7 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.plot.PlotComponent;
+import org.simbrain.plot.TimeSeriesPlotComponent;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -46,7 +46,7 @@ public final class NewPlotAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        PlotComponent plot = new PlotComponent("Plot");
+        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Plot");
         workspace.addWorkspaceComponent(plot);
     }
 }

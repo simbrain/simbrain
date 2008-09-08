@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.plot;
 
 import java.io.InputStream;
@@ -15,19 +33,23 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+/**
+ * Represents time series data.
+ * 
+ * TODO:    Ability to add and remove TimeSeriesConsumers
+ *          Custom component listener to reflect number of consumers
+ *          Ability to reset the plot.
+ */
+public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Consumer list. */
-    private ArrayList<DataSource> consumers= new ArrayList<DataSource>();
+    private ArrayList<TimeSeriesConsumer> consumers= new ArrayList<TimeSeriesConsumer>();
     
-    /** Coupling menu item. Must be reset every time.  */
-    //JMenuItem couplingMenuItem;
 
     /**
-     * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
-     * @param ws the workspace associated with this frame
+     * Create new time series plot component.     
      */
-    public PlotComponent(String name) {
+    public TimeSeriesPlotComponent(String name) {
         super(name);
         defaultInit();
     }
@@ -38,7 +60,7 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
      * @param name name of component
      * @param numDataSources number of data sources to initialize plot with
      */
-    public PlotComponent(final String name, final int numDataSources) {
+    public TimeSeriesPlotComponent(final String name, final int numDataSources) {
         super(name);
         addDataSources(numDataSources);
     }
@@ -59,7 +81,7 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     public void addDataSources(final int numDataSources) {
         int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            DataSource newAttribute = new DataSource(this, "" + (currentSize + i));
+            TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(this, "" + (currentSize + i));
             consumers.add(newAttribute);
         }
     }
@@ -74,8 +96,8 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
         return xstream;
     }
     
-    public static PlotComponent open(InputStream input, final String name, final String format) {
-        return (PlotComponent) getXStream().fromXML(input);
+    public static TimeSeriesPlotComponent open(InputStream input, final String name, final String format) {
+        return (TimeSeriesPlotComponent) getXStream().fromXML(input);
     }
 
     /**
@@ -115,7 +137,7 @@ public class PlotComponent extends WorkspaceComponent<WorkspaceComponentListener
     /**
      * {@inheritDoc}
      */
-    public Collection<DataSource> getConsumers() {
+    public Collection<TimeSeriesConsumer> getConsumers() {
         return consumers;
     }
 

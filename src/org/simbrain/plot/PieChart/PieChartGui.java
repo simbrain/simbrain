@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot;
+package org.simbrain.plot.PieChart;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -34,6 +34,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ProducingAttribute;
@@ -44,17 +45,17 @@ import org.simbrain.workspace.gui.GenericFrame;
 import org.jfree.data.xy.XYSeries;
 
 /**
- * Display a TimeSeriesPlot.
+ * Display a PieChart.
  */
-public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
+public class PieChartGui extends GuiComponent<PieChartComponent> {
 
     /** The underlying plot component. */
-    private final TimeSeriesPlotComponent component;
-
+    private final PieChartComponent component;
+    
     /**
-     * Construct a time series plot gui.
+     * Construct the GUI Pie Chart 
      */
-    public TimeSeriesPlotGui(final GenericFrame frame, final TimeSeriesPlotComponent component) {
+    public PieChartGui(final GenericFrame frame, final PieChartComponent component) {
         super(frame, component);
         this.component = component;
         setPreferredSize(new Dimension(500, 400));
@@ -66,27 +67,14 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
     @Override
     public void postAddInit() {
         setLayout(new BorderLayout());
-        JMenu couplingMenu = new JMenu("Couplings");
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.add(couplingMenu);
-        getParentFrame().setJMenuBar(menuBar);
-
-        // Add the series to your data set
-        XYSeriesCollection dataset = new XYSeriesCollection();
-        for (TimeSeriesConsumer consumer : component.getConsumers()) {
-            dataset.addSeries(consumer.getXySeries());
-        }
         
         // Generate the graph
-        JFreeChart chart = ChartFactory.createXYLineChart(
-            "Time series", // Title
-            "Iterations", // x-axis Label
-            "Value(s)", // y-axis Label
-            dataset, // Dataset
-            PlotOrientation.VERTICAL, // Plot Orientation
-            true, // Show Legend
-            true, // Use tooltips
-            false // Configure chart to generate URLs?
+        JFreeChart chart = ChartFactory.createPieChart(
+            "Pie Chart",
+            component.getDataset(),
+            true, // include legend
+            true,
+            false
         );
         
         ChartPanel panel = new ChartPanel(chart);
@@ -100,7 +88,6 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
 
     @Override
     public void update() {
-        
     }
    
 }

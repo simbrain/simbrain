@@ -21,21 +21,17 @@ package org.simbrain.workspace.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-
-import org.simbrain.plot.TimeSeriesPlotComponent;
+import org.simbrain.plot.PieChart.*;
+import org.simbrain.plot.TimeSeries.*;
 import org.simbrain.workspace.Workspace;
 
 /**
- * Add game world 2d to workspace.
+ * Add Plot component to workspace.
  */
 public final class NewPlotAction extends WorkspaceAction {
 
-    private static final long serialVersionUID = 1L;
-
-
     /**
-     * Create a game world 2d action with the specified
-     * workspace.
+     * Create a new plot component.
      *
      * @param workspace workspace, must not be null
      */
@@ -46,6 +42,7 @@ public final class NewPlotAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+//        PieChartComponent plot = new PieChartComponent("Plot");
         TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Plot");
         workspace.addWorkspaceComponent(plot);
     }

@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot;
+package org.simbrain.plot.TimeSeries;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,7 +55,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     }
     
     /**
-     * Initializes a jfreechart with specific number of data sources.
+     * Initializes a JFreeChart with specific number of data sources.
      *
      * @param name name of component
      * @param numDataSources number of data sources to initialize plot with
@@ -69,7 +69,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      * Default initialization.
      */
     private void defaultInit() {
-        addDataSources(3);
+        addDataSources(10);
     }
     
     /**

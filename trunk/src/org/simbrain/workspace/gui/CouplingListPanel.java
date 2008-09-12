@@ -19,8 +19,14 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Vector;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,26 +37,19 @@ import org.simbrain.workspace.Coupling;
  * Displays a list of the current couplings in the network.
  *
  */
-public class CouplingListPanel extends JPanel {
+public class CouplingListPanel extends JPanel implements CouplingComponentListener, ActionListener {
 
     /** List of network couplings. */
     private JList couplings = new JList();
 
+    /** Instance of parent frame. */
+    private JFrame couplingFrame = new JFrame();
+
     /** Simbrain desktop reference. */
     private final SimbrainDesktop desktop;
 
-    /** Vertical screen resolution. */
-    private final double screenHeight = java.awt.Toolkit.getDefaultToolkit().
-            getScreenSize().getHeight();
-
-    /** Height of an individual cell in pixels. */
-    private final int cellHeight = 17;
-
-    /** Percentage of screen for window to utilize. */
-    private final double windowPercentage = 0.86;
-
-    /** Maximum number of cells to be visible for a given screen resolution. */
-    private final double maxCellsVisible = screenHeight / cellHeight * windowPercentage;
+    /** List of couplings. */
+    private Vector<Coupling> couplingList = new Vector();
 
     /**
      * Creates a new coupling list panel using the applicable desktop and coupling lists.
@@ -58,27 +57,65 @@ public class CouplingListPanel extends JPanel {
      * @param couplingList list of couplings to be shown in window
      */
     public CouplingListPanel(final SimbrainDesktop desktop, final Vector<Coupling> couplingList) {
-        //Layout manager for the JPanel.
+
         super(new BorderLayout());
 
         // Reference to the simbrain desktop
         this.desktop = desktop;
+        this.couplingList = couplingList;
+
+        // Listens for frame closing for removal of listener.
+        couplingFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(final WindowEvent w) {
+                desktop.getWorkspace().getManager().removeCouplingListener(CouplingListPanel.this);
+            }
+        });
+        desktop.getWorkspace().getManager().addCouplingListener(this);
 
         //Populates the coupling list with data.
-        couplings.setListData(couplingList);
-
-        // Sets the height of the cells.
-        couplings.setFixedCellHeight(cellHeight);
-        // Dynamically sets the number of rows that are visible.
-        couplings.setVisibleRowCount(Math.min(couplingList.size(), (int) maxCellsVisible));
+        couplings.setListData(this.couplingList);
 
         //Scroll pane for showing lists larger than viewing window and setting maximum size
-        JScrollPane listScroll = new JScrollPane(couplings);
+        final JScrollPane listScroll = new JScrollPane(couplings);
         listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+        // Allows the user to delete couplings within the list frame.
+        JPanel buttonPanel = new JPanel();
+        JButton deleteCouplingButton = new JButton("Delete");
+        deleteCouplingButton.setActionCommand("Delete");
+        deleteCouplingButton.addActionListener(this);
+        buttonPanel.add(deleteCouplingButton);
+
         // Add scroll pane to JPanel
         add(listScroll, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+        couplingFrame.setContentPane(this);
+        couplingFrame.pack();
+
+
+    }
+
+    /**
+     * Updates the list of couplings when new couplings are made.
+     */
+    public void couplingListUpdated() {
+        couplingList = new Vector(desktop.getWorkspace().getManager().getCouplings());
+        couplings.setListData(couplingList);
+    }
+
+
+    /**
+     * @see ActionListener
+     * @param event Action event.
+     */
+    public void actionPerformed(final ActionEvent event) {
+        if (event.getSource() instanceof JButton) {
+            JButton button = (JButton) event.getSource();
+            if (button.getActionCommand().equals("Delete")) {
+                System.out.println("Delete button Pressed");
+            }
+        }
         
     }
 

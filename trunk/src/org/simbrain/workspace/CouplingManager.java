@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.gui.CouplingComponentListener;
 
 /**
  * Manages all the couplings for a Workspace instance.
@@ -50,6 +51,8 @@ public class CouplingManager implements UpdatePriority {
     private static final int DEFAULT_PRIORITY = 0;
     /** Priority of this component; used in priorty based workspace update. */
     private int priority = DEFAULT_PRIORITY;
+    /** List of listeners to fire updates when couplings are changed. */
+    private ArrayList<CouplingComponentListener> couplingManagerListeners = new ArrayList<CouplingComponentListener>();
 
     /**
      * Helper method to cleanup nasty generics declarations.
@@ -167,6 +170,7 @@ public class CouplingManager implements UpdatePriority {
         // TODO is this the way to do this?
         targetCouplings.put(target, addCouplingToList(
             targetCouplings.get(source), coupling));
+        fireCouplingListUpdated();
     }
     
     /**
@@ -246,6 +250,7 @@ public class CouplingManager implements UpdatePriority {
         source.couplingRemoved(coupling);
         
         if (target != source) { target.couplingRemoved(coupling); }
+        fireCouplingListUpdated();
     }
     
     /**
@@ -324,5 +329,32 @@ public class CouplingManager implements UpdatePriority {
      */
     public void setPriority(int value) {
         priority = value;
+    }
+
+
+    /**
+     * Sends updates to all listeners when changes are made.
+     */
+    private void fireCouplingListUpdated() {
+
+        for (CouplingComponentListener listeners : couplingManagerListeners) {
+            listeners.couplingListUpdated();
+        }
+    }
+
+    /**
+     * Adds a new listener to be updated when changes are made.
+     * @param listener to be updated of changes
+     */
+    public void addCouplingListener(final CouplingComponentListener listener) {
+        couplingManagerListeners.add(listener);
+    }
+
+    /**
+     * Removes the listener from the list.
+     * @param listener to be removed
+     */
+    public void removeCouplingListener(final CouplingComponentListener listener) {
+        couplingManagerListeners.remove(listener);
     }
 }

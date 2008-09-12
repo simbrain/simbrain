@@ -21,8 +21,8 @@ package org.simbrain.workspace.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import org.simbrain.plot.PieChart.*;
-import org.simbrain.plot.TimeSeries.*;
+import org.simbrain.plot.piechart.*;
+import org.simbrain.plot.timeseries.*;
 import org.simbrain.workspace.Workspace;
 
 /**

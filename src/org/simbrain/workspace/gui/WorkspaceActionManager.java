@@ -62,6 +62,7 @@ import org.simbrain.workspace.actions.OpenGaugeAction;
 import org.simbrain.workspace.actions.OpenNetworkAction;
 import org.simbrain.workspace.actions.OpenOdorWorldAction;
 import org.simbrain.workspace.actions.OpenWorkspaceAction;
+import org.simbrain.workspace.actions.OpenWorkspaceComponentListAction;
 import org.simbrain.workspace.actions.QuitWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
@@ -169,6 +170,8 @@ public class WorkspaceActionManager {
     /** Opens the coupling list. */
     private final Action openCouplingListAction;
 
+    private final Action openWorkspaceComponentListAction;
+
     /** Location of script menu directory. */
     private final static String SCRIPT_MENU_DIRECTORY = "." + System.getProperty("file.separator") + "scriptmenu";
     
@@ -216,6 +219,7 @@ public class WorkspaceActionManager {
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);
+        openWorkspaceComponentListAction = new OpenWorkspaceComponentListAction(desktop);
     }
 
     /**
@@ -483,7 +487,14 @@ public class WorkspaceActionManager {
     /**
      * @return the openCouplingListAction.
      */
-	public Action getOpenCouplingListAction() {
-		return openCouplingListAction;
-	}
+    public Action getOpenCouplingListAction() {
+        return openCouplingListAction;
+    }
+
+    /**
+     * @return the openWorkspaceComponentListAction.
+     */
+    public Action getOpenWorkspaceComponentListAction() {
+        return openWorkspaceComponentListAction;
+    }
 }

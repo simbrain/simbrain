@@ -42,8 +42,8 @@ public final class NewPlotAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-//        PieChartComponent plot = new PieChartComponent("Plot");
-        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Plot");
+        PieChartComponent plot = new PieChartComponent("Plot");
+//        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Plot");
         workspace.addWorkspaceComponent(plot);
     }
 }

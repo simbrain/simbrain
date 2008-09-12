@@ -406,6 +406,7 @@ public class SimbrainDesktop {
         coupleMenu.add(actionManager.getOpenCouplingManagerAction());
         coupleMenu.add(actionManager.getGlobalUpdateAction());
         coupleMenu.add(actionManager.getOpenCouplingListAction());
+        coupleMenu.add(actionManager.getOpenWorkspaceComponentListAction());
         return coupleMenu;
     }
 

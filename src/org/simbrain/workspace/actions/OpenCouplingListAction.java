@@ -19,8 +19,6 @@
 package org.simbrain.workspace.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -55,28 +53,17 @@ public final class OpenCouplingListAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Open coupling list");
     }
 
-    /** @see AbstractAction */
+    /**
+     * @see AbstractAction
+     * @param event Action event
+     */
     public void actionPerformed(final ActionEvent event) {
-        final JFrame frame = new JFrame();
+        final JFrame frame = new JFrame("Coupling List");
         JComponent cl = new CouplingListPanel(desktop,
                 new Vector(desktop.getWorkspace().getManager().getCouplings()));
         frame.setContentPane(cl);
         frame.pack();
         frame.setLocationRelativeTo(null);
-
-        // Initial width and height of the frame.
-        final int initialWidth = frame.getWidth();
-        final int initialHeight = frame.getHeight();
-
-        // Frame component adapter for limiting the maximum frame size.
-        frame.addComponentListener(new ComponentAdapter() {
-          public void componentResized(final ComponentEvent event) {
-            frame.setSize(
-              Math.min(initialWidth, frame.getWidth()),
-              Math.min(initialHeight, frame.getHeight()));
-          }
-        });
-
         frame.setVisible(true);
     }
 }

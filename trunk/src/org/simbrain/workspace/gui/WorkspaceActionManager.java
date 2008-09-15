@@ -51,9 +51,10 @@ import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
 import org.simbrain.workspace.actions.NewOscWorldAction;
-import org.simbrain.workspace.actions.NewPlotAction;
+import org.simbrain.workspace.actions.NewPieChartPlotAction;
 import org.simbrain.workspace.actions.NewTextWorldAction;
 import org.simbrain.workspace.actions.NewThreeDeeWorldAction;
+import org.simbrain.workspace.actions.NewTimeSeriesPlotAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
 import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
@@ -120,7 +121,10 @@ public class WorkspaceActionManager {
     private final Action newGaugeAction;
 
     /** New plot action. */
-    private final Action newPlotAction;
+    private final Action newPieChartPlotAction;
+
+    /** New time series plot action. */
+    private final Action newTimeSeriesPlotAction;
 
     /** New console action. */
     private final Action newConsoleAction;
@@ -207,7 +211,8 @@ public class WorkspaceActionManager {
         newThreeDeeWorldAction = new NewThreeDeeWorldAction(workspace);
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
-        newPlotAction = new NewPlotAction(workspace);
+        newPieChartPlotAction = new NewPieChartPlotAction(workspace);
+        newTimeSeriesPlotAction = new NewTimeSeriesPlotAction(workspace);
 
         workspaceHelpAction = new WorkspaceHelpAction();
 
@@ -229,14 +234,14 @@ public class WorkspaceActionManager {
      */
     public List<Action> getGlobalControlActions() {
         return Arrays
-                .asList(new Action[] { globalRunAction, globalStopAction });
+                .asList(new Action[] {globalRunAction, globalStopAction});
     }
 
     /**
      * @return Open and save workspace actions.
      */
     public List<Action> getOpenSaveWorkspaceActions() {
-        return Arrays.asList(new Action[] { openWorkspaceAction,
+        return Arrays.asList(new Action[] {openWorkspaceAction,
                 saveWorkspaceAction, saveWorkspaceAsAction });
     }
 
@@ -244,7 +249,7 @@ public class WorkspaceActionManager {
      * @return Open worlds actions.
      */
     public List<Action> getOpenWorldActions() {
-        return Arrays.asList(new Action[] { openDataWorldAction,
+        return Arrays.asList(new Action[] {openDataWorldAction,
                 openOdorWorldAction });
     }
 
@@ -252,7 +257,7 @@ public class WorkspaceActionManager {
      * @return New worlds actions.
      */
     public List<Action> getNewWorldActions() {
-        return Arrays.asList(new Action[] { newDataWorldAction,
+        return Arrays.asList(new Action[] {newDataWorldAction,
                 newGameWorld2dAction, newMidiWorldAction, newOdorWorldAction,
                 newOscWorldAction, newThreeDeeWorldAction, newTextWorldAction,
                 newVisionWorldAction });
@@ -261,8 +266,10 @@ public class WorkspaceActionManager {
     /**
      * @return Simbrain gauge actions.
      */
-    public List<Action> getGaugeActions() {
-        return Arrays.asList(new Action[] { newGaugeAction, newPlotAction });
+    public List<Action> getPlotActions() {
+        return Arrays.asList(new Action[] {newGaugeAction,
+                newPieChartPlotAction,
+                newTimeSeriesPlotAction});
     }
 
     /**
@@ -275,7 +282,7 @@ public class WorkspaceActionManager {
         File dir = new File(SCRIPT_MENU_DIRECTORY);
         if (dir.isDirectory() == false) {
             return null; // Throw exception instead?
-        }        
+        }
         // TODO: look for other endings and invoke relevant script types
         for (File file : dir.listFiles()) {
             if (file.getName().endsWith(".bsh")) {
@@ -452,8 +459,18 @@ public class WorkspaceActionManager {
         return quitWorkspaceAction;
     }
 
-    public Action getNewPlotAction() {
-        return newPlotAction;
+    /**
+     * @return the newPieChartPlotAction.
+     */
+    public Action getNewPieChartPlotAction() {
+        return newPieChartPlotAction;
+    }
+
+    /**
+     * @return the newTimeSeriesPlotAction.
+     */
+    public Action getNewTimeSeriesPlotAction() {
+        return newTimeSeriesPlotAction;
     }
 
     /**

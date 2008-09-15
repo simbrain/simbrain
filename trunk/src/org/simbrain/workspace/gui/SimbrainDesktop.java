@@ -306,7 +306,7 @@ public class SimbrainDesktop {
         button = new JButton();
         button.setIcon(ResourceManager.getImageIcon("Gauge.png"));
         final JPopupMenu gaugeMenu = new JPopupMenu();
-        for (Action action : actionManager.getGaugeActions()) {
+        for (Action action : actionManager.getPlotActions()) {
             gaugeMenu.add(action);
         }
         button.addActionListener(new ActionListener() {
@@ -336,6 +336,10 @@ public class SimbrainDesktop {
         frame.setJMenuBar(menuBar);
     }
 
+    /**
+     * Create script menu.
+     * @return script JMenu
+     */
     private JMenu createScriptMenu() {
         JMenu scriptMenu = new JMenu("Scripts");
         scriptMenu.addMenuListener(menuListener);
@@ -381,8 +385,8 @@ public class SimbrainDesktop {
     private JMenu createInsertMenu() {
         JMenu insertMenu = new JMenu("Insert");
         insertMenu.add(actionManager.getNewNetworkAction());
-        JMenu newGaugeSubMenu = new JMenu("New Gauge");
-        for (Action action : actionManager.getGaugeActions()) {
+        JMenu newGaugeSubMenu = new JMenu("New Plot");
+        for (Action action : actionManager.getPlotActions()) {
             newGaugeSubMenu.add(action);
         }
         insertMenu.add(newGaugeSubMenu);
@@ -427,8 +431,8 @@ public class SimbrainDesktop {
     private void createContextMenu() {
         contextMenu = new JPopupMenu();
         contextMenu.add(actionManager.getNewNetworkAction());
-        JMenu newGaugeSubMenu = new JMenu("New Gauge");
-        for (Action action : actionManager.getGaugeActions()) {
+        JMenu newGaugeSubMenu = new JMenu("New Plot");
+        for (Action action : actionManager.getPlotActions()) {
             newGaugeSubMenu.add(action);
         }
         contextMenu.add(newGaugeSubMenu);

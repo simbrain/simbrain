@@ -28,22 +28,21 @@ import org.simbrain.workspace.Workspace;
 /**
  * Add Plot component to workspace.
  */
-public final class NewPlotAction extends WorkspaceAction {
+public final class NewTimeSeriesPlotAction extends WorkspaceAction {
 
     /**
      * Create a new plot component.
      *
      * @param workspace workspace, must not be null
      */
-    public NewPlotAction(Workspace workspace) {
-        super("New Plot", workspace);
+    public NewTimeSeriesPlotAction(Workspace workspace) {
+        super("Time Series", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        PieChartComponent plot = new PieChartComponent("Plot");
-//        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Plot");
+        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Time Series");
         workspace.addWorkspaceComponent(plot);
     }
 }

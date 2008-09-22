@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.actions;
+package org.simbrain.workspace.actions.chart;
 
 import java.awt.event.ActionEvent;
 
@@ -24,25 +24,26 @@ import javax.swing.AbstractAction;
 import org.simbrain.plot.piechart.*;
 import org.simbrain.plot.timeseries.*;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.actions.WorkspaceAction;
 
 /**
  * Add Plot component to workspace.
  */
-public final class NewPieChartPlotAction extends WorkspaceAction {
+public final class NewTimeSeriesPlotAction extends WorkspaceAction {
 
     /**
      * Create a new plot component.
      *
      * @param workspace workspace, must not be null
      */
-    public NewPieChartPlotAction(Workspace workspace) {
-        super("Pie Chart", workspace);
+    public NewTimeSeriesPlotAction(Workspace workspace) {
+        super("Time Series", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        PieChartComponent plot = new PieChartComponent("Pie Chart");
+        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Time Series");
         workspace.addWorkspaceComponent(plot);
     }
 }

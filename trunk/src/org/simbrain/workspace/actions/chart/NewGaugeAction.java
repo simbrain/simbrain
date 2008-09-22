@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.actions;
+package org.simbrain.workspace.actions.chart;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -28,6 +28,7 @@ import javax.swing.KeyStroke;
 import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.actions.WorkspaceAction;
 
 /**
  * Add Gauge to workspace.

@@ -537,16 +537,6 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     }
 
     /**
-     * Shows the script dialog box.
-     */
-    public void showScriptDialog() {
-        final DialogScript theDialog = new DialogScript(this);
-        theDialog.setLocationRelativeTo(null);
-        theDialog.pack();
-        theDialog.setVisible(true);
-    }
-
-    /**
      * @return The selected abstract entity.
      */
     public AbstractEntity getSelectedEntity() {

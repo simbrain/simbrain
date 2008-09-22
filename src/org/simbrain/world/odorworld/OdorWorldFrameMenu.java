@@ -106,12 +106,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         }
     };
     
-    private final ActionListener scriptItemListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            parentFrame.getWorldPanel().showScriptDialog();
-        }
-    };
-    
     private final ActionListener helpItemListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             Utils.showQuickRef("World.html");
@@ -130,7 +124,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
 
         add(getScriptMenu());
         getScriptMenu().add(getScriptItem());
-        getScriptItem().addActionListener(scriptItemListener);
 
         add(getHelpMenu());
         getHelpMenu().add(getHelpItem());

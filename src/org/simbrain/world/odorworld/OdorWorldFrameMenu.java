@@ -64,10 +64,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     private JMenuItem pasteItem = new JMenuItem("Paste");
     /** Clear all menu item. */
     private JMenuItem clearAllItem = new JMenuItem("Clear all entities");
-    /** Script menu. */
-    private JMenu scriptMenu = new JMenu("Script ");
-    /** Script menu Item. */
-    private JMenuItem scriptItem = new JMenuItem("Open script dialog");
     /** Help menu. */
     private JMenu helpMenu = new JMenu("Help");
     /** Help menu item. */
@@ -121,9 +117,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         setUpFileMenu();
 
         setUpEditMenu();
-
-        add(getScriptMenu());
-        getScriptMenu().add(getScriptItem());
 
         add(getHelpMenu());
         getHelpMenu().add(getHelpItem());
@@ -395,33 +388,5 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      */
     public JMenuItem getSaveItem() {
         return saveItem;
-    }
-
-    /**
-     * @param scriptItem The scriptItem to set.
-     */
-    public void setScriptItem(final JMenuItem scriptItem) {
-        this.scriptItem = scriptItem;
-    }
-
-    /**
-     * @return Returns the scriptItem.
-     */
-    public JMenuItem getScriptItem() {
-        return scriptItem;
-    }
-
-    /**
-     * @param scriptMenu The scriptMenu to set.
-     */
-    public void setScriptMenu(final JMenu scriptMenu) {
-        this.scriptMenu = scriptMenu;
-    }
-
-    /**
-     * @return Returns the scriptMenu.
-     */
-    public JMenu getScriptMenu() {
-        return scriptMenu;
     }
 }

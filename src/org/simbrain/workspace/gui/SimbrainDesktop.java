@@ -57,8 +57,12 @@ import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.gauge.GaugeDesktopComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.gui.NetworkDesktopComponent;
+import org.simbrain.plot.barchart.BarChartComponent;
+import org.simbrain.plot.barchart.BarChartGui;
 import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartGui;
+import org.simbrain.plot.scatterplot.ScatterPlotComponent;
+import org.simbrain.plot.scatterplot.ScatterPlotGui;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
@@ -224,6 +228,8 @@ public class SimbrainDesktop {
      */
     private static void registerComponents() {
         // TODO use a configuration file
+        registerComponent(BarChartComponent.class, BarChartGui.class);
+        registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
         registerComponent(DataWorldComponent.class, DataWorldDesktopComponent.class);
         registerComponent(GameWorld2DComponent.class, GameWorld2DDesktopComponent.class);
         registerComponent(GaugeComponent.class, GaugeDesktopComponent.class);
@@ -232,11 +238,11 @@ public class SimbrainDesktop {
         registerComponent(OdorWorldComponent.class, OdorWorldDesktopComponent.class);
         registerComponent(OscWorldComponent.class, OscWorldDesktopComponent.class);
         registerComponent(PieChartComponent.class, PieChartGui.class);
+        registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
+        registerComponent(ThreeDeeComponent.class, MainConsole.class);
         registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
-        registerComponent(ThreeDeeComponent.class, MainConsole.class);
-        registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
     }
     /**
      * Returns the workspace.

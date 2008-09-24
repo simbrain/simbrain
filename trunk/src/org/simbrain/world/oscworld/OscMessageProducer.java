@@ -1,10 +1,25 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2008 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.oscworld;
 
 import java.lang.reflect.Type;
 
-import java.io.IOException;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +57,8 @@ final class OscMessageProducer
     /**
      * Create a new OSC message producer with the specified OSC world component.
      *
-     * @param address OSC message address, must not be null and must start with <code>'/'</code> character
+     * @param address OSC message address, must not be null and must start with
+     *    <code>'/'</code> character
      * @param component OSC world component, must not be null
      */
     OscMessageProducer(final String address, final OscWorldComponent component) {
@@ -97,22 +113,22 @@ final class OscMessageProducer
     }
 
     /** {@inheritDoc} */
-    public final WorkspaceComponent<?> getParentComponent() {
+    public WorkspaceComponent<?> getParentComponent() {
         return component;
     }
 
     /** {@inheritDoc} */
-    public final List<? extends ProducingAttribute<?>> getProducingAttributes() {
+    public List<? extends ProducingAttribute<?>> getProducingAttributes() {
         return Collections.singletonList(attribute);
     }
 
     /** {@inheritDoc} */
-    public final ProducingAttribute<?> getDefaultProducingAttribute() {
+    public ProducingAttribute<?> getDefaultProducingAttribute() {
         return attribute;
     }
 
     /** {@inheritDoc} */
-    public final void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {
+    public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {
         throw new UnsupportedOperationException("default attribute is not modifiable");
     }
 

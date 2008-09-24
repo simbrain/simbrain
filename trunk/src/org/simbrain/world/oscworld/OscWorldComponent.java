@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2008 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.oscworld;
 
 import java.io.OutputStream;
@@ -9,8 +27,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -52,10 +68,8 @@ public final class OscWorldComponent
     /** Default OSC out port. */
     private static final int DEFAULT_OSC_OUT_PORT = 9999;
 
-    static
-    {
-        try
-        {
+    static {
+        try {
             DEFAULT_OSC_OUT_HOST = InetAddress.getLocalHost();
         }
         catch (UnknownHostException e) {
@@ -91,12 +105,11 @@ public final class OscWorldComponent
 
     /** {@inheritDoc} */
     public void closing() {
-        // TODO:  throws one SocketException to stdout/err
-        //    might have to wait a bit after stopListening() to let run() stop correctly
         oscPortIn.stopListening();
+        // TODO:  always throws SocketException; wrote email to JavaOSC author
         oscPortIn.close();
         oscPortOut.close();
-        // TODO:  remove consumer list event listeners
+        // TODO:  remove list event listeners
     }
 
     /** {@inheritDoc} */
@@ -120,18 +133,38 @@ public final class OscWorldComponent
     }
 
     // TODO:  make these bound properties
+    /**
+     * Return the OSC in host name.
+     *
+     * @return the OSC in host name
+     */
     String getOscInHost() {
         return DEFAULT_OSC_OUT_HOST.toString();
     }
 
+    /**
+     * Return the OSC out host name.
+     *
+     * @return the OSC out host name
+     */
     String getOscOutHost() {
         return DEFAULT_OSC_OUT_HOST.toString();
     }
 
+    /**
+     * Return the OSC in port number.
+     *
+     * @return the OSC in port number
+     */
     int getOscInPort() {
         return DEFAULT_OSC_IN_PORT;
     }
 
+    /**
+     * Return the OSC out port number.
+     *
+     * @return the OSC out port number
+     */
     int getOscOutPort() {
         return DEFAULT_OSC_OUT_PORT;
     }
@@ -203,7 +236,8 @@ public final class OscWorldComponent
     /**
      * Add a new OSC in message with the specified address.
      *
-     * @param address OSC in message address, must not be null and must start with <code>'/'</code> character
+     * @param address OSC in message address, must not be null and must start with
+     *    <code>'/'</code> character
      */
     void addInMessage(final String address) {
         OscMessageProducer producer = new OscMessageProducer(address, this);
@@ -213,7 +247,8 @@ public final class OscWorldComponent
     /**
      * Add a new OSC out message with the specified address.
      *
-     * @param address OSC out message address, must not be null and must start with <code>'/'</code> character
+     * @param address OSC out message address, must not be null and must start with
+     *    <code>'/'</code> character
      */
     void addOutMessage(final String address) {
         OscMessageConsumer consumer = new OscMessageConsumer(address, this);

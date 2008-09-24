@@ -16,16 +16,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.timeseries;
+package org.simbrain.plot.barchart;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.JMenuItem;
+
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.scatterplot.ScatterPlotConsumer;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -33,39 +38,50 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Represents time series data.
- * 
- * TODO:    Ability to add and remove TimeSeriesConsumers
- *          Custom component listener to reflect number of consumers
- *          Ability to reset the plot.
+ * Daa for a JFreeChart pie chart.
  */
-public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Consumer list. */
-    private ArrayList<TimeSeriesConsumer> consumers= new ArrayList<TimeSeriesConsumer>();
+    private ArrayList<BarChartConsumer> consumers= new ArrayList<BarChartConsumer>();
     
-    /** Time Series Data. */
-    private XYSeriesCollection dataset = new XYSeriesCollection();
+    /** JFreeChart dataset for bar charts*/
+    private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
 
     /**
-     * Create new time series plot component.
-     *
-     * @param name name
+     * Create new PieChart Component.
      */
-    public TimeSeriesPlotComponent(final String name) {
+    public BarChartComponent(String name) {
         super(name);
-        addDataSources(10);
+        defaultInit();
     }
     
     /**
-     * Initializes a JFreeChart with specific number of data sources.
+     * Initializes a jfreechart with specific number of data sources.
      *
      * @param name name of component
      * @param numDataSources number of data sources to initialize plot with
      */
-    public TimeSeriesPlotComponent(final String name, final int numDataSources) {
+    public BarChartComponent(final String name, final int numDataSources) {
         super(name);
         addDataSources(numDataSources);
+    }
+   
+    /**
+     * Return JFreeChart pie dataset.
+     * 
+     * @return dataset
+     */
+    public CategoryDataset getDataset() { 
+        return dataset;
+    }
+    
+    /**
+     * Default initialization.
+     */
+    private void defaultInit() {
+        addDataSources(6);
     }
     
     /**
@@ -77,9 +93,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     public void addDataSources(final int numDataSources) {
         int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(this, "" + (currentSize + i), i);
+            BarChartConsumer newAttribute = new BarChartConsumer(this, "" + (currentSize + i), i);
             consumers.add(newAttribute);
-            dataset.addSeries(new XYSeries(i));
         }
     }
     
@@ -93,8 +108,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
         return xstream;
     }
     
-    public static TimeSeriesPlotComponent open(InputStream input, final String name, final String format) {
-        return (TimeSeriesPlotComponent) getXStream().fromXML(input);
+    public static BarChartComponent open(InputStream input, final String name, final String format) {
+        return (BarChartComponent) getXStream().fromXML(input);
     }
 
     /**
@@ -104,21 +119,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
-
-    
-//    /**
-//     * Sets the values.
-//     * TODO: Check.
-//     * 
-//     * @param seriesIndex index of consumer
-//     * @param value value to set
-//     */
-//    public void setValue(int seriesIndex, double value) {
-//        long current = System.currentTimeMillis();
-//        boolean update = current - lastUpdate > UPDATE_INTERVAL;
-//        seriesList.get(seriesIndex).add(this.getWorkspace().getTime(), value, update);
-//        if (update) lastUpdate = current;
-//    }
 
     @Override
     public boolean hasChangedSinceLastSave() {
@@ -134,21 +134,16 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     /**
      * {@inheritDoc}
      */
-    public Collection<TimeSeriesConsumer> getConsumers() {
+    public Collection<BarChartConsumer> getConsumers() {
         return consumers;
     }
 
     @Override
     public void update() {
-        for (TimeSeriesConsumer consumer : getConsumers()) {
-            dataset.getSeries(consumer.getIndex()).add(getWorkspace().getTime(), consumer.getValue());
+        for (BarChartConsumer consumer : getConsumers()) {
+            dataset.setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
         }
     }
 
-    /**
-     * @return the dataset
-     */
-    public XYSeriesCollection getDataset() {
-        return dataset;
-    }
+
 }

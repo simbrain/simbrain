@@ -16,38 +16,38 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.timeseries;
+package org.simbrain.plot.barchart;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import org.jfree.data.xy.XYSeries;
-import org.simbrain.plot.scatterplot.ScatterPlotComponent;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
- * Represents one source of timeSeries data.
+ * Represents one possible data value in a bar chart.
  */
-public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
+public class BarChartConsumer extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
-    private TimeSeriesPlotComponent plot;
+    private BarChartComponent plot;
         
     /** Name. */
     private final String name;
     
-    private Double value = new Double(0);
-    
     /** Index. */
     private Integer index;
-
+    
+    /** Value. */
+    private Double value = new Double(0);
+    
     /**
-     * Construct a TimeSeriesConsumer.
-     *  
+     * Construct  BarChartConsumer.
+     * 
      * @param plot the parent component
      * @param name the name of this consumer (displayed in the plot)
      */
-    public TimeSeriesConsumer(final TimeSeriesPlotComponent plot, final String name, final Integer index) {
+    public BarChartConsumer(BarChartComponent plot, String name, Integer index) {
         this.plot = plot;
         this.name = name;
         this.index = index;
@@ -56,14 +56,7 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
     /**
      * {@inheritDoc}
      */
-    public Double getValue() {
-            return value;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setValue(final Double val) {
+    public void setValue(Double val) {
         value = val;
     }
 
@@ -71,7 +64,7 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "TimeSeries " + name;
+        return name;
     }
     
     /**
@@ -82,18 +75,9 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
     }
 
     /**
-     * Return index.
-     *
-     * @return index
-     */
-    public Integer getIndex() {
-            return index;
-    }
-
-    /**
      * {@inheritDoc}
      */
-    public TimeSeriesPlotComponent getParentComponent() {
+    public BarChartComponent getParentComponent() {
         return plot;
     }
 
@@ -103,5 +87,24 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
     public String getAttributeDescription() {
         return getDescription();
     }
-
+    
+    /**
+     * Return index.
+     *
+     * @return index
+     */
+    public Integer getIndex() {
+            return index;
+    }
+    
+    /**
+     * Return current value.
+     *
+     * @return value
+     */
+    public Double getValue() {
+            return value;
+    }
+    
 }
+

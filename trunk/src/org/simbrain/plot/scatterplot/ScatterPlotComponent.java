@@ -16,45 +16,50 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.timeseries;
+package org.simbrain.plot.scatterplot;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.JMenuItem;
+
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
+import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.scatterplot.ScatterPlotConsumer;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+
+import bsh.This;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Represents time series data.
- * 
- * TODO:    Ability to add and remove TimeSeriesConsumers
- *          Custom component listener to reflect number of consumers
- *          Ability to reset the plot.
+ * Data for a JFreeChart ScatterPlot.
  */
-public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Consumer list. */
-    private ArrayList<TimeSeriesConsumer> consumers= new ArrayList<TimeSeriesConsumer>();
+    private ArrayList<ScatterPlotConsumer> consumers= new ArrayList<ScatterPlotConsumer>();
     
-    /** Time Series Data. */
-    private XYSeriesCollection dataset = new XYSeriesCollection();
+    /** Scatter Plot Data. */
+    private XYSeriesCollection dataset;
+    
+    /** Default number of sources. */
+    private final int DEFAULT_NUMBER_OF_SOURCES = 5;
 
     /**
-     * Create new time series plot component.
-     *
-     * @param name name
+     * Create new PieChart Component.
      */
-    public TimeSeriesPlotComponent(final String name) {
+    public ScatterPlotComponent(final String name) {
         super(name);
-        addDataSources(10);
+        init(DEFAULT_NUMBER_OF_SOURCES);
     }
     
     /**
@@ -63,9 +68,20 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      * @param name name of component
      * @param numDataSources number of data sources to initialize plot with
      */
-    public TimeSeriesPlotComponent(final String name, final int numDataSources) {
+    public ScatterPlotComponent(final String name, final int numDataSources) {
         super(name);
-        addDataSources(numDataSources);
+        init(numDataSources);
+    }
+    
+    /**
+     * Initialize plot.
+     *
+     * @param numSources number of data sources
+     */
+    private void init(final int numSources) {
+        this.setStrategy(Strategy.TOTAL);
+        dataset = new XYSeriesCollection();
+        addDataSources(numSources);
     }
     
     /**
@@ -77,12 +93,21 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     public void addDataSources(final int numDataSources) {
         int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(this, "" + (currentSize + i), i);
+            ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(this, "ScatterPlot Source " + (currentSize + i), i);
             consumers.add(newAttribute);
             dataset.addSeries(new XYSeries(i));
         }
     }
-    
+
+    /**
+     * Return JFreeChart xy dataset.
+     * 
+     * @return dataset
+     */
+    public XYDataset getDataset() { 
+        return dataset;
+    }
+
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
@@ -92,9 +117,12 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
         // TODO omit fields
         return xstream;
     }
-    
-    public static TimeSeriesPlotComponent open(InputStream input, final String name, final String format) {
-        return (TimeSeriesPlotComponent) getXStream().fromXML(input);
+       
+    /**
+     * {@inheritDoc}
+     */
+    public static ScatterPlotComponent open(InputStream input, final String name, final String format) {
+        return (ScatterPlotComponent) getXStream().fromXML(input);
     }
 
     /**
@@ -104,21 +132,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     public void save(final OutputStream output, final String format) {
         getXStream().toXML(output);
     }
-
-    
-//    /**
-//     * Sets the values.
-//     * TODO: Check.
-//     * 
-//     * @param seriesIndex index of consumer
-//     * @param value value to set
-//     */
-//    public void setValue(int seriesIndex, double value) {
-//        long current = System.currentTimeMillis();
-//        boolean update = current - lastUpdate > UPDATE_INTERVAL;
-//        seriesList.get(seriesIndex).add(this.getWorkspace().getTime(), value, update);
-//        if (update) lastUpdate = current;
-//    }
 
     @Override
     public boolean hasChangedSinceLastSave() {
@@ -134,21 +147,24 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     /**
      * {@inheritDoc}
      */
-    public Collection<TimeSeriesConsumer> getConsumers() {
+    public Collection<ScatterPlotConsumer> getConsumers() {
         return consumers;
     }
 
     @Override
     public void update() {
-        for (TimeSeriesConsumer consumer : getConsumers()) {
-            dataset.getSeries(consumer.getIndex()).add(getWorkspace().getTime(), consumer.getValue());
-        }
-    }
 
-    /**
-     * @return the dataset
-     */
-    public XYSeriesCollection getDataset() {
-        return dataset;
+        // Constantly erase.   How is performance for this version?
+        for (ScatterPlotConsumer consumer : getConsumers()) {
+            dataset.getSeries(consumer.getIndex()).clear();
+            dataset.getSeries(consumer.getIndex()).add(consumer.getX(), consumer.getY());
+            //System.out.println("--[" + consumer.getIndex() + "]:" + dataset.getSeries(consumer.getIndex()).getItemCount());
+        }
+        
+        
+// THE VERSION BELOW KEEPS A HISTORY.  THERE IS NO "HOT" POINT
+//        for (ScatterPlotConsumer consumer : getConsumers()) {
+//            dataset.getSeries(consumer.getIndex()).add(consumer.getX(), consumer.getY());
+//        }
     }
 }

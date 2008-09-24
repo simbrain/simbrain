@@ -1,13 +1,31 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2008 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.oscworld;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import java.util.Collections;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -20,12 +38,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 
 import javax.swing.border.EmptyBorder;
-
-import ca.odell.glazedlists.GlazedLists;
 
 import ca.odell.glazedlists.swing.EventListModel;
 
@@ -41,12 +58,6 @@ import org.simbrain.workspace.gui.GenericFrame;
 public final class OscWorldDesktopComponent
     extends GuiComponent<OscWorldComponent> {
 
-    /** Create OSC in message action. */
-    private final Action createOscInMessageAction;
-
-    /** Create OSC out message action. */
-    private final Action createOscOutMessageAction;
-
     /** List of OSC out message consumers. */
     private final JList consumers;
 
@@ -57,33 +68,32 @@ public final class OscWorldDesktopComponent
     /**
      * Create a new OSC world desktop component with the specified OSC world component.
      *
+     * @param frame parent frame
      * @param oscWorldComponent OSC world component
      */
-    public OscWorldDesktopComponent(GenericFrame frame, final OscWorldComponent oscWorldComponent) {
+    public OscWorldDesktopComponent(final GenericFrame frame,
+                                    final OscWorldComponent oscWorldComponent) {
         super(frame, oscWorldComponent);
 
-        createOscInMessageAction = new CreateOscInMessageAction();
-        createOscOutMessageAction = new CreateOscOutMessageAction();
+        Action closeAction = new CloseAction();
+        Action createOscInMessageAction = new CreateOscInMessageAction();
+        Action createOscOutMessageAction = new CreateOscOutMessageAction();
         consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
         producers = new JList(new EventListModel(oscWorldComponent.getProducersEventList()));
 
         consumers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        consumers.addMouseListener(new MouseAdapter()
-            {
+        consumers.setVisibleRowCount(16);
+        consumers.addMouseListener(new MouseAdapter() {
                 /** {@inheritDoc} */
-                public void mousePressed(final MouseEvent event)
-                {
-                    if (event.isPopupTrigger())
-                    {
+                public void mousePressed(final MouseEvent event) {
+                    if (event.isPopupTrigger()) {
                         showContextMenu(event);
                     }
                 }
 
                 /** {@inheritDoc} */
-                public void mouseReleased(final MouseEvent event)
-                {
-                    if (event.isPopupTrigger())
-                    {
+                public void mouseReleased(final MouseEvent event) {
+                    if (event.isPopupTrigger()) {
                         showContextMenu(event);
                     }
                 }
@@ -93,13 +103,12 @@ public final class OscWorldDesktopComponent
                  *
                  * @param event mouse event
                  */
-                private void showContextMenu(final MouseEvent event)
-                {
-                    if (consumers.getSelectedIndex() > -1)
-                    {
+                private void showContextMenu(final MouseEvent event) {
+                    if (consumers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
-                        JMenu producerMenu = CouplingMenus.getProducerMenu(oscWorldComponent.getWorkspace(), consumer.getDefaultConsumingAttribute());
+                        JMenu producerMenu = CouplingMenus.getProducerMenu(oscWorldComponent.getWorkspace(),
+                                                                           consumer.getDefaultConsumingAttribute());
                         producerMenu.setText("Set input source");
                         contextMenu.add(producerMenu);
                         contextMenu.show(consumers, event.getX(), event.getY());
@@ -108,22 +117,18 @@ public final class OscWorldDesktopComponent
             });
 
         producers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        producers.addMouseListener(new MouseAdapter()
-            {
+        producers.setVisibleRowCount(16);
+        producers.addMouseListener(new MouseAdapter() {
                 /** {@inheritDoc} */
-                public void mousePressed(final MouseEvent event)
-                {
-                    if (event.isPopupTrigger())
-                    {
+                public void mousePressed(final MouseEvent event) {
+                    if (event.isPopupTrigger()) {
                         showContextMenu(event);
                     }
                 }
 
                 /** {@inheritDoc} */
-                public void mouseReleased(final MouseEvent event)
-                {
-                    if (event.isPopupTrigger())
-                    {
+                public void mouseReleased(final MouseEvent event) {
+                    if (event.isPopupTrigger()) {
                         showContextMenu(event);
                     }
                 }
@@ -133,13 +138,12 @@ public final class OscWorldDesktopComponent
                  *
                  * @param event mouse event
                  */
-                private void showContextMenu(final MouseEvent event)
-                {
-                    if (producers.getSelectedIndex() > -1)
-                    {
+                private void showContextMenu(final MouseEvent event) {
+                    if (producers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
-                        JMenu consumerMenu = CouplingMenus.getConsumerMenu(oscWorldComponent.getWorkspace(), producer.getDefaultProducingAttribute());
+                        JMenu consumerMenu = CouplingMenus.getConsumerMenu(oscWorldComponent.getWorkspace(),
+                                                                           producer.getDefaultProducingAttribute());
                         consumerMenu.setText("Set output target");
                         contextMenu.add(consumerMenu);
                         contextMenu.show(producers, event.getX(), event.getY());
@@ -153,6 +157,8 @@ public final class OscWorldDesktopComponent
         JMenu file = new JMenu("File");
         file.add(createOscInMessageAction);
         file.add(createOscOutMessageAction);
+        file.addSeparator();
+        file.add(closeAction);
         toolBar.add(createOscInMessageAction);
         toolBar.add(createOscOutMessageAction);
 
@@ -187,6 +193,32 @@ public final class OscWorldDesktopComponent
     /** {@inheritDoc} */
     public void closing() {
         // empty
+    }
+
+
+    /**
+     * Close action.
+     */
+    private final class CloseAction
+        extends AbstractAction {
+
+        /**
+         * Create a new close action.
+         */
+        CloseAction() {
+            // TODO:  would be nice to have internal frame title here, e.g. "OscWorldDesktop 1"
+            super("Close");
+            putValue(Action.LONG_DESCRIPTION, "Close");
+            KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                                                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            putValue(Action.ACCELERATOR_KEY, keyStroke);
+        }
+
+
+        /** {@inheritDoc} */
+        public void actionPerformed(final ActionEvent event) {
+            close();
+        }
     }
 
     /**

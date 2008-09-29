@@ -21,29 +21,29 @@ package org.simbrain.workspace.actions.chart;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import org.simbrain.plot.piechart.*;
-import org.simbrain.plot.timeseries.*;
+
+import org.simbrain.plot.scatterplot.ScatterPlotComponent;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
 /**
- * Add Plot component to workspace.
+ * Add scatter plot component to workspace.
  */
-public final class NewPieChartPlotAction extends WorkspaceAction {
+public final class NewScatterPlotAction extends WorkspaceAction {
 
     /**
-     * Create a new plot component.
+     * Create a new scatter plot component.
      *
      * @param workspace workspace, must not be null
      */
-    public NewPieChartPlotAction(Workspace workspace) {
-        super("Pie Chart", workspace);
+    public NewScatterPlotAction(final Workspace workspace) {
+        super("Scatter Plot", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        PieChartComponent plot = new PieChartComponent("Pie Chart");
+        ScatterPlotComponent plot = new ScatterPlotComponent("Scatter Plot");
         workspace.addWorkspaceComponent(plot);
     }
 }

@@ -18,45 +18,32 @@
  */
 package org.simbrain.workspace.actions.chart;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
-
-import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.plot.barchart.BarChartComponent;
-import org.simbrain.plot.scatterplot.ScatterPlotComponent;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.plot.piechart.*;
+import org.simbrain.plot.timeseries.*;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
 /**
- * Add Gauge to workspace.
+ * Add Plot component to workspace.
  */
-public final class NewGaugeAction extends WorkspaceAction {
-
-    private static final long serialVersionUID = 1L;
-
+public final class NewTimeSeriesAction extends WorkspaceAction {
 
     /**
-     * Create a new add gauge action with the specified
-     * workspace.
+     * Create a new plot component.
+     *
+     * @param workspace workspace, must not be null
      */
-    public NewGaugeAction(Workspace workspace) {
-        super("New high dimensional visualizer", workspace);
-        putValue(SHORT_DESCRIPTION, "New high dimensional visualizer");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.png"));
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_H, toolkit.getMenuShortcutKeyMask());
-        putValue(ACCELERATOR_KEY, keyStroke);
+    public NewTimeSeriesAction(Workspace workspace) {
+        super("Time Series", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GaugeComponent gauge = new GaugeComponent("Gauge");
-        workspace.addWorkspaceComponent(gauge);
+        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Time Series");
+        workspace.addWorkspaceComponent(plot);
     }
 }

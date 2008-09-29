@@ -66,9 +66,11 @@ import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
 import org.simbrain.workspace.actions.WorkspaceHelpAction;
+import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewGaugeAction;
-import org.simbrain.workspace.actions.chart.NewPieChartPlotAction;
-import org.simbrain.workspace.actions.chart.NewTimeSeriesPlotAction;
+import org.simbrain.workspace.actions.chart.NewPieChartAction;
+import org.simbrain.workspace.actions.chart.NewScatterPlotAction;
+import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -121,10 +123,16 @@ public class WorkspaceActionManager {
     private final Action newGaugeAction;
 
     /** New plot action. */
-    private final Action newPieChartPlotAction;
+    private final Action newPieChartAction;
 
     /** New time series plot action. */
-    private final Action newTimeSeriesPlotAction;
+    private final Action newTimeSeriesAction;
+
+    /** New bar chart action. */
+    private final Action newBarChartAction;
+
+    /** New scatter plot action. */
+    private final Action newScatterPlotAction;
 
     /** New console action. */
     private final Action newConsoleAction;
@@ -203,6 +211,11 @@ public class WorkspaceActionManager {
         newGaugeAction = new NewGaugeAction(workspace);
         newConsoleAction = new NewConsoleAction(workspace);
 
+        newPieChartAction = new NewPieChartAction(workspace);
+        newTimeSeriesAction = new NewTimeSeriesAction(workspace);
+        newBarChartAction = new NewBarChartAction(workspace);
+        newScatterPlotAction = new NewScatterPlotAction(workspace);
+
         newDataWorldAction = new NewDataWorldAction(workspace);
         newGameWorld2dAction = new NewGameWorld2dAction(workspace);
         newMidiWorldAction = new NewMidiWorldAction(workspace);
@@ -211,8 +224,6 @@ public class WorkspaceActionManager {
         newThreeDeeWorldAction = new NewThreeDeeWorldAction(workspace);
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
-        newPieChartPlotAction = new NewPieChartPlotAction(workspace);
-        newTimeSeriesPlotAction = new NewTimeSeriesPlotAction(workspace);
 
         workspaceHelpAction = new WorkspaceHelpAction();
 
@@ -267,20 +278,20 @@ public class WorkspaceActionManager {
      * @return Simbrain gauge actions.
      */
     public List<Action> getPlotActions() {
-        return Arrays.asList(new Action[] {newGaugeAction,
-                newPieChartPlotAction,
-                newTimeSeriesPlotAction});
+        return Arrays.asList(new Action[] {newBarChartAction, newGaugeAction, newPieChartAction,
+                newScatterPlotAction, newTimeSeriesAction});
     }
 
     /**
      * Make a list of script actions by iterating through script menu directory.
      * 
+     * @param workspace reference
      * @return script action
      */
-    public List<Action> getScriptActions(Workspace workspace) {
+    public List<Action> getScriptActions(final Workspace workspace) {
         ArrayList<Action> list = new ArrayList<Action>();
         File dir = new File(SCRIPT_MENU_DIRECTORY);
-        if (dir.isDirectory() == false) {
+        if (!dir.isDirectory()) {
             return null; // Throw exception instead?
         }
         // TODO: look for other endings and invoke relevant script types
@@ -463,14 +474,14 @@ public class WorkspaceActionManager {
      * @return the newPieChartPlotAction.
      */
     public Action getNewPieChartPlotAction() {
-        return newPieChartPlotAction;
+        return newPieChartAction;
     }
 
     /**
      * @return the newTimeSeriesPlotAction.
      */
     public Action getNewTimeSeriesPlotAction() {
-        return newTimeSeriesPlotAction;
+        return newTimeSeriesAction;
     }
 
     /**
@@ -513,5 +524,19 @@ public class WorkspaceActionManager {
      */
     public Action getOpenWorkspaceComponentListAction() {
         return openWorkspaceComponentListAction;
+    }
+
+    /**
+     * @return the newBarChartAction
+     */
+    public Action getNewBarChartAction() {
+        return newBarChartAction;
+    }
+
+    /**
+     * @return the newScatterPlotAction
+     */
+    public Action getNewScatterPlotAction() {
+        return newScatterPlotAction;
     }
 }

@@ -18,45 +18,32 @@
  */
 package org.simbrain.workspace.actions.chart;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
-import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.plot.barchart.BarChartComponent;
-import org.simbrain.plot.scatterplot.ScatterPlotComponent;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
 /**
- * Add Gauge to workspace.
+ * Add bar chart component to workspace.
  */
-public final class NewGaugeAction extends WorkspaceAction {
-
-    private static final long serialVersionUID = 1L;
-
+public final class NewBarChartAction extends WorkspaceAction {
 
     /**
-     * Create a new add gauge action with the specified
-     * workspace.
+     * Create a new bar chart component.
+     *
+     * @param workspace workspace, must not be null
      */
-    public NewGaugeAction(Workspace workspace) {
-        super("New high dimensional visualizer", workspace);
-        putValue(SHORT_DESCRIPTION, "New high dimensional visualizer");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.png"));
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_H, toolkit.getMenuShortcutKeyMask());
-        putValue(ACCELERATOR_KEY, keyStroke);
+    public NewBarChartAction(final Workspace workspace) {
+        super("Bar Chart", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GaugeComponent gauge = new GaugeComponent("Gauge");
-        workspace.addWorkspaceComponent(gauge);
+        BarChartComponent plot = new BarChartComponent("Bar Chart");
+        workspace.addWorkspaceComponent(plot);
     }
 }

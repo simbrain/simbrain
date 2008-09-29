@@ -18,12 +18,17 @@
  */
 package org.simbrain.workspace.actions;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.CouplingListPanel;
@@ -61,9 +66,31 @@ public final class OpenCouplingListAction extends AbstractAction {
         final JFrame frame = new JFrame("Coupling List");
         JComponent cl = new CouplingListPanel(desktop,
                 new Vector(desktop.getWorkspace().getManager().getCouplings()));
+        MyGlassPane pane = new MyGlassPane();
         frame.setContentPane(cl);
+        frame.setGlassPane(pane);
         frame.pack();
+        pane.repaint();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        
+//        final JFrame tFrame = new JFrame();
+//        JPanel panel = new JPanel();
+//        JPanel tPanel = new JPanel();
+//        tPanel.setBackground(Color.white);
+//        tPanel.setOpaque(false);
+//        panel.setBackground(Color.red);
+//        tFrame.setContentPane(panel);
+//        tFrame.pack();
+//        tFrame.setGlassPane(tPanel);
+//        tFrame.setVisible(true);
+    }
+    class MyGlassPane extends JComponent {
+        public void paint(Graphics g) {
+            g.setColor(Color.red);
+            g.fillRect(0, 0, 100, 100);
+            System.out.println("Inside Paint Method");
+        }
     }
 }

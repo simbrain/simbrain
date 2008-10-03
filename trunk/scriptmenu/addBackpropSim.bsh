@@ -40,9 +40,9 @@ import org.simbrain.world.dataworld.DataWorldComponent;
         ConsumingAttribute inputNeuron1 = network.getConsumingAttribute("Neuron_1", "Activation"); 
         ConsumingAttribute inputNeuron2 = network.getConsumingAttribute("Neuron_2", "Activation"); 
         ConsumingAttribute inputNeuron3 = network.getConsumingAttribute("Neuron_3", "Activation");
-        workspace.getManager().addCoupling(new Coupling(column1, inputNeuron1));
-        workspace.getManager().addCoupling(new Coupling(column2, inputNeuron2));
-        workspace.getManager().addCoupling(new Coupling(column3, inputNeuron3));
+        workspace.getCouplingManager().addCoupling(new Coupling(column1, inputNeuron1));
+        workspace.getCouplingManager().addCoupling(new Coupling(column2, inputNeuron2));
+        workspace.getCouplingManager().addCoupling(new Coupling(column3, inputNeuron3));
         
  
         // Couple training table columns to  target values
@@ -52,9 +52,9 @@ import org.simbrain.world.dataworld.DataWorldComponent;
         ConsumingAttribute target1 = network.getConsumingAttribute("Neuron_9", "TargetValue"); 
         ConsumingAttribute target2 = network.getConsumingAttribute("Neuron_10", "TargetValue"); 
         ConsumingAttribute target3 = network.getConsumingAttribute("Neuron_11", "TargetValue"); 
-        workspace.getManager().addCoupling(new Coupling(train1, target1));
-        workspace.getManager().addCoupling(new Coupling(train2, target2));
-        workspace.getManager().addCoupling(new Coupling(train3, target3));
+        workspace.getCouplingManager().addCoupling(new Coupling(train1, target1));
+        workspace.getCouplingManager().addCoupling(new Coupling(train2, target2));
+        workspace.getCouplingManager().addCoupling(new Coupling(train3, target3));
 
         // Create Plot component
         PlotComponent errorPlot = new PlotComponent("Error Rate");
@@ -84,7 +84,7 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             public void update(Workspace workspace) {
                 
                 inputData.doUpdate();
-                workspace.getManager().updateAllCouplings();
+                workspace.getCouplingManager().updateAllCouplings();
                 network.doUpdate();
             }
             

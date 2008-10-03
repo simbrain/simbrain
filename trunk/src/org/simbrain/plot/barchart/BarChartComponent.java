@@ -23,14 +23,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.JMenuItem;
-
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.general.PieDataset;
-import org.jfree.data.xy.XYSeries;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -43,16 +37,21 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Consumer list. */
-    private ArrayList<BarChartConsumer> consumers= new ArrayList<BarChartConsumer>();
+    private ArrayList<BarChartConsumer> consumers = new ArrayList<BarChartConsumer>();
     
-    /** JFreeChart dataset for bar charts*/
+    /** JFreeChart dataset for bar charts. */
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+    /** Initial number of data sources. */
+    private static final int INITIAL_DATA_SOURCES = 6;
 
 
     /**
-     * Create new PieChart Component.
+     * Create new BarChart Component.
+     *
+     * @param name chart name
      */
-    public BarChartComponent(String name) {
+    public BarChartComponent(final String name) {
         super(name);
         defaultInit();
     }
@@ -73,7 +72,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      * 
      * @return dataset
      */
-    public CategoryDataset getDataset() { 
+    public CategoryDataset getDataset() {
         return dataset;
     }
     
@@ -81,7 +80,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      * Default initialization.
      */
     private void defaultInit() {
-        addDataSources(6);
+        addDataSources(INITIAL_DATA_SOURCES);
     }
     
     /**
@@ -91,10 +90,30 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      * @param numDataSources number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
-        int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            BarChartConsumer newAttribute = new BarChartConsumer(this, "" + (currentSize + i), i);
-            consumers.add(newAttribute);
+            addColumn();
+        }
+    }
+
+    /**
+     * Adds a new column to the dataset.
+     */
+    public void addColumn() {
+        int columnIndex = consumers.size() + 1;
+        BarChartConsumer newAttribute = new BarChartConsumer(this, ""
+                + (columnIndex), columnIndex);
+        consumers.add(newAttribute);
+    }
+
+    /**
+     * Removes the last column from the dataset.
+     */
+    public void removeColumn() {
+        int lastColumnIndex = dataset.getColumnCount() - 1;
+
+        if (lastColumnIndex >= 0) {
+            dataset.removeColumn(lastColumnIndex);
+            consumers.remove(lastColumnIndex);
         }
     }
     

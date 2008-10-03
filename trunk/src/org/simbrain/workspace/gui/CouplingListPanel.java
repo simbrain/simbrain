@@ -67,10 +67,10 @@ public class CouplingListPanel extends JPanel implements CouplingComponentListen
         // Listens for frame closing for removal of listener.
         couplingFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(final WindowEvent w) {
-                desktop.getWorkspace().getManager().removeCouplingListener(CouplingListPanel.this);
+                desktop.getWorkspace().getCouplingManager().removeCouplingListener(CouplingListPanel.this);
             }
         });
-        desktop.getWorkspace().getManager().addCouplingListener(this);
+        desktop.getWorkspace().getCouplingManager().addCouplingListener(this);
 
         //Populates the coupling list with data.
         couplings.setListData(this.couplingList);
@@ -100,7 +100,7 @@ public class CouplingListPanel extends JPanel implements CouplingComponentListen
      * Updates the list of couplings when new couplings are made.
      */
     public void couplingListUpdated() {
-        couplingList = new Vector(desktop.getWorkspace().getManager().getCouplings());
+        couplingList = new Vector(desktop.getWorkspace().getCouplingManager().getCouplings());
         couplings.setListData(couplingList);
     }
 

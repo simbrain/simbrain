@@ -226,6 +226,22 @@ public class CouplingManager implements UpdatePriority {
         return local;
     }
     
+    
+    public void removeCouplings(WorkspaceComponent component) {
+        ArrayList<Coupling> toRemove = new ArrayList();
+        for (Coupling<?> coupling : getCouplings()) {
+            if (coupling.getConsumingAttribute().getParent().getParentComponent() == component) {
+                toRemove.add(coupling);
+            }
+            if (coupling.getProducingAttribute().getParent().getParentComponent() == component) {
+                toRemove.add(coupling);
+            }
+        }
+        for (Coupling coupling : toRemove) {
+            removeCoupling(coupling);
+        }
+    }
+    
     /**
      * Removes a coupling from the manager.
      * 

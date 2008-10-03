@@ -25,26 +25,74 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceListener;
+
 /**
  * Displays a list of all currently open workspace components.
  *
  */
-public class WorkspaceComponentListPanel extends JPanel {
+public class WorkspaceComponentListPanel extends JPanel implements WorkspaceListener  {
 
     /** List of open components. */
     private JList componentList = new JList();
 
+    /** Reference to Simbrain desktop */
+    private SimbrainDesktop desktop;
+    
     /**
      * Workspace component list panel constructor.
      * @param desktop reference.
      */
     public WorkspaceComponentListPanel(final SimbrainDesktop desktop) {
-        super(new BorderLayout());
+        this.desktop = desktop;
 
         componentList.setListData(new Vector(desktop.getWorkspace().getComponentList()));
 
         JScrollPane scrollPane = new JScrollPane(componentList);
+        desktop.getWorkspace().addListener(this);
 
         add(scrollPane);
     }
+    
+
+    /**
+     * Update the panel.
+     */
+    private void update() {
+        Vector newList = new Vector(desktop.getWorkspace().getComponentList());
+        componentList.setListData(newList);
+        //this.setPreferredSize(new Dimension(componentList.getPreferredSize().width + 10, componentList.getPreferredSize().height + 10));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void componentAdded(WorkspaceComponent<?> component) {
+        update();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void componentRemoved(WorkspaceComponent<?> component) {
+        update();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void workspaceCleared() {
+        update();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean clearWorkspace() {
+        update();
+        return true;
+    }
+    
 }

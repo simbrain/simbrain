@@ -126,13 +126,16 @@ public class Workspace {
      */
     public void couple(final WorkspaceComponent source, final WorkspaceComponent target) {        
         //TODO: Add strategies
-        // Below is 1-1
+        // Below is 1-1 (based in part on "getCustomListOfConsumingAttributes")
         Iterator<ConsumingAttribute> consumer = target.getCustomListOfConsumingAttributes().iterator();
         for (ProducingAttribute producer : (ArrayList<ProducingAttribute>)source.getCustomListOfProducingAttributes()) {
             if (consumer.hasNext()) {
                 this.addCoupling(new Coupling(producer, consumer.next()));
             }
         }
+
+    
+    
     }
     
     
@@ -202,10 +205,10 @@ public class Workspace {
      */
     public void removeWorkspaceComponent(final WorkspaceComponent<?> component) {
         LOGGER.debug("removing component: " + component);
-        
         for (WorkspaceListener listener : listeners) {
             listener.componentRemoved(component);
         }
+        this.getCouplingManager().removeCouplings(component);   // Remove all couplings assciated with this component
         componentList.remove(component);
         this.setWorkspaceChanged(true);
     }
@@ -315,13 +318,13 @@ public class Workspace {
      * Remove all items (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
-        if (changesExist()) {
-            for (WorkspaceListener listener : listeners) {
-                if (!listener.clearWorkspace()) { return; }
-            }
-        }
-        workspaceChanged = false;
         removeAllComponents();
+//        if (changesExist()) {
+//            for (WorkspaceListener listener : listeners) {
+//                if (!listener.clearWorkspace()) { return; }
+//            }
+//        }
+        workspaceChanged = false;
         currentFile = null;
         for (WorkspaceListener listener : listeners) {
             listener.workspaceCleared();
@@ -333,15 +336,15 @@ public class Workspace {
      * Disposes all Simbrain Windows.
      */
     public void removeAllComponents() {
+        ArrayList<WorkspaceComponent> toRemove = new ArrayList();
         synchronized (componentList) {
             for (WorkspaceComponent<?> component : componentList) {
-                for (WorkspaceListener listener : listeners) {
-                    listener.componentRemoved(component);
-                }
+                toRemove.add(component);
             }
-            
-            componentList.clear();
-        }
+            for (WorkspaceComponent<?> component : toRemove) {
+                removeWorkspaceComponent(component);
+            }
+        } 
     }
 
     /**
@@ -449,10 +452,10 @@ public class Workspace {
      * 
      * @return The coupling manager for this workspace.
      */
-    public CouplingManager getManager() {
+    public CouplingManager getCouplingManager() {
         return manager;
     }
-    
+  
     /**
      * {@inheritDoc}
      */

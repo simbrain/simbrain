@@ -94,7 +94,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericFrame frame) {
         super();
 
-        this.manager = desktop.getWorkspace().getManager();
+        this.manager = desktop.getWorkspace().getCouplingManager();
         this.frame = frame;
         GenericListModel componentList = new GenericListModel(desktop.getWorkspace().getComponentList());
 

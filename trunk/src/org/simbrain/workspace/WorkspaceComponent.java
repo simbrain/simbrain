@@ -132,7 +132,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
 
     public final void close() {
         closing();
-        
         workspace.removeWorkspaceComponent(this);
     }
     
@@ -214,6 +213,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     @Override
     public String toString() {
         return name;
+//        return this.getClass().getSimpleName() + ": " + name;
     }
 
     /**
@@ -552,5 +552,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     public void setPriority(int value) {
         priority = value;
     }
+    
+    
 
 }

@@ -45,7 +45,7 @@ public class SingleCouplingMenuItem extends JCheckBoxMenuItem {
             final ProducingAttribute<?> source,
             final ConsumingAttribute<?> target) {
         super(description,
-                workspace.getManager().containsCoupling(new Coupling(source, target)));
+                workspace.getCouplingManager().containsCoupling(new Coupling(source, target)));
         this.workspace = workspace;
         this.source = source;
         this.target = target;

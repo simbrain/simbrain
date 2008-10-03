@@ -54,7 +54,7 @@ public class WorkspaceSerializer {
         
         serializeComponents(serializer, archive, zipStream);
         
-        for (Coupling<?> coupling : workspace.getManager().getCouplings()) {
+        for (Coupling<?> coupling : workspace.getCouplingManager().getCouplings()) {
             archive.addCoupling(coupling);
         }
         

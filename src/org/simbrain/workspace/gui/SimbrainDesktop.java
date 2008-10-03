@@ -15,15 +15,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -34,15 +31,11 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
@@ -68,16 +61,9 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ToggleButton;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.SingleAttributeConsumer;
-import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
-import org.simbrain.workspace.WorkspacePreferences;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
@@ -118,13 +104,12 @@ public class SimbrainDesktop {
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
 
     /** Initial indent of entire workspace. */
-    private static final int WORKSPACE_INSET = 50;
+    private static final int WORKSPACE_INSET = 80;
 
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
-    private static final Map<Workspace, SimbrainDesktop> INSTANCES
-        = new HashMap<Workspace, SimbrainDesktop>();
+    private static final Map<Workspace, SimbrainDesktop> INSTANCES = new HashMap<Workspace, SimbrainDesktop>();
     
     /** Desktop pane. */
     JDesktopPane desktop;
@@ -171,60 +156,45 @@ public class SimbrainDesktop {
      * @param workspace The workspace for this desktop.
      */
     public SimbrainDesktop(final Workspace workspace) {
+       
         INSTANCES.put(workspace, this);
         this.workspace = workspace;
         frame = new JFrame("Simbrain");
-
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setBounds(WORKSPACE_INSET, WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2),
-                screenSize.height - (WORKSPACE_INSET * 2));
-
-
-        //Action
         actionManager = new WorkspaceActionManager(this);
-        
-        // Menus
         createAndAttachMenus();
-
-        // Toolbar
         wsToolBar = createToolBar();
-       
-        // Left panel
-        JPanel leftPanel = new JPanel();
-        leftPanel.add(new JList());
-        
-        // Main workspace
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        desktop = new JDesktopPane(); //a specialized layered pane
-        JScrollPane workspaceScroller = new JScrollPane();
-        rightPanel.add("Center", workspaceScroller);
-
-        // High level panel
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        JSplitPane splitterPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                leftPanel, rightPanel);
-        mainPanel.add("North", wsToolBar);
-        mainPanel.add("Center", splitterPanel);
-        
-        frame.setContentPane(mainPanel);
-        workspaceScroller.setViewportView(desktop);
-
-        frame.addWindowListener(windowListener);
-        desktop.addMouseListener(mouseListener);
-        frame.addKeyListener(new WorkspaceKeyAdapter(workspace));
-        desktop.addKeyListener(new WorkspaceKeyAdapter(workspace));
         createContextMenu();
-
         workspace.addListener(listener);
-        
         SimbrainDesktop.registerComponents();
+
+        //Set up Desktop
+        desktop = new JDesktopPane();
+        desktop.addMouseListener(mouseListener);
+        desktop.addKeyListener(new WorkspaceKeyAdapter(workspace));
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        desktop.setPreferredSize(new Dimension(screenSize.width - (WORKSPACE_INSET * 2),screenSize.height - (WORKSPACE_INSET * 3)));
+        
+        // Set up Main Panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(wsToolBar, "North");
+        mainPanel.add(desktop, "Center");
+
+        // Set up Frame
+        frame.setBounds(WORKSPACE_INSET, WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2),screenSize.height - (WORKSPACE_INSET * 2));
+        frame.setContentPane(mainPanel);
+        frame.pack();
+        frame.addWindowListener(windowListener);
+        frame.addKeyListener(new WorkspaceKeyAdapter(workspace));
 
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
+    
+
+    
 
     /**
-     * Create mappings from components to their GUI wrappers
+     * Create mappings from components to their GUI wrappers.
      */
     private static void registerComponents() {
         // TODO use a configuration file
@@ -542,23 +512,25 @@ public class SimbrainDesktop {
         }
     };
     
-    
     /**
-     * Wraps GUI Component in a JInternalFrame for Desktop
-     * 
-     * @author jyoshimi
-     *
+     * Utility class for adding internal frames, which are not
+     * wrappers for WorkspaceComponents. Wraps GUI Component in a 
+     * JInternalFrame for Desktop.
      */
     private static class DesktopInternalFrame extends GenericJInternalFrame {
         
+        /** Reference to workspace component. */
         WorkspaceComponent workspaceComponent;
+        
+        /** Gui Component. */
         GuiComponent guiComponent;
 
         /**
+         * Construct an internal frame.
          * 
-         * @param workspaceComponent
+         * @param workspaceComponent workspace component.
          */
-        public DesktopInternalFrame(WorkspaceComponent workspaceComponent) {
+        public DesktopInternalFrame(final WorkspaceComponent workspaceComponent) {
             setResizable(true);
             setMaximizable(true);
             setIconifiable(true);
@@ -568,10 +540,11 @@ public class SimbrainDesktop {
         }
         
         /**
+         * Set the Gui Component.
          * 
-         * @param guiComponent
+         * @param guiComponent the component to set.
          */
-        public void setGuiComponent(GuiComponent guiComponent) {
+        public void setGuiComponent(final GuiComponent guiComponent) {
             this.guiComponent = guiComponent;
         }
         
@@ -591,12 +564,11 @@ public class SimbrainDesktop {
     }
     
     /**
-     * Utility class for adding internal frames, which are not
-     * wrappers for WorkspaceComponents.
+     * Add internal frame.
      *
      * @param internalFrame the frame to add.
      */
-    public void addInternalFrame(JInternalFrame internalFrame) {
+    public void addInternalFrame(final JInternalFrame internalFrame) {
         desktop.add(internalFrame);
     }
 
@@ -630,7 +602,7 @@ public class SimbrainDesktop {
                 (int) guiComponent.getPreferredSize().getWidth(),
                 (int) guiComponent.getPreferredSize().getHeight());
             guiChanged = true;
-        } else {            
+        } else {
             GuiComponent<?> lastComponentAdded = null;
             for (GuiComponent<?> next : components.values()) {
                 lastComponentAdded = next;

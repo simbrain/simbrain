@@ -43,8 +43,8 @@ import org.simbrain.world.odorworld.OdorWorldEntity;
         ProducingAttribute rightWhisker = odorWorld.getProducingAttribute("MightyMouse","Right[1]");
         ConsumingAttribute inputNeuron1 = network.getConsumingAttribute("Neuron_1", "Activation"); 
         ConsumingAttribute inputNeuron2 = network.getConsumingAttribute("Neuron_2", "Activation"); 
-        workspace.getManager().addCoupling(new Coupling(leftWhisker, inputNeuron1));
-        workspace.getManager().addCoupling(new Coupling(rightWhisker, inputNeuron2));
+        workspace.getCouplingManager().addCoupling(new Coupling(leftWhisker, inputNeuron1));
+        workspace.getCouplingManager().addCoupling(new Coupling(rightWhisker, inputNeuron2));
  
         //Couple Output Neurons to motion
         ProducingAttribute actor1 = network.getProducingAttribute("Neuron_3", "Activation"); 
@@ -53,17 +53,17 @@ import org.simbrain.world.odorworld.OdorWorldEntity;
         ConsumingAttribute turnLeft = odorWorld.getConsumingAttribute("MightyMouse", "Left"); 
         ConsumingAttribute goStraight = odorWorld.getConsumingAttribute("MightyMouse", "Forward"); 
         ConsumingAttribute turnRight = odorWorld.getConsumingAttribute("MightyMouse", "Right"); 
-        workspace.getManager().addCoupling(new Coupling(actor1, turnLeft));
-        workspace.getManager().addCoupling(new Coupling(actor2, goStraight));
-        workspace.getManager().addCoupling(new Coupling(actor3, turnRight));
+        workspace.getCouplingManager().addCoupling(new Coupling(actor1, turnLeft));
+        workspace.getCouplingManager().addCoupling(new Coupling(actor2, goStraight));
+        workspace.getCouplingManager().addCoupling(new Coupling(actor3, turnRight));
         
         //Couple left and right Reward sensors to reward neurons in Actor-critic network
         ProducingAttribute leftReward = odorWorld.getProducingAttribute("MightyMouse","Left[2]");
         ProducingAttribute rightReward = odorWorld.getProducingAttribute("MightyMouse","Right[2]");
         ConsumingAttribute ac1 = network.getConsumingAttribute("Neuron_6", "Activation"); 
         ConsumingAttribute ac2 = network.getConsumingAttribute("Neuron_7", "Activation"); 
-        workspace.getManager().addCoupling(new Coupling(leftReward, ac1));
-        workspace.getManager().addCoupling(new Coupling(rightReward, ac2));
+        workspace.getCouplingManager().addCoupling(new Coupling(leftReward, ac1));
+        workspace.getCouplingManager().addCoupling(new Coupling(rightReward, ac2));
 
         
         // Train the actor critic network

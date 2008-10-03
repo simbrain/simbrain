@@ -22,43 +22,44 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
+import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
+import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.CouplingMenus;
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
-import org.jfree.data.xy.XYSeries;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Display a PieChart.
  */
-public class BarChartGui extends GuiComponent<BarChartComponent> {
+public class BarChartGui extends GuiComponent<BarChartComponent> implements ActionListener {
 
     /** The underlying plot component. */
     private final BarChartComponent component;
+
+    /** Chart gui. */
+    private JFreeChart chart;
+
+    /** Preferred frame size. */
+    private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
     
     /**
      * Construct the GUI Bar Chart.
+     *
+     * @param frame Generic frame
+     * @param component Bar chart component
      */
     public BarChartGui(final GenericFrame frame, final BarChartComponent component) {
         super(frame, component);
         this.component = component;
-        setPreferredSize(new Dimension(500, 400));
+        setPreferredSize(PREFERRED_SIZE);
     }
 
     /**
@@ -69,7 +70,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> {
         setLayout(new BorderLayout());
         
         // Generate the graph
-        JFreeChart chart = ChartFactory.createBarChart(
+        chart = ChartFactory.createBarChart(
                 "Bar Chart Demo 1",       // chart title
                 "Category",               // domain axis label
                 "Value",                  // range axis label
@@ -80,8 +81,42 @@ public class BarChartGui extends GuiComponent<BarChartComponent> {
                 false                     // URLs?
 
             );
+
+        chart.getCategoryPlot().getRangeAxis().setRange(0, 2);
+        chart.getCategoryPlot().getRangeAxis().setAutoRange(false);
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setActionCommand("Delete");
+        deleteButton.addActionListener(this);
+        JButton addButton = new JButton("Add");
+        addButton.setActionCommand("Add");
+        addButton.addActionListener(this);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
+        
         ChartPanel panel = new ChartPanel(chart);
+        
+        add("North", createMenuBar());
         add("Center", panel);
+        add("South", buttonPanel);
+    }
+
+    /**
+     * Creates the menu bar.
+     * @return menu bar
+     */
+    private JMenuBar createMenuBar() {
+        JMenuBar bar = new JMenuBar();
+        JMenu editMenu = new JMenu("Edit");
+        JMenuItem preferences = new JMenuItem("Preferences...");
+        preferences.addActionListener(this);
+        preferences.setActionCommand("dialog");
+        
+        editMenu.add(preferences);
+        bar.add(editMenu);
+        return bar;
     }
 
     @Override
@@ -91,6 +126,21 @@ public class BarChartGui extends GuiComponent<BarChartComponent> {
 
     @Override
     public void update() {
+    }
+
+    /** @see ActionListener */
+    public void actionPerformed(ActionEvent arg0) {
+        if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
+            BarChartDialog dialog = new BarChartDialog(chart);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+        } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
+            component.removeColumn();
+        } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
+            component.addColumn();
+        }
+        
     }
    
 }

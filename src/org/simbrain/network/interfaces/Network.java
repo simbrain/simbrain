@@ -686,7 +686,7 @@ public abstract class Network {
             s.initSpikeResponder();
         }
 
-        CouplingManager manager = rootNetwork.getParent().getWorkspace().getManager();
+        CouplingManager manager = rootNetwork.getParent().getWorkspace().getCouplingManager();
         
         for (Attribute oldAttr : oldNeuron.getConsumingAttributes()) {
             Attribute newAttr = find(oldAttr.getAttributeDescription(),

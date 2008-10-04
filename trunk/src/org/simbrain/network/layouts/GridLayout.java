@@ -35,8 +35,7 @@ public class GridLayout implements Layout {
      * @param vSpacing vertical spacing between neurons
      * @param numColumns number of columns of neurons
      */
-    public GridLayout(final double hSpacing, final double vSpacing,
-            final int numColumns) {
+    public GridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
         this.hSpacing = hSpacing;
         this.vSpacing = vSpacing;
         this.numColumns = numColumns;

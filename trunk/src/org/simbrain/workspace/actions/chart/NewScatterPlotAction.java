@@ -22,7 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.plot.scatterplot.ScatterPlotComponent;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
@@ -43,7 +43,7 @@ public final class NewScatterPlotAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ScatterPlotComponent plot = new ScatterPlotComponent("Scatter Plot");
+        ProjectionComponent plot = new ProjectionComponent("Scatter Plot");
         workspace.addWorkspaceComponent(plot);
     }
 }

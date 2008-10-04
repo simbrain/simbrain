@@ -111,11 +111,11 @@ public class ProjectSammon extends Projector {
      * @return closeness of points
      */
     public double iterate() {
+
         if (upstairs.getNumPoints() < 2) {
             return 0;
         }
-
-        // Question: Why do I need the new below? Why can't I use refs for Y_m
+                // Question: Why do I need the new below? Why can't I use refs for Y_m
         // and Y_i?
         setYArray(downstairs.getDatasetCopy());
         setD(downstairs.getDistances());

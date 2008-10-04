@@ -1,0 +1,49 @@
+package org.simbrain;
+
+import java.awt.Point;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.plot.projection.*;
+import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.Workspace;
+
+{
+
+        //Make a scatter chart
+        ProjectionComponent chart = new ProjectionComponent("Test Chart");
+        workspace.addWorkspaceComponent(chart);
+
+        // Make Network
+        NetworkComponent networkComponent = new NetworkComponent("Test Network");
+        workspace.addWorkspaceComponent(networkComponent);
+        RootNetwork network = networkComponent.getRootNetwork();
+        GridLayout layout = new GridLayout(50.0, 50.0, 5);
+        int numNeurons = 25;
+        layout.setInitialLocation(new Point(10, 10));
+        for (int i = 0; i < numNeurons; i++) {
+            NakaRushtonNeuron neuron = new NakaRushtonNeuron();
+            network.addNeuron(neuron);
+        }
+        layout.layoutNeurons(network);
+        Sparse connection = new Sparse(network, network.getFlatNeuronList(),
+                network.getFlatNeuronList());
+        connection.setExcitatoryProbability(.05);
+        connection.setInhibitoryProbability(.1);
+        connection.connectNeurons();    
+	network.randomizeNeurons();
+	networkComponent.update();
+
+	// Make Couplings
+        for (int i = 1; i < numNeurons; i++) {
+            ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + i, "Activation"); 
+            ConsumingAttribute chartAttribute = chart.getSingleConsumingAttribute("HDV Source " + i);
+            workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
+        }
+
+}

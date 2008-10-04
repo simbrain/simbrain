@@ -21,6 +21,8 @@ public class Sparse extends ConnectNeurons {
     /** Probability connection will be an inhibitory weight. */
     private double inhibitoryProbability = NetworkPreferences.getInhibitoryProbability();
 
+    //TODO: set weights strengths or synapses
+    
     /**
      * See super class description.
      *
@@ -39,14 +41,44 @@ public class Sparse extends ConnectNeurons {
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
                 Neuron target = (Neuron) j.next();
                 if (Math.random() < excitatoryProbability) {
-                    network.addSynapse(new ClampedSynapse(source, target));
+                    ClampedSynapse excitatory = new ClampedSynapse(source, target);
+                    excitatory.setStrength(10);
+                    network.addSynapse(excitatory);
                 }
                 if (Math.random() < inhibitoryProbability) {
                     ClampedSynapse inhibitory = new ClampedSynapse(source, target);
-                    inhibitory.setStrength(-1);
+                    inhibitory.setStrength(-10);
                     network.addSynapse(inhibitory);
                 }
             }
         }
+    }
+
+    /**
+     * @return the excitatoryProbability
+     */
+    public double getExcitatoryProbability() {
+        return excitatoryProbability;
+    }
+
+    /**
+     * @param excitatoryProbability the excitatoryProbability to set
+     */
+    public void setExcitatoryProbability(double excitatoryProbability) {
+        this.excitatoryProbability = excitatoryProbability;
+    }
+
+    /**
+     * @return the inhibitoryProbability
+     */
+    public double getInhibitoryProbability() {
+        return inhibitoryProbability;
+    }
+
+    /**
+     * @param inhibitoryProbability the inhibitoryProbability to set
+     */
+    public void setInhibitoryProbability(double inhibitoryProbability) {
+        this.inhibitoryProbability = inhibitoryProbability;
     }
 }

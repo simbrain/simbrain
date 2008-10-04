@@ -630,8 +630,6 @@ public class Dataset {
      * @return a matrix of interpoint distances
      */
     public double[][] getDistances() {
-        System.out.println("in getDistances");
-
         calculateDistances();
 
         int numPoints = getNumPoints();

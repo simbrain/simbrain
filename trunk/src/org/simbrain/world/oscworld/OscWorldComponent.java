@@ -239,7 +239,7 @@ public final class OscWorldComponent
      * @param address OSC in message address, must not be null and must start with
      *    <code>'/'</code> character
      */
-    void addInMessage(final String address) {
+    public void addInMessage(final String address) {
         OscMessageProducer producer = new OscMessageProducer(address, this);
         producers.add(producer);
     }
@@ -250,7 +250,7 @@ public final class OscWorldComponent
      * @param address OSC out message address, must not be null and must start with
      *    <code>'/'</code> character
      */
-    void addOutMessage(final String address) {
+    public void addOutMessage(final String address) {
         OscMessageConsumer consumer = new OscMessageConsumer(address, this);
         consumers.add(consumer);
     }

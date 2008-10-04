@@ -151,6 +151,7 @@ public class Gauge {
 
         while (iterations < numTimes) {
             error = currentProjector.iterate();
+            System.out.println(error);
             iterations++;
         }
     }
@@ -303,4 +304,47 @@ public class Gauge {
     public void setCurrentState(double[] currentState) {
         this.currentState = currentState;
     }
+    
+
+    @Override
+    public String toString() {
+        return "High Dimensional Data \n" +
+            getCurrentProjector().getUpstairs().toString() +
+            "Projected Data \n" +
+            getCurrentProjector().getDownstairs().toString();
+    }
+    
+    /**
+     * Reset the gauge.  Clear the underlying datasets.
+     */
+    public void reset() {
+        this.getUpstairs().clear();
+        this.getDownstairs().clear();
+    }
+    
+    /**
+     * Returns the size of the dataset.
+     *
+     * @return size of dataset.
+     */
+    public int getSize() {
+        return getCurrentProjector().getDownstairs().getNumPoints();
+    }
+    
+    /**
+     * Returns the current projected point.
+     *
+     * @param index index of point to return.
+     * @return the point.
+     */
+    public double[] getProjectedPoint(final int index) {
+        if (index < getCurrentProjector().getDownstairs().getNumPoints() && index > 0) {
+            return getCurrentProjector().getDownstairs().getPoint(index);
+        } else {
+            // throw index out of range exception
+            return null;
+        }
+    }
+
+    
 }

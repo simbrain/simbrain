@@ -479,7 +479,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
         if (theThread == null) {
             theThread = new GaugeThread(this);
         }
-
         playBtn.setIcon(ResourceManager.getImageIcon("Stop.png"));
         playBtn.setToolTipText("Stop iterating projection algorithm");
         theThread.setRunning(true);

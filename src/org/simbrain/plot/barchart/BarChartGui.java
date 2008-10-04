@@ -82,8 +82,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
 
             );
 
-        chart.getCategoryPlot().getRangeAxis().setRange(0, 2);
-        chart.getCategoryPlot().getRangeAxis().setAutoRange(false);
+        chart.getCategoryPlot().getRangeAxis().setAutoRange(true);
 
         JButton deleteButton = new JButton("Delete");
         deleteButton.setActionCommand("Delete");

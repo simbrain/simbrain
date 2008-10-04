@@ -45,7 +45,7 @@ public class ClampedSynapse extends Synapse {
         strength = val;
         id = theId;
     }
-
+    
     /**
      * Creates a weight connecting source and target neurons.
      *

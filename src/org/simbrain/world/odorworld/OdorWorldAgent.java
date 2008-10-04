@@ -430,8 +430,12 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
             currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
         }
 
-        return currentStimulus[sensor.getStimulusDimension()];
+        return currentStimulus[sensor.getStimulusDimension()-1];
     }
+    
+//    public void invokeBehavior(Behavior behavior(this)) {
+//        behavior.invoke();
+//    }
 
     /**
      * @return Returns the straight_factor.

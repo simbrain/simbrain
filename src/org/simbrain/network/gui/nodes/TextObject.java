@@ -134,7 +134,7 @@ public class TextObject extends ScreenElement implements PropertyChangeListener 
     }
 
     public void propertyChange(PropertyChangeEvent arg0) {
-    setBounds(ptext.getBounds());
+        setBounds(ptext.getBounds());
     }
 
     /**

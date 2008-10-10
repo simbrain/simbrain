@@ -652,7 +652,8 @@ public class SimbrainDesktop {
      * Shows the dialog for opening a workspace file.
      */
     public void openWorkspace() {
-        SFileChooser simulationChooser = new SFileChooser(workspace.getCurrentDirectory(), "zip");
+        SFileChooser simulationChooser = new SFileChooser(workspace.getCurrentDirectory(), "Zip Archive");
+        simulationChooser.addExtension("zip");
         File simFile = simulationChooser.showOpenDialog();
         if (simFile != null) {
             openWorkspace(simFile);
@@ -725,12 +726,15 @@ public class SimbrainDesktop {
      * Show a save dialog.
      */
     public void saveAs() {
-        SFileChooser chooser = new SFileChooser(workspace.getCurrentDirectory(), "zip");
+        SFileChooser chooser = new SFileChooser(workspace.getCurrentDirectory(), "Zip Archive");
+        chooser.addExtension("zip");
+        
         if (workspace.getCurrentFile() != null) {
-            chooser.setSelectedFile(workspace.getCurrentFile());
+            chooser.showSaveDialog(workspace.getCurrentFile());
         } else {
-            chooser.setSelectedFile(new File("workspace"));
+            chooser.showSaveDialog("workspace");
         }
+        
         File theFile = chooser.showSaveDialog();
         if (theFile != null) {
             workspace.setCurrentFile(theFile);

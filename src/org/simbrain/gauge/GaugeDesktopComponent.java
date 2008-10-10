@@ -23,6 +23,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
+import org.jdesktop.dataset.DataSet;
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Projector;
@@ -251,9 +252,9 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
             } else if (jmi == importCSV) {
                 importCSV();
             } else if (jmi == exportLow) {
-                exportLow();
+                exportDataSet(gauge.getDownstairs());
             } else if (jmi == exportHigh) {
-                exportHigh();
+                exportDataSet(gauge.getUpstairs());
             } else if (jmi == projectionPrefs) {
                 gaugePanel.handlePreferenceDialogs();
             } else if (jmi == graphicsPrefs) {
@@ -290,7 +291,8 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
     public void importCSV() {
         gaugePanel.resetGauge();
 
-        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "csv");
+        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "Comman Separated Values");
+        chooser.addExtension("csv");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
@@ -302,29 +304,17 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
             component.setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
-
+    
     /**
-     * Export high dimensional data to csv (comma-separated-values).
+     * Export data to csv (comma-separated-values).
      */
-    public void exportHigh() {
-        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "csv");
+    public void exportDataSet(Dataset data) {
+        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "Comman Separated Values");
+        chooser.addExtension("csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
-            gauge.getUpstairs().saveData(theFile);
-            component.setCurrentDirectory(chooser.getCurrentLocation());
-        }
-    }
-
-    /**
-     * Export low-dimensional data to csv (comma-separated-values).
-     */
-    public void exportLow() {
-        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "csv");
-        File theFile = chooser.showSaveDialog();
-
-        if (theFile != null) {
-            gauge.getDownstairs().saveData(theFile);
+            data.saveData(theFile);
             component.setCurrentDirectory(chooser.getCurrentLocation());
         }
     }

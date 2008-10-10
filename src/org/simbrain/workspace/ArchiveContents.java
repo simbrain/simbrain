@@ -130,7 +130,7 @@ class ArchiveContents {
             this.className = component.getClass().getCanonicalName();
             this.id = serializer.getId(component);
             this.name = component.getName();
-            this.format = component.getFileExtension();
+            this.format = component.getDefaultFormat();
             this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_") + '.' + format;
         }
         
@@ -167,7 +167,7 @@ class ArchiveContents {
             private DesktopComponent(final Component parent,
                     final org.simbrain.workspace.gui.GuiComponent<?> dc) {
                 this.className = dc.getClass().getCanonicalName();
-                this.format = dc.getWorkspaceComponent().getFileExtension();
+                this.format = dc.getWorkspaceComponent().getDefaultFormat();
                 this.uri = "guis/" + parent.id + '_' + parent.name.replaceAll("\\s", "_")
                     + '.' + format;
             }

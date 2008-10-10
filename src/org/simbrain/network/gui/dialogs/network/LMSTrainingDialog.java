@@ -247,7 +247,8 @@ public class LMSTrainingDialog extends StandardDialog implements
         Object o = e.getSource();
 
         if (o == jbInputsFile) {
-            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
+            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "Comman Separated Values");
+            chooser.addExtension("csv");
             File theFile = chooser.showOpenDialog();
 
             if (theFile == null) {
@@ -257,7 +258,8 @@ public class LMSTrainingDialog extends StandardDialog implements
             setBackropDirectory(chooser.getCurrentLocation());
             setInputTraining(theFile);
         } else if (o == jbOutputsFile) {
-            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
+            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "Comman Separated Values");
+            chooser.addExtension("csv");
             File theFile = chooser.showOpenDialog();
 
             if (theFile == null) {

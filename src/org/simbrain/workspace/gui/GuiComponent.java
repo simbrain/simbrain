@@ -20,26 +20,19 @@ package org.simbrain.workspace.gui;
 
 import java.awt.Rectangle;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.workspace.WorkspacePreferences;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -48,13 +41,9 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * A gui view on a  {@link org.simbrain.workspace.WorkspaceComponent}.
  */
 public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPanel {
-
-    /** Logger. */
-    private static final Logger LOGGER = Logger.getLogger(GuiComponent.class);
-    
     /** Reference to workspace component. */
     private final E workspaceComponent;
-    
+    private final SFileChooser chooser;
     /** Reference to  parent frame. */
     private GenericFrame parentFrame;
 
@@ -68,6 +57,12 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         super();
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
+        chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), 
+            workspaceComponent.getDescription());
+        for (String format : workspaceComponent.getFormats()) {
+            chooser.addExtension(format);
+        }
+        
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
 
@@ -102,7 +97,12 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      * Calls up a dialog for opening a workspace component.
      */
     public void showOpenFileDialog() {
-        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), workspaceComponent.getFileExtension());
+        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), workspaceComponent.getDescription());
+        
+        for (String format : workspaceComponent.getFormats()) {
+            chooser.addExtension(format);
+        }
+        
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
             workspaceComponent.open(theFile);
@@ -116,19 +116,31 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      * Show the dialog for saving a workspace component.
      */
     public void showSaveFileDialog() {
-        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), workspaceComponent.getFileExtension());
+        File theFile = workspaceComponent.getCurrentFile();
         
-        if (workspaceComponent.getCurrentFile() != null) {
-            chooser.setSelectedFile(workspaceComponent.getCurrentFile());
-        } else {
-            chooser.setSelectedFile(new File(getName()));
+        System.out.println("current: " + theFile);
+        
+        if (theFile == null) {
+            theFile = new File(getName());
         }
         
-        File theFile = chooser.showSaveDialog();
+        theFile = chooser.showSaveDialog(theFile);
         
-        if (theFile != null) {
-            workspaceComponent.save(theFile);
-            workspaceComponent.setCurrentDirectory(chooser.getCurrentLocation());
+        if (theFile != null) {            
+            workspaceComponent.setCurrentFile(theFile);
+            
+            try {
+                FileOutputStream stream = new FileOutputStream(theFile);
+                
+                // TODO format?
+                workspaceComponent.save(stream, null);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            
+            workspaceComponent.setCurrentDirectory(theFile.getParentFile().getAbsolutePath());
+            
+//            workspaceComponent.setCurrentDirectory(chooser.getCurrentLocation());
             workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
         }
@@ -141,7 +153,14 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         if (workspaceComponent.getCurrentFile() == null) {
             showSaveFileDialog();
         } else {
-            workspaceComponent.save(workspaceComponent.getCurrentFile());
+            try {
+                FileOutputStream stream = new FileOutputStream(workspaceComponent.getCurrentFile());
+                workspaceComponent.save(stream, null);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            
+//            workspaceComponent.save(workspaceComponent.getCurrentFile());
         }
     }
     

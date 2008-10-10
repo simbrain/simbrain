@@ -167,7 +167,12 @@ public final class BufferedImagePixelMatrixEditor
         openImageFile = new AbstractAction("...") {
             /** {@inheritDoc} */
             public void actionPerformed(final ActionEvent event) {
-                SFileChooser chooser = new SFileChooser(currentDirectory, extensions);
+                SFileChooser chooser = new SFileChooser(currentDirectory, "All Supported Images");
+                
+                for (String extension : extensions) {
+                    chooser.addExtension(extension);
+                }
+                
                 chooser.setUseImagePreview(true);
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {

@@ -254,7 +254,8 @@ public class SOMTrainingDialog extends StandardDialog implements
         Object o = e.getSource();
 
         if (o == jbInputsFile) {
-            SFileChooser chooser = new SFileChooser(getSOMDirectory(), "csv");
+            SFileChooser chooser = new SFileChooser(getSOMDirectory(), "Comman Separated Values");
+            chooser.addExtension("csv");
             File theFile = chooser.showOpenDialog();
 
             if (theFile == null) {

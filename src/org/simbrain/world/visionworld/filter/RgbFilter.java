@@ -77,8 +77,8 @@ public class RgbFilter implements Filter {
         final int width = image.getWidth();
         final int height = image.getHeight();
         
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 int rgb = image.getRGB(x, y);
                 int b = rgb & BYTE_MASK;
                 rgb = rgb >>> BITS_IN_A_BYTE;

@@ -127,7 +127,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
      * @return a list of the formats that this component supports.
      */
     public List<? extends String> getFormats() {
-        return Collections.emptyList();
+        return Collections.singletonList(getDefaultFormat());
     }
 
     public final void close() {
@@ -320,7 +320,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
      *
      * @param openFile file representing saved component.
      */
-    public void open(final File openFile) {
+    public final void open(final File openFile) {
         setCurrentFile(openFile);
         FileReader reader;
         try {
@@ -477,13 +477,21 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
         this.strategy = strategy;
     }
     
-
+    /**
+     * The overall name for the set of supported formats
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return null;
+    }
+    
     /**
      * The file extension for a component type, e.g. By default, "xml".
      *
      * @return the file extension
      */
-    public String getFileExtension() {
+    public String getDefaultFormat() {
         return "xml";
     }
     

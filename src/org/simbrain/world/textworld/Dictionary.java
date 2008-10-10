@@ -68,7 +68,8 @@ public class Dictionary extends Hashtable {
      * Loads an existing dictioary from a file.
      */
     public void loadDictionary() {
-        SFileChooser chooser = new SFileChooser(".", "csv"); // TODO: Use getCurrentDirectory
+        SFileChooser chooser = new SFileChooser(".", "Comma Separated Values"); // TODO: Use getCurrentDirectory
+        chooser.addExtension("csv");
         File theFile = chooser.showOpenDialog();
 
         if (theFile == null) {

@@ -78,7 +78,8 @@ public class UpdateStatusLabel extends PText {
      * Load custom update script.
      */
     private void loadCustomUpdateScript() {
-        SFileChooser chooser = new SFileChooser(".", "bsh");
+        SFileChooser chooser = new SFileChooser(".", "Beanshell Script");
+        chooser.addExtension("bsh");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
             networkPanel.getRootNetwork().setCustomUpdateScript(theFile);

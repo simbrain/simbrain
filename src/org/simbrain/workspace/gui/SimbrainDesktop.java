@@ -56,6 +56,8 @@ import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartGui;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.projection.ProjectionGui;
+import org.simbrain.plot.scatterplot.ScatterPlotComponent;
+import org.simbrain.plot.scatterplot.ScatterPlotGui;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
@@ -209,6 +211,7 @@ public class SimbrainDesktop {
         registerComponent(OscWorldComponent.class, OscWorldDesktopComponent.class);
         registerComponent(PieChartComponent.class, PieChartGui.class);
         registerComponent(ProjectionComponent.class, ProjectionGui.class);
+        registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
         registerComponent(ThreeDeeComponent.class, MainConsole.class);
         registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);

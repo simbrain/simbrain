@@ -69,6 +69,7 @@ import org.simbrain.workspace.actions.WorkspaceHelpAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewGaugeAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
+import org.simbrain.workspace.actions.chart.NewProjectionPlotAction;
 import org.simbrain.workspace.actions.chart.NewScatterPlotAction;
 import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
@@ -119,20 +120,23 @@ public class WorkspaceActionManager {
     /** New vision world action. */
     private final Action newVisionWorldAction;
 
-    /** New gauge action. */
-    private final Action newGaugeAction;
-
-    /** New plot action. */
-    private final Action newPieChartAction;
-
-    /** New time series plot action. */
-    private final Action newTimeSeriesAction;
-
     /** New bar chart action. */
     private final Action newBarChartAction;
 
+    /** New gauge action. */
+    private final Action newGaugeAction;
+
+    /** New pie chart action. */
+    private final Action newPieChartAction;
+
+    /** New projection plot action. */
+    private final Action newProjectionPlotAction;
+
     /** New scatter plot action. */
     private final Action newScatterPlotAction;
+
+    /** New time series plot action. */
+    private final Action newTimeSeriesAction;
 
     /** New console action. */
     private final Action newConsoleAction;
@@ -182,11 +186,13 @@ public class WorkspaceActionManager {
     /** Opens the coupling list. */
     private final Action openCouplingListAction;
 
+    /** Opens the list of workspace components. */
     private final Action openWorkspaceComponentListAction;
 
     /** Location of script menu directory. */
-    private final static String SCRIPT_MENU_DIRECTORY = "." + System.getProperty("file.separator") + "scriptmenu";
-    
+    private static final String SCRIPT_MENU_DIRECTORY = "."
+            + System.getProperty("file.separator") + "scriptmenu";
+
 
     /**
      * Create a new workspace action manager for the specified workspace.
@@ -211,10 +217,11 @@ public class WorkspaceActionManager {
         newGaugeAction = new NewGaugeAction(workspace);
         newConsoleAction = new NewConsoleAction(workspace);
 
-        newPieChartAction = new NewPieChartAction(workspace);
-        newTimeSeriesAction = new NewTimeSeriesAction(workspace);
         newBarChartAction = new NewBarChartAction(workspace);
+        newPieChartAction = new NewPieChartAction(workspace);
+        newProjectionPlotAction = new NewProjectionPlotAction(workspace);
         newScatterPlotAction = new NewScatterPlotAction(workspace);
+        newTimeSeriesAction = new NewTimeSeriesAction(workspace);
 
         newDataWorldAction = new NewDataWorldAction(workspace);
         newGameWorld2dAction = new NewGameWorld2dAction(workspace);
@@ -279,7 +286,7 @@ public class WorkspaceActionManager {
      */
     public List<Action> getPlotActions() {
         return Arrays.asList(new Action[] {newBarChartAction, newGaugeAction, newPieChartAction,
-                newScatterPlotAction, newTimeSeriesAction});
+                newProjectionPlotAction, newScatterPlotAction, newTimeSeriesAction});
     }
 
     /**

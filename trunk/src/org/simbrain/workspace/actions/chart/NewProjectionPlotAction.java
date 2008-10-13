@@ -22,28 +22,28 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.plot.scatterplot.ScatterPlotComponent;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
 /**
- * Add scatter plot component to workspace.
+ * Add projection plot component to workspace.
  */
-public final class NewScatterPlotAction extends WorkspaceAction {
+public final class NewProjectionPlotAction extends WorkspaceAction {
 
     /**
-     * Create a new scatter plot component.
+     * Create a new projection plot component.
      *
      * @param workspace workspace, must not be null
      */
-    public NewScatterPlotAction(final Workspace workspace) {
-        super("Scatter Plot", workspace);
+    public NewProjectionPlotAction(final Workspace workspace) {
+        super("Projection Plot", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ScatterPlotComponent plot = new ScatterPlotComponent("Scatter Plot");
+        ProjectionComponent plot = new ProjectionComponent("Projection Plot");
         workspace.addWorkspaceComponent(plot);
     }
 }

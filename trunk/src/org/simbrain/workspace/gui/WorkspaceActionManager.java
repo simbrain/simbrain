@@ -62,6 +62,7 @@ import org.simbrain.workspace.actions.OpenOdorWorldAction;
 import org.simbrain.workspace.actions.OpenWorkspaceAction;
 import org.simbrain.workspace.actions.OpenWorkspaceComponentListAction;
 import org.simbrain.workspace.actions.QuitWorkspaceAction;
+import org.simbrain.workspace.actions.RunScriptAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
@@ -189,6 +190,9 @@ public class WorkspaceActionManager {
     /** Opens the list of workspace components. */
     private final Action openWorkspaceComponentListAction;
 
+    /** Run script action. */
+    private final Action runScriptAction;
+
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "."
             + System.getProperty("file.separator") + "scriptmenu";
@@ -239,6 +243,8 @@ public class WorkspaceActionManager {
         globalUpdateAction = new GlobalUpdateAction(workspace);
         globalRunAction = new GlobalRunAction(workspace);
         globalStopAction = new GlobalStopAction(workspace);
+
+        runScriptAction = new RunScriptAction(workspace);
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);
@@ -545,5 +551,12 @@ public class WorkspaceActionManager {
      */
     public Action getNewScatterPlotAction() {
         return newScatterPlotAction;
+    }
+
+    /**
+     * @return the runScriptAction
+     */
+    public Action getRunScriptAction() {
+        return runScriptAction;
     }
 }

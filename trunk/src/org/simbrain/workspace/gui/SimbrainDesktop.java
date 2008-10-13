@@ -321,6 +321,8 @@ public class SimbrainDesktop {
      */
     private JMenu createScriptMenu() {
         JMenu scriptMenu = new JMenu("Scripts");
+        scriptMenu.add(actionManager.getRunScriptAction());
+        scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
         for (Action action : actionManager.getScriptActions(this.getWorkspace())) {
             scriptMenu.add(action);
@@ -339,7 +341,6 @@ public class SimbrainDesktop {
         for (Action action : actionManager.getOpenSaveWorkspaceActions()) {
             fileMenu.add(action);
         }
-        fileMenu.addSeparator();
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getClearWorkspaceAction());
         fileMenu.addSeparator();

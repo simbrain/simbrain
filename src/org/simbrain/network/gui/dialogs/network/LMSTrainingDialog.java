@@ -247,8 +247,8 @@ public class LMSTrainingDialog extends StandardDialog implements
         Object o = e.getSource();
 
         if (o == jbInputsFile) {
-            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "Comman Separated Values");
-            chooser.addExtension("csv");
+            SFileChooser chooser = new SFileChooser(getBackropDirectory(), 
+                "Comma Separated Values", "csv");
             File theFile = chooser.showOpenDialog();
 
             if (theFile == null) {

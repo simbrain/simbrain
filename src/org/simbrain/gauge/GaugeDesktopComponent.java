@@ -291,8 +291,8 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
     public void importCSV() {
         gaugePanel.resetGauge();
 
-        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "Comman Separated Values");
-        chooser.addExtension("csv");
+        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), 
+            "Comma Separated Values", "csv");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
@@ -309,8 +309,8 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
      * Export data to csv (comma-separated-values).
      */
     public void exportDataSet(Dataset data) {
-        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), "Comman Separated Values");
-        chooser.addExtension("csv");
+        SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), 
+            "Comma Separated Values", "csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {

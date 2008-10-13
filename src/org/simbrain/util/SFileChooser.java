@@ -41,6 +41,7 @@ import javax.swing.filechooser.FileFilter;
 public class SFileChooser {
     /** default serial version id */
     private static final long serialVersionUID = 1L;
+    
     /** 
      * the map of extension and their descriptions in the order
      * of their addition
@@ -59,7 +60,7 @@ public class SFileChooser {
      * Creates file chooser dialog.
      * 
      * @param currentDirectory Open and save directory
-     * @param ext File type extension for open and save
+     * @param description the description for the full set of extensions
      */
     public SFileChooser(final String currentDirectory, final String description) {
         this.currentDirectory = currentDirectory;
@@ -67,12 +68,31 @@ public class SFileChooser {
     }
 
     /**
+     * Creates file chooser dialog.  Use this constructor only when
+     * only one extension is supported.
+     * 
+     * @param currentDirectory Open and save directory
+     * @param description the description of the extension
+     * @param extension File type extension for open and save
+     */
+    public SFileChooser(final String currentDirectory, final String description, final String extension) {
+        this.currentDirectory = currentDirectory;
+        this.description = null;
+        
+        if (description == null) {
+            addExtension(extension);
+        } else {
+            addExtension(description, extension);
+        }
+    }
+    
+    /**
      * adds an extension with the provided description
      * 
      * @param extension the extension
      * @param description the description
      */
-    public void addExtension(String extension, String description) {
+    public void addExtension(String description, String extension) {
         exts.put(extension, description);
     }
     
@@ -82,7 +102,7 @@ public class SFileChooser {
      * @param extension the extension to add
      */
     public void addExtension(String extension) {
-        addExtension(extension, "*." + extension);
+        addExtension("*." + extension, extension);
     }
     
     /**

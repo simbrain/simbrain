@@ -462,9 +462,12 @@ public class SimbrainDesktop {
         }
         
         try {
+            GenericFrame genericFrame = parentFrame != null ? parentFrame
+                : new DesktopInternalFrame(component);
+            
             Constructor<? extends GuiComponent<?>> constructor
                 = guiClass.getConstructor(GenericFrame.class, componentClass);
-            return constructor.newInstance(parentFrame, component);
+            return constructor.newInstance(genericFrame, component);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

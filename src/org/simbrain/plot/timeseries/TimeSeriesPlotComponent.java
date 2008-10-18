@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -46,6 +47,12 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     
     /** Time Series Data. */
     private XYSeriesCollection dataset = new XYSeriesCollection();
+
+    /** Maximum iteration size if this chart is fixed width. */
+    private final int MAX_SIZE = 100;
+
+    /** Whether this chart if fixed width or not. */
+    private final boolean FIXED_WIDTH = true;
 
     /**
      * Create new time series plot component.
@@ -105,21 +112,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
         getXStream().toXML(output);
     }
 
-    
-//    /**
-//     * Sets the values.
-//     * TODO: Check.
-//     * 
-//     * @param seriesIndex index of consumer
-//     * @param value value to set
-//     */
-//    public void setValue(int seriesIndex, double value) {
-//        long current = System.currentTimeMillis();
-//        boolean update = current - lastUpdate > UPDATE_INTERVAL;
-//        seriesList.get(seriesIndex).add(this.getWorkspace().getTime(), value, update);
-//        if (update) lastUpdate = current;
-//    }
-
     @Override
     public boolean hasChangedSinceLastSave() {
         // TODO Auto-generated method stub
@@ -137,9 +129,21 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     public Collection<TimeSeriesConsumer> getConsumers() {
         return consumers;
     }
-
+    
     @Override
     public void update() {
+
+        // Trim appropriately if fixed width
+        if(FIXED_WIDTH == true) {
+            for (Iterator iterator = dataset.getSeries().iterator(); iterator.hasNext();) {
+                XYSeries series = (XYSeries) iterator.next();
+                if (series.getItemCount() > MAX_SIZE) {
+                    series.remove(0);
+                }
+            }            
+        }
+
+        // Add the data
         for (TimeSeriesConsumer consumer : getConsumers()) {
             dataset.getSeries(consumer.getIndex()).add(getWorkspace().getTime(), consumer.getValue());
         }

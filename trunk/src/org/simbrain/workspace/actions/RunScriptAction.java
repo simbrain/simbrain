@@ -27,6 +27,7 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -36,8 +37,9 @@ import bsh.Interpreter;
  */
 public final class RunScriptAction extends WorkspaceAction {
 
-    private static final long serialVersionUID = 1L;
-
+    /** Reference to Simbrain Desktop. */
+    private SimbrainDesktop desktop;
+    
     /** Script directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "."
         + System.getProperty("file.separator") + "scriptmenu";
@@ -46,8 +48,9 @@ public final class RunScriptAction extends WorkspaceAction {
     /**
      * Create a new script action for the workspace.
      */
-    public RunScriptAction(Workspace workspace) {
-        super("Run Script...", workspace);
+    public RunScriptAction(SimbrainDesktop desktop) {
+        super("Run Script...", desktop.getWorkspace());
+        this.desktop = desktop;
     }
 
 
@@ -59,6 +62,7 @@ public final class RunScriptAction extends WorkspaceAction {
             Interpreter interpreter = new Interpreter();
             
             try {
+                interpreter.set("desktop", desktop);
                 interpreter.set("workspace", workspace);
                 interpreter.source(scriptFile.toString());
             } catch (FileNotFoundException e) {

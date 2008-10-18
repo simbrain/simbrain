@@ -67,19 +67,6 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
         RootNetwork.getXStream().toXML(rootNetwork, output);
     }
     
-    public String getKeyForAttribute(Attribute attribute) {
-        if (attribute.getParent() instanceof Neuron) {
-            String prefix = ((Neuron) attribute.getParent()).getId();
-            return prefix + ':' + attribute.getAttributeDescription();
-        } else {
-            return null;
-        }
-    }
-
-    public Attribute getAttributeForKey(String key) {
-        return rootNetwork.getAttribute(key);
-    }
-    
     public RootNetwork getRootNetwork() {
         return rootNetwork;
     }

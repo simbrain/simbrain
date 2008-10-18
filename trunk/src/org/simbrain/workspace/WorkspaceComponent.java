@@ -105,20 +105,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     public abstract void save(OutputStream output, String format);
     
     /**
-     * Subclasses should override this; used in coupling serialization.
-     */
-    public String getKeyForAttribute(Attribute attribute) {
-        return null;
-    }
-
-    /**
-     * Subclasses should override this; used in coupling serialization.
-     */
-    public Attribute getAttributeForKey(String key) {
-        return null;
-    }
-
-    /**
      * Returns a list of the formats that this component supports.
      * 
      * <p>The default behavior is to return an empty list.  This means

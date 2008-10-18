@@ -125,16 +125,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         }
     }
 
-    @Override
-    public Attribute getAttributeForKey(String key) {
-        return dataModel.getAttribute(key);
-    }
-
-    @Override
-    public String getKeyForAttribute(Attribute attribute) {
-        return dataModel.getKey(attribute);
-    }
-
     /**
      * {@inheritDoc}
      */

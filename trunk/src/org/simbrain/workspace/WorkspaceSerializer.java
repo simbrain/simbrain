@@ -190,10 +190,12 @@ public class WorkspaceSerializer {
                     = componentDeserializer.getComponent(coupling.target.uri);
                 
                 workspace.addCoupling(new Coupling(
-                    (ProducingAttribute<?>) sourceComponent
-                        .getAttributeForKey(coupling.source.key),
-                    (ConsumingAttribute<?>) targetComponent
-                        .getAttributeForKey(coupling.target.key)));
+                        (ProducingAttribute<?>) sourceComponent.getProducingAttribute(
+                                        coupling.source.attributeHolderID,
+                                        coupling.source.attributeID),
+                        (ConsumingAttribute<?>) targetComponent.getConsumingAttribute(
+                                        coupling.target.attributeHolderID,
+                                        coupling.target.attributeID)));
             }
         }
     }

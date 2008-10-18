@@ -8,10 +8,10 @@ import org.simbrain.workspace.*;
 import org.simbrain.world.dataworld.DataWorldComponent;
 
 {
-
             // Create Network
             NetworkComponent network = new NetworkComponent("Backprop Network");
             workspace.addWorkspaceComponent(network);
+	    desktop.getDesktopComponent(network).getParentFrame().setBounds(46, 57, 400, 400);
             LayersLayout layout = new LayersLayout(40, 40, LayersLayout.HORIZONTAL);  // TODO: This should not be needed
             Backprop bp = new Backprop(network.getRootNetwork(), 3, 5, 3, layout);
             network.getRootNetwork().addNetwork(bp);
@@ -35,6 +35,7 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             inputData.getDataModel().set(1, 1, new Double(1));
             inputData.getDataModel().set(2, 2, new Double(1));
             inputData.setName("Input Data");
+	    desktop.getDesktopComponent(inputData).getParentFrame().setBounds(508, 59, 300, 146);
             
             // Coupling input table columns to input neurons of backprop network
             ProducingAttribute column1 = inputData.getSingleProducingAttribute("Column 1");
@@ -62,6 +63,7 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             // Create Plot component
             TimeSeriesPlotComponent errorPlot = new TimeSeriesPlotComponent("Error Rate", 1);
             workspace.addWorkspaceComponent(errorPlot);
+	    desktop.getDesktopComponent(errorPlot).getParentFrame().setBounds(509, 232, 351, 281);
 
             // Train network
             int epochs = Integer.parseInt(JOptionPane.showInputDialog("Number of epochs"));

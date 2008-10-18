@@ -22,7 +22,7 @@ public final class NewOscWorldAction extends WorkspaceAction {
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        OscWorldComponent world = new OscWorldComponent("OSC World");
+        OscWorldComponent world = new OscWorldComponent("");
         workspace.addWorkspaceComponent(world);
     }
 }

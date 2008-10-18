@@ -44,7 +44,7 @@ public final class NewThreeDeeWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ThreeDeeComponent component = new ThreeDeeComponent("3D World");
+        ThreeDeeComponent component = new ThreeDeeComponent("");
         workspace.addWorkspaceComponent(component);
     }
 }

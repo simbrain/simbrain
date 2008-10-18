@@ -15,10 +15,6 @@ import org.simbrain.workspace.Workspace;
 
 {
 
-        //Make a barchart
-        BarChartComponent barChart = new BarChartComponent("Test Chart");
-        workspace.addWorkspaceComponent(barChart);
-
         // Make Network
         NetworkComponent networkComponent = new NetworkComponent("Test Network");
         workspace.addWorkspaceComponent(networkComponent);
@@ -38,6 +34,12 @@ import org.simbrain.workspace.Workspace;
         connection.connectNeurons();    
 	network.randomizeNeurons();
 	networkComponent.update();
+        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
+
+        //Make a barchart
+        BarChartComponent barChart = new BarChartComponent("Test Chart");
+        workspace.addWorkspaceComponent(barChart);
+        desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
 
 	// Make Couplings
         for (int i = 1; i < numNeurons; i++) {

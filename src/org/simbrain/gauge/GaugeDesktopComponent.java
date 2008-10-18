@@ -134,7 +134,7 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
             gaugePanel.resetGauge();
         }
 
-        public void setName(String name) {
+        public void setTitle(String name) {
         }
     };
     

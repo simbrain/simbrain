@@ -42,7 +42,7 @@ public final class NewDataWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        DataWorldComponent world = new DataWorldComponent("Data World");
+        DataWorldComponent world = new DataWorldComponent("");
         workspace.addWorkspaceComponent(world);
     }
 }

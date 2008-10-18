@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * A collection of components which interact via couplings.   Neural networks, datatables, gauges, and scripts are examples of components in a Simbrain workspace.
@@ -70,6 +72,12 @@ public class Workspace {
 
     /** Listeners on this workspace. */
     private Set<WorkspaceListener> listeners = new HashSet<WorkspaceListener>();
+
+    /**
+     * Mapping from workspace component types to integers which show how many have been added.
+     * For naming.
+     */
+    private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
     /**
      *  Enumeration for the update methods
@@ -181,15 +189,36 @@ public class Workspace {
         component.setWorkspace(this);
         workspaceChanged = true;
         
+        /*
+         * Handle component naming.
+         * 
+         * If the component has not yet been named, name as follows:
+         *      (ClassName - "Component") + index
+         * where index iterates as new components are added. 
+         * e.g. Network 1, Network 2, etc.
+         */
+        if (component.getName().equalsIgnoreCase("")) {
+            if (componentNameIndices.get(component.getClass()) == null) {
+                componentNameIndices.put(component.getClass(), 1);
+            } else {
+                int index = componentNameIndices.get(component.getClass());
+                componentNameIndices.put(component.getClass(), index + 1);
+            }
+            component.setName(component.getSimpleName() + 
+                    componentNameIndices.get(component.getClass()));            
+        }
+ 
+        // Notify listeners 
         if (fireEvents) {
             for (WorkspaceListener listener : listeners) {
                 listener.componentAdded(component);
             }
         }
+
     }
     
     /**
-     * Adds a workspace component to the workspace with a priority
+     * Adds a workspace component to the workspace with a priority.
      * 
      * @param component The component to add.
      */
@@ -315,15 +344,10 @@ public class Workspace {
     }
 
     /**
-     * Remove all items (networks, worlds, etc.) from this workspace.
+     * Remove all components (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
         removeAllComponents();
-//        if (changesExist()) {
-//            for (WorkspaceListener listener : listeners) {
-//                if (!listener.clearWorkspace()) { return; }
-//            }
-//        }
         workspaceChanged = false;
         currentFile = null;
         for (WorkspaceListener listener : listeners) {
@@ -344,7 +368,7 @@ public class Workspace {
             for (WorkspaceComponent<?> component : toRemove) {
                 removeWorkspaceComponent(component);
             }
-        } 
+        }
     }
 
     /**
@@ -403,6 +427,7 @@ public class Workspace {
      */
     public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
+        WorkspacePreferences.setDefaultFile(currentFile.getAbsolutePath());
     }
 
     /**

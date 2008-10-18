@@ -7,7 +7,7 @@ package org.simbrain.workspace;
  */
 public interface WorkspaceListener {
     /**
-     * event when the workspace is requested to be cleared
+     * Event when the workspace is requested to be cleared
      * listeners should not clear themselves until the
      * clearWorkspace event.
      * 

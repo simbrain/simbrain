@@ -9,7 +9,7 @@ import org.simbrain.workspace.*;
 {
 
 	// Parameters 
-	int NUM_NEURONS = 200;
+	int NUM_NEURONS = 100;
 	double GRID_SPACE = 50;
 	double INHIBITORY_PROB = .2;
 	double INHIBITORY_RADIUS = 100;
@@ -17,13 +17,14 @@ import org.simbrain.workspace.*;
 	double EXCITATORY_RADIUS = 200;
 
         // Build Network
-        NetworkComponent networkComponent = new NetworkComponent("Sound Network");
+        NetworkComponent networkComponent = new NetworkComponent("Sparse Network");
         workspace.addWorkspaceComponent(networkComponent);
         RootNetwork network = networkComponent.getRootNetwork();
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
         layout.setInitialLocation(new Point(10, 10));
         for (int i = 0; i < NUM_NEURONS; i++) {
             IntegrateAndFireNeuron neuron = new IntegrateAndFireNeuron();
+	    neuron.setTimeConstant(.1);
             network.addNeuron(neuron);
         }
         layout.layoutNeurons(network);

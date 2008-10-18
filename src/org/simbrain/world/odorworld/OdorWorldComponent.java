@@ -124,39 +124,6 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     protected void update() {
         /* no implementation */
     }
-
-    @Override
-    public Attribute getAttributeForKey(String key) {
-
-        Matcher matcher = Pattern.compile("(.+):(.+)").matcher(key);
-        
-        if (!matcher.matches()) {
-            System.out.println("No match");
-            return null;
-        }
-        
-        String agentName = matcher.group(1);
-        String attribute = matcher.group(2);
-
-        OdorWorldAgent theAgent = world.findAgent(agentName);
-        
-        //TODO: Make below a standard attribute holder function?        
-        for (Attribute a : theAgent.getConsumingAttributes()) {
-            if (a.getAttributeDescription().equals(attribute)) return a;
-        }
-        for (Attribute a : theAgent.getProducingAttributes()) {
-            if (a.getAttributeDescription().equals(attribute)) return a;
-        }
-        // No match found
-        return null;
-    }
-
-    @Override
-    public String getKeyForAttribute(Attribute attribute) {
-        String agentName = ((OdorWorldAgent) attribute.getParent()).getName();
-        String attributeName = attribute.getAttributeDescription();
-        return agentName + ":" + attributeName;
-    }
     
     @Override
     public void setCurrentDirectory(final String currentDirectory) { 

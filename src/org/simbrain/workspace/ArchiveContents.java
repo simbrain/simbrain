@@ -205,8 +205,13 @@ class ArchiveContents {
         static final class Attribute {
             /** The uri for the parent component of this attribute. */
             final String uri;
+            
             /** The key that the component uses to identify the attribute. */
-            final String key;
+            final String attributeHolderID;
+
+            /** The key that the component uses to identify the attribute. */
+            final String attributeID;
+
             
             /**
              * Creates a new instance.
@@ -219,7 +224,9 @@ class ArchiveContents {
                 WorkspaceComponent<?> comp = attribute.getParent().getParentComponent();
                 
                 this.uri = parent.componentUris.get(comp);
-                this.key = comp.getKeyForAttribute(attribute);
+                this.attributeID = attribute.getAttributeDescription();
+                this.attributeHolderID = attribute.getParent().getDescription();
+
             }
         }
     }

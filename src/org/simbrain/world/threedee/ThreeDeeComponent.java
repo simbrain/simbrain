@@ -105,36 +105,6 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
         return model.agents;
     }
     
-    @Override
-    public Attribute getAttributeForKey(final String key) {
-        String[] keyParts = key.split(":");
-        
-        for (Bindings b : model.bindings) {
-            if (b.getDescription().equals(keyParts[0])) {
-                List<Attribute> attributes = new ArrayList<Attribute>();
-                
-                attributes.addAll(b.getConsumingAttributes());
-                attributes.addAll(b.getProducingAttributes());
-                
-                for (Attribute a : attributes) {
-                    if (a.getAttributeDescription().equals(keyParts[1])) {
-                        return a;
-                    }
-                }
-                
-                return null;
-            }
-        }
-        
-        return null;
-    }
-
-    @Override
-    public String getKeyForAttribute(final Attribute attribute) {
-        return attribute.getParent().getDescription()
-            + ":" + attribute.getAttributeDescription();
-    }
-    
     /**
      * Returns the environment for this Component.
      * 

@@ -45,21 +45,7 @@ public class WorkspaceComponentDeserializer {
             
             WorkspaceComponent<?> wc = (WorkspaceComponent<?>)
                 method.invoke(null, input, component.name, null);
-            
-            for (Consumer consumer : wc.getConsumers()) {
-                for (Attribute attribute : consumer.getConsumingAttributes()) {
-                    String key = wc.getKeyForAttribute(attribute);
-//                    System.out.println("consumer: " + key);
-                }
-            }
-
-            for (Producer producer : wc.getProducers()) {
-                for (Attribute attribute : producer.getProducingAttributes()) {
-                    String key = wc.getKeyForAttribute(attribute);
-//                    System.out.println("producer: " + key);
-                }
-            }
-            
+                        
             componentKeys.put(component.uri, wc);
             wc.setChangedSinceLastSave(false);
             return wc;

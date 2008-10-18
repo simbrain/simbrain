@@ -44,7 +44,7 @@ public final class NewTextWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        TextWorldComponent world = new TextWorldComponent("Text World");
+        TextWorldComponent world = new TextWorldComponent("");
         workspace.addWorkspaceComponent(world);
     }
 }

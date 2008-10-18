@@ -11,5 +11,5 @@ public interface WorkspaceComponentListener {
      */
     void componentUpdated();
     
-    void setName(String name);
+    void setTitle(String name);
 }

@@ -43,7 +43,7 @@ public final class NewBarChartAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        BarChartComponent plot = new BarChartComponent("Bar Chart");
+        BarChartComponent plot = new BarChartComponent("");
         workspace.addWorkspaceComponent(plot);
     }
 }

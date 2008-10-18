@@ -40,10 +40,9 @@ public final class NewTimeSeriesAction extends WorkspaceAction {
         super("Time Series", workspace);
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("Time Series");
+        TimeSeriesPlotComponent plot = new TimeSeriesPlotComponent("");
         workspace.addWorkspaceComponent(plot);
     }
 }

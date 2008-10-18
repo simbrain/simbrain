@@ -45,7 +45,7 @@ public final class NewConsoleAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ConsoleComponent console = new ConsoleComponent("Console");
+        ConsoleComponent console = new ConsoleComponent("");
         workspace.addWorkspaceComponent(console);
     }
 }

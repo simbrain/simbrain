@@ -53,6 +53,6 @@ public final class NewNetworkAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addWorkspaceComponent(new NetworkComponent("Network"));
+        workspace.addWorkspaceComponent(new NetworkComponent(""));
     }
 }

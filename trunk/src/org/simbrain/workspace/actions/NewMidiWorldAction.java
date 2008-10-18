@@ -22,7 +22,7 @@ public final class NewMidiWorldAction extends WorkspaceAction {
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        MidiWorldComponent world = new MidiWorldComponent("MIDI World");
+        MidiWorldComponent world = new MidiWorldComponent("");
         workspace.addWorkspaceComponent(world);
     }
 }

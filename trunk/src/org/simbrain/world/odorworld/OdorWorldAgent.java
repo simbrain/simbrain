@@ -640,7 +640,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
          * {@inheritDoc}
          */
         public Consumer getParent() {
-            System.out.println(getAttributeDescription() + ": " + OdorWorldAgent.this);
+            //System.out.println(getAttributeDescription() + ": " + OdorWorldAgent.this);
             return OdorWorldAgent.this;
         }
 

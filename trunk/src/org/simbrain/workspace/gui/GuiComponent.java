@@ -41,9 +41,13 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * A gui view on a  {@link org.simbrain.workspace.WorkspaceComponent}.
  */
 public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPanel {
+
     /** Reference to workspace component. */
     private final E workspaceComponent;
+    
+    /** File Chooser. */
     private final SFileChooser chooser;
+    
     /** Reference to  parent frame. */
     private GenericFrame parentFrame;
 
@@ -57,7 +61,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         super();
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
-        chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), 
+        chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(),
             workspaceComponent.getDescription());
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
@@ -139,8 +143,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
             }
             
             workspaceComponent.setCurrentDirectory(theFile.getParentFile().getAbsolutePath());
-            
-//            workspaceComponent.setCurrentDirectory(chooser.getCurrentLocation());
             workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
         }
@@ -159,8 +161,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            
-//            workspaceComponent.save(workspaceComponent.getCurrentFile());
         }
     }
     
@@ -171,7 +171,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      * @throws IOException if an IO error occurs
      */
     public void save(final OutputStream ostream) throws IOException {
-        new XStream(new DomDriver()).toXML(getBounds(), ostream);
+        new XStream(new DomDriver()).toXML(this.getParentFrame().getBounds(), ostream);
     }
     
     /**
@@ -184,11 +184,12 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      */
     public static GuiComponent<?> open(final WorkspaceComponent<?> component,
             final InputStream istream, final String name) {
+        
         SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
         GuiComponent<?> dc = desktop.createDesktopComponent(null, component);
         Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
         
-        dc.setName(name);
+        dc.setTitle(name);
         dc.setBounds(bounds);
         
         return dc;
@@ -215,6 +216,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         }
     }
 
+    /**
+     * Return name of unerlying component.
+     */
     public String getName() {
         return (workspaceComponent == null) ? "null" : workspaceComponent.getName();
     }
@@ -222,13 +226,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
     /**
      * @param name the name to set
      */
-    public void setName(final String name) {
-        workspaceComponent.setName(name);
+    public void setTitle(final String name) {
         getParentFrame().setTitle(name);
     }
-
-
-
 
     /**
      * Retrieves a simple version of a component name from its class,
@@ -257,7 +257,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
             update();
         }
 
-        public void setName(String name) {
+        public void setTitle(String name) {
             parentFrame.setTitle(name);
         }
     }
@@ -270,10 +270,5 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
     public GenericFrame getParentFrame() {
         return this.parentFrame;
     }
-
-    
-
-    
-    
 
 }

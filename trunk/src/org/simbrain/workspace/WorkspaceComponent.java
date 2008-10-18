@@ -222,7 +222,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     public void setName(final String name) {
         this.name = name;
         for (WorkspaceComponentListener listener : this.getListeners()) {
-            listener.setName(name);
+            listener.setTitle(name);
         }
     }
 

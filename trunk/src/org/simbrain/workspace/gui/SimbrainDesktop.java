@@ -93,6 +93,7 @@ import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
  */
 public class SimbrainDesktop {
     
+
     /** The x offset for popup menus. */
     private static final int MENU_X_OFFSET = 5;
 
@@ -137,15 +138,43 @@ public class SimbrainDesktop {
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
 
-    /**
-     * Mapping from workspace component types to integers which show how many have been added.
-     * For naming.
-     */
-    private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
-
     /** All the components in the workspace. */
     private Map<WorkspaceComponent<?>, GuiComponent<?>> components
         = new LinkedHashMap<WorkspaceComponent<?>, GuiComponent<?>>();
+    
+    /** Listener on the workspace. */
+    private final WorkspaceListener listener = new WorkspaceListener() {
+        public boolean clearWorkspace() {
+            save();
+            return true;
+        }
+        
+        public void workspaceCleared() {
+            if (changesExist()) {
+                save();
+            }
+            frame.setTitle("Simbrain");
+            return;
+        }
+        
+        /**
+         * Add a new <c>SimbrainComponent</c>.
+         *
+         * @param component
+         */
+        @SuppressWarnings("unchecked")
+        public void componentAdded(final WorkspaceComponent workspaceComponent) {
+            addComponent(workspaceComponent, null);
+        }
+
+        @SuppressWarnings("unchecked")
+        public void componentRemoved(final WorkspaceComponent workspaceComponent) {
+
+            GuiComponent<?> component = components.get(workspaceComponent);
+            components.remove(component);
+            component.getParentFrame().dispose();
+        }
+    };
     
     // TODO this should be addressed at a higher level
     public static SimbrainDesktop getDesktop(Workspace workspace) {
@@ -191,9 +220,6 @@ public class SimbrainDesktop {
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
-    
-
-    
 
     /**
      * Create mappings from components to their GUI wrappers.
@@ -324,7 +350,7 @@ public class SimbrainDesktop {
         scriptMenu.add(actionManager.getRunScriptAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
-        for (Action action : actionManager.getScriptActions(this.getWorkspace())) {
+        for (Action action : actionManager.getScriptActions(this)) {
             scriptMenu.add(action);
         }
         return scriptMenu;
@@ -445,6 +471,165 @@ public class SimbrainDesktop {
     }
     
     /**
+     * Return a workspace component.
+     * @param component component to return
+     * @return component.
+     */
+    public GuiComponent<?> getDesktopComponent(final WorkspaceComponent<?> component) {
+        return components.get(component);
+    }
+    
+    /**
+     * Utility class for adding internal frames, which are not
+     * wrappers for WorkspaceComponents. Wraps GUI Component in a 
+     * JInternalFrame for Desktop.
+     */
+    private static class DesktopInternalFrame extends GenericJInternalFrame {
+        
+        /** Reference to workspace component. */
+        WorkspaceComponent workspaceComponent;
+        
+        /** Gui Component. */
+        GuiComponent guiComponent;
+
+        /**
+         * Construct an internal frame.
+         * 
+         * @param workspaceComponent workspace component.
+         */
+        public DesktopInternalFrame(final WorkspaceComponent workspaceComponent) {
+            init();
+            this.workspaceComponent = workspaceComponent;
+        }
+        
+        public DesktopInternalFrame(final GuiComponent guiComponent) {
+            init();
+            this.guiComponent = guiComponent;
+            this.workspaceComponent = guiComponent.getWorkspaceComponent();
+        }
+           
+        /**
+         * Initialize the frame.
+         */
+        private void init() {
+            setResizable(true);
+            setMaximizable(true);
+            setIconifiable(true);
+            setClosable(true);
+            addInternalFrameListener(new WindowFrameListener());            
+        }
+        
+        /**
+         * Set the Gui Component.
+         * 
+         * @param guiComponent the component to set.
+         */
+        public void setGuiComponent(final GuiComponent guiComponent) {
+            this.guiComponent = guiComponent;
+        }
+        
+        /**
+         * Manage cleanup when a component is closed.
+         */
+        private class WindowFrameListener extends InternalFrameAdapter {
+            /** @see InternalFrameAdapter */
+            public void internalFrameClosing(final InternalFrameEvent e) {
+                if (workspaceComponent.hasChangedSinceLastSave()) {
+                    guiComponent.showHasChangedDialog();
+                }
+                
+                guiComponent.close();
+            }
+        }
+    } // End DesktopInternalFrame
+    
+    /**
+     * Add internal frame.
+     *
+     * @param internalFrame the frame to add.
+     */
+    public void addInternalFrame(final JInternalFrame internalFrame) {
+        desktop.add(internalFrame);
+    }
+
+    /**
+     * Add a new <c>SimbrainComponent</c>.
+     * Handles creation of new components and deserialization of components
+     *
+     * @param desktopComponent
+     */
+    @SuppressWarnings("unchecked")
+    public void addComponent(final WorkspaceComponent workspaceComponent, GuiComponent guiComponent) {
+
+        LOGGER.trace("Adding workspace component: " + workspaceComponent);
+
+        // How the component is created depends on whether it is being deserialized or not
+        boolean isDeserialized = true;
+        if (guiComponent == null) {
+            isDeserialized = false;
+        }
+        
+        final DesktopInternalFrame  componentFrame;
+        if (isDeserialized == true) {
+            componentFrame = new DesktopInternalFrame(guiComponent);
+            guiComponent.setParentFrame(componentFrame);
+        } else {
+            componentFrame = new DesktopInternalFrame(workspaceComponent);
+            guiComponent = createDesktopComponent(componentFrame, workspaceComponent);            
+            componentFrame.setGuiComponent(guiComponent);
+        }
+        
+        // Set Title
+        componentFrame.setTitle(workspaceComponent.getName());
+
+        // Handle GuiComponent Bounds
+        if (isDeserialized == true) {
+           componentFrame.setBounds(guiComponent.getBounds());
+        } else {
+            if (lastClickedPoint != null) {
+                componentFrame.setBounds(
+                    (int) lastClickedPoint.getX(),
+                    (int) lastClickedPoint.getY(),
+                    (int) guiComponent.getPreferredSize().getWidth(),
+                    (int) guiComponent.getPreferredSize().getHeight());
+                guiChanged = true;
+            } else if (components.size() == 0) {
+                componentFrame.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
+                    (int) guiComponent.getPreferredSize().getWidth(),
+                    (int) guiComponent.getPreferredSize().getHeight());
+                guiChanged = true;
+            } else {
+                GuiComponent<?> lastComponentAdded = null;
+                for (GuiComponent<?> next : components.values()) {
+                    lastComponentAdded = next;
+                }
+                int lastX = (int) lastComponentAdded.getParentFrame().getBounds().getX();
+                int lastY = (int) lastComponentAdded.getParentFrame().getBounds().getY();
+                componentFrame.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
+                    (int) guiComponent.getPreferredSize().getWidth(),
+                    (int) guiComponent.getPreferredSize().getHeight());
+                guiChanged = true;
+            }
+        }
+
+        // Finish adding component
+        guiComponent.addComponentListener(componentListener);
+        lastClickedPoint = null;
+        components.put(workspaceComponent, guiComponent);
+        componentFrame.setContentPane(guiComponent);
+        componentFrame.setVisible(true);
+        desktop.add(componentFrame);
+        guiComponent.postAddInit();
+   
+        // Forces last component of the desktop to the front        
+        try {
+            ((JInternalFrame)componentFrame).setSelected(true);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
      * Creates an instance of the proper wrapper class around the provided instance.
      * 
      * @param component The component to wrap.
@@ -475,185 +660,6 @@ public class SimbrainDesktop {
         }
     }
     
-    /**
-     * Return a workspace component.
-     * @param component component to return
-     * @return component.
-     */
-    public GuiComponent<?> getDesktopComponent(final WorkspaceComponent<?> component) {
-        return components.get(component);
-    }
-    
-    /** Listener on the workspace. */
-    private final WorkspaceListener listener = new WorkspaceListener() {
-        public boolean clearWorkspace() {
-            save();
-            return true;
-        }
-        
-        public void workspaceCleared() {
-            if (changesExist()) {
-                save();
-            }
-            
-            frame.setTitle("Simbrain");
-            
-            return;
-        }
-        
-        /**
-         * Add a new <c>SimbrainComponent</c>.
-         *
-         * @param component
-         */
-        @SuppressWarnings("unchecked")
-        public void componentAdded(final WorkspaceComponent workspaceComponent) {
-            addComponent(workspaceComponent, null);
-        }
-
-        @SuppressWarnings("unchecked")
-        public void componentRemoved(final WorkspaceComponent workspaceComponent) {
-            GuiComponent<?> component = components.get(workspaceComponent);            
-            components.remove(component);
-            component.getParentFrame().dispose();
-        }
-    };
-    
-    /**
-     * Utility class for adding internal frames, which are not
-     * wrappers for WorkspaceComponents. Wraps GUI Component in a 
-     * JInternalFrame for Desktop.
-     */
-    private static class DesktopInternalFrame extends GenericJInternalFrame {
-        
-        /** Reference to workspace component. */
-        WorkspaceComponent workspaceComponent;
-        
-        /** Gui Component. */
-        GuiComponent guiComponent;
-
-        /**
-         * Construct an internal frame.
-         * 
-         * @param workspaceComponent workspace component.
-         */
-        public DesktopInternalFrame(final WorkspaceComponent workspaceComponent) {
-            setResizable(true);
-            setMaximizable(true);
-            setIconifiable(true);
-            setClosable(true);
-            addInternalFrameListener(new WindowFrameListener());
-            this.workspaceComponent = workspaceComponent;
-        }
-        
-        /**
-         * Set the Gui Component.
-         * 
-         * @param guiComponent the component to set.
-         */
-        public void setGuiComponent(final GuiComponent guiComponent) {
-            this.guiComponent = guiComponent;
-        }
-        
-        /**
-         * Manage cleanup when a component is closed.
-         */
-        private class WindowFrameListener extends InternalFrameAdapter {
-            /** @see InternalFrameAdapter */
-            public void internalFrameClosing(final InternalFrameEvent e) {
-                if (workspaceComponent.hasChangedSinceLastSave()) {
-                    guiComponent.showHasChangedDialog();
-                }
-                
-                guiComponent.close();
-            }
-        }
-    }
-    
-    /**
-     * Add internal frame.
-     *
-     * @param internalFrame the frame to add.
-     */
-    public void addInternalFrame(final JInternalFrame internalFrame) {
-        desktop.add(internalFrame);
-    }
-
-    /**
-     * Add a new <c>SimbrainComponent</c>.
-     *
-     * @param desktopComponent
-     */
-    @SuppressWarnings("unchecked")
-    public void addComponent(final WorkspaceComponent workspaceComponent, GuiComponent guiComponent) {
-
-        LOGGER.trace("Adding workspace component: " + workspaceComponent);
-
-        final DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
-        
-        // When deserializing it is provided
-        if (guiComponent == null) {
-            guiComponent = createDesktopComponent(componentFrame, workspaceComponent);
-        }
-        componentFrame.setGuiComponent(guiComponent);
-        
-        /* HANDLE COMPONENT BOUNDS */
-        if (lastClickedPoint != null) {
-            componentFrame.setBounds((int) lastClickedPoint.getX(),
-                (int) lastClickedPoint.getY(),
-                (int) guiComponent.getPreferredSize().getWidth(),
-                (int) guiComponent.getPreferredSize().getHeight());
-            guiChanged = true;
-        } else if (components.size() == 0) {
-            componentFrame.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
-                (int) guiComponent.getPreferredSize().getWidth(),
-                (int) guiComponent.getPreferredSize().getHeight());
-            guiChanged = true;
-        } else {
-            GuiComponent<?> lastComponentAdded = null;
-            for (GuiComponent<?> next : components.values()) {
-                lastComponentAdded = next;
-            }
-            int lastX = lastComponentAdded.getParentFrame().getX();
-            int lastY = lastComponentAdded.getParentFrame().getY();
-            componentFrame.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
-                (int) guiComponent.getPreferredSize().getWidth(),
-                (int) guiComponent.getPreferredSize().getHeight());
-            guiChanged = true;
-        }
-        /* HANDLE COMPONENT NAMING */
-        /*
-         * Names take the form (ClassName - "Component") + index, where index
-         * iterates as new components are added. e.g. Network 1, Network 2, etc.
-         */
-        if (componentNameIndices.get(guiComponent.getClass()) == null) {
-            componentNameIndices.put(guiComponent.getClass(), 1);
-        } else {
-            int index = componentNameIndices.get(guiComponent.getClass());
-            componentNameIndices.put(guiComponent.getClass(), index + 1);
-        }
-        guiComponent.getParentFrame().setTitle("" + guiComponent.getSimpleName()
-            + componentNameIndices.get(guiComponent.getClass()));
-        guiComponent.getParentFrame().setTitle("" + guiComponent.getSimpleName() + " "
-            + componentNameIndices.get(guiComponent.getClass()));
-
-        /* FINISH ADDING COMPONENT */
-        guiComponent.addComponentListener(componentListener);
-        lastClickedPoint = null;
-        components.put(workspaceComponent, guiComponent);
-        componentFrame.setContentPane(guiComponent);
-        componentFrame.setVisible(true);
-        desktop.add(componentFrame);
-        guiComponent.postAddInit();
-   
-        // Forces last component of the desktop to the front
-        
-        try {
-            ((JInternalFrame)componentFrame).setSelected(true);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
-        }
-    }
     
     /**
      * Shows the dialog for opening a workspace file.
@@ -736,13 +742,14 @@ public class SimbrainDesktop {
         SFileChooser chooser = new SFileChooser(
             workspace.getCurrentDirectory(), "Zip Archive", "zip");
         
+        File theFile;
+
         if (workspace.getCurrentFile() != null) {
-            chooser.showSaveDialog(workspace.getCurrentFile());
+             theFile = chooser.showSaveDialog(workspace.getCurrentFile());
         } else {
-            chooser.showSaveDialog("workspace");
+             theFile = chooser.showSaveDialog("workspace");
         }
         
-        File theFile = chooser.showSaveDialog();
         if (theFile != null) {
             workspace.setCurrentFile(theFile);
             workspace.setCurrentDirectory(chooser.getCurrentLocation());
@@ -818,8 +825,6 @@ public class SimbrainDesktop {
         }
     }
 
-
-    
     /** Listener for mouse presses. */
     private final MouseListener mouseListener = new MouseAdapter() {
         /**
@@ -896,4 +901,5 @@ public class SimbrainDesktop {
             /* no implementation */
         }
     };
+    
 }

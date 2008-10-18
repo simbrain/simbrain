@@ -301,7 +301,7 @@ public class WorkspaceActionManager {
      * @param workspace reference
      * @return script action
      */
-    public List<Action> getScriptActions(final Workspace workspace) {
+    public List<Action> getScriptActions(final SimbrainDesktop desktop) {
         ArrayList<Action> list = new ArrayList<Action>();
         File dir = new File(SCRIPT_MENU_DIRECTORY);
         if (!dir.isDirectory()) {
@@ -310,7 +310,7 @@ public class WorkspaceActionManager {
         // TODO: look for other endings and invoke relevant script types
         for (File file : dir.listFiles()) {
             if (file.getName().endsWith(".bsh")) {
-                list.add(new ScriptAction(workspace, file.getName()));
+                list.add(new ScriptAction(desktop, file.getName()));
             }
         }
         return list;
@@ -323,17 +323,24 @@ public class WorkspaceActionManager {
      */
     public final class ScriptAction extends WorkspaceAction {
 
+        /** Name of script for use in actions (e.g. menu items). */
         private String scriptName;
 
+        /** Reference to workspace. */
         private Workspace workspace;
+
+        /** Reference to Simbrain Desktop. */
+        private SimbrainDesktop desktop;
+
         /**
          * Create a new add gauge action with the specified workspace.
          */
-        public ScriptAction(Workspace workspace, String scriptName) {
-            super(scriptName, workspace);
+        public ScriptAction(SimbrainDesktop desktop, String scriptName) {
+            super(scriptName, desktop.getWorkspace());
             // putValue(SHORT_DESCRIPTION, name);
             this.scriptName = scriptName;
-            this.workspace = workspace;
+            this.desktop = desktop;
+            this.workspace = desktop.getWorkspace();
         }
 
         /** @see AbstractAction */
@@ -343,6 +350,7 @@ public class WorkspaceActionManager {
             
             try {
                 interpreter.set("workspace", workspace);
+                interpreter.set("desktop", desktop);
                 interpreter.source(SCRIPT_MENU_DIRECTORY + System.getProperty("file.separator") + scriptName);
             } catch (FileNotFoundException e) {
                System.out.println("File not found");

@@ -244,7 +244,7 @@ public class WorkspaceActionManager {
         globalRunAction = new GlobalRunAction(workspace);
         globalStopAction = new GlobalStopAction(workspace);
 
-        runScriptAction = new RunScriptAction(workspace);
+        runScriptAction = new RunScriptAction(desktop);
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);

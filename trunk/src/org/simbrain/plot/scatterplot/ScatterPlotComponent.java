@@ -52,7 +52,7 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
     private XYSeriesCollection dataset;
     
     /** Default number of sources. */
-    private final int DEFAULT_NUMBER_OF_SOURCES = 5;
+    private static final int DEFAULT_NUMBER_OF_SOURCES = 5;
 
     /**
      * Create new PieChart Component.
@@ -91,12 +91,39 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
      * @param numDataSources number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
-        int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(this, "ScatterPlot Source " + (currentSize + i), i);
-            consumers.add(newAttribute);
-            dataset.addSeries(new XYSeries(i));
+            addDataSource();
         }
+    }
+
+    /**
+     * Adds a data source.
+     */
+    public void addDataSource() {
+        int currentSize = consumers.size();
+        ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(this, "ScatterPlot Source "
+                + (currentSize), currentSize);
+        consumers.add(newAttribute);
+        dataset.addSeries(new XYSeries(currentSize));
+    }
+
+    /**
+     * Removes a data source.
+     */
+    public void removeDataSource() {
+        int lastSeriesIndex = dataset.getSeriesCount() - 1;
+
+        if (lastSeriesIndex >= 0) {
+            dataset.removeSeries(lastSeriesIndex);
+            consumers.remove(lastSeriesIndex);
+        }
+    }
+
+    /**
+     * Clears the chart of plotted data.
+     */
+    public void clearChart() {
+        
     }
 
     /**

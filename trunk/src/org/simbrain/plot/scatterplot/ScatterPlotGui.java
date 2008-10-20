@@ -19,14 +19,18 @@
 package org.simbrain.plot.scatterplot;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -34,8 +38,10 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.barchart.BarChartDialog;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.gui.CouplingMenuItem;
@@ -47,13 +53,22 @@ import org.jfree.data.xy.XYSeries;
 /**
  * Display a Scatter Plot.
  */
-public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> {
+public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implements ActionListener {
 
     /** The underlying plot component. */
     private final ScatterPlotComponent component;
+
+    /** Chart un-initialized instance. */
+    private JFreeChart chart;
+
+    /** XY chart renderer. */
+    private XYDotRenderer renderer;
     
     /**
      * Construct the ScatterPlot.
+     *
+     * @param frame Generic frame for gui use
+     * @param component Scatter plot component
      */
     public ScatterPlotGui(final GenericFrame frame, final ScatterPlotComponent component) {
         super(frame, component);
@@ -69,17 +84,52 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> {
         setLayout(new BorderLayout());
         
         // Generate the graph
-        JFreeChart chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
+        chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
                 "X", "Y", component.getDataset(), PlotOrientation.VERTICAL, true, false, false);
+
+        renderer = new XYDotRenderer();
+        chart.getXYPlot().setRenderer(renderer);
+        
 
         // Use below to make this stuff settable
         chart.getXYPlot().getDomainAxis().setRange(0, 100);
         chart.getXYPlot().getRangeAxis().setRange(0, 100);
         chart.getXYPlot().getDomainAxis().setAutoRange(false);
         chart.getXYPlot().getRangeAxis().setAutoRange(false);
+
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setActionCommand("Delete");
+        deleteButton.addActionListener(this);
+        JButton addButton = new JButton("Add");
+        addButton.setActionCommand("Add");
+        addButton.addActionListener(this);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
         
         ChartPanel panel = new ChartPanel(chart);
+        
+        add("North", createMenuBar());
         add("Center", panel);
+        add("South", buttonPanel);
+    }
+
+    /**
+     * Creates the menu bar.
+     * @return menu bar
+     */
+    private JMenuBar createMenuBar() {
+        JMenuBar bar = new JMenuBar();
+        JMenu editMenu = new JMenu("Edit");
+        JMenuItem preferences = new JMenuItem("Preferences...");
+        preferences.addActionListener(this);
+        preferences.setActionCommand("dialog");
+        
+        editMenu.add(preferences);
+        bar.add(editMenu);
+        return bar;
     }
 
     @Override
@@ -88,6 +138,20 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> {
 
     @Override
     public void update() {
+    }
+
+    /** @see ActionListener */
+    public void actionPerformed(ActionEvent arg0) {
+        if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
+            ScatterPlotDialog dialog = new ScatterPlotDialog(chart, renderer);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+        } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
+            component.removeDataSource();
+        } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
+            component.addDataSource();
+        }
     }
    
 }

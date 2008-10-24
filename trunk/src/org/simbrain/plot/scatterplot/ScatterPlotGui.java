@@ -19,36 +19,23 @@
 package org.simbrain.plot.scatterplot;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.barchart.BarChartDialog;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.CouplingMenus;
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
-import org.jfree.data.xy.XYSeries;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Display a Scatter Plot.

@@ -20,21 +20,34 @@ package org.simbrain.plot.timeseries;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Display a TimeSeriesPlot.
  */
-public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
+public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> implements ActionListener {
 
     /** The underlying plot component. */
     private final TimeSeriesPlotComponent component;
+
+    /** Chart un-initialized instance. */
+    private JFreeChart chart;
 
     /**
      * Construct a time series plot gui.
@@ -56,7 +69,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
         setLayout(new BorderLayout());
         
         // Generate the graph
-        JFreeChart chart = ChartFactory.createXYLineChart(
+        chart = ChartFactory.createXYLineChart(
             "Time series", // Title
             "Iterations", // x-axis Label
             "Value(s)", // y-axis Label
@@ -66,9 +79,42 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
             true, // Use tooltips
             false // Configure chart to generate URLs?
         );
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setActionCommand("Delete");
+        deleteButton.addActionListener(this);
+        JButton addButton = new JButton("Add");
+        addButton.setActionCommand("Add");
+        addButton.addActionListener(this);
+        JButton clearButton = new JButton("Clear");
+        clearButton.setActionCommand("ClearData");
+        clearButton.addActionListener(this);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
+        buttonPanel.add(clearButton);
         
         ChartPanel panel = new ChartPanel(chart);
+        
+        add("North", createMenuBar());
         add("Center", panel);
+        add("South", buttonPanel);
+    }
+
+    /**
+     * Creates the menu bar.
+     * @return menu bar
+     */
+    private JMenuBar createMenuBar() {
+        JMenuBar bar = new JMenuBar();
+        JMenu editMenu = new JMenu("Edit");
+        JMenuItem preferences = new JMenuItem("Preferences...");
+        preferences.addActionListener(this);
+        preferences.setActionCommand("dialog");
+        editMenu.add(preferences);
+        bar.add(editMenu);
+        return bar;
     }
 
     @Override
@@ -77,6 +123,22 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> {
 
     @Override
     public void update() {
+    }
+
+    /** @see ActionListener */
+    public void actionPerformed(ActionEvent arg0) {
+        if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
+            TimeSeriesPlotDialog dialog = new TimeSeriesPlotDialog(chart);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+        } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
+            component.removeDataSource();
+        } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
+            component.addDataSource();
+        } else if (arg0.getActionCommand().equalsIgnoreCase("ClearData")) {
+            component.clearData();
+        }
     }
    
 }

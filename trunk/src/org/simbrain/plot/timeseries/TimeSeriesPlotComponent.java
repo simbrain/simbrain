@@ -26,7 +26,6 @@ import java.util.Iterator;
 
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.scatterplot.ScatterPlotConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -82,14 +81,44 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      * @param numDataSources number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
-        int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(this, "" + (currentSize + i), i);
-            consumers.add(newAttribute);
-            dataset.addSeries(new XYSeries(i));
+            addDataSource();
         }
     }
-    
+
+    /**
+     * Clears the plot.
+     */
+    public void clearData() {
+        int seriesCount = dataset.getSeriesCount();
+        for (int i = 0; seriesCount > i; ++i) {
+            dataset.getSeries(i).clear();
+        }
+    }
+
+    /**
+     * Removes a data source from the chart.
+     */
+    public void removeDataSource() {
+        int lastSeriesIndex = dataset.getSeriesCount() - 1;
+
+        if (lastSeriesIndex >= 0) {
+            dataset.removeSeries(lastSeriesIndex);
+            consumers.remove(lastSeriesIndex);
+        }
+    }
+
+    /**
+     * Adds a data source to the chart.
+     */
+    public void addDataSource() {
+        int currentSize = consumers.size();
+        TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(this, ""
+                + (currentSize), currentSize);
+        consumers.add(newAttribute);
+        dataset.addSeries(new XYSeries(currentSize));
+    }
+
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object

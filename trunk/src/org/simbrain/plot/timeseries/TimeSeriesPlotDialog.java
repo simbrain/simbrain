@@ -154,6 +154,8 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
         if (fixedRangeBox.isSelected()) {
             chart.getXYPlot().getDomainAxis().setFixedAutoRange(
                     Double.parseDouble(fixedRangeField.getText()));
+        } else {
+            chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
         }
     }
 

@@ -282,24 +282,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
         }
         return list;
     }
-    
-    /**
-     * Save a workspace component to a file. Currently assumes xml.
-     *
-     * @param saveFile the file to save.
-     */
-    public void save(final File saveFile) {
-        setCurrentFile(saveFile);
-        String xml = getXML();
-        try {
-            FileWriter writer  = new FileWriter(saveFile);
-            writer.write(xml);
-            writer.close();
-            setChangedSinceLastSave(false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
         
     /**
      * Open a workspace component from a file.  Currently assumes xml.

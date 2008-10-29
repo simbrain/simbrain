@@ -101,7 +101,7 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
      */
     public void addDataSource() {
         int currentSize = consumers.size();
-        ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(this, "ScatterPlot Source "
+        ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(this, "ScatterPlot"
                 + (currentSize), currentSize);
         consumers.add(newAttribute);
         dataset.addSeries(new XYSeries(currentSize));

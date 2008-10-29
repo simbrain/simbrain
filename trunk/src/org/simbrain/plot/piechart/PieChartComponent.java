@@ -90,7 +90,7 @@ public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentList
     public void addDataSources(final int numDataSources) {
         int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            PieDataConsumer newAttribute = new PieDataConsumer(this, "" + (currentSize + i), i);
+            PieDataConsumer newAttribute = new PieDataConsumer(this, "PieData" + (currentSize + i), i);
             consumers.add(newAttribute);
         }
     }

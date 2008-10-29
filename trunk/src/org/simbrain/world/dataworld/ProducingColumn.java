@@ -37,7 +37,7 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
      * @return The name of the attribute.
      */
     public String getAttributeDescription() {
-        return "Column " + (columnNumber + 1);
+        return "Column" + (columnNumber + 1);
     }
 
     /**
@@ -51,7 +51,7 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "Column " + (columnNumber + 1);
+        return "Column" + (columnNumber + 1);
     }
 
     /**

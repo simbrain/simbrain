@@ -15,9 +15,14 @@ public interface AttributeHolder {
     WorkspaceComponent<?> getParentComponent();
     
     /**
-     * Returns the description for this object.
+     * Returns a description for this attribute holder.
+     * This is used for serialization and in interface 
+     * elements which display attributes.
      * 
-     * @return The description for this object.
+     * NOTE: This description must be unique relative to
+     * other AttributeHolders in a Component.
+     * 
+     * @return The description for this attribute holder.
      */
     String getDescription();
 }

@@ -95,7 +95,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         dataset = new XYSeriesCollection();
         dataset.addSeries(new XYSeries("Data"));
         for (int i = 0; i < numSources; i++) {
-            ProjectionConsumer newAttribute = new ProjectionConsumer(this, "HDV Source " + i, i);
+            ProjectionConsumer newAttribute = new ProjectionConsumer(this, "Dimension" + i, i);
             consumers.add(newAttribute);
         }
         gauge.init(numSources);

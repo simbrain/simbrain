@@ -48,10 +48,10 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     private XYSeriesCollection dataset = new XYSeriesCollection();
 
     /** Maximum iteration size if this chart is fixed width. */
-    private final int MAX_SIZE = 100;
+    private int maxSize = 100;
 
     /** Whether this chart if fixed width or not. */
-    private final boolean FIXED_WIDTH = true;
+    private boolean fixedWidth = true;
 
     /**
      * Create new time series plot component.
@@ -163,18 +163,21 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     public void update() {
 
         // Trim appropriately if fixed width
-        if(FIXED_WIDTH == true) {
-            for (Iterator iterator = dataset.getSeries().iterator(); iterator.hasNext();) {
+        if (fixedWidth) {
+//            System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
+            for (Iterator iterator = dataset.getSeries().iterator(); iterator.hasNext(); ) {
                 XYSeries series = (XYSeries) iterator.next();
-                if (series.getItemCount() > MAX_SIZE) {
+                if (series.getItemCount() > maxSize) {
                     series.remove(0);
                 }
-            }            
+            }
         }
+
 
         // Add the data
         for (TimeSeriesConsumer consumer : getConsumers()) {
-            dataset.getSeries(consumer.getIndex()).add(getWorkspace().getTime(), consumer.getValue());
+            dataset.getSeries(consumer.getIndex()).add(
+                    getWorkspace().getTime(), consumer.getValue());
         }
     }
 
@@ -183,5 +186,33 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      */
     public XYSeriesCollection getDataset() {
         return dataset;
+    }
+
+    /**
+     * @return the maxSize
+     */
+    public int getMaxSize() {
+        return maxSize;
+    }
+
+    /**
+     * @param maxSize the maxSize to set
+     */
+    public void setMaxSize(final int maxSize) {
+        this.maxSize = maxSize;
+    }
+
+    /**
+     * @return the fixedWidth
+     */
+    public boolean isFixedWidth() {
+        return fixedWidth;
+    }
+
+    /**
+     * @param fixedWidth the fixedWidth to set
+     */
+    public void setFixedWidth(final boolean fixedWidth) {
+        this.fixedWidth = fixedWidth;
     }
 }

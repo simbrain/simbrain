@@ -20,6 +20,10 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
     /** Reference to chart component. */
     private JFreeChart chart;
 
+
+    /** Reference to the plot component. */
+    private TimeSeriesPlotComponent component;
+    
 //    /** Reference to the dot renderer. */
 //    private XYDotRenderer renderer;
 
@@ -52,9 +56,11 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
      * Dialog for displaying chart options.
      *
      * @param chart Reference to the chart component to be changed
+     * @param component Reference to the component
      */
-    public TimeSeriesPlotDialog(final JFreeChart chart) {
+    public TimeSeriesPlotDialog(final JFreeChart chart, final TimeSeriesPlotComponent component) {
         this.chart = chart;
+        this.component = component;
 //        this.renderer = renderer;
         LabelledItemPanel dialogPanel = new LabelledItemPanel();
 
@@ -157,6 +163,8 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
         } else {
             chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
         }
+        component.setFixedWidth(fixedRangeBox.isSelected());
+        component.setMaxSize(Integer.parseInt(fixedRangeField.getText()));
     }
 
     /** @see ActionListener */
@@ -169,6 +177,7 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
             minDomainField.setEnabled(!autoDomainBox.isSelected());
         } else if (arg0.getActionCommand().equalsIgnoreCase("FixedRange")) {
             fixedRangeField.setEnabled(fixedRangeBox.isSelected());
+            fixedRangeField.setText(Integer.toString(component.getMaxSize()));
             if (fixedRangeBox.isSelected()) {
                 autoDomainBox.setSelected(fixedRangeBox.isSelected());
             } else {

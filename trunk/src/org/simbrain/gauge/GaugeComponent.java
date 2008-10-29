@@ -176,12 +176,6 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
     }
 
     @Override
-    public void save(File openFile) {
-        gauge.getCurrentProjector().preSaveInit();
-        super.save(openFile);
-    }
-    
-    @Override
     public String getXML() {
         return getXStream().toXML(gauge.getCurrentProjector());
     }

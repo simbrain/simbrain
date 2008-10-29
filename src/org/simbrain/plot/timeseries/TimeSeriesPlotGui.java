@@ -100,6 +100,9 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
         add("North", createMenuBar());
         add("Center", panel);
         add("South", buttonPanel);
+
+        // Sets the initial fixed width for the chart.
+        chart.getXYPlot().getDomainAxis().setFixedAutoRange(component.getMaxSize());
     }
 
     /**
@@ -128,7 +131,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
     /** @see ActionListener */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            TimeSeriesPlotDialog dialog = new TimeSeriesPlotDialog(chart);
+            TimeSeriesPlotDialog dialog = new TimeSeriesPlotDialog(chart, component);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);

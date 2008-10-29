@@ -100,7 +100,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public void addColumn() {
         int columnIndex = consumers.size() + 1;
-        BarChartConsumer newAttribute = new BarChartConsumer(this, ""
+        BarChartConsumer newAttribute = new BarChartConsumer(this, "BarChartData"
                 + (columnIndex), columnIndex);
         consumers.add(newAttribute);
     }

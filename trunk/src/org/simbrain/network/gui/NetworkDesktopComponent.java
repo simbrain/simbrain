@@ -96,7 +96,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         if (networkPanel.getRootNetwork() != this.getWorkspaceComponent().getRootNetwork()) {
             networkPanel.setRootNetwork(this.getWorkspaceComponent().getRootNetwork().getRootNetwork());            
         }
-        networkPanel.getRootNetwork().addListener(networkPanel);
+        networkPanel.getRootNetwork().getParent().addListener(networkPanel);
         networkPanel.syncToModel();
         networkPanel.repaint();
         networkPanel.clearSelection();

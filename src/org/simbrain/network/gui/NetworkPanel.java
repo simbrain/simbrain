@@ -23,11 +23,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -97,12 +92,10 @@ import org.simbrain.network.networks.actorcritic.ActorCritic;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.NeuronComparator;
 import org.simbrain.util.JMultiLineToolTip;
+import org.simbrain.util.NeuronComparator;
 import org.simbrain.util.ToggleButton;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 
 import edu.umd.cs.piccolo.PCamera;
@@ -303,7 +296,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         addInputEventListener(textHandle);
         addInputEventListener(new ContextMenuEventHandler());
 
-        rootNetwork.addNetworkListener(this);
+        rootNetwork.getParent().addListener(this);
 
         selectionModel.addSelectionListener(new NetworkSelectionListener()
             {
@@ -2145,7 +2138,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Close model rootNetwork.
      */
     public void closeNetwork() {
-        getRootNetwork().removeNetworkListener(this);
+        getRootNetwork().getParent().removeListener(this);
         getRootNetwork().close();
     }
 
@@ -2421,4 +2414,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 	public ViewGroupNode getViewGroupNode() {
 		return vgn;
 	}
+
+
+    public void componentUpdated()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    public void setTitle(String name)
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }

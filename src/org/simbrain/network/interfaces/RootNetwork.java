@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -64,9 +63,6 @@ public class RootNetwork extends Network {
 
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
-
-    /** List of observers. */
-    private HashSet<NetworkListener> listenerList = new HashSet<NetworkListener>();
 
     /** The thread that runs the network. */
     private NetworkThread networkThread;
@@ -204,7 +200,7 @@ public class RootNetwork extends Network {
      */
     private Object readResolve() {
         logger = Logger.getLogger(RootNetwork.class);
-        listenerList = new HashSet<NetworkListener>();
+//        listenerList = new HashSet<NetworkListener>();
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
         networkIdGenerator = new SimpleId("Network", 1);
@@ -212,11 +208,6 @@ public class RootNetwork extends Network {
         synapseIdGenerator = new SimpleId("Synapse", 1);
         return this;
     }
-    
-    public void addListener(final NetworkListener listener) {
-        listenerList.add(listener);
-    }
-    
 
     /**
      * Externally called update function which coordinates input and output neurons and
@@ -537,8 +528,8 @@ public class RootNetwork extends Network {
      * @param deleted neuron which has been deleted
      */
     public void fireNeuronDeleted(final Neuron deleted) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.neuronRemoved(new NetworkEvent(this, deleted));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.neuronRemoved(new NetworkEvent<Neuron>(this, deleted));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -549,7 +540,7 @@ public class RootNetwork extends Network {
      * Fire a network changed event to all registered model listeners.
      */
     public void fireNetworkChanged() {
-        for (NetworkListener listener : getListenerList()) {
+        for (NetworkListener listener : component.getListeners()) {
             listener.networkChanged();
         }
         if (getParent() != null) {
@@ -562,8 +553,8 @@ public class RootNetwork extends Network {
      * @param moved Neuron that has been moved
      */
     public void fireNeuronMoved(final Neuron moved) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.neuronMoved(new NetworkEvent(this, moved));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.neuronMoved(new NetworkEvent<Neuron>(this, moved));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -574,7 +565,7 @@ public class RootNetwork extends Network {
      * Fire a clamp changed event to all registered model listeners.
      */
     public void fireClampChanged() {
-        for (NetworkListener listener : getListenerList()) {
+        for (NetworkListener listener : component.getListeners()) {
             listener.clampMenuChanged();
             listener.clampBarChanged();
         }
@@ -590,8 +581,8 @@ public class RootNetwork extends Network {
      * @param added neuron which was added
      */
     public void fireNeuronAdded(final Neuron added) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.neuronAdded(new NetworkEvent(this, added));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.neuronAdded(new NetworkEvent<Neuron>(this, added));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);            
@@ -605,8 +596,8 @@ public class RootNetwork extends Network {
      * @param changed the new, changed neuron
      */
     public void fireNeuronChanged(final Neuron old, final Neuron changed) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.neuronChanged(new NetworkEvent(this, old, changed));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.neuronChanged(new NetworkEvent<Neuron>(this, old, changed));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -619,8 +610,8 @@ public class RootNetwork extends Network {
      * @param added synapse which was added
      */
     public void fireSynapseAdded(final Synapse added) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.synapseAdded(new NetworkEvent(this, added));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.synapseAdded(new NetworkEvent<Synapse>(this, added));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -633,8 +624,8 @@ public class RootNetwork extends Network {
      * @param deleted synapse which was deleted
      */
     public void fireSynapseDeleted(final Synapse deleted) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.synapseRemoved(new NetworkEvent(this, deleted));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.synapseRemoved(new NetworkEvent<Synapse>(this, deleted));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -648,8 +639,8 @@ public class RootNetwork extends Network {
      * @param changed new, changed synapse
      */
     public void fireSynapseChanged(final Synapse old, final Synapse changed) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.synapseChanged(new NetworkEvent(this, old, changed));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.synapseChanged(new NetworkEvent<Synapse>(this, old, changed));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -713,9 +704,9 @@ public class RootNetwork extends Network {
      *
      * @return the top level listener list
      */
-    public HashSet<NetworkListener> getListenerList() {
-        return listenerList;
-    }
+//    public HashSet<NetworkListener> getListenerList() {
+//        return listenerList;
+//    }
 
     /**
      * Fire a subnetwork added event to all registered model listeners.
@@ -723,8 +714,8 @@ public class RootNetwork extends Network {
      * @param added synapse which was added
      */
     public void fireSubnetAdded(final RootNetwork added) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.subnetAdded(new NetworkEvent(this, added));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.subnetAdded(new NetworkEvent<Network>(this, added));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -737,8 +728,8 @@ public class RootNetwork extends Network {
      * @param deleted synapse which was deleted
      */
     public void fireSubnetDeleted(final Network deleted) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.subnetRemoved(new NetworkEvent(this, deleted));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.subnetRemoved(new NetworkEvent<Network>(this, deleted));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
@@ -751,7 +742,7 @@ public class RootNetwork extends Network {
      * @param added synapse which was added
      */
     public void fireSubnetAdded(final Network added) {
-        for (NetworkListener listener : getListenerList()) {
+        for (NetworkListener listener : component.getListeners()) {
             listener.subnetAdded(new NetworkEvent<Network>(this, added));
         }
         if (getParent() != null) {
@@ -765,7 +756,7 @@ public class RootNetwork extends Network {
      * @param added Group that has been added
      */
     public void fireGroupAdded(final Group added) {
-        for (NetworkListener listener : getListenerList()) {
+        for (NetworkListener listener : component.getListeners()) {
             listener.groupAdded(new NetworkEvent<Group>(this, added));
         }
         if (getParent() != null) {
@@ -780,7 +771,7 @@ public class RootNetwork extends Network {
      * @param changed New changed group
      */
     public void fireGroupChanged(final Group old, final Group changed) {
-        for (NetworkListener listener : getListenerList()) {
+        for (NetworkListener listener : component.getListeners()) {
             listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
         }
         if (getParent() != null) {
@@ -794,31 +785,14 @@ public class RootNetwork extends Network {
      * @param deleted Group to be deleted
      */
     public void fireGroupDeleted(final Group deleted) {
-        for (NetworkListener listener : getListenerList()) {
-            listener.groupRemoved(new NetworkEvent(this, deleted));
+        for (NetworkListener listener : component.getListeners()) {
+            listener.groupRemoved(new NetworkEvent<Group>(this, deleted));
         }
         if (getParent() != null) {
             getParent().setChangedSinceLastSave(true);
         }
     }
-    /**
-     * Add the specified network listener.
-     *
-     * @param l listener to add
-     */
-    public void addNetworkListener(final NetworkListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * Remove the specified network listener.
-     *
-     * @param l listener to remove
-     */
-    public void removeNetworkListener(final NetworkListener l) {
-        getListenerList().remove(l);
-    }
-
+    
     /**
      * @return Clamped weights.
      */

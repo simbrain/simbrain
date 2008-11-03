@@ -21,6 +21,8 @@ package org.simbrain.network.neurons;
 import java.util.ArrayList;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
+import org.simbrain.network.interfaces.Group;
+import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.NetworkEvent;
 import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.Neuron;
@@ -103,7 +105,7 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
      */
     public void postUnmarshallingInit() {
         super.postUnmarshallingInit();
-        this.getParentNetwork().getRootNetwork().addNetworkListener(this);
+        this.getParentNetwork().getRootNetwork().getParent().addListener(this);
         this.setInputLists();
     }
 
@@ -494,24 +496,6 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     /**
      * @inheritDoc org.simnet.interfaces.NetworkListener
      */
-    public void neuronChanged(NetworkEvent e) {
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void neuronAdded(final NetworkEvent e) {
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void neuronRemoved(final NetworkEvent e) {
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
     public void synapseRemoved(final NetworkEvent<Synapse> e) {
         if (this.isConnected(e.getObject())) {
             this.setInputLists();
@@ -545,12 +529,6 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     /**
      * @inheritDoc org.simnet.interfaces.NetworkListener
      */
-    public void subnetRemoved(NetworkEvent e) {
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
     public void clampMenuChanged() {
     }
 
@@ -560,22 +538,60 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     public void clampBarChanged() {
     }
 
-    public void neuronMoved(NetworkEvent e) {
+    public void componentUpdated()
+    {
+        // TODO Auto-generated method stub
+    }
+
+    public void setTitle(String name)
+    {
+        // TODO Auto-generated method stub
+    }
+
+    public void groupAdded(NetworkEvent<Group> event)
+    {
         // TODO Auto-generated method stub
         
     }
 
-    public void groupAdded(NetworkEvent event) {
-	// TODO Auto-generated method stub
-	
-    }
-
-    public void groupChanged(NetworkEvent event) {
+    public void groupChanged(NetworkEvent<Group> event)
+    {
         // TODO Auto-generated method stub
         
     }
 
-    public void groupRemoved(NetworkEvent event) {
+    public void groupRemoved(NetworkEvent<Group> event)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void neuronAdded(NetworkEvent<Neuron> e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void neuronChanged(NetworkEvent<Neuron> e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void neuronMoved(NetworkEvent<Neuron> e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void neuronRemoved(NetworkEvent<Neuron> e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void subnetRemoved(NetworkEvent<Network> e)
+    {
         // TODO Auto-generated method stub
         
     }

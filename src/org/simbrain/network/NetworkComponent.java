@@ -24,18 +24,16 @@ import java.io.OutputStream;
 import java.util.Collection;
 
 import org.simbrain.network.gui.NetworkPreferences;
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Network frame.
  */
-public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public final class NetworkComponent extends WorkspaceComponent<NetworkListener> {
 
     private RootNetwork rootNetwork = new RootNetwork(this);
     
@@ -111,5 +109,14 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     @Override
     public String getCurrentDirectory() {
        return NetworkPreferences.getCurrentDirectory();
+    }
+    
+    /**
+     * Returns the listeners on this component.
+     * 
+     * @return The listeners on this component.
+     */
+    public Collection<? extends NetworkListener> getListeners() {
+        return super.getListeners();
     }
 }

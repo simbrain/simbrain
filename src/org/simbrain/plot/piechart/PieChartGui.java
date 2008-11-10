@@ -24,9 +24,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -47,7 +49,7 @@ import org.jfree.data.xy.XYSeries;
 /**
  * Display a PieChart.
  */
-public class PieChartGui extends GuiComponent<PieChartComponent> {
+public class PieChartGui extends GuiComponent<PieChartComponent> implements ActionListener {
 
     /** The underlying plot component. */
     private final PieChartComponent component;
@@ -77,8 +79,37 @@ public class PieChartGui extends GuiComponent<PieChartComponent> {
             false
         );
         
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setActionCommand("Delete");
+        deleteButton.addActionListener(this);
+        JButton addButton = new JButton("Add");
+        addButton.setActionCommand("Add");
+        addButton.addActionListener(this);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
+        
         ChartPanel panel = new ChartPanel(chart);
+
+        createAttachMenuBar();
+
         add("Center", panel);
+        add("South", buttonPanel);
+    }
+
+    /**
+     * Creates the menu bar.
+     */
+    private void createAttachMenuBar() {
+        JMenuBar bar = new JMenuBar();
+        JMenu editMenu = new JMenu("Edit");
+        JMenuItem preferences = new JMenuItem("Preferences...");
+        preferences.addActionListener(this);
+        preferences.setActionCommand("dialog");
+        editMenu.add(preferences);
+        bar.add(editMenu);
+        getParentFrame().setJMenuBar(bar);
     }
 
     @Override
@@ -88,6 +119,15 @@ public class PieChartGui extends GuiComponent<PieChartComponent> {
 
     @Override
     public void update() {
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equalsIgnoreCase("Add")) {
+            component.addDataSource();
+        } else if (e.getActionCommand().equalsIgnoreCase("Delete")) {
+            component.removeDataSource();
+        }
+        
     }
    
 }

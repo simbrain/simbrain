@@ -24,10 +24,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
@@ -81,7 +85,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
     private JComboBox projectionList = new JComboBox(Gauge.getProjectorList());
 
     /** Bottom panel. */
-    private JPanel bottomPanel = new JPanel();
+    private Box bottomPanel = Box.createVerticalBox();
 
     /** Toolbar for bottom panel. */
     private JToolBar theToolBar = new JToolBar();
@@ -161,18 +165,52 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         theToolBar.add(iterateBtn);
         theToolBar.add(clearBtn);
         theToolBar.add(randomBtn);
+
+        // Add/Delete Buttons
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setActionCommand("Delete");
+        deleteButton.addActionListener(this);
+        JButton addButton = new JButton("Add");
+        addButton.setActionCommand("Add");
+        addButton.addActionListener(this);
+        // Button Panel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(addButton);
+
+        // Setup Menu Bar
+        getParentFrame().setJMenuBar(createMenuBar());
         
         // Status Bar
         statusBar.add(pointsLabel);
         statusBar.add(dimsLabel);
         errorBar.add(errorLabel);
-        
-        add("North", theToolBar);
-        add("Center", panel);
+
+        bottomPanel.add("North", buttonPanel);
         JPanel southPanel = new JPanel();
         southPanel.add(errorBar);
         southPanel.add(statusBar);
-        add("South", southPanel);
+        bottomPanel.add("South", southPanel);
+        
+        // Put all panels together
+        add("North", theToolBar);
+        add("Center", panel);
+        add("South", bottomPanel);
+    }
+
+    /**
+     * Creates the menu bar.
+     * @return menu bar
+     */
+    private JMenuBar createMenuBar() {
+        JMenuBar bar = new JMenuBar();
+        JMenu editMenu = new JMenu("Edit");
+        JMenuItem preferences = new JMenuItem("Preferences...");
+        preferences.addActionListener(this);
+        preferences.setActionCommand("dialog");
+        editMenu.add(preferences);
+        bar.add(editMenu);
+        return bar;
     }
 
     @Override
@@ -262,6 +300,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
                component.getGauge().getDownstairs().randomize(100);
                component.resetChartDataset();
             }
+        }
+
+        if (e.getActionCommand().equalsIgnoreCase("Add")) {
+            component.addSource();
+        }
+        if (e.getActionCommand().equalsIgnoreCase("Delete")) {
+            component.removeSource();
         }
                
    }

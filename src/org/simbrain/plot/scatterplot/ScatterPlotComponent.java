@@ -123,7 +123,10 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
      * Clears the chart of plotted data.
      */
     public void clearChart() {
-        
+        int seriesCount = dataset.getSeriesCount();
+        for (int i = 0; seriesCount > i; ++i) {
+            dataset.getSeries(i).clear();
+        }
     }
 
     /**

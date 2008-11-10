@@ -96,8 +96,9 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
         buttonPanel.add(clearButton);
         
         ChartPanel panel = new ChartPanel(chart);
-        
-        add("North", createMenuBar());
+
+        createAttachMenuBar();
+
         add("Center", panel);
         add("South", buttonPanel);
 
@@ -107,9 +108,8 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
 
     /**
      * Creates the menu bar.
-     * @return menu bar
      */
-    private JMenuBar createMenuBar() {
+    private void createAttachMenuBar() {
         JMenuBar bar = new JMenuBar();
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");
@@ -117,7 +117,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
         preferences.setActionCommand("dialog");
         editMenu.add(preferences);
         bar.add(editMenu);
-        return bar;
+        getParentFrame().setJMenuBar(bar);
     }
 
     @Override

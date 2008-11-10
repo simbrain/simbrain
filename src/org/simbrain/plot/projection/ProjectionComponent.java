@@ -95,10 +95,33 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         dataset = new XYSeriesCollection();
         dataset.addSeries(new XYSeries("Data"));
         for (int i = 0; i < numSources; i++) {
-            ProjectionConsumer newAttribute = new ProjectionConsumer(this, "Dimension" + i, i);
-            consumers.add(newAttribute);
+            addSource();
         }
         gauge.init(numSources);
+    }
+
+    /**
+     * Adds a source to dataset.
+     */
+    public void addSource() {
+        int currentSize = consumers.size() + 1;
+        ProjectionConsumer newAttribute = new ProjectionConsumer(this,
+                "Dimension" + currentSize, currentSize);
+        consumers.add(newAttribute);
+        gauge.init(currentSize);
+    }
+
+    /**
+     * Removes a source from the dataset.
+     */
+    public void removeSource() {
+        int currentSize = consumers.size() - 1;
+
+        if (currentSize > 0) {
+//            dataset.removeSeries(lastSeriesIndex);
+            consumers.remove(currentSize);
+            gauge.init(currentSize);
+        }
     }
  
     /**

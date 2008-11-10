@@ -17,7 +17,7 @@ import org.simbrain.workspace.*;
 	double EXCITATORY_RADIUS = 200;
 
         // Build Network
-        NetworkComponent networkComponent = new NetworkComponent("Sparse Network");
+        NetworkComponent networkComponent = new NetworkComponent("SparseNetwork");
         workspace.addWorkspaceComponent(networkComponent);
         RootNetwork network = networkComponent.getRootNetwork();
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));

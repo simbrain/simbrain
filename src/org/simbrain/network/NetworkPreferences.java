@@ -75,6 +75,9 @@ public final class NetworkPreferences {
     /** Default sparse inhibitory probility. */
     private static final double DEFAULT_INHIBITORY_PROBABILITY = .5;
 
+    /** Default allow self connection. */
+    private static final boolean ALLOW_SELF_CONNECTION = false;
+
 
     /**
      * Private default constructor.
@@ -477,5 +480,24 @@ public final class NetworkPreferences {
      */
     public static void setInhibitoryProbability(final double value) {
         PREFERENCES.putDouble("inhibitoryProbability", value);
+    }
+
+    /**
+     * Returns the allow self connections.
+     * Defaults to <code>&quot;false&quot;</code>.
+     *
+     * @return the allow self connections.
+     */
+    public static boolean getAllowSelfConnections() {
+        return PREFERENCES.getBoolean("allowSelfConnections", ALLOW_SELF_CONNECTION);
+    }
+
+    /**
+     * Sets the allow self connection value.
+     *
+     * @param value self connection value
+     */
+    public static void setAllowSelfConnection(final boolean value) {
+        PREFERENCES.putBoolean("allowSelfConnections", value);
     }
 }

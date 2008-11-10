@@ -88,11 +88,38 @@ public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentList
      * @param numDataSources number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
-        int currentSize = consumers.size() + 1;
         for (int i = 0; i < numDataSources; i++) {
-            PieDataConsumer newAttribute = new PieDataConsumer(this, "PieData" + (currentSize + i), i);
-            consumers.add(newAttribute);
+            addDataSource();
         }
+    }
+
+    /**
+     * Adds a data source to the plot.
+     */
+    public void addDataSource() {
+        int currentSize = consumers.size() + 1;
+        PieDataConsumer newAttribute = new PieDataConsumer(this, "PieData" + (currentSize), currentSize);
+        consumers.add(newAttribute);
+//        dataset.setValue(dataset.getKey(currentSize), -1);
+    }
+
+    /**
+     * Removes a data source from the plot.
+     */
+    public void removeDataSource() {
+        int lastSeriesIndex = consumers.size() - 1;
+
+        if (lastSeriesIndex >= 0) {
+            consumers.remove(lastSeriesIndex);
+        }
+        clearChart();
+    }
+
+    /**
+     * Clears data from the chart.
+     */
+    public void clearChart() {
+        dataset.clear();
     }
     
     /**

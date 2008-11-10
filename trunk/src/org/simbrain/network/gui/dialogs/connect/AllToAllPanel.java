@@ -18,34 +18,44 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import javax.swing.JCheckBox;
+
+import org.simbrain.network.NetworkPreferences;
+
 
 /**
  * <b>AllToAllPanel</b> creates a dialog for setting preferences of all to all neuron connections.
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 
+    private JCheckBox allowSelfConnect = new JCheckBox();
+
     /**
      * This method is the default constructor.
      */
     public AllToAllPanel() {
+        this.addItem("Allow Self Connection", allowSelfConnect);
     }
 
     /**
      * Populate fields with current data.
      */
     public void commitChanges() {
+        NetworkPreferences.setAllowSelfConnection(allowSelfConnect.isSelected());
     }
 
     /**
      * Populates fields with default data.
      */
     public void fillDefaultValues() {
+        allowSelfConnect.setSelected(NetworkPreferences.getAllowSelfConnections());
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void fillFieldValues() {
+        allowSelfConnect.setSelected(NetworkPreferences.getAllowSelfConnections());
     }
 
 }

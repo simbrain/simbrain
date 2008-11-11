@@ -34,9 +34,9 @@ public interface Filter {
     double filter(BufferedImage image);
     
     /**
-     * Text description of filter.
+     * Return the description of this filter.
      *
-     * @return text description
+     * @return the description of this filter
      */
     String getDescription();
 }

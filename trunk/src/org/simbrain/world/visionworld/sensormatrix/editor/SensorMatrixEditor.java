@@ -34,7 +34,7 @@ public interface SensorMatrixEditor {
      *
      * @return the editor component for this sensor matrix editor
      */
-    Component getEditorComponent(int defaultRows, int defaultColumns, int defaultHeight, int defaultWidth);
+    Component getEditorComponent();
     
     /**
      * Create a new instance of SensorMatrix from the properties of this

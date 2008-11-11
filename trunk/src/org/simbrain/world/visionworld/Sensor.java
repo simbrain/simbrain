@@ -35,7 +35,6 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.visionworld.filter.UniformFilter;
 
 /**
  * Sensor.
@@ -55,14 +54,25 @@ public final class Sensor extends SingleAttributeProducer<Double> {
     private double sample;
 
     /** Producer description. */
-    private final String producerDescription;
+    private String producerDescription;
     
     /** Reference to parent workspace component. */
     private WorkspaceComponent parentComponent;
 
-
     /** No filter. */
-    private static final Filter NO_FILTER = new UniformFilter(0);
+    private static final Filter NO_FILTER = new Filter()
+        {
+            /** {@inheritDoc} */
+            public double filter(final BufferedImage image) {
+                return 0.0d;
+            }
+
+            /** {@inheritDoc} */
+            public String getDescription() {
+                return "None";
+            }
+        };
+
 
     /**
      * Create a new sensor with the specified receptive field and no filter.
@@ -88,19 +98,8 @@ public final class Sensor extends SingleAttributeProducer<Double> {
         }
         this.filter = filter;
         this.receptiveField = receptiveField;
+        updateProducerDescription();
         propertyChangeSupport = new PropertyChangeSupport(this);
-
-        StringBuffer sb = new StringBuffer();
-        sb.append("Sensor ");
-        sb.append(this.receptiveField.getWidth());
-        sb.append("x");
-        sb.append(this.receptiveField.getHeight());
-        sb.append(" @ (");
-        sb.append(this.receptiveField.getX());
-        sb.append(", ");
-        sb.append(this.receptiveField.getY());
-        sb.append(")");
-        producerDescription = sb.toString();
     }
 
 
@@ -152,8 +151,12 @@ public final class Sensor extends SingleAttributeProducer<Double> {
      * @param filter filter for this sensor, must not be null
      */
     public void setFilter(final Filter filter) {
+        if (filter == null) {
+            throw new IllegalArgumentException("filter must not be null");
+        }
         Filter oldFilter = this.filter;
         this.filter = filter;
+        updateProducerDescription();
         propertyChangeSupport.firePropertyChange("filter", oldFilter, this.filter);
     }
 
@@ -242,28 +245,47 @@ public final class Sensor extends SingleAttributeProducer<Double> {
         // empty
     }
 
+    /** {@inheritDoc} */
     public Producer getParent() {
         return this;
     }
 
+    /** {@inheritDoc} */
     public String getAttributeDescription() {
         return "sample";
     }
 
+    /** {@inheritDoc} */
     public Type getType() {
         return Double.TYPE;
     }
 
-    public String getDescription() {
-        return getFilter().getDescription() + " at (" + receptiveField.getCenterX() + "," + receptiveField.getCenterY() + ")";
+    /**
+     * Update producer description.
+     */
+    private void updateProducerDescription() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(getFilter().getDescription());
+        sb.append(" at (");
+        sb.append(receptiveField.getCenterX());
+        sb.append(", ");
+        sb.append(receptiveField.getCenterY());
+        sb.append(")");
+        producerDescription = sb.toString();
     }
 
+    /** {@inheritDoc} */
+    public String getDescription() {
+        return producerDescription;
+    }
+
+    /** {@inheritDoc} */
     public Double getValue() {
         return Double.valueOf(sample);
     }
 
-    public void setParentComponent(WorkspaceComponent parentComponent) {
+    /** {@inheritDoc} */
+    public void setParentComponent(final WorkspaceComponent parentComponent) {
         this.parentComponent = parentComponent;
     }
-
 }

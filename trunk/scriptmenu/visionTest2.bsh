@@ -1,0 +1,40 @@
+import java.awt.image.*;
+import java.io.*;
+import javax.imageio.*;
+import org.simbrain.world.visionworld.*;
+import org.simbrain.world.visionworld.sensormatrix.*;
+import org.simbrain.world.visionworld.pixelmatrix.*;
+import org.simbrain.world.visionworld.filter.*;
+
+// load image
+BufferedImage image = null;
+try {
+    image = ImageIO.read(new File("./scriptmenu/sample.jpg"));
+}
+catch (IOException e) {
+    e.printStackTrace();
+}
+System.out.println("loaded image, width=" + image.getWidth(null) + " height=" + image.getHeight(null));
+
+// create pixel matrix
+PixelMatrix pixelMatrix = new BufferedImagePixelMatrix(image);
+System.out.println("created pixelMatrix, width=" + pixelMatrix.getWidth() + " height=" + pixelMatrix.getHeight());
+
+// create dense sensor matrix
+int receptiveFieldWidth = 100;
+int receptiveFieldHeight = 50;
+int rows = (int) (pixelMatrix.getHeight() / receptiveFieldHeight);
+int columns = (int) (pixelMatrix.getWidth() / receptiveFieldWidth);
+System.out.println("creating sensorMatrix, rows=" + rows + " columns=" + columns + " receptiveFieldWidth=" + receptiveFieldWidth + " receptiveFieldHeight=" + receptiveFieldHeight);
+Filter defaultFilter = new PixelAccumulator();
+SensorMatrix sensorMatrix = new DenseSensorMatrix(rows, columns, receptiveFieldWidth, receptiveFieldHeight, defaultFilter);
+System.out.println("created sensorMatrix, rows=" + sensorMatrix.rows() + " columns=" + sensorMatrix.columns() + " receptiveFieldWidth=" + sensorMatrix.getReceptiveFieldWidth() + " receptiveFieldHeight=" + sensorMatrix.getReceptiveFieldHeight());
+
+// create vision world model
+VisionWorldModel visionWorldModel = new MutableVisionWorldModel(pixelMatrix, sensorMatrix);
+System.out.println("created visionWorldModel, pixelMatrix=" + visionWorldModel.getPixelMatrix() + " sensorMatrix=" + visionWorldModel.getSensorMatrix());
+
+// create vision world component and load it into workspace
+VisionWorldComponent visionWorldComponent = new VisionWorldComponent("visionTest2.bsh", visionWorldModel);
+workspace.addWorkspaceComponent(visionWorldComponent);
+desktop.getDesktopComponent(visionWorldComponent).postAddInit();

@@ -44,7 +44,7 @@ import org.simbrain.workspace.Workspace;
 	// Make Couplings
         for (int i = 1; i < numNeurons; i++) {
             ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + i, "Activation"); 
-            ConsumingAttribute barChartAttribute = barChart.getSingleConsumingAttribute("" + i);
+            ConsumingAttribute barChartAttribute = barChart.getSingleConsumingAttribute("BarChartData" + i);
             workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, barChartAttribute));
         }
 

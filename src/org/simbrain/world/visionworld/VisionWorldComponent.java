@@ -103,8 +103,8 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
         List<Producer> producers = new ArrayList<Producer>();
         VisionWorldModel model = visionWorld.getModel();
         SensorMatrix sensorMatrix = model.getSensorMatrix();
-        for (int row = 0, rows = sensorMatrix.columns(); row < rows; row++) {
-            for (int column = 0, columns = sensorMatrix.rows(); column < columns; column++) {
+        for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+            for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
                 Sensor sensor = sensorMatrix.getSensor(row, column);
                 sensor.setParentComponent(this);
                 producers.add(sensor);

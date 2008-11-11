@@ -22,6 +22,8 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
+import java.beans.PropertyChangeListener;
+
 import org.simbrain.world.visionworld.filter.UniformFilter;
 
 /**
@@ -41,6 +43,20 @@ public final class MutableVisionWorldModel
 
     /** Empty sensor matrix. */
     private static final SensorMatrix EMPTY_SENSOR_MATRIX = new EmptySensorMatrix();
+
+    /** No filter. */
+    private static final Filter NO_FILTER = new Filter()
+        {
+            /** {@inheritDoc} */
+            public double filter(final BufferedImage image) {
+                return 0.0d;
+            }
+
+            /** {@inheritDoc} */
+            public String getDescription() {
+                return "None";
+            }
+        };
 
 
     /**
@@ -72,17 +88,9 @@ public final class MutableVisionWorldModel
         }
         this.pixelMatrix = pixelMatrix;
         this.sensorMatrix = sensorMatrix;
-        
-        pixelMatrix.addListener(listener, true);
     }
 
-    PixelMatrix.Listener listener = new PixelMatrix.Listener() {
-        public void imageChanged() {
-//            System.out.println("image changed: " + System.currentTimeMillis());
-            firePixelMatrixChanged(pixelMatrix, pixelMatrix);
-        }
-    };
-    
+
     /** {@inheritDoc} */
     public PixelMatrix getPixelMatrix() {
         return pixelMatrix;
@@ -161,12 +169,26 @@ public final class MutableVisionWorldModel
             return emptyImage;
         }
 
-        public void addListener(Listener listener, boolean weak) {
-            /* no implementation */
+        /** {@inheritDoc} */
+        public void addPropertyChangeListener(final PropertyChangeListener listener) {
+            // empty
         }
 
-        public void removeListener(Listener listener) {
-            /* no implementation */
+        /** {@inheritDoc} */
+        public void addPropertyChangeListener(final String propertyName,
+                                              final PropertyChangeListener listener) {
+            // empty
+        }
+
+        /** {@inheritDoc} */
+        public void removePropertyChangeListener(final PropertyChangeListener listener) {
+            // empty
+        }
+
+        /** {@inheritDoc} */
+        public void removePropertyChangeListener(final String propertyName,
+                                                 final PropertyChangeListener listener) {
+            // empty
         }
     }
 
@@ -198,7 +220,7 @@ public final class MutableVisionWorldModel
 
         /** {@inheritDoc} */
         public Filter getDefaultFilter() {
-            return new UniformFilter(0);
+            return NO_FILTER;
         }
 
         /** {@inheritDoc} */

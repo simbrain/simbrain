@@ -188,17 +188,6 @@ public final class BufferedImagePixelMatrixEditor
     }
 
     /**
-     * Sets the current directory for class and persistence.
-     *
-     * @param dir current directory
-     */
-    protected void setCurrentDirectory(final String dir) {
-        this.currentDirectory = dir;
-        VisionWorldPreferences.setCurrentDirectory(dir);
-    }
-
-
-    /**
      * Layout components.
      */
     private void layoutComponents() {
@@ -319,5 +308,16 @@ public final class BufferedImagePixelMatrixEditor
     /** {@inheritDoc} */
     public String toString() {
         return DISPLAY_NAME;
+    }
+
+    /**
+     * Sets the current directory for class and persistence.
+     *
+     * @param dir current directory
+     */
+    // TODO:  protected?  this class is final
+    protected void setCurrentDirectory(final String dir) {
+        this.currentDirectory = dir;
+        VisionWorldPreferences.setCurrentDirectory(dir);
     }
 }

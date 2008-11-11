@@ -18,9 +18,6 @@
  */
 package org.simbrain.world.visionworld.pixelmatrix;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Graphics2D;
@@ -28,6 +25,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 import java.awt.image.BufferedImage;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.ReceptiveField;
@@ -40,6 +40,9 @@ public final class BufferedImagePixelMatrix
 
     /** Image for this pixel matrix. */
     private volatile BufferedImage image;
+
+    /** Property change support. */
+    private final PropertyChangeSupport propertyChangeSupport;
 
     /** Default height. */
     public static final int DEFAULT_HEIGHT = 100;
@@ -74,6 +77,7 @@ public final class BufferedImagePixelMatrix
             throw new IllegalArgumentException("width must be greater than zero");
         }
         this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     /**
@@ -86,6 +90,7 @@ public final class BufferedImagePixelMatrix
             throw new IllegalArgumentException("image must not be null");
         }
         this.image = makeIndexedRGBImage(image);
+        this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
 
@@ -139,16 +144,9 @@ public final class BufferedImagePixelMatrix
         if (image == null) {
             throw new IllegalArgumentException("image must not be null");
         }
-        
+        BufferedImage oldImage = this.image;
         this.image = image;
-        for (WeakReference<Listener> ref : listeners) {
-            Listener listener = ref.get();
-            if (listener != null) {
-                listener.imageChanged();
-            } else {
-                listeners.remove(ref);
-            }
-        }
+        propertyChangeSupport.firePropertyChange("image", oldImage, this.image);
     }
     
     /** {@inheritDoc} */
@@ -176,6 +174,28 @@ public final class BufferedImagePixelMatrix
     }
 
     /** {@inheritDoc} */
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /** {@inheritDoc} */
+    public void addPropertyChangeListener(final String propertyName,
+                                          final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    /** {@inheritDoc} */
+    public void removePropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    /** {@inheritDoc} */
+    public void removePropertyChangeListener(final String propertyName,
+                                             final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    /** {@inheritDoc} */
     public Image view(final ReceptiveField receptiveField) {
         if (receptiveField == null) {
             throw new IllegalArgumentException("receptiveField must not be null");
@@ -200,17 +220,5 @@ public final class BufferedImagePixelMatrix
         g.drawRenderedImage(baseImage, new AffineTransform());
         g.dispose();
         return image;
-    }
-
-    List<Listener> strong = new ArrayList<Listener>();
-    List<WeakReference<Listener>> listeners = new ArrayList<WeakReference<Listener>>();
-    
-    public void addListener(Listener listener, boolean weak) {
-        listeners.add(new WeakReference<Listener>(listener));
-        if (!weak) strong.add(listener);
-    }
-
-    public void removeListener(Listener listener) {
-        strong.remove(listener);
     }
 }

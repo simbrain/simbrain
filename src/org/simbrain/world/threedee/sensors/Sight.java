@@ -14,7 +14,7 @@ import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldModel;
-import org.simbrain.world.visionworld.dialog.AbstractSensorMatrixDialog;
+//import org.simbrain.world.visionworld.dialog.AbstractSensorMatrixDialog;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 public class Sight {
@@ -48,9 +48,10 @@ public class Sight {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        
+
+        /*
+          TODO:  restore visionworld integration here
         AbstractSensorMatrixDialog dialog = new AbstractSensorMatrixDialog() {
-            /** Serial Version ID */
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -74,7 +75,7 @@ public class Sight {
         dialog.init();
         dialog.setBounds(100, 100, 450, 550);
         dialog.setVisible(true);
-        
+        */
         try {
             semaphore.acquire();
         } catch (InterruptedException e) {

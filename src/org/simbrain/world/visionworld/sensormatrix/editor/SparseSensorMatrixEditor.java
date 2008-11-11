@@ -259,12 +259,4 @@ public final class SparseSensorMatrixEditor
     public String toString() {
         return DISPLAY_NAME;
     }
-
-
-    public Component getEditorComponent(int defaultRows, int defaultColumns, int defaultHeight,
-            int defaultWidth)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

@@ -87,41 +87,33 @@ public interface PixelMatrix {
     // todo:  using BufferedImage may be inappropriate here, maybe a DoubleMatrix2D instead?
     Image view(ReceptiveField receptiveField);
 
-    void addListener(Listener listener, boolean weak);
-    
-    void removeListener(Listener listener);
-    
-    interface Listener {
-        void imageChanged();
-    }
-    
-//    /**
-//     * Add the specified property change listener.
-//     *
-//     * @param listener listener to add
-//     */
-//    void addPropertyChangeListener(PropertyChangeListener listener);
-//
-//    /**
-//     * Add the specified property change listener for the specified property.
-//     *
-//     * @param propertyName property name
-//     * @param listener listener to add
-//     */
-//    void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
-//
-//    /**
-//     * Remove the specified property change listener.
-//     *
-//     * @param listener listener to remove
-//     */
-//    void removePropertyChangeListener(PropertyChangeListener listener);
-//
-//    /**
-//     * Remove the specified property change listener for the specified property.
-//     *
-//     * @param propertyName property name
-//     * @param listener listener to remove
-//     */
-//    void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
+    /**
+     * Add the specified property change listener.
+     *
+     * @param listener listener to add
+     */
+    void addPropertyChangeListener(PropertyChangeListener listener);
+
+    /**
+     * Add the specified property change listener for the specified property.
+     *
+     * @param propertyName property name
+     * @param listener listener to add
+     */
+    void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+
+    /**
+     * Remove the specified property change listener.
+     *
+     * @param listener listener to remove
+     */
+    void removePropertyChangeListener(PropertyChangeListener listener);
+
+    /**
+     * Remove the specified property change listener for the specified property.
+     *
+     * @param propertyName property name
+     * @param listener listener to remove
+     */
+    void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 }

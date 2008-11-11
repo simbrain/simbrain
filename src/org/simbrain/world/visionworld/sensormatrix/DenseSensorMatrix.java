@@ -34,9 +34,6 @@ public final class DenseSensorMatrix
 
     /** 2D object matrix of sensors. */
     private final ObjectMatrix2D sensors;
-    private final int rows;
-    private final int columns;
-//    private final Sensor[] sensors;
 
 
     /**
@@ -59,9 +56,6 @@ public final class DenseSensorMatrix
         if (columns < 1) {
             throw new IllegalArgumentException("columns must be >= 1");
         }
-        this.rows = rows;
-        this.columns = columns;
-//        sensors = new Sensor[rows * columns];
         sensors = new DenseObjectMatrix2D(rows, columns);
         createSensors();
     }
@@ -81,26 +75,22 @@ public final class DenseSensorMatrix
                 ReceptiveField receptiveField = new ReceptiveField(x, y, receptiveFieldWidth, receptiveFieldHeight);
                 Sensor sensor = (defaultFilter == null) ? new Sensor(receptiveField) : new Sensor(defaultFilter, receptiveField);
                 sensors.set(row, column, sensor);
-//                sensors[(rows * column) + row] = sensor;
             }
         }
     }
 
     /** {@inheritDoc} */
     public int rows() {
-        return rows;
+        return sensors.rows();
     }
 
     /** {@inheritDoc} */
     public int columns() {
-        return columns;
+        return sensors.columns();
     }
-    
-    
 
     /** {@inheritDoc} */
     public Sensor getSensor(final int row, final int column) {
-//        return sensors[(rows * column) + row];
         return (Sensor) sensors.get(row, column);
     }
 }

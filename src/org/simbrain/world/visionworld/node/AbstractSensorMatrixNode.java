@@ -205,8 +205,8 @@ abstract class AbstractSensorMatrixNode
             g.setPaint(gridPaint);
             g.setStroke(StrokeUtils.prepareStroke(gridStroke, paintContext));
 
-            double h = rect.getHeight() / sensorMatrix.columns();
-            double w = rect.getWidth() / sensorMatrix.rows();
+            double h = rect.getHeight() / sensorMatrix.rows();
+            double w = rect.getWidth() / sensorMatrix.columns();
 
             for (double x = rect.getX(); x < rect.getWidth(); x += w) {
                 g.draw(new Line2D.Double(x, rect.getY(), x, rect.getY() + rect.getHeight()));

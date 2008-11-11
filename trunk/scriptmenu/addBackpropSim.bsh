@@ -38,9 +38,9 @@ import org.simbrain.world.dataworld.DataWorldComponent;
 	    desktop.getDesktopComponent(inputData).getParentFrame().setBounds(508, 59, 300, 146);
             
             // Coupling input table columns to input neurons of backprop network
-            ProducingAttribute column1 = inputData.getSingleProducingAttribute("Column 1");
-            ProducingAttribute column2 = inputData.getSingleProducingAttribute("Column 2");
-            ProducingAttribute column3 = inputData.getSingleProducingAttribute("Column 3");
+            ProducingAttribute column1 = inputData.getSingleProducingAttribute("Column1");
+            ProducingAttribute column2 = inputData.getSingleProducingAttribute("Column2");
+            ProducingAttribute column3 = inputData.getSingleProducingAttribute("Column3");
             ConsumingAttribute inputNeuron1 = network.getConsumingAttribute("Neuron_1", "Activation"); 
             ConsumingAttribute inputNeuron2 = network.getConsumingAttribute("Neuron_2", "Activation"); 
             ConsumingAttribute inputNeuron3 = network.getConsumingAttribute("Neuron_3", "Activation");
@@ -50,9 +50,9 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             
      
             // Couple training table columns to  target values
-            ProducingAttribute train1 = trainingData.getSingleProducingAttribute("Column 1");
-            ProducingAttribute train2 = trainingData.getSingleProducingAttribute("Column 2");
-            ProducingAttribute train3 = trainingData.getSingleProducingAttribute("Column 3");
+            ProducingAttribute train1 = trainingData.getSingleProducingAttribute("Column1");
+            ProducingAttribute train2 = trainingData.getSingleProducingAttribute("Column2");
+            ProducingAttribute train3 = trainingData.getSingleProducingAttribute("Column3");
             ConsumingAttribute target1 = network.getConsumingAttribute("Neuron_9", "TargetValue"); 
             ConsumingAttribute target2 = network.getConsumingAttribute("Neuron_10", "TargetValue"); 
             ConsumingAttribute target3 = network.getConsumingAttribute("Neuron_11", "TargetValue"); 

@@ -17,7 +17,7 @@ import org.simbrain.workspace.*;
 {
 
 	// SIMULATION PARAMETERS 
-	int SENSOR_WIDTH = 100;
+	int SENSOR_WIDTH = 70;
 	int SENSOR_HEIGHT = 50;
 	int GRID_SPACE = 50;
 
@@ -38,28 +38,34 @@ import org.simbrain.workspace.*;
         workspace.addWorkspaceComponent(networkComponent);
         desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(500, 20, 446, 337);
         RootNetwork network = networkComponent.getRootNetwork();
-        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, CELLS_VERTICAL);
+        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, CELLS_HORIZONTAL);
         layout.setInitialLocation(new Point(420, 10));
         for (int i = 0; i < CELLS_HORIZONTAL * CELLS_VERTICAL ; i++) {
-            NakaRushtonNeuron neuron = new NakaRushtonNeuron();
+            LinearNeuron neuron = new LinearNeuron();
+	    neuron.setUpperBound(10);
             network.addNeuron(neuron);
         }
         layout.layoutNeurons(network);
+	networkComponent.update();
 
         // BUILD VISION COMPONENT
-        SensorMatrix matrix = new DenseSensorMatrix(CELLS_VERTICAL, CELLS_HORIZONTAL, SENSOR_WIDTH, SENSOR_HEIGHT,new PixelAccumulator());
+        SensorMatrix matrix = new DenseSensorMatrix(CELLS_VERTICAL, CELLS_HORIZONTAL, SENSOR_WIDTH, SENSOR_HEIGHT,new RgbFilter(125,125,125, 0,10));
         MutableVisionWorldModel model = new MutableVisionWorldModel(new BufferedImagePixelMatrix(image), matrix);
         VisionWorldComponent vision = new VisionWorldComponent("Vision world", model);
+	vision.getProducers();
         workspace.addWorkspaceComponent(vision);
         desktop.getDesktopComponent(vision).postAddInit();
         desktop.getDesktopComponent(vision).getParentFrame().setBounds(20, 20, 446, 337);
 
 
 	// COUPLE VISION WORLD SENSORS TO INPUT NEURONS
-	for (int i = 0; i <  CELLS_HORIZONTAL * CELLS_VERTICAL; i++) {
-	        //ProducingAttribute visionSensor = vision.getVisionWorld().getModel().getSensorMatrix().getSensor(i % CELLS_VERTICAL, i % CELLS_HORIZONTAL);
-	        //ConsumingAttribute neuron = networkComponent.getConsumingAttribute("Neuron_" + i, "Activation"); 
-        	//workspace.getCouplingManager().addCoupling(new Coupling(visionSensor, neuron));       
+	int neuronCounter = 1;
+	for (int i = 0; i < CELLS_VERTICAL; i++) {
+		for (int j = 0; j < CELLS_HORIZONTAL; j++) {
+			ProducingAttribute visionSensor = vision.getVisionWorld().getModel().getSensorMatrix().getSensor(i, j);
+		        ConsumingAttribute neuron = networkComponent.getConsumingAttribute("Neuron_" + neuronCounter++, "Activation"); 
+        		workspace.getCouplingManager().addCoupling(new Coupling(visionSensor, neuron));       
+		}
 	}
 
 	// Show it a succession of frames from a movie

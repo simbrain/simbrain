@@ -124,7 +124,7 @@ public class StochasticNeuron extends Neuron {
             firingProbability = value;
         }
 
-        public String getAttributeDescription() {
+        public String getKey() {
             return "Firing Probability";
         }
 

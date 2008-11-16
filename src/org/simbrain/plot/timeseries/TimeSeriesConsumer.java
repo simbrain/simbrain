@@ -19,10 +19,7 @@
 package org.simbrain.plot.timeseries;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
-import org.jfree.data.xy.XYSeries;
-import org.simbrain.plot.scatterplot.ScatterPlotComponent;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
@@ -57,7 +54,7 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public Double getValue() {
-            return value;
+        return value;
     }
     
     /**
@@ -70,8 +67,15 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
     /**
      * {@inheritDoc}
      */
+    public String getKey() {
+        return name;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription() {
-        return "TimeSeries " + name;
+        return "TimeSeries " + getKey();
     }
     
     /**
@@ -96,12 +100,4 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
     public TimeSeriesPlotComponent getParentComponent() {
         return plot;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getAttributeDescription() {
-        return getDescription();
-    }
-
 }

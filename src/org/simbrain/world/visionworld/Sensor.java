@@ -35,7 +35,6 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
-
 /**
  * Sensor.
  */
@@ -250,8 +249,7 @@ public final class Sensor extends SingleAttributeProducer<Double> {
         return this;
     }
 
-    /** {@inheritDoc} */
-    public String getAttributeDescription() {
+    public String getKey() {
         return "sample";
     }
 

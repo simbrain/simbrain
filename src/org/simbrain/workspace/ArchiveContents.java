@@ -224,7 +224,7 @@ class ArchiveContents {
                 WorkspaceComponent<?> comp = attribute.getParent().getParentComponent();
                 
                 this.uri = parent.componentUris.get(comp);
-                this.attributeID = attribute.getAttributeDescription();
+                this.attributeID = attribute.getKey();
                 this.attributeHolderID = attribute.getParent().getDescription();
 
             }

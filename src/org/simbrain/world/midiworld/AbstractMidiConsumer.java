@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 
@@ -68,14 +69,13 @@ abstract class AbstractMidiConsumer
     /**
      * Trigger attribute.
      */
-    private final class TriggerAttribute
-        implements ConsumingAttribute<Double> {
+    private final class TriggerAttribute extends AbstractAttribute implements ConsumingAttribute<Double> {
 
         /** Value. */
         private Double value = 0.0d;
 
         /** {@inheritDoc} */
-        public String getAttributeDescription() {
+        public String getKey() {
             return "Trigger Attribute";
         }
 

@@ -31,13 +31,17 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
         this.columnNumber = columnNumber;
     }
 
+    public String getKey() {
+        return String.valueOf(columnNumber + 1);
+    }
+    
     /**
      * From consuming attribute.  Should not be used.
      * 
      * @return The name of the attribute.
      */
     public String getAttributeDescription() {
-        return "Column" + (columnNumber + 1);
+        return getDescription();
     }
 
     /**
@@ -51,7 +55,7 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "Column" + (columnNumber + 1);
+        return "Column " + getKey();
     }
 
     /**

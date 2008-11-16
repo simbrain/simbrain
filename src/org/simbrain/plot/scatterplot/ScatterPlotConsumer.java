@@ -175,7 +175,7 @@ public class ScatterPlotConsumer implements Consumer {
      * X Attribute.
      */
     private class XAttribute extends ScatterPlotAttribute {
-        public String getAttributeDescription() {
+        public String getKey() {
             return "X";
         }
     }
@@ -184,10 +184,8 @@ public class ScatterPlotConsumer implements Consumer {
      * Y Attribute.
      */
     private class YAttribute extends ScatterPlotAttribute {
-        public String getAttributeDescription() {
+        public String getKey() {
             return "Y";
         }
     }
-    
 }
-

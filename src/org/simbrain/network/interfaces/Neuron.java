@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.synapses.SignalSynapse;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Consumer;
@@ -832,7 +831,7 @@ public abstract class Neuron implements Producer, Consumer {
         /**
          * {@inheritDoc}
          */
-        public String getAttributeDescription() {
+        public String getKey() {
             return "Activation";
         }
         
@@ -876,7 +875,7 @@ public abstract class Neuron implements Producer, Consumer {
         /**
          * {@inheritDoc}
          */
-        public String getAttributeDescription() {
+        public String getKey() {
             return "UpperBound";
         }
         
@@ -920,7 +919,7 @@ public abstract class Neuron implements Producer, Consumer {
         /**
          * {@inheritDoc}
          */
-        public String getAttributeDescription() {
+        public String getKey() {
             return "LowerBound";
         }
         
@@ -992,6 +991,10 @@ public abstract class Neuron implements Producer, Consumer {
          */
         public Type getType() {
             return Double.TYPE;
+        }
+
+        public String getKey() {
+            return "TargetValue";
         }
     }
 

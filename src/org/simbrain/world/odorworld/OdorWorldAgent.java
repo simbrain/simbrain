@@ -538,7 +538,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         /**
          * {@inheritDoc}
          */
-        public String getAttributeDescription() {
+        public String getKey() {
             return getName() + "[" + stimulusDimension + "]";
         }
 
@@ -632,7 +632,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         /**
          * {@inheritDoc}
          */
-        public String getAttributeDescription() {
+        public String getKey() {
             return name;
         }
 

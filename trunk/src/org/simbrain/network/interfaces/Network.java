@@ -21,14 +21,10 @@ package org.simbrain.network.interfaces;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.synapses.SignalSynapse;
 import org.simbrain.network.util.CopyFactory;
-import org.simbrain.network.util.SimpleId;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.CouplingManager;
 
@@ -689,7 +685,7 @@ public abstract class Network {
         CouplingManager manager = rootNetwork.getParent().getWorkspace().getCouplingManager();
         
         for (Attribute oldAttr : oldNeuron.getConsumingAttributes()) {
-            Attribute newAttr = find(oldAttr.getAttributeDescription(),
+            Attribute newAttr = find(oldAttr.getKey(),
                 newNeuron.getConsumingAttributes());
             
             if (newAttr != null) {
@@ -698,7 +694,7 @@ public abstract class Network {
         }
         
         for (Attribute oldAttr : oldNeuron.getProducingAttributes()) {
-            Attribute newAttr = find(oldAttr.getAttributeDescription(),
+            Attribute newAttr = find(oldAttr.getKey(),
                 newNeuron.getProducingAttributes());
             
             if (newAttr != null) {
@@ -718,7 +714,7 @@ public abstract class Network {
      */
     private static Attribute find(final String name, final List<? extends Attribute> toSearch) {
         for (Attribute consuming : toSearch) {
-            if (consuming.getAttributeDescription().equals(name)) {
+            if (consuming.getKey().equals(name)) {
                 return consuming;
             }
         }

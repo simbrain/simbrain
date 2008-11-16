@@ -19,9 +19,7 @@
 package org.simbrain.plot.barchart;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
-import org.jfree.data.xy.XYSeries;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
@@ -60,11 +58,15 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
         value = val;
     }
 
+    public String getKey() {
+        return name;
+    }
+    
     /**
      * {@inheritDoc}
      */
     public String getDescription() {
-        return name;
+        return getKey();
     }
     
     /**
@@ -81,13 +83,6 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
         return plot;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getAttributeDescription() {
-        return getDescription();
-    }
-    
     /**
      * Return index.
      *

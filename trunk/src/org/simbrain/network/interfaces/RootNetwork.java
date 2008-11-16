@@ -955,35 +955,35 @@ public class RootNetwork extends Network {
         return neuronIdGenerator;
     }
     
-    public Attribute getAttribute(String id) {
-        System.out.println("id: " + id);
-        
-        Matcher matcher = Pattern.compile('(' + NEURON_ID_PREFIX + "_\\d+):(\\w+)").matcher(id);
-        
-        if (!matcher.matches()) return null;
-        
-        String parent = matcher.group(1);
-        String attribute = matcher.group(2);
-        
-        System.out.println("parent: " + parent);
-        System.out.println("attribute: " + attribute);
-        
-        for (Neuron n : getFlatNeuronList()) {
-            if (n.getId().equals(parent)) {
-                for (Attribute a : n.consumingAttributes()) {
-                    System.out.println("\tchecking: " + a.getAttributeDescription());
-                    if (a.getAttributeDescription().equals(attribute)) return a;
-                }
-                
-                for (Attribute a : n.producingAttributes()) {
-                    System.out.println("\tchecking: " + a.getAttributeDescription());
-                    if (a.getAttributeDescription().equals(attribute)) return a;
-                }
-            }
-        }
-        
-        return null;
-    }
+//    public Attribute getAttribute(String id) {
+//        System.out.println("id: " + id);
+//        
+//        Matcher matcher = Pattern.compile('(' + NEURON_ID_PREFIX + "_\\d+):(\\w+)").matcher(id);
+//        
+//        if (!matcher.matches()) return null;
+//        
+//        String parent = matcher.group(1);
+//        String attribute = matcher.group(2);
+//        
+//        System.out.println("parent: " + parent);
+//        System.out.println("attribute: " + attribute);
+//        
+//        for (Neuron n : getFlatNeuronList()) {
+//            if (n.getId().equals(parent)) {
+//                for (Attribute a : n.consumingAttributes()) {
+//                    System.out.println("\tchecking: " + a.getAttributeDescription());
+//                    if (a.getAttributeDescription().equals(attribute)) return a;
+//                }
+//                
+//                for (Attribute a : n.producingAttributes()) {
+//                    System.out.println("\tchecking: " + a.getAttributeDescription());
+//                    if (a.getAttributeDescription().equals(attribute)) return a;
+//                }
+//            }
+//        }
+//        
+//        return null;
+//    }
     
     /**
      * Return the generator for network ids.

@@ -27,6 +27,7 @@ import java.util.List;
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
 
+import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 
@@ -140,11 +141,10 @@ final class OscMessageProducer
     /**
      * Double attribute.
      */
-    private final class DoubleAttribute
-        implements ProducingAttribute<Double> {
+    private final class DoubleAttribute extends AbstractAttribute implements ProducingAttribute<Double> {
 
         /** {@inheritDoc} */
-        public String getAttributeDescription() {
+        public String getKey() {
             return " " + address + ", f";
         }
 

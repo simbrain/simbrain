@@ -46,8 +46,15 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
     /**
      * {@inheritDoc}
      */
+    public String getKey() {
+        return String.valueOf(columnNumber + 1);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription() {
-        return "Column" + (columnNumber + 1);
+        return "Column " + getKey();
     }
 
     /**

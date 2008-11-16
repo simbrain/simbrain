@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.illposed.osc.OSCMessage;
 
+import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 
@@ -127,11 +128,10 @@ final class OscMessageConsumer
     /**
      * Double attribute.
      */
-    private final class DoubleAttribute
-        implements ConsumingAttribute<Double> {
+    private final class DoubleAttribute extends AbstractAttribute implements ConsumingAttribute<Double> {
 
         /** {@inheritDoc} */
-        public String getAttributeDescription() {
+        public String getKey() {
             return " " + address + ", f";
         }
 

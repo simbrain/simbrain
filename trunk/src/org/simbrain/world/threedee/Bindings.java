@@ -127,7 +127,7 @@ public abstract class Bindings implements Consumer, Producer {
         /**
          * {@inheritDoc}
          */
-        public String getAttributeDescription() {
+        public String getKey() {
             return description;
         }
 

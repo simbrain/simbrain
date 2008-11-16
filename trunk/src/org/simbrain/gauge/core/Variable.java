@@ -3,7 +3,6 @@ package org.simbrain.gauge.core;
 import java.lang.reflect.Type;
 
 import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
@@ -49,7 +48,11 @@ public class Variable extends SingleAttributeConsumer<Double> {
     }
 
     public String getDescription() {
-        return "Dimension " + dimension;
+        return "Dimension " + getKey();
+    }
+    
+    public String getKey() {
+        return String.valueOf(dimension);
     }
 
     public GaugeComponent getParentComponent() {

@@ -61,8 +61,15 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
     /**
      * {@inheritDoc}
      */
-    public String getDescription() {
+    public String getKey() {
         return name;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getDescription() {
+        return getKey();
     }
     
     /**
@@ -79,13 +86,6 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
         return plot;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getAttributeDescription() {
-        return getDescription();
-    }
-    
     /**
      * Return index.
      *
@@ -104,6 +104,4 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
             return value;
     }
 
-
 }
-

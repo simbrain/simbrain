@@ -10,21 +10,28 @@ import java.lang.reflect.Type;
 public interface Attribute {
 
     /**
-     * Returns the name of this consuming attribute.
+     * Returns the descriptive name of this attribute.
+     * 
+     * @return the name of this attribute.
+     */
+    String getAttributeDescription();
+
+    /**
+     * Returns the key for this attribute.
      * This is used for serialization and in interface
      * elements which display attributes.
      *
      * NOTE 1: This description must be unique relative to
      * other Attributes in an AttributeHolder.
      * 
-     * NOTE 2: The description of the attribute must be exactly
+     * NOTE 2: The key of the attribute must be exactly
      * the same after deserialization as it was before serialization,
      * even if the description of the attribute was not serialized.
      * 
-     * @return the name of this consuming attribute.
+     * @return the key for this attribute.
      */
-    String getAttributeDescription();
-
+    String getKey();
+    
     /**
      * returns the type of the generic parameter.
      * 
@@ -38,5 +45,4 @@ public interface Attribute {
      * @return parent AttributeHolder
      */
     AttributeHolder getParent();
-
 }

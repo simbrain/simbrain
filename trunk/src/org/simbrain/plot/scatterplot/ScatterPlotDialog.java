@@ -24,11 +24,17 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
     /** Reference to the dot renderer. */
     private XYDotRenderer renderer;
 
+    /** Reference to the component */
+    private ScatterPlotComponent component;
+
     /** Auto Range check box. */
     private JCheckBox autoRange = new JCheckBox();
 
     /** Auto Domain check box. */
     private JCheckBox autoDomain = new JCheckBox();
+
+    /** Show the history of the plot. */
+    private JCheckBox showHistory = new JCheckBox();
 
     /** Text field for setting the maximum range. */
     private JTextField maxRangeField = new JTextField();
@@ -51,9 +57,10 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
      * @param chart Reference to the chart component to be changed
      * @param renderer Reference to the dot renderer
      */
-    public ScatterPlotDialog(final JFreeChart chart, final XYDotRenderer renderer) {
+    public ScatterPlotDialog(final JFreeChart chart, final XYDotRenderer renderer, final ScatterPlotComponent component) {
         this.chart = chart;
         this.renderer = renderer;
+        this.component = component;
         LabelledItemPanel dialogPanel = new LabelledItemPanel();
 
         fillFieldValues();
@@ -73,6 +80,8 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
         dialogPanel.addItem("Maximum Range", maxRangeField);
         dialogPanel.addItem("Minimum Range", minRangeField);
         dialogPanel.addItem("Auto Range", autoRange);
+
+        dialogPanel.addItem("Show History", showHistory);
 
         JButton colorButton = new JButton("Color");
         colorButton.addActionListener(this);
@@ -103,6 +112,7 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
                 .isAutoRange());
         autoDomain.setSelected(chart.getXYPlot().getDomainAxis()
                 .isAutoRange());
+        showHistory.setSelected(component.isShowHistory());
         maxRangeField.setText(Double.toString(chart.getXYPlot()
                 .getRangeAxis().getRange().getUpperBound()));
         minRangeField.setText(Double.toString(chart.getXYPlot()
@@ -141,6 +151,7 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
         renderer.setDotHeight(Integer.parseInt(dotSizeField.getText()));
         renderer.setDotWidth(Integer.parseInt(dotSizeField.getText()));
 
+        component.setShowHistory(showHistory.isSelected());
     }
 
     /** @see ActionListener */

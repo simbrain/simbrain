@@ -34,7 +34,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      * This method is the default constructor.
      */
     public AllToAllPanel() {
-        this.addItem("Allow Self Connection", allowSelfConnect);
+        this.addItem("Allow Self Connections", allowSelfConnect);
     }
 
     /**

@@ -54,6 +54,9 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
     /** Default number of sources. */
     private static final int DEFAULT_NUMBER_OF_SOURCES = 5;
 
+    /** Show plot history. */
+    private boolean showHistory = false;
+
     /**
      * Create new PieChart Component.
      */
@@ -181,20 +184,36 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
         return consumers;
     }
 
+    /**
+     * @return the show history.
+     */
+    public boolean isShowHistory() {
+        return showHistory;
+    }
+
+    public void setShowHistory(boolean value) {
+        showHistory = value;
+    }
+
     @Override
     public void update() {
 
-        // Constantly erase.   How is performance for this version?
-        for (ScatterPlotConsumer consumer : getConsumers()) {
-            dataset.getSeries(consumer.getIndex()).clear();
-            dataset.getSeries(consumer.getIndex()).add(consumer.getX(), consumer.getY());
-            //System.out.println("--[" + consumer.getIndex() + "]:" + dataset.getSeries(consumer.getIndex()).getItemCount());
+        if (!showHistory) {
+            // Constantly erase. How is performance for this version?
+            for (ScatterPlotConsumer consumer : getConsumers()) {
+                dataset.getSeries(consumer.getIndex()).clear();
+                dataset.getSeries(consumer.getIndex()).add(consumer.getX(),
+                        consumer.getY());
+                // System.out.println("--[" + consumer.getIndex() + "]:" +
+                // dataset.getSeries(consumer.getIndex()).getItemCount());
+            }
+        } else {
+
+            // THE VERSION BELOW KEEPS A HISTORY. THERE IS NO "HOT" POINT
+            for (ScatterPlotConsumer consumer : getConsumers()) {
+                dataset.getSeries(consumer.getIndex()).add(consumer.getX(),
+                        consumer.getY());
+            }
         }
-        
-        
-// THE VERSION BELOW KEEPS A HISTORY.  THERE IS NO "HOT" POINT
-//        for (ScatterPlotConsumer consumer : getConsumers()) {
-//            dataset.getSeries(consumer.getIndex()).add(consumer.getX(), consumer.getY());
-//        }
     }
 }

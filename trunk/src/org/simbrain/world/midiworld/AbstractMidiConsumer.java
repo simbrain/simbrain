@@ -46,6 +46,16 @@ abstract class AbstractMidiConsumer
      */
     protected abstract void trigger(final double value);
 
+    /**
+     * Return the parent component for this consumer as a MidiWorldComponent.
+     * Saves subclasses from having to cast the result of <code>getParentComponent()</code>.
+     *
+     * @return the parent component for this consumer as a MidiWorldComponent
+     */
+    protected final MidiWorldComponent getMidiWorldComponent() {
+        return component;
+    }
+
     /** {@inheritDoc} */
     public final WorkspaceComponent<?> getParentComponent() {
         return component;

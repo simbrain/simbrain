@@ -147,8 +147,11 @@ public final class ScreenCapturePixelMatrix
         int r = (rgb >> 16) & 255;
         int g = (rgb >> 8) & 255;
         int b = rgb & 255;
-        int[] a = image.getAlphaRaster().getPixel(x, y, new int[1]);
-        return new Color(r, g, b, a[0]);
+        if (image.getAlphaRaster() != null) {
+            int[] a = image.getAlphaRaster().getPixel(x, y, new int[1]);
+            return new Color(r, g, b, a[0]);
+        }
+        return new Color(r, g, b);
     }
 
     /** {@inheritDoc} */
@@ -161,7 +164,9 @@ public final class ScreenCapturePixelMatrix
         int[] a = new int[1];
         a[0] = color.getAlpha();
         image.setRGB(x, y, rgb);
-        image.getAlphaRaster().setPixel(x, y, a);
+        if (image.getAlphaRaster() != null) {
+            image.getAlphaRaster().setPixel(x, y, a);
+        }
     }
 
     /** {@inheritDoc} */

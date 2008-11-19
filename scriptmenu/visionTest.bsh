@@ -2,6 +2,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import org.simbrain.world.visionworld.*;
 import org.simbrain.world.visionworld.sensormatrix.*;
 import org.simbrain.world.visionworld.pixelmatrix.*;
@@ -14,48 +15,57 @@ import org.simbrain.network.networks.*;
 import org.simbrain.network.neurons.*;
 import org.simbrain.workspace.*;
 
+/*
+* CREATES A VISION WORLD AND RETINA, AND PLAYS A SEQUENCE OF IMAGES
+*/
 {
 
-	// SIMULATION PARAMETERS 
-	int SENSOR_WIDTH = 70;
-	int SENSOR_HEIGHT = 50;
+	// SIMULATION PARAMETERS
+	int SENSOR_WIDTH = 15;
+	int SENSOR_HEIGHT = 15;
 	int GRID_SPACE = 50;
+	int RED_FILTER = -80;
+	int GREEN_FILTER = 0;
+	int BLUE_FILTER = 0;
+	int LOWER = 0;
+	int UPPER = 1;
 
-	// LOAD IMAGE
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(new File("./scriptmenu/sample.jpg"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }        
+	// LOAD INITIAL IMAGE
+	BufferedImage image =	 null;
+	try {
+	    image = ImageIO.read(new File("./scriptmenu/movie/frame1.tiff"));
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
 
-	// SET OTHER PARAMETERS [DO NOT EDIT]
-	int CELLS_HORIZONTAL = image.getWidth()/SENSOR_WIDTH;
-	int CELLS_VERTICAL = image.getHeight()/SENSOR_HEIGHT;
-	
-        // BUILD SIMPLE INPUT NETWORK
-        NetworkComponent networkComponent = new NetworkComponent("Vision Network");
-        workspace.addWorkspaceComponent(networkComponent);
-        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(500, 20, 446, 337);
-        RootNetwork network = networkComponent.getRootNetwork();
-        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, CELLS_HORIZONTAL);
-        layout.setInitialLocation(new Point(420, 10));
-        for (int i = 0; i < CELLS_HORIZONTAL * CELLS_VERTICAL ; i++) {
-            LinearNeuron neuron = new LinearNeuron();
-	    neuron.setUpperBound(10);
-            network.addNeuron(neuron);
-        }
-        layout.layoutNeurons(network);
+	// OTHER PARAMETERS [DO NOT EDIT]
+	int CELLS_HORIZONTAL = image.getWidth() / SENSOR_WIDTH;
+	int CELLS_VERTICAL = image.getHeight() / SENSOR_HEIGHT;
+
+	// BUILD NEURAL NETWORK
+	NetworkComponent networkComponent = new NetworkComponent("Vision Network");
+	workspace.addWorkspaceComponent(networkComponent);
+	desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(500, 20, 446, 337);
+	RootNetwork network = networkComponent.getRootNetwork();
+	GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, CELLS_HORIZONTAL);
+	layout.setInitialLocation(new Point(420, 10));
+	for (int i = 0; i < CELLS_HORIZONTAL * CELLS_VERTICAL ; i++) {
+	    LinearNeuron neuron = new LinearNeuron();
+	    neuron.setUpperBound(UPPER);
+	    network.addNeuron(neuron);
+	}
+	layout.layoutNeurons(network);
 	networkComponent.update();
 
-        // BUILD VISION COMPONENT
-        SensorMatrix matrix = new DenseSensorMatrix(CELLS_VERTICAL, CELLS_HORIZONTAL, SENSOR_WIDTH, SENSOR_HEIGHT,new RgbFilter(125,125,125, 0,10));
-        MutableVisionWorldModel model = new MutableVisionWorldModel(new BufferedImagePixelMatrix(image), matrix);
-        VisionWorldComponent vision = new VisionWorldComponent("Vision world", model);
+	// BUILD VISION COMPONENT
+	RgbFilter filter = new RgbFilter(RED_FILTER,GREEN_FILTER,BLUE_FILTER, LOWER,UPPER);
+	SensorMatrix matrix = new DenseSensorMatrix(CELLS_VERTICAL, CELLS_HORIZONTAL, SENSOR_WIDTH, SENSOR_HEIGHT, filter);
+	MutableVisionWorldModel model = new MutableVisionWorldModel(new BufferedImagePixelMatrix(image), matrix);
+	VisionWorldComponent vision = new VisionWorldComponent("Vision world", model);
 	vision.getProducers();
-        workspace.addWorkspaceComponent(vision);
-        desktop.getDesktopComponent(vision).postAddInit();
-        desktop.getDesktopComponent(vision).getParentFrame().setBounds(20, 20, 446, 337);
+	workspace.addWorkspaceComponent(vision);
+	//desktop.getDesktopComponent(vision).postAddInit();
+	desktop.getDesktopComponent(vision).getParentFrame().setBounds(20, 20, 446, 337);
 
 
 	// COUPLE VISION WORLD SENSORS TO INPUT NEURONS
@@ -63,11 +73,52 @@ import org.simbrain.workspace.*;
 	for (int i = 0; i < CELLS_VERTICAL; i++) {
 		for (int j = 0; j < CELLS_HORIZONTAL; j++) {
 			ProducingAttribute visionSensor = vision.getVisionWorld().getModel().getSensorMatrix().getSensor(i, j);
-		        ConsumingAttribute neuron = networkComponent.getConsumingAttribute("Neuron_" + neuronCounter++, "Activation"); 
-        		workspace.getCouplingManager().addCoupling(new Coupling(visionSensor, neuron));       
+			ConsumingAttribute neuron = networkComponent.getConsumingAttribute("Neuron_" + neuronCounter++, "Activation");
+			workspace.getCouplingManager().addCoupling(new Coupling(visionSensor, neuron));
 		}
 	}
 
-	// Show it a succession of frames from a movie
-	// Or press buttons to make them run.
+	// TODO: Add Som / Sparse network and connect  using a Sparse Connection with .2 prob. for excitatory
+
+
+	// VIEWER DIALOG WINDOW
+	JFrame f = new JFrame("Image Viewer");
+	JPanel panel = new JPanel();
+	// Main Buton
+	JButton button = new JButton("Show images");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SnapshotViewer viewer = new SnapshotViewer();
+				viewer.start();
+	}});
+	panel.add(button);
+	// Fields
+	JTextField redField = new JTextField("Red");
+	//panel.add(redField);
+	// Set up Frame
+	f.setSize(300,100);
+	f.setLocationRelativeTo(null);
+	f.getContentPane().add(panel);
+	f.setVisible(true);
+
+
+	// SNAPSHOT VIEWING CLASS
+	class SnapshotViewer extends Thread {
+	    int i = 1;
+	    public void run() {
+			while ((i++ < 7)) {
+			    // Pause for a second
+			    Thread.sleep(1);
+				BufferedImage image = null;
+				try {
+			    image = ImageIO.read(new File("./scriptmenu/movie/frame"+ i + ".tiff"));
+			    vision.getVisionWorld().getModel().setPixelMatrix(new BufferedImagePixelMatrix(image));
+			    workspace.globalUpdate();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	    }
+	}
 }
+

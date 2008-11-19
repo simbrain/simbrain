@@ -30,8 +30,11 @@ public final class PixelMatrixEditors {
     /** Buffered image pixel matrix editor. */
     public static final PixelMatrixEditor BUFFERED_IMAGE = new BufferedImagePixelMatrixEditor();
 
+    /** Screen capture pixel matrix editor. */
+    public static final PixelMatrixEditor SCREEN_CAPTURE = new ScreenCapturePixelMatrixEditor();
+
     /** Private array of pixel matrix editors. */
-    private static final PixelMatrixEditor[] values = new PixelMatrixEditor[] { BUFFERED_IMAGE };
+    private static final PixelMatrixEditor[] values = new PixelMatrixEditor[] { BUFFERED_IMAGE, SCREEN_CAPTURE };
 
     /** Public list of pixel matrix editors. */
     public static final List<PixelMatrixEditor> VALUES = Collections.unmodifiableList(Arrays.asList(values));

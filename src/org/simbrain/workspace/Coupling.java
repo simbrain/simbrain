@@ -131,23 +131,13 @@ public final class Coupling<E> {
             producerString = "Null";
         } else {
             producerComponent =  "[" + producingAttribute.getParent().getParentComponent().toString() +"]";
-            if (producingAttribute instanceof SingleAttributeProducer) {
-                producerString = producingAttribute.getParent().getDescription();
-            } else {
-                producerString = producingAttribute.getParent().getDescription()
-                    + ":" + producingAttribute.getAttributeDescription();
-            }
+            producerString = producingAttribute.getAttributeDescription();
         }
         if (consumingAttribute == null) {
             consumerString = "Null";
         } else {
             consumerComponent = "[" + consumingAttribute.getParent().getParentComponent().toString() +"]";
-            if (consumingAttribute instanceof SingleAttributeConsumer) {
-                consumerString = consumingAttribute.getParent().getDescription();
-            } else {
-                consumerString = consumingAttribute.getParent().getDescription()
-                    + ":" + consumingAttribute.getAttributeDescription();
-            }
+            consumerString = consumingAttribute.getAttributeDescription();
         }
         return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
      }

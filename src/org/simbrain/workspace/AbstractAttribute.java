@@ -7,6 +7,6 @@ public abstract class AbstractAttribute implements Attribute {
      * that returns the key for the attribute
      */
     public String getAttributeDescription() {
-        return getKey();
+        return this.getParent().getDescription() + ":" + getKey();
     }
 }

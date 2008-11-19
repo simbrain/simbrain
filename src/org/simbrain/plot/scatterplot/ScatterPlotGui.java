@@ -126,10 +126,11 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
     public void update() {
     }
 
+
     /** @see ActionListener */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            ScatterPlotDialog dialog = new ScatterPlotDialog(chart, renderer);
+            ScatterPlotDialog dialog = new ScatterPlotDialog(chart, renderer, component);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);

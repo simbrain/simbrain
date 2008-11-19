@@ -1,5 +1,4 @@
 import javax.swing.JOptionPane;
-
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.layouts.LayersLayout;
 import org.simbrain.network.networks.Backprop;
@@ -48,7 +47,6 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             workspace.getCouplingManager().addCoupling(new Coupling(column2, inputNeuron2));
             workspace.getCouplingManager().addCoupling(new Coupling(column3, inputNeuron3));
             
-     
             // Couple training table columns to  target values
             ProducingAttribute train1 = trainingData.getSingleProducingAttribute("Column1");
             ProducingAttribute train2 = trainingData.getSingleProducingAttribute("Column2");
@@ -73,9 +71,18 @@ import org.simbrain.world.dataworld.DataWorldComponent;
                 workspace.globalUpdate();    
             }
             bp.setTrain(false);
-
             
-            // Create the custom updating method
+	    // Set Update Method
+            workspace.setUpdateMethod(Workspace.UpdateMethod.CUSTOM);
+            workspace.setCustomUpdateMethod(new BackpropUpdate(network, inputData));
+
+            // Close training data window
+            trainingData.close();
+            
+            // Display Debug Info
+            System.out.println(workspace); 
+	    
+	    // Custom updating method
             class BackpropUpdate extends CustomUpdate {
 
                 NetworkComponent network;
@@ -94,13 +101,5 @@ import org.simbrain.world.dataworld.DataWorldComponent;
                 }
                 
             }
-            workspace.setUpdateMethod(Workspace.UpdateMethod.CUSTOM);
-            workspace.setCustomUpdateMethod(new BackpropUpdate(network, inputData));
-
-            // Close training data window
-            trainingData.close();
-            
-            // Display Debug Info
-            System.out.println(workspace);
-
+	    
 }

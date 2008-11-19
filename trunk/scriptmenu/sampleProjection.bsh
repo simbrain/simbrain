@@ -18,10 +18,12 @@ import org.simbrain.workspace.Workspace;
         //Make a scatter chart
         ProjectionComponent chart = new ProjectionComponent("Test Chart");
         workspace.addWorkspaceComponent(chart);
+        desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
 
         // Make Network
         NetworkComponent networkComponent = new NetworkComponent("Test Network");
         workspace.addWorkspaceComponent(networkComponent);
+        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
         RootNetwork network = networkComponent.getRootNetwork();
         GridLayout layout = new GridLayout(50.0, 50.0, 5);
         int numNeurons = 25;

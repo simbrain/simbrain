@@ -26,6 +26,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -112,6 +113,17 @@ public final class CreatePixelMatrixDialog
         pixelMatrixEditor = PixelMatrixEditors.VALUES.get(0);
         pixelMatrixEditorPlaceholder = new JPanel();
         pixelMatrixEditorPlaceholder.setLayout(new BorderLayout());
+
+        pixelMatrices.addActionListener(new ActionListener() {
+                /** {@inheritDoc} */
+                public void actionPerformed(final ActionEvent event) {
+                    pixelMatrixEditorPlaceholder.remove(pixelMatrixEditor.getEditorComponent());
+                    pixelMatrixEditor = (PixelMatrixEditor) pixelMatrices.getModel().getSelectedItem();
+                    pixelMatrixEditorPlaceholder.add("Center", pixelMatrixEditor.getEditorComponent());
+                    pixelMatrixEditorPlaceholder.invalidate();
+                    getContentPane().validate();
+                }
+            });
 
         ok = new AbstractAction("OK") {
                 /** {@inheritDoc} */

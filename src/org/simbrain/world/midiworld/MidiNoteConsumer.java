@@ -29,7 +29,7 @@ final class MidiNoteConsumer
 
     /** {@inheritDoc} */
     protected void trigger(final double value) {
-        ((MidiWorldComponent) getParentComponent()).getMidiOut().sendNote(note);
+        getMidiWorldComponent().getMidiOut().sendNote(note);
     }
 
     /** {@inheritDoc} */

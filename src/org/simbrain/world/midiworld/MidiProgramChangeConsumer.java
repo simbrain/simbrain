@@ -30,7 +30,7 @@ final class MidiProgramChangeConsumer
 
     /** {@inheritDoc} */
     protected void trigger(final double value) {
-        ((MidiWorldComponent) getParentComponent()).getMidiOut().sendProgramChange(programChange);
+        getMidiWorldComponent().getMidiOut().sendProgramChange(programChange);
     }
 
     /** {@inheritDoc} */

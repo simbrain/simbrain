@@ -29,7 +29,7 @@ final class MidiControllerConsumer
 
     /** {@inheritDoc} */
     protected void trigger(final double value) {
-        ((MidiWorldComponent) getParentComponent()).getMidiOut().sendController(controller);
+        getMidiWorldComponent().getMidiOut().sendController(controller);
     }
 
     /** {@inheritDoc} */

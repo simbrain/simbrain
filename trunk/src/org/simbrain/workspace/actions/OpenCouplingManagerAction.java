@@ -25,7 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
+import org.simbrain.workspace.gui.couplingmanager2.DesktopCouplingManager;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -55,9 +55,12 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         GenericJInternalFrame frame = new GenericJInternalFrame();
         DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
         frame.setContentPane(cm);
-        frame.setSize(850, 420);
+//        frame.setSize(850, 420);
         frame.pack();
+        frame.setResizable(true);
+        frame.setClosable(true);
         frame.setVisible(true);
+        frame.setMaximizable(true);
         desktop.addInternalFrame(frame);
     }
 }

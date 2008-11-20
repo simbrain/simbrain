@@ -19,6 +19,9 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.Color;
+
+import java.awt.geom.Point2D;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +39,7 @@ import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
 import org.simbrain.world.visionworld.action.EditSensorsAction;
+import org.simbrain.world.visionworld.action.IsometricViewAction;
 import org.simbrain.world.visionworld.action.NormalViewAction;
 import org.simbrain.world.visionworld.action.PaintViewAction;
 import org.simbrain.world.visionworld.action.StackedViewAction;
@@ -337,6 +341,31 @@ public final class VisionWorld
     }
 
     /**
+     * Switch to the isometric view.
+     */
+    public void isometricView() {
+        sensorMatrixNode.setVisible(true);
+        sensorMatrixNode.moveToFront();
+        sensorMatrixNode.setOffset(0.0d, sensorMatrixNode.getHeight() * -0.1d);
+        if (pixelMatrixNode.hasFocus()) {
+            pixelMatrixNode.setFocus(false);
+        }
+        if (!selectionEventHandlerInstalled) {
+            selectionEventHandlerInstalled = true;
+            addInputEventListener(selectionEventHandler);
+        }
+        Point2D sensorCenter = sensorMatrixNode.getBounds().getCenter2D();
+        sensorMatrixNode.getTransformReference(true).scale(1.0d, 0.573558d);
+        sensorMatrixNode.getTransformReference(true).rotate(Math.PI/4.0d, sensorCenter.getX(), sensorCenter.getY());
+
+        Point2D pixelCenter = sensorMatrixNode.getBounds().getCenter2D();
+        pixelMatrixNode.getTransformReference(true).scale(1.0d, 0.573558d);
+        pixelMatrixNode.getTransformReference(true).rotate(Math.PI/4.0d, pixelCenter.getX(), pixelCenter.getY());
+
+        centerCamera();
+    }
+
+    /**
      * Create pixel matrix.
      */
     public void createPixelMatrix() {
@@ -400,6 +429,6 @@ public final class VisionWorld
      * @return a list of view menu actions for this vision world
      */
     public List<Action> getViewMenuActions() {
-        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new PaintViewAction(this)});
+        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new IsometricViewAction(this), new PaintViewAction(this)});
     }
 }

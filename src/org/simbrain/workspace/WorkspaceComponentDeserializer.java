@@ -1,6 +1,7 @@
 package org.simbrain.workspace;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,16 +40,27 @@ public class WorkspaceComponentDeserializer {
     WorkspaceComponent<?> deserializeWorkspaceComponent(final ArchiveContents.Component component,
             final InputStream input) {
         try {
-            Class<WorkspaceComponent<?>> clazz
-                = (Class<WorkspaceComponent<?>>) Class.forName(component.className);
-            Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
+            Class<WorkspaceComponent<?>> clazz = (Class<WorkspaceComponent<?>>) Class.forName(component.className);
             
-            WorkspaceComponent<?> wc = (WorkspaceComponent<?>)
-                method.invoke(null, input, component.name, null);
-                        
+            WorkspaceComponent<?> wc = deserializeWorkspaceComponent(clazz, component.name, input, null);
+            
             componentKeys.put(component.uri, wc);
             wc.setChangedSinceLastSave(false);
             return wc;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static WorkspaceComponent<?> deserializeWorkspaceComponent(final Class<?> clazz, 
+            String name, final InputStream input, final String format) {
+        try {
+            Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
+                
+            WorkspaceComponent<?> wc = (WorkspaceComponent<?>)
+                method.invoke(null, input, name, format);
+                
+                return wc;
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

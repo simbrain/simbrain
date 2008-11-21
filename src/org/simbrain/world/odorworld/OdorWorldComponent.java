@@ -18,29 +18,14 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.world.dataworld.DataModel;
-import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.gameworld2d.GameWorld2DComponent;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
@@ -86,11 +71,11 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         return OdorWorld.getXStream().toXML(world);
     }
 
-    @Override
-    public void deserializeFromReader(FileReader reader) {
-        world = (OdorWorld) OdorWorld.getXStream().fromXML(reader);
-        world.setParent(this);
-    }
+//    @Override
+//    public void deserializeFromReader(FileReader reader) {
+//        world = (OdorWorld) OdorWorld.getXStream().fromXML(reader);
+//        world.setParent(this);
+//    }
 
     /**
      * {@inheritDoc}

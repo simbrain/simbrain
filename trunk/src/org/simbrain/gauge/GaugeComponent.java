@@ -18,9 +18,6 @@
  */
 package org.simbrain.gauge;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -28,7 +25,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.simbrain.console.ConsoleComponent;
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Projector;
@@ -37,7 +33,6 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.odorworld.OdorWorld;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -180,8 +175,8 @@ public class GaugeComponent extends WorkspaceComponent<GaugeComponentListener> {
         return getXStream().toXML(gauge.getCurrentProjector());
     }
 
-    @Override
-    public void deserializeFromReader(FileReader reader) {
-        gauge.setCurrentProjector((Projector) getXStream().fromXML(reader));
-    }
+//    @Override
+//    public void deserializeFromReader(FileReader reader) {
+//        gauge.setCurrentProjector((Projector) getXStream().fromXML(reader));
+//    }
 }

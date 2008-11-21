@@ -20,6 +20,7 @@ package org.simbrain.workspace.gui;
 
 import java.awt.Rectangle;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,6 +33,7 @@ import javax.swing.JPanel;
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentDeserializer;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
 import com.thoughtworks.xstream.XStream;
@@ -43,7 +45,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPanel {
 
     /** Reference to workspace component. */
-    private final E workspaceComponent;
+    private E workspaceComponent;
     
     /** File Chooser. */
     private final SFileChooser chooser;
@@ -100,6 +102,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
     /**
      * Calls up a dialog for opening a workspace component.
      */
+    @SuppressWarnings("unchecked")
     public void showOpenFileDialog() {
         SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), workspaceComponent.getDescription());
         
@@ -109,8 +112,18 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            workspaceComponent.open(theFile);
-            workspaceComponent.setName(theFile.getName());
+//            workspaceComponent.open(theFile);
+            
+            try {
+                workspaceComponent = (E) WorkspaceComponentDeserializer.deserializeWorkspaceComponent(
+                    workspaceComponent.getClass(), theFile.getName(), 
+                    new FileInputStream(theFile), SFileChooser.getExtension(theFile));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            
+            
+//            workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
             postAddInit();
         }

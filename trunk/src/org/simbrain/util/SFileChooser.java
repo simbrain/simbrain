@@ -328,7 +328,7 @@ public class SFileChooser {
      * @param theFile the file
      * @return all the characters after the last period in the file name
      */
-    private String getExtension(final File theFile) {
+    public static String getExtension(final File theFile) {
         String fileName = theFile.getName();
         int position = fileName.lastIndexOf('.');
         

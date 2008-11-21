@@ -313,7 +313,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
      * Override for use with save service.
      * @param reader
      */
-    public void deserializeFromReader(final FileReader reader) {
+    public final void deserializeFromReader(final FileReader reader) {
         // no implementation
     }
 

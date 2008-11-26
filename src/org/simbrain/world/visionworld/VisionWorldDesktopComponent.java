@@ -20,20 +20,14 @@ package org.simbrain.world.visionworld;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Vision world frame.
@@ -55,6 +49,8 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
         component.addListener(new BasicComponentListener());
         this.setPreferredSize(new Dimension(400,400));
 
+        // Sets a reference within vision world for use by actions.
+        component.getVisionWorld().setVisionWorldDesktopComponent(this);
 
         JMenuBar menuBar = new JMenuBar();
         JToolBar toolBar = new JToolBar();

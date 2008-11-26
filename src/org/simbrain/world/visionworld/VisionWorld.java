@@ -19,12 +19,9 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.Color;
-
 import java.awt.geom.Point2D;
-
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,13 +32,18 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JToolTip;
 
+import org.simbrain.network.gui.filters.Filters;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
 import org.simbrain.world.visionworld.action.EditSensorsAction;
 import org.simbrain.world.visionworld.action.IsometricViewAction;
 import org.simbrain.world.visionworld.action.NormalViewAction;
+import org.simbrain.world.visionworld.action.OpenVisionWorldAction;
 import org.simbrain.world.visionworld.action.PaintViewAction;
+import org.simbrain.world.visionworld.action.SaveVisionWorldAction;
+import org.simbrain.world.visionworld.action.SaveVisionWorldAsAction;
+import org.simbrain.world.visionworld.action.SelectAllAction;
 import org.simbrain.world.visionworld.action.StackedViewAction;
 import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
 import org.simbrain.world.visionworld.dialog.CreateSensorMatrixDialog;
@@ -98,6 +100,9 @@ public final class VisionWorld
 
     /** View padding. */
     private static final double VIEW_PADDING = 10.0d;
+
+    /** Vision world desktop component. */
+    private VisionWorldDesktopComponent desktop;
 
 
     /**
@@ -168,8 +173,7 @@ public final class VisionWorld
 
         /* initialize sensor nodes */
         updateSensorNodes();
-        
-//        editSensorsAction = new EditSensorsAction(this);
+
     }
 
     /**
@@ -221,6 +225,23 @@ public final class VisionWorld
                 sensorNodes.put(sensorNode.getSensor(), sensorNode);
             }
         }
+    }
+
+    /**
+     * Selects all of the sensor nodes.
+     */
+    public void selectAll() {
+        // TODO: Still needs to be wired up. Current version doesn't work.
+        selectionModel.setSelection(getSelectableNodes());
+    }
+
+    /**
+     * Returns selectable nodes
+     * 
+     * @return Selectable Nodes
+     */
+    private Collection<Sensor> getSelectableNodes() {
+        return getLayer().getAllNodes(Filters.getSelectableFilter(), null);
     }
 
     /**
@@ -401,7 +422,8 @@ public final class VisionWorld
      * @return a list of file menu actions for this vision world
      */
     public List<Action> getFileMenuActions() {
-        return Arrays.asList(new Action[] {new CreatePixelMatrixAction(this), new CreateSensorMatrixAction(this)});
+        return Arrays.asList(new Action[] {new OpenVisionWorldAction(desktop), new SaveVisionWorldAsAction(desktop),
+                new SaveVisionWorldAction(desktop), new CreatePixelMatrixAction(this), new CreateSensorMatrixAction(this)});
     }
 
     /**
@@ -410,7 +432,7 @@ public final class VisionWorld
      * @return a list of edit menu actions for this vision world
      */
     public List<Action> getEditMenuActions() {
-        return Collections.<Action>emptyList();
+        return Arrays.asList(new Action[] {editSensorsAction, new SelectAllAction(this)});
     }
 
     /**
@@ -430,5 +452,20 @@ public final class VisionWorld
      */
     public List<Action> getViewMenuActions() {
         return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new IsometricViewAction(this), new PaintViewAction(this)});
+    }
+
+    /**
+     * Sets the desktop component.
+     * @param desktop component to set
+     */
+    public void setVisionWorldDesktopComponent(final VisionWorldDesktopComponent desktop) {
+        this.desktop = desktop;
+    }
+
+    /**
+     * @return desktop component.
+     */
+    public VisionWorldDesktopComponent getVisionWorldDesktopComponent() {
+        return desktop;
     }
 }

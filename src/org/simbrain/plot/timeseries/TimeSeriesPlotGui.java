@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -35,6 +36,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -49,6 +51,9 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
     /** Chart un-initialized instance. */
     private JFreeChart chart;
 
+    /** Plot action manager. */
+    private PlotActionManager actionManager;
+
     /**
      * Construct a time series plot gui.
      * 
@@ -59,6 +64,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
         super(frame, component);
         this.component = component;
         setPreferredSize(new Dimension(500, 400));
+        actionManager = new PlotActionManager(this);
     }
 
     /**
@@ -111,11 +117,19 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
      */
     private void createAttachMenuBar() {
         JMenuBar bar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("File");
+        for (Action action : actionManager.getOpenSavePlotActions()) {
+            fileMenu.add(action);
+        }
+
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");
         preferences.addActionListener(this);
         preferences.setActionCommand("dialog");
         editMenu.add(preferences);
+
+        bar.add(fileMenu);
         bar.add(editMenu);
         getParentFrame().setJMenuBar(bar);
     }

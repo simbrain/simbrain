@@ -131,4 +131,9 @@ public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComp
     public VisionWorld getVisionWorld() {
         return visionWorld;
     }
+
+    @Override
+    public String getCurrentDirectory() {
+        return "." + System.getProperty("file.separator");
+    }
 }

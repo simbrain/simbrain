@@ -22,8 +22,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Ellipse2D;
 
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -40,10 +40,9 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Projector;
-import org.simbrain.gauge.graphics.GaugeThread;
+import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.GenericFrame;
@@ -106,7 +105,10 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
     private JLabel errorLabel = new JLabel();
 
     /** Show error option. */
-    private boolean showError = true; 
+    private boolean showError = true;
+
+    /** Plot Action Manager. */
+    private PlotActionManager actionManager;
 
     /**
      * Construct the ScatterPlot.
@@ -116,6 +118,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         this.component = component;
         setPreferredSize(new Dimension(500, 400));        
         component.addListener(this);
+        actionManager = new PlotActionManager(this);
  
     }
 
@@ -179,7 +182,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         buttonPanel.add(addButton);
 
         // Setup Menu Bar
-        getParentFrame().setJMenuBar(createMenuBar());
+        createAttachMenuBar();
         
         // Status Bar
         statusBar.add(pointsLabel);
@@ -202,15 +205,22 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
      * Creates the menu bar.
      * @return menu bar
      */
-    private JMenuBar createMenuBar() {
+    private void createAttachMenuBar() {
         JMenuBar bar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("File");
+        for (Action action : actionManager.getOpenSavePlotActions()) {
+            fileMenu.add(action);
+        }
+
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");
         preferences.addActionListener(this);
         preferences.setActionCommand("dialog");
         editMenu.add(preferences);
+        bar.add(fileMenu);
         bar.add(editMenu);
-        return bar;
+        getParentFrame().setJMenuBar(bar);
     }
 
     @Override

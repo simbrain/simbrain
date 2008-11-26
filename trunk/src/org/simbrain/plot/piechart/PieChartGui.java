@@ -22,29 +22,20 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.CouplingMenus;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.workspace.gui.GenericFrame;
-import org.jfree.data.xy.XYSeries;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Display a PieChart.
@@ -53,6 +44,9 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
 
     /** The underlying plot component. */
     private final PieChartComponent component;
+
+    /** Plot action manager. */
+    private PlotActionManager actionManager;
     
     /**
      * Construct the GUI Pie Chart 
@@ -61,6 +55,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         super(frame, component);
         this.component = component;
         setPreferredSize(new Dimension(500, 400));
+        actionManager = new PlotActionManager(this);
     }
 
     /**
@@ -103,11 +98,18 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
      */
     private void createAttachMenuBar() {
         JMenuBar bar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("File");
+        for (Action action : actionManager.getOpenSavePlotActions()) {
+            fileMenu.add(action);
+        }
+
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");
         preferences.addActionListener(this);
         preferences.setActionCommand("dialog");
         editMenu.add(preferences);
+        bar.add(fileMenu);
         bar.add(editMenu);
         getParentFrame().setJMenuBar(bar);
     }

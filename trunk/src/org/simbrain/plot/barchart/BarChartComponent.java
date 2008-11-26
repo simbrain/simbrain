@@ -123,8 +123,25 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        // TODO omit fields
+//        xstream.omitField(BarChartComponent.class, "logger");
+        xstream.omitField(WorkspaceComponent.class, "component");
+        xstream.omitField(WorkspaceComponent.class, "listenerList");
+        xstream.omitField(WorkspaceComponent.class, "workspace");
+        xstream.omitField(WorkspaceComponent.class, "logger");
         return xstream;
+    }
+
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        System.out.println("ReadResolve.");
+        return this;
     }
     
     public static BarChartComponent open(InputStream input, final String name, final String format) {
@@ -136,7 +153,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        getXStream().toXML(this, output);
     }
 
     @Override
@@ -164,5 +181,19 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
         }
     }
 
+    @Override
+    public String getCurrentDirectory() {
+        return "." + System.getProperty("file.separator");
 
+    }
+    
+    @Override
+    public String getXML() {
+        return BarChartComponent.getXStream().toXML(this);
+    }
+    
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {
+        super.setCurrentDirectory(currentDirectory);
+    }
 }

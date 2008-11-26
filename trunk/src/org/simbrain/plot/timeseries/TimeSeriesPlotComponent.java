@@ -125,8 +125,24 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      */
     private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        // TODO omit fields
+        xstream.omitField(WorkspaceComponent.class, "component");
+        xstream.omitField(WorkspaceComponent.class, "listenerList");
+        xstream.omitField(WorkspaceComponent.class, "workspace");
+        xstream.omitField(WorkspaceComponent.class, "logger");
         return xstream;
+    }
+
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        System.out.println("ReadResolve.");
+        return this;
     }
     
     public static TimeSeriesPlotComponent open(InputStream input, final String name, final String format) {
@@ -138,7 +154,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        getXStream().toXML(this, output);
     }
 
     @Override
@@ -214,5 +230,21 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      */
     public void setFixedWidth(final boolean fixedWidth) {
         this.fixedWidth = fixedWidth;
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+        return "." + System.getProperty("file.separator");
+
+    }
+    
+    @Override
+    public String getXML() {
+        return TimeSeriesPlotComponent.getXStream().toXML(this);
+    }
+    
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {
+        super.setCurrentDirectory(currentDirectory);
     }
 }

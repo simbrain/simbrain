@@ -23,24 +23,16 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.JMenuItem;
-
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.general.PieDataset;
-import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.plot.projection.ProjectionConsumer;
-import org.simbrain.workspace.Consumer;
+import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.core.ProjectPCA;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
-import bsh.This;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.simbrain.gauge.core.*;
 
 /**
  * Data for a JFreeChart ScatterPlot.
@@ -139,8 +131,26 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      */
     private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        // TODO omit fields
+        xstream.omitField(WorkspaceComponent.class, "component");
+        xstream.omitField(WorkspaceComponent.class, "listenerList");
+        xstream.omitField(WorkspaceComponent.class, "workspace");
+        xstream.omitField(WorkspaceComponent.class, "logger");
+        xstream.omitField(ProjectPCA.class, "logger");
+
         return xstream;
+    }
+
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        System.out.println("ReadResolve.");
+        return this;
     }
        
     /**
@@ -155,7 +165,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        getXStream().toXML(this, output);
     }
 
     @Override
@@ -217,5 +227,21 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         }
     }
 
+
+    @Override
+    public String getCurrentDirectory() {
+        return "." + System.getProperty("file.separator");
+
+    }
+    
+    @Override
+    public String getXML() {
+        return ProjectionComponent.getXStream().toXML(this);
+    }
+    
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {
+        super.setCurrentDirectory(currentDirectory);
+    }
 
 }

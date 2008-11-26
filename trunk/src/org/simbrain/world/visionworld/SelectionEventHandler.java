@@ -86,6 +86,9 @@ final class SelectionEventHandler
         if (event.isLeftMouseButton()) {
             super.mouseClicked(event);
         }
+        if (event.getClickCount() == 2) {
+            visionWorld.editSensors();
+        }
     }
 
     /** {@inheritDoc} */

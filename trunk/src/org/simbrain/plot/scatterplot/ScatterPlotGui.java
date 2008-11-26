@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -34,6 +35,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
+import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -50,6 +52,9 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
 
     /** XY chart renderer. */
     private XYDotRenderer renderer;
+
+    /** Plot action manager. */
+    private PlotActionManager actionManager;
     
     /**
      * Construct the ScatterPlot.
@@ -61,6 +66,7 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
         super(frame, component);
         this.component = component;
         setPreferredSize(new Dimension(500, 400));
+        actionManager = new PlotActionManager(this);
     }
 
     /**
@@ -109,11 +115,18 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
      */
     private void createAttachMenuBar() {
         JMenuBar bar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("File");
+        for (Action action : actionManager.getOpenSavePlotActions()) {
+            fileMenu.add(action);
+        }
+
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");
         preferences.addActionListener(this);
         preferences.setActionCommand("dialog");
         editMenu.add(preferences);
+        bar.add(fileMenu);
         bar.add(editMenu);
         getParentFrame().setJMenuBar(bar);
     }

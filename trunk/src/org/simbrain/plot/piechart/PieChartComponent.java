@@ -28,6 +28,7 @@ import javax.swing.JMenuItem;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.data.xy.XYSeries;
+import org.simbrain.plot.barchart.BarChartComponent;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
@@ -128,10 +129,26 @@ public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     private static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        // TODO omit fields
+        xstream.omitField(WorkspaceComponent.class, "component");
+        xstream.omitField(WorkspaceComponent.class, "listenerList");
+        xstream.omitField(WorkspaceComponent.class, "workspace");
+        xstream.omitField(WorkspaceComponent.class, "logger");
         return xstream;
     }
-    
+
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     * 
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        System.out.println("ReadResolve.");
+        return this;
+    }
+
     public static PieChartComponent open(InputStream input, final String name, final String format) {
         return (PieChartComponent) getXStream().fromXML(input);
     }
@@ -141,7 +158,7 @@ public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        getXStream().toXML(this, output);
     }
 
     @Override
@@ -172,5 +189,21 @@ public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentList
         for (PieDataConsumer consumer : getConsumers()) {
             dataset.setValue(consumer.getIndex(), consumer.getValue() / total);
         }
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+        return "." + System.getProperty("file.separator");
+
+    }
+    
+    @Override
+    public String getXML() {
+        return PieChartComponent.getXStream().toXML(this);
+    }
+    
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {
+        super.setCurrentDirectory(currentDirectory);
     }
 }

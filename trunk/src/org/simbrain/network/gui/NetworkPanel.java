@@ -108,7 +108,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Network panel.
  */
-public final class NetworkPanel extends PCanvas implements NetworkListener, ActionListener {
+public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** The model neural-rootNetwork object. */
     private RootNetwork rootNetwork;
@@ -2058,30 +2058,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             } else if (box.getAction() instanceof ClampNeuronsAction) {
                 box.setSelected(rootNetwork.getClampNeurons());
             }
-        }
-    }
-
-    /** @see ActionListener */
-    public void actionPerformed(final ActionEvent e) {
-
-        Object o = e.getSource();
-
-        if (o instanceof JMenuItem) {
-            JMenuItem m = (JMenuItem) o;
-
-            String st = m.getActionCommand();
-
-//            // Gauge events
-//            if (st.startsWith("Gauge:")) {
-//                // I use the label's text since it is the gauge's name
-//                GaugeComponent gauge = getWorkspace().getGauge(m.getText());
-//
-//                if (gauge != null) {
-//                    gauge.setVariables(getSelectedModelElements(), getNetworkFrame().getTitle());
-//                    getRootNetwork().addNetworkListener(gauge);
-//                    gauge.getGaugePanel().update();
-//                }
-//            }
         }
     }
 

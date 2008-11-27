@@ -206,7 +206,7 @@ public class DataWorld extends JPanel {
 
         ret.addSeparator();
 
-        JMenu producerMenu = CouplingMenus.getProducerListMenu(this.getParentComponent().getWorkspaceComponent().getWorkspace(), couplingMenuItemListener);
+        JMenu producerMenu = CouplingMenus.getMenuOfTargetComponents(this.getParentComponent().getWorkspaceComponent());
 
         ret.add(producerMenu);
 

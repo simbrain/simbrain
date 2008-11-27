@@ -135,20 +135,17 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
     public void showSaveFileDialog() {
         File theFile = workspaceComponent.getCurrentFile();
         
-        System.out.println("current: " + theFile);
-        
         if (theFile == null) {
             theFile = new File(getName());
         }
         
         theFile = chooser.showSaveDialog(theFile);
         
-        if (theFile != null) {            
+        if (theFile != null) {
             workspaceComponent.setCurrentFile(theFile);
             
             try {
                 FileOutputStream stream = new FileOutputStream(theFile);
-                
                 // TODO format?
                 workspaceComponent.save(stream, null);
             } catch (FileNotFoundException e) {

@@ -224,15 +224,15 @@ public class GaugeDesktopComponent extends GuiComponent<GaugeComponent> {
      * Set up the coupling menu.
      */
     private void setCouplingMenu() {
-        prefsMenu.removeAll();
-        producerListItem = CouplingMenus.getProducerListMenu(this.getWorkspaceComponent().getWorkspace(), couplingMenuItemListener);
-        prefsMenu.add(producerListItem);
-        prefsMenu.addSeparator();
-        prefsMenu.add(projectionPrefs);
-        prefsMenu.add(graphicsPrefs);
-        prefsMenu.add(generalPrefs);
-        prefsMenu.addSeparator();
-        prefsMenu.add(setAutozoom);
+//        prefsMenu.removeAll();
+//        producerListItem = CouplingMenus.getProducerListMenu(this.getWorkspaceComponent().getWorkspace(), couplingMenuItemListener);
+//        prefsMenu.add(producerListItem);
+//        prefsMenu.addSeparator();
+//        prefsMenu.add(projectionPrefs);
+//        prefsMenu.add(graphicsPrefs);
+//        prefsMenu.add(generalPrefs);
+//        prefsMenu.addSeparator();
+//        prefsMenu.add(setAutozoom);
     }
     
     /**

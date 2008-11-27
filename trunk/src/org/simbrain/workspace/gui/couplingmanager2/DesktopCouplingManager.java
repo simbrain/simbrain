@@ -146,6 +146,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
 
         JComponent couplingList = new CouplingListPanel(desktop,
                 new Vector(desktop.getWorkspace().getCouplingManager().getCouplings()));
+        couplingList.setBorder(BorderFactory.createTitledBorder("Couplings"));
 
         // MAIN PANEL
         JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));

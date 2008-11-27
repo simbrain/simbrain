@@ -685,10 +685,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
             if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
                 LOGGER.debug("producer list");
-                desktopComponent.getWorkspaceComponent().getWorkspace().coupleSpecific(m.getWorkspaceComponent(), getNetworkPanel().getSelectedConsumingAttributes());
+                desktopComponent.getWorkspaceComponent().getWorkspace().coupleOneToOne(m.getWorkspaceComponent().getProducingAttributes(), getNetworkPanel().getSelectedConsumingAttributes());
             } else if (m.getEventType() == CouplingMenuItem.EventType.CONSUMER_LIST) {
                 LOGGER.debug("consumer list");
-                desktopComponent.getWorkspaceComponent().getWorkspace().coupleSpecific(getNetworkPanel().getSelectedProducingAttributes(), m.getWorkspaceComponent());
+                desktopComponent.getWorkspaceComponent().getWorkspace().coupleOneToOne(getNetworkPanel().getSelectedProducingAttributes(), m.getWorkspaceComponent().getConsumingAttributes());
             }
         }
         

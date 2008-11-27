@@ -30,8 +30,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
-import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * A collection of components which interact via couplings.   Neural networks, datatables, gauges, and scripts are examples of components in a Simbrain workspace.
@@ -124,56 +122,35 @@ public class Workspace {
     void toggleEvents(final boolean on) {
         this.fireEvents = on;
     }
-    
-    
-    /**
-     * Couple producing attributes in the source component to consuming attributes in the target component.
-     *
-     * @param source reference to source component.
-     * @param target reference to target component.
-     */
-    public void couple(final WorkspaceComponent source, final WorkspaceComponent target) {        
-        //TODO: Add strategies
-        // Below is 1-1 (based in part on "getCustomListOfConsumingAttributes")
-        Iterator<ConsumingAttribute> consumer = target.getCustomListOfConsumingAttributes().iterator();
-        for (ProducingAttribute producer : (ArrayList<ProducingAttribute>)source.getCustomListOfProducingAttributes()) {
-            if (consumer.hasNext()) {
-                this.addCoupling(new Coupling(producer, consumer.next()));
-            }
-        }
 
-    
-    
-    }
-    
-    
     /**
-     * Couple a specified set of producing attributes to the consuming attributes in a target component.
+     * Couple each source attribute to all target attributes.
+     * 
+     * @param sourceAttributes source producing attributes
+     * @param targetAttributes target consuming attributes
      */
-    public void coupleSpecific(final ArrayList<ProducingAttribute> sourceProducers, final WorkspaceComponent<?> targetComponent) {
-        
-        Iterator consumerIterator =  ((ArrayList<?>)targetComponent.getCustomListOfConsumingAttributes()).iterator();
-        for (ProducingAttribute producingAttribute : sourceProducers) {
-            if (consumerIterator.hasNext()) {
-                Coupling coupling = new Coupling(producingAttribute, (ConsumingAttribute) consumerIterator.next());
-                addCoupling(coupling);
-            } else {
-                break;
+    public void coupleOneToMany(ArrayList<ProducingAttribute<?>> sourceAttributes, ArrayList<ConsumingAttribute<?>> targetAttributes) {
+        for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
+            for (ConsumingAttribute<?> consumingAttribute : targetAttributes) {
+                Coupling<?> coupling = new Coupling(producingAttribute, consumingAttribute);
+                getCouplingManager().addCoupling(coupling);
             }
         }
-        
     }
+    
     /**
-     * Couple producing attributes in a source component with specified consuming attributes.
+     * Couple each source attribute to one target attribute, as long as there are target attributes
+     * to couple to.
+     * 
+     * @param sourceAttributes source producing attributes
+     * @param targetAttributes target producing attributes
      */
-    public void coupleSpecific(final WorkspaceComponent<?> sourceComponent, final ArrayList<ConsumingAttribute> targetConsumers) {
-        Iterator consumerIterator = targetConsumers.iterator();
-        for (ProducingAttribute producingAttribute :  sourceComponent.getCustomListOfProducingAttributes()) {
-            if (consumerIterator.hasNext()) {
-                Coupling coupling = new Coupling(producingAttribute, (ConsumingAttribute) consumerIterator.next());
-                addCoupling(coupling);
-            } else {
-                break;
+    public void coupleOneToOne(ArrayList<ProducingAttribute<?>> sourceAttributes, ArrayList<ConsumingAttribute<?>> targetAttributes) {
+        Iterator<ConsumingAttribute<?>> consumingAttributes = targetAttributes.iterator();
+        for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
+            if (consumingAttributes.hasNext()) {
+                Coupling<?> coupling = new Coupling(producingAttribute, consumingAttributes.next());
+                getCouplingManager().addCoupling(coupling);
             }
         }
     }
@@ -194,7 +171,7 @@ public class Workspace {
          * 
          * If the component has not yet been named, name as follows:
          *      (ClassName - "Component") + index
-         * where index iterates as new components are added. 
+         * where index iterates as new components are added.
          * e.g. Network 1, Network 2, etc.
          */
         if (component.getName().equalsIgnoreCase("")) {
@@ -205,7 +182,7 @@ public class Workspace {
                 componentNameIndices.put(component.getClass(), index + 1);
             }
             component.setName(component.getSimpleName() + 
-                    componentNameIndices.get(component.getClass()));            
+                    componentNameIndices.get(component.getClass()));
         }
  
         // Notify listeners 

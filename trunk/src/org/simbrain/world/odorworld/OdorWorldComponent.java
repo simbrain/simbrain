@@ -41,14 +41,14 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
      */
     public OdorWorldComponent(final String name) {
         super(name);
-        this.setStrategy(Strategy.TOTAL);
+        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
     }
     
     @SuppressWarnings("unchecked")
     private OdorWorldComponent(final String name, final OdorWorld world) {
         super(name);
         this.world = world;
-        this.setStrategy(Strategy.TOTAL);
+        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
         world.setParent(this);
     }
 

@@ -323,7 +323,7 @@ public class SFileChooser {
     }
     
     /**
-     * returns all the characters after the last period in the file name
+     * Returns all the characters after the last period in the file name.
      * 
      * @param theFile the file
      * @return all the characters after the last period in the file name

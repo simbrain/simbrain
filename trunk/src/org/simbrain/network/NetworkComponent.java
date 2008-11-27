@@ -94,12 +94,6 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
         return RootNetwork.getXStream().toXML(rootNetwork);
     }
 
-//    @Override
-//    public void deserializeFromReader(FileReader reader) {
-//        rootNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(reader);
-//        rootNetwork.setParent(this);
-//    }
-    
     @Override
     public void setCurrentDirectory(final String currentDirectory) {
         super.setCurrentDirectory(currentDirectory);

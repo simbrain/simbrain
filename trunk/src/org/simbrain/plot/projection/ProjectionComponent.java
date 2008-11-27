@@ -83,7 +83,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      * @param numSources number of data sources
      */
     private void init(final int numSources) {
-        this.setStrategy(Strategy.TOTAL);
+        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
         dataset = new XYSeriesCollection();
         dataset.addSeries(new XYSeries("Data"));
         for (int i = 0; i < numSources; i++) {

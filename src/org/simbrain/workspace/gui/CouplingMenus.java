@@ -84,7 +84,7 @@ public class CouplingMenus  {
             componentMenuItem.addActionListener(listener);
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    targetComponent.getWorkspace().couple(targetComponent, sourceComponent);
+                    targetComponent.getWorkspace().coupleOneToOne(targetComponent.getProducingAttributes(), sourceComponent.getConsumingAttributes());
                 }
             });
             componentMenu.add(componentMenuItem);

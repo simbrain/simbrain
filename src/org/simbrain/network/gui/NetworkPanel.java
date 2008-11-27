@@ -1004,8 +1004,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return ret;
     }
     
-    public ArrayList<ProducingAttribute> getSelectedProducingAttributes() {
-        ArrayList ret = new ArrayList();
+    public ArrayList<ProducingAttribute<?>> getSelectedProducingAttributes() {
+        ArrayList<ProducingAttribute<?>> ret = new ArrayList<ProducingAttribute<?>>();
         for (PNode e : getSelection()) {
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron().getDefaultProducingAttribute());
@@ -1014,8 +1014,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return ret;
     }
     
-    public ArrayList<ConsumingAttribute> getSelectedConsumingAttributes() {
-        ArrayList ret = new ArrayList();
+    public ArrayList<ConsumingAttribute<?>> getSelectedConsumingAttributes() {
+        ArrayList<ConsumingAttribute<?>> ret = new ArrayList<ConsumingAttribute<?>>();
         for (PNode e : getSelection()) {
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron().getDefaultConsumingAttribute());

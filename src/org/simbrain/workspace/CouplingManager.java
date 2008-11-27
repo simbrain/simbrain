@@ -226,7 +226,11 @@ public class CouplingManager implements UpdatePriority {
         return local;
     }
     
-    
+    /**
+     * Remove all couplings associated with a WorkspaceComponent.
+     *
+     * @param component component to check.
+     */
     public void removeCouplings(WorkspaceComponent component) {
         ArrayList<Coupling> toRemove = new ArrayList();
         for (Coupling<?> coupling : getCouplings()) {
@@ -237,7 +241,16 @@ public class CouplingManager implements UpdatePriority {
                 toRemove.add(coupling);
             }
         }
-        for (Coupling coupling : toRemove) {
+        removeCouplings(toRemove);
+    }
+    
+    /**
+     * Remove a specified list of couplings.
+     *
+     * @param couplings list of couplings to remove
+     */
+    public void removeCouplings(final ArrayList<Coupling> couplings) {
+        for (Coupling coupling : couplings) {
             removeCoupling(coupling);
         }
     }

@@ -21,8 +21,6 @@ package org.simbrain.workspace;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,14 +57,14 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     /** Default priority. */
     private static final int DEFAULT_PRIORITY = 0;
     
-    /** Priority of this component; used in priorty based workspace update. */
+    /** Priority of this component; used in priority based workspace update. */
     private int priority = DEFAULT_PRIORITY;
     
     /** How to order a list of attributes. */
-    public enum Strategy {TOTAL, DEFAULT_EACH, CUSTOM };
+    public enum AttributeListingStyle {TOTAL, DEFAULT_EACH };
     
-    /** Current Strategy for this component. */
-    private Strategy strategy;
+    /** Current attribute listing style. */
+    private AttributeListingStyle attributeListingStyle = AttributeListingStyle.DEFAULT_EACH;
 
     /**
      * Current directory. So when re-opening this type of component the app remembers where to look. 
@@ -79,7 +77,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
      * Subclasses can provide a default value using User Preferences.
      */
     private File currentFile;
-
     
     /** The set of all listeners on this component. */
     private Collection<E> listeners = new HashSet<E>();
@@ -92,7 +89,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     public WorkspaceComponent(final String name) {
         this.name = name;
         logger.trace(this.getClass().getCanonicalName() + ": " + name + " created");
-        strategy = Strategy.DEFAULT_EACH;
     }
 
     /**
@@ -237,19 +233,18 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
 
     /**
      * Return producing attributes in a particular order, for use in creating couplings.
-     * Can create customized orderings by overriding this method.
      * 
      * @return custom list of producing attributes.
      */
-    public ArrayList<ProducingAttribute<?>> getCustomListOfProducingAttributes() {
+    public ArrayList<ProducingAttribute<?>> getProducingAttributes() {
         
         ArrayList<ProducingAttribute<?>> list = new ArrayList<ProducingAttribute<?>>();
     
-        if (strategy.equals(Strategy.DEFAULT_EACH)) {
+        if (attributeListingStyle.equals(AttributeListingStyle.DEFAULT_EACH)) {
             for (Producer producer : this.getProducers()) {
                 list.add(producer.getDefaultProducingAttribute());
             }
-        } else if (strategy.equals(Strategy.TOTAL)) {
+        } else if (attributeListingStyle.equals(AttributeListingStyle.TOTAL)) {
             for (Producer producer : this.getProducers()) {
                 for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
                     list.add(attribute);
@@ -260,19 +255,18 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     }
 
     /**
-     * Return consuming attributes in a particular order, for use in creating couplings.
-     * Can create customized orderings by overriding this method.
+     * Return consuming attributes in a specified order.
      * 
      * @return custom list of producing attributes.
      */
-    public ArrayList<ConsumingAttribute<?>> getCustomListOfConsumingAttributes() {
+    public ArrayList<ConsumingAttribute<?>> getConsumingAttributes() {
         
         ArrayList<ConsumingAttribute<?>> list = new ArrayList<ConsumingAttribute<?>>();
-        if (strategy.equals(Strategy.DEFAULT_EACH)) {
+        if (attributeListingStyle.equals(AttributeListingStyle.DEFAULT_EACH)) {
             for (Consumer consumer : this.getConsumers()) {
                 list.add(consumer.getDefaultConsumingAttribute());
             }
-        } else if (strategy.equals(Strategy.TOTAL)) {
+        } else if (attributeListingStyle.equals(AttributeListingStyle.TOTAL)) {
             for (Consumer consumer : this.getConsumers()) {
                 for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
                     list.add(attribute);
@@ -437,16 +431,16 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
         /* no default implementation */
     }
 
-    public Strategy getStrategy() {
-        return strategy;
+    public AttributeListingStyle getAttributeListingStyle() {
+        return attributeListingStyle;
     }
 
-    public void setStrategy(Strategy strategy) {
-        this.strategy = strategy;
+    public void setAttributeListingStyle(AttributeListingStyle style) {
+        this.attributeListingStyle = style;
     }
     
     /**
-     * The overall name for the set of supported formats
+     * The overall name for the set of supported formats.
      *
      * @return the description
      */

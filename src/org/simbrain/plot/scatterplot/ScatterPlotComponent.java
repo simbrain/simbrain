@@ -74,7 +74,7 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
      * @param numSources number of data sources
      */
     private void init(final int numSources) {
-        this.setStrategy(Strategy.TOTAL);
+        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
         dataset = new XYSeriesCollection();
         addDataSources(numSources);
     }

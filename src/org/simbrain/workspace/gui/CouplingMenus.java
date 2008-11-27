@@ -27,19 +27,39 @@ import javax.swing.JMenuItem;
 import org.simbrain.workspace.*;
 
 /**
- * Provides menus which can be used in setting couplings
+ * Provides JMenus which can be used to create couplings.
  */
 public class CouplingMenus  {
 
     /**
-     * Creates a producer oriented menu for coupling to the given target.
+     * For coupling a specific source component to a selected target component,
+     * using one of the built in coupling methods (one to one, all to all, etc.).
      * 
-     * @param workspace reference to workspace 
-     * @param target the consuming attribute.
-     * @return A new menu instance.
+     * @param sourceComponent the specified source component
+     * @return the menu of target components
      */
-    public static JMenu getProducerMenu(final Workspace workspace, final ConsumingAttribute<?> target) {
-        System.out.println("getProducerMenu");
+    public static JMenu getMenuOfTargetComponents(final WorkspaceComponent<?> sourceComponent) {
+        JMenu componentMenu = new JMenu("Components");
+        for (final WorkspaceComponent<?> targetComponent : sourceComponent.getWorkspace().getComponentList()) {
+            JMenuItem componentMenuItem = new JMenuItem(targetComponent.getName());
+            componentMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    sourceComponent.getWorkspace().coupleOneToOne(sourceComponent.getProducingAttributes(), targetComponent.getConsumingAttributes());
+                }
+            });
+            componentMenu.add(componentMenuItem);
+        }
+        return componentMenu;
+    }
+    
+    /**
+     * For coupling a selected producing attribute to a specified target consuming attribute.
+     * 
+     * @param workspace parent workspace 
+     * @param target the specified consuming attribute.
+     * @return the menu of producing attributes
+     */
+    public static JMenu getMenuOfProducingAttributes(final Workspace workspace, final ConsumingAttribute<?> target) {
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
 
@@ -69,38 +89,15 @@ public class CouplingMenus  {
         }
         return producerMenu;
     }
-    
+        
     /**
-     * Creates a consumer oriented menu for coupling to the given source.
+     * For coupling a specified producing attribute to a selected target consuming attribute.
      * 
-     * @param workspace reference to workspace
-     * @param source the producing attribute.
-     * @return A new menu instance.
+     * @param workspace parent workspace 
+     * @param target the specified producing attribute.
+     * @return the menu of consuming attributes
      */
-    public static JMenu getComponentMenu(final ActionListener listener, final WorkspaceComponent targetComponent) {
-        JMenu componentMenu = new JMenu("Components");
-        for (final WorkspaceComponent<?> sourceComponent : targetComponent.getWorkspace().getComponentList()) {
-            JMenuItem componentMenuItem = new JMenuItem(sourceComponent.getName());
-            componentMenuItem.addActionListener(listener);
-            componentMenuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    targetComponent.getWorkspace().coupleOneToOne(targetComponent.getProducingAttributes(), sourceComponent.getConsumingAttributes());
-                }
-            });
-            componentMenu.add(componentMenuItem);
-        }
-        return componentMenu;
-    }
-
-    
-    /**
-     * Creates a consumer oriented menu for coupling to the given source.
-     * 
-     * @param workspace reference to workspace
-     * @param source the producing attribute.
-     * @return A new menu instance.
-     */
-    public static JMenu getConsumerMenu(final Workspace workspace, final ProducingAttribute<?> source) {
+    public static JMenu getMenuOfConsumingAttributes(final Workspace workspace, final ProducingAttribute<?> source) {
         JMenu consumerMenu = new JMenu("Consumers");
         for (WorkspaceComponent<?> component : workspace.getComponentList()) {
             Collection<? extends Consumer> consumers = component.getConsumers();
@@ -127,44 +124,5 @@ public class CouplingMenus  {
         }
         return consumerMenu;
     }
-    
-    /**
-     * Get a menu representing all components which have lists of producers,
-     * which returns such a list.
-     *
-     * @param workspace reference to workspace
-     * @param listener the component which will listens to the menu items in this menu
-     * @return the menu containing all available components with nonempty producer lists
-     */
-    public static JMenu getProducerListMenu(final Workspace workspace, final ActionListener listener) {
-        JMenu producerListMenu = new JMenu("Producer lists");
-        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-                CouplingMenuItem producerListItem = new CouplingMenuItem(component,
-                    CouplingMenuItem.EventType.PRODUCER_LIST);
-                producerListItem.setText(component.getName());
-                producerListItem.addActionListener(listener);
-                producerListMenu.add(producerListItem);
-        }
-        return producerListMenu;
-    }
 
-    /**
-     * Get a menu representing all components which have lists of consumers,
-     * which returns such a list.
-     *
-     * @param workspace reference to workspace
-     * @param listener the component which will listens to the menu items in this menu
-     * @return the menu containing all available components with nonempty consumer lists
-     */
-    public static JMenu getConsumerListMenu(final Workspace workspace, final ActionListener listener) {
-        JMenu consumerListMenu = new JMenu("Consumer lists");
-        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-                CouplingMenuItem consumerListItem = new CouplingMenuItem(component,
-                    CouplingMenuItem.EventType.CONSUMER_LIST);
-                consumerListItem.setText(component.getName());
-                consumerListItem.addActionListener(listener);
-                consumerListMenu.add(consumerListItem);
-        }
-        return consumerListMenu;
-    }
 }

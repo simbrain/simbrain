@@ -7,9 +7,7 @@ import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Packages an object with a jmenu item to make it easy to pass them along
- * through action events.
- * 
+ * Packages elements of a coupling into a JMenuItem.
  */
 public class CouplingMenuItem extends JMenuItem {
 

@@ -304,22 +304,14 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // Add coupling menus
         
-        contextMenu.add(CouplingMenus.getComponentMenu(popUpMenuListener, this.getNetworkPanel().getParentComponent().getWorkspaceComponent()));
+        contextMenu.add(CouplingMenus.getMenuOfTargetComponents(this.getNetworkPanel().getParentComponent().getWorkspaceComponent()));
         Workspace workspace = this.getNetworkPanel().getParentComponent().getWorkspaceComponent().getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
-            JMenu producerMenu = CouplingMenus.getProducerMenu(workspace, this.neuron.getDefaultConsumingAttribute());
+            JMenu producerMenu = CouplingMenus.getMenuOfProducingAttributes(workspace, this.neuron.getDefaultConsumingAttribute());
             producerMenu.setText("Set input source");
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = CouplingMenus.getConsumerMenu(workspace, this.neuron.getDefaultProducingAttribute());
+            JMenu consumerMenu = CouplingMenus.getMenuOfConsumingAttributes(workspace, this.neuron.getDefaultProducingAttribute());
             consumerMenu.setText("Set output target");
-            contextMenu.add(consumerMenu);
-            contextMenu.addSeparator();
-        } else if (getNetworkPanel().getSelectedNeurons().size() > 1) {
-            JMenu producerMenu = CouplingMenus.getProducerListMenu(workspace, popUpMenuListener);
-            producerMenu.setText("Set input sources");
-            contextMenu.add(producerMenu);
-            JMenu consumerMenu = CouplingMenus.getConsumerListMenu(workspace, popUpMenuListener);
-            consumerMenu.setText("Set output targets");
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
         }

@@ -176,6 +176,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
 
     @Override
     public void update() {
+        System.out.println(dataset);
         for (BarChartConsumer consumer : getConsumers()) {
             dataset.setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
         }

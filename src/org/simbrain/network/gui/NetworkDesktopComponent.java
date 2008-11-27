@@ -30,6 +30,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.workspace.gui.CouplingMenus;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
 

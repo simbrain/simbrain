@@ -107,7 +107,7 @@ public final class OscWorldDesktopComponent
                     if (consumers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
-                        JMenu producerMenu = CouplingMenus.getProducerMenu(oscWorldComponent.getWorkspace(),
+                        JMenu producerMenu = CouplingMenus.getMenuOfProducingAttributes(oscWorldComponent.getWorkspace(),
                                                                            consumer.getDefaultConsumingAttribute());
                         producerMenu.setText("Set input source");
                         contextMenu.add(producerMenu);
@@ -142,7 +142,7 @@ public final class OscWorldDesktopComponent
                     if (producers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
-                        JMenu consumerMenu = CouplingMenus.getConsumerMenu(oscWorldComponent.getWorkspace(),
+                        JMenu consumerMenu = CouplingMenus.getMenuOfConsumingAttributes(oscWorldComponent.getWorkspace(),
                                                                            producer.getDefaultProducingAttribute());
                         consumerMenu.setText("Set output target");
                         contextMenu.add(consumerMenu);

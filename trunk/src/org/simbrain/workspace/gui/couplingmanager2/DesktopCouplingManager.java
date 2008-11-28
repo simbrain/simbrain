@@ -36,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
@@ -90,7 +91,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         // SOURCE SIDE
         JPanel leftPanel = new JPanel(new BorderLayout());
         JScrollPane leftScrollPane = new JScrollPane(producingAttributes);
-        Border leftBorder = BorderFactory.createTitledBorder("Producing Attributes");
+        Border leftBorder = BorderFactory.createTitledBorder("Source Producing Attributes");
         leftPanel.setBorder(leftBorder);
         producingAttributes.setDragEnabled(true);
         producingAttributes.setCellRenderer(new ProducingAttributeCellRenderer());
@@ -109,7 +110,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         // TARGET SIDE
         JPanel rightPanel = new JPanel(new BorderLayout());
         JScrollPane rightScrollPane = new JScrollPane(consumingAttributes);
-        Border rightBorder = BorderFactory.createTitledBorder("Consuming Attributes");
+        Border rightBorder = BorderFactory.createTitledBorder("Target Consuming Attributes");
         rightPanel.setBorder(rightBorder);
         consumingAttributes.setDragEnabled(true);
         consumingAttributes.setCellRenderer(new ConsumingAttributeCellRenderer());
@@ -150,7 +151,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
 
         // MAIN PANEL
         JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
-        centerPanel.add(leftPanel); 
+        centerPanel.add(leftPanel);
         centerPanel.add(couplingList);
         centerPanel.add(rightPanel);
         centerPanel.setPreferredSize(new Dimension(800, 400));
@@ -162,7 +163,6 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
 
     /**
      * Custom cell renderer.
-     * name.
      */
     private class ConsumingAttributeCellRenderer extends DefaultListCellRenderer {
 
@@ -187,8 +187,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
     }
 
     /**
-     * Custom producer cell renderer which shows default attribute
-     * name.
+     * Custom producer cell renderer.
      */
     private class ProducingAttributeCellRenderer extends DefaultListCellRenderer {
 
@@ -263,10 +262,20 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * Add couplings using the selected method.
      */
     private void addCouplings() {
+        ArrayList<ProducingAttribute<?>> producingAttributes = getSelectedProducingAttributes();
+        ArrayList<ConsumingAttribute<?>> consumingAttributes = getSelectedConsumingAttributes();
+        
+        if ((producingAttributes.size() == 0) || (consumingAttributes.size() == 0)) {
+          JOptionPane.showMessageDialog(null,
+                  "You must select at least one consuming and producing attribute \n in order to create couplings!",
+                  "No Attributes Selected Warning", JOptionPane.WARNING_MESSAGE);
+                  return;
+        }
+        
         if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to one")) {
-            desktop.getWorkspace().coupleOneToOne(getSelectedProducingAttributes(), getSelectedConsumingAttributes());
+            desktop.getWorkspace().coupleOneToOne(producingAttributes, consumingAttributes);
         } else if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to many")) {
-            desktop.getWorkspace().coupleOneToMany(getSelectedProducingAttributes(), getSelectedConsumingAttributes());
+            desktop.getWorkspace().coupleOneToMany(producingAttributes, consumingAttributes);
         }
     }
     

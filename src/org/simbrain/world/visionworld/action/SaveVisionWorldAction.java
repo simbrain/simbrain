@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
 /**
@@ -45,8 +46,8 @@ public final class SaveVisionWorldAction
             throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.desktopComponent = desktopComponent;
-//        putValue(SMALL_ICON, ResourceManager.getImageIcon("PixelMatrix.png"));
-//        putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+        putValue(SHORT_DESCRIPTION, "Save Vision World");
     }
 
 

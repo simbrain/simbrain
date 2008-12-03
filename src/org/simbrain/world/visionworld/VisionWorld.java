@@ -32,7 +32,6 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JToolTip;
 
-import org.simbrain.network.gui.filters.Filters;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
@@ -231,17 +230,12 @@ public final class VisionWorld
      * Selects all of the sensor nodes.
      */
     public void selectAll() {
-        // TODO: Still needs to be wired up. Current version doesn't work.
-        selectionModel.setSelection(getSelectableNodes());
-    }
-
-    /**
-     * Returns selectable nodes
-     * 
-     * @return Selectable Nodes
-     */
-    private Collection<Sensor> getSelectableNodes() {
-        return getLayer().getAllNodes(Filters.getSelectableFilter(), null);
+        for (Object node : getLayer().getAllNodes()) {
+            if (node instanceof SensorNode) {
+                ((SensorNode)node).setSelected(true);
+            }
+        }
+        this.repaint();
     }
 
     /**

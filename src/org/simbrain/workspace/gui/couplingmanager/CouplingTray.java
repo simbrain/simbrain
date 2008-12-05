@@ -38,7 +38,10 @@ import org.simbrain.workspace.ProducingAttribute;
 
 /**
  * Tray which manages binding of couplings.  Most of the code handles drag and drop issues.
- *
+ * 
+ * NOTE: Not currently working (bindElementAt broken because it relied on a problematic methods
+ * which could create couplings in invalid states).  This package slated for removal... 
+ * 
  * @author jyoshimi
  *
  */
@@ -226,7 +229,7 @@ public class CouplingTray extends JList implements DropTargetListener {
          * @param index of location to bind
          */
         public void bindElementAt(final ProducingAttribute producer, final int index) {
-            getElementAt(index).setProducingAttribute(producer);
+            //getElementAt(index).setProducingAttribute(producer);
             this.fireContentsChanged(this, 0, getSize());
         }
         
@@ -236,7 +239,7 @@ public class CouplingTray extends JList implements DropTargetListener {
          * @param index of location to bind
          */
         public void bindElementAt(final ConsumingAttribute consumer, final int index) {
-            getElementAt(index).setConsumingAttribute(consumer);
+            //getElementAt(index).setConsumingAttribute(consumer);
             this.fireContentsChanged(this, 0, getSize());
         }
     }

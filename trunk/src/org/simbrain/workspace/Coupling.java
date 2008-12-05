@@ -94,22 +94,6 @@ public final class Coupling<E> {
         return producingAttribute;
     }
 
-
-    /**
-     * @param producingAttribute the producingAttribute to set
-     */
-    public void setProducingAttribute(final ProducingAttribute<E> producingAttribute) {
-        this.producingAttribute = producingAttribute;
-    }
-
-    /**
-     * @param consumingAttribute the consumingAttribute to set
-     */
-    public void setConsumingAttribute(final ConsumingAttribute<E>consumingAttribute) {
-        this.consumingAttribute = consumingAttribute;
-    }
-
-
     /**
      * @return the consumingAttribute
      */

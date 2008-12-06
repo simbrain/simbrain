@@ -55,7 +55,7 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "Column " + getKey();
+        return "Column" + getKey();
     }
 
     /**

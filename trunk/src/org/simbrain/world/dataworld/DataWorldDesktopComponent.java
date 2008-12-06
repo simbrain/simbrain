@@ -24,22 +24,22 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.InputStream;
 import java.util.Random;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.CouplingMenus;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -49,7 +49,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private static final long serialVersionUID = 1L;
 
     /** World scroll pane. */
-    private JScrollPane worldScroller = new JScrollPane();
+    private JScrollPane scroller;
 
     /** Data world. */
     private DataWorld world;
@@ -107,22 +107,21 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
      *
      * @param component reference to model component
      */
-    public DataWorldDesktopComponent(GenericFrame frame, final DataWorldComponent component) {
+    public DataWorldDesktopComponent(final GenericFrame frame, final DataWorldComponent component) {
 
         super(frame, component);
         
         component.addListener(new BasicComponentListener());
-        world = new DataWorld(this);
         component.getDataModel().initValues(new Double(0));
+
         checkIterationMode();
-        setLayout(new BorderLayout());
-        add("Center", worldScroller);
         addMenuBar(world);
-        add(world.getTable().getTableHeader(), BorderLayout.PAGE_START);
-        worldScroller.setViewportView(world);
-        worldScroller.setEnabled(false);
-        setPreferredSize(new Dimension(300,200));
-        frame.pack();
+
+        world = new DataWorld(this);
+        scroller = new JScrollPane();
+        scroller.setViewportView(world);
+        setLayout(new BorderLayout());
+        add(scroller, BorderLayout.CENTER);
     }
 
     /**
@@ -173,6 +172,9 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         edit.add(iterationMode);
         edit.add(columnIteration);
         mb.add(edit);
+        
+        JMenu producerMenu = CouplingMenus.getMenuOfTargetComponents(getWorkspaceComponent());
+        mb.add(producerMenu);
 
         getParentFrame().setJMenuBar(mb);
     }
@@ -208,7 +210,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     private ActionListener addRowListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().addNewRow();
+            world.getDataModel().addNewRow(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
@@ -216,8 +218,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     private ActionListener addColListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().addNewColumn();
-            world.getDataModel().fillNew(new Double(0));
+            world.getDataModel().addNewColumn(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
@@ -243,6 +244,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         public void actionPerformed(final ActionEvent e) {
             world.getDataModel().fill(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
+            repaint();
         }
     };
     
@@ -259,7 +261,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++ ) {
                     double value = (rand.nextDouble() * range) + lower;
-                    model.set(i , j, value);                    
+                    model.set(i , j, value);
                 }
             }
             getWorkspaceComponent().setChangedSinceLastSave(true);
@@ -324,16 +326,13 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     /** @see javax.swing.JFrame */
     public void pack() {
         getParentFrame().pack();
-        setMaximumSize(new Dimension((int) getMaximumSize().getWidth(), (int) getSize().getHeight()));
+        // Set max size somehow?
         repaint();
     }
     
     @Override
     public void postAddInit() {
-        world = new DataWorld(this);
-        worldScroller.setViewportView(world);
-        world.setParentComponent(this);
-        repaint();
+        pack();
     }
 
 }

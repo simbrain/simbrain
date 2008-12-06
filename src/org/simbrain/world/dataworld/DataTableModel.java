@@ -28,8 +28,10 @@ public class DataTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
     
+    /** Underlying data. */
     private final DataModel<Double> model;
     
+    /** Listener. */
     private final DataModel.Listener listener = new DataModel.Listener() {
 
         public void columnAdded(int column) {
@@ -60,6 +62,11 @@ public class DataTableModel extends AbstractTableModel {
         
     };
     
+    /**
+     * Construct the table model.
+     *
+     * @param model reference to underlying data.
+     */
     DataTableModel(final DataModel<Double> model)
     {
         this.model = model;

@@ -151,10 +151,4 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         return DataModel.getXStream().toXML(dataModel);
     }
 
-//    @Override
-//    public void deserializeFromReader(FileReader reader) {
-//        dataModel = (DataModel<Double>) DataModel.getXStream().fromXML(reader);
-//        dataModel.setParent(this);
-//    }
-
 }

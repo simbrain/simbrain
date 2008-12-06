@@ -322,12 +322,12 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     }
     
     /**
-     * Get a SingleConsumingAttribute by name
+     * Get a SingleConsumingAttribute by name.
      *
      * @param consumerId id of single consuming attribute
      * @return the attribute
      */
-    public ConsumingAttribute getSingleConsumingAttribute(String consumerId) {
+    public ConsumingAttribute getSingleConsumingAttribute(final String consumerId) {
         for (Consumer consumer : getConsumers()) {
             if (consumer instanceof SingleAttributeConsumer) {
                 if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
@@ -340,12 +340,12 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
 
 
     /**
-     * Get a SingleProducingAttribute by id
+     * Get a SingleProducingAttribute by id.
      *
      * @param producerId id of single producing attribute
      * @return the attribute
      */
-    public ProducingAttribute getSingleProducingAttribute(String producerId) {
+    public ProducingAttribute getSingleProducingAttribute(final String producerId) {
         for (Producer producer : getProducers()) {
             if (producer instanceof SingleAttributeProducer) {
                 if (producer.getDescription().equalsIgnoreCase(producerId)) {

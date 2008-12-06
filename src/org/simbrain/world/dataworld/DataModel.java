@@ -16,6 +16,11 @@ import org.simbrain.workspace.SingleAttributeProducer;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+/**
+ * Underlying data model.
+ * 
+ * @param <E>
+ */
 public class DataModel<E> {
 
     /** Default initial number of rows. */
@@ -28,10 +33,10 @@ public class DataModel<E> {
     private List<List<E>> rowData = new ArrayList<List<E>>();
 
     /** Number of columns. */
-    private int width = DEFAULT_COLUMN_COUNT;
+    private int numColumns = DEFAULT_COLUMN_COUNT;
 
     /** Number of rows. */
-    private int height = DEFAULT_ROW_COUNT;
+    private int numRows = DEFAULT_ROW_COUNT;
 
     /** Iteration mode. */
     private boolean iterationMode = false;
@@ -63,33 +68,45 @@ public class DataModel<E> {
     /** The parent component of this model. */
     private DataWorldComponent parent;
     
-    DataModel(DataWorldComponent parent) {
+    /**
+     * Construct a dataworld model.
+     *
+     * @param parent parent WorkspaceComponent.
+     */
+    DataModel(final DataWorldComponent parent) {
         this.parent = parent;
-
-        for (int i = 0; i < height; i++) {
-            rowData.add((List<E>) newRow());
-        }
-        
+        for (int i = 0; i < numRows; i++) {
+            rowData.add((List<E>) newRow(null));
+        }        
         init();
     }
 
-    DataModel(DataWorldComponent parent, int width, int height) {
-        this.width = width;
-        this.height = height;
+    /**
+     * Construct a dataworld model of a specified number of rows and columns.
+     *
+     * @param parent parent WorkspaceComponent.
+     * @param numColumns number of columns.
+     * @param height number of rows.
+     */
+    DataModel(final DataWorldComponent parent, final int numRows, final int numColumns) {
+        this.numRows = numRows;
+        this.numColumns = numColumns;
         this.parent = parent;
 
-        for (int i = 0; i < height; i++) {
-            rowData.add((List<E>) newRow());
+        for (int i = 0; i < numColumns; i++) {
+            rowData.add((List<E>) newRow(null));
         }
-        
         init();
     }
 
+    /**
+     * Initialize data model.
+     */
     private void init() {
         consumers = new ArrayList<SingleAttributeConsumer<?>>();
         producers = new ArrayList<SingleAttributeProducer<?>>();
         
-        for (int i = 0; i < width; i++) {
+        for (int i = 0; i < numColumns; i++) {
             consumers.add(new ConsumingColumn<E>(this, i));
             producers.add(new ProducingColumn<E>(this, i));
         }
@@ -127,36 +144,6 @@ public class DataModel<E> {
         return this;
     }
     
-    public String getKey(Attribute attribute) {
-        int index;
-        
-        if ((index = consumers.indexOf(attribute)) >= 0) {
-            return "consumer:" + index;
-        } else if ((index = producers.indexOf(attribute)) >= 0) {
-            return "producer:" + index;
-        }
-        
-        return null;
-    }
-    
-    public Attribute getAttribute(String key) {
-        Matcher matcher = Pattern.compile("(\\w+):(\\d+)").matcher(key);
-        
-        if (!matcher.matches()) return null;
-        
-        List<? extends Attribute> list;
-        String type = matcher.group(1);
-        
-        if (type.equals("consumer")) {
-            list = consumers;
-        } else if (type.equals("producer")) {
-            list = producers;
-        } else {
-            throw new IllegalArgumentException("unknown type: " + type);
-        }
-        
-        return list.get(Integer.parseInt(matcher.group(2)));
-    }
     
     public DataWorldComponent getParent() {
         return parent;
@@ -182,11 +169,11 @@ public class DataModel<E> {
         return Collections.unmodifiableList(producers);
     }
 
-    private List<E> newRow() {
+    private List<E> newRow(E value) {
         ArrayList<E> row = new ArrayList<E>();
 
-        for (int i = 0; i < width; i++) {
-            row.add(null);
+        for (int i = 0; i < numColumns; i++) {
+            row.add(value);
         }
         return row;
     }
@@ -270,64 +257,84 @@ public class DataModel<E> {
         this.currentRow = currentRow;
     }
 
-    public void addNewRow() {
-        height++;
-        rowData.add(newRow());
-        for (Listener listener : listeners) listener.rowAdded(height - 1);
+    public void addNewRow(E value) {
+        numRows++;
+        rowData.add(newRow(value));
+        for (Listener listener : listeners) listener.rowAdded(numRows - 1);
     }
 
-    public void insertNewRow(int at) {
-        height++;
-        rowData.add(at, newRow());
+    public void insertNewRow(int at, E value) {
+        numRows++;
+        rowData.add(at, newRow(value));
         for (Listener listener : listeners) listener.rowAdded(at);
     }
     
-    public void addNewColumn() {
-        width++;
-        for (List<E> row : rowData) row.add(null);
-        consumers.add(new ConsumingColumn<E>(this, width - 1));
-        for (Listener listener : listeners) listener.columnAdded(width - 1);
+    public void addNewColumn(E value) {
+        numColumns++;
+        for (List<E> row : rowData) {
+            row.add(value);
+        }
+        consumers.add(new ConsumingColumn<E>(this, numColumns - 1));
+        for (Listener listener : listeners) {
+            listener.columnAdded(numColumns - 1);
+        }
     }
 
-    public void insertNewColumn(int at) {
-        width++;
-        for (List<E> row : rowData) row.add(at, null);
+    public void insertNewColumn(int at, E value) {
+        numColumns++;
+        for (List<E> row : rowData) {
+            row.add(at, value);
+        }
         consumers.add(new ConsumingColumn<E>(this, at));
-        for (Listener listener : listeners) listener.columnAdded(at);
+        for (Listener listener : listeners) {
+            listener.columnAdded(at);
+        }
     }
 
     public void removeLastRow() {
-        height--;
-        rowData.remove(height);
-        for (Listener listener : listeners) listener.rowRemoved(height);
+        numRows--;
+        rowData.remove(numRows);
+        for (Listener listener : listeners) listener.rowRemoved(numRows);
     }
     
     public void removeRow(int at) {
-        height--;
+        numRows--;
         rowData.remove(at);
         for (Listener listener : listeners) listener.rowRemoved(at);
     }
     
     public void removeLastColumn() {
-        width--;
-        for (List<E> row : rowData) row.remove(width);
-        consumers.add(new ConsumingColumn<E>(this, width));
-        for (Listener listener : listeners) listener.columnRemoved(width);
+        numColumns--;
+        for (List<E> row : rowData) {
+            row.remove(numColumns);
+        }
+        consumers.add(new ConsumingColumn<E>(this, numColumns)); {
+            for (Listener listener : listeners) listener.columnRemoved(numColumns);            
+        }
     }
     
+    /**
+     * Remove column at specified index.
+     * 
+     * @param at index
+     */
     public void removeColumn(int at) {
-        width--;
-        for (List<E> row : rowData) row.remove(at);
+        numColumns--;
+        for (List<E> row : rowData) {
+            row.remove(at);
+        }
         consumers.add(new ConsumingColumn<E>(this, at));
-        for (Listener listener : listeners) listener.columnRemoved(at);
+        for (Listener listener : listeners) {
+            listener.columnRemoved(at);
+        }
     }
     
     public int getColumnCount() {
-        return width;
+        return numColumns;
     }
     
     public int getRowCount() {
-        return height;
+        return numRows;
     }
     
     public void initValues(E value) {
@@ -343,15 +350,6 @@ public class DataModel<E> {
     public void fill(E value) {
         for (List<E> row : rowData) {
             Collections.fill(row, value);
-        }
-    }
-
-    /**
-     * Same as fill, but only fills the last column.
-     */
-    public void fillNew(E value) {
-        for (List<E> row : rowData) {
-            row.set(width - 1, value);
         }
     }
     

@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.gui.AttributePanel;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -66,6 +67,7 @@ public final class OpenCouplingListAction extends AbstractAction {
         final JFrame frame = new JFrame("Coupling List");
         JComponent cl = new CouplingListPanel(desktop,
                 new Vector(desktop.getWorkspace().getCouplingManager().getCouplings()));
+//        JComponent cl = new AttributePanel(desktop);
         MyGlassPane pane = new MyGlassPane();
         frame.setContentPane(cl);
         frame.setGlassPane(pane);
@@ -74,18 +76,11 @@ public final class OpenCouplingListAction extends AbstractAction {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        
-//        final JFrame tFrame = new JFrame();
-//        JPanel panel = new JPanel();
-//        JPanel tPanel = new JPanel();
-//        tPanel.setBackground(Color.white);
-//        tPanel.setOpaque(false);
-//        panel.setBackground(Color.red);
-//        tFrame.setContentPane(panel);
-//        tFrame.pack();
-//        tFrame.setGlassPane(tPanel);
-//        tFrame.setVisible(true);
     }
+
+    /**
+     * Class for creating a glass pane. Used for when no data is available.
+     */
     class MyGlassPane extends JComponent {
         public void paint(Graphics g) {
             g.setColor(Color.red);

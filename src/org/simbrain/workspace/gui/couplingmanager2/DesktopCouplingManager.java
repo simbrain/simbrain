@@ -130,7 +130,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(couplingMethodComboBox);
 
-        JButton addCouplingsButton = new JButton("Add Couplings");
+        JButton addCouplingsButton = new JButton("Add Coupling(s)");
         addCouplingsButton.setActionCommand("addCouplings");
         addCouplingsButton.addActionListener(this);
         bottomPanel.add(addCouplingsButton);

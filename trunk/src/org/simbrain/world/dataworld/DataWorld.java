@@ -41,8 +41,10 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.CouplingMenus;
+import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**
  * <b>DataWorld</b> is a jpanel which contains a table object and a that table's model object.
@@ -205,13 +207,9 @@ public class DataWorld extends JPanel {
             ret.add(remCol);
         }
         ret.addSeparator();
-        JMenu producerMenu = CouplingMenus.getMenuOfProducingAttributes(ws.getWorkspaceComponent().getWorkspace(), 
-                ws.getWorkspaceComponent().getConsumingAttributes().get(getSelectedColumn()));
+        JMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", ws.getWorkspaceComponent().getWorkspace(), ws.getWorkspaceComponent().getConsumingAttributes().get(getSelectedColumn()));
         ret.add(producerMenu);
-        
-        ret.addSeparator();
-        JMenu consumerMenu = CouplingMenus.getMenuOfConsumingAttributes(ws.getWorkspaceComponent().getWorkspace(), 
-                ws.getWorkspaceComponent().getProducingAttributes().get(getSelectedColumn()));
+        JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", ws.getWorkspaceComponent().getWorkspace(), ws.getWorkspaceComponent().getProducingAttributes().get(getSelectedColumn()));
         ret.add(consumerMenu);
 
         return ret;

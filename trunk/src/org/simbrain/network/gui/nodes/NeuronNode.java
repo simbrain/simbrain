@@ -53,8 +53,11 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuron;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.ComponentMenu;
+import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.CouplingMenus;
+import org.simbrain.workspace.gui.ProducingAttributeMenu;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -302,16 +305,12 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             contextMenu.addSeparator();
         }
 
-        // Add coupling menus
-        
-        contextMenu.add(CouplingMenus.getMenuOfTargetComponents(this.getNetworkPanel().getParentComponent().getWorkspaceComponent()));
+        // Add coupling menus        
         Workspace workspace = this.getNetworkPanel().getParentComponent().getWorkspaceComponent().getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
-            JMenu producerMenu = CouplingMenus.getMenuOfProducingAttributes(workspace, this.neuron.getDefaultConsumingAttribute());
-            producerMenu.setText("Set input source");
+            JMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", workspace, this.neuron.getDefaultConsumingAttribute());
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = CouplingMenus.getMenuOfConsumingAttributes(workspace, this.neuron.getDefaultProducingAttribute());
-            consumerMenu.setText("Set output target");
+            JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", workspace, this.neuron.getDefaultProducingAttribute());
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
         }

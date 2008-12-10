@@ -51,6 +51,7 @@ import org.dishevelled.layout.LabelFieldPanel;
 import org.simbrain.workspace.gui.CouplingMenus;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**
  * OSC world desktop component.
@@ -107,7 +108,7 @@ public final class OscWorldDesktopComponent
                     if (consumers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
-                        JMenu producerMenu = CouplingMenus.getMenuOfProducingAttributes(oscWorldComponent.getWorkspace(),
+                        ProducingAttributeMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", oscWorldComponent.getWorkspace(),
                                                                            consumer.getDefaultConsumingAttribute());
                         producerMenu.setText("Set input source");
                         contextMenu.add(producerMenu);

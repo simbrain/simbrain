@@ -30,6 +30,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.workspace.gui.ComponentMenu;
 import org.simbrain.workspace.gui.CouplingMenus;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
@@ -87,6 +88,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         menuBar.add(networkPanel.createEditMenu());
         menuBar.add(networkPanel.createInsertMenu());
         menuBar.add(networkPanel.createViewMenu());
+        menuBar.add(new ComponentMenu("Couple", this.getWorkspaceComponent().getWorkspace(), this.getWorkspaceComponent()));
         menuBar.add(networkPanel.createHelpMenu());
         getParentFrame().setJMenuBar(menuBar);
     }

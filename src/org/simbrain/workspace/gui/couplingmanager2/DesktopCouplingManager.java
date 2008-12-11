@@ -44,26 +44,22 @@ import javax.swing.border.Border;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.AttributePanel;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.gui.AttributePanel.AttributeType;
 
 /**
  * GUI dialog for creating couplings.
  */
-public class DesktopCouplingManager extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
-
-    /** Source workspace components. */
-    private final JComboBox sourceComponents = new JComboBox();
+public class DesktopCouplingManager extends JPanel implements ActionListener {
 
     /** List of producing attributes. */
-    private JList producingAttributes = new JList();
-
-    /** Target workspace components. */
-    private final JComboBox targetComponents = new JComboBox();
+    private AttributePanel producingAttributes;
 
     /** List of consuming attributes. */
-    private JList consumingAttributes = new JList();
+    private AttributePanel consumingAttributes;
 
     /** Methods for making couplings. */
     String[] tempStrings = { "One to one", "One to many" };
@@ -88,45 +84,21 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         this.desktop = desktop;
         this.frame = frame;
 
-        // SOURCE SIDE
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        JScrollPane leftScrollPane = new JScrollPane(producingAttributes);
+        // Left Panel
+        JPanel leftPanel = new JPanel();
         Border leftBorder = BorderFactory.createTitledBorder("Source Producing Attributes");
         leftPanel.setBorder(leftBorder);
-        producingAttributes.setDragEnabled(true);
-        producingAttributes.setCellRenderer(new ProducingAttributeCellRenderer());
-        producingAttributes.addMouseListener(this);
-        producingAttributes.addMouseMotionListener(this);
-        GenericListModel sourceComponentList = new GenericListModel(desktop.getWorkspace().getComponentList());
-        sourceComponents.setModel(sourceComponentList);
-        sourceComponents.addActionListener(this);
-        if (sourceComponents.getModel().getSize() > 0) {
-            sourceComponents.setSelectedIndex(0);
-            this.refresh((WorkspaceComponent<?>)sourceComponentList.getElementAt(0), sourceComponents);
-        }
-        leftPanel.add("North", sourceComponents);
-        leftPanel.add("Center", leftScrollPane);
+        producingAttributes = new AttributePanel(desktop.getWorkspace(), AttributeType.Producing);
+        leftPanel.add(producingAttributes);
 
-        // TARGET SIDE
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        JScrollPane rightScrollPane = new JScrollPane(consumingAttributes);
+        // Right Panel
+        JPanel rightPanel = new JPanel();
         Border rightBorder = BorderFactory.createTitledBorder("Target Consuming Attributes");
         rightPanel.setBorder(rightBorder);
-        consumingAttributes.setDragEnabled(true);
-        consumingAttributes.setCellRenderer(new ConsumingAttributeCellRenderer());
-        consumingAttributes.addMouseListener(this);
-        consumingAttributes.addMouseMotionListener(this);
-        GenericListModel targetComponentList = new GenericListModel(desktop.getWorkspace().getComponentList());
-        targetComponents.setModel(targetComponentList);
-        targetComponents.addActionListener(this);
-        if (targetComponents.getModel().getSize() > 0) {
-            targetComponents.setSelectedIndex(0);
-            refresh((WorkspaceComponent<?>)targetComponentList.getElementAt(0), targetComponents);
-        }
-        rightPanel.add("North", targetComponents);
-        rightPanel.add("Center", rightScrollPane);
+        consumingAttributes = new AttributePanel(desktop.getWorkspace(),  AttributeType.Consuming);
+        rightPanel.add(consumingAttributes);
         
-        // BOTTOM
+        // Bottom Panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(couplingMethodComboBox);
 
@@ -145,11 +117,10 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         cancelButton.addActionListener(this);
         bottomPanel.add(cancelButton);
 
-        JComponent couplingList = new CouplingListPanel(desktop,
-                new Vector(desktop.getWorkspace().getCouplingManager().getCouplings()));
+        JComponent couplingList = new CouplingListPanel(desktop,new Vector(desktop.getWorkspace().getCouplingManager().getCouplings()));
         couplingList.setBorder(BorderFactory.createTitledBorder("Couplings"));
 
-        // MAIN PANEL
+        // Main Panel
         JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
         centerPanel.add(leftPanel);
         centerPanel.add(couplingList);
@@ -159,78 +130,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
         desktop.getFrame().getRootPane().setDefaultButton(okButton);
-    }
-
-    /**
-     * Custom cell renderer.
-     */
-    private class ConsumingAttributeCellRenderer extends DefaultListCellRenderer {
-
-        /**
-         * Returns the list of cell renderer components.
-         * @param list Graphical object to be rendered.
-         * @param object to be rendered.
-         * @param index of object.
-         * @param isSelected boolean value.
-         * @param cellHasFocus boolean value.
-         * @return Component to be rendered.
-         * @overrides java.awt.Component
-         */
-        public java.awt.Component getListCellRendererComponent(final JList list,
-                final Object object, final int index, final boolean isSelected, final boolean cellHasFocus) {
-            DefaultListCellRenderer renderer = (DefaultListCellRenderer)
-                    super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
-            ConsumingAttribute consumingAttribute = (ConsumingAttribute) object;
-            renderer.setText(consumingAttribute.getAttributeDescription());
-            return renderer;
-       }
-    }
-
-    /**
-     * Custom producer cell renderer.
-     */
-    private class ProducingAttributeCellRenderer extends DefaultListCellRenderer {
-
-        /**
-         * Producer cell renderer component.
-         * @param list to be rendered.
-         * @param object to be added.
-         * @param index of producer.
-         * @param isSelected boolean value.
-         * @param cellHasFocus boolean value.
-         * @return rendered producers.
-         * @overrides java.awt.Component
-         */
-        public java.awt.Component getListCellRendererComponent(final JList list, final Object object,
-                final int index, final boolean isSelected, final boolean cellHasFocus) {
-            DefaultListCellRenderer renderer = (DefaultListCellRenderer)
-            super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
-            ProducingAttribute producingAttribute = (ProducingAttribute) object;
-           renderer.setText(producingAttribute.getAttributeDescription());
-            return renderer;
-       }
-    }
-
-    /**
-     * Refresh combo boxes.
-     *
-     * @param component the workspace component being checked
-     * @param comboBox the combo box upon which the refresh is based
-     */
-    private void refresh(final WorkspaceComponent component, final JComboBox comboBox) {
-
-        if (component != null) {
-            // Populate attribute Lists
-            if (comboBox == targetComponents) {
-                if (component.getConsumers() != null)  {
-                    consumingAttributes.setModel(new GenericListModel<ConsumingAttribute>(component.getConsumingAttributes()));
-                }
-          } else if (comboBox == sourceComponents) {
-              if (component.getProducers() != null) {
-                  producingAttributes.setModel(new GenericListModel<ProducingAttribute>(component.getProducingAttributes()));
-              }
-          }
-        }
+        
     }
 
     /**
@@ -242,7 +142,6 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         // Refresh component lists
         if (event.getSource() instanceof JComboBox) {
             WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event.getSource()).getSelectedItem();
-            refresh(component, (JComboBox) event.getSource());
         }
 
        // Handle Button Presses
@@ -262,10 +161,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * Add couplings using the selected method.
      */
     private void addCouplings() {
-        ArrayList<ProducingAttribute<?>> producingAttributes = getSelectedProducingAttributes();
-        ArrayList<ConsumingAttribute<?>> consumingAttributes = getSelectedConsumingAttributes();
+
+    	ArrayList<ProducingAttribute<?>> producingAttributeList = (ArrayList<ProducingAttribute<?>>) producingAttributes.getSelectedAttributes();
+        ArrayList<ConsumingAttribute<?>> consumingAttributeList = (ArrayList<ConsumingAttribute<?>>) consumingAttributes.getSelectedAttributes();
         
-        if ((producingAttributes.size() == 0) || (consumingAttributes.size() == 0)) {
+        if ((producingAttributeList.size() == 0) || (consumingAttributeList.size() == 0)) {
           JOptionPane.showMessageDialog(null,
                   "You must select at least one consuming and producing attribute \n in order to create couplings!",
                   "No Attributes Selected Warning", JOptionPane.WARNING_MESSAGE);
@@ -273,95 +173,12 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         }
         
         if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to one")) {
-            desktop.getWorkspace().coupleOneToOne(producingAttributes, consumingAttributes);
+            desktop.getWorkspace().coupleOneToOne(producingAttributeList, consumingAttributeList);
         } else if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to many")) {
-            desktop.getWorkspace().coupleOneToMany(producingAttributes, consumingAttributes);
+            desktop.getWorkspace().coupleOneToMany(producingAttributeList, consumingAttributeList);
         }
     }
-    
-    /**
-     * Returns producers selected in producer list.
-     * @return selected producers.
-     */
-    public ArrayList<ProducingAttribute<?>> getSelectedProducingAttributes() {
-        ArrayList<ProducingAttribute<?>> ret = new ArrayList<ProducingAttribute<?>>();
-        for (Object object : producingAttributes.getSelectedValues()) {
-            ret.add((ProducingAttribute<?>) object);
-        }
-        return ret;
-    }
 
-    /**
-     * Returns consumers selected in consumer list.
-     * @return selected consumers.
-     */
-    private ArrayList<ConsumingAttribute<?>> getSelectedConsumingAttributes() {
-        ArrayList<ConsumingAttribute<?>> ret = new ArrayList<ConsumingAttribute<?>>();
-        for (Object object : consumingAttributes.getSelectedValues()) {
-            ret.add((ConsumingAttribute<?>) object);
-        }
-        return ret;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseClicked(final MouseEvent event) {
-        System.out.println("MouseClicked");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseEntered(final MouseEvent arg0) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseExited(final MouseEvent arg0) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mousePressed(final MouseEvent event) {
-        System.out.println("MousePressed");
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseDragged(final MouseEvent event) {
-       System.out.println("MouseDragged");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseReleased(final MouseEvent arg0) {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseMoved(final MouseEvent arg0) {
-    }
-
-    /**
-     * @return the consumerJList.
-     */
-    public JList getConsumerJList() {
-        return consumingAttributes;
-    }
-
-    /**
-     * @return the producerJList.
-     */
-    public JList getProducerJList() {
-        return producingAttributes;
-    }
 }
 
 

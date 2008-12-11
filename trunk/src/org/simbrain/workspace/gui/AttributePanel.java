@@ -23,171 +23,228 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.simbrain.workspace.AbstractAttribute;
+import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.couplingmanager2.GenericListModel;
+import org.simbrain.workspace.WorkspaceListener;
 
 /**
- * Displays a list of the current couplings in the network.
- *
+ * Displays a panel with a JComboBox, which the user uses to select a component,
+ * and a JList of attributes for that component.
  */
-public class AttributePanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
+public class AttributePanel extends JPanel implements ActionListener, MouseListener {
 
-    /** List of network couplings. */
-    private JList attributes = new JList();
+	/** Parent frame. */
+	private JFrame parentFrame = new JFrame();
 
-    /** Instance of parent frame. */
-    private JFrame attributeFrame = new JFrame();
+	/** Workspace components. */
+	private ComponentDropDownBox componentList;
 
-    /** Source workspace components. */
-    private JComboBox sourceComponents = new JComboBox();
+	/** List of Attributes in a specified Component. */
+	private JList attributeList;
+	
+	/** List model. */
+	private DefaultListModel model;
 
-    /** Simbrain desktop reference. */
-    private final SimbrainDesktop desktop;
+	// TODO: Replace with generic parameter if possible.
+	public enum AttributeType { Producing, Consuming };
+	private AttributeType attributeType;
 
-    /**
-     * Creates a new coupling list panel using the applicable desktop and coupling lists.
-     * @param desktop Reference to simbrain desktop
-     * @param couplingList list of couplings to be shown in window
-     */
-    public AttributePanel(final SimbrainDesktop desktop) {
+	/**
+	 * Creates a new attribute list panel.
+	 * 
+	 * @param workspace reference to workspace
+	 */
+	public AttributePanel(final Workspace workspace, AttributeType attributeType) {
+		super(new BorderLayout());
+		this.attributeType = attributeType;
+		
+		// Set up attribute lists
+		model = new DefaultListModel();
+		attributeList = new JList(model);
+		attributeList.setCellRenderer(new AttributeCellRenderer());
+		attributeList.addMouseListener(this);
+		
+		// Scroll pane
+		JScrollPane listScroll = new JScrollPane(attributeList);
+		listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		
+		// Component list
+		componentList = new ComponentDropDownBox(workspace);
+		componentList.addActionListener(this);
+		add(componentList, BorderLayout.NORTH);
+		add(listScroll, BorderLayout.CENTER);
+		
+		// Initialize frame
+		parentFrame.setContentPane(this);
+		parentFrame.pack();
+	}
 
-        super(new BorderLayout());
+	/**
+	 * @see ActionListener
+	 */
+	public void actionPerformed(final ActionEvent event) {
 
-        // Reference to the simbrain desktop
-        this.desktop = desktop;
+		// Refresh component lists
+		if (event.getSource() instanceof JComboBox) {
+			WorkspaceComponent<?> component = (WorkspaceComponent<?>) ((JComboBox) event
+					.getSource()).getSelectedItem();
+			refresh(component);
+		}
+	}
 
-        attributes.setDragEnabled(true);
-        attributes.setCellRenderer(new AttributeCellRenderer());
-        attributes.addMouseListener(this);
-        attributes.addMouseMotionListener(this);
-        GenericListModel sourceComponentList = new GenericListModel(desktop.getWorkspace().getComponentList());
-        sourceComponents.setModel(sourceComponentList);
-        sourceComponents.addActionListener(this);
-        if (sourceComponents.getModel().getSize() > 0) {
-            sourceComponents.setSelectedIndex(0);
-            this.refresh((WorkspaceComponent<?>)sourceComponentList.getElementAt(0), sourceComponents);
-        }
+	/**
+	 * Refresh attribute list.
+	 */
+	private void refresh(final WorkspaceComponent<?> component) {
 
-        //Scroll pane for showing lists larger than viewing window and setting maximum size
-        JScrollPane listScroll = new JScrollPane(attributes);
-        listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		// Set Attribute list
+		if (component != null) {
+			model.clear();
+			if (attributeType == AttributeType.Producing) {
+				for (ProducingAttribute<?> attribute : component.getProducingAttributes()) {
+					model.addElement(attribute);
+				}
+			} else if (attributeType == AttributeType.Consuming) {
+				for (ConsumingAttribute<?> attribute : component.getConsumingAttributes()) {
+					model.addElement(attribute);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Clear attribute list.
+	 */
+	private void clearList() {
+		model.clear();
+	}
 
-        // Add scroll pane to JPanel
-        add(sourceComponents, BorderLayout.NORTH);
-        add(listScroll, BorderLayout.CENTER);
-//        add(buttonPanel, BorderLayout.SOUTH);
-        attributeFrame.setContentPane(this);
-        attributeFrame.pack();
-    }
+	/**
+	 * Returns selected attributes.
+	 * 
+	 * @return list of selected attributes.
+	 */
+	public ArrayList<?> getSelectedAttributes() {
+		if (attributeType == AttributeType.Producing) {
+			ArrayList<ProducingAttribute<?>> ret = new ArrayList<ProducingAttribute<?>>();
+			for (Object object : attributeList.getSelectedValues()) {
+				ret.add((ProducingAttribute<?>) object);
+			}
+			return ret;
+		} else if (attributeType == AttributeType.Consuming) {
+			ArrayList<ConsumingAttribute<?>> ret = new ArrayList<ConsumingAttribute<?>>();
+			for (Object object : attributeList.getSelectedValues()) {
+				ret.add((ConsumingAttribute<?>) object);
+			}
+			return ret;
+		}
+		return null;
+	}
 
+	public void mouseClicked(MouseEvent e) {
+	}
 
-    /**
-     * @see ActionListener
-     * @param event Action event.
-     */
-    public void actionPerformed(final ActionEvent event) {
+	public void mouseEntered(MouseEvent e) {
+	}
 
-        // Refresh component lists
-        if (event.getSource() instanceof JComboBox) {
-            WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event.getSource()).getSelectedItem();
-            refresh(component, (JComboBox) event.getSource());
-        }        
-    }
+	public void mouseExited(MouseEvent e) {
+	}
 
-    /**
-     * Custom producer cell renderer.
-     */
-    private class AttributeCellRenderer extends DefaultListCellRenderer {
+	public void mousePressed(MouseEvent e) {
+	}
 
-        /**
-         * Producer cell renderer component.
-         * @param list to be rendered.
-         * @param object to be added.
-         * @param index of producer.
-         * @param isSelected boolean value.
-         * @param cellHasFocus boolean value.
-         * @return rendered producers.
-         * @overrides java.awt.Component
-         */
-        public java.awt.Component getListCellRendererComponent(final JList list, final Object object,
-                final int index, final boolean isSelected, final boolean cellHasFocus) {
-            DefaultListCellRenderer renderer = (DefaultListCellRenderer)
-            super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
-            ProducingAttribute attribute = (ProducingAttribute) object;
-           renderer.setText(attribute.getAttributeDescription());
-            return renderer;
-       }
-    }
-    
+	public void mouseReleased(MouseEvent e) {
+	}
 
-    /**
-     * Refresh combo boxes.
-     *
-     * @param component the workspace component being checked
-     * @param comboBox the combo box upon which the refresh is based
-     */
-    private void refresh(final WorkspaceComponent component, final JComboBox comboBox) {
+	/**
+	 * Custom attribute renderer for JList.
+	 */
+	private class AttributeCellRenderer extends DefaultListCellRenderer {
 
-        if (component != null) {
-            if (component.getProducers() != null) {
-                attributes.setModel(new GenericListModel<ProducingAttribute>(
-                                component.getProducingAttributes()));
-            }
-        }
-    }
+		/**
+		 * @overrides java.awt.Component
+		 */
+		public java.awt.Component getListCellRendererComponent(
+				final JList list, final Object object, final int index,
+				final boolean isSelected, final boolean cellHasFocus) {
+			DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
+					.getListCellRendererComponent(list, object, index,
+							isSelected, cellHasFocus);
+			AbstractAttribute attribute = (AbstractAttribute) object;
+			renderer.setText(attribute.getAttributeDescription());
+			return renderer;
+		}
 
+	}
 
-    public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("Clicked");
-    }
+	/**
+	 * A JComboBox which listens to the workspace and updates accordingly.
+	 */
+	private class ComponentDropDownBox extends JComboBox implements WorkspaceListener {
 
+		/** Reference to workspace. */
+		Workspace workspace;
 
-    public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("Entered");
-    }
+		/**
+		 * @param workspace the workspace
+		 */
+		public ComponentDropDownBox(Workspace workspace) {
+			this.workspace = workspace;
+			for (WorkspaceComponent<?> component : workspace.getComponentList()) {
+				this.addItem(component);
+			}
+			if (this.getModel().getSize() > 0) {
+				this.setSelectedIndex(0);
+				AttributePanel.this.refresh((WorkspaceComponent<?>)this.getItemAt(0));
+			}
+			workspace.addListener(this);
+		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		public boolean clearWorkspace() {
+			return false;
+		}
 
-    public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("Exited");
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public void componentAdded(WorkspaceComponent<?> component) {
+			this.addItem(component);
+		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		public void componentRemoved(WorkspaceComponent<?> component) {
+			this.removeItem(component);
+			if (this.getItemCount() == 0) {
+				AttributePanel.this.clearList();				
+			}
+		}
 
-    public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("Pressed");
-    }
-
-
-    public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("Released");
-    }
-
-
-    public void mouseDragged(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("Dragged");
-    }
-
-
-    public void mouseMoved(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("Moved");
-    }
-
+		/**
+		 * {@inheritDoc}
+		 */
+		public void workspaceCleared() {
+			this.removeAllItems();
+			AttributePanel.this.clearList();			
+		}
+	}
 
 }

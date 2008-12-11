@@ -21,19 +21,14 @@ package org.simbrain.network.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.io.File;
 
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.workspace.gui.ComponentMenu;
-import org.simbrain.workspace.gui.CouplingMenus;
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 
 
 /**

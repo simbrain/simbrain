@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -69,7 +70,7 @@ public class Workspace {
     private WorkspaceThread workspaceThread;
 
     /** Listeners on this workspace. */
-    private Set<WorkspaceListener> listeners = new HashSet<WorkspaceListener>();
+    private CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
      * Mapping from workspace component types to integers which show how many have been added.

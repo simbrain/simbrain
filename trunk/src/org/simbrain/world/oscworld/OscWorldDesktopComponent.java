@@ -21,11 +21,10 @@ package org.simbrain.world.oscworld;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -34,24 +33,22 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-
 import javax.swing.border.EmptyBorder;
 
-import ca.odell.glazedlists.swing.EventListModel;
-
 import org.dishevelled.layout.LabelFieldPanel;
-
-import org.simbrain.workspace.gui.CouplingMenus;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.ProducingAttributeMenu;
+
+import ca.odell.glazedlists.swing.EventListModel;
 
 /**
  * OSC world desktop component.
@@ -143,7 +140,7 @@ public final class OscWorldDesktopComponent
                     if (producers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
                         OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
-                        JMenu consumerMenu = CouplingMenus.getMenuOfConsumingAttributes(oscWorldComponent.getWorkspace(),
+                        ConsumingAttributeMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", oscWorldComponent.getWorkspace(),
                                                                            producer.getDefaultProducingAttribute());
                         consumerMenu.setText("Set output target");
                         contextMenu.add(consumerMenu);

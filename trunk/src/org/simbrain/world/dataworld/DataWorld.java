@@ -43,7 +43,6 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.CouplingMenus;
 import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**

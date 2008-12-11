@@ -36,6 +36,7 @@ import javax.swing.border.Border;
 
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingComponentListener;
 
 /**
  * Displays a list of the current couplings in the network.

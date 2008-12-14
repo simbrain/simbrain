@@ -1,17 +1,15 @@
 package org.simbrain.console;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.io.InputStreamReader;
 
 import org.simbrain.workspace.Workspace;
 
-import bsh.commands.*;
 import bsh.EvalError;
 import bsh.Interpreter;
-import bsh.TargetError;
 
 public class SimbrainInterpreter extends bsh.Interpreter {
-
+    private static final long serialVersionUID = 1L;
+    
     public static void main(final String[] args) {
         CommandLineReader in = new CommandLineReader(new InputStreamReader(System.in));
         Interpreter interpreter = new Interpreter(in, System.out, System.err, true);

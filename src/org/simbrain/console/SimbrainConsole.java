@@ -1,15 +1,8 @@
 package org.simbrain.console;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-
-import org.simbrain.workspace.Workspace;
-
-import bsh.commands.*;
 import bsh.Capabilities;
 import bsh.EvalError;
 import bsh.Interpreter;
-import bsh.TargetError;
 
 public class SimbrainConsole extends bsh.Console {
 

@@ -43,12 +43,11 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class BarChartGui extends GuiComponent<BarChartComponent> implements ActionListener {
 
-    /** The underlying plot component. */
-    private final BarChartComponent component;
-
     /** Chart gui. */
     private JFreeChart chart;
 
+    ChartPanel chartPanel = new ChartPanel(null);
+    
     /** Preferred frame size. */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
@@ -63,32 +62,9 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
      */
     public BarChartGui(final GenericFrame frame, final BarChartComponent component) {
         super(frame, component);
-        this.component = component;
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
-    }
-
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         setLayout(new BorderLayout());
-        
-        // Generate the graph
-        chart = ChartFactory.createBarChart(
-                "Bar Chart Demo 1",       // chart title
-                "Category",               // domain axis label
-                "Value",                  // range axis label
-                component.getDataset(),                  // data
-                PlotOrientation.VERTICAL, // orientation
-                true,                     // include legend
-                true,                     // tooltips?
-                false                     // URLs?
-
-            );
-
-        chart.getCategoryPlot().getRangeAxis().setAutoRange(true);
 
         JButton deleteButton = new JButton("Delete");
         deleteButton.setActionCommand("Delete");
@@ -101,12 +77,32 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
         
-        ChartPanel panel = new ChartPanel(chart);
-
         createAttachMenuBar();
 
-        add("Center", panel);
+        add("Center", chartPanel);
         add("South", buttonPanel);
+    }
+    
+    /**
+     * Initializes frame.
+     */
+    @Override
+    public void postAddInit() {
+        // Generate the graph
+        chart = ChartFactory.createBarChart(
+                "Bar Chart Demo 1",       // chart title
+                "Category",               // domain axis label
+                "Value",                  // range axis label
+                this.getWorkspaceComponent().getModel().getDataset(),                  // data
+                PlotOrientation.VERTICAL, // orientation
+                true,                     // include legend
+                true,                     // tooltips?
+                false                     // URLs?
+
+            );
+        chartPanel.setChart(chart);
+        chart.getCategoryPlot().getRangeAxis().setAutoRange(true);
+        
     }
 
     /**
@@ -148,9 +144,9 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
-            component.removeColumn();
+        	this.getWorkspaceComponent().getModel().removeColumn();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
-            component.addColumn();
+        	this.getWorkspaceComponent().getModel().addColumn();
         }
         
     }

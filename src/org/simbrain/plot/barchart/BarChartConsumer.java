@@ -28,7 +28,7 @@ import org.simbrain.workspace.SingleAttributeConsumer;
 public class BarChartConsumer extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
-    private BarChartComponent plot;
+    private BarChartModel data;
         
     /** Name. */
     private final String name;
@@ -45,8 +45,8 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
      * @param plot the parent component
      * @param name the name of this consumer (displayed in the plot)
      */
-    public BarChartConsumer(BarChartComponent plot, String name, Integer index) {
-        this.plot = plot;
+    public BarChartConsumer(BarChartModel data, String name, Integer index) {
+        this.data = data;
         this.name = name;
         this.index = index;
     }
@@ -80,7 +80,7 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public BarChartComponent getParentComponent() {
-        return plot;
+        return data.getParent();
     }
 
     /**

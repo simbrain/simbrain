@@ -22,9 +22,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -32,20 +36,13 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Daa for a JFreeChart pie chart.
+ * Data for a JFreeChart pie chart.
  */
 public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
-    /** Consumer list. */
-    private ArrayList<BarChartConsumer> consumers = new ArrayList<BarChartConsumer>();
-    
-    /** JFreeChart dataset for bar charts. */
-    private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-    /** Initial number of data sources. */
-    private static final int INITIAL_DATA_SOURCES = 6;
-
-
+	/** Data model. */
+	private BarChartModel model;
+	
     /**
      * Create new BarChart Component.
      *
@@ -53,10 +50,22 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public BarChartComponent(final String name) {
         super(name);
-        defaultInit();
+    	model = new BarChartModel(this);		
     }
-    
+
     /**
+     * Create new BarChart Component from a specified model.
+     * Used in deserializing.
+     *
+     * @param name chart name
+     */
+    public BarChartComponent(final String name, final BarChartModel model) {
+        super(name);
+        this.model = model;
+        model.setParent(this);
+    }
+
+	/**
      * Initializes a jfreechart with specific number of data sources.
      *
      * @param name name of component
@@ -64,121 +73,42 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public BarChartComponent(final String name, final int numDataSources) {
         super(name);
-        addDataSources(numDataSources);
+    	model = new BarChartModel(this);		
+        model.addDataSources(numDataSources);
     }
-   
+
     /**
-     * Return JFreeChart pie dataset.
-     * 
-     * @return dataset
-     */
-    public CategoryDataset getDataset() {
-        return dataset;
-    }
-    
-    /**
-     * Default initialization.
-     */
-    private void defaultInit() {
-        addDataSources(INITIAL_DATA_SOURCES);
-    }
-    
-    /**
-     * Create specified number of set of data sources.
-     * Adds these two existing data sources.
+     * Returns model.
      *
-     * @param numDataSources number of data sources to initialize plot with
+     * @return the model.
      */
-    public void addDataSources(final int numDataSources) {
-        for (int i = 0; i < numDataSources; i++) {
-            addColumn();
-        }
+    public BarChartModel getModel() {
+    	return model;
     }
 
-    /**
-     * Adds a new column to the dataset.
-     */
-    public void addColumn() {
-        int columnIndex = consumers.size() + 1;
-        BarChartConsumer newAttribute = new BarChartConsumer(this, "BarChartData"
-                + (columnIndex), columnIndex);
-        consumers.add(newAttribute);
-    }
-
-    /**
-     * Removes the last column from the dataset.
-     */
-    public void removeColumn() {
-        int lastColumnIndex = dataset.getColumnCount() - 1;
-
-        if (lastColumnIndex >= 0) {
-            dataset.removeColumn(lastColumnIndex);
-            consumers.remove(lastColumnIndex);
-        }
-    }
-    
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-//        xstream.omitField(BarChartComponent.class, "logger");
-        xstream.omitField(WorkspaceComponent.class, "component");
-        xstream.omitField(WorkspaceComponent.class, "listenerList");
-        xstream.omitField(WorkspaceComponent.class, "workspace");
-        xstream.omitField(WorkspaceComponent.class, "logger");
-        return xstream;
-    }
-
-    /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     * 
-     * @return Initialized object.
-     */
-    private Object readResolve() {
-        System.out.println("ReadResolve.");
-        return this;
-    }
-    
     public static BarChartComponent open(InputStream input, final String name, final String format) {
-        return (BarChartComponent) getXStream().fromXML(input);
+        BarChartModel dataModel = (BarChartModel) BarChartModel.getXStream().fromXML(input);
+        return new BarChartComponent(name, dataModel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(this, output);
+    	BarChartModel.getXStream().toXML(model, output);
     }
 
     @Override
     public boolean hasChangedSinceLastSave() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void closing() {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<BarChartConsumer> getConsumers() {
-        return consumers;
     }
 
     @Override
     public void update() {
-        System.out.println(dataset);
-        for (BarChartConsumer consumer : getConsumers()) {
-            dataset.setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
+        for (BarChartConsumer consumer : model.getConsumers()) {
+            model.getDataset().setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
         }
     }
 
@@ -189,12 +119,22 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
     }
     
     @Override
-    public String getXML() {
-        return BarChartComponent.getXStream().toXML(this);
-    }
-    
-    @Override
     public void setCurrentDirectory(final String currentDirectory) {
         super.setCurrentDirectory(currentDirectory);
     }
+    
+    @Override
+    public List<? extends Consumer> getConsumers() {
+        return (List<? extends Consumer>) model.getConsumers();
+    }
+    
+    @Override
+    public List<? extends Producer> getProducers() {
+        return (List<? extends Producer>) Collections.emptySet();
+    }
+
+	@Override
+	public String getXML() {
+		return BarChartModel.getXStream().toXML(model);
+	}
 }

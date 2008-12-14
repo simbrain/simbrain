@@ -18,19 +18,11 @@
  */
 package org.simbrain.console;
 
-import java.awt.Dimension;
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.swing.JInternalFrame;
-
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-
-import bsh.Interpreter;
-import bsh.util.JConsole;
 
 /**
  * Component corresponding to a beanshell window.

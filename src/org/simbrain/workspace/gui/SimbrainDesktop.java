@@ -551,6 +551,11 @@ public class SimbrainDesktop {
     public void addInternalFrame(final JInternalFrame internalFrame) {
         desktop.add(internalFrame);
     }
+    
+    public void registerComponentInstance(final WorkspaceComponent workspaceComponent, GuiComponent guiComponent) {
+        components.put(workspaceComponent, guiComponent);
+    }
+    
 
     /**
      * Add a new <c>SimbrainComponent</c>.
@@ -615,7 +620,7 @@ public class SimbrainDesktop {
         // Finish adding component
         guiComponent.addComponentListener(componentListener);
         lastClickedPoint = null;
-        components.put(workspaceComponent, guiComponent);
+        registerComponentInstance(workspaceComponent, guiComponent);
         componentFrame.setContentPane(guiComponent);
         componentFrame.setVisible(true);
         desktop.add(componentFrame);

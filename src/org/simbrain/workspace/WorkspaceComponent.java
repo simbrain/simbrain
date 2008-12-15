@@ -406,7 +406,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
      * 
      * @param workspace The workspace for this component.
      */
-    void setWorkspace(final Workspace workspace) {
+    public void setWorkspace(final Workspace workspace) {
         this.workspace = workspace;
     }
 

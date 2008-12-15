@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace.gui;
 
+import java.awt.Desktop;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +33,7 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentDeserializer;
 import org.simbrain.workspace.WorkspaceComponentListener;
@@ -41,8 +43,13 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * A gui view on a  {@link org.simbrain.workspace.WorkspaceComponent}.
+ * 
+ * @param <E> the type of the workspace component.
  */
 public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPanel {
+
+    /** serial version UID. */
+    private static final long serialVersionUID = 1L;
 
     /** Reference to workspace component. */
     private E workspaceComponent;
@@ -58,8 +65,11 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
    
     /**
      * Construct a workspace component.
+     * 
+     * @param frame the parent frame.
+     * @param workspaceComponent the component to wrap.
      */
-    public GuiComponent(GenericFrame frame, E workspaceComponent) {
+    public GuiComponent(final GenericFrame frame, final E workspaceComponent) {
         super();
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
@@ -80,6 +90,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         /* no implementation */
     }
 
+    /**
+     * Closes this view.
+     */
     public void close() {
         closing();
         workspaceComponent.close();
@@ -104,7 +117,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      */
     @SuppressWarnings("unchecked")
     public void showOpenFileDialog() {
-        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(), workspaceComponent.getDescription());
+        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(),
+            workspaceComponent.getDescription());
         
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
@@ -115,9 +129,18 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
 //            workspaceComponent.open(theFile);
             
             try {
-                workspaceComponent = (E) WorkspaceComponentDeserializer.deserializeWorkspaceComponent(
-                    workspaceComponent.getClass(), theFile.getName(), 
+                Workspace workspace = workspaceComponent.getWorkspace();
+                
+                workspaceComponent = (E) WorkspaceComponentDeserializer
+                    .deserializeWorkspaceComponent(
+                    workspaceComponent.getClass(), theFile.getName(),
                     new FileInputStream(theFile), SFileChooser.getExtension(theFile));
+                
+                workspaceComponent.setWorkspace(workspace);
+                
+                SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
+                
+                desktop.registerComponentInstance(workspaceComponent, this);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -195,8 +218,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
     public static GuiComponent<?> open(final WorkspaceComponent<?> component,
             final InputStream istream, final String name) {
         
-        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
-        GuiComponent<?> dc = desktop.createDesktopComponent(null, component);
+//        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
+        GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);
         Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
         
         dc.setTitle(name);
@@ -212,7 +235,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane
                 .showInternalOptionDialog(this,
-                 "This component has changed since last save,\nWould you like to save these changes?",
+                 "This component has changed since last save,\n"
+               + "Would you like to save these changes?",
                  "Component Has Changed", JOptionPane.YES_NO_OPTION,
                  JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
@@ -227,7 +251,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
     }
 
     /**
-     * Return name of unerlying component.
+     * Return name of underlying component.
+     * 
+     * @return the name of underlying component.
      */
     public String getName() {
         return (workspaceComponent == null) ? "null" : workspaceComponent.getName();
@@ -254,31 +280,60 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         return simpleName;
     }
     
+    /**
+     * Returns the workspace component wrapped by this instance.
+     * 
+     * @return the workspace component wrapped by this instance.
+     */
     public E getWorkspaceComponent() {
         return workspaceComponent;
     }
     
+    /**
+     * ComponentListener base.
+     * 
+     * @author Matt Watson
+     */
     protected class BasicComponentListener implements WorkspaceComponentListener {
+        /**
+         * The constructor for this inner class.
+         */
         public BasicComponentListener() {
             /* need a public constructor for subclasses */
         }
         
+        /**
+         * Called when a component is updated.
+         */
         public void componentUpdated() {
             update();
         }
 
-        public void setTitle(String name) {
+        /**
+         * Sets the title of this window.
+         * 
+         * @param name the name of the window.
+         */
+        public void setTitle(final String name) {
             parentFrame.setTitle(name);
         }
     }
             
-
-    public void setParentFrame(GenericFrame parentFrame) {
+    /**
+     * Sets the parent frame of this view.
+     * 
+     * @param parentFrame the new parent.
+     */
+    public void setParentFrame(final GenericFrame parentFrame) {
         this.parentFrame = parentFrame;
     }
     
+    /**
+     * Returns the parent from of this view.
+     * 
+     * @return the parent from of this view.
+     */
     public GenericFrame getParentFrame() {
         return this.parentFrame;
     }
-
 }

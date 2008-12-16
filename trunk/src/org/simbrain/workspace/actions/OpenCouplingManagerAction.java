@@ -21,13 +21,11 @@ package org.simbrain.workspace.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.couplingmanager2.DesktopCouplingManager;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.gui.couplingmanager2.DesktopCouplingManager;
 
 /**
  * Open data world in current workspace.
@@ -53,6 +51,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         GenericJInternalFrame frame = new GenericJInternalFrame();
+        desktop.addInternalFrame(frame);
         DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
         frame.setContentPane(cm);
 //        frame.setSize(850, 420);
@@ -61,6 +60,5 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         frame.setClosable(true);
         frame.setVisible(true);
         frame.setMaximizable(true);
-        desktop.addInternalFrame(frame);
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.Desktop;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileInputStream;

@@ -80,23 +80,19 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      * @param reference to parent frame
      */
     public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericFrame frame) {
-        super();
+        super(new BorderLayout());
         this.desktop = desktop;
         this.frame = frame;
 
         // Left Panel
-        JPanel leftPanel = new JPanel();
         Border leftBorder = BorderFactory.createTitledBorder("Source Producing Attributes");
-        leftPanel.setBorder(leftBorder);
         producingAttributes = new AttributePanel(desktop.getWorkspace(), AttributeType.Producing);
-        leftPanel.add(producingAttributes);
+        producingAttributes.setBorder(leftBorder);
 
         // Right Panel
-        JPanel rightPanel = new JPanel();
         Border rightBorder = BorderFactory.createTitledBorder("Target Consuming Attributes");
-        rightPanel.setBorder(rightBorder);
         consumingAttributes = new AttributePanel(desktop.getWorkspace(),  AttributeType.Consuming);
-        rightPanel.add(consumingAttributes);
+        consumingAttributes.setBorder(rightBorder);
         
         // Bottom Panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -122,11 +118,10 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         // Main Panel
         JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
-        centerPanel.add(leftPanel);
+        centerPanel.add(producingAttributes);
         centerPanel.add(couplingList);
-        centerPanel.add(rightPanel);
+        centerPanel.add(consumingAttributes);
         centerPanel.setPreferredSize(new Dimension(800, 400));
-        this.setLayout(new BorderLayout());
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
         desktop.getFrame().getRootPane().setDefaultButton(okButton);

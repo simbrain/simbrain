@@ -53,6 +53,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         GenericJInternalFrame frame = new GenericJInternalFrame();
         desktop.addInternalFrame(frame);
         DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
+        frame.setTitle("Coupling Manager");
         frame.setContentPane(cm);
 //        frame.setSize(850, 420);
         frame.pack();
@@ -60,5 +61,6 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         frame.setClosable(true);
         frame.setVisible(true);
         frame.setMaximizable(true);
+        frame.setIconifiable(true);
     }
 }

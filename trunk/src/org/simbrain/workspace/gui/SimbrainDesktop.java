@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -69,8 +68,6 @@ import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
-import org.simbrain.world.gameworld2d.GameWorld2DComponent;
-import org.simbrain.world.gameworld2d.GameWorld2DDesktopComponent;
 import org.simbrain.world.midiworld.MidiWorldComponent;
 import org.simbrain.world.midiworld.MidiWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -229,7 +226,6 @@ public class SimbrainDesktop {
         registerComponent(BarChartComponent.class, BarChartGui.class);
         registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
         registerComponent(DataWorldComponent.class, DataWorldDesktopComponent.class);
-        registerComponent(GameWorld2DComponent.class, GameWorld2DDesktopComponent.class);
         registerComponent(GaugeComponent.class, GaugeDesktopComponent.class);
         registerComponent(MidiWorldComponent.class, MidiWorldDesktopComponent.class);
         registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);

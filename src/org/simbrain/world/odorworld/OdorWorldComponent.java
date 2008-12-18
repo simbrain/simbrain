@@ -52,7 +52,6 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         world.setParent(this);
     }
 
-
     /**
      * Recreates an instance of this class from a saved component.
      * 
@@ -70,12 +69,6 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public String getXML() {
         return OdorWorld.getXStream().toXML(world);
     }
-
-//    @Override
-//    public void deserializeFromReader(FileReader reader) {
-//        world = (OdorWorld) OdorWorld.getXStream().fromXML(reader);
-//        world.setParent(this);
-//    }
 
     /**
      * {@inheritDoc}
@@ -107,7 +100,7 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 
     @Override
     protected void update() {
-        /* no implementation */
+    	world.update();    	
     }
     
     @Override
@@ -120,6 +113,4 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public String getCurrentDirectory() {
        return OdorWorldPreferences.getCurrentDirectory();
     }
-    
-    
 }

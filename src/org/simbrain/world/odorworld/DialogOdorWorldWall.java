@@ -32,6 +32,8 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.environment.SmellSourcePanel;
+import org.simbrain.world.odorworld.entities.Wall;
 
 
 /**
@@ -72,7 +74,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     private JTextField resurrectionProb = new JTextField();
 
     /** The panel containing stimulus information. */
-    private PanelStimulus stimPanel;
+    private SmellSourcePanel stimPanel;
 
     /** The panel containing items not pertaining to other panels. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
@@ -129,10 +131,11 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
         miscPanel.addItem("Bites to die", bitesToDie);
         miscPanel.addItem("Resurrection Probability", resurrectionProb);
 
-        setStimPanel(new PanelStimulus(wall));
-        getStimPanel().getTabbedPane().insertTab("Wall", null, topPanel, null, 0);
-        getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
-        getStimPanel().getTabbedPane().setSelectedIndex(0);
+        // TODO
+//        setStimPanel(new StimulusVectorPanel(wall));
+//        getStimPanel().getTabbedPane().insertTab("Wall", null, topPanel, null, 0);
+//        getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
+//        getStimPanel().getTabbedPane().setSelectedIndex(0);
         setContentPane(getStimPanel());
     }
 
@@ -145,10 +148,10 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 
         if (o == colorButton) {
             Color theColor = getColor();
-
-            if (theColor != null) {
-                worldPanel.setWallColor(theColor);
-            }
+            // TODO: Colors now specific to walls
+//            if (theColor != null) {
+//                worldPanel.setWallColor(theColor);
+//            }
         }
 
         if (o == edible) {
@@ -160,12 +163,12 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        width.setValue(wall.getWidth());
-        height.setValue(wall.getHeight());
-        resurrectionProb.setText("" + wall.getResurrectionProb());
-        edible.setSelected(wall.getEdible());
-        bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
-        bitesToDie.setEnabled(wall.getEdible());
+//        width.setValue(wall.getWidth());
+//        height.setValue(wall.getHeight());
+//        resurrectionProb.setText("" + wall.getResurrectionProb());
+//        edible.setSelected(wall.getEdible());
+//        bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
+//        bitesToDie.setEnabled(wall.getEdible());
     }
 
     /**
@@ -201,27 +204,27 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      * Commits the changes edited here.
      */
     public void commitChanges() {
-        wall.setEdible(edible.isSelected());
-
-        if (!edible.isSelected()) {
-            wall.setBites(0);
-        }
-
-        wall.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
-        wall.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
+//        wall.setEdible(edible.isSelected());
+//
+//        if (!edible.isSelected()) {
+//            wall.setBites(0);
+//        }
+//
+//        wall.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
+//        wall.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
     }
 
     /**
      * @param stimPanel The stimPanel to set.
      */
-    void setStimPanel(final PanelStimulus stimPanel) {
+    void setStimPanel(final SmellSourcePanel stimPanel) {
         this.stimPanel = stimPanel;
     }
 
     /**
      * @return Returns the stimPanel.
      */
-    PanelStimulus getStimPanel() {
+    SmellSourcePanel getStimPanel() {
         return stimPanel;
     }
 }

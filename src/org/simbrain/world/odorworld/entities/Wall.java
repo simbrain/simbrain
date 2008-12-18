@@ -16,11 +16,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld.entities;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+
+import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.environment.TwoDEnvironment;
+import org.simbrain.world.odorworld.LifeCycle;
+import org.simbrain.world.odorworld.OdorWorld;
 
 
 /**
@@ -28,49 +35,36 @@ import java.awt.Rectangle;
  *
  * @author Ryan Bartley
  */
-public class Wall extends AbstractEntity {
-    /** X value. */
+public class Wall implements OdorWorldEntity {
+    
+	/** X value. */
     private int x;
+    
     /** Y value. */
     private int y;
+    
     /** Height value. */
     private int height;
+    
     /** Width value. */
     private int width;
+    
     /** Parent world. */
     private OdorWorld parent;
-    /** Stimulus. */
-    private Stimulus theStimulus = new Stimulus();
-    /** Object edible boolean. */
-    private boolean edible;
-    /** Initial bites value. */
-    private final int initBites = 30;
-    /** Bites to die value. */
-    private int bitesToDie = initBites;
-    /** Number of bites value. */
-    private int bites;
-    /** Resurrection probability value. */
-    private double resurrectionProb = 0;
+    
+    /** Wall color. */
+    Color wallColor = Color.black;
 
-    /**
-     * Return the resurrectin probability.
-     *
-     * @return the resurrection probability
-     */
-    public double getResurrectionProb() {
-        return resurrectionProb;
-    }
+	/** Smell of this entity, if any. */
+	private SmellSource smellSource;
+	
+	/** Life cycle of this entity, if it can be eaten. */
+	private LifeCycle lifeCycle;
 
-    /**
-     * Sets the resurrection probability.
-     *
-     * @param resurrectionProb Resurrection probability value
-     */
-    public void setResurrectionProb(final double resurrectionProb) {
-        this.resurrectionProb = resurrectionProb;
-    }
+    /** Whether this entity inhibits movement. */
+	private boolean inhibitsMovement;
 
-    /**
+	/**
      * Creates a wall in OdorWorld.
      *
      * @param parentWorld Current world
@@ -125,7 +119,7 @@ public class Wall extends AbstractEntity {
     }
 
     /**
-     * Sets the widht.
+     * Sets the width.
      *
      * @param width The width
      */
@@ -184,7 +178,7 @@ public class Wall extends AbstractEntity {
      * @param g the world graphics object
      */
     public void paintThis(final Graphics g) {
-//        g.setColor(parent.getWa());
+    	//g.setColor(parent.getWa());
         g.fillRect(getX(), getY(), getWidth(), getHeight());
     }
     
@@ -199,91 +193,108 @@ public class Wall extends AbstractEntity {
     }
 
     /**
-     * Return the stimulus.
-     *
-     * @return the stimulus
+     * {@inheritDoc}
      */
-    public Stimulus getStimulus() {
-        return theStimulus;
-    }
+	public void update() {
+		// No implementation
+	}
 
     /**
-     * Sets the stimulus.
-     *
-     * @param theStimulus The stimulus
+     * {@inheritDoc}
      */
-    public void setStimulus(final Stimulus theStimulus) {
-        this.theStimulus = theStimulus;
-    }
+	public TwoDEnvironment getEnvironment() {
+		return parent;
+	}
+
+	/**
+	 * Suggested = actual for static entities.
+	 *
+	 * @return location
+	 */
+	public double[] getLocation() {
+		return new double[]{x,y};
+	}
+
 
     /**
-     * Return the location.
-     *
-     * @return the location
+     * {@inheritDoc}
      */
-    public Point getLocation() {
-        return new Point(getX() + (getWidth() / 2), getY() + (getHeight() / 2));
-    }
+	public void setLocation(double[] location) {
+		x = (int) location[0];
+		y = (int) location[0];
+	}
 
     /**
-     * Return the bites to die.
-     *
-     * @return the bites to die
+     * {@inheritDoc}
      */
-    public int getBitesToDie() {
-        return bitesToDie;
-    }
+	public double[] getSuggestedLocation() {
+		return getLocation();
+	}
 
     /**
-     * Sets the bites to die.
-     *
-     * @param bitesToDie The bies to die
+     * {@inheritDoc}
      */
-    public void setBitesToDie(final int bitesToDie) {
-        this.bitesToDie = bitesToDie;
-    }
+	public void setSuggestedLocation(double[] location) {
+		setLocation(location);
+	}
 
     /**
-     * Return the edible.
-     *
-     * @return the edible
+     * {@inheritDoc}
      */
-    public boolean getEdible() {
-        return edible;
-    }
+	public Rectangle getBounds() {
+		return null; // TODO
+	}
+
 
     /**
-     * Sets the edible.
-     *
-     * @param edible The edible
+     * {@inheritDoc}
      */
-    public void setEdible(final boolean edible) {
-        this.edible = edible;
-    }
+	public void paintEntity(Component component, Graphics g) {
+        g.setColor(wallColor);
+        Rectangle rect = getBounds();
+        g.fillRect(rect.x, rect.y, rect.width, rect.height);
+	}
 
     /**
-     * Return the bites.
-     *
-     * @return the bites
+     * {@inheritDoc}
      */
-    public int getBites() {
-        return bites;
-    }
+	public void postSerializationInit() {
+		// TODO Auto-generated method stub
+	}
 
     /**
-     * Sets the bites.
-     *
-     * @param bites The bites
+     * {@inheritDoc}
      */
-    public void setBites(final int bites) {
-        this.bites = bites;
-    }
+	public boolean inhibitsMovement() {
+		return inhibitsMovement;
+	}
 
     /**
-     * Terminates an object that is edible.
+     * {@inheritDoc}
      */
-    public void terminate() {
-        parent.getAbstractEntityList().remove(this);
-        parent.getDeadEntityList().add(this);
-    }
+	public void setInhibitsMovement(boolean inhibitsMovement) {
+		this.inhibitsMovement = inhibitsMovement;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public void setSmellSource(SmellSource source) {
+		smellSource = source;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public SmellSource getSmellSource() {
+		return smellSource;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public LifeCycle getLifeCycleObject() {
+		return lifeCycle;
+	}
+
 }

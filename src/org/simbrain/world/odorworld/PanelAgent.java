@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.world.odorworld.entities.MovingEntity;
 
 
 /**
@@ -31,7 +32,7 @@ public class PanelAgent extends LabelledItemPanel {
     private static final long serialVersionUID = 1L;
     
     /** Entity referenced. */
-    private OdorWorldAgent entityRef = null;
+    private MovingEntity entityRef = null;
     /** Whisker angle field. */
     private JTextField tfWhiskerAngle = new JTextField();
     /** Whisker lenght field. */
@@ -48,7 +49,7 @@ public class PanelAgent extends LabelledItemPanel {
      *
      * @param we reference to the creature entity whoes detection  parameters are being adjusted
      */
-    public PanelAgent(final OdorWorldAgent we) {
+    public PanelAgent(final MovingEntity we) {
         entityRef = we;
 
         fillFieldValues();
@@ -59,23 +60,26 @@ public class PanelAgent extends LabelledItemPanel {
         this.addItem("Straight movement increment", this.tfStraightMovementIncrement);
     }
 
+    // TODO!
+    
+    
     /**
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        tfWhiskerAngle.setText(Double.toString((entityRef.getWHISKER_ANGLE() * halfCircleDeg) / Math.PI));
-        tfWhiskerLength.setText(Double.toString(entityRef.getWhiskerLength()));
-        tfTurnIncrement.setText(Double.toString(entityRef.getTurnIncrement()));
-        tfStraightMovementIncrement.setText(Double.toString(entityRef.getMovementIncrement()));
+//        tfWhiskerAngle.setText(Double.toString((OdorWorldAgent.WHISKER_ANGLE * halfCircleDeg) / Math.PI));
+//        tfWhiskerLength.setText(Double.toString(entityRef.getWhiskerLength()));
+//        tfTurnIncrement.setText(Double.toString(entityRef.getTurnIncrement()));
+//        tfStraightMovementIncrement.setText(Double.toString(entityRef.getMovementIncrement()));
     }
 
     /**
      * Set values based on fields.
      */
     public void commitChanges() {
-        entityRef.setWhiskerAngle((Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI) / halfCircleDeg);
-        entityRef.setWhiskerLength(Double.parseDouble(tfWhiskerLength.getText()));
-        entityRef.setTurnIncrement(Double.parseDouble(tfTurnIncrement.getText()));
-        entityRef.setMovementIncrement(Double.parseDouble(tfStraightMovementIncrement.getText()));
+//        entityRef.setWhiskerAngle((Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI) / halfCircleDeg);
+//        entityRef.setWhiskerLength(Double.parseDouble(tfWhiskerLength.getText()));
+//        entityRef.setTurnIncrement(Double.parseDouble(tfTurnIncrement.getText()));
+//        entityRef.setMovementIncrement(Double.parseDouble(tfStraightMovementIncrement.getText()));
     }
 }

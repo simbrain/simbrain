@@ -20,6 +20,11 @@ package org.simbrain.world.odorworld;
 
 import java.awt.Point;
 
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.MovingEntity;
+import org.simbrain.world.odorworld.entities.StaticEntity;
+import org.simbrain.world.odorworld.entities.Wall;
+
 
 /**
  * <b>WorldClipboard</b> is a static clipboard utility class.
@@ -28,7 +33,7 @@ import java.awt.Point;
  */
 public final class WorldClipboard {
     /** Clipboard entity. */
-    private static AbstractEntity clipboardEntity;
+    private static OdorWorldEntity clipboardEntity;
 
     /**
      * Default constructor.
@@ -49,9 +54,9 @@ public final class WorldClipboard {
      * @param selectedEntity Selected entity
      * @param parent Parent world
      */
-    public static void cutItem(final AbstractEntity selectedEntity, final OdorWorldPanel parent) {
+    public static void cutItem(final OdorWorldEntity selectedEntity, final OdorWorldPanel parent) {
         setClipboardEntity(selectedEntity);
-        parent.getWorld().getAbstractEntityList().remove(selectedEntity);
+        parent.getWorld().getEntityList().remove(selectedEntity);
         parent.repaint();
     }
 
@@ -62,14 +67,14 @@ public final class WorldClipboard {
      * @param parent Parent world
      */
     public static void pasteItem(final Point p, final OdorWorldPanel parent) {
-        AbstractEntity temp = getClipboardEntity();
-
+        OdorWorldEntity temp = getClipboardEntity();
+// TODO
         if (temp != null) {
-            temp.setParent(parent.getWorld());
-            temp.setX(p.x);
-            temp.setY(p.y);
-            parent.getWorld().getAbstractEntityList().add(temp);
-            parent.repaint();
+//            temp.setParent(parent.getWorld());
+//            temp.setX(p.x);
+//            temp.setY(p.y);
+//            parent.getWorld().getAbstractEntityList().add(temp);
+//            parent.repaint();
         }
 
         copyItem(temp);
@@ -80,28 +85,31 @@ public final class WorldClipboard {
      *
      * @param entity Entity to copy
      */
-    public static void copyItem(final AbstractEntity entity) {
-        if (entity instanceof OdorWorldEntity && !(entity instanceof OdorWorldAgent)) {
-            copyEntity((OdorWorldEntity) entity);
-        } else if (entity instanceof OdorWorldAgent) {
-            copyAgent((OdorWorldAgent) entity);
-        } else if (entity instanceof Wall) {
-            copyWall((Wall) entity);
-        }
+    public static void copyItem(final OdorWorldEntity entity) {
+    	// TODO!
+//        if (entity instanceof OdorWorldEntity && !(entity instanceof OdorWorldAgent)) {
+//            copyEntity((OdorWorldEntity) entity);
+//        } else if (entity instanceof OdorWorldAgent) {
+//            copyAgent((OdorWorldAgent) entity);
+//        } else if (entity instanceof Wall) {
+//            copyWall((Wall) entity);
+//        }
     }
 
+    // TODO REDO ALL CLIPBOARD STUFF!
+    
     /**
      * Copy an entity from a world.
      *
      * @param entity Entity to copy
      */
-    public static void copyEntity(final OdorWorldEntity entity) {
-        OdorWorldEntity temp = new OdorWorldEntity();
-        temp.setImageName(entity.getImageName());
-        temp.setName("Copy of " + entity.getName());
-        temp.setStimulus(entity.getStimulus());
-        temp.setImage(entity.getImage().getImage());
-        setClipboardEntity(temp);
+    public static void copyEntity(final StaticEntity entity) {
+//        OdorWorldEntity temp = new OdorWorldEntity();
+//        temp.setImageName(entity.getImageName());
+//        temp.setName("Copy of " + entity.getName());
+////        temp.setStimulus(entity.getStimulus());
+//        temp.setImage(entity.getImage().getImage());
+//        setClipboardEntity(temp);
     }
 
     /**
@@ -109,9 +117,9 @@ public final class WorldClipboard {
      *
      * @param agent Agent to be copied
      */
-    public static void copyAgent(final OdorWorldAgent agent) {
-        OdorWorldAgent temp = agent.copy();
-        setClipboardEntity(temp);
+    public static void copyAgent(final MovingEntity agent) {
+        MovingEntity temp = agent.copy();
+//        setClipboardEntity(temp);  // TODO
     }
 
     /**
@@ -123,20 +131,20 @@ public final class WorldClipboard {
         Wall temp = new Wall(wall.getParent());
         temp.setWidth(wall.getWidth());
         temp.setHeight(wall.getHeight());
-        setClipboardEntity(temp);
+       // setClipboardEntity(temp);
     }
 
     /**
      * @param clipboardEntity The clipboardEntity to set.
      */
-    public static void setClipboardEntity(final AbstractEntity clipboardEntity) {
+    public static void setClipboardEntity(final OdorWorldEntity clipboardEntity) {
         WorldClipboard.clipboardEntity = clipboardEntity;
     }
 
     /**
      * @return Returns the clipboardEntity.
      */
-    public static AbstractEntity getClipboardEntity() {
+    public static OdorWorldEntity getClipboardEntity() {
         return clipboardEntity;
     }
 }

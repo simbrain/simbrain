@@ -109,15 +109,6 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     }
 
     /**
-     * Return the arraylist of agents.
-     *
-     * @return List of agents
-     */
-    public ArrayList<OdorWorldAgent> getAgentList() {
-        return worldPanel.getWorld().getAgentList();
-    }
-
-    /**
      * @return Odor world frame menu.
      */
     public OdorWorldFrameMenu getMenu() {

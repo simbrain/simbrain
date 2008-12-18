@@ -4,9 +4,17 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.environment.Agent;
+import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.environment.TwoDEntity;
+import org.simbrain.util.environment.TwoDEnvironment;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.odorworld.entities.MovingEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.StaticEntity;
+import org.simbrain.world.odorworld.entities.Wall;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -14,17 +22,11 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Core model class of Odor World, which contains a list of entities in the world.
  * This is the class that is currently serialized.
+ * 
  */
-public class OdorWorld {
+public class OdorWorld implements TwoDEnvironment {
 
-    /** The increment of a manual turn. */
-    public static final int manualMotionTurnIncrement = 4;
-
-    /** The initial value used in stimulus arrays. */
-    private static final int stimInitVal = 10;
-
-    /** The initial orientation for adding agents. */
-    public static final float INIT_ORIENTATION = 45;
+	// TODO: Make a separate odor world model for persistence
 
     /** The width of the world. */
     private int worldWidth = 300;
@@ -32,31 +34,16 @@ public class OdorWorld {
     /** The height of the world. */
     private int worldHeight = 300;
 
-    /** The initial size of an object. */
-    private final int initObjectSize = 35;
+    /** Whether or not sprites wrap around or are halted at the borders */
+    private boolean wrapAround = true;
 
-    /** The size of an object with an initialization to the constant value. */
-    private int objectSize = initObjectSize;
+    /** The list of all non-agent entities in the world. */
+    private ArrayList<OdorWorldEntity> entityList = new ArrayList<OdorWorldEntity>();
 
-    /** The boolean representing whether or not this world uses local boundaries ("clipping"). */
-    private boolean useLocalBounds = false;
+    // TODO: One problem with this this design is that this list can get out of sync.
+    /** The list of all non-agent entities in the world. */
+    private ArrayList<SmellSource> smellSources = new ArrayList<SmellSource>();
 
-    /** The boolean representing whether or not an object is solid (cannot be moved through). */
-    private boolean objectInhibitsMovement = true;
-
-    /** The list of all entities in the world. */
-    //World entities and entity selection
-    private ArrayList<AbstractEntity> abstractEntityList = new ArrayList<AbstractEntity>();
-
-    /** The list of all dead entities. */
-    private ArrayList<AbstractEntity> deadEntityList = new ArrayList<AbstractEntity>();
-
-    /** Current creature within the world. */
-    private OdorWorldAgent currentCreature = null;
-
-    /** Name of world. */
-    private String worldName;
-    
     /** Reference to parent component. */
     private OdorWorldComponent parent;
     
@@ -75,133 +62,89 @@ public class OdorWorld {
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(OdorWorldEntity.class, "image");
-        xstream.omitField(OdorWorldEntity.class, "parent");
+        xstream.omitField(StaticEntity.class, "image");
+        xstream.omitField(StaticEntity.class, "parent");
         xstream.omitField(OdorWorld.class, "parent");
         return xstream;
     }
-    
-    public OdorWorldAgent findAgent(final String name) {
-        for (OdorWorldAgent entity : this.getAgentList()) {
-            if (entity.getName().equals(name)) {
-                return entity;
-            }
-        }
-        return null;
-    }
+
     void setParent(final OdorWorldComponent parent) {
         this.parent = parent;
     }
     
-    OdorWorldComponent getParent() {
+    public WorkspaceComponent<?> getParent() {
         return parent;
     }
-    
-    /**
-     * Clears all entities from the world.
-     */
-    public void clearAllEntities() {
-        while (abstractEntityList.size() > 0) {
-            removeEntity((AbstractEntity) abstractEntityList.get(0));
-        }
-    }
 
-    /**
-     * Remove the specified world entity.
-     *
-     * @param entity world entity to delete
-     */
-    public void removeEntity(final AbstractEntity entity) {
-        abstractEntityList.remove(entity);
-    }
-
-    /**
-     * @return the list of entity names
-     */
-    public ArrayList<String> getEntityNames() {
-        final ArrayList<String> temp = new ArrayList<String>();
-
-        for (int i = 0; i < abstractEntityList.size(); i++) {
-            final AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
-
-            if (tempElement instanceof OdorWorldEntity) {
-                temp.add(((OdorWorldEntity) tempElement).getName());
-            }
-        }
-
-        return temp;
-    }
-
-    /**
-     * Go through entities in this world and find the one with the greatest number of dimensions. This will determine
-     * the dimensionality of the proximal stimulus sent to the network
-     *
-     * @return the number of dimensions in the highest dimensional stimulus
-     */
-    public int getHighestDimensionalStimulus() {
-        Stimulus temp = null;
-        int max = 0;
-
-        for (int i = 0; i < getEntityList().size(); i++) {
-            temp = ((OdorWorldEntity) getEntityList().get(i)).getStimulus();
-
-            if (temp.getStimulusDimension() > max) {
-                max = temp.getStimulusDimension();
-            }
-        }
-
-        return max;
-    }
-
-    /**
-     * @return a list of entities
-     */
-    public ArrayList<OdorWorldEntity> getEntityList() {
-        final ArrayList<OdorWorldEntity> temp = new ArrayList<OdorWorldEntity>();
-
-        for (int i = 0; i < abstractEntityList.size(); i++) {
-            final AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
-
-            if (tempElement instanceof OdorWorldEntity) {
-                temp.add((OdorWorldEntity) tempElement);
-            }
-        }
-
-        return temp;
-    }
     /**
      * Add a world object at point p.  Note that it currently has a set of default values specified within the code.
      *
      * @param p the location where the object should be added
      */
-    public void addEntity(final Point p) {
-        final OdorWorldEntity we = new OdorWorldEntity();
-        we.setLocation(p);
-        we.setImageName("Swiss.gif");
-        we.getStimulus().setStimulusVector(new double[] {stimInitVal, stimInitVal, 0, 0, 0, 0, 0, 0 });
-        abstractEntityList.add(we);
+    public void addStaticEntity(final double[] p) {
+        StaticEntity object = new StaticEntity(this, "Swiss.gif", new double[]{50,50});
+        object.setSmellSource(new SmellSource(this, new double[] {1, 1, 0, 0}, SmellSource.DecayFunction.GAUSSIAN, object.getSuggestedLocation()));
+        addEntity(object);
     }
     
-    public void addEntity(final OdorWorldEntity entity) {
-        abstractEntityList.add(entity);
-    }
-
     /**
-     * @return Returns the agentList.
+     * Add a world object at point p.  Note that it currently has a set of default values specified within the code.
+     *
+     * @param p the location where the object should be added
      */
-    public ArrayList<OdorWorldAgent> getAgentList() {
-        final ArrayList<OdorWorldAgent> ret = new ArrayList<OdorWorldAgent>();
-
-        for (int i = 0; i < abstractEntityList.size(); i++) {
-            final AbstractEntity temp = (AbstractEntity) abstractEntityList.get(i);
-
-            if (temp instanceof OdorWorldAgent) {
-                ret.add((OdorWorldAgent) temp);
-            }
-        }
-
-        return ret;
+    public void addMovingEntity(final double[] p) {
+        final MovingEntity agent = new MovingEntity(this, "temp",  p);
+        addEntity(agent);
     }
+    
+    /**
+     * Add an entity.
+     *
+     * @param entity the entity to add.
+     */
+    public void addEntity(OdorWorldEntity entity) {
+    	entityList.add(entity);
+    	if (entity.getSmellSource() != null) {
+    		smellSources.add(entity.getSmellSource());
+    	}
+    }
+    
+    /**
+     * Remove an entity.
+     *
+     * @param entity the entity to remove.
+     */
+    public void removeEntity(OdorWorldEntity entity) {
+    	entityList.remove(entity);
+    	if (entity.getSmellSource() != null) {
+    		smellSources.remove(entity.getSmellSource());
+    	}
+    }
+    
+    /**
+     * Adds a wall to the world.
+     */
+    public void addWall() {
+        Wall wall = new Wall(this);
+        addEntity(wall);
+        
+        // TODO!
+//        final Point upperLeft = determineUpperLeft(getWallPoint1(), getWallPoint2());
+//
+//        newWall.setWidth(Math.abs(getWallPoint2().x - getWallPoint1().x));
+//        newWall.setHeight(Math.abs(getWallPoint2().y - getWallPoint1().y));
+//        newWall.setX(upperLeft.x);
+//        newWall.setY(upperLeft.y);
+//
+//        newWall.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
+//        world.getAbstractEntityList().add(newWall);
+//        setWallPoint1(null);
+//        setWallPoint2(null);
+//
+//        drawingWalls = false;
+//        this.repaint();
+    }
+
     
     /**
      * Standard method call made to objects after they are deserialized.
@@ -212,135 +155,102 @@ public class OdorWorld {
      * @return Initialized object.
      */
     private Object readResolve() {
-        for (OdorWorldEntity entity : getEntityList()) {
-            entity.setImage(ResourceManager.getImage(entity.getImageName()));
-            entity.setParent(this);
+        for (OdorWorldEntity entity : entityList) {
+        	entity.setParent(this);
+        	entity.postSerializationInit();
         }
         return this;
     }
     
     /**
-     * Remove the entity from the dead, return it to the living, and set its bite counter back to a default value.
+     * Check to see if the creature can move to a given new location.  If it is off screen or on top of a creature,
+     * disallow the move.
      *
-     * @param e Lazarus
+     * @param possibleCreatureLocation on-screen location to be checked
+     *
+     * @return true if the move is valid, false otherwise
      */
-    public void resurrect(final AbstractEntity e) {
-        if (e instanceof OdorWorldEntity) ((OdorWorldEntity) e).reset();
-        getAbstractEntityList().add(e);
-        getDeadEntityList().remove(e);
+    public boolean validMove(final OdorWorldEntity toCheck, final Point possibleCreatureLocation) {
+    	
+    	boolean ret = true;
+    	
+        // Collisions handled here too
+    	// TODO: Bump sensors
+    	for (OdorWorldEntity entity : getEntityList()) {
+    		if ((entity != toCheck) && (entity.inhibitsMovement())) {
+    			if (entity.getLifeCycleObject() != null) {
+    				if (entity.getLifeCycleObject().isDead()) {
+    					continue;
+    				}
+     			}
+    			if (entity.getBounds().contains(possibleCreatureLocation)) {
+    				ret = false;
+    				System.out.println(entity.getBounds() + "---" + possibleCreatureLocation );    	
+    				if (entity.getLifeCycleObject() != null) {
+        				entity.getLifeCycleObject().bite();    					
+    				}
+    			}    				
+    		}
+    	}
+        return ret;
     }
+    
+    
     /**
-     * Add an agent at point p.
-     *
-     * @param p the location where the agent should be added
+     * Update world.
      */
-    public void addAgent(OdorWorldAgent agent) {
-        abstractEntityList.add(agent);
+    public void update() {
+    	for (OdorWorldEntity entity : entityList) {
+    		if (entity.getLifeCycleObject() != null) {
+    			entity.getLifeCycleObject().update();
+    		}
+    		entity.update();
+    	}
+    	checkBounds();
     }
     
     /**
-     * Remove all objects from world.
+     * Implements a "video-game" world or torus, such that when an object leaves on side of the screen it reappears on
+     * the other.
      */
-    public void clear() {
-        abstractEntityList.clear();
+    private void checkBounds() {
+    	
+        if (wrapAround) {
+        	for (OdorWorldEntity entity : entityList) {
+        		// For now this means it's a movable entity
+        		if (entity instanceof MovingEntity) {
+        			double x = entity.getLocation()[0];
+        			double y = entity.getLocation()[1];
+                    if (x >= worldWidth) {
+                    	x -= worldWidth;
+                    }
+                    if (x < 0) {
+                        x += worldWidth;
+                    }
+                    if (y >= worldWidth) {
+                    	y -= worldWidth;
+                    }
+                    if (y < 0) {
+                        y += worldWidth;
+                    }
+                    entity.setLocation(new double[]{x,y});        			
+        		}
+        	}
+        }
     }
-
-    /**
-     * @return the abstractEntityList
-     */
-    public ArrayList<AbstractEntity> getAbstractEntityList() {
-        return abstractEntityList;
-    }
-
-    /**
-     * @return the currentCreature
-     */
-    public OdorWorldAgent getCurrentCreature() {
-        return currentCreature;
-    }
-
-    /**
-     * @param currentCreature the currentCreature to set
-     */
-    public void setCurrentCreature(OdorWorldAgent currentCreature) {
-        this.currentCreature = currentCreature;
-    }
-
-    /**
-     * @return the deadEntityList
-     */
-    public ArrayList<AbstractEntity> getDeadEntityList() {
-        return deadEntityList;
-    }
-
-    /**
-     * @return the objectInhibitsMovement
-     */
-    public boolean isObjectInhibitsMovement() {
-        return objectInhibitsMovement;
-    }
-
-    /**
-     * @param objectInhibitsMovement the objectInhibitsMovement to set
-     */
-    public void setObjectInhibitsMovement(boolean objectInhibitsMovement) {
-        this.objectInhibitsMovement = objectInhibitsMovement;
-    }
-
-    /**
-     * @return the objectSize
-     */
-    public int getObjectSize() {
-        return objectSize;
-    }
-
-    /**
-     * @param objectSize the objectSize to set
-     */
-    public void setObjectSize(int objectSize) {
-        this.objectSize = objectSize;
-    }
-
-    /**
-     * @return the useLocalBounds
-     */
-    public boolean isUseLocalBounds() {
-        return useLocalBounds;
-    }
-
-    /**
-     * @param useLocalBounds the useLocalBounds to set
-     */
-    public void setUseLocalBounds(boolean useLocalBounds) {
-        this.useLocalBounds = useLocalBounds;
-    }
-
-    /**
-     * @return the worldName
-     */
-    public String getWorldName() {
-        return worldName;
-    }
-
-    /**
-     * @param worldName the worldName to set
-     */
-    public void setWorldName(String worldName) {
-        this.worldName = worldName;
-    }
-
+	
     /**
      * {@inheritDoc}
      */
     public List<? extends Consumer> getConsumers() {
-        return getAgentList();
+    	return getAgentList();
     }
 
     /**
      * {@inheritDoc}
      */
     public List<? extends Producer> getProducers() {
-        return getAgentList();
+    	return getAgentList();
     }
 
     /**
@@ -370,4 +280,61 @@ public class OdorWorld {
     public void setWorldWidth(int worldWidth) {
         this.worldWidth = worldWidth;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+	public List<TwoDEntity> getTwoDEntityList() {
+		return new ArrayList<TwoDEntity> (this.getEntityList());
+	}
+
+    /**
+     * Clear all entities.
+     */
+	public void clearAllEntities() {
+		entityList.clear();
+	}
+
+	/**
+	 * @return the entityList
+	 */
+	public ArrayList<Agent> getAgentList() {
+		ArrayList<Agent> ret = new ArrayList<Agent>();
+		for(OdorWorldEntity entity : entityList) {
+			if (entity instanceof MovingEntity) {
+				ret.add(((MovingEntity)entity).getAgent());
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * @return the entityList
+	 */
+	public ArrayList<OdorWorldEntity> getEntityList() {
+		return entityList;
+	}
+
+	/**
+	 * @param entityList the entityList to set
+	 */
+	public void setEntityList(ArrayList<OdorWorldEntity> entityList) {
+		this.entityList = entityList;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public List<SmellSource> getSmellSources() {
+		return smellSources;
+	}
+	
+	/**
+	 * Add a smell source the world.
+	 *
+	 * @param source the smell source to add.
+	 */
+	public void addSmellSource(SmellSource source) {
+		smellSources.add(source);
+	}
 }

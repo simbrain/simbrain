@@ -16,43 +16,63 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.util.environment;
 
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 
-
 /**
- * <b>Stimulus</b>.
+ * <b>Stimulus</b> represent a distal stimulus in the form of a vector.  It can have noise added and 
+ * has built in functions to compute decay. 
+ * 
+ * Standardly these objects represent "distal stimuli" relative to an organism.
+ *  
  */
-public class Stimulus {
+public class SmellSource implements TwoDEntity {
+
+	/** Environment this agent is embedded in. */
+	private TwoDEnvironment environment;
+	
+	/** Vector of stimulus values associated to object. */
+    private double[] stimulusVector;
+
+    /** Location of the distal stimulus. */
+    private double[] location; 
+
+    /** Decay Functions. */
+    public enum DecayFunction {
+    	
+    	STEP("Step"), 
+    	LINEAR("Linear"),
+    	GAUSSIAN("Gaussian"),
+    	QUADRATIC("Quadratic");
+    	
+    	/** Name of decay function. */
+    	private String name;
+    	
+    	/**
+    	 * Constructor.
+    	 *
+    	 * @param name name.
+    	 */
+    	DecayFunction(String name) {
+    		this.name = name;
+    	}
+    	
+    	@Override
+    	public String toString() {
+    		return name;
+    	}
+    };
+
+    /** Method for calculating decay of stimulus as a function of distance from object. */
+    private DecayFunction decayFunction = DecayFunction.LINEAR;
+
+    /** If outside of this radius the object has no affect on the network. */
+    private double stimulusDispersion = 70;
 
     /** Peak value. */
     private double peak = 0;
-
-    /** String value. */
-    public static final String STEP = "Step";
-
-    /** String value. */
-    public static final String LINEAR = "Linear";
-
-    /** String value. */
-    public static final String GAUSSIAN = "Gaussian";
-
-    /** String value. */
-    public static final String QUADRATIC = "Quadratic";
-
-    /** vector of stimulus values associated to object. */
-    private double[] stimulusVector;
-
-    /** Method for calcluating decay of stimulus as a function of distance from object. */
-    private String decayFunction = LINEAR;
-
-    /** Initial distance. */
-    private final double initDis = 70;
-
-    /** If outside of this radius the object has no affect on the network. */
-    private double stimulusDispersion = initDis;
 
     /** If true, add noise to object's stimulus vector. */
     private boolean addNoise = false;
@@ -63,10 +83,6 @@ public class Stimulus {
     /** A value between 0 and 1 which describes how much noise is added. */
     private double noiseLevel = initNoise;
 
-    /** String array of decay functions. */
-    public static final String[] DECAYFUNCTIONS =
-        {Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC };
-
     /**
      * Instance of stimulus initializing values to be set.
      *
@@ -76,19 +92,32 @@ public class Stimulus {
      * @param addNoise Add noise
      * @param noiseLevel Level of noise
      */
-    public Stimulus(final double[] distalstim, final String decay,
+    public SmellSource(final TwoDEnvironment environment, final double[] distalstim, final DecayFunction decay,
             final double disp, final boolean addNoise, final double noiseLevel) {
-        stimulusVector = distalstim;
-        decayFunction = decay;
-        stimulusDispersion = disp;
+        this.environment = environment;
+    	this.stimulusVector = distalstim;
+        this.decayFunction = decay;
+        this.stimulusDispersion = disp;
         this.addNoise = addNoise;
         this.noiseLevel = noiseLevel;
+    }
+    
+    /**
+     * Instance of stimulus initializing values to be set.
+     *
+     * @param distalstim Distal stimulus
+     */
+    public SmellSource(final TwoDEnvironment environment, final double[] distalstim, final DecayFunction decay, final double[] location) {
+        this.environment = environment;
+        this.stimulusVector = distalstim;
+        this.decayFunction = decay;
+        this.location = location;
     }
 
     /**
      * Default constructor.
      */
-    public Stimulus() {
+    public SmellSource() {
     }
 
     /**
@@ -103,14 +132,10 @@ public class Stimulus {
         }
     }
 
-    /////////////////////////
-    // Getters and Setters //
-    /////////////////////////
-
     /**
-     * Return the dimension of the stimulus.
+     * Return the number of dimensions in the stimulus vector.
      *
-     * @return the deminsion of the stimulus
+     * @return the dimension of the stimulus
      */
     public int getStimulusDimension() {
         if (stimulusVector == null) {
@@ -132,7 +157,7 @@ public class Stimulus {
     /**
      * Return the stimulus vector.
      *
-     * @return the stimulsu vector
+     * @return the stimulus vector
      */
     public double[] getStimulusVector() {
         return stimulusVector;
@@ -202,15 +227,6 @@ public class Stimulus {
     }
 
     /**
-     * Sets the decay funcion.
-     *
-     * @param decay decay function
-     */
-    public void setDecayFunction(final String decay) {
-        decayFunction = decay;
-    }
-
-    /**
      * Sets the noise level.
      *
      * @param d Noise level
@@ -238,32 +254,22 @@ public class Stimulus {
     }
 
     /**
-     * Return the decay function.
-     *
-     * @return the decay function
-     */
-    public String getDecayFunction() {
-        return decayFunction;
-    }
-
-    /**
      * Calculate what impact the object will have on the creature's receptors (input nodes) based on its distance from
-     * this object and its features (whether it is a "noisy object", and how the stimulus decays.  That is, calculate
+     * this object and its features (whether it is a "noisy object", and how the stimulus decays).  That is, calculate
      * the proximal stimulus this distal stimulus gives rise to.
      *
      * @param distance distance of creature from object
-     *
      * @return proximal stimulus to creature caused by this object
      */
     public double[] getStimulus(final double distance) {
         double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
 
         if (distance < stimulusDispersion) {
-            if (decayFunction.equals(STEP)) {
+            if (decayFunction == DecayFunction.STEP) {
                 if (distance > peak) {
                     ret = (double[]) (stimulusVector.clone());
                 }
-            } else if (decayFunction.equals(LINEAR)) {
+            } else if (decayFunction == DecayFunction.LINEAR) {
                 if (distance < peak) {
                     double scalingFactor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
 
@@ -276,14 +282,14 @@ public class Stimulus {
                     double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
                     ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
                 }
-            } else if (decayFunction.equals(GAUSSIAN)) {
+            } else if (decayFunction == DecayFunction.GAUSSIAN) {
                 double temp = distance;
                 temp -= peak;
 
                 double sigma = .5 * (stimulusDispersion - peak);
                 double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
                 ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
-            } else if (decayFunction.equals(QUADRATIC)) {
+            } else if (decayFunction == DecayFunction.QUADRATIC) {
                 double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
 
                 if (scalingFactor < 0) {
@@ -292,38 +298,63 @@ public class Stimulus {
 
                 ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
             }
-
-            //Add noise to object vector
-            if (addNoise) {
-                SimbrainMath.addNoise(ret, noiseLevel);
-            }
         }
 
         return ret;
     }
-
+    
+    public void update() {
+        //Add noise to object vector
+        if (addNoise) {
+            SimbrainMath.addNoise(stimulusVector, noiseLevel);
+        }    	
+    }
+    
     /**
-     * Helper function for combo boxes.
-     * @param df the decayfunction index to return
-     * @return the int associated with df
+     * Calculate what impact the object will have on the creature's receptors (input nodes) based on its distance from
+     * this object and its features (whether it is a "noisy object", and how the stimulus decays).  That is, calculate
+     * the proximal stimulus this distal stimulus gives rise to.
+     *
+     * @param distance distance of creature from object
+     * @return proximal stimulus to creature caused by this object
      */
-    public int getDecayFunctionIndex(final String df) {
-        for (int i = 0; i < DECAYFUNCTIONS.length; i++) {
-            if (df.equals(DECAYFUNCTIONS[i])) {
-                return i;
+    public double getStimulus(final int dimension, final double distance) {
+        double ret = 0;
+        double val = stimulusVector[dimension];
+        
+        if (distance < stimulusDispersion) {
+            if (decayFunction == DecayFunction.STEP) {
+                if (distance > peak) {
+                    ret = val;
+                }
+            } else if (decayFunction == DecayFunction.LINEAR) {
+                if (distance < peak) {
+                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
+                    if (scalingFactor < 0) {
+                        scalingFactor = 0;
+                    }
+                    ret = val * scalingFactor;
+                } else {
+                    double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
+                    ret = val * scalingFactor;
+                }
+            } else if (decayFunction == DecayFunction.GAUSSIAN) {
+                double temp = distance;
+                temp -= peak;
+
+                double sigma = .5 * (stimulusDispersion - peak);
+                double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
+                ret = val * scalingFactor;
+            } else if (decayFunction == DecayFunction.QUADRATIC) {
+                double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
+
+                if (scalingFactor < 0) {
+                    scalingFactor = 0;
+                }
+                ret = val * scalingFactor;
             }
         }
-
-        return 0;
-    }
-
-    /**
-     * Return the decay functions.
-     *
-     * @return the decay functions
-     */
-    public static String[] getDecayFunctions() {
-        return DECAYFUNCTIONS;
+        return ret;
     }
 
     /**
@@ -339,4 +370,36 @@ public class Stimulus {
     public void setPeak(final double peak) {
         this.peak = peak;
     }
+
+	/**
+	 * @return the decayFunction
+	 */
+	public DecayFunction getDecayFunction() {
+		return decayFunction;
+	}
+
+	/**
+	 * @param decayFunction the decayFunction to set
+	 */
+	public void setDecayFunction(DecayFunction decayFunction) {
+		this.decayFunction = decayFunction;
+	}
+
+	/**
+	 * @return the location
+	 */
+	public double[] getSuggestedLocation() {
+		return location;
+	}
+
+	/**
+	 * @param location the location to set
+	 */
+	public void setSuggestedLocation(double[] location) {
+		this.location = location;
+	}
+
+	public TwoDEnvironment getEnvironment() {
+		return environment;
+	}
 }

@@ -41,6 +41,23 @@ public class SimbrainMath {
 
         return (int) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
+    
+    /**
+     * Calculates the Euclidean distance between two points.  Used in World.
+     *
+     * @param src source point
+     * @param tar target point
+     *
+     * @return distance between source and target
+     */
+    public static double distance(final double[] src, final double[] tar) {
+        double x1 = src[0];
+        double x2 = tar[0];
+        double y1 = src[1];
+        double y2 = tar[1];
+
+        return (int) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+    }
 
     /**
      * Set an array of doubles to zero.  TODO: Replace usage in World with library call

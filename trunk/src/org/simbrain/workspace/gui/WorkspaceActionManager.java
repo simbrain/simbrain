@@ -267,8 +267,7 @@ public class WorkspaceActionManager {
     public List<Action> getNewWorldActions() {
         return Arrays.asList(new Action[] { newDataWorldAction,
                 newMidiWorldAction, newOdorWorldAction, newOscWorldAction,
-                newThreeDeeWorldAction, newTextWorldAction,
-                newVisionWorldAction });
+                newThreeDeeWorldAction, newVisionWorldAction });
     }
 
     /**

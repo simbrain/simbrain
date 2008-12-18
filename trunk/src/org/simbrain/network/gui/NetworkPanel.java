@@ -182,9 +182,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /** Color of "zero" weights. */
     private Color zeroWeightColor = new Color(NetworkPreferences.getZeroWeightColor());
 
-    /** Temporary storage of persistent nodes; used by Castor. */
-    private ArrayList nodeList = new ArrayList();
-
     /** Label which displays current time. */
     private TimeLabel timeLabel;
 
@@ -1787,24 +1784,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     public void setAutoZoomMode(final boolean autoZoomMode) {
         this.autoZoomMode = autoZoomMode;
         repaint();
-    }
-
-    /**
-     * Used by Castor.
-     *
-     * @return temporary list of persistable PNodes
-     */
-    public ArrayList getNodeList() {
-        return nodeList;
-    }
-
-    /**
-     * Used by Castor.
-     *
-     * @param list temporary list of persistable PNodes
-     */
-    public void setNodeList(final ArrayList list) {
-        nodeList = list;
     }
 
     /**

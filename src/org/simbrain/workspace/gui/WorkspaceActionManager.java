@@ -18,11 +18,7 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,12 +28,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JFrame;
-import javax.swing.KeyStroke;
 
-import org.simbrain.console.ConsoleComponent;
-import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
 import org.simbrain.workspace.actions.GlobalRunAction;
@@ -45,7 +36,6 @@ import org.simbrain.workspace.actions.GlobalStopAction;
 import org.simbrain.workspace.actions.GlobalUpdateAction;
 import org.simbrain.workspace.actions.NewConsoleAction;
 import org.simbrain.workspace.actions.NewDataWorldAction;
-import org.simbrain.workspace.actions.NewGameWorld2dAction;
 import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
@@ -76,8 +66,6 @@ import org.simbrain.workspace.actions.chart.NewTimeSeriesAction;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import bsh.TargetError;
-import bsh.util.JConsole;
 
 /**
  * Workspace action manager.
@@ -105,9 +93,6 @@ public class WorkspaceActionManager {
 
     /** New data world action. */
     private final Action newDataWorldAction;
-
-    /** New game world 2d action. */
-    private final Action newGameWorld2dAction;
 
     /** New MIDI world action. */
     private final Action newMidiWorldAction;
@@ -228,7 +213,6 @@ public class WorkspaceActionManager {
         newTimeSeriesAction = new NewTimeSeriesAction(workspace);
 
         newDataWorldAction = new NewDataWorldAction(workspace);
-        newGameWorld2dAction = new NewGameWorld2dAction(workspace);
         newMidiWorldAction = new NewMidiWorldAction(workspace);
         newOdorWorldAction = new NewOdorWorldAction(workspace);
         newOscWorldAction = new NewOscWorldAction(workspace);
@@ -281,9 +265,9 @@ public class WorkspaceActionManager {
      * @return New worlds actions.
      */
     public List<Action> getNewWorldActions() {
-        return Arrays.asList(new Action[] {newDataWorldAction,
-                newGameWorld2dAction, newMidiWorldAction, newOdorWorldAction,
-                newOscWorldAction, newThreeDeeWorldAction, newTextWorldAction,
+        return Arrays.asList(new Action[] { newDataWorldAction,
+                newMidiWorldAction, newOdorWorldAction, newOscWorldAction,
+                newThreeDeeWorldAction, newTextWorldAction,
                 newVisionWorldAction });
     }
 
@@ -384,13 +368,6 @@ public class WorkspaceActionManager {
      */
     public Action getNewDataWorldAction() {
         return newDataWorldAction;
-    }
-
-    /**
-     * @return the newGameWorld2dAction.
-     */
-    public Action getNewGameWorld2dAction() {
-        return newGameWorld2dAction;
     }
 
     /**

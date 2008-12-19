@@ -43,6 +43,7 @@ import org.simbrain.world.visionworld.action.PaintViewAction;
 import org.simbrain.world.visionworld.action.SaveVisionWorldAction;
 import org.simbrain.world.visionworld.action.SaveVisionWorldAsAction;
 import org.simbrain.world.visionworld.action.SelectAllAction;
+import org.simbrain.world.visionworld.action.SelectNoneAction;
 import org.simbrain.world.visionworld.action.StackedViewAction;
 import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
 import org.simbrain.world.visionworld.dialog.CreateSensorMatrixDialog;
@@ -155,7 +156,6 @@ public final class VisionWorld
 
         this.model.addModelListener(modelListener);
 
-//        selectionModel = new SensorSelectionModel(this);
         selectionListener = new SensorSelectionListener()
             {
                 /** {@inheritDoc} */
@@ -227,15 +227,19 @@ public final class VisionWorld
     }
 
     /**
+     * Selects none of the sensor nodes.
+     */
+    public void selectNone() {
+        selectionModel.clear();
+        repaint();
+    }
+
+    /**
      * Selects all of the sensor nodes.
      */
     public void selectAll() {
-        for (Object node : getLayer().getAllNodes()) {
-            if (node instanceof SensorNode) {
-                ((SensorNode)node).setSelected(true);
-            }
-        }
-        this.repaint();
+        selectionModel.setSelection(sensorNodes.keySet());
+        repaint();
     }
 
     /**
@@ -426,7 +430,7 @@ public final class VisionWorld
      * @return a list of edit menu actions for this vision world
      */
     public List<Action> getEditMenuActions() {
-        return Arrays.asList(new Action[] {editSensorsAction, new SelectAllAction(this)});
+        return Arrays.asList(new Action[] {editSensorsAction, new SelectAllAction(this), new SelectNoneAction(this)});
     }
 
     /**

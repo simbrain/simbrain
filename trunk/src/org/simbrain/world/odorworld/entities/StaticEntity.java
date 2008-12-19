@@ -139,6 +139,7 @@ public class StaticEntity implements OdorWorldEntity {
      * {@inheritDoc}
      */
 	public void paintEntity(Component component, Graphics g) {
+		//g.fillRect(this.getBounds().x, this.getBounds().y, this.getBounds().width, this.getBounds().height);
 		image.paintIcon(component, g, (int) getSuggestedLocation()[0], (int) getSuggestedLocation()[1]);		
 	}
 

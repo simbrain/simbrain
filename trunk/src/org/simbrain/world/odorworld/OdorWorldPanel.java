@@ -214,15 +214,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         menu.initMenu();
     }
 
-    ////////////////////
-    // Initialization //
-    ////////////////////
 
 
-    //////////////////////
-    // Graphics Methods //
-    //////////////////////
-    
     private final MouseListener mouseListener = new MouseAdapter() {
 
         /**
@@ -244,6 +237,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             if (selectedEntity != null) {
                 distanceX = (int) selectedEntity.getLocation()[0] - mouseEvent.getPoint().x;
                 distanceY = (int) selectedEntity.getLocation()[1] - mouseEvent.getPoint().y;
+                if (selectedEntity instanceof MovingEntity) {
+                    world.setCurrentCreature((MovingEntity) selectedEntity);	
+                }
             }
 
             //submits point for wall drawing
@@ -330,9 +326,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
         //TODO!
 
-//        if (k.getKeyCode() == KeyEvent.VK_UP) {
-//            world.getCurrentCreature().goStraightForward(1);
-//        } else if (k.getKeyCode() == KeyEvent.VK_DOWN) {
+        if (k.getKeyCode() == KeyEvent.VK_UP) {
+            world.getCurrentCreature().moveStraight();
+        }// else if (k.getKeyCode() == KeyEvent.VK_DOWN) {
 //            world.getCurrentCreature().goStraightBackward(1);
 //        } else if (k.getKeyCode() == KeyEvent.VK_RIGHT) {
 //            world.getCurrentCreature().turnRight(OdorWorld.manualMotionTurnIncrement);
@@ -527,142 +523,6 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
         return ret;
     }
-    
-//    /**
-//     * Returns a menu with a sub-menu for each agent.
-//     *
-//     * @param al the action listener (currently in the network panel) which listens to these menu events
-//     *
-//     * @return a JMenu with a list of sensors for each agent
-//     */
-//    @Override
-//    public JMenu getSensorIdMenu(final ActionListener al) {
-//        final JMenu ret = new JMenu(getWorldName());
-//        final int dims = getHighestDimensionalStimulus();
-//
-//        for (int i = 0; i < getAgentList().size(); i++) {
-//            final Agent agent = (Agent) getAgentList().get(i);
-//            final JMenu agentMenu = new JMenu(agent.getName());
-//
-//            // X and Y Coordinate Sensors
-//           final CouplingMenuItem xItem = new CouplingMenuItem("X-coordinate",
-//                        new SensoryCoupling(agent, new String[] {"X"}));
-//           xItem.addActionListener(al);
-//           agentMenu.add(xItem);
-//           final CouplingMenuItem yItem = new CouplingMenuItem("Y-coordinate",
-//                   new SensoryCoupling(agent, new String[] {"Y"}));
-//           yItem.addActionListener(al);
-//           agentMenu.add(yItem);
-//
-//           // Whisker sensors
-//           final JMenu centerMenu = new JMenu("Center");
-//
-//            for (int j = 0; j < dims; j++) {
-//                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-//                        new SensoryCoupling(agent, new String[] {"Center", "" + (j + 1) }));
-//                stimItem.addActionListener(al);
-//                centerMenu.add(stimItem);
-//            }
-//
-//            agentMenu.add(centerMenu);
-//
-//            final JMenu leftMenu = new JMenu("Left");
-//
-//            for (int j = 0; j < dims; j++) {
-//                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-//                        new SensoryCoupling(agent, new String[] {"Left", "" + (j + 1) }));
-//                stimItem.addActionListener(al);
-//                leftMenu.add(stimItem);
-//            }
-//
-//            agentMenu.add(leftMenu);
-//
-//            final JMenu rightMenu = new JMenu("Right");
-//
-//            for (int j = 0; j < dims; j++) {
-//                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-//                        new SensoryCoupling(agent, new String[] {"Right", "" + (j + 1) }));
-//                stimItem.addActionListener(al);
-//                rightMenu.add(stimItem);
-//            }
-//
-//            agentMenu.add(rightMenu);
-//            ret.add(agentMenu);
-//        }
-//
-//        return ret;
-//    }
-//
-//    /**
-//     * Returns a menu with the motor commands available to this agent.
-//     *
-//     * @param al the action listener (currently in the network panel) which listens to these menu events
-//     *
-//     * @return a JMenu with the motor commands available for this agent
-//     */
-//    @Override
-//    public JMenu getMotorCommandMenu(final ActionListener al) {
-//        final JMenu ret = new JMenu("" + this.getWorldName());
-//
-//        for (int i = 0; i < getAgentList().size(); i++) {
-//            final Agent agent = (Agent) getAgentList().get(i);
-//            final JMenu agentMenu = new JMenu(agent.getName());
-//
-//            CouplingMenuItem motorItem = new CouplingMenuItem(
-//                                                              "Forward",
-//                                                              new MotorCoupling(agent, new String[] {"Forward" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("Backward", new MotorCoupling(agent, new String[] {"Backward" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("Right", new MotorCoupling(agent, new String[] {"Right" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("Left", new MotorCoupling(agent, new String[] {"Left" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("North", new MotorCoupling(agent, new String[] {"North" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("South", new MotorCoupling(agent, new String[] {"South" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("West", new MotorCoupling(agent, new String[] {"West" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("East", new MotorCoupling(agent, new String[] {"East" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("North-east", new MotorCoupling(agent, new String[] {"North-east" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("North-west", new MotorCoupling(agent, new String[] {"North-west" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("South-east", new MotorCoupling(agent, new String[] {"South-east" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            motorItem = new CouplingMenuItem("South-west", new MotorCoupling(agent, new String[] {"South-west" }));
-//            motorItem.addActionListener(al);
-//            agentMenu.add(motorItem);
-//
-//            ret.add(agentMenu);
-//        }
-//
-//        return ret;
-//    }
 
     /**
      * @return Returns the parentFrame.

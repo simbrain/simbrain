@@ -130,7 +130,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
     
     @Override
     public List<? extends Producer> getProducers() {
-        return (List<? extends Producer>) Collections.emptySet();
+        return Collections.<Producer>emptyList();
     }
 
 	@Override

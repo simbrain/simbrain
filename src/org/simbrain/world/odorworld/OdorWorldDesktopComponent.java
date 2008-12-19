@@ -20,6 +20,8 @@ package org.simbrain.world.odorworld;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -44,15 +46,6 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
 
     private static final long serialVersionUID = 1L;
 
-    /** The height of the scrollbar (used for resizing). */
-    private static final int SCROLLBAR_HEIGHT = 75;
-
-    /** The width of the scrollbar (used for resizing). */
-    private static final int SCROLLBAR_WIDTH = 29;
-
-   /** Allows the world to be scrolled if it is bigger than the display window. */
-    private JScrollPane worldScroller = new JScrollPane();
-
     /** Odor world to be in frame. */
     private OdorWorldPanel worldPanel;
 
@@ -73,24 +66,27 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
      */
     public void init() {
         setLayout(new BorderLayout());
-        add("Center", worldScroller);
         worldPanel = new OdorWorldPanel(this);
         setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(),worldPanel.getWorld().getWorldHeight()));
-        worldScroller.setViewportView(worldPanel);
-        worldScroller.setEnabled(false);
+        add("Center", worldPanel);
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
-        setMaxSize();
-    }
+        this.addComponentListener(new ComponentListener() {  
 
+				public void componentHidden(ComponentEvent arg0) {
+				}
 
-    /**
-     * Sets maximum size for the parent window.
-     */
-    public void setMaxSize() {
-        this.setMaximumSize(new Dimension(worldPanel.getWorld().getWorldWidth() + SCROLLBAR_WIDTH, worldPanel.getWorld().getWorldHeight() + SCROLLBAR_HEIGHT));
-        this.setBounds(getX(), getY(), worldPanel.getWorld().getWorldWidth() + SCROLLBAR_WIDTH, worldPanel.getWorld().getWorldHeight() + SCROLLBAR_HEIGHT);
-        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(), worldPanel.getWorld().getWorldHeight()));
+				public void componentMoved(ComponentEvent arg0) {
+				}
+
+				public void componentResized(ComponentEvent arg0) {
+					worldPanel.getWorld().setWorldWidth(worldPanel.getWidth());
+					worldPanel.getWorld().setWorldHeight(worldPanel.getHeight());					
+				}
+
+				public void componentShown(ComponentEvent arg0) {
+				}
+        });
     }
 
     /**

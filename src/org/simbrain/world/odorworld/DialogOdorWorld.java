@@ -136,7 +136,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
         worldPanel.getWorld().setWorldWidth(Integer.parseInt(worldWidth.getText()));
         worldPanel.getWorld().setWorldHeight(Integer.parseInt(worldHeight.getText()));
         worldPanel.setBackgroundColor(theColor.getRGB());
-        worldPanel.getParentFrame().setMaxSize();
+        //worldPanel.getParentFrame().setMaxSize();
     }
 
     /**

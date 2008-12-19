@@ -22,7 +22,6 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Core model class of Odor World, which contains a list of entities in the world.
  * This is the class that is currently serialized.
- * 
  */
 public class OdorWorld implements TwoDEnvironment {
 
@@ -46,6 +45,9 @@ public class OdorWorld implements TwoDEnvironment {
 
     /** Reference to parent component. */
     private OdorWorldComponent parent;
+    
+    /** Currently selected creature. */
+    private MovingEntity currentCreature;
     
     /**
      * Default constructor.
@@ -185,7 +187,6 @@ public class OdorWorld implements TwoDEnvironment {
      			}
     			if (entity.getBounds().contains(possibleCreatureLocation)) {
     				ret = false;
-    				System.out.println(entity.getBounds() + "---" + possibleCreatureLocation );    	
     				if (entity.getLifeCycleObject() != null) {
         				entity.getLifeCycleObject().bite();    					
     				}
@@ -337,4 +338,19 @@ public class OdorWorld implements TwoDEnvironment {
 	public void addSmellSource(SmellSource source) {
 		smellSources.add(source);
 	}
+
+	/**
+	 * @return the currentCreature
+	 */
+	public MovingEntity getCurrentCreature() {
+		return currentCreature;
+	}
+
+	/**
+	 * @param currentCreature the currentCreature to set
+	 */
+	public void setCurrentCreature(MovingEntity currentCreature) {
+		this.currentCreature = currentCreature;
+	}
+
 }

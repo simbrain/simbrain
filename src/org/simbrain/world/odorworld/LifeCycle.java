@@ -10,7 +10,7 @@ public class LifeCycle {
 	/** Whether it's dead or not. */
 	private boolean isDead = false;
 
-    /** Number of bites to heat edible item. */
+    /** Number of bites to eat edible item. */
     private int bitesToDie = 200;
 
     /** Number of bites on stimulus. */
@@ -30,7 +30,7 @@ public class LifeCycle {
 	}
 
     /**
-     * @return Bites to eat item.
+     * @return how may bites until it's a goner...
      */
     public int getBitesToDie() {
         return bitesToDie;
@@ -115,5 +115,4 @@ public class LifeCycle {
 			}
 		}
 	}
-
 }

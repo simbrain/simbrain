@@ -60,10 +60,10 @@ public class MovingEntity implements OdorWorldEntity {
 	private static double WHISKER_ANGLE = Math.PI / 4;
 
 	/** Amount to manually rotate. */
-    public final double manualMotionTurnIncrement = 4;
+	private final double manualMotionTurnIncrement = 4;
 
 	/** Amount to manually rotate. */
-    public final double manualStraightMovementIncrement = 4;
+	private final double manualStraightMovementIncrement = 4;
     
     /** Parent. */
     private OdorWorld parent;
@@ -73,8 +73,17 @@ public class MovingEntity implements OdorWorldEntity {
 
     /** Whether this entity inhibits movement. */
 	private boolean inhibitsMovement;
-    	
-    /**
+	
+	/** Default straight movement effector.  Also used in manual movement. */
+	private StraightMovementEffector straightMovement;
+
+	/** Default straight movement effector.  Also used in manual movement. */
+	private RotationEffector leftRotation;
+
+	/** Default straight movement effector.  Also used in manual movement. */
+	private RotationEffector rightRotation;
+
+	/**
      * Creates an instance of an agent.
      *
      * @param wr Odor world to place agent
@@ -95,9 +104,14 @@ public class MovingEntity implements OdorWorldEntity {
      * Initialize effectors and sensors, thereby allowing other Simbrain components to couple to the agent.
      */
     public void initEffectorsAndSensors() {
-    	agent.getEffectors().add(new StraightMovementEffector(agent, "Straight", 1, 1));
-    	agent.getEffectors().add(new RotationEffector(agent, "Left", 1, 1));
-    	agent.getEffectors().add(new RotationEffector(agent, "Right", 1, -1));
+    	
+    	straightMovement = new StraightMovementEffector(agent, "Straight", 1, 1);	
+    	leftRotation = new RotationEffector(agent, "Left", 1, 1);
+    	rightRotation = new RotationEffector(agent, "Right", 1, -1);
+    	
+    	agent.getEffectors().add(straightMovement);
+    	agent.getEffectors().add(leftRotation);
+    	agent.getEffectors().add(rightRotation);
     	agent.getSensors().add(new SmellSensor(agent, "Left", 1, WHISKER_ANGLE));
     	agent.getSensors().add(new SmellSensor(agent, "Center", 1));
     	agent.getSensors().add(new SmellSensor(agent, "Right", 1, -WHISKER_ANGLE));
@@ -146,6 +160,13 @@ public class MovingEntity implements OdorWorldEntity {
          currentImage.setImage(image); 
     }
 
+    /**
+     * Manually move this entity forward.
+     */
+    public void moveStraight() {
+    	straightMovement.setValue(manualStraightMovementIncrement); //TODO: Not yet working
+    }
+    
     //TODO
     public MovingEntity copy() {
 //        OdorWorldAgent temp = new OdorWorldAgent();
@@ -226,6 +247,7 @@ public class MovingEntity implements OdorWorldEntity {
 	 * {@inheritDoc}
 	 */
 	public void paintEntity(Component component, Graphics g) {
+		//g.fillRect(this.getBounds().x, this.getBounds().y, this.getBounds().width, this.getBounds().height);
 		currentImage.paintIcon(component, g, (int) actualLocation[0], (int) actualLocation[1]);		
 	}
 

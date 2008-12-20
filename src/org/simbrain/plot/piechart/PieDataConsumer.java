@@ -19,18 +19,16 @@
 package org.simbrain.plot.piechart;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
-import org.jfree.data.xy.XYSeries;
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
- * Represents one possible data value in a pie chart
+ * Represents one possible data value in a pie chart.
  */
 public class PieDataConsumer extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
-    private PieChartComponent plot;
+    private PieChartModel data;
         
     /** Name. */
     private final String name;
@@ -44,13 +42,14 @@ public class PieDataConsumer extends SingleAttributeConsumer<Double> {
     /**
      * Construct a PieDataConsumer.
      * 
-     * @param plot
+     * @param data
      *            the parent component
      * @param name
      *            the name of this consumer (displayed in the plot)
+     * @param index of the plot item
      */
-    public PieDataConsumer(PieChartComponent plot, String name, Integer index) {
-        this.plot = plot;
+    public PieDataConsumer(final PieChartModel data, final String name, final Integer index) {
+        this.data = data;
         this.name = name;
         this.index = index;
     }
@@ -58,7 +57,7 @@ public class PieDataConsumer extends SingleAttributeConsumer<Double> {
     /**
      * {@inheritDoc}
      */
-    public void setValue(Double val) {
+    public void setValue(final Double val) {
         value = val;
     }
 
@@ -87,7 +86,7 @@ public class PieDataConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public PieChartComponent getParentComponent() {
-        return plot;
+        return data.getParent();
     }
 
     /**

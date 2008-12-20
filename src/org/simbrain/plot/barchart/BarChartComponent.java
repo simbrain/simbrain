@@ -20,29 +20,22 @@ package org.simbrain.plot.barchart;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Data for a JFreeChart pie chart.
  */
 public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
-	/** Data model. */
-	private BarChartModel model;
-	
+    /** Data model. */
+    private BarChartModel model;
+
     /**
      * Create new BarChart Component.
      *
@@ -50,7 +43,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public BarChartComponent(final String name) {
         super(name);
-    	model = new BarChartModel(this);		
+        model = new BarChartModel(this);
     }
 
     /**
@@ -58,6 +51,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      * Used in deserializing.
      *
      * @param name chart name
+     * @param model chart model
      */
     public BarChartComponent(final String name, final BarChartModel model) {
         super(name);
@@ -65,7 +59,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
         model.setParent(this);
     }
 
-	/**
+    /**
      * Initializes a jfreechart with specific number of data sources.
      *
      * @param name name of component
@@ -73,7 +67,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      */
     public BarChartComponent(final String name, final int numDataSources) {
         super(name);
-    	model = new BarChartModel(this);		
+        model = new BarChartModel(this);
         model.addDataSources(numDataSources);
     }
 
@@ -83,17 +77,25 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
      * @return the model.
      */
     public BarChartModel getModel() {
-    	return model;
+        return model;
     }
 
-    public static BarChartComponent open(InputStream input, final String name, final String format) {
+    /**
+     * Opens a saved bar chart.
+     * @param input stream
+     * @param name name of file
+     * @param format format
+     * @return bar chart component to be opened
+     */
+    public static BarChartComponent open(final InputStream input,
+            final String name, final String format) {
         BarChartModel dataModel = (BarChartModel) BarChartModel.getXStream().fromXML(input);
         return new BarChartComponent(name, dataModel);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-    	BarChartModel.getXStream().toXML(model, output);
+        BarChartModel.getXStream().toXML(model, output);
     }
 
     @Override
@@ -133,8 +135,8 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
         return Collections.<Producer>emptyList();
     }
 
-	@Override
-	public String getXML() {
-		return BarChartModel.getXStream().toXML(model);
-	}
+    @Override
+    public String getXML() {
+        return BarChartModel.getXStream().toXML(model);
+    }
 }

@@ -46,7 +46,8 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     /** Chart gui. */
     private JFreeChart chart;
 
-    ChartPanel chartPanel = new ChartPanel(null);
+    /** Panel for chart. */
+    private ChartPanel chartPanel = new ChartPanel(null);
     
     /** Preferred frame size. */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
@@ -137,16 +138,16 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     }
 
     /** @see ActionListener */
-    public void actionPerformed(ActionEvent arg0) {
+    public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
             BarChartDialog dialog = new BarChartDialog(chart);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
-        	this.getWorkspaceComponent().getModel().removeColumn();
+            this.getWorkspaceComponent().getModel().removeColumn();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
-        	this.getWorkspaceComponent().getModel().addColumn();
+            this.getWorkspaceComponent().getModel().addColumn();
         }
         
     }

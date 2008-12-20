@@ -42,37 +42,26 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class PieChartGui extends GuiComponent<PieChartComponent> implements ActionListener {
 
-    /** The underlying plot component. */
-    private final PieChartComponent component;
-
     /** Plot action manager. */
     private PlotActionManager actionManager;
+
+    /** Chart Panel. */
+    private ChartPanel chartPanel = new ChartPanel(null);
+
+    /** Preferred frame size. */
+    private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
     
     /**
-     * Construct the GUI Pie Chart 
+     * Construct the GUI Pie Chart.
+     *
+     * @param frame Generic Frame
+     * @param component Pie chart component
      */
     public PieChartGui(final GenericFrame frame, final PieChartComponent component) {
         super(frame, component);
-        this.component = component;
-        setPreferredSize(new Dimension(500, 400));
+        setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
-    }
-
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         setLayout(new BorderLayout());
-        
-        // Generate the graph
-        JFreeChart chart = ChartFactory.createPieChart(
-            "Pie Chart",
-            component.getDataset(),
-            true, // include legend
-            true,
-            false
-        );
         
         JButton deleteButton = new JButton("Delete");
         deleteButton.setActionCommand("Delete");
@@ -84,13 +73,29 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
-        
-        ChartPanel panel = new ChartPanel(chart);
 
         createAttachMenuBar();
 
-        add("Center", panel);
+        add("Center", chartPanel);
         add("South", buttonPanel);
+    }
+
+    /**
+     * Initializes frame.
+     */
+    @Override
+    public void postAddInit() {
+        
+        // Generate the graph
+        JFreeChart chart = ChartFactory.createPieChart(
+            "Pie Chart",
+            this.getWorkspaceComponent().getModel().getDataset(),
+            true, // include legend
+            true,
+            false
+        );
+        chartPanel.setChart(chart);
+
     }
 
     /**
@@ -125,9 +130,9 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equalsIgnoreCase("Add")) {
-            component.addDataSource();
+            this.getWorkspaceComponent().getModel().addDataSource();
         } else if (e.getActionCommand().equalsIgnoreCase("Delete")) {
-            component.removeDataSource();
+            this.getWorkspaceComponent().getModel().removeDataSource();
         }
         
     }

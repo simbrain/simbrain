@@ -44,9 +44,13 @@ public class BarChartModel {
     private BarChartComponent parentComponent;
 
 
+    /**
+     * Bar chart model constructor.
+     * @param parent component
+     */
     public BarChartModel(final BarChartComponent parent) {
-    	parentComponent = parent;
-    	defaultInit();
+        parentComponent = parent;
+        defaultInit();
     }
 
     /**
@@ -71,19 +75,19 @@ public class BarChartModel {
      * @return parent component.
      */
     public BarChartComponent getParent() {
-		return parentComponent;
-	}
+        return parentComponent;
+    }
 
     /**
      * Set the parent.
      *
      * @param parent the parent
      */
-    public void setParent(BarChartComponent parent) {
-    	this.parentComponent = parent;
+    public void setParent(final BarChartComponent parent) {
+        this.parentComponent = parent;
     }
 
-	/**
+    /**
      * Create specified number of set of data sources.
      * Adds these two existing data sources.
      *
@@ -150,14 +154,17 @@ public class BarChartModel {
         return consumers;
     }
 
+    /**
+     * Used for debugging model.
+     */
     public void debug() {
-    	System.out.println("------------ Debug model ------------");
+        System.out.println("------------ Debug model ------------");
         for (int i = 0; i < dataset.getRowCount(); i++) {
             for (int j = 0; j < dataset.getColumnCount(); j++) {
-                System.out.println("<"+i + "," + j + "> " + dataset.getValue(i, j));
+                System.out.println("<" + i + "," + j + "> " + dataset.getValue(i, j));
             }
         }
-    	System.out.println("--------------------------------------");
+        System.out.println("--------------------------------------");
     }
 
 }

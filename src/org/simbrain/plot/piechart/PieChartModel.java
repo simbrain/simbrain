@@ -155,7 +155,6 @@ public class PieChartModel {
      */
     private Object readResolve() {
         consumers = new ArrayList<PieDataConsumer>();
-        defaultInit();
         return this;
     }
 

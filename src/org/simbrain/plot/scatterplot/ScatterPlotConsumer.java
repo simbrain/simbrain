@@ -32,7 +32,7 @@ import org.simbrain.workspace.ConsumingAttribute;
 public class ScatterPlotConsumer implements Consumer {
 
     /** Reference to gauge. */
-    private ScatterPlotComponent plot;
+    private ScatterPlotModel data;
         
     /** Name. */
     private final String name;
@@ -41,7 +41,8 @@ public class ScatterPlotConsumer implements Consumer {
     private Integer index;
 
     /**  X and Y Attributes for this consumer. */
-    private ArrayList<ConsumingAttribute<Double>> attributeList = new ArrayList<ConsumingAttribute<Double>>();
+    private ArrayList<ConsumingAttribute<Double>> attributeList =
+        new ArrayList<ConsumingAttribute<Double>>();
     
     /** The X Attribute. */
     private XAttribute xAttribute = new XAttribute();
@@ -53,18 +54,20 @@ public class ScatterPlotConsumer implements Consumer {
     /**
      * Construct a ScatterPlotConsumer.
      * 
-     * @param plot the parent component
+     * @param data the parent component
      * @param name the name of this consumer (displayed in the plot)
+     * @param index of plot series
      */
-    public ScatterPlotConsumer(final ScatterPlotComponent plot, final String name, final Integer index) {
-        this.plot = plot;
+    public ScatterPlotConsumer(final ScatterPlotModel data,
+            final String name, final Integer index) {
+        this.data = data;
         this.name = name;
         this.index = index;
         attributeList.add(xAttribute);
         attributeList.add(yAttribute);
     }
 
-    /** 
+    /**
      * Return value for x attribute.
      * 
      * @return value for x attribute.
@@ -74,7 +77,7 @@ public class ScatterPlotConsumer implements Consumer {
         return xAttribute.getValue();
     }
 
-    /** 
+    /**
      * Return value for y attribute.
      * 
      * @return value for y attribute.
@@ -95,7 +98,7 @@ public class ScatterPlotConsumer implements Consumer {
      * {@inheritDoc}
      */
     public ScatterPlotComponent getParentComponent() {
-        return plot;
+        return data.getParent();
     }
 
     /**

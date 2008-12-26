@@ -28,11 +28,12 @@ import org.simbrain.workspace.SingleAttributeConsumer;
 public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
-    private TimeSeriesPlotComponent plot;
+    private TimeSeriesModel data;
         
-    /** Name. */
+    /** Name of chart. */
     private final String name;
-    
+
+    /** Value. */
     private Double value = new Double(0);
     
     /** Index. */
@@ -41,11 +42,12 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
     /**
      * Construct a TimeSeriesConsumer.
      *  
-     * @param plot the parent component
+     * @param data the time series data model
      * @param name the name of this consumer (displayed in the plot)
+     * @param index of the series item
      */
-    public TimeSeriesConsumer(final TimeSeriesPlotComponent plot, final String name, final Integer index) {
-        this.plot = plot;
+    public TimeSeriesConsumer(final TimeSeriesModel data, final String name, final Integer index) {
+        this.data = data;
         this.name = name;
         this.index = index;
     }
@@ -75,7 +77,7 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "TimeSeries " + getKey();
+        return getKey();
     }
     
     /**
@@ -98,6 +100,6 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public TimeSeriesPlotComponent getParentComponent() {
-        return plot;
+        return data.getParent();
     }
 }

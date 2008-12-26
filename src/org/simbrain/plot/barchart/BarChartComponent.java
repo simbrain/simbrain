@@ -56,7 +56,7 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
     public BarChartComponent(final String name, final BarChartModel model) {
         super(name);
         this.model = model;
-        model.setParent(this);
+        this.model.setParent(this);
     }
 
     /**

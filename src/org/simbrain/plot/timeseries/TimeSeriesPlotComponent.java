@@ -20,17 +20,15 @@ package org.simbrain.plot.timeseries;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Represents time series data.
@@ -41,11 +39,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
-    /** Consumer list. */
-    private ArrayList<TimeSeriesConsumer> consumers= new ArrayList<TimeSeriesConsumer>();
-    
-    /** Time Series Data. */
-    private XYSeriesCollection dataset = new XYSeriesCollection();
+    /** The data model. */
+    private TimeSeriesModel model;
 
     /** Maximum iteration size if this chart is fixed width. */
     private int maxSize = 100;
@@ -60,9 +55,22 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      */
     public TimeSeriesPlotComponent(final String name) {
         super(name);
-        addDataSources(10);
+        model = new TimeSeriesModel(this);
     }
-    
+
+    /**
+     * Creates a new time series component from a specified model.
+     * Used in deserializing.
+     *
+     * @param name chart name
+     * @param model chart model
+     */
+    public TimeSeriesPlotComponent(final String name, final TimeSeriesModel model) {
+        super(name);
+        this.model = model;
+        this.model.setParent(this);
+    }
+
     /**
      * Initializes a JFreeChart with specific number of data sources.
      *
@@ -71,65 +79,15 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      */
     public TimeSeriesPlotComponent(final String name, final int numDataSources) {
         super(name);
-        addDataSources(numDataSources);
-    }
-    
-    /**
-     * Create specified number of set of data sources.
-     * Adds these two existing data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public void addDataSources(final int numDataSources) {
-        for (int i = 0; i < numDataSources; i++) {
-            addDataSource();
-        }
+        model = new TimeSeriesModel(this);
+        model.addDataSources(numDataSources);
     }
 
     /**
-     * Clears the plot.
+     * @return the model.
      */
-    public void clearData() {
-        int seriesCount = dataset.getSeriesCount();
-        for (int i = 0; seriesCount > i; ++i) {
-            dataset.getSeries(i).clear();
-        }
-    }
-
-    /**
-     * Removes a data source from the chart.
-     */
-    public void removeDataSource() {
-        int lastSeriesIndex = dataset.getSeriesCount() - 1;
-
-        if (lastSeriesIndex >= 0) {
-            dataset.removeSeries(lastSeriesIndex);
-            consumers.remove(lastSeriesIndex);
-        }
-    }
-
-    /**
-     * Adds a data source to the chart.
-     */
-    public void addDataSource() {
-        int currentSize = consumers.size();
-        TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(this, ""
-                + (currentSize), currentSize);
-        consumers.add(newAttribute);
-        dataset.addSeries(new XYSeries(currentSize));
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(WorkspaceComponent.class, "component");
-        xstream.omitField(WorkspaceComponent.class, "listenerList");
-        xstream.omitField(WorkspaceComponent.class, "workspace");
-        xstream.omitField(WorkspaceComponent.class, "logger");
-        return xstream;
+    public TimeSeriesModel getModel() {
+        return model;
     }
 
     /**
@@ -144,9 +102,18 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
         System.out.println("ReadResolve.");
         return this;
     }
-    
-    public static TimeSeriesPlotComponent open(InputStream input, final String name, final String format) {
-        return (TimeSeriesPlotComponent) getXStream().fromXML(input);
+
+    /**
+     * Opens a saved time series plot.
+     * @param input stream
+     * @param name name of file
+     * @param format format
+     * @return bar chart component to be opened
+     */
+    public static TimeSeriesPlotComponent open(final InputStream input,
+            final String name, final String format) {
+        TimeSeriesModel dataModel = (TimeSeriesModel) TimeSeriesModel.getXStream().fromXML(input);
+        return new TimeSeriesPlotComponent(name, dataModel);
     }
 
     /**
@@ -154,7 +121,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(this, output);
+        TimeSeriesModel.getXStream().toXML(model, output);
     }
 
     @Override
@@ -171,8 +138,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     /**
      * {@inheritDoc}
      */
-    public Collection<TimeSeriesConsumer> getConsumers() {
-        return consumers;
+    public List<? extends Consumer> getConsumers() {
+        return (List<? extends Consumer>) model.getConsumers();
+    }
+
+    @Override
+    public List<? extends Producer> getProducers() {
+        return Collections.<Producer>emptyList();
     }
     
     @Override
@@ -181,7 +153,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
         // Trim appropriately if fixed width
         if (fixedWidth) {
 //            System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
-            for (Iterator iterator = dataset.getSeries().iterator(); iterator.hasNext(); ) {
+            for (Iterator iterator = model.getDataset().getSeries().iterator(); iterator.hasNext(); ) {
                 XYSeries series = (XYSeries) iterator.next();
                 if (series.getItemCount() > maxSize) {
                     series.remove(0);
@@ -191,17 +163,10 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
 
 
         // Add the data
-        for (TimeSeriesConsumer consumer : getConsumers()) {
-            dataset.getSeries(consumer.getIndex()).add(
+        for (TimeSeriesConsumer consumer : model.getConsumers()) {
+            model.getDataset().getSeries(consumer.getIndex()).add(
                     getWorkspace().getTime(), consumer.getValue());
         }
-    }
-
-    /**
-     * @return the dataset
-     */
-    public XYSeriesCollection getDataset() {
-        return dataset;
     }
 
     /**
@@ -240,7 +205,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<WorkspaceCompone
     
     @Override
     public String getXML() {
-        return TimeSeriesPlotComponent.getXStream().toXML(this);
+        return TimeSeriesModel.getXStream().toXML(model);
     }
     
     @Override

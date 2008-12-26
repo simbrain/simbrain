@@ -34,8 +34,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -43,16 +41,20 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Display a TimeSeriesPlot.
  */
-public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> implements ActionListener {
-
-    /** The underlying plot component. */
-    private final TimeSeriesPlotComponent component;
+public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
+            implements ActionListener {
 
     /** Chart un-initialized instance. */
     private JFreeChart chart;
 
     /** Plot action manager. */
     private PlotActionManager actionManager;
+
+    /** Initial size. */
+    private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
+
+    /** Panel for chart. */
+    private ChartPanel chartPanel = new ChartPanel(null);
 
     /**
      * Construct a time series plot gui.
@@ -62,29 +64,9 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
      */
     public TimeSeriesPlotGui(final GenericFrame frame, final TimeSeriesPlotComponent component) {
         super(frame, component);
-        this.component = component;
-        setPreferredSize(new Dimension(500, 400));
+        setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);
-    }
-
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         setLayout(new BorderLayout());
-        
-        // Generate the graph
-        chart = ChartFactory.createXYLineChart(
-            "Time series", // Title
-            "Iterations", // x-axis Label
-            "Value(s)", // y-axis Label
-            component.getDataset(), // Dataset
-            PlotOrientation.VERTICAL, // Plot Orientation
-            true, // Show Legend
-            true, // Use tooltips
-            false // Configure chart to generate URLs?
-        );
 
         JButton deleteButton = new JButton("Delete");
         deleteButton.setActionCommand("Delete");
@@ -100,16 +82,34 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
         buttonPanel.add(clearButton);
-        
-        ChartPanel panel = new ChartPanel(chart);
 
         createAttachMenuBar();
 
-        add("Center", panel);
+        add("Center", chartPanel);
         add("South", buttonPanel);
+    }
+
+    /**
+     * Initializes frame.
+     */
+    @Override
+    public void postAddInit() {
+        
+        // Generate the graph
+        chart = ChartFactory.createXYLineChart(
+            "Time series", // Title
+            "Iterations", // x-axis Label
+            "Value(s)", // y-axis Label
+            this.getWorkspaceComponent().getModel().getDataset(), // Dataset
+            PlotOrientation.VERTICAL, // Plot Orientation
+            true, // Show Legend
+            true, // Use tooltips
+            false // Configure chart to generate URLs?
+        );
+        chartPanel.setChart(chart);
 
         // Sets the initial fixed width for the chart.
-        chart.getXYPlot().getDomainAxis().setFixedAutoRange(component.getMaxSize());
+        chart.getXYPlot().getDomainAxis().setFixedAutoRange(getWorkspaceComponent().getMaxSize());
     }
 
     /**
@@ -145,16 +145,16 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent> imp
     /** @see ActionListener */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            TimeSeriesPlotDialog dialog = new TimeSeriesPlotDialog(chart, component);
+            TimeSeriesPlotDialog dialog = new TimeSeriesPlotDialog(chart, getWorkspaceComponent());
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
-            component.removeDataSource();
+            this.getWorkspaceComponent().getModel().removeDataSource();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
-            component.addDataSource();
+            this.getWorkspaceComponent().getModel().addDataSource();
         } else if (arg0.getActionCommand().equalsIgnoreCase("ClearData")) {
-            component.clearData();
+            this.getWorkspaceComponent().getModel().clearData();
         }
     }
    

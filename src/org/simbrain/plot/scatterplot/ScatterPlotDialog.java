@@ -24,7 +24,7 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
     /** Reference to the dot renderer. */
     private XYDotRenderer renderer;
 
-    /** Reference to the component */
+    /** Reference to the component. */
     private ScatterPlotComponent component;
 
     /** Auto Range check box. */
@@ -56,8 +56,10 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
      *
      * @param chart Reference to the chart component to be changed
      * @param renderer Reference to the dot renderer
+     * @param component Scatter plot component
      */
-    public ScatterPlotDialog(final JFreeChart chart, final XYDotRenderer renderer, final ScatterPlotComponent component) {
+    public ScatterPlotDialog(final JFreeChart chart, final XYDotRenderer renderer,
+            final ScatterPlotComponent component) {
         this.chart = chart;
         this.renderer = renderer;
         this.component = component;

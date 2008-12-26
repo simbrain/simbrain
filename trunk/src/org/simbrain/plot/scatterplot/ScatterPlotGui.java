@@ -44,17 +44,23 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implements ActionListener {
 
-    /** The underlying plot component. */
-    private final ScatterPlotComponent component;
-
     /** Chart un-initialized instance. */
     private JFreeChart chart;
+
+    /** Chart panel. */
+    private ChartPanel chartPanel = new ChartPanel(null);
+
+    /** Scatter plot component. */
+    private ScatterPlotComponent component;
 
     /** XY chart renderer. */
     private XYDotRenderer renderer;
 
     /** Plot action manager. */
     private PlotActionManager actionManager;
+
+    /** Preferred frame size. */
+    private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
     
     /**
      * Construct the ScatterPlot.
@@ -65,31 +71,9 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
     public ScatterPlotGui(final GenericFrame frame, final ScatterPlotComponent component) {
         super(frame, component);
         this.component = component;
-        setPreferredSize(new Dimension(500, 400));
+        setPreferredSize(new Dimension(PREFERRED_SIZE));
         actionManager = new PlotActionManager(this);
-    }
-
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         setLayout(new BorderLayout());
-        
-        // Generate the graph
-        chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
-                "X", "Y", component.getDataset(), PlotOrientation.VERTICAL, true, false, false);
-
-        renderer = new XYDotRenderer();
-        chart.getXYPlot().setRenderer(renderer);
-        
-
-        // Use below to make this stuff settable
-        chart.getXYPlot().getDomainAxis().setRange(0, 100);
-        chart.getXYPlot().getRangeAxis().setRange(0, 100);
-        chart.getXYPlot().getDomainAxis().setAutoRange(false);
-        chart.getXYPlot().getRangeAxis().setAutoRange(false);
-
 
         JButton deleteButton = new JButton("Delete");
         deleteButton.setActionCommand("Delete");
@@ -101,13 +85,34 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
-        
-        ChartPanel panel = new ChartPanel(chart);
 
         createAttachMenuBar();
 
-        add("Center", panel);
+        add("Center", chartPanel);
         add("South", buttonPanel);
+    }
+
+    /**
+     * Initializes frame.
+     */
+    @Override
+    public void postAddInit() {
+
+        // Generate the graph
+        chart = ChartFactory.createScatterPlot("Scatter Plot Demo 1",
+                "X", "Y", this.getWorkspaceComponent().getModel().getDataset(),
+                PlotOrientation.VERTICAL, true, false, false);
+
+        // Use below to make this stuff settable
+        chart.getXYPlot().getDomainAxis().setRange(0, 100);
+        chart.getXYPlot().getRangeAxis().setRange(0, 100);
+        chart.getXYPlot().getDomainAxis().setAutoRange(false);
+        chart.getXYPlot().getRangeAxis().setAutoRange(false);
+
+        chartPanel.setChart(chart);
+        renderer = new XYDotRenderer();
+        chart.getXYPlot().setRenderer(renderer);
+
     }
 
     /**
@@ -148,9 +153,9 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
-            component.removeDataSource();
+            this.getWorkspaceComponent().getModel().removeDataSource();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
-            component.addDataSource();
+            this.getWorkspaceComponent().getModel().addDataSource();
         }
     }
    

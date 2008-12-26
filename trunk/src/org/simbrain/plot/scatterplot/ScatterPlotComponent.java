@@ -20,158 +20,65 @@ package org.simbrain.plot.scatterplot;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Data for a JFreeChart ScatterPlot.
  */
 public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
-    /** Consumer list. */
-    private ArrayList<ScatterPlotConsumer> consumers= new ArrayList<ScatterPlotConsumer>();
-    
-    /** Scatter Plot Data. */
-    private XYSeriesCollection dataset;
-    
-    /** Default number of sources. */
-    private static final int DEFAULT_NUMBER_OF_SOURCES = 5;
-
     /** Show plot history. */
     private boolean showHistory = false;
 
+    /** Data Model. */
+    private ScatterPlotModel model;
+
     /**
      * Create new PieChart Component.
+     *
+     * @param name chart name
      */
     public ScatterPlotComponent(final String name) {
         super(name);
-        init(DEFAULT_NUMBER_OF_SOURCES);
+        model = new ScatterPlotModel(this);
     }
     
     /**
-     * Initializes a JFreeChart with specific number of data sources.
+     * Create new BarChart Component from a specified model.
+     * Used in deserializing.
+     *
+     * @param name chart name
+     * @param model chart model
+     */
+    public ScatterPlotComponent(final String name, final ScatterPlotModel model) {
+        super(name);
+        this.model = model;
+        this.model.setParent(this);
+    }
+
+    /**
+     * Initializes a jfreechart with specific number of data sources.
      *
      * @param name name of component
      * @param numDataSources number of data sources to initialize plot with
      */
     public ScatterPlotComponent(final String name, final int numDataSources) {
         super(name);
-        init(numDataSources);
-    }
-    
-    /**
-     * Initialize plot.
-     *
-     * @param numSources number of data sources
-     */
-    private void init(final int numSources) {
-        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
-        dataset = new XYSeriesCollection();
-        addDataSources(numSources);
-    }
-    
-    /**
-     * Create specified number of set of data sources.
-     * Adds these two existing data sources.
-     *
-     * @param numDataSources number of data sources to initialize plot with
-     */
-    public void addDataSources(final int numDataSources) {
-        for (int i = 0; i < numDataSources; i++) {
-            addDataSource();
-        }
+        model = new ScatterPlotModel(this);
+        model.addDataSources(numDataSources);
     }
 
     /**
-     * Adds a data source.
+     * @return the model.
      */
-    public void addDataSource() {
-        int currentSize = consumers.size();
-        ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(this, "ScatterPlot"
-                + (currentSize), currentSize);
-        consumers.add(newAttribute);
-        dataset.addSeries(new XYSeries(currentSize));
-    }
-
-    /**
-     * Removes a data source.
-     */
-    public void removeDataSource() {
-        int lastSeriesIndex = dataset.getSeriesCount() - 1;
-
-        if (lastSeriesIndex >= 0) {
-            dataset.removeSeries(lastSeriesIndex);
-            consumers.remove(lastSeriesIndex);
-        }
-    }
-
-    /**
-     * Clears the chart of plotted data.
-     */
-    public void clearChart() {
-        int seriesCount = dataset.getSeriesCount();
-        for (int i = 0; seriesCount > i; ++i) {
-            dataset.getSeries(i).clear();
-        }
-    }
-
-    /**
-     * Return JFreeChart xy dataset.
-     * 
-     * @return dataset
-     */
-    public XYDataset getDataset() { 
-        return dataset;
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(WorkspaceComponent.class, "component");
-        xstream.omitField(WorkspaceComponent.class, "listenerList");
-        xstream.omitField(WorkspaceComponent.class, "workspace");
-        xstream.omitField(WorkspaceComponent.class, "logger");
-        return xstream;
-    }
-
-    /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     * 
-     * @return Initialized object.
-     */
-    private Object readResolve() {
-        System.out.println("ReadResolve.");
-        return this;
-    }
-       
-    /**
-     * {@inheritDoc}
-     */
-    public static ScatterPlotComponent open(InputStream input, final String name, final String format) {
-        return (ScatterPlotComponent) getXStream().fromXML(input);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void save(final OutputStream output, final String format) {
-        getXStream().toXML(this, output);
+    public ScatterPlotModel getModel() {
+        return model;
     }
 
     @Override
@@ -184,12 +91,22 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
     public void closing() {
         // TODO Auto-generated method stub
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public static ScatterPlotComponent open(final InputStream input,
+            final String name, final String format) {
+        ScatterPlotModel dataModel = (ScatterPlotModel) ScatterPlotModel.getXStream().fromXML(input);
+        return new ScatterPlotComponent(name, dataModel);
+    }
 
     /**
      * {@inheritDoc}
      */
-    public Collection<ScatterPlotConsumer> getConsumers() {
-        return consumers;
+    @Override
+    public void save(final OutputStream output, final String format) {
+        ScatterPlotModel.getXStream().toXML(model, output);
     }
 
     /**
@@ -199,7 +116,11 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
         return showHistory;
     }
 
-    public void setShowHistory(boolean value) {
+    /**
+     * Boolean show history.
+     * @param value show history
+     */
+    public void setShowHistory(final boolean value) {
         showHistory = value;
     }
 
@@ -208,9 +129,9 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
 
         if (!showHistory) {
             // Constantly erase. How is performance for this version?
-            for (ScatterPlotConsumer consumer : getConsumers()) {
-                dataset.getSeries(consumer.getIndex()).clear();
-                dataset.getSeries(consumer.getIndex()).add(consumer.getX(),
+            for (ScatterPlotConsumer consumer : model.getConsumers()) {
+                model.getDataset().getSeries(consumer.getIndex()).clear();
+                model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
                         consumer.getY());
                 // System.out.println("--[" + consumer.getIndex() + "]:" +
                 // dataset.getSeries(consumer.getIndex()).getItemCount());
@@ -218,8 +139,8 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
         } else {
 
             // THE VERSION BELOW KEEPS A HISTORY. THERE IS NO "HOT" POINT
-            for (ScatterPlotConsumer consumer : getConsumers()) {
-                dataset.getSeries(consumer.getIndex()).add(consumer.getX(),
+            for (ScatterPlotConsumer consumer : model.getConsumers()) {
+                model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
                         consumer.getY());
             }
         }
@@ -233,11 +154,21 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
     
     @Override
     public String getXML() {
-        return ScatterPlotComponent.getXStream().toXML(this);
+        return ScatterPlotModel.getXStream().toXML(model);
     }
     
     @Override
     public void setCurrentDirectory(final String currentDirectory) {
         super.setCurrentDirectory(currentDirectory);
+    }
+
+    @Override
+    public List<? extends Consumer> getConsumers() {
+        return (List<? extends Consumer>) model.getConsumers();
+    }
+    
+    @Override
+    public List<? extends Producer> getProducers() {
+        return Collections.<Producer>emptyList();
     }
 }

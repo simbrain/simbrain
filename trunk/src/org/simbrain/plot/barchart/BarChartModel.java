@@ -143,7 +143,6 @@ public class BarChartModel {
      */
     private Object readResolve() {
         consumers = new ArrayList<BarChartConsumer>();
-        defaultInit();
         return this;
     }
     

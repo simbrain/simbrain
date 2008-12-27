@@ -251,8 +251,9 @@ public abstract class Projector {
      * using the currently selected method
      *
      * @param point point to be added
+     * @return true if the point was added, false otherwise.
      */
-    public void addDatapoint(final double[] point) {
+    public boolean addDatapoint(final double[] point) {
        // logger.debug("addDatapoint called");
         // Add the upstairs point
         double tolerance = theSettings.getTolerance();
@@ -262,10 +263,12 @@ public abstract class Projector {
             if (point.length == 1) {
                 newPoint = new double[] {point[0], 0 };
                 downstairs.addPoint(newPoint);
-                return;
+                return true;
             }
 
             // Add the downstairs point differently depending on the add method
+            //   The first case is the default case: add the points and run the projection
+            //	 The other cases are custom add methods
             if (theSettings.getAddMethod().equals(Settings.REFRESH)) {
                 newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
                 downstairs.addPoint(newPoint);
@@ -277,7 +280,9 @@ public abstract class Projector {
                 newPoint = AddData.nnSubspace(upstairs, downstairs, point);
                 downstairs.addPoint(newPoint);
             }
+            return true;
         }
+        return false;
     }
 
     /**

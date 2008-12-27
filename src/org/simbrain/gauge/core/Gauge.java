@@ -116,17 +116,17 @@ public class Gauge {
      *
      * @param point the point to add
      */
-    public void addDatapoint(final double[] point) {
+    public boolean addDatapoint(final double[] point) {
 
         logger.debug("addDatapoint called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
-            return;
+            return false;
         }
 
         logger.debug("Gauge: isOn " + isOn());
 
         if (isOn()) {
-            currentProjector.addDatapoint(point);
+            boolean ret = currentProjector.addDatapoint(point);
 
             /* This is needed to invoke the current projector's init function */
             if (currentProjector.isIterable()) {
@@ -134,7 +134,9 @@ public class Gauge {
             }
 
             error = 0;
+            return ret;
         }
+        return false;
     }
 
     /**
@@ -150,8 +152,8 @@ public class Gauge {
         int iterations = 0;
 
         while (iterations < numTimes) {
+        	// TODO: Why should the current projector return an error when that is specific to Sammon? 
             error = currentProjector.iterate();
-            System.out.println(error);
             iterations++;
         }
     }

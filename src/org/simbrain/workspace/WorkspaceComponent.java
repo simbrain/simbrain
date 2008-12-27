@@ -140,10 +140,16 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
      */
     public final void doUpdate() {
         update();
-        
+        fireUpdateEvent();
+    }
+    
+    /**
+     * Notify all listeners of a componentUpdated event.
+     */
+    public final void fireUpdateEvent() {
         for (E listener : listeners) {
             listener.componentUpdated();
-        }
+        }    	
     }
     
     /**

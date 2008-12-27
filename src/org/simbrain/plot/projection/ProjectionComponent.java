@@ -39,7 +39,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * 
  * TODO:
  *  Color last point (override paint and just get last one?)
- *  Basicaly get all the stuff from the old gui here!
+ *  Basically get all the stuff from the old gui here!
  *  Tooltips
  *  Add ability to plot multiple HDV's at once?
  *  Maybe ability to connect them with lines
@@ -57,6 +57,9 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     
     /** High Dimensional Projection. */
     private Gauge gauge = new Gauge();
+    
+    /** True when no thread is updating this component. */
+    private boolean isSuspended = true;
 
     /**
      * Create new PieChart Component.
@@ -85,7 +88,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     private void init(final int numSources) {
         this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
         dataset = new XYSeriesCollection();
-        dataset.addSeries(new XYSeries("Data"));
+        dataset.addSeries(new XYSeries("Data", false, true));
         for (int i = 0; i < numSources; i++) {
             addSource();
         }
@@ -110,7 +113,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         int currentSize = consumers.size() - 1;
 
         if (currentSize > 0) {
-//            dataset.removeSeries(lastSeriesIndex);
+        	//dataset.removeSeries(lastSeriesIndex);
             consumers.remove(currentSize);
             gauge.init(currentSize);
         }
@@ -186,52 +189,91 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         return consumers;
     }
 
+    /**
+     * Get the current state of the consumers, send this to the projection algorithm,
+     * and update the graphics.
+     */
     @Override
     public void update() {
 
+    	// Create a new double array to be sent as a new "point" to the projection dataset
         double[] temp = new double[getConsumers().size()];
         int i = 0;
         for (ProjectionConsumer consumer : getConsumers()) {
-            temp[i++] = consumer.getValue();
+            temp[i] = consumer.getValue();
+            i++;
         }
-        gauge.addDatapoint(temp);
-        
-        double[] lastPoint = gauge.getProjectedPoint(gauge.getSize()-1);
-        if (lastPoint != null) {
-            dataset.getSeries(0).add(lastPoint[0], lastPoint[1]);
+        boolean newDatapointWasAdded = gauge.addDatapoint(temp);
+        if (newDatapointWasAdded) {
+            resetChartDataset(); // (should rename; see below)
+            // TODO: Add a check to see whether the current projection algorith
+            //		 resets all the data or simply involves adding a single  new datapoint
+            //		 If only one new datapoint is added it should be added to the dataset
+            //		  and "resetChartDataset" should not be called.
         }
-
     }
     
+    /**
+     * Get reference to underlying gauge object.
+     *
+     * @return gauge object.
+     */
     public Gauge getGauge() {
         return gauge;
     }
     
+    /**
+     * Clear the dataset.
+     */
     public void clearData() {
         dataset.getSeries(0).clear();
         gauge.reset();
+        fireUpdateEvent();
     }
     
+    /**
+     * Change projection.
+     */
     public void changeProjection() {
         gauge.getCurrentProjector().project(); // Should this have happened already?
         resetChartDataset();
     }
     
+    /**
+     * Update the entire dataset.  Called when the entire chart dataset is changed.
+     */
     public void resetChartDataset() {
         dataset.getSeries(0).clear();
-        for (int i = 0; i < gauge.getSize(); i++) {
+        int size = gauge.getSize();
+        for (int i = 0; i < size - 2; i++) {
             double[] point = gauge.getProjectedPoint(i);
             if(point != null) {
-                dataset.getSeries(0).add(point[0], point[1]);
+            	// No need to update the chart yet (hence the "false" parameter)
+            	dataset.getSeries(0).add(point[0], point[1], false);
             }
         }
+        // Notify chart when last datapoint is updated
+        double[] point = gauge.getProjectedPoint(size-1);
+        if (point != null) {
+            dataset.getSeries(0).add(point[0], point[1], true);        	
+        }
+    }
+
+    /**
+     * Used for debugging model.
+     */
+    public void debug() {
+        System.out.println("------------ Print contents of dataset ------------");
+        for (int i = 0; i < dataset.getSeries(0).getItemCount(); i++) {
+                System.out.println("<" + i + "> " + dataset.getSeries(0).getDataItem(i).getX() + "," + dataset.getSeries(0).getDataItem(i).getY());
+            }
+        System.out.println("--------------------------------------");
     }
 
 
     @Override
     public String getCurrentDirectory() {
         return "." + System.getProperty("file.separator");
-
     }
     
     @Override
@@ -244,4 +286,17 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         super.setCurrentDirectory(currentDirectory);
     }
 
+    /**
+     * @return whether this component being updated by a thread or not.
+     */
+	public boolean isSuspended() {
+		return isSuspended;
+	}
+
+	/**
+	 * @param b  whether this component being updated by a thread or not.
+	 */
+	public void setSuspended(boolean b) {
+		isSuspended = b;		
+	}
 }

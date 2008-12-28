@@ -25,14 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.NetworkThread;
 import org.simbrain.network.util.SimpleId;
-import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 
@@ -64,9 +60,6 @@ public class RootNetwork extends Network {
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
 
-    /** The thread that runs the network. */
-    private NetworkThread networkThread;
-
     /** Whether this is a discrete or continuous time network. */
     private int timeType = DISCRETE;
 
@@ -76,13 +69,13 @@ public class RootNetwork extends Network {
     /** If this is a continuous-time network. */
     public static final int CONTINUOUS = 1;
 
-    /** In iterartions or seconds. */
+    /** In iterations or seconds. */
     private double time = 0;
 
     /** Time step. */
     private double timeStep = .01;
 
-    /** Constant value for Math.lg(10); used to approxomate log 10. */
+    /** Constant value for Math.log(10); used to approximate log 10. */
     private static final double LOG_10 = Math.log(10);
 
     /** Used to temporarily turn off all learning. */
@@ -98,12 +91,13 @@ public class RootNetwork extends Network {
     /** Whether network files should use tabs or not. */
     private boolean usingTabs = true;
 
-    /** Enumeration for the update methods
-     *  BUFFER: default update method; based on buffering
-     *  PRIORITYBASED: user sets the priority for each neuron,
-     *  sub-neuron and synapse. Default priority value is 0.
-     *  Elements with smaller priority value are updated first.
-     *  SCRIPT: update is handled by a script
+    /**
+     * 	Enumeration for the update methods
+     *  	BUFFER: default update method; based on buffering
+     *  	PRIORITYBASED: user sets the priority for each neuron,
+     *  	sub-neuron and synapse. Default priority value is 0.
+     *  	Elements with smaller priority value are updated first.
+     *  	SCRIPT: update is handled by a script
      */
     public enum UpdateMethod { PRIORITYBASED, SCRIPTBASED, BUFFERED }
 
@@ -235,7 +229,7 @@ public class RootNetwork extends Network {
         clearInputs();
 
         // For thread
-        updateCompleted = true;
+        this.setUpdateCompleted(true);
     }
 
     /**
@@ -254,7 +248,7 @@ public class RootNetwork extends Network {
         clearInputs();
 
         // For thread
-        updateCompleted = true;
+        this.setUpdateCompleted(true);
     }
 
     /**
@@ -393,14 +387,7 @@ public class RootNetwork extends Network {
         }
         return null;
     }
-
-    /**
-     * Respond to worldChanged event.
-     */
-    public void worldChanged() {
-        updateRootNetwork();
-    }
-
+    
     /**
      * Clears out input values of network nodes, which otherwise linger and
      * cause problems.
@@ -648,24 +635,6 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Notify any objects observing this network that it has closed.
-     */
-    public void close() {
-        if (this.getNetworkThread() != null) {
-            this.getNetworkThread().setRunning(false);
-        }
-        // Only consider this a close if no one is listening to this network
-//        if (getListenerList().size() == 0) {
-            // Remove world listeners
-//            for (Iterator i = getCouplingList().iterator(); i.hasNext(); ) {
-//                Coupling coupling = (Coupling) i.next();
-//                if (coupling.getWorld() != null) {
-//                    coupling.getWorld().removeWorldListener(this);
-//                }
-//            }
-    }
-
-    /**
      * Used by Network thread to ensure that an update cycle is complete before
      * updating again.
      *
@@ -684,29 +653,6 @@ public class RootNetwork extends Network {
     public void setUpdateCompleted(final boolean b) {
         updateCompleted = b;
     }
-
-    /**
-     * @return Returns the networkThread.
-     */
-    public NetworkThread getNetworkThread() {
-        return networkThread;
-    }
-
-    /**
-     * @param networkThread The networkThread to set.
-     */
-    public void setNetworkThread(final NetworkThread networkThread) {
-        this.networkThread = networkThread;
-    }
-
-    /**
-     * Return the top level listener list.
-     *
-     * @return the top level listener list
-     */
-//    public HashSet<NetworkListener> getListenerList() {
-//        return listenerList;
-//    }
 
     /**
      * Fire a subnetwork added event to all registered model listeners.

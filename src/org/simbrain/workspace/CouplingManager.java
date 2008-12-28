@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Matt Watson
  */
-public class CouplingManager implements UpdatePriority {
+public class CouplingManager {
 
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);

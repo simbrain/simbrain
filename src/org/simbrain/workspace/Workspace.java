@@ -28,7 +28,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
@@ -42,6 +46,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class Workspace {
+
     /** The time to sleep between updates. */
     private static final int SLEEP_INTERVAL = 1;
     
@@ -66,10 +71,10 @@ public class Workspace {
     /** Current directory. So when re-opening this type of component the app remembers where to look. */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
-    /** Thread which runs workspace. */
-    private WorkspaceThread workspaceThread;
-
-    /** Listeners on this workspace. */
+    /**
+     * Listeners on this workspace. The CopyOnWriteArrayList is not a problem because
+     * writes to this list are uncommon.
+     */
     private CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
@@ -78,30 +83,24 @@ public class Workspace {
      */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
-    /**
-     *  Enumeration for the update methods
-     *  BUFFER: default update method; based on buffering
-     *  PRIORITYBASED: user sets the priority for each component and the coupling manager
-     *  Elements with smaller priority number (i.e., higher priority)
-     *   are updated first.
-     */
-    public static enum UpdateMethod { BUFFERED, PRIORITY_BASED, CUSTOM}
-
-    /** Current update method. */
-    private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
-    
     /** Custom update method; null if none. */
     private CustomUpdate customUpdateMethod = null;
-    
-    /**
-     * Used in prioirty based update.
-     */
-    private SortedSet<Integer> updatePriorities =  new TreeSet<Integer>();
     
     // TODO: Add docs
     private boolean fireEvents = true;
 
+    /** The barrier which controls thread update. */
+    private CyclicBarrier barrier;
     
+    /** The executor. */
+    private ExecutorService workspaceUpdater;
+    
+    /** Flag for updating. */
+    private volatile boolean isUpdating;
+    
+    /** Provisional global time implementation. */
+    private volatile int time = 0;
+
     /**
      * Adds a listener to the workspace.
      * 
@@ -194,17 +193,7 @@ public class Workspace {
         }
 
     }
-    
-    /**
-     * Adds a workspace component to the workspace with a priority.
-     * 
-     * @param component The component to add.
-     */
-    public void addWorkspaceComponent(final WorkspaceComponent<?> component, int priority) {
-        updatePriorities.add(new Integer(priority));
-        addWorkspaceComponent(component);
-    }
-    
+
     /**
      * Remove the specified component.
      *
@@ -215,48 +204,9 @@ public class Workspace {
         for (WorkspaceListener listener : listeners) {
             listener.componentRemoved(component);
         }
-        this.getCouplingManager().removeCouplings(component);   // Remove all couplings assciated with this component
+        this.getCouplingManager().removeCouplings(component);   // Remove all couplings associated with this component
         componentList.remove(component);
         this.setWorkspaceChanged(true);
-    }
-    
-    // TODO: Add other update methods.
-    
-    /**
-     * Update all couplings on all components.  Currently use a buffering method.
-     */
-    public void globalUpdate() {
-
-        if (updateMethod == UpdateMethod.BUFFERED) {
-                manager.updateAllCouplings();
-                synchronized (componentList) {
-                for (WorkspaceComponent<?> component : componentList) {
-                    component.doUpdate();
-                    //System.out.println(component + ": " + (System.nanoTime() - time));
-                    try {
-                        Thread.sleep(SLEEP_INTERVAL);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } else if (updateMethod == UpdateMethod.PRIORITY_BASED) {
-            for (Integer i : updatePriorities) {
-                // TODO!
-            }
-
-        } else if (updateMethod == UpdateMethod.CUSTOM) {
-               if (customUpdateMethod == null) {
-                   // TODO: Throw Exception
-               } else {
-                   synchronized (componentList) {
-                       customUpdateMethod.update(this);
-                   }
-
-               }
-        }
-        
-        time++;
     }
     
     /**
@@ -279,47 +229,70 @@ public class Workspace {
     }
     
     /**
-     * Adds a coupling to the CouplingManager.
-     * 
-     * @param coupling The coupling to add.
+     * Update all couplings on all components.  Currently use a buffering method.
      */
-    public void addCoupling(final Coupling<?> coupling) {
-        manager.addCoupling(coupling);
-    }
-    
-    /**
-     * Removes a coupling from the CouplingManager.
-     * 
-     * @param coupling The coupling to remove.
-     */
-    public void removeCoupling(final Coupling<?> coupling) {
-        manager.removeCoupling(coupling);
-    }
+    public void globalUpdate() {
 
+    	// default update is a buffered method (TODO Elaborate)
+       if (customUpdateMethod == null) {
+                manager.updateAllCouplings();
+                synchronized (componentList) {
+                for (WorkspaceComponent<?> component : componentList) {
+                    component.doUpdate();
+                    //System.out.println(component + ": " + (System.nanoTime() - time));
+                    try {
+                        Thread.sleep(SLEEP_INTERVAL);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+			synchronized (componentList) {
+				customUpdateMethod.update(this);
+			}
+        }
+        time++;
+    }
     
     /**
      * Iterates all couplings on all components until halted by user.
      */
     public void globalRun() {
-        WorkspaceThread workspaceThread = getWorkspaceThread();
-
-        if (!workspaceThread.isRunning()) {
-            workspaceThread.setRunning(true);
-            workspaceThread.start();
-        } else {
-            workspaceThread.setRunning(false);
-        }
+    	
+    	isUpdating = true;
+        if (customUpdateMethod == null) {
+        	int numComponents = this.getComponentList().size();
+            barrier = new CyclicBarrier(numComponents, new UpdateCouplings()); 
+            workspaceUpdater = Executors.newFixedThreadPool(numComponents); 
+            for (int i = 0; i < numComponents; i++) {  
+            	workspaceUpdater.execute(new WorkspaceComponentUpdater(this.getComponentList().get(i)));
+            }
+        }else {
+        	// For custom updating, it is assumed the script using the custom updater
+			// will provide thread control. However, default single threading is
+			// here provided
+			Executors.newSingleThreadExecutor().execute(new Runnable() {
+				public void run() {
+					while (isUpdating) {
+						customUpdateMethod.update(Workspace.this);
+						time++; // TODO: Should this be here or up to the custom
+								// update method?
+					}
+				}
+			});
+		}
     }
 
     /**
      * Stops iteration of all couplings on all components.
      */
     public void globalStop() {
-        WorkspaceThread workspaceThread = getWorkspaceThread();
-
-        workspaceThread.setRunning(false);
-        clearWorkspaceThread();
-    }
+    	isUpdating = false;
+    	if (workspaceUpdater != null) {
+    		workspaceUpdater.shutdown();
+    	}
+     }
 
     /**
      * Remove all components (networks, worlds, etc.) from this workspace.
@@ -338,7 +311,7 @@ public class Workspace {
      * Disposes all Simbrain Windows.
      */
     public void removeAllComponents() {
-        ArrayList<WorkspaceComponent> toRemove = new ArrayList();
+        ArrayList<WorkspaceComponent<?>> toRemove = new ArrayList<WorkspaceComponent<?>>();
         synchronized (componentList) {
             for (WorkspaceComponent<?> component : componentList) {
                 toRemove.add(component);
@@ -431,24 +404,6 @@ public class Workspace {
         }
         return null;
     }
-    
-    /**
-     * Returns the workspaceThread.
-     * 
-     * @return The workspaceThread.
-     */
-    public WorkspaceThread getWorkspaceThread() {
-        if (workspaceThread == null) { workspaceThread = new WorkspaceThread(this); }
-        
-        return workspaceThread;
-    }
-    
-    /**
-     * Clears the workspace thread.
-     */
-    private void clearWorkspaceThread() {
-        workspaceThread = null;
-    }
 
     /**
      * Returns the coupling manager for this workspace.
@@ -473,27 +428,112 @@ public class Workspace {
         return builder.toString();
     }
 
-    public UpdateMethod getUpdateMethod() {
-        return updateMethod;
+    /**
+     * Adds a coupling to the CouplingManager.
+     * 
+     * @param coupling The coupling to add.
+     */
+    public void addCoupling(final Coupling<?> coupling) {
+        manager.addCoupling(coupling);
+    }
+    
+    /**
+     * Removes a coupling from the CouplingManager.
+     * 
+     * @param coupling The coupling to remove.
+     */
+    public void removeCoupling(final Coupling<?> coupling) {
+        manager.removeCoupling(coupling);
     }
 
-    public void setUpdateMethod(UpdateMethod updateMethod) {
-        this.updateMethod = updateMethod;
-    }
-
+    /**
+     * Get the custom update method, if any.
+     *
+     * @return custom update method, which is null if there is none.
+     */
     public CustomUpdate getCustomUpdateMethod() {
         return customUpdateMethod;
     }
 
+    /**
+     * Set current update method; set to null if there is no custom method.
+     *
+     * @param customUpdateMethod custom update method.
+     */
     public void setCustomUpdateMethod(CustomUpdate customUpdateMethod) {
         this.customUpdateMethod = customUpdateMethod;
     }
-
-    /** Provisional global time implementation. */
-    private int time = 0;
     
+    /**
+     * Returns global time.
+     * 
+     * @return
+     */
     public Number getTime() {
         return time;
     }
+    
+    /**
+     * Update task.
+     */
+    public class WorkspaceComponentUpdater implements Runnable {
+
+    	/** Reference to component. */
+    	private WorkspaceComponent<?> workspaceComponent;
+    	
+    	/** The task to be run. */
+    	private Runnable task;
+    	
+    	/**
+    	 * Workspace component updater.
+    	 * 
+    	 * @param component reference to component.
+    	 */
+    	public WorkspaceComponentUpdater(final WorkspaceComponent<?> component) {
+    		this.workspaceComponent = component;
+    		if (workspaceComponent.getTask() == null) {
+    			task = new Runnable() {
+					public void run() {
+						workspaceComponent.doUpdate();
+					}    				
+    			};
+    		} else {
+    			task = workspaceComponent.getTask();
+    		}
+    	}
+
+    	/**
+    	 * {@inheritDoc}
+    	 */
+		public void run() {
+			while(isUpdating) {
+				try {
+					task.run();
+					time++;
+					barrier.await();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (BrokenBarrierException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
+			}
+		}
+    	
+    }
+    
+    /**
+     * Task for updating couplings.
+     */
+	private class UpdateCouplings implements Runnable {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void run() {
+			manager.updateAllCouplings();
+		}	
+	}
     
 }

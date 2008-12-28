@@ -67,14 +67,13 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             int epochs = Integer.parseInt(JOptionPane.showInputDialog("Number of epochs"));
             bp.setTrain(true);
             for(int i = 0; i < epochs; i++) {
-                errorPlot.getDataset().getSeries(0).add(i, bp.getError());
+                errorPlot.getModel().getDataset().getSeries(0).add(i, bp.getError());
                 workspace.globalUpdate();    
             }
             bp.setTrain(false);
             
 	    // Set Update Method
-            workspace.setUpdateMethod(Workspace.UpdateMethod.CUSTOM);
-            workspace.setCustomUpdateMethod(new BackpropUpdate(network, inputData));
+            workspace.setCustomUpdateMethod(new BackpropUpdate(network, inputData)); // TODO: Not thread safe.  Must use SwingUtilities.
 
             // Close training data window
             trainingData.close();

@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * @param <E> The type of the workspace listener associated with this
  * component.
  */
-public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> implements UpdatePriority {
+public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
 
     /** The workspace that 'owns' this component. */
     private Workspace workspace;
@@ -115,6 +115,10 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> i
     public final void close() {
         closing();
         workspace.removeWorkspaceComponent(this);
+    }
+    
+    public Runnable getTask() {
+    	return null;
     }
     
     /**

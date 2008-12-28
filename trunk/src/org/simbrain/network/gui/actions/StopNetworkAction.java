@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.NetworkThread;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
@@ -55,17 +54,6 @@ public final class StopNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        // TODO:
-        // move to a method stopNetwork() or similar on NetworkPanel
-
-        if (networkPanel.getRootNetwork().getNetworkThread() == null) {
-            networkPanel.getRootNetwork().setNetworkThread(new NetworkThread(networkPanel.getRootNetwork()));
-        }
-
-        NetworkThread networkThread = networkPanel.getRootNetwork().getNetworkThread();
-
-        networkThread.setRunning(false);
-        networkPanel.getRootNetwork().setNetworkThread(null);
+    	networkPanel.stop();
     }
 }

@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -42,6 +43,7 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.simbrain.network.NetworkUpdater;
 import org.simbrain.network.groups.GeneRec;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
@@ -256,8 +258,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /** Groups nodes together for ease of use. */
     private ViewGroupNode vgn;
 
+    /** Reference to parent desktop component. */
     private final NetworkDesktopComponent desktopComponent;
-    
+
+    /** Local thread flag for manually starting and stopping the network. */
+    private volatile boolean isRunning;
+
     /**
      * Create a new rootNetwork panel.
      */
@@ -1202,12 +1208,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     public void centerCamera() {
         PCamera camera = getCamera();
 
-        boolean isRunning = false;
-        if (this.getRootNetwork().getNetworkThread() != null) {
-            isRunning = this.getRootNetwork().getNetworkThread().isRunning();
-        }
-
-        if (autoZoomMode && editMode.isSelection() && !isRunning) {
+        // TODO: Add a check to see if network is running
+        if (autoZoomMode && editMode.isSelection()) {
             PBounds filtered = getLayer().getFullBounds();
             PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 20,
                     filtered.getWidth() + 40, filtered.getHeight() + 40);
@@ -1989,13 +1991,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void networkChanged() {
 
+    	//TODO: Remove the below and does all this always need to happen in updates?
         if (guiOn == false) {
             timeLabel.update(); // Show time only
             return;
         }
 
-        for (Iterator i = getPersistentNodes().iterator(); i.hasNext(); ) {
-            PNode node = (PNode) i.next();
+        for (PNode node : this.getPersistentNodes()) {
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
                 neuronNode.update();
@@ -2008,7 +2010,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             }
         }
         timeLabel.update();
-        rootNetwork.getParent().setChangedSinceLastSave(true);
+        rootNetwork.getParent().setChangedSinceLastSave(true);  
         repaint();
     }
 
@@ -2094,7 +2096,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void closeNetwork() {
         getRootNetwork().getParent().removeListener(this);
-        getRootNetwork().close();
     }
 
     /**
@@ -2189,18 +2190,39 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     public Collection<NeuronNode> getSourceNeurons() {
         return sourceNeurons;
     }
-
+    
     /**
      * @return the model source neurons (used in connecting groups of neurons)
      */
-    public ArrayList<NeuronNode> getSourceModelNeurons() {
-        ArrayList ret = new ArrayList();
+    public ArrayList<Neuron> getSourceModelNeurons() {
+        ArrayList<Neuron> ret = new ArrayList<Neuron>();
         for (NeuronNode neuronNode : sourceNeurons) {
             ret.add(neuronNode.getNeuron());
         }
         return ret;
     }
+    
+    /**
+     * Create a thread and use it to repeatedly iterate the network.
+     */
+    public void start() {
+    	Executors.newSingleThreadExecutor().execute(new Runnable() {
+			public void run() {
+				isRunning = true;
+				NetworkUpdater updater = new NetworkUpdater(getRootNetwork());
+				while (isRunning) {
+	    			updater.run();					
+				}
+			}
+    	});
+    }
 
+    /**
+     * Stop the local network thread.
+     */
+    public void stop() {
+    	isRunning = false;
+    }
 
     /**
      * Set the offset used in multiple pastes.
@@ -2310,7 +2332,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * Overriden so that multi-line tooltips can be used.
+     * Overridden so that multi-line tooltips can be used.
      */
     public JToolTip createToolTip()
     {

@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import javax.swing.SwingUtilities;
+
 import org.simbrain.network.gui.NetworkPreferences;
 import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -114,4 +116,13 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
     public Collection<? extends NetworkListener> getListeners() {
         return super.getListeners();
     }
+
+	/* (non-Javadoc)
+	 * @see org.simbrain.workspace.WorkspaceComponent#getTask()
+	 */
+	@Override
+	public Runnable getTask() {
+		return new NetworkUpdater(this.getRootNetwork());
+	}
+	
 }

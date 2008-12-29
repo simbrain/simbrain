@@ -47,6 +47,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.AttributePanel;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.AttributePanel.AttributeType;
 
@@ -62,7 +63,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     private AttributePanel consumingAttributes;
 
     /** Methods for making couplings. */
-    String[] tempStrings = { "One to one", "One to many" };
+    private String[] tempStrings = {"One to one", "One to many" };
 
     /** Methods for making couplings. */
     private JComboBox couplingMethodComboBox = new JComboBox(tempStrings);
@@ -77,9 +78,9 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      * Creates and displays the coupling manager.
      *
      * @param desktop reference to parent desktop
-     * @param reference to parent frame
+     * @param frame reference to parent frame
      */
-    public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericFrame frame) {
+    public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericJInternalFrame frame) {
         super(new BorderLayout());
         this.desktop = desktop;
         this.frame = frame;
@@ -124,9 +125,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         centerPanel.setPreferredSize(new Dimension(800, 400));
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
-        desktop.getFrame().getRootPane().setDefaultButton(okButton);
+
+        frame.getRootPane().setDefaultButton(okButton);
         
     }
+
 
     /**
      * @see ActionListener.

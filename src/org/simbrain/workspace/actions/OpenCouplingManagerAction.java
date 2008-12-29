@@ -56,11 +56,11 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         frame.setTitle("Coupling Manager");
         frame.setContentPane(cm);
 //        frame.setSize(850, 420);
-        frame.pack();
         frame.setResizable(true);
         frame.setClosable(true);
-        frame.setVisible(true);
         frame.setMaximizable(true);
         frame.setIconifiable(true);
+        frame.setVisible(true);
+        frame.pack();
     }
 }

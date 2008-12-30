@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -31,7 +32,7 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 /**
  * Data for a JFreeChart pie chart.
  */
-public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class BarChartComponent extends WorkspaceComponent<ChartListener> {
 
     /** Data model. */
     private BarChartModel model;
@@ -112,6 +113,15 @@ public class BarChartComponent extends WorkspaceComponent<WorkspaceComponentList
         for (BarChartConsumer consumer : model.getConsumers()) {
             model.getDataset().setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
         }
+    }
+    
+    /**
+     * Update chart settings.  Called, e.g., when things are modified using a dialog.
+     */
+    public void updateSettings() {
+    	for (ChartListener listener : this.getListeners()) {
+    		listener.chartSettingsUpdated();
+    	}
     }
 
     @Override

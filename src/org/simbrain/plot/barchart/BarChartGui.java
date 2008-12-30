@@ -19,6 +19,7 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -77,7 +79,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
-        
+                
         createAttachMenuBar();
 
         add("Center", chartPanel);
@@ -103,6 +105,24 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
             );
         chartPanel.setChart(chart);
         chart.getCategoryPlot().getRangeAxis().setAutoRange(true);
+                
+        getWorkspaceComponent().addListener(new ChartListener() {
+
+			public void componentUpdated() {
+			}
+
+			public void setTitle(String name) {
+			}
+
+			//TODO: Explore parameters in
+			//			chart, chart.getCategoryPlot(), chart.getCategoryPlot().getRenderer(), chartPanel.. 
+			public void chartSettingsUpdated() {
+				// For now just one series...
+				chart.getCategoryPlot().getRenderer().setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
+			}
+        	
+        });
+        this.getWorkspaceComponent().updateSettings();
         
     }
 
@@ -140,7 +160,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     /** @see ActionListener */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            BarChartDialog dialog = new BarChartDialog(chart);
+            BarChartDialog dialog = new BarChartDialog(chart, this.getWorkspaceComponent().getModel());
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
@@ -151,5 +171,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         }
         
     }
+    
+    
    
 }

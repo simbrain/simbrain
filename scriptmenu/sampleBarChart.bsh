@@ -4,11 +4,13 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neurons.*;
-import org.simbrain.plot.barchart.BarChartComponent;
+import org.simbrain.plot.barchart.*;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.Workspace;
+import java.awt.Color;
 
 {
 
@@ -41,8 +43,10 @@ import org.simbrain.workspace.Workspace;
 
         //MAKE BARCHART
         BarChartComponent barChart = new BarChartComponent("Test Chart");
+	barChart.getModel().setBarColor(Color.blue);
         workspace.addWorkspaceComponent(barChart);
         desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
+	
 
 	// COUPLING NETWORK TO BARCHART
         for (int i = 1; i < numNeurons; i++) {

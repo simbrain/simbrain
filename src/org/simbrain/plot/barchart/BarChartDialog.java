@@ -1,10 +1,12 @@
 package org.simbrain.plot.barchart;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JTextField;
 
 import org.jfree.chart.JFreeChart;
@@ -29,15 +31,23 @@ public class BarChartDialog extends StandardDialog implements ActionListener {
     /** Text field for setting the minimum range. */
     private JTextField minRangeField = new JTextField();
 
+    /** Reference to barchart model. */
+    BarChartModel model;
+
+    /** Currently selected color, or null if non has been selected. */
+    private Color theColor = null;
+
     /**
      * Dialog for displaying chart options.
+     * 
+     * TODO: Remove chart as argument
      *
      * @param chart Reference to the calling chart
      */
-    public BarChartDialog(final JFreeChart chart) {
+    public BarChartDialog(final JFreeChart chart, final BarChartModel model) {
         this.chart = chart;
         LabelledItemPanel dialogPanel = new LabelledItemPanel();
-
+        this.model = model;
         fillFieldValues();
 
         autoRange.addActionListener(this);
@@ -50,7 +60,7 @@ public class BarChartDialog extends StandardDialog implements ActionListener {
         JButton colorButton = new JButton("Color");
         colorButton.addActionListener(this);
         colorButton.setActionCommand("BarColor");
-//        dialogPanel.addItem("Bar Color", colorButton);
+        dialogPanel.addItem("Bar Color", colorButton);
 
         setContentPane(dialogPanel);
         setResizable(false);
@@ -91,13 +101,19 @@ public class BarChartDialog extends StandardDialog implements ActionListener {
                     Double.parseDouble(minRangeField.getText()),
                     Double.parseDouble(maxRangeField.getText()));
         }
+        if (theColor != null) {
+        	model.setBarColor(theColor);
+        }
+        model.update();
     }
-
+    
     /** @see ActionListener */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("AutoRange")) {
             maxRangeField.setEnabled(!autoRange.isSelected());
             minRangeField.setEnabled(!autoRange.isSelected());
+        } else if (arg0.getActionCommand().equalsIgnoreCase("BarColor")) {
+            theColor = JColorChooser.showDialog(this, "Choose Color", model.getBarColor());        	
         }
     }
 }

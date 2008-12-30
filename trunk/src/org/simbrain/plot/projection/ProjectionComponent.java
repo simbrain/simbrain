@@ -26,8 +26,8 @@ import java.util.Collection;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.core.ProjectPCA;
+import org.simbrain.util.projection.Projector;
+import org.simbrain.util.projection.ProjectPCA;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -55,7 +55,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     private final int DEFAULT_NUMBER_OF_SOURCES = 25; // This is the dimensionality of the hi D dataset
     
     /** High Dimensional Projection. */
-    private Gauge gauge = new Gauge();
+    private Projector projector = new Projector();
 
     /** Flag which allows the user to start and stop iterative projection techniques.. */
     private volatile boolean isRunning = true;
@@ -94,7 +94,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         for (int i = 0; i < numSources; i++) {
             addSource();
         }
-        gauge.init(numSources);
+        projector.init(numSources);
     }
 
     /**
@@ -105,7 +105,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         ProjectionConsumer newAttribute = new ProjectionConsumer(this,
                 "Dimension" + currentSize, currentSize);
         consumers.add(newAttribute);
-        gauge.init(currentSize);
+        projector.init(currentSize);
     }
 
     /**
@@ -117,7 +117,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         if (currentSize > 0) {
         	//dataset.removeSeries(lastSeriesIndex);
             consumers.remove(currentSize);
-            gauge.init(currentSize);
+            projector.init(currentSize);
         }
     }
  
@@ -205,7 +205,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
             temp[i] = consumer.getValue();
             i++;
         }
-        boolean newDatapointWasAdded = gauge.addDatapoint(temp);
+        boolean newDatapointWasAdded = projector.addDatapoint(temp);
         if (newDatapointWasAdded) {
             resetChartDataset(); // (should rename; see below)
             // TODO: Add a check to see whether the current projection algorith
@@ -216,12 +216,12 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     }
     
     /**
-     * Get reference to underlying gauge object.
+     * Get reference to underlying projector object.
      *
-     * @return gauge object.
+     * @return projector object.
      */
-    public Gauge getGauge() {
-        return gauge;
+    public Projector getGauge() {
+        return projector;
     }
     
     /**
@@ -229,7 +229,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      */
     public void clearData() {
         dataset.getSeries(0).clear();
-        gauge.reset();
+        projector.reset();
         fireUpdateEvent();
     }
     
@@ -237,7 +237,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      * Change projection.
      */
     public void changeProjection() {
-        gauge.getCurrentProjector().project(); // Should this have happened already?
+        projector.getCurrentProjectionMethod().project(); // Should this have happened already?
         resetChartDataset();
     }
     
@@ -246,16 +246,16 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      */
     public void resetChartDataset() {
         dataset.getSeries(0).clear();
-        int size = gauge.getSize();
+        int size = projector.getNumPoints();
         for (int i = 0; i < size - 2; i++) {
-            double[] point = gauge.getProjectedPoint(i);
+            double[] point = projector.getProjectedPoint(i);
             if(point != null) {
             	// No need to update the chart yet (hence the "false" parameter)
             	dataset.getSeries(0).add(point[0], point[1], false);
             }
         }
         // Notify chart when last datapoint is updated
-        double[] point = gauge.getProjectedPoint(size-1);
+        double[] point = projector.getProjectedPoint(size-1);
         if (point != null) {
             dataset.getSeries(0).add(point[0], point[1], true);        	
         }

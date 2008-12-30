@@ -16,14 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.core;
+package org.simbrain.util.projection;
 
 /**
  * <b>Project Coordinate</b> is perhaps the simplest possible projection algorithm; It  simply takes two specificed
  * dimensions in the high dimensional space, and uses these as the basis for the low-dimensional space.  In effect it
  * just takes a 2-dimensional  subspace of the high-dimensional space.
  */
-public class ProjectCoordinate extends Projector {
+public class ProjectCoordinate extends ProjectionMethod {
     /**
      * Default projector coordinate constructor.
      */
@@ -31,8 +31,8 @@ public class ProjectCoordinate extends Projector {
     }
 
     /**
-     * Projector coordinate constructor.
-     * @param set Projector setting
+     * ProjectionMethod coordinate constructor.
+     * @param set ProjectionMethod setting
      */
     public ProjectCoordinate(final Settings set) {
         theSettings = set;
@@ -160,7 +160,7 @@ public class ProjectCoordinate extends Projector {
     }
 
     /**
-     * @see Projector
+     * @see ProjectionMethod
      */
     public boolean hasDialog() {
         return true;

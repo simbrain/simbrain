@@ -16,14 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.core;
-
-import org.simbrain.gauge.GaugePreferences;
-
+package org.simbrain.util.projection;
 
 /**
  * <b>Settings</b> stores gauge parameters which must persist when the projection algorithm is changed, but which
- * should not be static (which must be different when different instances of the Gauge class are created).  Examples
+ * should not be static (which must be different when different instances of the Projector class are created).  Examples
  * include settings particular to a specific projection  algorithm.
  */
 public class Settings {

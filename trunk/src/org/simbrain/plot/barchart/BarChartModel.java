@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.barchart;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -43,7 +44,9 @@ public class BarChartModel {
     /** Parent Component. */
     private BarChartComponent parentComponent;
 
-
+    /** Color of bars in barchart. */
+    private Color barColor = Color.red;
+    
     /**
      * Bar chart model constructor.
      * @param parent component
@@ -152,6 +155,10 @@ public class BarChartModel {
     public Collection<BarChartConsumer> getConsumers() {
         return consumers;
     }
+    
+    public void update() {
+    	this.getParent().updateSettings();
+    }
 
     /**
      * Used for debugging model.
@@ -165,5 +172,19 @@ public class BarChartModel {
         }
         System.out.println("--------------------------------------");
     }
+
+	/**
+	 * @return the barColor
+	 */
+	public Color getBarColor() {
+		return barColor;
+	}
+
+	/**
+	 * @param barColor the barColor to set
+	 */
+	public void setBarColor(Color barColor) {
+		this.barColor = barColor;
+	}
 
 }

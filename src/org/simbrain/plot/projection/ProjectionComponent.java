@@ -38,11 +38,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * Data for a JFreeChart ScatterPlot.
  * 
  * TODO:
- *  Color last point (override paint and just get last one?)
- *  Basically get all the stuff from the old gui here!
- *  Tooltips
- *  Add ability to plot multiple HDV's at once?
- *  Maybe ability to connect them with lines
+ *  Color "hot point"
+ *  Tool-tips
+ *  Add ability to plot multiple projections at once.
+ *  Option of connecting data-points with lines
  */
 public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
@@ -57,12 +56,15 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     
     /** High Dimensional Projection. */
     private Gauge gauge = new Gauge();
-    
-    /** True when no thread is updating this component. */
-    private boolean isSuspended = true;
+
+    /** Flag which allows the user to start and stop iterative projection techniques.. */
+    private volatile boolean isRunning = true;
+
+	/** Flag for checking that GUI update is completed. */
+	private volatile boolean setUpdateCompleted;
 
     /**
-     * Create new PieChart Component.
+     * Create new Projection Component.
      */
     public ProjectionComponent(final String name) {
         super(name);
@@ -257,6 +259,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         if (point != null) {
             dataset.getSeries(0).add(point[0], point[1], true);        	
         }
+        setUpdateCompleted(true);
     }
 
     /**
@@ -289,14 +292,34 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     /**
      * @return whether this component being updated by a thread or not.
      */
-	public boolean isSuspended() {
-		return isSuspended;
+	public boolean isRunning() {
+		return isRunning;
 	}
 
 	/**
+	 * This flag allows the user to start and stop iterative projection techniques.
+	 *
 	 * @param b  whether this component being updated by a thread or not.
 	 */
-	public void setSuspended(boolean b) {
-		isSuspended = b;		
+	public void setRunning(boolean b) {
+		isRunning = b;		
+	}
+
+	/**
+	 * Swing update flag.
+	 * 
+	 * @param b whether updated is completed
+	 */
+	public void setUpdateCompleted(boolean b) {
+		setUpdateCompleted = b;	
+	}
+
+	/**
+	 * Swing update flag.
+	 *
+	 * @return whether update is completd or not
+	 */
+	public boolean isUpdateCompleted() {
+		return setUpdateCompleted;
 	}
 }

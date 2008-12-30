@@ -130,13 +130,6 @@ public abstract class Bindings implements Consumer, Producer {
         public String getKey() {
             return description;
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Type getType() {
-            return Float.TYPE;
-        }
     }
 
     /**

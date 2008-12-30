@@ -79,13 +79,6 @@ public class TimeSeriesConsumer extends SingleAttributeConsumer<Double> {
     public String getDescription() {
         return getKey();
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Type getType() {
-        return Double.TYPE;
-    }
 
     /**
      * Return index.

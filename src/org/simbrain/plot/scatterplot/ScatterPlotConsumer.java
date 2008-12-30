@@ -165,13 +165,6 @@ public class ScatterPlotConsumer implements Consumer {
         public void setValue(final Double val) {
             value = val;
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Type getType() {
-            return Double.TYPE;
-        }
     }
     
     /**

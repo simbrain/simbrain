@@ -33,13 +33,6 @@ public interface Attribute {
     String getKey();
     
     /**
-     * returns the type of the generic parameter.
-     * 
-     * @return the type of the generic parameter.
-     */
-    Type getType();
-    
-    /**
      * Returns a reference the AttributeHolder which holds this Attribute.
 
      * @return parent AttributeHolder

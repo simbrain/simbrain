@@ -71,13 +71,6 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
     public String getDescription() {
         return getKey();
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Type getType() {
-        return Double.TYPE;
-    }
 
     /**
      * {@inheritDoc}

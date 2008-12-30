@@ -127,9 +127,5 @@ public class StochasticNeuron extends Neuron {
         public String getKey() {
             return "Firing Probability";
         }
-
-        public Type getType() {
-            return StochasticNeuron.class;
-        }
     }
 }

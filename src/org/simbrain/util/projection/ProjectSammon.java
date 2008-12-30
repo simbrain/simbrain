@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.core;
+package org.simbrain.util.projection;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * <B>ProjectSammon.java</B> Implements gradient descent to compute image of
  * Sammon projection.
  */
-public class ProjectSammon extends Projector {
+public class ProjectSammon extends ProjectionMethod {
     /** Array of datasets. */
     private ArrayList yArray;
 
@@ -455,7 +455,7 @@ public class ProjectSammon extends Projector {
     }
 
     /**
-     * @see Projector
+     * @see ProjectionMethod
      */
     public boolean hasDialog() {
         return true;

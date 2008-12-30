@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge;
+package org.simbrain.util.projection;
 
 import java.awt.Color;
 import java.util.prefs.BackingStoreException;

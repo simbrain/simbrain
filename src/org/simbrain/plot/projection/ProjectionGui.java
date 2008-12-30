@@ -41,8 +41,8 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
-import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.core.Projector;
+import org.simbrain.util.projection.Projector;
+import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.WorkspaceComponentListener;
@@ -54,7 +54,7 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class ProjectionGui extends GuiComponent<ProjectionComponent> implements WorkspaceComponentListener, ActionListener {
     
-    /** Gauge on/off checkbox. */
+    /** Projector on/off checkbox. */
     private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.png"));
 
     /** Open button. */
@@ -79,7 +79,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
     private JButton randomBtn = new JButton(ResourceManager.getImageIcon("Rand.png"));
 
     /** List of projector types. */
-    private JComboBox projectionList = new JComboBox(Gauge.getProjectorList());
+    private JComboBox projectionList = new JComboBox(Projector.getProjectorList());
 
     /** Bottom panel. */
     private Box bottomPanel = Box.createVerticalBox();
@@ -239,7 +239,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         // Update labels, etc.
         dimsLabel.setText("     Dimensions: " + getWorkspaceComponent().getGauge().getUpstairs().getDimensions());
         pointsLabel.setText("  Datapoints: " + getWorkspaceComponent().getGauge().getDownstairs().getNumPoints());
-        if (getWorkspaceComponent().getGauge().getCurrentProjector().isIterable()) {
+        if (getWorkspaceComponent().getGauge().getCurrentProjectionMethod().isIterable()) {
             errorLabel.setText(" Error:" + getWorkspaceComponent().getGauge().getError());
         }
     }
@@ -253,10 +253,10 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         // Handle drop down list; Change current projection algorithm
         if (e1 instanceof JComboBox) {
             String selectedGauge = ((JComboBox) e1).getSelectedItem().toString();
-            getWorkspaceComponent().getGauge().setCurrentProjector(selectedGauge);
+            getWorkspaceComponent().getGauge().setCurrentProjectionMethod(selectedGauge);
             getWorkspaceComponent().changeProjection();
             
-            Projector proj = getWorkspaceComponent().getGauge().getCurrentProjector();
+            ProjectionMethod proj = getWorkspaceComponent().getGauge().getCurrentProjectionMethod();
             if (proj == null) {
                 return;
             }

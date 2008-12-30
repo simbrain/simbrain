@@ -16,75 +16,48 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.core;
+package org.simbrain.util.projection;
 
 import org.apache.log4j.Logger;
-import org.simbrain.gauge.GaugePreferences;
 
 /**
- * <b>Gauge</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
+ * <b>Projector</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
  * initializing various projection algorithms.
+ * 
+ * TODO:
+ * - Is error needed here?
+ * - Changemore "projector" to "projectionmethod"
+ * 
  */
-public class Gauge {
+public class Projector {
 
     /** Log4j logger. */
-    private static final Logger logger = Logger.getLogger(Gauge.class);
+    private static final Logger logger = Logger.getLogger(Projector.class);
 
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
 
     /** References to projection objects.*/
-    private Projector currentProjector;
+    private ProjectionMethod currentProjectionMethod;
 
     /** How the datasets will be displayed. */
-    private String defaultProjector = GaugePreferences.getDefaultProjector();
+    private String defaultProjectionMethod = GaugePreferences.getDefaultProjector();
 
     /** Application parameters. */
     private double error = 0;
 
-    /** Determines if gauge needs to be updated. */
-    private boolean isOn = true;
-
     /** Current data point.  */
     double[] currentState = null;
 
-    /* 
-     * TO ADD A NEW PROJECTION ALGORITHM:
-     * Create a projection class modeled on any of the Project_ classes,
-     * which implements Projector, and make appropriate places in locations
-     * ONE, TWO, and THREE below.  You must also change the updateProjectionMenu() method
-     * in gaugePanel.
-     * If there is a dialog box associated with this projector, then changes will have
-     * to be made to org.hisee.graphics.GaugePanel.handlePreferenceDialogs() as well
-     */
-    
     /** List of available projection algorithms. */
-    public static final String[] PROJECTOR_LIST = {
-    //TODO ONE: Add name of new projection algorithm
+    public static final String[] PROJECTION_METHOD_LIST = {
             "Sammon", "PCA", "Coordinate" };
 
     /**
      * Default constructor for gauge.
      */
-    public Gauge() {
-        currentProjector = this.getProjectorByName(defaultProjector);
-    }
-    
-    /**
-     * Adds the current states and resets the state vector.
-     * The curent state is set by couplings to other workspace components.
-     */
-    public void updateCurrentState() {
-        logger.trace("updateCurrentState() called");
-        if ((currentProjector == null) || (getUpstairs() == null)) {
-            logger.debug("could not update current state");
-            return;
-        }
-        
-        addDatapoint(currentState);
-        currentProjector.project();
-        /* reset the current state */
-        currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
+    public Projector() {
+        currentProjectionMethod = this.getProjectionMethodByName(defaultProjectionMethod);
     }
 
     /**
@@ -93,22 +66,8 @@ public class Gauge {
      * @param dims dimensionality of the high dimensional dataset
      */
     public void init(final int dims) {
-        currentProjector.init(dims);
+        currentProjectionMethod.init(dims);
         currentState = org.simbrain.util.SimbrainMath.zeroVector(dims);
-    }
-
-    /**
-     * Fill in current data point.
-     *
-     * @param dimension dimension of the dataset to set value of
-     * @param value value to add
-     */
-    public void setValue(final int dimension, final double value) {
-    	logger.trace("dimension = " + dimension + "    value = " + value );
-        if (currentState == null) {
-            currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
-        }
-        currentState[dimension] = value;
     }
 
     /**
@@ -119,24 +78,19 @@ public class Gauge {
     public boolean addDatapoint(final double[] point) {
 
         logger.debug("addDatapoint called");
-        if ((currentProjector == null) || (getUpstairs() == null)) {
+        if ((currentProjectionMethod == null) || (getUpstairs() == null)) {
             return false;
         }
 
-        logger.debug("Gauge: isOn " + isOn());
+        boolean ret = currentProjectionMethod.addDatapoint(point);
 
-        if (isOn()) {
-            boolean ret = currentProjector.addDatapoint(point);
-
-            /* This is needed to invoke the current projector's init function */
-            if (currentProjector.isIterable()) {
-                currentProjector.init(getUpstairs(), getDownstairs());
-            }
-
-            error = 0;
-            return ret;
+        /* This is needed to invoke the current projector's init function */
+        if (currentProjectionMethod.isIterable()) {
+            currentProjectionMethod.init(getUpstairs(), getDownstairs());
         }
-        return false;
+
+        error = 0;
+        return ret;
     }
 
     /**
@@ -145,7 +99,7 @@ public class Gauge {
      * @param numTimes Number of times to iterate the gauge
      */
     public void iterate(final int numTimes) {
-        if (!currentProjector.isIterable()) {
+        if (!currentProjectionMethod.isIterable()) {
             return;
         }
 
@@ -153,7 +107,7 @@ public class Gauge {
 
         while (iterations < numTimes) {
         	// TODO: Why should the current projector return an error when that is specific to Sammon? 
-            error = currentProjector.iterate();
+            error = currentProjectionMethod.iterate();
             iterations++;
         }
     }
@@ -162,28 +116,27 @@ public class Gauge {
      * @return list of projector types, by name
      */
     public static String[] getProjectorList() {
-        return PROJECTOR_LIST;
+        return PROJECTION_METHOD_LIST;
     }
 
     /**
      * @param projName the name of the projection algorithm to switch to
      */
-    public void setCurrentProjector(final String projName) {
+    public void setCurrentProjectionMethod(final String projName) {
         if (projName == null) {
             return;
         }
-        Projector newProjector = getProjectorByName(projName);
-        newProjector.init(currentProjector.getUpstairs(), currentProjector.getDownstairs());
-        setCurrentProjector(newProjector);
+        ProjectionMethod newProjector = getProjectionMethodByName(projName);
+        newProjector.init(currentProjectionMethod.getUpstairs(), currentProjectionMethod.getDownstairs());
+        setCurrentProjectionMethod(newProjector);
     }
 
     /**
      * @param name name of projector
-     * @return Projector type by name.
+     * @return ProjectionMethod type by name.
      */
-    public Projector getProjectorByName(final String name) {
-        // TODO THREE: Add code below to associate a projector with its name
-        Projector ret = null;
+    public ProjectionMethod getProjectionMethodByName(final String name) {
+        ProjectionMethod ret = null;
 
         if (name.equalsIgnoreCase("Sammon")) {
             ret = new ProjectSammon(projectorSettings);
@@ -202,27 +155,27 @@ public class Gauge {
      * @return dimensions of the underlying data
      */
     public int getDimensions() {
-        if (currentProjector == null) {
+        if (currentProjectionMethod == null) {
             return 0;
-        } else if (currentProjector.getUpstairs() == null) {
+        } else if (currentProjectionMethod.getUpstairs() == null) {
             return 0;
         }
-        return currentProjector.getUpstairs().getDimensions();
+        return currentProjectionMethod.getUpstairs().getDimensions();
     }
 
     /**
      * @param newProj the new projection algorithm
      */
-    public void setCurrentProjector(final Projector newProj) {
-        currentProjector = newProj;
-        currentProjector.project();
+    public void setCurrentProjectionMethod(final ProjectionMethod newProj) {
+        currentProjectionMethod = newProj;
+        currentProjectionMethod.project();
     }
 
     /**
      * @return the current projection algorithm
      */
-    public Projector getCurrentProjector() {
-        return currentProjector;
+    public ProjectionMethod getCurrentProjectionMethod() {
+        return currentProjectionMethod;
     }
 
     /**
@@ -231,11 +184,11 @@ public class Gauge {
      * @return hi-dimensional dataset associated with current projector
      */
     public Dataset getUpstairs() {
-        if (currentProjector == null) {
+        if (currentProjectionMethod == null) {
             return null;
         }
 
-        return currentProjector.getUpstairs();
+        return currentProjectionMethod.getUpstairs();
     }
 
     /**
@@ -244,11 +197,11 @@ public class Gauge {
      * @return low-dimensional dataset associated with current projector
      */
     public Dataset getDownstairs() {
-        if (currentProjector == null) {
+        if (currentProjectionMethod == null) {
             return null;
         }
 
-        return currentProjector.getDownstairs();
+        return currentProjectionMethod.getDownstairs();
     }
 
     /**
@@ -261,36 +214,17 @@ public class Gauge {
     }
 
     /**
-     * If the gauge is on it should actively represent changing states of the network.
-     *
-     * @return true if the gauge is on
-     */
-    public boolean isOn() {
-        return isOn;
-    }
-
-    /**
-     * Turn the gauge on and off; i.e., allow new data or not.  Used mainly when the Gauge is a component in another
-     * application.
-     *
-     * @param b boolean value to update gauge
-     */
-    public void setOn(final boolean b) {
-        isOn = b;
-    }
-
-    /**
-     * @return Returns the defaultProjector.
+     * @return Returns the defaultProjectionMethod.
      */
     public String getDefaultProjector() {
-        return defaultProjector;
+        return defaultProjectionMethod;
     }
 
     /**
-     * @param defaultProjector The defaultProjector to set.
+     * @param defaultProjectionMethod The defaultProjectionMethod to set.
      */
-    public void setDefaultProjector(final String defaultProjector) {
-        this.defaultProjector = defaultProjector;
+    public void setDefaultProjectionMethod(final String defaultMethod) {
+        this.defaultProjectionMethod = defaultMethod;
     }
     
     /**
@@ -311,9 +245,9 @@ public class Gauge {
     @Override
     public String toString() {
         return "High Dimensional Data \n" +
-            getCurrentProjector().getUpstairs().toString() +
+            getCurrentProjectionMethod().getUpstairs().toString() +
             "Projected Data \n" +
-            getCurrentProjector().getDownstairs().toString();
+            getCurrentProjectionMethod().getDownstairs().toString();
     }
     
     /**
@@ -329,8 +263,8 @@ public class Gauge {
      *
      * @return size of dataset.
      */
-    public int getSize() {
-        return getCurrentProjector().getDownstairs().getNumPoints();
+    public int getNumPoints() {
+        return getCurrentProjectionMethod().getDownstairs().getNumPoints();
     }
     
     /**
@@ -340,8 +274,8 @@ public class Gauge {
      * @return the point.
      */
     public double[] getProjectedPoint(final int index) {
-        if (index < getCurrentProjector().getDownstairs().getNumPoints() && index > 0) {
-            return getCurrentProjector().getDownstairs().getPoint(index);
+        if (index < getCurrentProjectionMethod().getDownstairs().getNumPoints() && index > 0) {
+            return getCurrentProjectionMethod().getDownstairs().getPoint(index);
         } else {
             // throw index out of range exception
             return null;

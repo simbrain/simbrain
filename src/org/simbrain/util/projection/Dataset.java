@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.core;
+package org.simbrain.util.projection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +38,7 @@ import com.Ostermiller.util.CSVPrinter;
 
 /**
  * <b>Dataset</b> represents a set of n-dimensional points. Both the low and
- * high dimensional data of the current {@link Projector} are instances of this
+ * high dimensional data of the current {@link ProjectionMethod} are instances of this
  * class. Dataset provides methods for working with such sets (e.g. open dataset
  * up, adding points, checking their integrity, finding nearest neighbors of a
  * point, calculating their interpoint distances, etc.). It is assumed that all

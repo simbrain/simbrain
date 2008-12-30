@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.core;
+package org.simbrain.util.projection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,15 +26,15 @@ import org.apache.log4j.Logger;
 import com.Ostermiller.util.CSVParser;
 
 /**
- * <b>Projector</b> is a class describing a projection algorithm, which contains a high dimensional dataset (an
+ * <b>ProjectionMethod</b> is a class describing a projection algorithm, which contains a high dimensional dataset (an
  * "upstairs") and a low-dimensional projection of that high dimensional data (a "downstairs").  Classes which extend
  * this class provide different ways of projecting the high dimensional space to the lowdimensional  space. This class
  * provides general methods for handling pairs of datasets and checking their integrity.
  */
-public abstract class Projector {
+public abstract class ProjectionMethod {
 
     /** Logger. */
-    private Logger logger = Logger.getLogger(Projector.class);
+    private Logger logger = Logger.getLogger(ProjectionMethod.class);
 
      /**
       * A set of hi-d datapoints, each of which is an array of doubles
@@ -68,7 +68,7 @@ public abstract class Projector {
     public void init(final Dataset up, final Dataset down) {
 
         if (logger == null) {
-            logger = Logger.getLogger(Projector.class);
+            logger = Logger.getLogger(ProjectionMethod.class);
         }
         logger.trace("In projector.init(up, down)");
 
@@ -99,7 +99,7 @@ public abstract class Projector {
      */
     public void checkDatasets() {
         if ((upstairs == null) || (downstairs == null) || (upstairs.getNumPoints() == 0)) {
-            logger.debug("Could not invoke Projector.init()");
+            logger.debug("Could not invoke ProjectionMethod.init()");
             return;
         }
 
@@ -118,7 +118,7 @@ public abstract class Projector {
      * Updates datasets from persistent forms of data.
      */
     public void postOpenInit() {
-        logger = Logger.getLogger(Projector.class);
+        logger = Logger.getLogger(ProjectionMethod.class);
         upstairs.postOpenInit();
         downstairs.postOpenInit();
     }

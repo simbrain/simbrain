@@ -45,8 +45,6 @@ import javax.swing.event.MenuListener;
 import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
-import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.gauge.GaugeDesktopComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.gui.NetworkDesktopComponent;
 import org.simbrain.plot.barchart.BarChartComponent;
@@ -226,7 +224,6 @@ public class SimbrainDesktop {
         registerComponent(BarChartComponent.class, BarChartGui.class);
         registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
         registerComponent(DataWorldComponent.class, DataWorldDesktopComponent.class);
-        registerComponent(GaugeComponent.class, GaugeDesktopComponent.class);
         registerComponent(MidiWorldComponent.class, MidiWorldDesktopComponent.class);
         registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
         registerComponent(OdorWorldComponent.class, OdorWorldDesktopComponent.class);
@@ -303,7 +300,7 @@ public class SimbrainDesktop {
         button.setComponentPopupMenu(worldMenu);
         bar.add(button);
 
-        /* Gauge menu button. */
+        /* Chart menu button. */
         button = new JButton();
         button.setIcon(ResourceManager.getImageIcon("Gauge.png"));
         final JPopupMenu gaugeMenu = new JPopupMenu();

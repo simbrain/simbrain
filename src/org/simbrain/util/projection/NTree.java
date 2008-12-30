@@ -1,4 +1,4 @@
-package org.simbrain.gauge.core;
+package org.simbrain.util.projection;
 
 import java.util.ArrayList;
 import java.util.Collections;

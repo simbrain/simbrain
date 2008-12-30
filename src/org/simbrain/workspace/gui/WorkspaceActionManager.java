@@ -58,7 +58,6 @@ import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
 import org.simbrain.workspace.actions.WorkspaceHelpAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
-import org.simbrain.workspace.actions.chart.NewGaugeAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
 import org.simbrain.workspace.actions.chart.NewProjectionPlotAction;
 import org.simbrain.workspace.actions.chart.NewScatterPlotAction;
@@ -108,9 +107,6 @@ public class WorkspaceActionManager {
 
     /** New bar chart action. */
     private final Action newBarChartAction;
-
-    /** New gauge action. */
-    private final Action newGaugeAction;
 
     /** New pie chart action. */
     private final Action newPieChartAction;
@@ -203,7 +199,6 @@ public class WorkspaceActionManager {
         saveWorkspaceAsAction = new SaveWorkspaceAsAction(desktop);
 
         newNetworkAction = new NewNetworkAction(workspace);
-        newGaugeAction = new NewGaugeAction(workspace);
         newConsoleAction = new NewConsoleAction(workspace);
 
         newBarChartAction = new NewBarChartAction(workspace);
@@ -274,7 +269,7 @@ public class WorkspaceActionManager {
      * @return Simbrain gauge actions.
      */
     public List<Action> getPlotActions() {
-        return Arrays.asList(new Action[] {newBarChartAction, newGaugeAction, newPieChartAction,
+        return Arrays.asList(new Action[] {newBarChartAction, newPieChartAction,
                 newProjectionPlotAction, newScatterPlotAction, newTimeSeriesAction});
     }
 
@@ -367,13 +362,6 @@ public class WorkspaceActionManager {
      */
     public Action getNewDataWorldAction() {
         return newDataWorldAction;
-    }
-
-    /**
-     * @return the newGaugeAction.
-     */
-    public Action getNewGaugeAction() {
-        return newGaugeAction;
     }
 
     /**

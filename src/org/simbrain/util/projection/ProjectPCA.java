@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.core;
+package org.simbrain.util.projection;
 
 import java.util.Arrays;
 
@@ -27,7 +27,7 @@ import Jama.Matrix;
 /**
  * <B>ProjectPCA</B> Projects the high-dimensional dataset along its two principal components to the low-d dataset.
  */
-public class ProjectPCA extends Projector {
+public class ProjectPCA extends ProjectionMethod {
 
     /**
      * Defalut PCA project.
@@ -129,7 +129,7 @@ public class ProjectPCA extends Projector {
     }
 
     /**
-     * @see Projector
+     * @see ProjectionMethod
      */
     public boolean hasDialog() {
         return false;

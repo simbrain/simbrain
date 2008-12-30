@@ -40,13 +40,6 @@ public abstract class Sensor extends AbstractAttribute implements ProducingAttri
 	public Agent getParent() {
 		return parent;
 	}
-    
-	/**
-     * {@inheritDoc}
-     */
-	public Type getType() {
-		return null;
-	}
 	
 	/**
      * {@inheritDoc}

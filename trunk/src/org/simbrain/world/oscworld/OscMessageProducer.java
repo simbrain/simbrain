@@ -149,11 +149,6 @@ final class OscMessageProducer
         }
 
         /** {@inheritDoc} */
-        public Type getType() {
-            return Double.class;
-        }
-
-        /** {@inheritDoc} */
         public Producer getParent() {
             return OscMessageProducer.this;
         }

@@ -253,11 +253,6 @@ public final class Sensor extends SingleAttributeProducer<Double> {
         return "sample";
     }
 
-    /** {@inheritDoc} */
-    public Type getType() {
-        return Double.TYPE;
-    }
-
     /**
      * Update producer description.
      */

@@ -136,11 +136,6 @@ final class OscMessageConsumer
         }
 
         /** {@inheritDoc} */
-        public Type getType() {
-            return Double.class;
-        }
-
-        /** {@inheritDoc} */
         public Consumer getParent() {
             return OscMessageConsumer.this;
         }

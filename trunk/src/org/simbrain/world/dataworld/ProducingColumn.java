@@ -71,13 +71,6 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
     public Producer getParent() {
         return this;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Type getType() {
-        return Double.TYPE;
-    }
 
     /**
      * {@inheritDoc}

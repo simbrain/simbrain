@@ -43,10 +43,6 @@ public class Variable extends SingleAttributeConsumer<Double> {
         gauge.setValue(dimension, value);
     }
 
-    public Type getType() {
-        return Double.TYPE;
-    }
-
     public String getDescription() {
         return "Dimension " + getKey();
     }

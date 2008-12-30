@@ -90,11 +90,6 @@ abstract class AbstractMidiConsumer
         }
 
         /** {@inheritDoc} */
-        public Type getType() {
-            return Double.class;
-        }
-
-        /** {@inheritDoc} */
         public Consumer getParent() {
             return AbstractMidiConsumer.this;
         }

@@ -855,13 +855,6 @@ public abstract class Neuron implements Producer, Consumer {
         public Neuron getParent() {
             return Neuron.this;
         }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Type getType() {
-            return Double.TYPE;
-        }
     }
     
     /**
@@ -899,13 +892,7 @@ public abstract class Neuron implements Producer, Consumer {
         public Neuron getParent() {
             return Neuron.this;
         }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Type getType() {
-            return Double.TYPE;
-        }
+
     }
 
     /**
@@ -943,13 +930,6 @@ public abstract class Neuron implements Producer, Consumer {
         public Neuron getParent() {
             return Neuron.this;
         }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Type getType() {
-            return Double.TYPE;
-        }
     }
 
     /**
@@ -984,13 +964,6 @@ public abstract class Neuron implements Producer, Consumer {
          */
         public Neuron getParent() {
             return Neuron.this;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Type getType() {
-            return Double.TYPE;
         }
 
         public String getKey() {

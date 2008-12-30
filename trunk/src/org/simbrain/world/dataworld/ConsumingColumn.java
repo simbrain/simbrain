@@ -60,13 +60,6 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
     /**
      * {@inheritDoc}
      */
-    public Type getType() {
-        return Double.TYPE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public DataWorldComponent getParentComponent() {
         return tableModel.getParent();
     }

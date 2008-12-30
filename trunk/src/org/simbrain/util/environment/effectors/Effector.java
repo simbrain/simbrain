@@ -50,11 +50,4 @@ public abstract class Effector extends AbstractAttribute implements ConsumingAtt
 		return agent;
 	}
 
-    /**
-     * {@inheritDoc}
-     */
- 	public Type getType() {
-		return null;
-	}
-
 }

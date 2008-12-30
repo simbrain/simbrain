@@ -280,16 +280,15 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
             } else if (btemp == clearBtn) {
                 getWorkspaceComponent().clearData();
             } else if (btemp == playBtn) {
-            	System.out.println(getWorkspaceComponent().isSuspended());
-                if (getWorkspaceComponent().isSuspended()) {
+                if (getWorkspaceComponent().isRunning()) {
                     playBtn.setIcon(ResourceManager.getImageIcon("Stop.png"));
                     playBtn.setToolTipText("Stop iterating projection algorithm");
-                    getWorkspaceComponent().setSuspended(false);
+                    getWorkspaceComponent().setRunning(false);
                     Executors.newSingleThreadExecutor().execute(new ProjectionUpdater(getWorkspaceComponent()));                    
                 } else {
                     playBtn.setIcon(ResourceManager.getImageIcon("Play.png"));
                     playBtn.setToolTipText("Start iterating projection algorithm");
-                    getWorkspaceComponent().setSuspended(true);
+                    getWorkspaceComponent().setRunning(true);
                 }
             } else if (btemp == randomBtn) {
                getWorkspaceComponent().getGauge().getDownstairs().randomize(100);

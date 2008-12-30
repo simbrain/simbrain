@@ -18,6 +18,8 @@
  */
 package org.simbrain.plot.projection;
 
+import javax.swing.SwingUtilities;
+
 /**
  * Update iterable projection algorithms
  */
@@ -38,10 +40,22 @@ public class ProjectionUpdater implements Runnable {
 	 * {@inheritDoc}
 	 */
 	public void run() {
-		while (!component.isSuspended()) {
-			component.getGauge().iterate(1);
-			component.resetChartDataset();
-			component.fireUpdateEvent();
+		while (!component.isRunning()) {
+			try {
+				component.setUpdateCompleted(false);
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						component.getGauge().iterate(1);
+						component.resetChartDataset();
+						component.fireUpdateEvent();
+					}					
+				});
+				while (!component.isUpdateCompleted()) {
+					Thread.sleep(1); // TODO: make this settable? 
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

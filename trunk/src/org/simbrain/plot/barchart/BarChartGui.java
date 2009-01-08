@@ -37,6 +37,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -120,6 +122,12 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
 				// For now just one series...
 				chart.getCategoryPlot().getRenderer().setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
 			}
+
+            public void attributeRemoved(AttributeHolder parent, Attribute attribute)
+            {
+                // TODO Auto-generated method stub
+                
+            }
         	
         });
         this.getWorkspaceComponent().updateSettings();

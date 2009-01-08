@@ -31,6 +31,8 @@ import java.util.ArrayList;
 
 import javax.swing.JScrollPane;
 
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
@@ -126,5 +128,9 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
 
     public void componentUpdated() {
         worldPanel.repaint();        
+    }
+
+    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
+        /* no implementation */
     }
 }

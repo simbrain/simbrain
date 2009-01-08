@@ -45,6 +45,8 @@ import org.simbrain.util.projection.Projector;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -319,5 +321,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
             iterateBtn.setEnabled(false);
         }
     }
-    
+
+    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
+        /* no implementation */
+    }
 }

@@ -30,7 +30,9 @@ import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.util.SimpleId;
 import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.ProducingAttribute;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -516,6 +518,14 @@ public class RootNetwork extends Network {
      */
     public void fireNeuronDeleted(final Neuron deleted) {
         for (NetworkListener listener : component.getListeners()) {
+            for (ConsumingAttribute<?> attribute : deleted.consumingAttributes()) {
+                listener.attributeRemoved(deleted, attribute);
+            }
+            
+            for (ProducingAttribute<?> attribute : deleted.producingAttributes()) {
+                listener.attributeRemoved(deleted, attribute);
+            }
+            
             listener.neuronRemoved(new NetworkEvent<Neuron>(this, deleted));
         }
         if (getParent() != null) {

@@ -538,6 +538,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             if (button.getActionCommand().equalsIgnoreCase("apply")) {
                 applyChanges();
             } else if (button.getActionCommand().equalsIgnoreCase("ok")) {
+                System.out.println("ok clicked");
                 applyChanges();
                 frame.dispose();
             } else if (button.getActionCommand().equalsIgnoreCase("cancel")) {

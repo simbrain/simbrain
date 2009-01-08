@@ -16,4 +16,8 @@ public interface WorkspaceComponentListener {
      * Resets the component's name.
      */
     void setTitle(String name);
+    
+//    void attributeAdded(AttributeHolder parent, Attribute attribute);
+    
+    void attributeRemoved(AttributeHolder parent, Attribute attribute);
 }

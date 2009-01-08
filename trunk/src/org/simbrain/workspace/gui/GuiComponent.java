@@ -32,6 +32,8 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentDeserializer;
@@ -315,6 +317,10 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
          */
         public void setTitle(final String name) {
             parentFrame.setTitle(name);
+        }
+
+        public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
+            /* no implementation */
         }
     }
             

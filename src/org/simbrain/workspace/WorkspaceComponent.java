@@ -22,17 +22,26 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 /**
- * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}. Extend this class to create
- * your own component type.  Gui representations of a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
+ * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
+ * Extend this class to create your own component type.  Gui representations of
+ * a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
  * 
  * @param <E> The type of the workspace listener associated with this
  * component.
@@ -61,14 +70,15 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     private int priority = DEFAULT_PRIORITY;
     
     /** How to order a list of attributes. */
-    public enum AttributeListingStyle {TOTAL, DEFAULT_EACH };
+    public enum AttributeListingStyle { TOTAL, DEFAULT_EACH };
     
     /** Current attribute listing style. */
     private AttributeListingStyle attributeListingStyle = AttributeListingStyle.DEFAULT_EACH;
 
     /**
-     * Current directory. So when re-opening this type of component the app remembers where to look. 
-     * Subclasses can provide a default value using User Preferences.
+     * Current directory. So when re-opening this type of component the app remembers
+     * where to look.
+     * <p>Subclasses can provide a default value using User Preferences.
      */
     private String currentDirectory;
 
@@ -78,8 +88,13 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     private File currentFile;
     
+    /** WorkspaceComponentListeners mapped to their proxies. */
+    private final Map<WorkspaceComponentListener, E> componentListeners
+        = new HashMap<WorkspaceComponentListener, E>();
+    
+    
     /** The set of all listeners on this component. */
-    private Collection<E> listeners = new HashSet<E>();
+    private final Collection<E> listeners = new HashSet<E>();
     
     /**
      * Construct a workspace component.
@@ -112,13 +127,21 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         return Collections.singletonList(getDefaultFormat());
     }
 
+    /**
+     * Closes the WorkspaceComponent.
+     */
     public final void close() {
         closing();
         workspace.removeWorkspaceComponent(this);
     }
     
+    /**
+     * ???.
+     * 
+     * @return null
+     */
     public Runnable getTask() {
-    	return null;
+        return null;
     }
     
     /**
@@ -151,9 +174,9 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * Notify all listeners of a componentUpdated event.
      */
     public final void fireUpdateEvent() {
-        for (E listener : listeners) {
+        for (WorkspaceComponentListener listener : listeners) {
             listener.componentUpdated();
-        }    	
+        }
     }
     
     /**
@@ -177,8 +200,103 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * 
      * @param listener the Listener to add.
      */
+    public void addComponentListener(final WorkspaceComponentListener listener) {
+        E proxy = getProxy(listener);
+        if (proxy == null) throw new IllegalArgumentException(
+            "this workspace component class: " + getClass().getName()
+            + " is not designed to allow standard WorkspaceComponentListeners. "
+            + "Please review the developer documentation on this subject or seek assistance.");
+            
+        listeners.add(proxy);
+    }
+    
+    /**
+     * Returns a proxy for a plain WorkspaceComponentListener so that
+     * subclasses may treat it as a specialized listener.
+     * 
+     * @param listener the listener to wrap
+     * @return a proxy for the listener implementing E
+     */
+    @SuppressWarnings("unchecked")
+    private E getProxy(final WorkspaceComponentListener listener) {
+        Type superclass = getClass().getGenericSuperclass();
+        
+        Type[] typeArguments = ((ParameterizedType) superclass).getActualTypeArguments();
+        
+        if (typeArguments == null || typeArguments.length <= 0) return null;
+            
+        Type type = ((ParameterizedType) superclass).getActualTypeArguments()[0];
+        
+        if (!(type instanceof Class<?>)) return null;
+        
+        Class<?>[] clazz = {(Class<?>) type};
+        
+        if (!WorkspaceComponentListener.class.isAssignableFrom(clazz[0])) return null;
+        
+        return (E) Proxy.newProxyInstance(getClass().getClassLoader(),
+            clazz, new ProxyInvocationHandler(listener));
+    }
+    
+    /**
+     * A invocation handler for listener proxies.
+     * 
+     * @author Matt Watson
+     */
+    private class ProxyInvocationHandler implements InvocationHandler {
+        /** The underlying listener. */
+        final WorkspaceComponentListener listener;
+        
+        /**
+         * Creates a new instance for the provided listener.
+         * 
+         * @param listener the listener to wrap.
+         */
+        ProxyInvocationHandler(final WorkspaceComponentListener listener) {
+            this.listener = listener;
+        }
+        
+        /**
+         * If the method called is a WorkspaceComponentListener method, invokes
+         * that method, otherwise, does nothing.
+         * 
+         * @param proxy the proxy object
+         * @param method the method being called
+         * @param args the arguments to that method
+         * @return the result of the method call or null
+         * @throws InvocationTargetException if something goes wrong
+         * @throws IllegalAccessException if the security maanger prevents the call
+         */
+        public Object invoke(final Object proxy, final Method method, final Object[] args)
+                throws InvocationTargetException, IllegalAccessException {
+            try {
+                Class<?> listenerClass = listener.getClass();
+                Method implementation = listenerClass.getMethod(method.getName(),
+                    method.getParameterTypes());
+                
+                return implementation.invoke(listener, args);
+            } catch (NoSuchMethodException e) {
+                return null;
+            }
+        }
+    }
+    
+    /**
+     * Adds a listener to this component.
+     * 
+     * @param listener the Listener to add.
+     */
     public void addListener(final E listener) {
         listeners.add(listener);
+    }
+    
+    /**
+     * Adds a listener to this component.
+     * 
+     * @param listener the Listener to add.
+     */
+    public void removeComponentListener(final WorkspaceComponentListener listener) {
+        listeners.remove(componentListeners.get(listener));
+        componentListeners.remove(listener);
     }
     
     /**
@@ -315,7 +433,8 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
 
     /**
      * Override for use with save service.
-     * @param reader
+     * 
+     * @param reader the reader to deserialize from.
      */
     public final void deserializeFromReader(final FileReader reader) {
         // no implementation
@@ -441,11 +560,21 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         /* no default implementation */
     }
 
+    /**
+     * Returns the attribute listing style.
+     * 
+     * @return The attribute listing style.
+     */
     public AttributeListingStyle getAttributeListingStyle() {
         return attributeListingStyle;
     }
 
-    public void setAttributeListingStyle(AttributeListingStyle style) {
+    /**
+     * Sets the attribute listing style.
+     * 
+     * @param style the listing style.
+     */
+    public void setAttributeListingStyle(final AttributeListingStyle style) {
         this.attributeListingStyle = style;
     }
     
@@ -529,10 +658,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /**
      * {@inheritDoc}
      */
-    public void setPriority(int value) {
+    public void setPriority(final int value) {
         priority = value;
     }
-    
-    
-
 }

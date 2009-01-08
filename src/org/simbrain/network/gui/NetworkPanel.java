@@ -95,6 +95,8 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
 
@@ -2386,21 +2388,22 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /**
      * @return View Group Node.
      */
-	public ViewGroupNode getViewGroupNode() {
-		return vgn;
-	}
-
-
-    public void componentUpdated()
-    {
-        // TODO Auto-generated method stub
-        
+    public ViewGroupNode getViewGroupNode() {
+        return vgn;
     }
 
 
-    public void setTitle(String name)
-    {
-        // TODO Auto-generated method stub
-        
+    public void componentUpdated() {
+        /* no implementation */
+    }
+
+
+    public void setTitle(String name) {
+        /* no implementation */
+    }
+
+
+    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
+        /* no implementation */
     }
 }

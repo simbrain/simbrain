@@ -28,6 +28,8 @@ import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.networks.KwtaNetwork;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
@@ -538,62 +540,48 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     public void clampBarChanged() {
     }
 
-    public void componentUpdated()
-    {
-        // TODO Auto-generated method stub
+    public void componentUpdated() {
+        /* no implementation */
     }
 
-    public void setTitle(String name)
-    {
-        // TODO Auto-generated method stub
+    public void setTitle(String name) {
+        /* no implementation */
     }
 
-    public void groupAdded(NetworkEvent<Group> event)
-    {
-        // TODO Auto-generated method stub
-        
+    public void groupAdded(NetworkEvent<Group> event) {
+        /* no implementation */
     }
 
-    public void groupChanged(NetworkEvent<Group> event)
-    {
-        // TODO Auto-generated method stub
-        
+    public void groupChanged(NetworkEvent<Group> event) {
+        /* no implementation */
     }
 
-    public void groupRemoved(NetworkEvent<Group> event)
-    {
-        // TODO Auto-generated method stub
-        
+    public void groupRemoved(NetworkEvent<Group> event) {
+        /* no implementation */
     }
 
-    public void neuronAdded(NetworkEvent<Neuron> e)
-    {
-        // TODO Auto-generated method stub
-        
+    public void neuronAdded(NetworkEvent<Neuron> e) {
+        /* no implementation */
     }
 
-    public void neuronChanged(NetworkEvent<Neuron> e)
-    {
-        // TODO Auto-generated method stub
-        
+    public void neuronChanged(NetworkEvent<Neuron> e) {
+        /* no implementation */
     }
 
-    public void neuronMoved(NetworkEvent<Neuron> e)
-    {
-        // TODO Auto-generated method stub
-        
+    public void neuronMoved(NetworkEvent<Neuron> e) {
+        /* no implementation */
     }
 
-    public void neuronRemoved(NetworkEvent<Neuron> e)
-    {
-        // TODO Auto-generated method stub
-        
+    public void neuronRemoved(NetworkEvent<Neuron> e) {
+        /* no implementation */
     }
 
-    public void subnetRemoved(NetworkEvent<Network> e)
-    {
-        // TODO Auto-generated method stub
-        
+    public void subnetRemoved(NetworkEvent<Network> e) {
+        /* no implementation */
+    }
+
+    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
+        /* no implementation */
     }
 
 }

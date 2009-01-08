@@ -126,10 +126,10 @@ public class CouplingListPanel extends JPanel implements CouplingComponentListen
      * Returns consumers selected in consumer list.
      * @return selected consumers.
      */
-    private ArrayList<Coupling> getSelectedCouplings() {
-        ArrayList<Coupling> ret = new ArrayList<Coupling>();
+    private ArrayList<Coupling<?>> getSelectedCouplings() {
+        ArrayList<Coupling<?>> ret = new ArrayList<Coupling<?>>();
         for (Object object : couplings.getSelectedValues()) {
-            ret.add((Coupling) object);
+            ret.add((Coupling<?>) object);
         }
         return ret;
     }

@@ -51,7 +51,8 @@ public class CouplingManager {
     /** Priority of this component; used in priorty based workspace update. */
     private int priority = DEFAULT_PRIORITY;
     /** List of listeners to fire updates when couplings are changed. */
-    private ArrayList<CouplingComponentListener> couplingManagerListeners = new ArrayList<CouplingComponentListener>();
+    private ArrayList<CouplingComponentListener> couplingManagerListeners
+      = new ArrayList<CouplingComponentListener>();
 
     /**
      * Helper method to cleanup nasty generics declarations.
@@ -160,6 +161,11 @@ public class CouplingManager {
         WorkspaceComponent<?> target = coupling.getConsumingAttribute()
             .getParent().getParentComponent();
         
+        AttributeListener listener = new AttributeListener(coupling);
+        
+        source.addComponentListener(listener);
+        target.addComponentListener(listener);
+        
         SourceTarget sourceTarget = new SourceTarget(source, target);
 
         sourceTargetCouplings.put(sourceTarget, addCouplingToList(
@@ -171,6 +177,51 @@ public class CouplingManager {
             targetCouplings.get(source), coupling));
         fireCouplingListUpdated();
     }
+    
+    /**
+     * Listener for attribute changes.
+     * 
+     * @author Matt Watson
+     */
+    class AttributeListener implements WorkspaceComponentListener {
+        /** The coupling this listener is associated with. */
+        final Coupling<?> coupling;
+        
+        /**
+         * Creates a new listener for the given coupling.
+         * 
+         * @param coupling the coupling associated with this listener.
+         */
+        AttributeListener(final Coupling<?> coupling) {
+            this.coupling = coupling;
+        }
+        
+        /**
+         * called when the attribute is removed and deletes the associated coupling.
+         * 
+         * @param parent the parent of the attribute that was removed.
+         * @param consumer the attribute that is removed.
+         */
+        public void attributeRemoved(final AttributeHolder parent, final Attribute consumer) {
+            removeCoupling(coupling);
+        }
+
+        /**
+         * Called when the component is updated.
+         */
+        public void componentUpdated() {
+            /* no implementation */
+        }
+
+        /**
+         * Called when the component title is changed.
+         * 
+         * @param name the new title.
+         */
+        public void setTitle(final String name) {
+            /* no implementation */
+        }
+    };
     
     /**
      * Replaces any couplings where the old attribute is the source or
@@ -230,8 +281,8 @@ public class CouplingManager {
      *
      * @param component component to check.
      */
-    public void removeCouplings(WorkspaceComponent component) {
-        ArrayList<Coupling> toRemove = new ArrayList();
+    public void removeCouplings(final WorkspaceComponent<?> component) {
+        ArrayList<Coupling<?>> toRemove = new ArrayList<Coupling<?>>();
         for (Coupling<?> coupling : getCouplings()) {
             if (coupling.getConsumingAttribute().getParent().getParentComponent() == component) {
                 toRemove.add(coupling);
@@ -248,8 +299,8 @@ public class CouplingManager {
      *
      * @param couplings list of couplings to remove
      */
-    public void removeCouplings(final ArrayList<Coupling> couplings) {
-        for (Coupling coupling : couplings) {
+    public void removeCouplings(final ArrayList<Coupling<?>> couplings) {
+        for (Coupling<?> coupling : couplings) {
             removeCoupling(coupling);
         }
     }
@@ -355,7 +406,7 @@ public class CouplingManager {
     /**
      * {@inheritDoc}
      */
-    public void setPriority(int value) {
+    public void setPriority(final int value) {
         priority = value;
     }
 

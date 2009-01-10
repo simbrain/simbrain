@@ -54,14 +54,14 @@ public class CouplingListPanel extends JPanel implements CouplingComponentListen
     private final SimbrainDesktop desktop;
 
     /** List of couplings. */
-    private Vector<Coupling> couplingList = new Vector();
+    private Vector<Coupling<?>> couplingList = new Vector<Coupling<?>>();
 
     /**
      * Creates a new coupling list panel using the applicable desktop and coupling lists.
      * @param desktop Reference to simbrain desktop
      * @param couplingList list of couplings to be shown in window
      */
-    public CouplingListPanel(final SimbrainDesktop desktop, final Vector<Coupling> couplingList) {
+    public CouplingListPanel(final SimbrainDesktop desktop, final Vector<Coupling<?>> couplingList) {
 
         super(new BorderLayout());
 

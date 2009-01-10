@@ -3,6 +3,7 @@ package org.simbrain.workspace.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -35,6 +37,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
@@ -60,14 +63,15 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ToggleButton;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
-import org.simbrain.world.midiworld.MidiWorldComponent;
-import org.simbrain.world.midiworld.MidiWorldDesktopComponent;
+import org.simbrain.world.fugueworld.MidiWorldComponent;
+import org.simbrain.world.fugueworld.MidiWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.oscworld.OscWorldComponent;
@@ -79,15 +83,24 @@ import org.simbrain.world.threedee.gui.MainConsole;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
+import bsh.Interpreter;
+import bsh.util.JConsole;
+
+import com.javadocking.dock.Position;
+import com.javadocking.dock.TabDock;
+import com.javadocking.dockable.DefaultDockable;
+import com.javadocking.dockable.Dockable;
+import com.javadocking.dockable.DockingMode;
+
 /**
  * Creates a Swing-based environment for working with a workspace.
  * 
  * Also provides wrappers for GUI elements called from a terminal.
  * 
  * @author Matt Watson
+ * @author Jeff Yoshimi
  */
 public class SimbrainDesktop {
-    
 
     /** The x offset for popup menus. */
     private static final int MENU_X_OFFSET = 5;
@@ -118,6 +131,9 @@ public class SimbrainDesktop {
     /** Workspace tool bar. */
     private JToolBar wsToolBar = new JToolBar();
 
+    /** Whether the bottom dock is visible. */
+    private boolean dockVisible = true;
+
     /** the frame that will hold the workspace. */
     private JFrame frame;
     
@@ -126,6 +142,9 @@ public class SimbrainDesktop {
     
     /** Last clicked point. */
     private Point lastClickedPoint = null;
+    
+    /** The bottom dock. */
+    private TabDock bottomDock;
     
     /** The workspace this desktop wraps. */
     private final Workspace workspace;
@@ -192,21 +211,42 @@ public class SimbrainDesktop {
         createContextMenu();
         workspace.addListener(listener);
         SimbrainDesktop.registerComponents();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle workspaceBounds = new Rectangle(
+        		WORKSPACE_INSET, 
+        		WORKSPACE_INSET, 
+        		screenSize.width - (WORKSPACE_INSET * 2),
+        		screenSize.height - (WORKSPACE_INSET * 2));
 
         //Set up Desktop
         desktop = new JDesktopPane();
         desktop.addMouseListener(mouseListener);
         desktop.addKeyListener(new WorkspaceKeyAdapter(workspace));
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         desktop.setPreferredSize(new Dimension(screenSize.width - (WORKSPACE_INSET * 2),screenSize.height - (WORKSPACE_INSET * 3)));
-        
-        // Set up Main Panel
+                
+        // Create the TabDoc for bottom 
+		bottomDock = new TabDock();
+		Dockable componentDock = new DefaultDockable("Components", new WorkspaceComponentListPanel(this), "Workspace Components", null, DockingMode.ALL);
+		Dockable producingDock = new DefaultDockable("Producing Attributes", new AttributePanel(this.getWorkspace(), AttributePanel.AttributeType.Producing), "ProducingAttributes", null, DockingMode.ALL);
+        Vector<Coupling<?>> couplings = new Vector<Coupling<?>>(workspace.getCouplingManager().getCouplings());
+		Dockable couplingDock = new DefaultDockable("Couplings", new CouplingListPanel(this, couplings), "Couplings", null, DockingMode.ALL);
+		Dockable terminalDock= new DefaultDockable("Terminal", this.getTerminalPanel(), "Terminal", null, DockingMode.ALL);
+		bottomDock.addDockable(terminalDock, new Position(0));
+		bottomDock.addDockable(componentDock, new Position(1));
+		bottomDock.addDockable(producingDock,  new Position(2));
+		bottomDock.addDockable(couplingDock, new Position(3));
+					
+        // Set up the main panel
+		JSplitPane horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		horizontalSplitter.setDividerLocation((int) (3 * (workspaceBounds.getHeight()/4)));
+		horizontalSplitter.setTopComponent(desktop);
+		horizontalSplitter.setBottomComponent(bottomDock);
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(wsToolBar, "North");
-        mainPanel.add(desktop, "Center");
+        mainPanel.add(horizontalSplitter, "Center");
 
         // Set up Frame
-        frame.setBounds(WORKSPACE_INSET, WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2),screenSize.height - (WORKSPACE_INSET * 2));
+        frame.setBounds(workspaceBounds);
         frame.setContentPane(mainPanel);
         frame.pack();
         frame.addWindowListener(windowListener);
@@ -215,7 +255,7 @@ public class SimbrainDesktop {
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
-
+    
     /**
      * Create mappings from components to their GUI wrappers.
      */
@@ -236,6 +276,37 @@ public class SimbrainDesktop {
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
     }
+    
+    private JConsole getTerminalPanel() {
+        JConsole console = new JConsole();
+        Interpreter interpreter = new Interpreter(console);
+        interpreter.getNameSpace().importPackage("org.simbrain.network.neurons");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.connections");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.layouts");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.networks");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.interfaces");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.groups");
+        interpreter.getNameSpace().importPackage("org.simbrain.network.synapses");
+        interpreter.getNameSpace().importPackage("org.simbrain.workspace");
+        interpreter.getNameSpace().importCommands(".");
+        interpreter.getNameSpace().importCommands("org.simbrain.console.commands");
+        interpreter.getOut();
+        interpreter.getErr();
+        try {
+            interpreter.set("workspace", getWorkspace());
+            interpreter.set("bsh.prompt", ">");
+            interpreter.setErr(System.err);
+            interpreter.setOut(System.out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        new Thread(interpreter).start();
+        console.setPreferredSize(new Dimension(400,300));
+        return console;
+    }
+    
+
+    
     /**
      * Returns the workspace.
      * 
@@ -364,7 +435,6 @@ public class SimbrainDesktop {
         fileMenu.add(actionManager.getClearWorkspaceAction());
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getOpenNetworkAction());
-        fileMenu.add(actionManager.getOpenGaugeAction());
 
         JMenu worldSubMenu = new JMenu("Open World");
         for (Action action : actionManager.getOpenWorldActions()) {
@@ -899,5 +969,20 @@ public class SimbrainDesktop {
             /* no implementation */
         }
     };
+
+    /** 
+     * Provisional Code for toggling tab dock's visibility.
+     */
+	public void toggleDock() {
+		if (dockVisible) {
+			dockVisible = false;
+			bottomDock.setVisible(false);
+		} else {
+			dockVisible = true;
+			bottomDock.setVisible(true);
+			frame.pack();
+		}
+		
+	}
     
 }

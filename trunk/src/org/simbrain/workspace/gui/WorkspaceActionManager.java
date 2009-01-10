@@ -46,7 +46,6 @@ import org.simbrain.workspace.actions.NewVisionWorldAction;
 import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
 import org.simbrain.workspace.actions.OpenDataWorldAction;
-import org.simbrain.workspace.actions.OpenGaugeAction;
 import org.simbrain.workspace.actions.OpenNetworkAction;
 import org.simbrain.workspace.actions.OpenOdorWorldAction;
 import org.simbrain.workspace.actions.OpenWorkspaceAction;
@@ -129,9 +128,6 @@ public class WorkspaceActionManager {
     /** Open data world action. */
     private final Action openDataWorldAction;
 
-    /** Open gauge action. */
-    private final Action openGaugeAction;
-
     /** Open network action. */
     private final Action openNetworkAction;
 
@@ -190,7 +186,6 @@ public class WorkspaceActionManager {
         clearWorkspaceAction = new ClearWorkspaceAction(workspace);
 
         openDataWorldAction = new OpenDataWorldAction();
-        openGaugeAction = new OpenGaugeAction();
         openNetworkAction = new OpenNetworkAction(workspace);
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
 
@@ -397,13 +392,6 @@ public class WorkspaceActionManager {
      */
     public Action getOpenDataWorldAction() {
         return openDataWorldAction;
-    }
-
-    /**
-     * @return the openGaugeAction.
-     */
-    public Action getOpenGaugeAction() {
-        return openGaugeAction;
     }
 
     /**

@@ -202,8 +202,12 @@ public class CouplingManager {
          * @param parent the parent of the attribute that was removed.
          * @param consumer the attribute that is removed.
          */
-        public void attributeRemoved(final AttributeHolder parent, final Attribute consumer) {
-            removeCoupling(coupling);
+        public void attributeRemoved(final AttributeHolder parent, final Attribute attribute) {
+            if (coupling.getConsumingAttribute().equals(attribute)
+            ||  coupling.getProducingAttribute().equals(attribute))
+            {
+                removeCoupling(coupling);
+            }
         }
 
         /**

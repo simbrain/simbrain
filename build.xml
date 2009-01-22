@@ -165,7 +165,7 @@
         </javac>
     </target>
 
-    <target name="network" depends="workspace" description="Compile network">
+    <target name="network" depends="workspacemodule" description="Compile network">
         <mkdir dir="${modules}"/>
         <javac srcdir="${src}/org/simbrain/network/" destdir="${modules}" includeAntRuntime="no"
             classpathref="lib.path" debug="${comple.debug}">
@@ -192,10 +192,15 @@
 							<attribute name="Built-By" value="${user.name}"/>
 							<attribute name="Main-Class" value="org.simbrain.workspace.gui.Splasher"/>
 						</manifest>
-            <!-- Merge library jars into final jar file -->
-	            
         </jar>
     </target>
-    <!-- End tasks for extracting network and workspace. -->
 
+        <target name="minimalnetwork" description="Compile minimal network">
+        <mkdir dir="${modules}"/>
+        <javac srcdir="${src}/org/simbrain/network/" destdir="${modules}" includeAntRuntime="no"
+            classpathref="lib.path" debug="${comple.debug}">
+            <exclude name="gui/**"/>
+        </javac>
+    </target>
+    <!-- End tasks for extracting network and workspace. -->
 </project>

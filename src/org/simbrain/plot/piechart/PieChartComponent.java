@@ -23,15 +23,15 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Daa for a JFreeChart pie chart.
  */
-public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class PieChartComponent extends WorkspaceComponent<ChartListener> {
 
     /** Data model. */
     private PieChartModel model;
@@ -86,6 +86,15 @@ public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentList
         PieChartModel.getXStream().toXML(model, output);
     }
 
+    /**
+     * Update chart settings.  Called, e.g., when things are modified using a dialog.
+     */
+    public void updateSettings() {
+        for (ChartListener listener : this.getListeners()) {
+                listener.chartSettingsUpdated();
+        }
+    }
+
     @Override
     public boolean hasChangedSinceLastSave() {
         // TODO Auto-generated method stub
@@ -101,9 +110,9 @@ public class PieChartComponent extends WorkspaceComponent<WorkspaceComponentList
     public void update() {
         double total = 0;
         for (PieDataConsumer consumer : model.getConsumers()) {
-            total+=consumer.getValue();
+            total += consumer.getValue();
         }
-        if (total == 0) return; // TODO: Do something more sensible for this case
+        if (total == 0) { return; } // TODO: Do something more sensible for this case
         for (PieDataConsumer consumer : model.getConsumers()) {
             model.getDataset().setValue(consumer.getIndex(), consumer.getValue() / total);
         }

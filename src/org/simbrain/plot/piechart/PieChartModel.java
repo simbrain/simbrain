@@ -44,6 +44,9 @@ public class PieChartModel {
     /** JFreeChart dataset for pie charts. */
     private DefaultPieDataset dataset = new DefaultPieDataset();
 
+    /** Should the chart outline be visible. */
+    private boolean outlineVisible = true;
+
     /**
      * Default constructor.
      * @param parent component
@@ -121,6 +124,13 @@ public class PieChartModel {
     }
 
     /**
+     * Updates the chart to reflect changes.
+     */
+    public void update() {
+        this.getParent().updateSettings();
+    }
+
+    /**
      * Clears data from the chart.
      */
     public void clearChart() {
@@ -156,6 +166,20 @@ public class PieChartModel {
     private Object readResolve() {
         consumers = new ArrayList<PieDataConsumer>();
         return this;
+    }
+
+    /**
+     * @return the outlineVisible
+     */
+    public boolean isOutlineVisible() {
+        return outlineVisible;
+    }
+
+    /**
+     * @param outlineVisible the outlineVisible to set
+     */
+    public void setOutlineVisible(final boolean outlineVisible) {
+        this.outlineVisible = outlineVisible;
     }
 
 }

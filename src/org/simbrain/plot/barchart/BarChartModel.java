@@ -46,6 +46,17 @@ public class BarChartModel {
 
     /** Color of bars in barchart. */
     private Color barColor = Color.red;
+
+    /** Auto range bar chart. */
+    private boolean autoRange = true;
+
+    /** Maximum range. */
+    private double upperBound = 10;
+
+    /** Minimum range. */
+    private double lowerBound = 0;
+
+//    private Range chartRange = new Range(0, 10);
     
     /**
      * Bar chart model constructor.
@@ -156,8 +167,11 @@ public class BarChartModel {
         return consumers;
     }
     
+    /**
+     * Updates the chart to reflect changes.
+     */
     public void update() {
-    	this.getParent().updateSettings();
+        this.getParent().updateSettings();
     }
 
     /**
@@ -173,18 +187,70 @@ public class BarChartModel {
         System.out.println("--------------------------------------");
     }
 
-	/**
-	 * @return the barColor
-	 */
-	public Color getBarColor() {
-		return barColor;
-	}
+    /**
+     * @return the barColor
+     */
+    public Color getBarColor() {
+        return barColor;
+    }
 
-	/**
-	 * @param barColor the barColor to set
-	 */
-	public void setBarColor(Color barColor) {
-		this.barColor = barColor;
-	}
+    /**
+     * @param barColor
+     *            the barColor to set
+     */
+    public void setBarColor(final Color barColor) {
+        this.barColor = barColor;
+    }
+
+    /**
+     * @return the autoRange
+     */
+    public boolean isAutoRange() {
+        return autoRange;
+    }
+
+    /**
+     * @param autoRange the autoRange to set
+     */
+    public void setAutoRange(final boolean autoRange) {
+        this.autoRange = autoRange;
+    }
+
+    /**
+     * @return the upperBound
+     */
+    public double getUpperBound() {
+        return upperBound;
+    }
+
+    /**
+     * @param upperBound the upperBound to set
+     */
+    public void setUpperBound(final double upperBound) {
+        this.upperBound = upperBound;
+    }
+
+    /**
+     * @return the lowerBound
+     */
+    public double getLowerBound() {
+        return lowerBound;
+    }
+
+    /**
+     * @param lowerBound the lowerBound to set
+     */
+    public void setLowerBound(final double lowerBound) {
+        this.lowerBound = lowerBound;
+    }
+
+    /**
+     * @param lowerBound the lower range boundary.
+     * @param upperBound the upper range boundary.
+     */
+    public void setRange(final double lowerBound, final double upperBound) {
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+    }
 
 }

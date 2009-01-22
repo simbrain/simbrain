@@ -145,7 +145,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
     /** @see ActionListener */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            TimeSeriesPlotDialog dialog = new TimeSeriesPlotDialog(chart, getWorkspaceComponent());
+            TimeSeriesPlotDialog dialog = new TimeSeriesPlotDialog(chart, getWorkspaceComponent().getModel());
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);

@@ -23,15 +23,15 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Data for a JFreeChart ScatterPlot.
  */
-public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class ScatterPlotComponent extends WorkspaceComponent<ChartListener> {
 
     /** Show plot history. */
     private boolean showHistory = false;
@@ -122,6 +122,16 @@ public class ScatterPlotComponent extends WorkspaceComponent<WorkspaceComponentL
      */
     public void setShowHistory(final boolean value) {
         showHistory = value;
+    }
+
+    /**
+     * Update chart settings. Called, e.g., when things are modified using a
+     * dialog.
+     */
+    public void updateSettings() {
+        for (ChartListener listener : this.getListeners()) {
+            listener.chartSettingsUpdated();
+        }
     }
 
     @Override

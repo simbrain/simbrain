@@ -20,13 +20,6 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
     /** Reference to chart component. */
     private JFreeChart chart;
 
-
-    /** Reference to the plot component. */
-    private TimeSeriesPlotComponent component;
-    
-//    /** Reference to the dot renderer. */
-//    private XYDotRenderer renderer;
-
     /** Auto Range check box. */
     private JCheckBox autoRangeBox = new JCheckBox();
 
@@ -51,17 +44,20 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
     /** Text field for setting the minimum domain. */
     private JTextField minDomainField = new JTextField();
 
+    /** Time series model. */
+    private TimeSeriesModel model;
+
 
     /**
      * Dialog for displaying chart options.
      *
      * @param chart Reference to the chart component to be changed
-     * @param component Reference to the component
+     * @param model Reference to the model
      */
-    public TimeSeriesPlotDialog(final JFreeChart chart, final TimeSeriesPlotComponent component) {
+    public TimeSeriesPlotDialog(final JFreeChart chart, final TimeSeriesModel model) {
         this.chart = chart;
-        this.component = component;
-//        this.renderer = renderer;
+        this.model = model;
+
         LabelledItemPanel dialogPanel = new LabelledItemPanel();
 
         fillFieldValues();
@@ -86,7 +82,6 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
         dialogPanel.addItem("Minimum Range", minRangeField);
         dialogPanel.addItem("Auto Range", autoRangeBox);
 
-
         JButton colorButton = new JButton("Color");
         colorButton.addActionListener(this);
         colorButton.setActionCommand("BarColor");
@@ -110,25 +105,16 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
      * Fills the fields with current values.
      */
     private void fillFieldValues() {
-        autoRangeBox.setSelected(chart.getXYPlot().getRangeAxis()
-                .isAutoRange());
-        autoDomainBox.setSelected(chart.getXYPlot().getDomainAxis()
-                .isAutoRange());
-        maxRangeField.setText(Double.toString(chart.getXYPlot()
-                .getRangeAxis().getRange().getUpperBound()));
-        minRangeField.setText(Double.toString(chart.getXYPlot()
-                .getRangeAxis().getRange().getLowerBound()));
-        maxDomainField.setText(Double.toString(chart.getXYPlot()
-                .getDomainAxis().getRange().getUpperBound()));
-        minDomainField.setText(Double.toString(chart.getXYPlot()
-                .getDomainAxis().getRange().getLowerBound()));
+        autoRangeBox.setSelected(model.isAutoRange());
+        autoDomainBox.setSelected(model.isAutoDomain());
+        maxRangeField.setText(Double.toString(model.getUpperRangeBoundary()));
+        minRangeField.setText(Double.toString(model.getLowerRangeBoundary()));
+        maxDomainField.setText(Double.toString(model.getUpperDomainBoundary()));
+        minDomainField.setText(Double.toString(model.getLowerDomainBoundary()));
 
-        maxRangeField.setEnabled(!autoRangeBox.isSelected());
-        minRangeField.setEnabled(!autoRangeBox.isSelected());
-        maxDomainField.setEnabled(!autoDomainBox.isSelected());
-        minDomainField.setEnabled(!autoDomainBox.isSelected());
+        checkEnableFields();
 
-        if (chart.getXYPlot().getDomainAxis().getFixedAutoRange() > 0) {
+        if (model.isFixedWindow()) {
             fixedRangeBox.setSelected(true);
             autoDomainBox.setEnabled(false);
             fixedRangeField.setText(Double.toString(chart.getXYPlot()
@@ -137,6 +123,16 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
             fixedRangeBox.setSelected(false);
             fixedRangeField.setEnabled(false);
         }
+    }
+
+    /**
+     * Checks fields for their enable status.
+     */
+    private void checkEnableFields() {
+        maxRangeField.setEnabled(!autoRangeBox.isSelected());
+        minRangeField.setEnabled(!autoRangeBox.isSelected());
+        maxDomainField.setEnabled(!autoDomainBox.isSelected());
+        minDomainField.setEnabled(!autoDomainBox.isSelected());
     }
 
     /**
@@ -163,21 +159,19 @@ public class TimeSeriesPlotDialog extends StandardDialog implements ActionListen
         } else {
             chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
         }
-        component.setFixedWidth(fixedRangeBox.isSelected());
-        component.setMaxSize(Integer.parseInt(fixedRangeField.getText()));
+        model.getParent().setFixedWidth(fixedRangeBox.isSelected());
+        model.getParent().setMaxSize(Integer.parseInt(fixedRangeField.getText()));
     }
 
     /** @see ActionListener */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("AutoRange")) {
-            maxRangeField.setEnabled(!autoRangeBox.isSelected());
-            minRangeField.setEnabled(!autoRangeBox.isSelected());
+             checkEnableFields();
         } else if (arg0.getActionCommand().equalsIgnoreCase("AutoDomain")) {
-            maxDomainField.setEnabled(!autoDomainBox.isSelected());
-            minDomainField.setEnabled(!autoDomainBox.isSelected());
+            checkEnableFields();
         } else if (arg0.getActionCommand().equalsIgnoreCase("FixedRange")) {
             fixedRangeField.setEnabled(fixedRangeBox.isSelected());
-            fixedRangeField.setText(Integer.toString(component.getMaxSize()));
+            fixedRangeField.setText(Integer.toString(model.getParent().getMaxSize()));
             if (fixedRangeBox.isSelected()) {
                 autoDomainBox.setSelected(fixedRangeBox.isSelected());
             } else {

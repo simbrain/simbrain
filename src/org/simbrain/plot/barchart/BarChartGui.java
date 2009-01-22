@@ -19,13 +19,13 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -37,6 +37,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.util.propertyeditor.TestObject;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.gui.GenericFrame;
@@ -94,44 +96,57 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     @Override
     public void postAddInit() {
         // Generate the graph
-        chart = ChartFactory.createBarChart(
-                "Bar Chart Demo 1",       // chart title
-                "Category",               // domain axis label
-                "Value",                  // range axis label
-                this.getWorkspaceComponent().getModel().getDataset(),                  // data
+        chart = ChartFactory.createBarChart("Bar Chart Demo 1", // chart title
+                "Category", // domain axis label
+                "Value", // range axis label
+                this.getWorkspaceComponent().getModel().getDataset(), // data
                 PlotOrientation.VERTICAL, // orientation
-                true,                     // include legend
-                true,                     // tooltips?
-                false                     // URLs?
+                true, // include legend
+                true, // tooltips?
+                false // URLs?
 
-            );
+                );
         chartPanel.setChart(chart);
-        chart.getCategoryPlot().getRangeAxis().setAutoRange(true);
-                
+        chart.getCategoryPlot().getRangeAxis().setAutoRange(
+                getWorkspaceComponent().getModel().isAutoRange());
+        if (!getWorkspaceComponent().getModel().isAutoRange()) {
+            chart.getCategoryPlot().getRangeAxis().setRange(
+                    getWorkspaceComponent().getModel().getLowerBound(),
+                    getWorkspaceComponent().getModel().getUpperBound());
+        }
+
         getWorkspaceComponent().addListener(new ChartListener() {
 
-			public void componentUpdated() {
-			}
+            public void componentUpdated() {
+            }
 
-			public void setTitle(String name) {
-			}
+            public void setTitle(String name) {
+            }
 
-			//TODO: Explore parameters in
-			//			chart, chart.getCategoryPlot(), chart.getCategoryPlot().getRenderer(), chartPanel.. 
-			public void chartSettingsUpdated() {
-				// For now just one series...
-				chart.getCategoryPlot().getRenderer().setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
-			}
+            // TODO: Explore parameters in
+            // chart, chart.getCategoryPlot(),
+            // chart.getCategoryPlot().getRenderer(), chartPanel..
+            public void chartSettingsUpdated() {
+                chart.getCategoryPlot().getRenderer().setSeriesPaint(0,
+                        getWorkspaceComponent().getModel().getBarColor());
+                chart.getCategoryPlot().getRangeAxis().setAutoRange(
+                        getWorkspaceComponent().getModel().isAutoRange());
+                // For now change color for just one series...
+                if (!getWorkspaceComponent().getModel().isAutoRange()) {
+                    chart.getCategoryPlot().getRangeAxis().setRange(
+                            getWorkspaceComponent().getModel().getLowerBound(),
+                            getWorkspaceComponent().getModel().getUpperBound());
+                }
+            }
 
             public void attributeRemoved(AttributeHolder parent, Attribute attribute)
             {
                 // TODO Auto-generated method stub
                 
             }
-        	
         });
         this.getWorkspaceComponent().updateSettings();
-        
+
     }
 
     /**
@@ -168,10 +183,14 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     /** @see ActionListener */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            BarChartDialog dialog = new BarChartDialog(chart, this.getWorkspaceComponent().getModel());
+            JDialog dialog = new JDialog();
+            dialog.setContentPane(new ReflectivePropertyEditor(getWorkspaceComponent().getModel(), dialog));
+//            BarChartDialog dialog = new BarChartDialog(chart, getWorkspaceComponent().getModel());
+            dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
+            getWorkspaceComponent().getModel().update();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
             this.getWorkspaceComponent().getModel().removeColumn();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {

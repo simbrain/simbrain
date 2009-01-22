@@ -18,8 +18,12 @@
  */
 package org.simbrain.plot.scatterplot;
 
+import java.awt.Color;
+import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -44,6 +48,30 @@ public class ScatterPlotModel {
     /** Parent Component. */
     private ScatterPlotComponent parentComponent;
 
+    /** Auto domain. */
+    private boolean autoDomain = false;
+
+    /** Auto range. */
+    private boolean autoRange = false;
+
+    /** Upper range boundary. */
+    private double upperRangeBoundary = 10;
+
+    /** Lower range boundary. */
+    private double lowerRangeBoundary = 0;
+
+    /** Upper domain boundary. */
+    private double upperDomainBoundary = 10;
+
+    /** Lower domain boundary. */
+    private double lowerDomainBoundary = 0;
+
+    /** Size of chart dot. */
+    private int dotSize = 1;
+
+    /** Color for series. */
+    private List<Paint> chartSeriesPaint = new LinkedList<Paint>();
+
 
     /**
      * Scatter plot model constructor.
@@ -51,6 +79,7 @@ public class ScatterPlotModel {
      */
     public ScatterPlotModel(final ScatterPlotComponent parent) {
         parentComponent = parent;
+        setChartColors();
         defaultInit();
     }
 
@@ -84,6 +113,16 @@ public class ScatterPlotModel {
         parentComponent = parent;
     }
 
+    /**
+     * Sets the series colors for the chart.
+     */
+    private void setChartColors() {
+        chartSeriesPaint.add(Color.RED);
+        chartSeriesPaint.add(Color.BLUE);
+        chartSeriesPaint.add(Color.GREEN);
+        chartSeriesPaint.add(Color.YELLOW);
+        chartSeriesPaint.add(Color.PINK);
+    }
     
     /**
      * Create specified number of set of data sources.
@@ -117,6 +156,7 @@ public class ScatterPlotModel {
         if (lastSeriesIndex >= 0) {
             dataset.removeSeries(lastSeriesIndex);
             consumers.remove(lastSeriesIndex);
+            chartSeriesPaint.remove(lastSeriesIndex);
         }
     }
 
@@ -128,6 +168,13 @@ public class ScatterPlotModel {
         for (int i = 0; seriesCount > i; ++i) {
             dataset.getSeries(i).clear();
         }
+    }
+
+    /**
+     * Updates the chart.
+     */
+    public void update() {
+        getParent().updateSettings();
     }
 
     /**
@@ -159,5 +206,117 @@ public class ScatterPlotModel {
      */
     public Collection<ScatterPlotConsumer> getConsumers() {
         return consumers;
+    }
+
+    /**
+     * @return the autoDomain
+     */
+    public boolean isAutoDomain() {
+        return autoDomain;
+    }
+
+    /**
+     * @param autoDomain the autoDomain to set
+     */
+    public void setAutoDomain(final boolean autoDomain) {
+        this.autoDomain = autoDomain;
+    }
+
+    /**
+     * @return the autoRange
+     */
+    public boolean isAutoRange() {
+        return autoRange;
+    }
+
+    /**
+     * @param autoRange the autoRange to set
+     */
+    public void setAutoRange(final boolean autoRange) {
+        this.autoRange = autoRange;
+    }
+
+    /**
+     * @return the upperRangeBoundary
+     */
+    public double getUpperRangeBoundary() {
+        return upperRangeBoundary;
+    }
+
+    /**
+     * @param upperRangeBoundary the upperRangeBoundary to set
+     */
+    public void setUpperRangeBoundary(final double upperRangeBoundary) {
+        this.upperRangeBoundary = upperRangeBoundary;
+    }
+
+    /**
+     * @return the lowerRangeBoundary
+     */
+    public double getLowerRangeBoundary() {
+        return lowerRangeBoundary;
+    }
+
+    /**
+     * @param lowerRangeBoundary the lowerRangeBoundary to set
+     */
+    public void setLowerRangeBoundary(final double lowerRangeBoundary) {
+        this.lowerRangeBoundary = lowerRangeBoundary;
+    }
+
+    /**
+     * @return the upperDomainBoundary
+     */
+    public double getUpperDomainBoundary() {
+        return upperDomainBoundary;
+    }
+
+    /**
+     * @param upperDomainBoundary the upperDomainBoundary to set
+     */
+    public void setUpperDomainBoundary(final double upperDomainBoundary) {
+        this.upperDomainBoundary = upperDomainBoundary;
+    }
+
+    /**
+     * @return the lowerDomainBoundary
+     */
+    public double getLowerDomainBoundary() {
+        return lowerDomainBoundary;
+    }
+
+    /**
+     * @param lowerDomainBoundary the lowerDomainBoundary to set
+     */
+    public void setLowerDomainBoundary(final double lowerDomainBoundary) {
+        this.lowerDomainBoundary = lowerDomainBoundary;
+    }
+
+    /**
+     * @return the dotSize
+     */
+    public int getDotSize() {
+        return dotSize;
+    }
+
+    /**
+     * @param dotSize the dotSize to set
+     */
+    public void setDotSize(final int dotSize) {
+        this.dotSize = dotSize;
+    }
+
+    /**
+     * @return the paint color
+     */
+    public List<Paint> getChartSeriesPaint() {
+        return chartSeriesPaint;
+    }
+
+    /**
+     * @param chartSeriesPaint the paint color to set
+     */
+    public void setChartSeriesPaint(final List<Paint> chartSeriesPaint) {
+        this.chartSeriesPaint = chartSeriesPaint;
     }
 }

@@ -21,13 +21,9 @@ package org.simbrain.workspace;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
@@ -37,13 +33,17 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 /**
- * A collection of components which interact via couplings.   Neural networks, datatables, gauges, and scripts are examples of components in a Simbrain workspace.
- * Essentially, an instance of a workspace corresponds to a single simulation (though at some point it will be possible to link multiple workspaces on different machines together).
+ * A collection of components which interact via couplings. Neural networks,
+ * datatables, gauges, and scripts are examples of components in a Simbrain
+ * workspace. Essentially, an instance of a workspace corresponds to a single
+ * simulation (though at some point it will be possible to link multiple
+ * workspaces on different machines together).
  * 
- * A workspace can be visualized via a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
+ * A workspace can be visualized via a
+ * {@link org.simbrain.workspace.gui.SimbrainDesktop}.
  * 
  * @see org.simbrain.workspace.Coupling
- *
+ * 
  */
 public class Workspace {
 
@@ -60,7 +60,8 @@ public class Workspace {
     private final CouplingManager manager = new CouplingManager();
     
     /** List of workspace components. */
-    private List<WorkspaceComponent<?>> componentList = Collections.synchronizedList(new ArrayList<WorkspaceComponent<?>>());
+    private List<WorkspaceComponent<?>> componentList = Collections
+            .synchronizedList(new ArrayList<WorkspaceComponent<?>>());
 
     /** Sentinel for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
@@ -68,22 +69,36 @@ public class Workspace {
     /** Current workspace file. */
     private File currentFile = new File(WorkspacePreferences.getDefaultFile());
 
-    /** Current directory. So when re-opening this type of component the app remembers where to look. */
+    /**
+     * Current directory. So when re-opening this type of component the
+     * app remembers where to look.
+     */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
     /**
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem because
      * writes to this list are uncommon.
      */
-    private CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
+    private CopyOnWriteArrayList<WorkspaceListener> listeners =
+        new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
      * Mapping from workspace component types to integers which show how many have been added.
      * For naming.
      */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
-
-    /** Custom update method; null if none. */
+    
+    /**
+     * By default, the workspace is updated as followed:
+     *  1) Update couplings
+     *  2) Call "update" on all workspacecomponents
+     * 
+     * Sometimes this way of updating is not sufficient, and the user will
+     * want updates (in the GUI, presses of the iterate and play buttons) to
+     * update components and couplings in a different way.
+     *  
+     * For an example, see the script in {SimbrainDir}/scriptmenu/addBackpropSim.bsh
+     */
     private CustomUpdate customUpdateMethod = null;
     
     // TODO: Add docs
@@ -119,6 +134,7 @@ public class Workspace {
         listeners.remove(listener);
     }
     
+    //TODO: Document
     void toggleEvents(final boolean on) {
         this.fireEvents = on;
     }
@@ -129,7 +145,9 @@ public class Workspace {
      * @param sourceAttributes source producing attributes
      * @param targetAttributes target consuming attributes
      */
-    public void coupleOneToMany(ArrayList<ProducingAttribute<?>> sourceAttributes, ArrayList<ConsumingAttribute<?>> targetAttributes) {
+    public void coupleOneToMany(
+            final ArrayList<ProducingAttribute<?>> sourceAttributes,
+            final ArrayList<ConsumingAttribute<?>> targetAttributes) {
         for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
             for (ConsumingAttribute<?> consumingAttribute : targetAttributes) {
                 Coupling<?> coupling = new Coupling(producingAttribute, consumingAttribute);
@@ -145,7 +163,9 @@ public class Workspace {
      * @param sourceAttributes source producing attributes
      * @param targetAttributes target producing attributes
      */
-    public void coupleOneToOne(ArrayList<ProducingAttribute<?>> sourceAttributes, ArrayList<ConsumingAttribute<?>> targetAttributes) {
+    public void coupleOneToOne(
+            final ArrayList<ProducingAttribute<?>> sourceAttributes,
+            final ArrayList<ConsumingAttribute<?>> targetAttributes) {
         Iterator<ConsumingAttribute<?>> consumingAttributes = targetAttributes.iterator();
         for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
             if (consumingAttributes.hasNext()) {
@@ -181,11 +201,11 @@ public class Workspace {
                 int index = componentNameIndices.get(component.getClass());
                 componentNameIndices.put(component.getClass(), index + 1);
             }
-            component.setName(component.getSimpleName() + 
-                    componentNameIndices.get(component.getClass()));
+            component.setName(component.getSimpleName()
+                    + componentNameIndices.get(component.getClass()));
         }
- 
-        // Notify listeners 
+
+        // Notify listeners
         if (fireEvents) {
             for (WorkspaceListener listener : listeners) {
                 listener.componentAdded(component);
@@ -233,7 +253,7 @@ public class Workspace {
      */
     public void globalUpdate() {
 
-    	// default update is a buffered method (TODO Elaborate)
+       // Default updating, if no custom method is used
        if (customUpdateMethod == null) {
                 manager.updateAllCouplings();
                 synchronized (componentList) {
@@ -248,9 +268,10 @@ public class Workspace {
                 }
             }
         } else {
-			synchronized (componentList) {
-				customUpdateMethod.update(this);
-			}
+            // Update workspace using custom method.
+            synchronized (componentList) {
+                customUpdateMethod.update(this);
+            }
         }
         time++;
     }
@@ -259,29 +280,31 @@ public class Workspace {
      * Iterates all couplings on all components until halted by user.
      */
     public void globalRun() {
-    	
-    	isUpdating = true;
+        
+        isUpdating = true;
         if (customUpdateMethod == null) {
-        	int numComponents = this.getComponentList().size();
-            barrier = new CyclicBarrier(numComponents, new UpdateCouplings()); 
-            workspaceUpdater = Executors.newFixedThreadPool(numComponents); 
-            for (int i = 0; i < numComponents; i++) {  
-            	workspaceUpdater.execute(new WorkspaceComponentUpdater(this.getComponentList().get(i)));
+            int numComponents = this.getComponentList().size();
+            barrier = new CyclicBarrier(numComponents, new UpdateCouplings());
+            workspaceUpdater = Executors.newFixedThreadPool(numComponents);
+            for (int i = 0; i < numComponents; i++) {
+                workspaceUpdater.execute(new WorkspaceComponentUpdater(this
+                        .getComponentList().get(i)));
             }
-        }else {
-        	// For custom updating, it is assumed the script using the custom updater
-			// will provide thread control. However, default single threading is
-			// here provided
-			Executors.newSingleThreadExecutor().execute(new Runnable() {
-				public void run() {
-					while (isUpdating) {
-						customUpdateMethod.update(Workspace.this);
-						time++; // TODO: Should this be here or up to the custom
-								// update method?
-					}
-				}
-			});
-		}
+        } else {
+            // For custom updating, it is assumed the script using the custom
+            // updater
+            // will provide thread control. However, default single threading is
+            // here provided
+            Executors.newSingleThreadExecutor().execute(new Runnable() {
+                public void run() {
+                    while (isUpdating) {
+                        customUpdateMethod.update(Workspace.this);
+                        time++; // TODO: Should this be here or up to the custom
+                        // update method?
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -289,9 +312,9 @@ public class Workspace {
      */
     public void globalStop() {
     	isUpdating = false;
-    	if (workspaceUpdater != null) {
-    		workspaceUpdater.shutdown();
-    	}
+        if (workspaceUpdater != null) {
+            workspaceUpdater.shutdown();
+        }
      }
 
     /**
@@ -418,11 +441,13 @@ public class Workspace {
      * {@inheritDoc}
      */
     public String toString() {
-        StringBuilder builder = new StringBuilder("Number of components: " + componentList.size() + "\n");
+        StringBuilder builder =
+               new StringBuilder("Number of components: " + componentList.size() + "\n");
         int i = 0;
         synchronized (componentList) {
             for (WorkspaceComponent<?> component : componentList) {
-                builder.append("Component " + ((i++)+1) + ":" + component.getName() + "\n");
+                builder.append("Component " + ((i++) + 1)
+                        + ":" + component.getName() + "\n");
             }
         }
         return builder.toString();
@@ -460,14 +485,14 @@ public class Workspace {
      *
      * @param customUpdateMethod custom update method.
      */
-    public void setCustomUpdateMethod(CustomUpdate customUpdateMethod) {
+    public void setCustomUpdateMethod(final CustomUpdate customUpdateMethod) {
         this.customUpdateMethod = customUpdateMethod;
     }
     
     /**
      * Returns global time.
      * 
-     * @return
+     * @return the time
      */
     public Number getTime() {
         return time;
@@ -478,62 +503,63 @@ public class Workspace {
      */
     public class WorkspaceComponentUpdater implements Runnable {
 
-    	/** Reference to component. */
-    	private WorkspaceComponent<?> workspaceComponent;
-    	
-    	/** The task to be run. */
-    	private Runnable task;
-    	
-    	/**
-    	 * Workspace component updater.
-    	 * 
-    	 * @param component reference to component.
-    	 */
-    	public WorkspaceComponentUpdater(final WorkspaceComponent<?> component) {
-    		this.workspaceComponent = component;
-    		if (workspaceComponent.getTask() == null) {
-    			task = new Runnable() {
-					public void run() {
-						workspaceComponent.doUpdate();
-					}    				
-    			};
-    		} else {
-    			task = workspaceComponent.getTask();
-    		}
-    	}
+        /** Reference to component. */
+        private WorkspaceComponent<?> workspaceComponent;
 
-    	/**
-    	 * {@inheritDoc}
-    	 */
-		public void run() {
-			while(isUpdating) {
-				try {
-					task.run();
-					time++;
-					barrier.await();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (BrokenBarrierException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}				
-			}
-		}
-    	
+        /** The task to be run. */
+        private Runnable task;
+
+        /**
+         * Workspace component updater.
+         * 
+         * @param component
+         *            reference to component.
+         */
+        public WorkspaceComponentUpdater(final WorkspaceComponent<?> component) {
+            this.workspaceComponent = component;
+            if (workspaceComponent.getTask() == null) {
+                task = new Runnable() {
+                    public void run() {
+                        workspaceComponent.doUpdate();
+                    }
+                };
+            } else {
+                task = workspaceComponent.getTask();
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void run() {
+            while (isUpdating) {
+                try {
+                    task.run();
+                    time++;
+                    barrier.await();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (BrokenBarrierException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
-    
+
     /**
      * Task for updating couplings.
      */
-	private class UpdateCouplings implements Runnable {
+    private class UpdateCouplings implements Runnable {
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public void run() {
-			manager.updateAllCouplings();
-		}	
-	}
+        /**
+         * {@inheritDoc}
+         */
+        public void run() {
+            manager.updateAllCouplings();
+        }
+    }
     
 }

@@ -18,14 +18,10 @@
  */
 package org.simbrain.network;
 
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 
-import javax.swing.SwingUtilities;
-
-//import org.simbrain.network.gui.NetworkPreferences;
 import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.workspace.Consumer;
@@ -43,14 +39,14 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
     /**
      * Create a new network component.
      */
-    public NetworkComponent(String name) {
+    public NetworkComponent(final String name) {
         super(name);
     }
     
     /**
      * Create a new network component.
      */
-    public NetworkComponent(String name, RootNetwork network) {
+    public NetworkComponent(final String name, final RootNetwork network) {
         super(name);
         this.rootNetwork = network;
         rootNetwork.setParent(this);
@@ -58,7 +54,7 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
     }
 
     
-    public static NetworkComponent open(InputStream input, final String name, final String format) {
+    public static NetworkComponent open(final InputStream input, final String name, final String format) {
         RootNetwork newNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(input);
         return new NetworkComponent(name, newNetwork);
     }
@@ -118,12 +114,14 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
         return super.getListeners();
     }
 
-	/* (non-Javadoc)
-	 * @see org.simbrain.workspace.WorkspaceComponent#getTask()
-	 */
-	@Override
-	public Runnable getTask() {
-		return new NetworkUpdater(this.getRootNetwork());
-	}
-	
+	/*
+     * (non-Javadoc)
+     * 
+     * @see org.simbrain.workspace.WorkspaceComponent#getTask()
+     */
+    @Override
+    public Runnable getTask() {
+        return new NetworkUpdater(this.getRootNetwork());
+    }
+
 }

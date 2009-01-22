@@ -25,7 +25,7 @@ import java.util.Collection;
 
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.gui.NetworkPreferences;
+//import org.simbrain.network.gui.NetworkPreferences;
 import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.workspace.Consumer;
@@ -100,12 +100,13 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
     @Override
     public void setCurrentDirectory(final String currentDirectory) {
         super.setCurrentDirectory(currentDirectory);
-        NetworkPreferences.setCurrentDirectory(currentDirectory);
+//        NetworkPreferences.setCurrentDirectory(currentDirectory);
     }
 
     @Override
     public String getCurrentDirectory() {
-       return NetworkPreferences.getCurrentDirectory();
+//       return NetworkPreferences.getCurrentDirectory();
+        return null;
     }
     
     /**

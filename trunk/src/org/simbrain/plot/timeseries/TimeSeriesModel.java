@@ -44,6 +44,30 @@ public class TimeSeriesModel {
     /** Default number of data sources for plot initialization. */
     private static final int INITIAL_DATA_SOURCES = 10;
 
+    /** Should fixed window size be used. */
+    private boolean fixedWindow = true;
+
+    /** Should the domain automatically change to reflect the data. */
+    private boolean autoDomain = true;
+
+    /** Should the range automatically change to reflect the data. */
+    private boolean autoRange = true;
+
+    /** Size of window. */
+    private double windowSize = 100;
+
+    /** Upper boundary of the chart domain. */
+    private double upperDomainBoundary = 1;
+
+    /** Lower boundary of the chart domain. */
+    private double lowerDomainBoundary = -0;
+
+    /** Upper boundary of the chart range. */
+    private double upperRangeBoundary = 1;
+
+    /** Lower boundary of the chart range. */
+    private double lowerRangeBoundary = 0;
+
     /**
      * Time series model constructor.
      * @param parent component
@@ -158,5 +182,117 @@ public class TimeSeriesModel {
     private Object readResolve() {
         consumers = new ArrayList<TimeSeriesConsumer>();
         return this;
+    }
+
+    /**
+     * @return the fixedWindowSize
+     */
+    public boolean isFixedWindow() {
+        return fixedWindow;
+    }
+
+    /**
+     * @param fixedWindowSize the fixedWindowSize to set
+     */
+    public void setFixedWindow(final boolean fixedWindow) {
+        this.fixedWindow = fixedWindow;
+    }
+
+    /**
+     * @return the autoDomain
+     */
+    public boolean isAutoDomain() {
+        return autoDomain;
+    }
+
+    /**
+     * @param autoDomain the autoDomain to set
+     */
+    public void setAutoDomain(final boolean autoDomain) {
+        this.autoDomain = autoDomain;
+    }
+
+    /**
+     * @return the autoRange
+     */
+    public boolean isAutoRange() {
+        return autoRange;
+    }
+
+    /**
+     * @param autoRange the autoRange to set
+     */
+    public void setAutoRange(final boolean autoRange) {
+        this.autoRange = autoRange;
+    }
+
+    /**
+     * @return the windowSize
+     */
+    public double getWindowSize() {
+        return windowSize;
+    }
+
+    /**
+     * @param windowSize the windowSize to set
+     */
+    public void setWindowSize(final double windowSize) {
+        this.windowSize = windowSize;
+    }
+
+    /**
+     * @return the upperDomainBoundary
+     */
+    public double getUpperDomainBoundary() {
+        return upperDomainBoundary;
+    }
+
+    /**
+     * @param upperDomainBoundary the upperDomainBoundary to set
+     */
+    public void setUpperDomainBoundary(final double upperDomainBoundary) {
+        this.upperDomainBoundary = upperDomainBoundary;
+    }
+
+    /**
+     * @return the lowerDomainBoundary
+     */
+    public double getLowerDomainBoundary() {
+        return lowerDomainBoundary;
+    }
+
+    /**
+     * @param lowerDomainBoundary the lowerDomainBoundary to set
+     */
+    public void setLowerDomainBoundary(final double lowerDomainBoundary) {
+        this.lowerDomainBoundary = lowerDomainBoundary;
+    }
+
+    /**
+     * @return the upperRangeBoundary
+     */
+    public double getUpperRangeBoundary() {
+        return upperRangeBoundary;
+    }
+
+    /**
+     * @param upperRangeBoundary the upperRangeBoundary to set
+     */
+    public void setUpperRangeBoundary(final double upperRangeBoundary) {
+        this.upperRangeBoundary = upperRangeBoundary;
+    }
+
+    /**
+     * @return the lowerRangeBoundary
+     */
+    public double getLowerRangeBoundary() {
+        return lowerRangeBoundary;
+    }
+
+    /**
+     * @param lowerRangeBoundary the lowerRangeBoundary to set
+     */
+    public void setLowerRangeBoundary(final double lowerRangeBoundary) {
+        this.lowerRangeBoundary = lowerRangeBoundary;
     }
 }

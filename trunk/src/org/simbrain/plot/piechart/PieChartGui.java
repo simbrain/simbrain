@@ -19,12 +19,15 @@
 package org.simbrain.plot.piechart;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -33,7 +36,11 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -50,6 +57,9 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
 
     /** Preferred frame size. */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
+
+    /** Chart gui. */
+    private JFreeChart chart;
     
     /**
      * Construct the GUI Pie Chart.
@@ -87,7 +97,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
     public void postAddInit() {
         
         // Generate the graph
-        JFreeChart chart = ChartFactory.createPieChart(
+        chart = ChartFactory.createPieChart(
             "Pie Chart",
             this.getWorkspaceComponent().getModel().getDataset(),
             true, // include legend
@@ -96,6 +106,24 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         );
         chartPanel.setChart(chart);
 
+        getWorkspaceComponent().addListener(new ChartListener() {
+            public void componentUpdated() {
+            }
+
+            public void setTitle(final String name) {
+            }
+
+            public void chartSettingsUpdated() {
+                chart.getPlot().setOutlineVisible(getWorkspaceComponent()
+                        .getModel().isOutlineVisible());
+            }
+
+            public void attributeRemoved(AttributeHolder holder,
+                    Attribute attribute) {
+                
+            }
+        });
+        getWorkspaceComponent().updateSettings();
     }
 
     /**
@@ -131,6 +159,15 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equalsIgnoreCase("Add")) {
             this.getWorkspaceComponent().getModel().addDataSource();
+        } else if (e.getActionCommand().equalsIgnoreCase("dialog")) {
+            JDialog dialog = new JDialog();
+            dialog.setContentPane(new ReflectivePropertyEditor(getWorkspaceComponent()
+                    .getModel(), dialog));
+            dialog.setModal(true);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            getWorkspaceComponent().getModel().update();
         } else if (e.getActionCommand().equalsIgnoreCase("Delete")) {
             this.getWorkspaceComponent().getModel().removeDataSource();
         }

@@ -31,39 +31,42 @@ import org.simbrain.network.interfaces.RootNetwork;
  */
 public class NetworkUpdater implements Runnable {
 
-	/** Reference to network component. */
-	private RootNetwork root;
+    /** Reference to network component. */
+    private RootNetwork root;
 
-	/**
-	 * @param component
-	 */
-	public NetworkUpdater(RootNetwork root) {
-		super();
-		this.root = root;
-	}
+    /**
+     * @param component
+     */
+    public NetworkUpdater(final RootNetwork root) {
+        super();
+        this.root = root;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void run() {
-			try {
-				root.setUpdateCompleted(false);
-				SwingUtilities.invokeLater(new UpdateNetwork());
-				while (!root.isUpdateCompleted()) {
-					Thread.sleep(1); // TODO: make this settable? 
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public void run() {
+        try {
+            root.setUpdateCompleted(false);
+            SwingUtilities.invokeLater(new UpdateNetwork());
+            while (!root.isUpdateCompleted()) {
+                Thread.sleep(1); // TODO: make this settable?
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Updated the network.
-	 */
-	private class UpdateNetwork implements Runnable {
-		public void run() {
-			root.updateRootNetwork();
-		}
-	}
+    /**
+     * Update the network.
+     */
+    private class UpdateNetwork implements Runnable {
+        /**
+         * {@inheritDoc}
+         */
+        public void run() {
+            root.updateRootNetwork();
+        }
+    }
 
 }

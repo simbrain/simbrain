@@ -66,9 +66,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /** Default priority. */
     private static final int DEFAULT_PRIORITY = 0;
     
-    /** Priority of this component; used in priority based workspace update. */
-    private int priority = DEFAULT_PRIORITY;
-    
     /** How to order a list of attributes. */
     public enum AttributeListingStyle { TOTAL, DEFAULT_EACH };
     
@@ -136,9 +133,16 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
     
     /**
-     * ???.
+     * This can be overridden to provide a custom means of updating a component.
+     * This is meant to be used if, for example, one component can be updated
+     * in a multi-threaded manner or has special updating needs.
      * 
-     * @return null
+     * See, for example, the way this method is overridden in
+     * org.simbrain.network.NetworkComponent's implementation of this method.
+     * 
+     * If null is returned then default updating is used.
+     * 
+     * @return default value of null
      */
     public Runnable getTask() {
         return null;
@@ -646,19 +650,5 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public int getPriority() {
-        return priority;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setPriority(final int value) {
-        priority = value;
     }
 }

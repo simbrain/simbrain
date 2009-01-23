@@ -101,7 +101,7 @@ public class Workspace {
      */
     private CustomUpdate customUpdateMethod = null;
     
-    // TODO: Add docs
+    /** used to turn events off during special modifications. */
     private boolean fireEvents = true;
 
     /** The barrier which controls thread update. */
@@ -134,7 +134,11 @@ public class Workspace {
         listeners.remove(listener);
     }
     
-    //TODO: Document
+    /**
+     * Used to turn events off during special modifications.
+     * 
+     * @param on true to turn events on, false to turn events off
+     */
     void toggleEvents(final boolean on) {
         this.fireEvents = on;
     }
@@ -224,7 +228,8 @@ public class Workspace {
         for (WorkspaceListener listener : listeners) {
             listener.componentRemoved(component);
         }
-        this.getCouplingManager().removeCouplings(component);   // Remove all couplings associated with this component
+        /* Remove all couplings associated with this component */
+        this.getCouplingManager().removeCouplings(component);
         componentList.remove(component);
         this.setWorkspaceChanged(true);
     }
@@ -291,10 +296,11 @@ public class Workspace {
                         .getComponentList().get(i)));
             }
         } else {
-            // For custom updating, it is assumed the script using the custom
-            // updater
-            // will provide thread control. However, default single threading is
-            // here provided
+            /*
+             * For custom updating, it is assumed the script using the custom
+             * updater will provide thread control. However, default single threading is
+             * here provided
+             */
             Executors.newSingleThreadExecutor().execute(new Runnable() {
                 public void run() {
                     while (isUpdating) {
@@ -311,7 +317,7 @@ public class Workspace {
      * Stops iteration of all couplings on all components.
      */
     public void globalStop() {
-    	isUpdating = false;
+        isUpdating = false;
         if (workspaceUpdater != null) {
             workspaceUpdater.shutdown();
         }

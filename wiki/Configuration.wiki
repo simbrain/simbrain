@@ -1,0 +1,63 @@
+#summary Configuration tips for Simbrain developers
+
+= Introduction =
+
+Currently all these notes assume you are using Eclipse.  
+
+= Checkstyle = 
+
+== Install eclipse checkstyle ==
+
+From eclipse click on Help > Software Updates
+
+Next click on Available Software and then Add Site and enter "http://eclipse-cs.sourceforge.net/update" in the Location: text field.
+
+Click OK and then put a check mark next to the entry http://eclipse-cs.sourceforge.net/update in the list and click Install. 
+
+After the eclipse has finished checking the program for requirements and dependancies, click Next, accept the license agreement and click Finish.
+
+Finally, restart eclipse when prompted to do so by clicking Yes in the dialog box.
+
+== Configure eclipse checkstyle ==
+
+Right click on the Simbrain project in the package explorer and select Properties and click on Checkstyle in the left frame.
+
+Select Local Check Configurations and click on New.
+
+Select External Configuration File from the Type:  drop down menu. 
+
+Enter a name for the configuration such as "Simbrain Checkstyle"
+
+Click on Browse and locate the  [SimbrainRoot]/build/checkstyle.xml file and click OK. 
+
+Click on OK and then select Main and select the configuration file that was just imported (e.g. "Simbrain Checkstyle - (Local)") (Note: if the window size is too small, use the scroll bar to scroll to the top of the checkstyle frame.)
+
+Finally click the check box labeled Checkstyle active for this project to activate checkstyle and click OK to accept the settings. Eclipse will now ask to rebuild the project, click OK and any outstanding checkstyle errors will now be displayed.
+
+= Log4J = 
+
+== Import log4j JAR into project ==
+
+Right click on the project and select "properties" from the menu.
+
+Select "Java Build Path" from the frame on the left and then Libraries from the right frame.
+
+Make sure that the log4j jar file is listed. If it is not listed, add it to the build path by clicking on "Add JARs..." then selecting it from the "lib" directory within the build project. After the JAR is verified to be in the build path, click "Ok"
+
+== Configure log4j. ==
+
+Click on "Run" menu then go to "Run Configurations"   From here there are two cases:
+
+(If Running Simbrain for the first time, you must create a run configuraiton.  Double click on "Java Application" in the left frame. Change the name to something like "Simbrain" or some other descriptive term. Next under "Project:" heading click "Browse" and select the Simbrain project folder. Then under the "Main class:" heading type "org.simbrain.workspace.gui.Splasher")
+
+ - Import log4j properties file.
+
+Assuming the Simbrain run configuration is selected from the left frame:
+
+- select "Classpath" from the right frame and click on "User Entries" in the main panel
+
+- click on the "Advanced" button on the right
+
+- select "Add Folders" in the dialog and click "OK,"
+
+- select the "etc" folder within the project directory. Click "OK" then "Apply" and run the project.

@@ -37,7 +37,7 @@ public class WorkspaceComponentListPanel extends JPanel implements WorkspaceList
     /** List of open components. */
     private JList componentList = new JList();
 
-    /** Reference to Simbrain desktop */
+    /** Reference to Simbrain desktop. */
     private SimbrainDesktop desktop;
     
     /**
@@ -45,6 +45,7 @@ public class WorkspaceComponentListPanel extends JPanel implements WorkspaceList
      * @param desktop reference.
      */
     public WorkspaceComponentListPanel(final SimbrainDesktop desktop) {
+        super(new BorderLayout());
         this.desktop = desktop;
 
         componentList.setListData(new Vector(desktop.getWorkspace().getComponentList()));

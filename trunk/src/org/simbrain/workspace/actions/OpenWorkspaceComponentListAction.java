@@ -56,7 +56,7 @@ public final class OpenWorkspaceComponentListAction extends AbstractAction {
      * @param event Action event
      */
     public void actionPerformed(final ActionEvent event) {
-        final JFrame frame = new JFrame("Coupling List");
+        final JFrame frame = new JFrame("Component List");
         JComponent cl = new WorkspaceComponentListPanel(desktop);
         frame.setContentPane(cl);
         frame.pack();

@@ -45,7 +45,7 @@ public class TimeSeriesModel {
     private static final int INITIAL_DATA_SOURCES = 10;
 
     /** Should fixed window size be used. */
-    private boolean fixedWindow = true;
+    private boolean fixedWindow = false;
 
     /** Should the domain automatically change to reflect the data. */
     private boolean autoDomain = true;
@@ -54,7 +54,7 @@ public class TimeSeriesModel {
     private boolean autoRange = true;
 
     /** Size of window. */
-    private double windowSize = 100;
+    private int windowSize = 100;
 
     /** Upper boundary of the chart domain. */
     private double upperDomainBoundary = 1;
@@ -127,6 +127,13 @@ public class TimeSeriesModel {
                 + (currentSize), currentSize);
         consumers.add(newAttribute);
         dataset.addSeries(new XYSeries(currentSize));
+    }
+
+    /**
+     * Updates the chart settings.
+     */
+    public void update() {
+        getParent().updateSettings();
     }
 
     /**
@@ -229,14 +236,14 @@ public class TimeSeriesModel {
     /**
      * @return the windowSize
      */
-    public double getWindowSize() {
+    public int getWindowSize() {
         return windowSize;
     }
 
     /**
      * @param windowSize the windowSize to set
      */
-    public void setWindowSize(final double windowSize) {
+    public void setWindowSize(final int windowSize) {
         this.windowSize = windowSize;
     }
 

@@ -38,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
@@ -86,11 +87,6 @@ import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 import bsh.Interpreter;
 import bsh.util.JConsole;
 
-import com.javadocking.dock.Position;
-import com.javadocking.dock.TabDock;
-import com.javadocking.dockable.DefaultDockable;
-import com.javadocking.dockable.Dockable;
-import com.javadocking.dockable.DockingMode;
 
 /**
  * Creates a Swing-based environment for working with a workspace.
@@ -120,10 +116,12 @@ public class SimbrainDesktop {
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
-    private static final Map<Workspace, SimbrainDesktop> INSTANCES = new HashMap<Workspace, SimbrainDesktop>();
+    /** TODO: Create Javadoc comment. */
+    private static final Map<Workspace, SimbrainDesktop> INSTANCES =
+         new HashMap<Workspace, SimbrainDesktop>();
     
     /** Desktop pane. */
-    JDesktopPane desktop;
+    private JDesktopPane desktop;
 
     /** Cached context menu. */
     private JPopupMenu contextMenu;
@@ -144,7 +142,7 @@ public class SimbrainDesktop {
     private Point lastClickedPoint = null;
     
     /** The bottom dock. */
-    private TabDock bottomDock;
+    private JTabbedPane bottomDock;
     
     /** The workspace this desktop wraps. */
     private final Workspace workspace;
@@ -191,17 +189,18 @@ public class SimbrainDesktop {
     };
     
     // TODO this should be addressed at a higher level
-    public static SimbrainDesktop getDesktop(Workspace workspace) {
+    public static SimbrainDesktop getDesktop(final Workspace workspace) {
         return INSTANCES.get(workspace);
     }
     
     /**
      * Default constructor.
      * 
-     * @param workspace The workspace for this desktop.
+     * @param workspace
+     *            The workspace for this desktop.
      */
     public SimbrainDesktop(final Workspace workspace) {
-       
+
         INSTANCES.put(workspace, this);
         this.workspace = workspace;
         frame = new JFrame("Simbrain");
@@ -212,35 +211,39 @@ public class SimbrainDesktop {
         workspace.addListener(listener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Rectangle workspaceBounds = new Rectangle(
-        		WORKSPACE_INSET, 
-        		WORKSPACE_INSET, 
-        		screenSize.width - (WORKSPACE_INSET * 2),
-        		screenSize.height - (WORKSPACE_INSET * 2));
+        Rectangle workspaceBounds = new Rectangle(WORKSPACE_INSET,
+                WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2),
+                screenSize.height - (WORKSPACE_INSET * 2));
 
-        //Set up Desktop
+        // Set up Desktop
         desktop = new JDesktopPane();
         desktop.addMouseListener(mouseListener);
         desktop.addKeyListener(new WorkspaceKeyAdapter(workspace));
-        desktop.setPreferredSize(new Dimension(screenSize.width - (WORKSPACE_INSET * 2),screenSize.height - (WORKSPACE_INSET * 3)));
-                
-        // Create the TabDoc for bottom 
-		bottomDock = new TabDock();
-		Dockable componentDock = new DefaultDockable("Components", new WorkspaceComponentListPanel(this), "Workspace Components", null, DockingMode.ALL);
-		Dockable producingDock = new DefaultDockable("Producing Attributes", new AttributePanel(this.getWorkspace(), AttributePanel.AttributeType.Producing), "ProducingAttributes", null, DockingMode.ALL);
-        Vector<Coupling<?>> couplings = new Vector<Coupling<?>>(workspace.getCouplingManager().getCouplings());
-		Dockable couplingDock = new DefaultDockable("Couplings", new CouplingListPanel(this, couplings), "Couplings", null, DockingMode.ALL);
-		Dockable terminalDock= new DefaultDockable("Terminal", this.getTerminalPanel(), "Terminal", null, DockingMode.ALL);
-		bottomDock.addDockable(terminalDock, new Position(0));
-		bottomDock.addDockable(componentDock, new Position(1));
-		bottomDock.addDockable(producingDock,  new Position(2));
-		bottomDock.addDockable(couplingDock, new Position(3));
-					
+        desktop.setPreferredSize(new Dimension(screenSize.width
+                - (WORKSPACE_INSET * 2), screenSize.height - (WORKSPACE_INSET * 3)));
+
+        // Create the TabDoc for bottom
+        bottomDock = new JTabbedPane();
+        bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
+        bottomDock.addTab("Components", null, new WorkspaceComponentListPanel(
+                this), "Show workspace components");
+        bottomDock.addTab("Producing Attributes", null, new AttributePanel(this.getWorkspace(),
+                AttributePanel.AttributeType.Producing), "Show producing attributes");
+        bottomDock.addTab("Consuming Attributes", null, new AttributePanel(this.getWorkspace(),
+                AttributePanel.AttributeType.Consuming), "Show consuming attributes");
+
+        // List of current couplings for populating couplings panel.
+        Vector<Coupling<?>> couplings = new Vector<Coupling<?>>(workspace
+                .getCouplingManager().getCouplings());
+        bottomDock.addTab("Couplings", null, new CouplingListPanel(this,
+                couplings), "Show current couplings");
+
         // Set up the main panel
-		JSplitPane horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		horizontalSplitter.setDividerLocation((int) (3 * (workspaceBounds.getHeight()/4)));
-		horizontalSplitter.setTopComponent(desktop);
-		horizontalSplitter.setBottomComponent(bottomDock);
+        JSplitPane horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        horizontalSplitter.setDividerLocation((int) (3 * (workspaceBounds
+                .getHeight() / 4)));
+        horizontalSplitter.setTopComponent(desktop);
+        horizontalSplitter.setBottomComponent(bottomDock);
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(wsToolBar, "North");
         mainPanel.add(horizontalSplitter, "Center");
@@ -252,8 +255,8 @@ public class SimbrainDesktop {
         frame.addWindowListener(windowListener);
         frame.addKeyListener(new WorkspaceKeyAdapter(workspace));
 
-        //Make dragging a little faster but perhaps uglier.
-        //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+        // Make dragging a little faster but perhaps uglier.
+        // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
     
     /**
@@ -276,7 +279,10 @@ public class SimbrainDesktop {
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
     }
-    
+
+    /**
+     * @return Terminal panel.
+     */
     private JConsole getTerminalPanel() {
         JConsole console = new JConsole();
         Interpreter interpreter = new Interpreter(console);
@@ -519,7 +525,9 @@ public class SimbrainDesktop {
      * This nasty declaration creates a map of the workspace components to their associated
      * wrapper class.
      */
-    private static final Map<Class<? extends WorkspaceComponent<?>>,Class<? extends GuiComponent<?>>> wrappers = new HashMap<Class<? extends WorkspaceComponent<?>>,
+    private static final Map<Class<? extends WorkspaceComponent<?>>,
+            Class<? extends GuiComponent<?>>> wrappers =
+                new HashMap<Class<? extends WorkspaceComponent<?>>,
         Class<? extends GuiComponent<?>>>();
     
     /**
@@ -544,16 +552,16 @@ public class SimbrainDesktop {
     
     /**
      * Utility class for adding internal frames, which are not
-     * wrappers for WorkspaceComponents. Wraps GUI Component in a 
+     * wrappers for WorkspaceComponents. Wraps GUI Component in a
      * JInternalFrame for Desktop.
      */
     private static class DesktopInternalFrame extends GenericJInternalFrame {
         
         /** Reference to workspace component. */
-        WorkspaceComponent workspaceComponent;
+        private WorkspaceComponent workspaceComponent;
         
         /** Gui Component. */
-        GuiComponent guiComponent;
+        private GuiComponent guiComponent;
 
         /**
          * Construct an internal frame.
@@ -564,7 +572,11 @@ public class SimbrainDesktop {
             init();
             this.workspaceComponent = workspaceComponent;
         }
-        
+
+        /**
+         * Internal desktop frame.
+         * @param guiComponent component for gui rendering
+         */
         public DesktopInternalFrame(final GuiComponent guiComponent) {
             init();
             this.guiComponent = guiComponent;
@@ -579,7 +591,7 @@ public class SimbrainDesktop {
             setMaximizable(true);
             setIconifiable(true);
             setClosable(true);
-            addInternalFrameListener(new WindowFrameListener());            
+            addInternalFrameListener(new WindowFrameListener());
         }
         
         /**
@@ -614,8 +626,14 @@ public class SimbrainDesktop {
     public void addInternalFrame(final JInternalFrame internalFrame) {
         desktop.add(internalFrame);
     }
-    
-    public void registerComponentInstance(final WorkspaceComponent workspaceComponent, GuiComponent guiComponent) {
+
+    /**
+     * Registers instance of gui components.
+     * @param workspaceComponent Workspace component
+     * @param guiComponent GUI component
+     */
+    public void registerComponentInstance(final WorkspaceComponent workspaceComponent,
+            final GuiComponent guiComponent) {
         components.put(workspaceComponent, guiComponent);
     }
     
@@ -624,10 +642,13 @@ public class SimbrainDesktop {
      * Add a new <c>SimbrainComponent</c>.
      * Handles creation of new components and deserialization of components
      *
-     * @param desktopComponent
+     * @param workspaceComponent Workspace Component
+     * @param guiComp GUI component
      */
     @SuppressWarnings("unchecked")
-    public void addComponent(final WorkspaceComponent workspaceComponent, GuiComponent guiComponent) {
+    public void addComponent(final WorkspaceComponent workspaceComponent,
+            final GuiComponent guiComp) {
+        GuiComponent guiComponent = guiComp;
 
         LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
@@ -638,12 +659,12 @@ public class SimbrainDesktop {
         }
         
         final DesktopInternalFrame  componentFrame;
-        if (isDeserialized == true) {
+        if (isDeserialized) {
             componentFrame = new DesktopInternalFrame(guiComponent);
             guiComponent.setParentFrame(componentFrame);
         } else {
             componentFrame = new DesktopInternalFrame(workspaceComponent);
-            guiComponent = createDesktopComponent(componentFrame, workspaceComponent);            
+            guiComponent = createDesktopComponent(componentFrame, workspaceComponent);
             componentFrame.setGuiComponent(guiComponent);
         }
         
@@ -651,7 +672,7 @@ public class SimbrainDesktop {
         componentFrame.setTitle(workspaceComponent.getName());
 
         // Handle GuiComponent Bounds
-        if (isDeserialized == true) {
+        if (isDeserialized) {
            componentFrame.setBounds(guiComponent.getBounds());
         } else {
             if (lastClickedPoint != null) {
@@ -673,7 +694,8 @@ public class SimbrainDesktop {
                 }
                 int lastX = (int) lastComponentAdded.getParentFrame().getBounds().getX();
                 int lastY = (int) lastComponentAdded.getParentFrame().getBounds().getY();
-                componentFrame.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
+                componentFrame.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY
+                        + DEFAULT_WINDOW_OFFSET,
                     (int) guiComponent.getPreferredSize().getWidth(),
                     (int) guiComponent.getPreferredSize().getHeight());
                 guiChanged = true;
@@ -689,9 +711,9 @@ public class SimbrainDesktop {
         desktop.add(componentFrame);
         guiComponent.postAddInit();
    
-        // Forces last component of the desktop to the front        
+        // Forces last component of the desktop to the front
         try {
-            ((JInternalFrame)componentFrame).setSelected(true);
+            ((JInternalFrame) componentFrame).setSelected(true);
         } catch (PropertyVetoException e) {
             e.printStackTrace();
         }
@@ -705,8 +727,10 @@ public class SimbrainDesktop {
      * @return A new desktop component wrapping the provided component.
      */
     @SuppressWarnings("unchecked")
-    static GuiComponent<?> createDesktopComponent(final GenericFrame parentFrame, final WorkspaceComponent<?> component) {
-        Class<? extends WorkspaceComponent<?>> componentClass = (Class<? extends WorkspaceComponent<?>>) component.getClass();
+    static GuiComponent<?> createDesktopComponent(final GenericFrame parentFrame,
+            final WorkspaceComponent<?> component) {
+        Class<? extends WorkspaceComponent<?>> componentClass =
+            (Class<? extends WorkspaceComponent<?>>) component.getClass();
         Class<? extends GuiComponent<?>> guiClass = wrappers.get(componentClass);
         
         if (guiClass == null) {
@@ -746,7 +770,7 @@ public class SimbrainDesktop {
      *
      * @param file the file to use.
      */
-    private void openWorkspace(File file) {
+    private void openWorkspace(final File file) {
         WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
         try {
             workspace.clearWorkspace();
@@ -765,7 +789,7 @@ public class SimbrainDesktop {
      *
      * @param component component to view
      */
-    public static void showJFrame(WorkspaceComponent component) {
+    public static void showJFrame(final WorkspaceComponent component) {
         
         SimbrainDesktop.registerComponents();
         GenericJFrame theFrame = new GenericJFrame();
@@ -788,7 +812,8 @@ public class SimbrainDesktop {
                 try {
                     FileOutputStream ostream = new FileOutputStream(workspace.getCurrentFile());
                     try {
-                        WorkspaceSerializer serializer = new WorkspaceSerializer(this.getWorkspace());
+                        WorkspaceSerializer serializer =
+                            new WorkspaceSerializer(this.getWorkspace());
                         serializer.serialize(ostream);
                         frame.setTitle(workspace.getCurrentFile().getName());
                         workspace.setWorkspaceChanged(false);
@@ -866,7 +891,8 @@ public class SimbrainDesktop {
     private void showHasChangedDialog() {
         Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane.showOptionDialog(frame,
-                 "The workspace has changed since last save,\nWould you like to save these changes?",
+                 "The workspace has changed since last save,"
+                 + "\nWould you like to save these changes?",
                  "Workspace Has Changed", JOptionPane.YES_NO_OPTION,
                  JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
@@ -882,10 +908,11 @@ public class SimbrainDesktop {
     
     /**
      * Quit application.
+     * @param forceQuit should quit be forced.
      */
-    public void quit(boolean forceQuit) {
+    public void quit(final boolean forceQuit) {
                 
-        if (changesExist() && (forceQuit == false)) {
+        if (changesExist() && (!forceQuit)) {
             showHasChangedDialog();
         } else {
             workspace.removeAllComponents();
@@ -970,19 +997,19 @@ public class SimbrainDesktop {
         }
     };
 
-    /** 
+    /**
      * Provisional Code for toggling tab dock's visibility.
      */
-	public void toggleDock() {
-		if (dockVisible) {
-			dockVisible = false;
-			bottomDock.setVisible(false);
-		} else {
-			dockVisible = true;
-			bottomDock.setVisible(true);
-			frame.pack();
-		}
-		
-	}
+    public void toggleDock() {
+        if (dockVisible) {
+            dockVisible = false;
+            bottomDock.setVisible(false);
+        } else {
+            dockVisible = true;
+            bottomDock.setVisible(true);
+            frame.pack();
+        }
+
+    }
     
 }

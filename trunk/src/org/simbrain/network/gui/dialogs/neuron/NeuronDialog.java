@@ -40,6 +40,7 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.neurons.AdditiveNeuron;
 import org.simbrain.network.neurons.BinaryNeuron;
 import org.simbrain.network.neurons.ClampedNeuron;
+import org.simbrain.network.neurons.CustomNeuron;
 import org.simbrain.network.neurons.DecayNeuron;
 import org.simbrain.network.neurons.ExponentialDecayNeuron;
 import org.simbrain.network.neurons.IACNeuron;
@@ -87,6 +88,10 @@ public class NeuronDialog extends StandardDialog {
        
         association = new Association("Clamped", ClampedNeuron.class,
                 ClampedNeuronPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+
+        association = new Association("Custom", CustomNeuron.class,
+                CustomNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
 
         association = new Association("Decay", DecayNeuron.class, DecayNeuronPanel.class, false);
@@ -173,7 +178,7 @@ public class NeuronDialog extends StandardDialog {
     /** Neuron type combo box. */
     private JComboBox cbNeuronType = new JComboBox(ASSOCIATIONS.values().toArray());
 
-    /** Id Field */
+    /** Id Field. */
     private JLabel idLabel = new JLabel();
 
     /** Activation field. */
@@ -246,7 +251,7 @@ public class NeuronDialog extends StandardDialog {
         this.addButton(helpButton);
         cbNeuronType.addActionListener(listener);
 
-        topPanel.addItem("Id:", idLabel);            
+        topPanel.addItem("Id:", idLabel);
         topPanel.addItem("Activation", tfActivation);
         topPanel.addItem("Increment", tfIncrement);
         topPanel.addItem("Update priority", tfUpdatePriority);

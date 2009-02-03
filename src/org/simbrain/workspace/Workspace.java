@@ -24,17 +24,13 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
- * datatables, gauges, and scripts are examples of components in a Simbrain
+ * data-tables, gauges, and scripts are examples of components in a Simbrain
  * workspace. Essentially, an instance of a workspace corresponds to a single
  * simulation (though at some point it will be possible to link multiple
  * workspaces on different machines together).
@@ -47,9 +43,6 @@ import org.apache.log4j.Logger;
  */
 public class Workspace {
 
-    /** The time to sleep between updates. */
-    private static final int SLEEP_INTERVAL = 1;
-    
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
 
@@ -61,7 +54,7 @@ public class Workspace {
     
     /** List of workspace components. */
     private List<WorkspaceComponent<?>> componentList = Collections
-            .synchronizedList(new ArrayList<WorkspaceComponent<?>>());
+        .synchronizedList(new ArrayList<WorkspaceComponent<?>>());
 
     /** Sentinel for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
@@ -89,33 +82,18 @@ public class Workspace {
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
     
     /**
-     * By default, the workspace is updated as followed:
-     *  1) Update couplings
-     *  2) Call "update" on all workspacecomponents
-     * 
-     * Sometimes this way of updating is not sufficient, and the user will
-     * want updates (in the GUI, presses of the iterate and play buttons) to
-     * update components and couplings in a different way.
-     *  
-     * For an example, see the script in {SimbrainDir}/scriptmenu/addBackpropSim.bsh
+     * The updator used to manage component updates.
      */
-    private CustomUpdate customUpdateMethod = null;
+    private Object updatorLock = new Object();
+    
+    /**
+     * The updator used to manage component updates.
+     */
+    private WorkspaceUpdator updator = new WorkspaceUpdator(this, manager);
     
     /** used to turn events off during special modifications. */
     private boolean fireEvents = true;
-
-    /** The barrier which controls thread update. */
-    private CyclicBarrier barrier;
     
-    /** The executor. */
-    private ExecutorService workspaceUpdater;
-    
-    /** Flag for updating. */
-    private volatile boolean isUpdating;
-    
-    /** Provisional global time implementation. */
-    private volatile int time = 0;
-
     /**
      * Adds a listener to the workspace.
      * 
@@ -149,6 +127,7 @@ public class Workspace {
      * @param sourceAttributes source producing attributes
      * @param targetAttributes target consuming attributes
      */
+    @SuppressWarnings("unchecked")
     public void coupleOneToMany(
             final ArrayList<ProducingAttribute<?>> sourceAttributes,
             final ArrayList<ConsumingAttribute<?>> targetAttributes) {
@@ -167,6 +146,7 @@ public class Workspace {
      * @param sourceAttributes source producing attributes
      * @param targetAttributes target producing attributes
      */
+    @SuppressWarnings("unchecked")
     public void coupleOneToOne(
             final ArrayList<ProducingAttribute<?>> sourceAttributes,
             final ArrayList<ConsumingAttribute<?>> targetAttributes) {
@@ -215,7 +195,6 @@ public class Workspace {
                 listener.componentAdded(component);
             }
         }
-
     }
 
     /**
@@ -257,59 +236,17 @@ public class Workspace {
      * Update all couplings on all components.  Currently use a buffering method.
      */
     public void globalUpdate() {
-
-       // Default updating, if no custom method is used
-       if (customUpdateMethod == null) {
-                manager.updateAllCouplings();
-                synchronized (componentList) {
-                for (WorkspaceComponent<?> component : componentList) {
-                    component.doUpdate();
-                    //System.out.println(component + ": " + (System.nanoTime() - time));
-                    try {
-                        Thread.sleep(SLEEP_INTERVAL);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } else {
-            // Update workspace using custom method.
-            synchronized (componentList) {
-                customUpdateMethod.update(this);
-            }
+        synchronized (updatorLock) {
+            updator.doUpdate();
         }
-        time++;
     }
     
     /**
      * Iterates all couplings on all components until halted by user.
      */
     public void globalRun() {
-        
-        isUpdating = true;
-        if (customUpdateMethod == null) {
-            int numComponents = this.getComponentList().size();
-            barrier = new CyclicBarrier(numComponents, new UpdateCouplings());
-            workspaceUpdater = Executors.newFixedThreadPool(numComponents);
-            for (int i = 0; i < numComponents; i++) {
-                workspaceUpdater.execute(new WorkspaceComponentUpdater(this
-                        .getComponentList().get(i)));
-            }
-        } else {
-            /*
-             * For custom updating, it is assumed the script using the custom
-             * updater will provide thread control. However, default single threading is
-             * here provided
-             */
-            Executors.newSingleThreadExecutor().execute(new Runnable() {
-                public void run() {
-                    while (isUpdating) {
-                        customUpdateMethod.update(Workspace.this);
-                        time++; // TODO: Should this be here or up to the custom
-                        // update method?
-                    }
-                }
-            });
+        synchronized (updatorLock) {
+            updator.run();
         }
     }
 
@@ -317,9 +254,8 @@ public class Workspace {
      * Stops iteration of all couplings on all components.
      */
     public void globalStop() {
-        isUpdating = false;
-        if (workspaceUpdater != null) {
-            workspaceUpdater.shutdown();
+        synchronized (updatorLock) {
+            updator.stop();
         }
      }
 
@@ -452,8 +388,7 @@ public class Workspace {
         int i = 0;
         synchronized (componentList) {
             for (WorkspaceComponent<?> component : componentList) {
-                builder.append("Component " + ((i++) + 1)
-                        + ":" + component.getName() + "\n");
+                builder.append("Component " + ++i + ":" + component.getName() + "\n");
             }
         }
         return builder.toString();
@@ -476,23 +411,43 @@ public class Workspace {
     public void removeCoupling(final Coupling<?> coupling) {
         manager.removeCoupling(coupling);
     }
-
+    
     /**
-     * Get the custom update method, if any.
-     *
-     * @return custom update method, which is null if there is none.
+     * By default, the workspace is updated as followed:
+     *  1) Update couplings
+     *  2) Call "update" on all workspacecomponents
+     * 
+     * Sometimes this way of updating is not sufficient, and the user will
+     * want updates (in the GUI, presses of the iterate and play buttons) to
+     * update components and couplings in a different way.
+     *  
+     * For an example, see the script in {SimbrainDir}/scriptmenu/addBackpropSim.bsh
+     * 
+     * @param controller The update controller to use.
+     * @param threads The number of threads for the component updates.
      */
-    public CustomUpdate getCustomUpdateMethod() {
-        return customUpdateMethod;
+    public void setCustomUpdateController(final WorkspaceUpdator.UpdateController controller,
+            final int threads) {
+        synchronized (updatorLock) {
+            if (updator.isRunning()) throw new RuntimeException(
+                "Cannot change updator while running.");
+            
+            updator = new WorkspaceUpdator(this, manager, controller, threads);
+        }
     }
-
+    
     /**
-     * Set current update method; set to null if there is no custom method.
-     *
-     * @param customUpdateMethod custom update method.
+     * Sets a custom controller with the default number of threads.
+     * 
+     * @param controller The number of threads to use.
      */
-    public void setCustomUpdateMethod(final CustomUpdate customUpdateMethod) {
-        this.customUpdateMethod = customUpdateMethod;
+    public void setCustomUpdateController(final WorkspaceUpdator.UpdateController controller) {
+        synchronized (updatorLock) {
+            if (updator.isRunning()) throw new RuntimeException(
+                "Cannot change updator while running.");
+            
+            updator = new WorkspaceUpdator(this, manager, controller);
+        }
     }
     
     /**
@@ -501,71 +456,8 @@ public class Workspace {
      * @return the time
      */
     public Number getTime() {
-        return time;
-    }
-    
-    /**
-     * Update task.
-     */
-    public class WorkspaceComponentUpdater implements Runnable {
-
-        /** Reference to component. */
-        private WorkspaceComponent<?> workspaceComponent;
-
-        /** The task to be run. */
-        private Runnable task;
-
-        /**
-         * Workspace component updater.
-         * 
-         * @param component
-         *            reference to component.
-         */
-        public WorkspaceComponentUpdater(final WorkspaceComponent<?> component) {
-            this.workspaceComponent = component;
-            if (workspaceComponent.getTask() == null) {
-                task = new Runnable() {
-                    public void run() {
-                        workspaceComponent.doUpdate();
-                    }
-                };
-            } else {
-                task = workspaceComponent.getTask();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void run() {
-            while (isUpdating) {
-                try {
-                    task.run();
-                    time++;
-                    barrier.await();
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (BrokenBarrierException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Task for updating couplings.
-     */
-    private class UpdateCouplings implements Runnable {
-
-        /**
-         * {@inheritDoc}
-         */
-        public void run() {
-            manager.updateAllCouplings();
+        synchronized (updatorLock) {
+            return updator.getTime();
         }
     }
-    
 }

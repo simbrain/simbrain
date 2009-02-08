@@ -28,11 +28,18 @@ Select External Configuration File from the Type:  drop down menu.
 
 Enter a name for the configuration such as "Simbrain Checkstyle"
 
-Click on Browse and locate the  [SimbrainRoot]/build/checkstyle.xml file and click OK. 
+Click on Browse and locate the  Simbrain_Root/etc/checkstyle.xml file and click OK. 
 
 Click on OK and then select Main and select the configuration file that was just imported (e.g. "Simbrain Checkstyle - (Local)") (Note: if the window size is too small, use the scroll bar to scroll to the top of the checkstyle frame.)
 
 Finally click the check box labeled Checkstyle active for this project to activate checkstyle and click OK to accept the settings. Eclipse will now ask to rebuild the project, click OK and any outstanding checkstyle errors will now be displayed.
+
+== Eclipse Tabs to Spaces ==
+
+Since our checkstyle requires spaces, this has to be changed on Eclipse.  Here's an entry on how to do it:
+
+http://blog.dotkam.com/2007/03/21/changing-tabs-to-spaces-in-eclipse/
+
 
 = Log4J = 
 

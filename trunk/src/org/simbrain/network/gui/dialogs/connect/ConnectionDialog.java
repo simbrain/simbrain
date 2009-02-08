@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 
-import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -62,19 +61,19 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
      * Initialize the connection panel based upon the current connection type.
      */
     private void initConnectionType() {
-        if (NetworkPreferences.getConnectionType().equalsIgnoreCase("All to All")) {
-            cbConnectionType.setSelectedIndex(0);
-            optionsPanel = new AllToAllPanel();
-            optionsPanel.fillFieldValues();
-        } else if (NetworkPreferences.getConnectionType().equalsIgnoreCase("One to One")) {
-            cbConnectionType.setSelectedIndex(1);
-            optionsPanel = new OneToOnePanel();
-            optionsPanel.fillFieldValues();
-        } else if (NetworkPreferences.getConnectionType().equals("Sparse")) {
-            cbConnectionType.setSelectedIndex(2);
-            optionsPanel = new SparsePanel();
-            optionsPanel.fillFieldValues();
-        }
+//        if (NetworkPreferences.getConnectionType().equalsIgnoreCase("All to All")) {
+//            cbConnectionType.setSelectedIndex(0);
+//            optionsPanel = new AllToAllPanel();
+//            optionsPanel.fillFieldValues();
+//        } else if (NetworkPreferences.getConnectionType().equalsIgnoreCase("One to One")) {
+//            cbConnectionType.setSelectedIndex(1);
+//            optionsPanel = new OneToOnePanel();
+//            optionsPanel.fillFieldValues();
+//        } else if (NetworkPreferences.getConnectionType().equals("Sparse")) {
+//            cbConnectionType.setSelectedIndex(2);
+//            optionsPanel = new SparsePanel();
+//            optionsPanel.fillFieldValues();
+//        }
     }
 
     /**
@@ -106,7 +105,7 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        NetworkPreferences.setConnectionType(cbConnectionType.getSelectedItem().toString());
+//        NetworkPreferences.setConnectionType(cbConnectionType.getSelectedItem().toString());
         optionsPanel.commitChanges();
     }
 }

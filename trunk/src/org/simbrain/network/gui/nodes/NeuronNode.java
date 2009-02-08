@@ -20,8 +20,6 @@ package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -35,7 +33,6 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.gui.NetworkDesktopComponent;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
@@ -51,10 +48,6 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuron;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.ConsumingAttributeMenu;
-import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
@@ -139,17 +132,14 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         offset(x, y);
     }
 
-    private NetworkDesktopComponent desktopComponent;
-    
     /**
      * Create a new neuron node.
      *
      * @param net Reference to NetworkPanel
      * @param neuron reference to model neuron
      */
-    public NeuronNode(final NetworkPanel net, final Neuron neuron, NetworkDesktopComponent desktopComponent) {
+    public NeuronNode(final NetworkPanel net, final Neuron neuron) {
         super(net);
-        this.desktopComponent = desktopComponent;
         this.neuron = neuron;
         offset(neuron.getX(), neuron.getY());
         init();
@@ -298,16 +288,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (getNetworkPanel().getSelectedNeurons().size() > 1) {
             contextMenu.add(getNetworkPanel().createAlignMenu());
             contextMenu.add(getNetworkPanel().createSpacingMenu());
-            contextMenu.addSeparator();
-        }
-
-        // Add coupling menus        
-        Workspace workspace = this.getNetworkPanel().getParentComponent().getWorkspaceComponent().getWorkspace();
-        if (getNetworkPanel().getSelectedNeurons().size() == 1) {
-            JMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", workspace, this.neuron.getDefaultConsumingAttribute());
-            contextMenu.add(producerMenu);
-            JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", workspace, this.neuron.getDefaultProducingAttribute());
-            contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
         }
 
@@ -659,27 +639,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         Point2D p = new Point2D.Double(getNeuron().getX(), getNeuron().getY());
         this.setGlobalTranslation(p);
     }
-
-    private final ActionListener popUpMenuListener = new ActionListener() {
-
-        public void actionPerformed(ActionEvent e) {
-            LOGGER.debug("pop up producer / consumer menu event");
-
-            if (!(e.getSource() instanceof CouplingMenuItem)) {
-                return;
-            }
-            CouplingMenuItem m = (CouplingMenuItem) e.getSource();
-
-            if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
-                LOGGER.debug("producer list");
-                desktopComponent.getWorkspaceComponent().getWorkspace().coupleOneToOne(m.getWorkspaceComponent().getProducingAttributes(), getNetworkPanel().getSelectedConsumingAttributes());
-            } else if (m.getEventType() == CouplingMenuItem.EventType.CONSUMER_LIST) {
-                LOGGER.debug("consumer list");
-                desktopComponent.getWorkspaceComponent().getWorkspace().coupleOneToOne(getNetworkPanel().getSelectedProducingAttributes(), m.getWorkspaceComponent().getConsumingAttributes());
-            }
-        }
-        
-    };
 
     /**
      * @return Returns the DIAMETER.

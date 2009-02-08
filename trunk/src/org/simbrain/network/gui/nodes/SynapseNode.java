@@ -176,11 +176,6 @@ public final class SynapseNode
      */
     public void updateColor() {
 
-        if (synapse instanceof SignalSynapse) {
-            circle.setPaint(getNetworkPanel().getSignalColor());
-            return;
-        }
-
         if (synapse.getStrength() < 0) {
             circle.setPaint(getNetworkPanel().getInhibitoryColor());
         } else if (synapse.getStrength() == 0) {

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame path="./simulations/networks/competitive/6_inputs.net"
-        x="5" y="35" width="450" height="450"/>
-    <odorWorldFrame path="./simulations/worlds/distributedReps.wld"
-        x="505" y="34" width="450" height="450"/>
-</workspace-serializer>

@@ -3,7 +3,6 @@ package org.simbrain.network.connections;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.synapses.ClampedSynapse;
@@ -17,9 +16,9 @@ import org.simbrain.network.synapses.ClampedSynapse;
 public class Sparse extends ConnectNeurons {
 
     /** Probability connection will be an excitatory weight. */
-    private double excitatoryProbability = NetworkPreferences.getExcitatoryProbability();
+    private double excitatoryProbability = .1;
     /** Probability connection will be an inhibitory weight. */
-    private double inhibitoryProbability = NetworkPreferences.getInhibitoryProbability();
+    private double inhibitoryProbability = .1;
 
     //TODO: set weights strengths or synapses
     

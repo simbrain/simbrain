@@ -35,7 +35,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.NetworkPreferences;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
@@ -313,12 +312,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                     SelectionHandle.setSelectionColor(theColor);
                 }
 
-            } else if (cbChangeColor.getSelectedItem().toString().equals(SIGNAL)) {
-
-                if (theColor != null) {
-                    networkPanel.setSignalColor(theColor);
-                }
-
             } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 
                 if (theColor != null) {
@@ -335,7 +328,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             networkPanel.resetColors();
             setIndicatorColor();
         } else if (o == defaultButton) {
-            NetworkPreferences.restoreDefaults();
+            //NetworkPreferences.restoreDefaults();
             this.returnToCurrentPrefs();
         } else if (e.getActionCommand().equals("moveSelector")) {
             setIndicatorColor();
@@ -450,23 +443,22 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * Restores the changed fields to their previous values used when user cancels out of the dialog.
      */
     public void returnToCurrentPrefs() {
-        networkPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
-        networkPanel.setLineColor(new Color(NetworkPreferences.getLineColor()));
-        networkPanel.setHotColor(NetworkPreferences.getHotColor());
-        networkPanel.setCoolColor(NetworkPreferences.getCoolColor());
-        networkPanel.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
-        networkPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
-        SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
-        SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
-        networkPanel.setSignalColor(new Color(NetworkPreferences.getSignalColor()));
-        networkPanel.setSpikingColor(new Color(NetworkPreferences.getSpikingColor()));
-        networkPanel.setZeroWeightColor(new Color(NetworkPreferences.getZeroWeightColor()));
-        networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
-        networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
-        networkPanel.getRootNetwork().setTimeStep(NetworkPreferences.getTimeStep());
-        networkPanel.getRootNetwork().setPrecision(NetworkPreferences.getPrecision());
-        networkPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
-        networkPanel.getRootNetwork().setUsingTabs(NetworkPreferences.getUsingIndent());
+//        networkPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
+//        networkPanel.setLineColor(new Color(NetworkPreferences.getLineColor()));
+//        networkPanel.setHotColor(NetworkPreferences.getHotColor());
+//        networkPanel.setCoolColor(NetworkPreferences.getCoolColor());
+//        networkPanel.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
+//        networkPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
+//        SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
+//        SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
+//        networkPanel.setSpikingColor(new Color(NetworkPreferences.getSpikingColor()));
+//        networkPanel.setZeroWeightColor(new Color(NetworkPreferences.getZeroWeightColor()));
+//        networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
+//        networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
+//        networkPanel.getRootNetwork().setTimeStep(NetworkPreferences.getTimeStep());
+//        networkPanel.getRootNetwork().setPrecision(NetworkPreferences.getPrecision());
+//        networkPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
+//        networkPanel.getRootNetwork().setUsingTabs(NetworkPreferences.getUsingIndent());
         networkPanel.resetColors();
         setIndicatorColor();
         networkPanel.resetSynapseDiameters();
@@ -478,23 +470,22 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * Called when "ok" is pressed.
      */
     public void setAsDefault() {
-        NetworkPreferences.setBackgroundColor(networkPanel.getBackground().getRGB());
-        NetworkPreferences.setLineColor(networkPanel.getLineColor().getRGB());
-        NetworkPreferences.setHotColor(networkPanel.getHotColor());
-        NetworkPreferences.setCoolColor(networkPanel.getCoolColor());
-        NetworkPreferences.setExcitatoryColor(networkPanel.getExcitatoryColor().getRGB());
-        NetworkPreferences.setInhibitoryColor(networkPanel.getInhibitoryColor().getRGB());
-        NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
-        NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
-        NetworkPreferences.setSignalColor(networkPanel.getSignalColor().getRGB());
-        NetworkPreferences.setSpikingColor(networkPanel.getSpikingColor().getRGB());
-        NetworkPreferences.setZeroWeightColor(networkPanel.getZeroWeightColor().getRGB());
-        NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
-        NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
-        NetworkPreferences.setTimeStep(networkPanel.getRootNetwork().getTimeStep());
-        NetworkPreferences.setPrecision(networkPanel.getRootNetwork().getPrecision());
-        NetworkPreferences.setUsingIndent(networkPanel.getRootNetwork().getUsingTabs());
-        NetworkPreferences.setNudgeAmount(networkPanel.getNudgeAmount());
+//        NetworkPreferences.setBackgroundColor(networkPanel.getBackground().getRGB());
+//        NetworkPreferences.setLineColor(networkPanel.getLineColor().getRGB());
+//        NetworkPreferences.setHotColor(networkPanel.getHotColor());
+//        NetworkPreferences.setCoolColor(networkPanel.getCoolColor());
+//        NetworkPreferences.setExcitatoryColor(networkPanel.getExcitatoryColor().getRGB());
+//        NetworkPreferences.setInhibitoryColor(networkPanel.getInhibitoryColor().getRGB());
+//        NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
+//        NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
+//        NetworkPreferences.setSpikingColor(networkPanel.getSpikingColor().getRGB());
+//        NetworkPreferences.setZeroWeightColor(networkPanel.getZeroWeightColor().getRGB());
+//        NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
+//        NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
+//        NetworkPreferences.setTimeStep(networkPanel.getRootNetwork().getTimeStep());
+//        NetworkPreferences.setPrecision(networkPanel.getRootNetwork().getPrecision());
+//        NetworkPreferences.setUsingIndent(networkPanel.getRootNetwork().getUsingTabs());
+//        NetworkPreferences.setNudgeAmount(networkPanel.getNudgeAmount());
     }
 
     /**
@@ -532,10 +523,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         } else if (cbChangeColor.getSelectedItem().toString().equals(SELECTION)) {
 
             colorIndicator.setBackground(SelectionHandle.getSelectionColor());
-
-        } else if (cbChangeColor.getSelectedItem().toString().equals(SIGNAL)) {
-
-            colorIndicator.setBackground(networkPanel.getSignalColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 

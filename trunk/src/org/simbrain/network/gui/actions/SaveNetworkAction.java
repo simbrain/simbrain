@@ -61,6 +61,6 @@ public final class SaveNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.getParentComponent().save();
+       //networkPanel.getParentComponent().save();
     }
 }

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame
-        path="./simulations/networks/conditioning/SimpleTD.net" x="12"
-        y="38" width="450" height="450"/>
-    <dataWorldFrame path="./simulations/worlds/SimpleTD.csv" x="470"
-        y="188" width="538" height="171"/>
-</workspace-serializer>

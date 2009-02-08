@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame path="./simulations/networks/hopfield/cont2.net" x="5"
-        y="35" width="450" height="450"/>
-    <odorWorldFrame path="./simulations/worlds/two_strong.wld" x="476"
-        y="43" width="302" height="337"/>
-</workspace-serializer>

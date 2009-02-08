@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.simbrain.network.gui.NetworkPreferences;
-
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.handles.PHandle;
 import edu.umd.cs.piccolox.util.PNodeLocator;
@@ -54,7 +52,7 @@ public final class SelectionHandle
     private static final double EXTEND_FACTOR = 0.075d;
 
     /** Color of selection boxes. */
-    private static Color selectionColor = new Color(NetworkPreferences.getSelectionColor());
+    private static Color selectionColor = Color.green;
 
 
     /**

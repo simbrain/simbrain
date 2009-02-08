@@ -3,7 +3,6 @@
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="lib" location="lib"/>
-    <property name="modules" location="${bin}/modules"/>
     <property name="docs" location="docs"/>
     <property name="simulations" location="simulations"/>
     <property name="resource" value="org/simbrain/resource"/>
@@ -13,10 +12,9 @@
     <property name="util" value="org/simbrain/util"/>
     <property name="dist" location="dist"/>
     <property name="build" location="build"/>
+    <property name="etc" location="etc"/>
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
-    <property name="modulejarfile" location="modules/workspace.jar"/>
     <property name="compile.debug" value="true"/>
-
 
     <fileset id="lib.jars" dir="${lib}">
         <include name="**/*.jar"/>
@@ -31,10 +29,10 @@
     <target name="install" description="Install jar" depends="jar">
     </target>
 
-    <taskdef resource="checkstyletask.properties" classpath="${build}/checkstyle/checkstyle-all-4.4.jar"/>
+    <taskdef resource="checkstyletask.properties" classpath="${etc}/checkstyle-all-4.4.jar"/>
 
     <target name="checkstyle" description="Generates a report of code convention violations">
-      <checkstyle config="${build}/checkstyle.xml">
+      <checkstyle config="${etc}/checkstyle.xml">
         <formatter type="xml" tofile="checkstyle_report.xml"/>
         <fileset dir="${src}" includes="**/*.java"/>
       </checkstyle>
@@ -150,57 +148,72 @@
         <copy todir="${dist}" file = "${build}/License.txt"/>
     </target>
 
-    <target name="clean" description="Remove build and dist directories">
+    <target name="clean" description="Remove build and bin directories">
         <delete dir="${bin}"/>
-        <delete dir="${dist}"/>
-        <delete dir="${build}/apidocs"/>
+        <delete dir="${build}"/>
     </target>
 
-    <!-- Tasks for compiling network and workspace into separate plugins. -->
-    <target name="util" description="Compile util">
-        <mkdir dir="${modules}"/>
-        <javac srcdir="${src}/org/simbrain/util" destdir="${modules}" includeAntRuntime="no"
+    <!-- Used for creating library distributions -->
+    <target name="util" description="Compile utils">
+       <mkdir dir="${build}"/>
+       <javac srcdir="${src}/org/simbrain/util" destdir="${build}" includeAntRuntime="no"
             classpathref="lib.path" debug="${comple.debug}">
         	<exclude name="environment/**"/>
+        	<exclude name="projection/**"/>
         </javac>
     </target>
-
-    <target name="network" depends="workspacemodule" description="Compile network">
-        <mkdir dir="${modules}"/>
-        <javac srcdir="${src}/org/simbrain/network/" destdir="${modules}" includeAntRuntime="no"
+	
+    <!-- Used for creating library distributions -->
+    <target name="workspace" depends="util" description="Compile workspace module">
+        <mkdir dir="${build}"/>
+        <javac srcdir="${src}/org/simbrain/workspace/" destdir="${build}" includeAntRuntime="no"
             classpathref="lib.path" debug="${comple.debug}">
-            <exclude name="gui/**"/>
-        </javac>
-    </target>
-
-    <target name="workspacemodule" depends="util" description="Compile workspace">
-        <mkdir dir="${modules}"/>
-        <javac srcdir="${src}/org/simbrain/workspace" destdir="${modules}" includeAntRuntime="no"
-            classpathref="lib.path" debug="${comple.debug}">
-            <exclude name="gui/**"/>
-            <exclude name="actions/**"/>
-            <exclude name="WorkspaceSerializer.java"/>
+			<exclude name="gui/**"/>
+        	<exclude name="actions/**"/>
+        	<exclude name="WorkspaceSerializer.java"/>
         	<exclude name="ArchiveContents.java"/>
         	<exclude name="WorkspaceComponentDeserializer.java"/>
         </javac>
     </target>
 
-        <target name="workspace" depends="workspacemodule" description="Build jar">
-        <mkdir dir="modules"/>
-        <jar jarfile="${modulejarfile}" basedir="${modules}">
-						<manifest>
-							<attribute name="Built-By" value="${user.name}"/>
-							<attribute name="Main-Class" value="org.simbrain.workspace.gui.Splasher"/>
-						</manifest>
-        </jar>
+    <!-- Used for creating the network (with gui) distribution -->
+    <target name="network" depends="workspace" description="Compile network">
+        <mkdir dir="${build}"/>
+	<javac srcdir="${src}/${resource}/" destdir="${build}"/>	
+        <copy todir="${build}/${resource}">
+            <fileset dir="${src}/${resource}">
+              <exclude name="**/*.class"/>
+            </fileset>
+        </copy>
+        <javac 
+		srcdir="${src}/org/simbrain/network/" 
+        	destdir="${build}" 
+		classpathref="lib.path" 
+        	includeAntRuntime="no"
+        	debug="${compile.debug}">
+        	<exclude name="actions/**"/>
+         	<exclude name="gui/NetworkDesktopComponent.java"/>
+	</javac>
+   </target>
+	
+    <!-- Create network jar. -->
+    <target name="networkjar" depends="clean, network" description="Create the network jar">
+        <mkdir dir="${dist}"/>
+	<jar destfile="${dist}/Network.jar" basedir="${build}"/>
     </target>
 
-        <target name="minimalnetwork" description="Compile minimal network">
-        <mkdir dir="${modules}"/>
-        <javac srcdir="${src}/org/simbrain/network/" destdir="${modules}" includeAntRuntime="no"
+    <!-- Used for creating the minimal network (without gui) distribution -->
+    <target name="minimalnetwork" depends="workspace" description="Compile minimal network">
+        <javac srcdir="${src}/org/simbrain/network/" destdir="${build}" includeAntRuntime="no"
             classpathref="lib.path" debug="${comple.debug}">
             <exclude name="gui/**"/>
         </javac>
     </target>
-    <!-- End tasks for extracting network and workspace. -->
+
+    <!-- Create minimal network jar. -->
+    <target name="minimalnetworkjar" depends="clean, minimalnetwork" description="Create the minimal network jar">
+        <mkdir dir="${dist}"/>
+		<jar destfile="${dist}/MinimalNetwork.jar" basedir="${build}"/>
+    </target>
+	
 </project>

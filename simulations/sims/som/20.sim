@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame path="./simulations/networks/som/20.net" x="43" y="38"
-        width="450" height="450"/>
-    <odorWorldFrame
-        path="./simulations/worlds/distributedReps_LinearDecay.wld"
-        x="505" y="35" width="450" height="450"/>
-</workspace-serializer>

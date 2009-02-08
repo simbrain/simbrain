@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame
-        path="./simulations/networks/conditioning/MazeNavigation.net"
-        x="5" y="35" width="450" height="450"/>
-</workspace-serializer>

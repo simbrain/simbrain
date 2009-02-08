@@ -60,13 +60,13 @@ public class Workspace {
     private boolean workspaceChanged = false;
     
     /** Current workspace file. */
-    private File currentFile = new File(WorkspacePreferences.getDefaultFile());
+    private File currentFile = null;
 
     /**
      * Current directory. So when re-opening this type of component the
      * app remembers where to look.
      */
-    private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
+    private String currentDirectory =null;
 
     /**
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem because
@@ -328,7 +328,7 @@ public class Workspace {
      */
     public void setCurrentDirectory(final String currentDirectory) {
         this.currentDirectory = currentDirectory;
-        WorkspacePreferences.setCurrentDirectory(currentDirectory);
+        //WorkspacePreferences.setCurrentDirectory(currentDirectory);
     }
 
     /**
@@ -343,7 +343,7 @@ public class Workspace {
      */
     public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
-        WorkspacePreferences.setDefaultFile(currentFile.getAbsolutePath());
+        //WorkspacePreferences.setDefaultFile(currentFile.getAbsolutePath());
     }
 
     /**
@@ -429,9 +429,10 @@ public class Workspace {
     public void setCustomUpdateController(final WorkspaceUpdator.UpdateController controller,
             final int threads) {
         synchronized (updatorLock) {
-            if (updator.isRunning()) throw new RuntimeException(
-                "Cannot change updator while running.");
-            
+            if (updator.isRunning()) {
+                throw new RuntimeException(
+                        "Cannot change updator while running.");
+            }
             updator = new WorkspaceUpdator(this, manager, controller, threads);
         }
     }
@@ -443,8 +444,10 @@ public class Workspace {
      */
     public void setCustomUpdateController(final WorkspaceUpdator.UpdateController controller) {
         synchronized (updatorLock) {
-            if (updator.isRunning()) throw new RuntimeException(
-                "Cannot change updator while running.");
+            if (updator.isRunning()) {
+                throw new RuntimeException(
+                        "Cannot change updator while running.");
+            }
             
             updator = new WorkspaceUpdator(this, manager, controller);
         }

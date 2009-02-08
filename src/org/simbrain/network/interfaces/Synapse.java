@@ -21,7 +21,6 @@ package org.simbrain.network.interfaces;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.synapses.Hebbian;
 import org.simbrain.network.synapses.HebbianCPCA;
@@ -35,7 +34,6 @@ import org.simbrain.network.synapses.SubtractiveNormalizationSynapse;
 import org.simbrain.network.synapses.TDSynapse;
 import org.simbrain.network.synapses.TraceSynapse;
 import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
-import org.simbrain.network.util.UniqueID;
 
 
 /**
@@ -66,7 +64,7 @@ public abstract class Synapse {
     public static final int NUM_PARAMETERS = 8;
 
     /** Strength of synapse. */
-    protected double strength = NetworkPreferences.getStrength();
+    protected double strength = 1;
 
     /** Amount to increment the neuron. */
     protected double increment = 1;

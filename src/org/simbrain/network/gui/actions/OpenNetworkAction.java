@@ -64,6 +64,6 @@ public final class OpenNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.getParentComponent().showOpenFileDialog();
+       //networkPanel.getParentComponent().showOpenFileDialog();
     }
 }

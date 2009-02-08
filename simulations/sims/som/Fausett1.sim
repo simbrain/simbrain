@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame path="./simulations/networks/som/fausett1.net" x="43"
-        y="38" width="450" height="450"/>
-    <dataWorldFrame path="./simulations/networks/som/fausett1.csv"
-        x="505" y="35" width="388" height="139"/>
-</workspace-serializer>

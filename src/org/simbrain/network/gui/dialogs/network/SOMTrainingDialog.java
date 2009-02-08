@@ -29,7 +29,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.gui.NetworkPreferences;
 import org.simbrain.network.networks.SOM;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
@@ -116,7 +115,7 @@ public class SOMTrainingDialog extends StandardDialog implements
     private SOM som;
 
     /** Location of SOM directory. */
-    private static String somDirectory =  NetworkPreferences.getCurrentSOMDirectory();
+    private static String somDirectory =  ".";
 
     /** SOM training dialog thread. */
     private SOMTDialogThread theThread = null;
@@ -200,7 +199,7 @@ public class SOMTrainingDialog extends StandardDialog implements
         som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
         som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
         som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
-        NetworkPreferences.setCurrentSOMDirectory(getSOMDirectory());
+        //NetworkPreferences.setCurrentSOMDirectory(getSOMDirectory());
         stopThread();
         super.closeDialogOk();
     }

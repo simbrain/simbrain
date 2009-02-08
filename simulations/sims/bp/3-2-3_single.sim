@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame path="./simulations/networks/bp/3-2-3.net" x="8"
-        y="39" width="450" height="450"/>
-    <odorWorldFrame path="./simulations/worlds/three-Objects.wld"
-        x="505" y="35" width="329" height="375"/>
-</workspace-serializer>

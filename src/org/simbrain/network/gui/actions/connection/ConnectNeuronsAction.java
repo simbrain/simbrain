@@ -23,11 +23,7 @@ import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
@@ -65,7 +61,7 @@ public final class ConnectNeuronsAction
         this.sourceNeurons = sourceNeurons;
         this.targetNeurons = targetNeurons;
 
-        putValue(NAME, "Connect using \"" + NetworkPreferences.getConnectionType() + "\"");
+      //  putValue(NAME, "Connect using \"" + NetworkPreferences.getConnectionType() + "\"");
 
     }
 
@@ -76,16 +72,16 @@ public final class ConnectNeuronsAction
             return;
         }
         ConnectNeurons connection;
-        if (NetworkPreferences.getConnectionType().equals("All to All")) {
-            connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
-        } else if (NetworkPreferences.getConnectionType().equals("One to One")) {
-            connection = new OneToOne(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
-        } else if (NetworkPreferences.getConnectionType().equals("Sparse")) {
-            connection = new Sparse(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
-        } else {
-            System.out.println("Conditions Failed");
-            return;
-        }
-        connection.connectNeurons();
+//        if (NetworkPreferences.getConnectionType().equals("All to All")) {
+//            connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+//        } else if (NetworkPreferences.getConnectionType().equals("One to One")) {
+//            connection = new OneToOne(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+//        } else if (NetworkPreferences.getConnectionType().equals("Sparse")) {
+//            connection = new Sparse(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+//        } else {
+//            System.out.println("Conditions Failed");
+//            return;
+//        }
+//        connection.connectNeurons();
     }
 }

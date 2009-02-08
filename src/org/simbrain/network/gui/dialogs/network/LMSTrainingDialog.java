@@ -29,7 +29,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.gui.NetworkPreferences;
 import org.simbrain.network.networks.LMSNetwork;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
@@ -105,7 +104,7 @@ public class LMSTrainingDialog extends StandardDialog implements
     private LMSNetwork lms;
 
     /** Location of backprop directory. */
-    private static String backpropDirectory =  NetworkPreferences.getCurrentBackpropDirectory();
+    private static String backpropDirectory =  ".";
 
     /** Backprop training dialog thread. */
     private BPTDialogThread theThread = null;
@@ -181,7 +180,7 @@ public class LMSTrainingDialog extends StandardDialog implements
      */
     protected void closeDialogOk() {
         lms.setEta(Double.parseDouble(tfEta.getText()));
-        NetworkPreferences.setCurrentBackpropDirectory(getBackropDirectory());
+        //NetworkPreferences.setCurrentBackpropDirectory(getBackropDirectory());
         stopThread();
         super.closeDialogOk();
     }

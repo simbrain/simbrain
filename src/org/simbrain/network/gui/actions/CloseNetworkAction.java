@@ -61,6 +61,6 @@ public final class CloseNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.getParentComponent().getParentFrame().dispose();
+        //networkPanel.getParentComponent().getParentFrame().dispose();
     }
 }

@@ -158,31 +158,28 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     private NeuronNode lastSelectedNeuron = null;
 
     /** Background color of rootNetwork panel. */
-    private Color backgroundColor = new Color(NetworkPreferences.getBackgroundColor());
+    private Color backgroundColor = Color.white;
 
     /** Color of all lines in rootNetwork panel. */
-    private Color lineColor = new Color(NetworkPreferences.getLineColor());
+    private Color lineColor =  Color.black;
 
     /** Color of "active" neurons, with positive values. */
-    private float hotColor = NetworkPreferences.getHotColor();
-
+    private float hotColor = Color.red.getRGB();
+    
     /** Color of "inhibited" neurons, with negative values. */
-    private float coolColor = NetworkPreferences.getCoolColor();
+    private float coolColor = Color.blue.getRGB();
 
     /** Color of "excitatory" synapses, with positive values. */
-    private Color excitatoryColor = new Color(NetworkPreferences.getExcitatoryColor());
+    private Color excitatoryColor = Color.red;
 
     /** Color of "inhibitory" synapses, with negative values. */
-    private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
-
-    /** Colro of "signal" synapse. */
-    private Color signalColor = new Color(NetworkPreferences.getSignalColor());
+    private Color inhibitoryColor = Color.blue;
 
     /** Color of "spiking" synapse. */
-    private Color spikingColor = new Color(NetworkPreferences.getSpikingColor());
+    private Color spikingColor = Color.yellow;
 
     /** Color of "zero" weights. */
-    private Color zeroWeightColor = new Color(NetworkPreferences.getZeroWeightColor());
+    private Color zeroWeightColor = Color.gray;
 
     /** Label which displays current time. */
     private TimeLabel timeLabel;
@@ -206,13 +203,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     private boolean showTime = true;
 
     /** How much to nudge objects per key click. */
-    private double nudgeAmount = NetworkPreferences.getNudgeAmount();
+    private double nudgeAmount = .1;
 
     /** Maximum diameter of the circle representing the synapse. */
-    private int maxDiameter = NetworkPreferences.getMaxDiameter();
+    private int maxDiameter = 20;
 
     /** Maximum diameter of the circle representing the synapse. */
-    private int minDiameter = NetworkPreferences.getMinDiameter();
+    private int minDiameter = 5;
 
     /** Main tool bar. */
     private JToolBar mainToolBar;
@@ -252,14 +249,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /** Turn synapse node on or off. */
     private boolean synapseNodeOn = true;
 
-    /** Text object event handeler. */
+    /** Text object event handler. */
     private TextEventHandler textHandle = new TextEventHandler(this);
 
     /** Groups nodes together for ease of use. */
     private ViewGroupNode vgn;
-
-    /** Reference to parent desktop component. */
-    private final NetworkDesktopComponent desktopComponent;
 
     /** Local thread flag for manually starting and stopping the network. */
     private volatile boolean isRunning;
@@ -267,18 +261,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /**
      * Create a new rootNetwork panel.
      */
-    public NetworkPanel(RootNetwork rootNetwork, NetworkDesktopComponent desktopComponent) {
+    public NetworkPanel(RootNetwork rootNetwork) {
         super();
 
-        this.desktopComponent = desktopComponent;
         this.rootNetwork = rootNetwork;
 
         // always render in high quality
         setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
-
-        setBackground(new Color(NetworkPreferences.getBackgroundColor()));
 
         editMode = DEFAULT_BUILD_MODE;
         selectionModel = new NetworkSelectionModel(this);
@@ -1276,7 +1267,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             return;
         }
 
-        NeuronNode node = new NeuronNode(this, neuron, desktopComponent);
+        NeuronNode node = new NeuronNode(this, neuron);
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
     }
@@ -1789,13 +1780,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * @return a reference to the parent rootNetwork frame
-     */
-    public NetworkDesktopComponent getParentComponent() {
-        return desktopComponent;
-    }
-
-    /**
      * @return Returns the coolColor.
      */
     public float getCoolColor() {
@@ -2132,20 +2116,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void setZeroWeightColor(final Color zeroWeightColor) {
         this.zeroWeightColor = zeroWeightColor;
-    }
-
-    /**
-     * @return the signal synapse color.
-     */
-    public Color getSignalColor() {
-        return signalColor;
-    }
-
-    /**
-     * @param signalColor Color of the signal synapse.
-     */
-    public void setSignalColor(final Color signalColor) {
-        this.signalColor = signalColor;
     }
 
 

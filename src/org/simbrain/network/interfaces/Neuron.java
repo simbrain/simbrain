@@ -18,13 +18,11 @@
  */
 package org.simbrain.network.interfaces;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AbstractAttribute;
 import org.simbrain.workspace.Consumer;
@@ -46,16 +44,16 @@ public abstract class Neuron implements Producer, Consumer {
     private String id = null;
 
     /** Activation value of the neuron.  The main state variable. */
-    protected double activation = NetworkPreferences.getActivation();
+    protected double activation = 0;
 
     /** Minimum value this neuron can take. */
-    protected double lowerBound = NetworkPreferences.getNrnLowerBound();
+    protected double lowerBound = -1;
 
     /** Maximum value  this neuron can take. */
-    protected double upperBound = NetworkPreferences.getNrnUpperBound();
+    protected double upperBound = 1;
 
     /** Amount by which to increment or decrement neuron. */
-    private double increment = NetworkPreferences.getNrnIncrement();
+    private double increment = .1;
 
     /** Temporary activation value. */
     private double buffer = 0;

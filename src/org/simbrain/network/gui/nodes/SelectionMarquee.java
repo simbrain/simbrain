@@ -23,20 +23,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
-
 import java.awt.geom.GeneralPath;
 
-import edu.umd.cs.piccolo.nodes.PPath;
-
-import edu.umd.cs.piccolo.util.PPaintContext;
-
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
-
 import org.apache.commons.lang.SystemUtils;
-
-import org.simbrain.network.gui.NetworkPreferences;
-
 import org.simbrain.util.StrokeUtils;
+
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.util.PPaintContext;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Selection marquee node.
@@ -51,7 +45,7 @@ public final class SelectionMarquee
     private static final Stroke DEFAULT_STROKE = SystemUtils.IS_OS_MAC_OSX ? new BasicStroke(1.0f) : new PFixedWidthStroke(1.0f);
 
     /** Color of selection marquee. */
-    private static Color marqueeColor = new Color(NetworkPreferences.getLassoColor());
+    private static Color marqueeColor = Color.yellow;
 
     /** Default interior transparency. */
     private static final float DEFAULT_TRANSPARENCY = 0.6f;

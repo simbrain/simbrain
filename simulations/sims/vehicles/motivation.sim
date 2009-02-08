@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame
-        path="./simulations/networks/braitenberg/attract_motive.net"
-        x="6" y="35" width="450" height="450"/>
-    <odorWorldFrame path="./simulations/worlds/one_object.wld" x="505"
-        y="35" width="329" height="375"/>
-</workspace-serializer>

@@ -1025,7 +1025,6 @@ public class SimbrainDesktop {
         } else {
             dockVisible = true;
             horizontalSplitter.getBottomComponent().setVisible(true);
-//            frame.pack();
         }
 
     }

@@ -50,6 +50,7 @@ import org.simbrain.workspace.actions.OpenNetworkAction;
 import org.simbrain.workspace.actions.OpenOdorWorldAction;
 import org.simbrain.workspace.actions.OpenWorkspaceAction;
 import org.simbrain.workspace.actions.OpenWorkspaceComponentListAction;
+import org.simbrain.workspace.actions.PropertyTabAction;
 import org.simbrain.workspace.actions.QuitWorkspaceAction;
 import org.simbrain.workspace.actions.RunScriptAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAction;
@@ -170,6 +171,9 @@ public class WorkspaceActionManager {
     /** Run script action. */
     private final Action runScriptAction;
 
+    /** Show hide property tab. */
+    private final Action propertyTabAction;
+
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "."
             + System.getProperty("file.separator") + "scriptmenu";
@@ -178,7 +182,7 @@ public class WorkspaceActionManager {
     /**
      * Create a new workspace action manager for the specified workspace.
      * 
-     * @param workspace
+     * @param desktop
      *            workspace, must not be null
      */
     public WorkspaceActionManager(SimbrainDesktop desktop) {
@@ -223,6 +227,8 @@ public class WorkspaceActionManager {
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);
         openWorkspaceComponentListAction = new OpenWorkspaceComponentListAction(desktop);
+
+        propertyTabAction = new PropertyTabAction(desktop);
     }
 
     /**
@@ -307,8 +313,10 @@ public class WorkspaceActionManager {
 
         /**
          * Create a new add gauge action with the specified workspace.
+         * @param desktop Simbrain desktop
+         * @param scriptName name of script
          */
-        public ScriptAction(SimbrainDesktop desktop, String scriptName) {
+        public ScriptAction(final SimbrainDesktop desktop, final String scriptName) {
             super(scriptName, desktop.getWorkspace());
             // putValue(SHORT_DESCRIPTION, name);
             this.scriptName = scriptName;
@@ -324,7 +332,8 @@ public class WorkspaceActionManager {
             try {
                 interpreter.set("workspace", workspace);
                 interpreter.set("desktop", desktop);
-                interpreter.source(SCRIPT_MENU_DIRECTORY + System.getProperty("file.separator") + scriptName);
+                interpreter.source(SCRIPT_MENU_DIRECTORY +
+                        System.getProperty("file.separator") + scriptName);
             } catch (FileNotFoundException e) {
                System.out.println("File not found");
                e.printStackTrace();
@@ -518,5 +527,12 @@ public class WorkspaceActionManager {
      */
     public Action getRunScriptAction() {
         return runScriptAction;
+    }
+
+    /**
+     * @return the propertyTabAction
+     */
+    public Action getPropertyTabAction() {
+        return propertyTabAction;
     }
 }

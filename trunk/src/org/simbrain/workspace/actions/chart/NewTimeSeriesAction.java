@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.simbrain.plot.piechart.*;
 import org.simbrain.plot.timeseries.*;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
@@ -38,6 +39,8 @@ public final class NewTimeSeriesAction extends WorkspaceAction {
      */
     public NewTimeSeriesAction(Workspace workspace) {
         super("Time Series", workspace);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("chart141.gif"));
+        putValue(SHORT_DESCRIPTION, "New Time Series");
     }
 
     /** @see AbstractAction */

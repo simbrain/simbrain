@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.plot.scatterplot.ScatterPlotComponent;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
@@ -38,6 +39,8 @@ public final class NewScatterPlotAction extends WorkspaceAction {
      */
     public NewScatterPlotAction(final Workspace workspace) {
         super("Scatter Plot", workspace);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("chart145.gif"));
+        putValue(SHORT_DESCRIPTION, "New Scatter Plot");
     }
 
 

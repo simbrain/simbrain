@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.plot.barchart.BarChartComponent;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.WorkspaceAction;
 
@@ -38,6 +39,8 @@ public final class NewBarChartAction extends WorkspaceAction {
      */
     public NewBarChartAction(final Workspace workspace) {
         super("Bar Chart", workspace);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("chart009.gif"));
+        putValue(SHORT_DESCRIPTION, "New Bar Chart");
     }
 
 

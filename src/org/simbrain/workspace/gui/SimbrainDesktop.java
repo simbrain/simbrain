@@ -143,9 +143,15 @@ public class SimbrainDesktop {
     
     /** The bottom dock. */
     private JTabbedPane bottomDock;
+
+    /** Pane splitter for bottom dock. */
+    private JSplitPane horizontalSplitter;
     
     /** The workspace this desktop wraps. */
     private final Workspace workspace;
+
+    /** Boundary of workspace. */
+    private Rectangle workspaceBounds;
     
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
@@ -211,7 +217,7 @@ public class SimbrainDesktop {
         workspace.addListener(listener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Rectangle workspaceBounds = new Rectangle(WORKSPACE_INSET,
+        workspaceBounds = new Rectangle(WORKSPACE_INSET,
                 WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2),
                 screenSize.height - (WORKSPACE_INSET * 2));
 
@@ -239,7 +245,7 @@ public class SimbrainDesktop {
                 couplings), "Show current couplings");
 
         // Set up the main panel
-        JSplitPane horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         horizontalSplitter.setDividerLocation((int) (3 * (workspaceBounds
                 .getHeight() / 4)));
         horizontalSplitter.setTopComponent(desktop);
@@ -404,6 +410,7 @@ public class SimbrainDesktop {
     private void createAndAttachMenus() {
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
+        menuBar.add(createViewMenu());
         menuBar.add(createInsertMenu());
         menuBar.add(createScriptMenu());
         menuBar.add(createCoupleMenu());
@@ -450,6 +457,17 @@ public class SimbrainDesktop {
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getQuitWorkspaceAction());
         return fileMenu;
+    }
+
+    /**
+     * Create the workspace view menu.
+     *
+     * @return view menu
+     */
+    private JMenu createViewMenu() {
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.add(actionManager.getPropertyTabAction());
+        return viewMenu;
     }
 
     /**
@@ -1003,11 +1021,11 @@ public class SimbrainDesktop {
     public void toggleDock() {
         if (dockVisible) {
             dockVisible = false;
-            bottomDock.setVisible(false);
+            horizontalSplitter.getBottomComponent().setVisible(false);
         } else {
             dockVisible = true;
-            bottomDock.setVisible(true);
-            frame.pack();
+            horizontalSplitter.getBottomComponent().setVisible(true);
+//            frame.pack();
         }
 
     }

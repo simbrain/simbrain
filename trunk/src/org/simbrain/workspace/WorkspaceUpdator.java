@@ -1,7 +1,18 @@
 package org.simbrain.workspace;
 
+import java.awt.AWTEvent;
+import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.event.InvocationEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -27,11 +38,15 @@ public class WorkspaceUpdator {
     private final ExecutorService events;
     /** The listeners on this object. */
     private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+    /** */
+    private final TestEventQueue eventQueue;
     
     /** Whether updates should continue to run. */
     private volatile boolean run = false;
     /** The number of times the update has run. */
     private volatile int time = 0;
+    
+//    public static final Object componentLock = new Object();
     
     /** Creates the threads used in the ExecutorService. */
     private final ThreadFactory factory = new ThreadFactory() {
@@ -66,6 +81,7 @@ public class WorkspaceUpdator {
         this.controller = controller;
         this.service = Executors.newFixedThreadPool(threads, factory);
         this.events = Executors.newSingleThreadExecutor();
+        this.eventQueue = new TestEventQueue(this);
         
         addListener(new Listener() {
             public void finishedComponentUpdate(
@@ -82,6 +98,8 @@ public class WorkspaceUpdator {
                 System.out.println("Updating couplings");
             }
         });
+        
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
     }
     
     /**
@@ -121,7 +139,9 @@ public class WorkspaceUpdator {
 
         public void updateComponent(
                 final WorkspaceComponent<?> component, final CountDownLatch latch) {
-            service.submit(new ComponentUpdate(component, latch));
+            synchronized(component) {
+              service.submit(new ComponentUpdate(component, latch));
+            }
         }
 
         public void updateCouplings() {
@@ -195,8 +215,11 @@ public class WorkspaceUpdator {
      * Executes the updates using the set controller.
      */
     void doUpdate() {
-        controller.doUpdate(controls);
+        eventQueue.pauseInvocationEvents();
         
+        controller.doUpdate(controls);
+
+        eventQueue.runInvocationEvents();
         time++;
     }
     
@@ -239,6 +262,20 @@ public class WorkspaceUpdator {
     private void notifyUpdateFinished(final WorkspaceComponent<?> component, final int thread) {
         for (Listener listener : listeners) {
             listener.finishedComponentUpdate(component, thread);
+        }
+    }
+    
+    public <E> E syncOnAllComponents(Callable<E> task) throws Exception {
+        return syncRest(workspace.getComponentList().iterator(), task);
+    }
+    
+    public static <E> E syncRest(Iterator<? extends Object> iterator, Callable<E> task) throws Exception {
+        if (iterator.hasNext()) {
+            synchronized (iterator.next()) {
+                return syncRest(iterator, task);
+            }
+        } else {
+            return task.call();
         }
     }
     
@@ -399,6 +436,137 @@ public class WorkspaceUpdator {
          * Called when the couplings are updated.
          */
         void updatingCouplings();
+    }
+}
+
+class TestEventQueue extends EventQueue {
+//    ExecutorService events = Executors.newSingleThreadExecutor();
+    final WorkspaceUpdator updator;
+    Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
+    boolean paused = false;
+    Object lock = new Object();
+    
+    TestEventQueue(final WorkspaceUpdator updator) {
+        this.updator = updator;
+    }
+    
+    public void pauseInvocationEvents() {
+        synchronized(lock) {
+            paused = true;
+        }
+    }
+    
+    public void runInvocationEvents() {
+        synchronized(lock) {
+        
+            for (AWTEvent event; (event = queue.poll()) != null;) {
+                System.out.print("event unqueued: " + event);
+                super.postEvent(event);
+            }
+        
+//            holdForInput("");
+        
+            paused = false;
+        }
+    }
+    
+    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    
+    static void holdForInput(String out) {
+        System.out.print(out);
+        
+        try {
+            reader.readLine();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
+    public void postEvent(AWTEvent event) {
+        System.out.println("event posted: " + event);
+        
+        if (event instanceof InvocationEvent) {
+            event = new TestInvocationEvent((InvocationEvent) event, updator);
+        }
+            synchronized (lock) {
+                if (paused) {
+                    System.out.println("event queued: " + event);
+                    queue.add(event);
+                    return;
+                }
+            }
+
+//        }
+
+        super.postEvent(event);
+    }
+
+//  queue.add(event);
+    
+    
+    
+//  events.submit(new Runnable() {
+//      public void run() {
+//          TestEventQueue.super.postEvent(event);
+//      }
+//  });
+  
+//  event = new TestInvocationEvent((InvocationEvent) event);
+    
+    
+//    private static class DispatchRunnable implements Runnable {
+//        InvocationEvent event;
+//        
+//        DispatchRunnable(InvocationEvent event) {
+//            this.event = event;
+//        }
+//        
+//        public void run() {
+//            System.out.println("dispatch runnable running");
+//            
+//            event.dispatch();
+//        }
+//    }
+    
+    class TestInvocationEvent extends InvocationEvent {
+        private final InvocationEvent event;
+//        private final WorkspaceUpdator updator;
+        
+        public TestInvocationEvent(final InvocationEvent event, final WorkspaceUpdator updator) {
+            super(event.getSource(), new Runnable() {
+                public void run() {
+                    try {
+                        updator.syncOnAllComponents(new Callable<Object>() {
+                            public Object call() throws Exception {
+                                event.dispatch();
+                                return null;
+                            }
+                        });
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            
+            this.event = event;
+        }
+        
+        public Exception getException() {
+            return event.getException();
+        }
+        
+        public Throwable getThrowable() {
+            return event.getThrowable();
+        }
+        
+        public long getWhen() {
+            return event.getWhen();
+        }
+        
+        public String paramString() {
+            return event.paramString();
+        }
     }
 }
 

@@ -19,6 +19,7 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -578,7 +579,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         } else if (e.getActionCommand().equals("addRow")) {
             this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("addRowHere")) {
             if (
                 this.getWorld().getSelectedPoint().x < (this.getWorld()
@@ -593,36 +593,29 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             }
 
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("addCol")) {
             this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()));
             this.getWorld().getModel().zeroFillNew();
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("addColHere")) {
             insertColumnAtPoint(this.getWorld().getSelectedPoint());
             this.getWorld().getModel().zeroFillNew();
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("remRow")) {
             this.getWorld().getModel().removeRow(this.getWorld().getTable().getRowCount() - 1);
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("remRowHere")) {
             this.getWorld().getModel().removeRow(
                     this.getWorld().getTable().rowAtPoint(
                     this.getWorld().getSelectedPoint()));
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("remCol")) {
             this.getWorld().getModel().removeColumn(this.getWorld().getModel().getColumnCount() - 1);
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("remColHere")) {
             int col = this.getWorld().getTable().columnAtPoint(this.getWorld().getSelectedPoint());
             this.getWorld().getModel().removeColumn(col);
             changedSinceLastSave = true;
-            pack();
         } else if (e.getActionCommand().equals("zeroFill")) {
             this.getWorld().getModel().zeroFill();
             changedSinceLastSave = true;
@@ -737,12 +730,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
      * @param e Menu event
      */
     public void menuCanceled(final MenuEvent e) {
-    }
-
-    /** @see javax.swing.JFrame */
-    public void pack() {
-        super.pack();
-        this.setMaximumSize(this.getSize());
     }
 }
 

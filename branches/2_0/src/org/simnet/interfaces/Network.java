@@ -999,7 +999,7 @@ public abstract class Network implements WorldListener {
      * @return Units by which to count.
      */
     public static String[] getUnits() {
-        String[] units = {"Seconds", "Iterations" };
+        String[] units = {"msec", "iterations" };
 
         return units;
     }

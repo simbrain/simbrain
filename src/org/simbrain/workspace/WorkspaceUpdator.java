@@ -19,6 +19,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.log4j.Logger;
+
 /**
  * This class manages the workspace updates possibly using
  * multiple threads.
@@ -26,6 +28,9 @@ import java.util.concurrent.ThreadFactory;
  * @author Matt Watson
  */
 public class WorkspaceUpdator {
+    /** The static logger for the class. */
+    private static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
+    
     /** The parent workspace. */
     private final Workspace workspace;
     /** The coupling manager for the workspace. */
@@ -45,8 +50,8 @@ public class WorkspaceUpdator {
     private volatile boolean run = false;
     /** The number of times the update has run. */
     private volatile int time = 0;
-    
-//    public static final Object componentLock = new Object();
+    /** The lock used to lock calls on syncAllComponents. */
+    private final Object componentLock = new Object();
     
     /** Creates the threads used in the ExecutorService. */
     private final ThreadFactory factory = new ThreadFactory() {
@@ -85,17 +90,19 @@ public class WorkspaceUpdator {
         
         addListener(new Listener() {
             public void finishedComponentUpdate(
-                    final WorkspaceComponent<?> component, final int thread) {
-                System.out.println(thread + " finished: " + component);
+                    final WorkspaceComponent<?> component, final int update, final int thread) {
+                System.out.println("Update: " + update + " thread: "
+                    + thread + " finished: " + component);
             }
 
             public void startingComponentUpdate(
-                    final WorkspaceComponent<?> component, final int thread) {
-                System.out.println(thread + " updating: " + component);
+                    final WorkspaceComponent<?> component, final int update, final int thread) {
+                System.out.println("Update: " + update + " thread: "
+                    + thread + " updating: " + component);
             }
 
-            public void updatingCouplings() {
-                System.out.println("Updating couplings");
+            public void updatedCouplings(final int update) {
+                System.out.println("Update: " + update + " Updated couplings");
             }
         });
         
@@ -139,13 +146,17 @@ public class WorkspaceUpdator {
 
         public void updateComponent(
                 final WorkspaceComponent<?> component, final CountDownLatch latch) {
-            synchronized(component) {
-              service.submit(new ComponentUpdate(component, latch));
+            synchronized (component) {
+                service.submit(new ComponentUpdate(component, latch));
             }
         }
 
         public void updateCouplings() {
             manager.updateAllCouplings();
+            
+            LOGGER.trace("couplings updated?");
+            
+            notifyCouplingsUpdated();
         }
         
     };
@@ -171,6 +182,8 @@ public class WorkspaceUpdator {
                 return;
             }
             
+            LOGGER.trace("couplings");
+            
             controls.updateCouplings();
         }
     };
@@ -192,6 +205,11 @@ public class WorkspaceUpdator {
         run = false;
     }
     
+    /**
+     * Returns whether the updator is set to run.
+     * 
+     * @return whether the updator is set to run.
+     */
     public boolean isRunning() {
         return run;
     }
@@ -215,12 +233,17 @@ public class WorkspaceUpdator {
      * Executes the updates using the set controller.
      */
     void doUpdate() {
+        time++;
+        
+        LOGGER.trace("starting: " + time);
+        
         eventQueue.pauseInvocationEvents();
         
         controller.doUpdate(controls);
 
         eventQueue.runInvocationEvents();
-        time++;
+        
+        LOGGER.trace("done: " + time);
     }
     
     /**
@@ -248,9 +271,15 @@ public class WorkspaceUpdator {
      * @param thread The number of the thread doing the update.
      */
     private void notifyUpdateStarted(final WorkspaceComponent<?> component, final int thread) {
-        for (Listener listener : listeners) {
-            listener.startingComponentUpdate(component, thread);
-        }
+        final int time = this.time;
+        
+        events.submit(new Runnable() {
+            public void run() {
+                for (Listener listener : listeners) {
+                    listener.startingComponentUpdate(component, time, thread);
+                }
+            }
+        });
     }
     
     /**
@@ -260,13 +289,36 @@ public class WorkspaceUpdator {
      * @param thread The number of the thread doing the update.
      */
     private void notifyUpdateFinished(final WorkspaceComponent<?> component, final int thread) {
-        for (Listener listener : listeners) {
-            listener.finishedComponentUpdate(component, thread);
-        }
+        final int time = this.time;
+        
+        events.submit(new Runnable() {
+            public void run() {
+                for (Listener listener : listeners) {
+                    listener.finishedComponentUpdate(component, time, thread);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Called when the couplings are updated.
+     */
+    private void notifyCouplingsUpdated() {
+        final int time = this.time;
+        
+        events.submit(new Runnable() {
+            public void run() {
+                for (Listener listener : listeners) {
+                    listener.updatedCouplings(time);
+                }
+            }
+        });
     }
     
     public <E> E syncOnAllComponents(Callable<E> task) throws Exception {
-        return syncRest(workspace.getComponentList().iterator(), task);
+        synchronized (componentLock) {
+            return syncRest(workspace.getComponentList().iterator(), task);
+        }
     }
     
     public static <E> E syncRest(Iterator<? extends Object> iterator, Callable<E> task) throws Exception {
@@ -307,11 +359,7 @@ public class WorkspaceUpdator {
          * @param update the component update that is executing.
          */
         void setCurrentTask(final ComponentUpdate update) {
-            events.submit(new Runnable() {
-                public void run() {
-                    notifyUpdateStarted(update.component, thread);
-                }
-            });
+            notifyUpdateStarted(update.component, thread);
         }
         
         /**
@@ -320,11 +368,7 @@ public class WorkspaceUpdator {
          * @param update The component update to be cleared.
          */
         void clearCurrentTask(final ComponentUpdate update) {
-            events.submit(new Runnable() {
-                public void run() {
-                    notifyUpdateFinished(update.component, thread);
-                }
-            });
+            notifyUpdateFinished(update.component, thread);
         }
     }
     
@@ -357,6 +401,8 @@ public class WorkspaceUpdator {
             UpdateThread thread = (UpdateThread) Thread.currentThread();
             
             thread.setCurrentTask(this);
+            
+            LOGGER.trace("updating component: " + component);
             
             component.update();
             
@@ -422,7 +468,7 @@ public class WorkspaceUpdator {
          * @param component The component being updated.
          * @param thread The thread doing the update.
          */
-        void startingComponentUpdate(WorkspaceComponent<?> component, int thread);
+        void startingComponentUpdate(WorkspaceComponent<?> component, int update, int thread);
         
         /**
          * Called when a component update ends.
@@ -430,16 +476,18 @@ public class WorkspaceUpdator {
          * @param component The component that was updated.
          * @param thread The thread doing the update.
          */
-        void finishedComponentUpdate(WorkspaceComponent<?> component, int thread);
+        void finishedComponentUpdate(WorkspaceComponent<?> component, int update, int thread);
         
         /**
          * Called when the couplings are updated.
          */
-        void updatingCouplings();
+        void updatedCouplings(int update);
     }
 }
 
 class TestEventQueue extends EventQueue {
+    private static final Logger LOGGER = Logger.getLogger(TestEventQueue.class);
+    
 //    ExecutorService events = Executors.newSingleThreadExecutor();
     final WorkspaceUpdator updator;
     Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
@@ -460,7 +508,7 @@ class TestEventQueue extends EventQueue {
         synchronized(lock) {
         
             for (AWTEvent event; (event = queue.poll()) != null;) {
-                System.out.print("event unqueued: " + event);
+                LOGGER.debug("event unqueued: " + event);
                 super.postEvent(event);
             }
         
@@ -473,7 +521,7 @@ class TestEventQueue extends EventQueue {
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     
     static void holdForInput(String out) {
-        System.out.print(out);
+//        System.out.print(out);
         
         try {
             reader.readLine();
@@ -484,50 +532,23 @@ class TestEventQueue extends EventQueue {
     }
     
     public void postEvent(AWTEvent event) {
-        System.out.println("event posted: " + event);
+        LOGGER.debug("event posted: " + event);
         
         if (event instanceof InvocationEvent) {
             event = new TestInvocationEvent((InvocationEvent) event, updator);
-        }
+//        }
             synchronized (lock) {
                 if (paused) {
-                    System.out.println("event queued: " + event);
+                    LOGGER.debug("event queued: " + event);
                     queue.add(event);
                     return;
                 }
             }
 
-//        }
+        }
 
         super.postEvent(event);
     }
-
-//  queue.add(event);
-    
-    
-    
-//  events.submit(new Runnable() {
-//      public void run() {
-//          TestEventQueue.super.postEvent(event);
-//      }
-//  });
-  
-//  event = new TestInvocationEvent((InvocationEvent) event);
-    
-    
-//    private static class DispatchRunnable implements Runnable {
-//        InvocationEvent event;
-//        
-//        DispatchRunnable(InvocationEvent event) {
-//            this.event = event;
-//        }
-//        
-//        public void run() {
-//            System.out.println("dispatch runnable running");
-//            
-//            event.dispatch();
-//        }
-//    }
     
     class TestInvocationEvent extends InvocationEvent {
         private final InvocationEvent event;
@@ -569,30 +590,3 @@ class TestEventQueue extends EventQueue {
         }
     }
 }
-
-//void doUpdate() {
-//List<? extends WorkspaceComponent<?>> components = workspace.getComponentList();
-//
-//synchronized (components) {
-//  components = new ArrayList<WorkspaceComponent<?>>(components);
-//}
-//
-//int componentCount = components.size();
-//
-//if (componentCount < 1) return;
-//
-//CountDownLatch latch = new CountDownLatch(components.size());
-//
-//for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-//  service.submit(new ComponentUpdate(component, latch));
-//}
-//
-//try {
-//  latch.await();
-//} catch (InterruptedException e) {
-//  return;
-//}
-//
-//manager.updateAllCouplings();
-//time++;
-//}

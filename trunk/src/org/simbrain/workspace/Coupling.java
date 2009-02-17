@@ -79,10 +79,23 @@ public final class Coupling<E> {
      */
     public void update() {
         if ((consumingAttribute != null) && (producingAttribute != null)) {
-            consumingAttribute.setValue(buffer);
-            LOGGER.debug(consumingAttribute.getParent().getDescription()
-                + " just consumed " + producingAttribute.getValue() + " from "
-                + producingAttribute.getParent().getDescription());
+            final WorkspaceComponent<?> consumerComponent
+                = consumingAttribute.getParent().getParentComponent();
+            final WorkspaceComponent<?> producerComponent
+                = producingAttribute.getParent().getParentComponent();
+            
+            final E local;
+            
+            synchronized (producerComponent) {
+                local = buffer;
+            }
+            
+            synchronized (consumerComponent) {
+                consumingAttribute.setValue(local);
+                LOGGER.debug(consumingAttribute.getParent().getDescription()
+                    + " just consumed " + producingAttribute.getValue() + " from "
+                    + producingAttribute.getParent().getDescription());
+            }
         }
     }
 

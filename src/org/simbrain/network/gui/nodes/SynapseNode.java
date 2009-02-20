@@ -26,6 +26,7 @@ import java.awt.geom.Point2D;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
@@ -188,7 +189,7 @@ public final class SynapseNode
             if (((SpikingNeuron) source.getNeuron()).hasSpiked()) {
                 line.setStrokePaint(getNetworkPanel().getSpikingColor());
             } else {
-                line.setStrokePaint(getNetworkPanel().getLineColor());
+                line.setStrokePaint(NetworkGuiSettings.getLineColor());
             }
         }
     }
@@ -399,7 +400,7 @@ public final class SynapseNode
 
     /** @see ScreenElement */
     public void resetColors() {
-        line.setStrokePaint(getNetworkPanel().getLineColor());
+        line.setStrokePaint(NetworkGuiSettings.getLineColor());
         updateColor();
         updateDiameter();
     }

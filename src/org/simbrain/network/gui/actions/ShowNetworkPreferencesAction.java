@@ -69,7 +69,7 @@ public final class ShowNetworkPreferencesAction
 
                 /** @see Runnable */
                 public void run() {
-                    NetworkDialog dialog = new NetworkDialog(networkPanel);
+                    NetworkDialog dialog = networkPanel.getNetworkDialog(networkPanel);
                     dialog.pack();
                     dialog.setLocationRelativeTo(null);
                     dialog.setVisible(true);

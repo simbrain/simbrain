@@ -28,57 +28,60 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
      * @param workspace the workspace
      * @param sourceComponent the source component
      */
-    public ComponentMenu(String menuName, Workspace workspace, WorkspaceComponent<?> sourceComponent) {
-
-		super(menuName);
-		this.workspace = workspace;
-		this.sourceComponent = sourceComponent;
-		workspace.addListener(this);
-		updateMenu();
-	}
+    public ComponentMenu(final String menuName, final Workspace workspace,
+            WorkspaceComponent<?> sourceComponent) {
+        super(menuName);
+        this.workspace = workspace;
+        this.sourceComponent = sourceComponent;
+        workspace.addListener(this);
+        updateMenu();
+    }
 
     /**
      * {@inheritDoc}
      */
 	public boolean clearWorkspace() {
-		return false;
-	}
+        return false;
+    }
 
     /**
      * {@inheritDoc}
      */
 	public void componentAdded(WorkspaceComponent<?> component) {
-		updateMenu();
-	}
+        updateMenu();
+    }
 
     /**
      * {@inheritDoc}
      */
 	public void componentRemoved(WorkspaceComponent<?> component) {
-		updateMenu();
-	}
+        updateMenu();
+    }
 
     /**
      * {@inheritDoc}
      */
-	public void workspaceCleared() {
-		updateMenu();
-	}
+    public void workspaceCleared() {
+        updateMenu();
+    }
 
 	/**
-	 * Update the menu when components are added.
-	 */
-	private void updateMenu() {
-		this.removeAll();
-        for (WorkspaceComponent<?> component: workspace.getComponentList()) {
-        	final WorkspaceComponent<?> targetComponent = component;
-            JMenuItem componentMenuItem = new JMenuItem(targetComponent.getName());
+     * Update the menu when components are added.
+     */
+    private void updateMenu() {
+        this.removeAll();
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
+            final WorkspaceComponent<?> targetComponent = component;
+            JMenuItem componentMenuItem = new JMenuItem(targetComponent
+                    .getName());
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    workspace.coupleOneToOne(sourceComponent.getProducingAttributes(), targetComponent.getConsumingAttributes());
+                    workspace.coupleOneToOne(sourceComponent
+                            .getProducingAttributes(), targetComponent
+                            .getConsumingAttributes());
                 }
             });
             this.add(componentMenuItem);
         }
-	}
+    }
 }

@@ -1,24 +1,26 @@
 /*
- * Part of Simbrain--a java-based neural rootNetwork kit
- * Copyright (C) 2005-2006 Jeff Yoshimi <www.jeffyoshimi.net>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
+* Part of Simbrain--a java-based neural network kit
+* Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
 package org.simbrain.network.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,6 +37,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -46,6 +49,7 @@ import org.simbrain.network.NetworkUpdater;
 import org.simbrain.network.groups.GeneRec;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
+import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -110,7 +114,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Network panel.
  */
-public final class NetworkPanel extends PCanvas implements NetworkListener {
+public class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** The model neural-rootNetwork object. */
     private RootNetwork rootNetwork;
@@ -140,7 +144,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     private NetworkSelectionModel selectionModel;
 
     /** Action manager. */
-    private NetworkActionManager actionManager;
+    protected NetworkActionManager actionManager;
 
     /** Cached context menu. */
     private JPopupMenu contextMenu;
@@ -159,9 +163,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** Background color of rootNetwork panel. */
     private Color backgroundColor = Color.white;
-
-    /** Color of all lines in rootNetwork panel. */
-    private Color lineColor =  Color.black;
 
     /** Color of "active" neurons, with positive values. */
     private float hotColor = Color.red.getRGB();
@@ -225,11 +226,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** A list of check boxes pertaining to "clamp" information.
      * They are updated when the rootNetwork clamp status changes. */
-    private ArrayList checkBoxes = new ArrayList();
+    protected ArrayList<JCheckBoxMenuItem> checkBoxes = new ArrayList<JCheckBoxMenuItem>();
 
     /** A list of toggle buttons pertaining to "clamp" information.
      * They are updated when the rootNetwork clamp status changes. */
-    private ArrayList toggleButton = new ArrayList();
+    private ArrayList<JToggleButton> toggleButton = new ArrayList<JToggleButton>();
 
     /** Beginning position used in calculating offsets for multiple pastes. */
     private Point2D beginPosition;
@@ -261,7 +262,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /**
      * Create a new rootNetwork panel.
      */
-    public NetworkPanel(RootNetwork rootNetwork) {
+    public NetworkPanel(final RootNetwork rootNetwork) {
         super();
 
         this.rootNetwork = rootNetwork;
@@ -279,9 +280,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         // createContextMenuAlt();
 
         //initialize toolbars
+        JPanel toolbars = new JPanel();
         mainToolBar = this.createMainToolBar();
         editToolBar = this.createEditToolBar();
         clampToolBar = this.createClampToolBar();
+        // Construct toolbar pane
+        FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
+        flow.setHgap(0);
+        flow.setVgap(0);
+        toolbars.setLayout(flow);
+        toolbars.add(getMainToolBar());
+        toolbars.add(getEditToolBar());
+        toolbars.add(getClampToolBar());
+        super.setLayout(new BorderLayout());
+        this.add("North", toolbars);
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -308,7 +320,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
         // Format the updateScript Label
         updateStatusLabel = new UpdateStatusLabel(this);
-        updateStatusLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight() - UPDATE_LABEL_OFFSET);
+        updateStatusLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight()
+                - UPDATE_LABEL_OFFSET);
         getCamera().addChild(updateStatusLabel);
         updateStatusLabel.update();
 
@@ -320,103 +333,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     }
 
-
-    /**
-     * Create and return a new File menu for this rootNetwork panel.
-     *
-     * @return a new File menu for this rootNetwork panel
-     */
-    JMenu createFileMenu() {
-
-        JMenu fileMenu = new JMenu("File");
-
-        // Open / Close actions
-        for (Action action : actionManager.getOpenCloseActions()) {
-            fileMenu.add(action);
-        }
-
-        // Network preferences
-        fileMenu.addSeparator();
-        fileMenu.add(actionManager.getShowNetworkPreferencesAction());
-        fileMenu.addSeparator();
-
-        // Close
-        fileMenu.add(actionManager.getCloseNetworkAction());
-
-        return fileMenu;
-    }
-
-    /**
-     * Create and return a new Edit menu for this rootNetwork panel.
-     *
-     * @return a new Edit menu for this rootNetwork panel
-     */
-    JMenu createEditMenu() {
-
-        JMenu editMenu = new JMenu("Edit");
-
-        editMenu.add(actionManager.getCutAction());
-        editMenu.add(actionManager.getCopyAction());
-        editMenu.add(actionManager.getPasteAction());
-        editMenu.addSeparator();
-        editMenu.add(actionManager.getClearAction());
-        editMenu.add(createSelectionMenu());
-        editMenu.addSeparator();
-        editMenu.add(actionManager.getGroupAction());
-        editMenu.add(actionManager.getUngroupAction());
-        editMenu.addSeparator();
-        editMenu.add(createAlignMenu());
-        editMenu.add(createSpacingMenu());
-        editMenu.addSeparator();
-        editMenu.add(createClampMenu());
-        editMenu.addSeparator();
-        editMenu.add(actionManager.getShowIOInfoMenuItem());
-        editMenu.add(actionManager.getSetAutoZoomMenuItem());
-        editMenu.addSeparator();
-        editMenu.add(actionManager.getSetNeuronPropertiesAction());
-        editMenu.add(actionManager.getSetSynapsePropertiesAction());
-
-        return editMenu;
-    }
-
-    /**
-     * Create and return a new Insert menu for this rootNetwork panel.
-     *
-     * @return a new Insert menu for this rootNetwork panel
-     */
-    JMenu createInsertMenu() {
-
-        JMenu insertMenu = new JMenu("Insert");
-
-        insertMenu.add(createNewNetworkMenu());
-        insertMenu.add(actionManager.getNewNeuronAction());
-
-        return insertMenu;
-    }
-
-    /**
-     * Create and return a new View menu for this rootNetwork panel.
-     *
-     * @return a new View menu for this rootNetwork panel
-     */
-    JMenu createViewMenu() {
-        JMenu viewMenu = new JMenu("View");
-
-        viewMenu.add(actionManager.getShowEditToolBarMenuItem());
-        viewMenu.add(actionManager.getShowMainToolBarMenuItem());
-        viewMenu.add(actionManager.getShowClampToolBarMenuItem());
-        viewMenu.add(actionManager.getShowGUIAction());
-        viewMenu.add(actionManager.getShowNodesAction());
-
-        return viewMenu;
-    }
-
     /**
      * Creates a new rootNetwork JMenu.
      *
      * @return the new rootNetwork menu
      */
-    private JMenu createNewNetworkMenu() {
+    protected JMenu createNewNetworkMenu() {
         JMenu newNetMenu = new JMenu("New Network");
         newNetMenu.add(actionManager.getNewActorCriticNetworkAction());
         newNetMenu.add(actionManager.getNewBackpropNetworkAction());
@@ -430,48 +352,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         newNetMenu.add(actionManager.getNewWTANetworkAction());
 
         return newNetMenu;
-    }
-
-    /**
-     * Create clamp JMenu.
-     *
-     * @return the clamp JMenu
-     */
-    private JMenu createClampMenu() {
-        JMenu clampMenu = new JMenu("Clamp");
-        JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();
-        checkBoxes.add(cbW);
-        clampMenu.add(cbW);
-        JCheckBoxMenuItem cbN = actionManager.getClampNeuronsMenuItem();
-        checkBoxes.add(cbN);
-        clampMenu.add(cbN);
-        return clampMenu;
-    }
-
-    /**
-     * Create a selection JMenu.
-     *
-     * @return the selection menu.
-     */
-    public JMenu createSelectionMenu() {
-        JMenu selectionMenu = new JMenu("Select");
-        selectionMenu.add(actionManager.getSelectAllAction());
-        selectionMenu.add(actionManager.getSelectAllWeightsAction());
-        selectionMenu.add(actionManager.getSelectAllNeuronsAction());
-        selectionMenu.add(actionManager.getSelectIncomingWeightsAction());
-        selectionMenu.add(actionManager.getSelectOutgoingWeightsAction());
-        return selectionMenu;
-    }
-
-    /**
-     * Create and return a new Help menu for this rootNetwork panel.
-     *
-     * @return a new Help menu for this rootNetwork panel
-     */
-    JMenu createHelpMenu() {
-        JMenu helpMenu = new JMenu("Help");
-        helpMenu.add(actionManager.getShowHelpAction());
-        return helpMenu;
     }
 
     /**
@@ -1856,20 +1736,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * @return Returns the lineColor.
-     */
-    public Color getLineColor() {
-        return lineColor;
-    }
-
-    /**
-     * @param lineColor The lineColor to set.
-     */
-    public void setLineColor(final Color lineColor) {
-        this.lineColor = lineColor;
-    }
-
-    /**
      * @return Returns the numberOfPastes.
      */
     public double getNumberOfPastes() {
@@ -2375,5 +2241,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
         /* no implementation */
+    }
+
+    /**
+     * This is here so it can be overriden by NetworkDesktopDialog
+     * @param networkPanel
+     * @return
+     */
+    public NetworkDialog getNetworkDialog(NetworkPanel networkPanel) {
+        System.out.println("subclass");
+        return new NetworkDialog(networkPanel);
     }
 }

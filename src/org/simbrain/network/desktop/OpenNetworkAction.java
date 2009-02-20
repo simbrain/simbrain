@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.actions;
+package org.simbrain.network.desktop;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -25,42 +25,43 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.resource.ResourceManager;
 
 /**
- * Close network action.
+ * Open network action.
  */
-public final class CloseNetworkAction
-    extends AbstractAction {
+public final class OpenNetworkAction extends AbstractAction {
 
     /** Network panel. */
-    private final NetworkPanel networkPanel;
+    private final NetworkDesktopComponent networkComponent;
 
 
     /**
-     * Create a new close network action with the specified
+     * Create a new open network action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public CloseNetworkAction(final NetworkPanel networkPanel) {
+    public OpenNetworkAction(final NetworkDesktopComponent networkComponent) {
 
-        super("Close");
+        super("Open...");
 
-        if (networkPanel == null) {
+        if (networkComponent == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        this.networkPanel = networkPanel;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W,
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
+
+        this.networkComponent = networkComponent;
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        //networkPanel.getParentComponent().getParentFrame().dispose();
+        networkComponent.showOpenFileDialog();
     }
 }

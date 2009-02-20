@@ -22,9 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 
 import org.simbrain.network.gui.actions.AlignHorizontalAction;
@@ -33,7 +31,6 @@ import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
 import org.simbrain.network.gui.actions.ClearNeuronsAction;
 import org.simbrain.network.gui.actions.ClearSelectionAction;
-import org.simbrain.network.gui.actions.CloseNetworkAction;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
@@ -50,13 +47,10 @@ import org.simbrain.network.gui.actions.NewNeuronAction;
 import org.simbrain.network.gui.actions.NewSOMNetworkAction;
 import org.simbrain.network.gui.actions.NewStandardNetworkAction;
 import org.simbrain.network.gui.actions.NewWTANetworkAction;
-import org.simbrain.network.gui.actions.OpenNetworkAction;
 import org.simbrain.network.gui.actions.PanEditModeAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.RandomizeObjectsAction;
 import org.simbrain.network.gui.actions.RunNetworkAction;
-import org.simbrain.network.gui.actions.SaveAsNetworkAction;
-import org.simbrain.network.gui.actions.SaveNetworkAction;
 import org.simbrain.network.gui.actions.SelectAllAction;
 import org.simbrain.network.gui.actions.SelectAllNeuronsAction;
 import org.simbrain.network.gui.actions.SelectAllWeightsAction;
@@ -156,18 +150,6 @@ public final class NetworkActionManager {
     /** Show network preferences action. */
     private final Action showNetworkPreferencesAction;
 
-    /** Open network action. */
-    private final Action openNetworkAction;
-
-    /** Save network action. */
-    private final Action saveNetworkAction;
-
-    /** Save as network action. */
-    private final Action saveAsNetworkAction;
-
-    /** Close network action. */
-    private final Action closeNetworkAction;
-
     /** Align vertical action. */
     private final Action alignVerticalAction;
 
@@ -246,7 +228,10 @@ public final class NetworkActionManager {
     /** Sets the source neurons for neuron connections. */
     private Action setSourceNeuronsAction;
 
-    /** Sets the GUI to be used while running networks. Note that the action is wrapped in CheckBoxMenuItem. */
+    /**
+     * Sets the GUI to be used while running networks. Note that the action is
+     * wrapped in CheckBoxMenuItem.
+     */
     private final JCheckBoxMenuItem showGUIAction;
 
     /** Sets the nodes to be shown in GUI. Note that the action is wrapped in CheckBoxMenuItem. */
@@ -313,11 +298,6 @@ public final class NetworkActionManager {
         showDebugAction = new ShowDebugAction(networkPanel);
 
         showNetworkPreferencesAction = new ShowNetworkPreferencesAction(networkPanel);
-
-        openNetworkAction = new OpenNetworkAction(networkPanel);
-        saveNetworkAction = new SaveNetworkAction(networkPanel);
-        saveAsNetworkAction = new SaveAsNetworkAction(networkPanel);
-        closeNetworkAction = new CloseNetworkAction(networkPanel);
 
         alignVerticalAction = new AlignVerticalAction(networkPanel);
         alignHorizontalAction = new AlignHorizontalAction(networkPanel);
@@ -412,17 +392,6 @@ public final class NetworkActionManager {
     public List getNetworkControlActions() {
         return Arrays.asList(new Action[] {runNetworkAction,
                                            stopNetworkAction });
-    }
-
-    /**
-     * Return open and save actions.
-     *
-     * @return a list of open / save actions
-     */
-    public List<Action> getOpenCloseActions() {
-        return Arrays.asList(new Action[] {openNetworkAction,
-                                           saveNetworkAction,
-                                           saveAsNetworkAction});
     }
 
     /**
@@ -553,42 +522,6 @@ public final class NetworkActionManager {
      */
     public Action getShowNetworkPreferencesAction() {
         return showNetworkPreferencesAction;
-    }
-
-    /**
-     * Return the open network action.
-     *
-     * @return the open network action
-     */
-    public Action getOpenNetworkAction() {
-        return openNetworkAction;
-    }
-
-    /**
-     * Return the save as network action.
-     *
-     * @return the save as network action
-     */
-    public Action getSaveAsNetworkAction() {
-        return saveAsNetworkAction;
-    }
-
-    /**
-     * Return the save network action.
-     *
-     * @return the save network action
-     */
-    public Action getSaveNetworkAction() {
-        return saveNetworkAction;
-    }
-
-    /**
-     * Return the close network action.
-     *
-     * @return the close network action
-     */
-    public Action getCloseNetworkAction() {
-        return closeNetworkAction;
     }
 
     /**

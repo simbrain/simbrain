@@ -17,9 +17,9 @@ public abstract class ConnectNeurons {
     protected Network network;
     /** The source group of neurons, generally from which connections will be made. */
     protected ArrayList<Neuron> sourceNeurons;
-    /** The garget group of neurons, generally to which connections will be made. */
+    /** The target group of neurons, generally to which connections will be made. */
     protected ArrayList<Neuron> targetNeurons;
-
+    
     /**
      * Default constructor.
      *

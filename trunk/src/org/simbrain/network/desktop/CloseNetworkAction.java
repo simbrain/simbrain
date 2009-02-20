@@ -16,45 +16,51 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.actions;
+package org.simbrain.network.desktop;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
 
 /**
- * Save as network action.
+ * Close network action.
  */
-public final class SaveAsNetworkAction
+public final class CloseNetworkAction
     extends AbstractAction {
 
     /** Network panel. */
-    private final NetworkPanel networkPanel;
+    private final NetworkDesktopComponent networkDesktopComponent;
 
 
     /**
-     * Create a new save as network action with the specified network panel.
+     * Create a new close network action with the specified
+     * network panel.
      *
-     * @param networkPanel networkPanel, must not be null
+     * @param networkDesktopComponent networkPanel, must not be null
      */
-    public SaveAsNetworkAction(final NetworkPanel networkPanel) {
+    public CloseNetworkAction(final NetworkDesktopComponent networkDesktopComponent) {
 
-        super("Save As...");
+        super("Close");
 
-        if (networkPanel == null) {
+        if (networkDesktopComponent == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
+        this.networkDesktopComponent = networkDesktopComponent;
 
-        this.networkPanel = networkPanel;
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
     }
+
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        //networkPanel.getParentComponent().showSaveFileDialog();
+        networkDesktopComponent.getParentFrame().dispose();
     }
 }

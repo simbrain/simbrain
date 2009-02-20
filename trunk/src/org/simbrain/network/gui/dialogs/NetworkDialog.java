@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
@@ -84,7 +85,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private static final String ZERO = "Zero weight";
 
     /** Network panel. */
-    private NetworkPanel networkPanel;
+    protected NetworkPanel networkPanel;
 
     /** List of items for combo box. */
     private String[] objectColorList = {BACKGROUND, COOLNODE, EXCITATORY, HOTNODE,
@@ -114,9 +115,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /** Miscellaneous panel. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
 
-    /** Restore defaults button. */
-    private JButton defaultButton = new JButton("Restore defaults");
-
     /** Change color combo box. */
     private JComboBox cbChangeColor = new JComboBox(objectColorList);
 
@@ -137,9 +135,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /** Rounding check box. */
     private JCheckBox isRoundingBox = new JCheckBox();
-
-    /** Indent network files check box. */
-    private JCheckBox indentNetworkFilesBox = new JCheckBox();
 
     /** Nudge amount text field. */
     private JTextField nudgeAmountField = new JTextField();
@@ -191,7 +186,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         weightSizeMinSlider.setPaintLabels(true);
 
         //Add Action Listeners
-        defaultButton.addActionListener(this);
         showTimeBox.addActionListener(this);
         showSubnetOutlineBox.addActionListener(this);
         changeColorButton.addActionListener(this);
@@ -224,7 +218,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         logicPanel.addItem("Set Script", scriptButton);
 
         //Set up Misc Panel
-        miscPanel.addItem("Indent network files", indentNetworkFilesBox);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
 
         //Set up tab panels
@@ -234,7 +227,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         tabbedPane.addTab("Graphics", tabGraphics);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Misc.", tabMisc);
-        addButton(defaultButton);
         setContentPane(tabbedPane);
     }
 
@@ -273,7 +265,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
 
                 if (theColor != null) {
-                    networkPanel.setLineColor(theColor);
+                    NetworkGuiSettings.setLineColor(theColor);
                }
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
@@ -327,9 +319,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             }
             networkPanel.resetColors();
             setIndicatorColor();
-        } else if (o == defaultButton) {
-            //NetworkPreferences.restoreDefaults();
-            this.returnToCurrentPrefs();
         } else if (e.getActionCommand().equals("moveSelector")) {
             setIndicatorColor();
         } else if (o == showTimeBox) {
@@ -355,7 +344,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         isRoundingBox.setSelected(networkPanel.getRootNetwork().getRoundingOff());
         weightSizeMaxSlider.setValue(networkPanel.getMaxDiameter());
         weightSizeMinSlider.setValue(networkPanel.getMinDiameter());
-        indentNetworkFilesBox.setSelected(networkPanel.getRootNetwork().getUsingTabs());
         if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.BUFFERED)) {
             cbUpdateMethod.setSelectedIndex(0);
         } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.PRIORITYBASED)) {
@@ -370,7 +358,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      */
     private void commitChanges() {
         networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
-        networkPanel.getRootNetwork().setUsingTabs(indentNetworkFilesBox.isSelected());
         networkPanel.getRootNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         switch (cbUpdateMethod.getSelectedIndex()) {
             case 0:
@@ -440,65 +427,16 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Restores the changed fields to their previous values used when user cancels out of the dialog.
-     */
-    public void returnToCurrentPrefs() {
-//        networkPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
-//        networkPanel.setLineColor(new Color(NetworkPreferences.getLineColor()));
-//        networkPanel.setHotColor(NetworkPreferences.getHotColor());
-//        networkPanel.setCoolColor(NetworkPreferences.getCoolColor());
-//        networkPanel.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
-//        networkPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
-//        SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
-//        SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
-//        networkPanel.setSpikingColor(new Color(NetworkPreferences.getSpikingColor()));
-//        networkPanel.setZeroWeightColor(new Color(NetworkPreferences.getZeroWeightColor()));
-//        networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
-//        networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
-//        networkPanel.getRootNetwork().setTimeStep(NetworkPreferences.getTimeStep());
-//        networkPanel.getRootNetwork().setPrecision(NetworkPreferences.getPrecision());
-//        networkPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
-//        networkPanel.getRootNetwork().setUsingTabs(NetworkPreferences.getUsingIndent());
-        networkPanel.resetColors();
-        setIndicatorColor();
-        networkPanel.resetSynapseDiameters();
-        fillFieldValues();
-    }
-
-    /**
-     * Sets selected preferences as user defaults to be used each time program is launched.
-     * Called when "ok" is pressed.
-     */
-    public void setAsDefault() {
-//        NetworkPreferences.setBackgroundColor(networkPanel.getBackground().getRGB());
-//        NetworkPreferences.setLineColor(networkPanel.getLineColor().getRGB());
-//        NetworkPreferences.setHotColor(networkPanel.getHotColor());
-//        NetworkPreferences.setCoolColor(networkPanel.getCoolColor());
-//        NetworkPreferences.setExcitatoryColor(networkPanel.getExcitatoryColor().getRGB());
-//        NetworkPreferences.setInhibitoryColor(networkPanel.getInhibitoryColor().getRGB());
-//        NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
-//        NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
-//        NetworkPreferences.setSpikingColor(networkPanel.getSpikingColor().getRGB());
-//        NetworkPreferences.setZeroWeightColor(networkPanel.getZeroWeightColor().getRGB());
-//        NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
-//        NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
-//        NetworkPreferences.setTimeStep(networkPanel.getRootNetwork().getTimeStep());
-//        NetworkPreferences.setPrecision(networkPanel.getRootNetwork().getPrecision());
-//        NetworkPreferences.setUsingIndent(networkPanel.getRootNetwork().getUsingTabs());
-//        NetworkPreferences.setNudgeAmount(networkPanel.getNudgeAmount());
-    }
-
-    /**
      * Set the color indicator based on the current selection  in the combo box.
      */
-    private void setIndicatorColor() {
+    protected void setIndicatorColor() {
         if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
 
             colorIndicator.setBackground(networkPanel.getBackground());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
 
-            colorIndicator.setBackground(networkPanel.getLineColor());
+            colorIndicator.setBackground(NetworkGuiSettings.getLineColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
 

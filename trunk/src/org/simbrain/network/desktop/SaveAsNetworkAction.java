@@ -16,22 +16,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.actions;
+package org.simbrain.network.desktop;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Save network action.
+ * Save as network action.
  */
-public final class SaveNetworkAction
+public final class SaveAsNetworkAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -39,28 +36,25 @@ public final class SaveNetworkAction
 
 
     /**
-     * Create a new save network action with the specified network panel.
+     * Create a new save as network action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public SaveNetworkAction(final NetworkPanel networkPanel) {
+    public SaveAsNetworkAction(final NetworkPanel networkPanel) {
 
-        super("Save");
+        super("Save As...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
-
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
 
         this.networkPanel = networkPanel;
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-       //networkPanel.getParentComponent().save();
+        //networkPanel.getParentComponent().showSaveFileDialog();
     }
 }

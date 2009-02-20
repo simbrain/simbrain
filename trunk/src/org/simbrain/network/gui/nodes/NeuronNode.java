@@ -33,6 +33,7 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
@@ -173,6 +174,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         this.addChild(text);
 
+        resetColors();
         update();
 
         setPickable(true);
@@ -356,8 +358,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 circle.setStrokePaint(getNetworkPanel().getSpikingColor());
                 outArrow.setStrokePaint(getNetworkPanel().getSpikingColor());
             } else {
-                circle.setStrokePaint(getNetworkPanel().getLineColor());
-                outArrow.setStrokePaint(getNetworkPanel().getLineColor());
+                circle.setStrokePaint(NetworkGuiSettings.getLineColor());
+                outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
             }
         }
     }
@@ -749,10 +751,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** @see ScreenElement */
     public void resetColors() {
-        circle.setStrokePaint(getNetworkPanel().getLineColor());
-        inArrow.setStrokePaint(getNetworkPanel().getLineColor());
-        outArrow.setStrokePaint(getNetworkPanel().getLineColor());
-        updateColor();
+        circle.setStrokePaint(NetworkGuiSettings.getLineColor());
+        inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+        outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
     }
 
     /**

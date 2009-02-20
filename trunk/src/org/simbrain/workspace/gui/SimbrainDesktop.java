@@ -50,7 +50,7 @@ import org.apache.log4j.Logger;
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.gui.NetworkDesktopComponent;
+import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.plot.barchart.BarChartComponent;
 import org.simbrain.plot.barchart.BarChartGui;
 import org.simbrain.plot.piechart.PieChartComponent;

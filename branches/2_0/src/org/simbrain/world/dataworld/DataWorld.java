@@ -19,6 +19,7 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -78,7 +79,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     private ButtonEditor buttonEditor;
 
     /** Upper bound. */
-    private int upperBound = 0;
+    private int upperBound = 1;
 
     /** Lower bound. */
     private int lowerBound = 0;
@@ -116,6 +117,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /** Local variable used for iterating. */
     private int currentRowCounter = 0;
 
+    /** Grid Color. */
+    private Color gridColor =  Color.LIGHT_GRAY;
+
     /**
      * Creates a new instance of the data world.
      *
@@ -143,6 +147,8 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         remRow.setActionCommand("remRowHere");
         remCol.addActionListener(parentFrame);
         remCol.setActionCommand("remColHere");
+
+        table.setGridColor(gridColor);
 
         add("Center", table);
         init();

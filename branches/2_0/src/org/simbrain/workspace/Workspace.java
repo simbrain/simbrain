@@ -263,13 +263,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         menuItem.addActionListener(this);
         fileMenu.add(menuItem);
         menuItem = new JMenu("Open World");
-        JMenuItem subMenuItem = new JMenuItem("OdorWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("openOdorWorld");
-        menuItem.add(subMenuItem);
-        subMenuItem = new JMenuItem("DataWorld");
+        JMenuItem subMenuItem = new JMenuItem("DataWorld");
         subMenuItem.addActionListener(this);
         subMenuItem.setActionCommand("openDataWorld");
+        menuItem.add(subMenuItem);
+        subMenuItem = new JMenuItem("OdorWorld");
+        subMenuItem.addActionListener(this);
+        subMenuItem.setActionCommand("openOdorWorld");
         menuItem.add(subMenuItem);
         fileMenu.add(menuItem);
         fileMenu.addSeparator();
@@ -299,14 +299,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         insertMenu.add(menuItem);
 
         menuItem = new JMenu("New World");
-        subMenuItem = new JMenuItem("OdorWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("newOdorWorld");
-        menuItem.add(subMenuItem);
-
         subMenuItem = new JMenuItem("DataWorld");
         subMenuItem.addActionListener(this);
         subMenuItem.setActionCommand("newDataWorld");
+        menuItem.add(subMenuItem);
+        subMenuItem = new JMenuItem("OdorWorld");
+        subMenuItem.addActionListener(this);
+        subMenuItem.setActionCommand("newOdorWorld");
         menuItem.add(subMenuItem);
 
 //        subMenuItem = new JMenuItem("TextWorld");

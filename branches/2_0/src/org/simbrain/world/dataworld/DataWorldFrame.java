@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -105,8 +106,17 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     /** Add row menu item. */
     private JMenuItem addRow = new JMenuItem("Add a row");
 
+    /** Add multiple rows menu item. */
+    private JMenuItem addRowsDialog = new JMenuItem("Add rows...");
+
     /** Add column menu item. */
     private JMenuItem addCol = new JMenuItem("Add a column");
+
+    /** Add multiple columns menu item. */
+    private JMenuItem addColumnsDialog = new JMenuItem("Add columns...");
+
+    /** Set the number of columns and rows menu item. */
+    private JMenuItem setRowsColumnsDialog = new JMenuItem("Set rows/columns...");
 
     /** Zero fill menu item. */
     private JMenuItem zeroFill = new JMenuItem("ZeroFill the Table");
@@ -205,8 +215,14 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
 
         addRow.addActionListener(this);
         addRow.setActionCommand("addRow");
+        addRowsDialog.addActionListener(this);
+        addRowsDialog.setActionCommand("addRowsDialog");
         addCol.addActionListener(this);
         addCol.setActionCommand("addCol");
+        addColumnsDialog.addActionListener(this);
+        addColumnsDialog.setActionCommand("addColumnsDialog");
+        setRowsColumnsDialog.addActionListener(this);
+        setRowsColumnsDialog.setActionCommand("setRowsColumnsDialog");
         remRow.addActionListener(this);
         remRow.setActionCommand("remRow");
         remCol.addActionListener(this);
@@ -215,6 +231,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         zeroFill.setActionCommand("zeroFill");
         randomize.addActionListener(this);
         randomize.setActionCommand("randomize");
+        randomize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
         randomProps.addActionListener(this);
         randomProps.setActionCommand("randomProps");
         iterationMode.addActionListener(this);
@@ -222,7 +240,10 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         columnIteration.addActionListener(this);
         columnIteration.setActionCommand("columnIteration");
         edit.add(addRow);
+        edit.add(addRowsDialog);
         edit.add(addCol);
+        edit.add(addColumnsDialog);
+        edit.add(setRowsColumnsDialog);
         edit.add(zeroFill);
         edit.addSeparator();
         edit.add(remRow);
@@ -593,10 +614,28 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             }
 
             changedSinceLastSave = true;
+        } else if (e.getActionCommand().equals("addRowsDialog")) {
+            AddRowsDialog dialog = new AddRowsDialog(this);
+            dialog.setLocationRelativeTo(null);
+            dialog.setAlwaysOnTop(true);
+            dialog.pack();
+            dialog.setVisible(true);
         } else if (e.getActionCommand().equals("addCol")) {
             this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()));
             this.getWorld().getModel().zeroFillNew();
             changedSinceLastSave = true;
+        } else if (e.getActionCommand().equals("addColumnsDialog")) {
+            AddColumnsDialog dialog = new AddColumnsDialog(this);
+            dialog.setLocationRelativeTo(null);
+            dialog.setAlwaysOnTop(true);
+            dialog.pack();
+            dialog.setVisible(true);
+        } else if (e.getActionCommand().equals("setRowsColumnsDialog")) {
+            SetRowsColumnsDialog dialog = new SetRowsColumnsDialog(this);
+            dialog.setLocationRelativeTo(null);
+            dialog.setAlwaysOnTop(true);
+            dialog.pack();
+            dialog.setVisible(true);
         } else if (e.getActionCommand().equals("addColHere")) {
             insertColumnAtPoint(this.getWorld().getSelectedPoint());
             this.getWorld().getModel().zeroFillNew();

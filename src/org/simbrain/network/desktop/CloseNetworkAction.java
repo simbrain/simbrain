@@ -25,8 +25,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.gui.NetworkPanel;
-
 /**
  * Close network action.
  */

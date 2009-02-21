@@ -19,7 +19,6 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -29,7 +28,6 @@ import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -173,7 +171,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         getContentPane().add("Center", worldScroller);
         world = new DataWorld(this);
         addMenuBar(world);
-        getContentPane().add(world.getTable().getTableHeader(), BorderLayout.PAGE_START);
         worldScroller.setViewportView(world);
         worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

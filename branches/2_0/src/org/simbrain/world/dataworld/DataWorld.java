@@ -128,6 +128,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     public DataWorld(final DataWorldFrame ws) {
         super(new BorderLayout());
         setParentFrame(ws);
+        add(getTable().getTableHeader(), BorderLayout.PAGE_START);
 
         buttonEditor = new ButtonEditor(new AbstractAction()
             {

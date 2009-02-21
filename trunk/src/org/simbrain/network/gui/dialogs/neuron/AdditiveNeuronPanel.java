@@ -85,7 +85,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
@@ -129,7 +129,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
         AdditiveNeuron neuronRef = new AdditiveNeuron();
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
@@ -139,7 +139,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < neuronList.size(); i++) {
             AdditiveNeuron neuronRef = (AdditiveNeuron) neuronList.get(i);

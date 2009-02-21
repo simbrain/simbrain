@@ -54,6 +54,15 @@ public class Radial extends ConnectNeurons {
         super(network, neurons, neurons2);
     }
 
+    /** {@inheritDoc} */
+    public Radial() {
+    }
+    
+    @Override
+    public String toString() {
+        return "Radial";
+    }
+    
     /** @inheritDoc */
     public void connectNeurons() {
         for (Neuron source : sourceNeurons) {

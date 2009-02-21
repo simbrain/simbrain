@@ -52,7 +52,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         super(frame, component);
         this.setPreferredSize(new Dimension(450,400));
 
-        networkPanel = new NetworkPanelDesktop(component.getRootNetwork());
+        networkPanel = new NetworkPanelDesktop(this, component.getRootNetwork());
 
         // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         setLayout(new BorderLayout());

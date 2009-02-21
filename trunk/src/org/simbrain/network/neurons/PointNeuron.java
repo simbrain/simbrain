@@ -176,7 +176,7 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
         current = getLeakCurrent() + getExcitatoryCurrent() + getInhibitoryCurrent();
 
         // Update voltage
-        voltage = voltage - this.getParentNetwork().getTimeStep() * current;
+        voltage = voltage - this.getParentNetwork().getRootNetwork().getTimeStep() * current;
 
         // Apply output function
         if (outputFunction == NONE) {

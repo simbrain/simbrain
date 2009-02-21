@@ -99,7 +99,7 @@ public class AdditiveNeuron extends Neuron {
         }
 
         double val =  getActivation()
-                        + super.getParentNetwork().getTimeStep() * (-getActivation() / resistance + wtdSum);
+                        + super.getParentNetwork().getRootNetwork().getTimeStep() * (-getActivation() / resistance + wtdSum);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();

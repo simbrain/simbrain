@@ -31,19 +31,13 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
     public void commitChanges() {
     }
 
     /**
-     * Populates fields with default data.
-     */
-    public void fillDefaultValues() {
-    }
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
     public void fillFieldValues() {
     }

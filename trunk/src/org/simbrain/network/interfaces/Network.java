@@ -36,7 +36,7 @@ import org.simbrain.workspace.CouplingManager;
 public abstract class Network {
 
     /** The initial time-step for the network. */
-    private static final double DEFAULT_TIME_STEP = .01;
+    private static final double DEFAULT_TIME_STEP = .2;
     
     /** Logger. */
     private Logger logger = Logger.getLogger(Network.class);
@@ -765,29 +765,6 @@ public abstract class Network {
      */
     public void setParentNetwork(final Network parentNet) {
         this.parentNet = parentNet;
-    }
-
-    /**
-     * @return Returns the timeStep.
-     */
-    public double getTimeStep() {
-        return timeStep;
-    }
-
-    /**
-     * @param timeStep The timeStep to set.
-     */
-    public void setTimeStep(final double timeStep) {
-        this.timeStep = timeStep;
-    }
-
-    /**
-     * @return Units by which to count.
-     */
-    public static String[] getUnits() {
-        String[] units = {"Seconds", "Iterations" };
-
-        return units;
     }
 
     /**

@@ -97,7 +97,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
         }
 
         double val = getActivation()
-                     + (this.getParentNetwork().getTimeStep() / timeConstant * (restingPotential - getActivation()
+                     + (this.getParentNetwork().getRootNetwork().getTimeStep() / timeConstant * (restingPotential - getActivation()
                      + (resistance * inputs)));
 
         if (val > threshold) {

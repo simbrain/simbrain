@@ -6,6 +6,10 @@ import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 
+import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -14,8 +18,12 @@ import org.simbrain.util.StandardDialog;
  */
 public class ConnectionDialog extends StandardDialog implements ActionListener {
 
+    /** Connection type objects. */
+    private ConnectNeurons[] connectionObjects = new ConnectNeurons[] {
+            new AllToAll(), new OneToOne(), new Sparse() };
+
     /** Select connection type. */
-    private JComboBox cbConnectionType = new JComboBox(new String[]{"All to All", "One to One", "Sparse"});
+    private JComboBox cbConnectionType = new JComboBox(connectionObjects);
 
     /** Main dialog box. */
     private Box mainPanel = Box.createVerticalBox();
@@ -28,7 +36,6 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
 
     /**
      * Connection dialog default constructor.
-     *
      */
     public ConnectionDialog() {
         init();
@@ -36,16 +43,15 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
 
     /**
      * Initialize default constructor.
-     *
      */
     private void init() {
         setTitle("Connect Neurons");
 
-        initConnectionType();
-
         cbConnectionType.addActionListener(this);
-
         typePanel.addItem("Connection Type", cbConnectionType);
+        cbConnectionType.setSelectedItem(connectionObjects[0]);
+        initPanel();
+        ConnectNeurons.connectionType = (ConnectNeurons)cbConnectionType.getSelectedItem();
         mainPanel.add(typePanel);
         mainPanel.add(optionsPanel);
         setContentPane(mainPanel);
@@ -60,20 +66,33 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
     /**
      * Initialize the connection panel based upon the current connection type.
      */
-    private void initConnectionType() {
-//        if (NetworkPreferences.getConnectionType().equalsIgnoreCase("All to All")) {
-//            cbConnectionType.setSelectedIndex(0);
-//            optionsPanel = new AllToAllPanel();
-//            optionsPanel.fillFieldValues();
-//        } else if (NetworkPreferences.getConnectionType().equalsIgnoreCase("One to One")) {
-//            cbConnectionType.setSelectedIndex(1);
-//            optionsPanel = new OneToOnePanel();
-//            optionsPanel.fillFieldValues();
-//        } else if (NetworkPreferences.getConnectionType().equals("Sparse")) {
-//            cbConnectionType.setSelectedIndex(2);
-//            optionsPanel = new SparsePanel();
-//            optionsPanel.fillFieldValues();
-//        }
+    private void initPanel() {
+        if (cbConnectionType.getSelectedItem() instanceof AllToAll) {
+            clearOptionPanel();
+            optionsPanel = new AllToAllPanel();
+            optionsPanel.fillFieldValues();
+            mainPanel.add(optionsPanel);
+        } else if (cbConnectionType.getSelectedItem() instanceof OneToOne) {
+            clearOptionPanel();
+            optionsPanel = new OneToOnePanel();
+            optionsPanel.fillFieldValues();
+            mainPanel.add(optionsPanel);
+        } else if (cbConnectionType.getSelectedItem() instanceof Sparse) {
+            clearOptionPanel();
+            optionsPanel = new SparsePanel();
+            optionsPanel.fillFieldValues();
+            mainPanel.add(optionsPanel);
+        }
+        pack();
+    }
+    
+    /**
+     * Remove current panel, if any.
+     */
+    private void clearOptionPanel() {
+        if (optionsPanel != null) {
+            mainPanel.remove(optionsPanel);
+        }
     }
 
     /**
@@ -81,31 +100,14 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
      * @param e Action event.
      */
     public void actionPerformed(final ActionEvent e) {
-        if (cbConnectionType.getSelectedItem().equals("All to All")) {
-            mainPanel.remove(optionsPanel);
-            optionsPanel = new AllToAllPanel();
-            optionsPanel.fillDefaultValues();
-            mainPanel.add(optionsPanel);
-        } else if (cbConnectionType.getSelectedItem().equals("One to One")) {
-            mainPanel.remove(optionsPanel);
-            optionsPanel = new OneToOnePanel();
-            optionsPanel.fillDefaultValues();
-            mainPanel.add(optionsPanel);
-        } else if (cbConnectionType.getSelectedItem().equals("Sparse")) {
-            mainPanel.remove(optionsPanel);
-            optionsPanel = new SparsePanel();
-            optionsPanel.fillDefaultValues();
-            mainPanel.add(optionsPanel);
-        }
-
-        pack();
+         initPanel();
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-//        NetworkPreferences.setConnectionType(cbConnectionType.getSelectedItem().toString());
+        ConnectNeurons.connectionType = (ConnectNeurons)cbConnectionType.getSelectedItem();
         optionsPanel.commitChanges();
     }
 }

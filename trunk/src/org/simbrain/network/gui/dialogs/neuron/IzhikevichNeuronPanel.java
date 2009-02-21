@@ -87,7 +87,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         IzhikevichNeuron neuronRef = (IzhikevichNeuron) neuronList.get(0);
 
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
 
         tfA.setText(Double.toString(neuronRef.getA()));
         tfB.setText(Double.toString(neuronRef.getB()));
@@ -137,7 +137,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         IzhikevichNeuron neuronRef = new IzhikevichNeuron();
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
         tfA.setText(Double.toString(neuronRef.getA()));
         tfB.setText(Double.toString(neuronRef.getB()));
         tfC.setText(Double.toString(neuronRef.getC()));
@@ -150,7 +150,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < neuronList.size(); i++) {
             IzhikevichNeuron neuronRef = (IzhikevichNeuron) neuronList.get(i);

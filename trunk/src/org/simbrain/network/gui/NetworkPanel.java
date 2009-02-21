@@ -1140,14 +1140,13 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public void neuronAdded(final NetworkEvent<Neuron> e) {
         neuronAdded(e.getObject());
     }
-
+    
     /** @inheritDoc org.simnet.interfaces.NetworkListener#neuronAdded */
     public void neuronAdded(final Neuron neuron) {
         if (this.findNeuronNode(neuron) != null) {
             return;
         }
-
-        NeuronNode node = new NeuronNode(this, neuron);
+        NeuronNode node = getNeuronNode(this, neuron);
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
     }
@@ -2008,12 +2007,14 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         actionManager.getShowNodesAction().setState(synapseNodeOn);
 
         if (synapseNodeOn) {
-            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext(); ) {
+            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes
+                    .hasNext();) {
                 SynapseNode node = (SynapseNode) synapseNodes.next();
                 node.setVisible(true);
             }
         } else {
-            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext(); ) {
+            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes
+                    .hasNext();) {
                 SynapseNode node = (SynapseNode) synapseNodes.next();
                 node.setVisible(false);
             }
@@ -2043,14 +2044,14 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void start() {
     	Executors.newSingleThreadExecutor().execute(new Runnable() {
-			public void run() {
-				isRunning = true;
-				NetworkUpdater updater = new NetworkUpdater(getRootNetwork());
-				while (isRunning) {
-	    			updater.run();					
-				}
-			}
-    	});
+            public void run() {
+                isRunning = true;
+                NetworkUpdater updater = new NetworkUpdater(getRootNetwork());
+                while (isRunning) {
+                    updater.run();
+                }
+            }
+        });
     }
 
     /**
@@ -2170,11 +2171,9 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     /**
      * Overridden so that multi-line tooltips can be used.
      */
-    public JToolTip createToolTip()
-    {
+    public JToolTip createToolTip() {
         return new JMultiLineToolTip();
     }
-
 
     /**
      * @return turn synapse nodes on.
@@ -2190,7 +2189,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public void setNodesOn(final boolean synapseNodeOn) {
         this.synapseNodeOn = synapseNodeOn;
     }
-
 
     /**
      * @return the actionManager
@@ -2228,28 +2226,50 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         return vgn;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public void componentUpdated() {
         /* no implementation */
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     public void setTitle(String name) {
         /* no implementation */
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
         /* no implementation */
     }
 
     /**
-     * This is here so it can be overriden by NetworkDesktopDialog
-     * @param networkPanel
-     * @return
+     * Returns a NetworkDialog. Overriden by NetworkPanelDesktop, which returns
+     * a NetworkDialog with additional features used in Desktop version of Simbrain.
+     *
+     * @param networkPanel network panel
+     * @return subclass version of network dialog.
      */
-    public NetworkDialog getNetworkDialog(NetworkPanel networkPanel) {
-        System.out.println("subclass");
+    public NetworkDialog getNetworkDialog(final NetworkPanel networkPanel) {
         return new NetworkDialog(networkPanel);
     }
+    
+    
+    /**
+     * Returns a neuron node. Overriden by NetworkPanelDesktop, which returns
+     * a NeuronNode with additional features used in Desktop version of Simbrain.
+     *
+     * @param netPanel network panel.
+     * @param neuron logical neuron this node represents
+     */
+    public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
+        return new NeuronNode(net, neuron);
+    }
+
 }

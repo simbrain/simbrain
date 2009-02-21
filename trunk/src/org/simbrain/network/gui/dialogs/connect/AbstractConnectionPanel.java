@@ -32,12 +32,8 @@ import org.simbrain.util.LabelledItemPanel;
  */
 public abstract class AbstractConnectionPanel extends JPanel {
 
-    /** Null string. */
-    public static final String NULL_STRING = "...";
-
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
-
 
     /**
      * Adds a new item.
@@ -51,7 +47,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
     /**
      * Adds a new item label.
      * @param text Text to add
-     * @param comp Componenet to add.
+     * @param comp Component to add.
      */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
@@ -69,11 +65,6 @@ public abstract class AbstractConnectionPanel extends JPanel {
      * Populate fields with current data.
      */
     public abstract void fillFieldValues();
-
-    /**
-     * Populate fields with default data.
-     */
-    public abstract void fillDefaultValues();
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.

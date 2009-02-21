@@ -57,12 +57,13 @@ import edu.umd.cs.piccolo.nodes.PText;
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
  */
 public class NeuronNode extends ScreenElement implements PropertyChangeListener {
+
     private static final Logger LOGGER = Logger.getLogger(NeuronNode.class);
     
     private static final long serialVersionUID = 1L;
 
     /** The logical neuron this screen element represents. */
-    private Neuron neuron;
+    protected Neuron neuron;
 
     /** Diameter of neuron. */
     private static final int DIAMETER = 24;
@@ -113,25 +114,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** Neuron font very small. */
     public static final Font NEURON_FONT_VERYSMALL = new Font("Arial", Font.PLAIN, 7);
-
-
-    /**
-     * Default constructor; used by Castor.
-     */
-    public NeuronNode() {
-        circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
-    }
-
-    //TODO: Delete this when everything has been converted
-    /**
-     * Initialize a NeuronNode to a location. Used by Castor.
-     *
-     * @param x x coordinate of NeuronNode
-     * @param y y coordinate of NeuronNode
-     */
-    public NeuronNode(final double x, final double y) {
-        offset(x, y);
-    }
 
     /**
      * Create a new neuron node.
@@ -280,7 +262,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // Add Connect Actions
         if (getNetworkPanel().getSelectedNeurons() != null) {
-            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), 
+            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(),
                 getNetworkPanel().getSelectedNeurons(), this));
         }
         contextMenu.add(getConnectMenu());
@@ -306,14 +288,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private JMenu getConnectMenu() {
         JMenu menu = new JMenu("Connect");
 
+        // Set Source Action
         menu.add(new SetSourceNeuronsAction(getNetworkPanel()));
-
-        // If neurons have been selected, create an acction which will connect selected neurons to this one
+        // Show Dialog Action
+        menu.add(new ShowConnectDialogAction(getNetworkPanel()));
+        // Connect Action
         if (getNetworkPanel().getSelectedNeurons() != null) {
             menu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(),
                     getNetworkPanel().getSelectedModelNeurons()));
-        }
-        menu.add(new ShowConnectDialogAction(getNetworkPanel()));
+        }        
         return menu;
     }
 

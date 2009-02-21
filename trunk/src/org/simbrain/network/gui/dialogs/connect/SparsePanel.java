@@ -20,6 +20,8 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import javax.swing.JTextField;
 
+import org.simbrain.network.connections.Sparse;
+
 
 /**
  * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron connections.
@@ -28,6 +30,7 @@ public class SparsePanel extends AbstractConnectionPanel {
 
     /** Excitatory Probability. */
     private JTextField tfExcite = new JTextField();
+
     /** Inhibitory Probability. */
     private JTextField tfInhibit = new JTextField();
 
@@ -40,27 +43,20 @@ public class SparsePanel extends AbstractConnectionPanel {
     }
 
     /**
-     * Populate fields with current data.
+     * {@inheritDoc}
      */
     public void commitChanges() {
-//        NetworkPreferences.setExcitatoryProbability(Double.parseDouble(tfExcite.getText()));
-//        NetworkPreferences.setInhibitoryProbability(Double.parseDouble(tfInhibit.getText()));
+        Sparse.excitatoryProbability = Double.parseDouble(tfExcite.getText());
+        Sparse.inhibitoryProbability = Double.parseDouble(tfInhibit.getText());
     }
 
+    
     /**
-     * Populates fields with default data.
-     */
-    public void fillDefaultValues() {
-//        tfExcite.setText(Double.toString(NetworkPreferences.getExcitatoryProbability()));
-//        tfInhibit.setText(Double.toString(NetworkPreferences.getInhibitoryProbability()));
-    }
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
+     * {@inheritDoc}
      */
     public void fillFieldValues() {
-//        tfExcite.setText(Double.toString(NetworkPreferences.getExcitatoryProbability()));
-//        tfInhibit.setText(Double.toString(NetworkPreferences.getInhibitoryProbability()));
+        tfExcite.setText(Double.toString(Sparse.excitatoryProbability));
+        tfInhibit.setText(Double.toString(Sparse.inhibitoryProbability));
     }
 
 }

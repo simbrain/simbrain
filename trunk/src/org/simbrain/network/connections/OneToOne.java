@@ -25,6 +25,15 @@ public class OneToOne extends ConnectNeurons {
     public OneToOne(final Network network, final ArrayList neurons, final ArrayList neurons2) {
         super(network, neurons, neurons2);
     }
+    
+    /** {@inheritDoc} */
+    public OneToOne() {
+    }
+
+    @Override
+    public String toString() {
+        return "One to one";
+    }
 
     /** @inheritDoc */
     public void connectNeurons() {
@@ -33,7 +42,7 @@ public class OneToOne extends ConnectNeurons {
             Neuron source = (Neuron) sources.next();
             if (targets.hasNext()) {
                 Neuron target = (Neuron) targets.next();
-                network.addSynapse(new ClampedSynapse(source, target));                    
+                network.addSynapse(new ClampedSynapse(source, target));
             }
         }
     }

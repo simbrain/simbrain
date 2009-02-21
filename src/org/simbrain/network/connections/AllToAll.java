@@ -15,12 +15,22 @@ import org.simbrain.network.synapses.ClampedSynapse;
 public class AllToAll extends ConnectNeurons {
 
     /** Allows neurons to have a self connection. */
-    private boolean allowSelfConnection = true;
+    public static boolean allowSelfConnection = true;
 
     public AllToAll(final Network network, final ArrayList neurons, final ArrayList neurons2) {
         super(network, neurons, neurons2);
     }
 
+    /** {@inheritDoc} */
+    public AllToAll() {
+    }
+
+    @Override
+    public String toString() {
+        return "All to all";
+    }
+
+    
     /** {@inheritDoc} */
     public void connectNeurons() {
         for (Neuron source : sourceNeurons) {

@@ -107,7 +107,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         PointNeuron neuronRef = (PointNeuron) neuronList.get(0);
 
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
 
         tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
@@ -162,7 +162,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         PointNeuron neuronRef = new PointNeuron();
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
         tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
@@ -179,7 +179,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < neuronList.size(); i++) {
             PointNeuron neuronRef = (PointNeuron) neuronList.get(i);

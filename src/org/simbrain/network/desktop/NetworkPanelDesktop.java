@@ -27,6 +27,8 @@ import javax.swing.JMenu;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
+import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 
 /**
@@ -36,8 +38,11 @@ import org.simbrain.network.interfaces.RootNetwork;
  */
 public class NetworkPanelDesktop extends NetworkPanel {
 
-    public NetworkPanelDesktop(final RootNetwork rootNetwork) {
+    NetworkDesktopComponent component;
+    
+    public NetworkPanelDesktop(final NetworkDesktopComponent component, final RootNetwork rootNetwork) {
         super(rootNetwork);
+        this.component = component;
         
         // TODO: Finish this and clean it up
         NetworkGuiSettings.setLineColor(new Color(NetworkGuiPreferences.getLineColor()));
@@ -152,12 +157,24 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
     
     /*
-     * This is here so it can be overriden by NetworkDesktopDialog
+     * This version of network dialog allows user to set User Preferences.
+     *
      * @param networkPanel
-     * @return
+     * @return superclass version of network dialog, with User Preferences
      */
-    public NetworkDialog getNetworkDialog(NetworkPanel networkPanel) {
-        System.out.println("superclass");
+    public NetworkDialog getNetworkDialog(final NetworkPanel networkPanel) {
         return new DesktopNetworkDialog(networkPanel);
     }
+    
+    /**
+     * This version of a NeuronNode has a coupling context menu.
+     *
+     * @param networkPanel network panel
+     * @param neuron neuron to show in Gui
+     * @return desktop version of NeuronNode, with context menu
+     */
+    public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
+        return new NeuronNodeDesktop(component, net, neuron);
+    }
+
 }

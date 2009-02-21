@@ -71,11 +71,11 @@ public class RootNetwork extends Network {
     /** If this is a continuous-time network. */
     public static final int CONTINUOUS = 1;
 
-    /** In iterations or seconds. */
+    /** In iterations or msec. */
     private double time = 0;
 
     /** Time step. */
-    private double timeStep = .01;
+    private double timeStep = .2;
 
     /** Constant value for Math.log(10); used to approximate log 10. */
     private static final double LOG_10 = Math.log(10);
@@ -506,7 +506,7 @@ public class RootNetwork extends Network {
      * @return Units by which to count.
      */
     public static String[] getUnits() {
-        String[] units = {"Seconds", "Iterations" };
+        String[] units = {"msec", "iterations" };
 
         return units;
     }

@@ -16,9 +16,9 @@ import org.simbrain.network.synapses.ClampedSynapse;
 public class Sparse extends ConnectNeurons {
 
     /** Probability connection will be an excitatory weight. */
-    private double excitatoryProbability = .1;
+    public static double excitatoryProbability = .1;
     /** Probability connection will be an inhibitory weight. */
-    private double inhibitoryProbability = .1;
+    public static double inhibitoryProbability = .1;
 
     //TODO: set weights strengths or synapses
     
@@ -32,6 +32,15 @@ public class Sparse extends ConnectNeurons {
     public Sparse(final Network network, final ArrayList neurons, final ArrayList neurons2) {
         super(network, neurons, neurons2);
     }
+    
+    /** {@inheritDoc} */
+    public Sparse() {}
+
+    @Override
+    public String toString() {
+        return "Sparse";
+    }
+
 
     /** @inheritDoc */
     public void connectNeurons() {

@@ -53,7 +53,7 @@ public class ExponentialDecayNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         ExponentialDecayNeuron neuronRef = (ExponentialDecayNeuron) neuronList.get(0);
 
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
 
 //      Handle consistency of multiple selections
@@ -69,7 +69,7 @@ public class ExponentialDecayNeuronPanel extends AbstractNeuronPanel {
     public void fillDefaultValues() {
         ExponentialDecayNeuron neuronRef = new ExponentialDecayNeuron();
 
-        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
     }
 
@@ -77,7 +77,7 @@ public class ExponentialDecayNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < neuronList.size(); i++) {
             ExponentialDecayNeuron neuronRef = (ExponentialDecayNeuron) neuronList.get(i);

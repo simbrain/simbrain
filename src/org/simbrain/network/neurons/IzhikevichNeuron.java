@@ -27,18 +27,22 @@ import org.simbrain.network.util.RandomSource;
  * <b>IzhikevichNeuron</b>.
  */
 public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
+    
     /** Has spiked. */
     private boolean hasSpiked = false;
     /** Recovery. */
     private double recovery = 0;
+    
+    // Default values correspond to "tonic spiking"
+    
     /** A. */
-    private double a = .2;
+    private double a = .02;
     /** B. */
-    private double b = 2;
+    private double b = .2;
     /** C. */
-    private double c = -56;
+    private double c = -65;
     /** D. */
-    private double d = -16;
+    private double d = 6;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Add noise to the neuron. */
@@ -86,7 +90,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
      * Updates the neuron.
      */
     public void update() {
-        double timeStep = this.getParentNetwork().getTimeStep();
+        double timeStep = this.getParentNetwork().getRootNetwork().getTimeStep();
         double inputs = getWeightedInputs();
 
         if (addNoise) {

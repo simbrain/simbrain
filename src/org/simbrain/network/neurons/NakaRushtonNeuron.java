@@ -115,7 +115,7 @@ public class NakaRushtonNeuron extends Neuron {
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            a += (this.getParentNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
+            a += (this.getParentNetwork().getRootNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
         } else {
             a = 0;
         }
@@ -129,10 +129,10 @@ public class NakaRushtonNeuron extends Neuron {
 
 
         if (addNoise) {
-            val += (this.getParentNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s))
+            val += (this.getParentNetwork().getRootNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s))
             + noiseGenerator.getRandom()));
         } else {
-            val += (this.getParentNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+            val += (this.getParentNetwork().getRootNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
         setBuffer(val);

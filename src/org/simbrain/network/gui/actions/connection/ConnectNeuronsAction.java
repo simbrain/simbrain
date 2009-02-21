@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.*;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
@@ -40,7 +40,6 @@ public final class ConnectNeuronsAction
 
     /** Target neuron. */
     private ArrayList targetNeurons;
-
 
     /**
      * Create a new connect neurons action.  Connects a set of source neurons to a set of target neurons.
@@ -61,7 +60,7 @@ public final class ConnectNeuronsAction
         this.sourceNeurons = sourceNeurons;
         this.targetNeurons = targetNeurons;
 
-      //  putValue(NAME, "Connect using \"" + NetworkPreferences.getConnectionType() + "\"");
+        putValue(NAME, "Connect using \"" + ConnectNeurons.connectionType + "\"");
 
     }
 
@@ -71,17 +70,7 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
-        ConnectNeurons connection;
-//        if (NetworkPreferences.getConnectionType().equals("All to All")) {
-//            connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
-//        } else if (NetworkPreferences.getConnectionType().equals("One to One")) {
-//            connection = new OneToOne(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
-//        } else if (NetworkPreferences.getConnectionType().equals("Sparse")) {
-//            connection = new Sparse(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
-//        } else {
-//            System.out.println("Conditions Failed");
-//            return;
-//        }
-//        connection.connectNeurons();
+        ConnectNeurons connection = ConnectNeurons.connectionType;
+        connection.connectNeurons(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
     }
 }

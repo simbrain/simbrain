@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -35,19 +34,19 @@ public final class SaveNetworkAction
     extends AbstractAction {
 
     /** Network panel. */
-    private final NetworkPanel networkPanel;
+    private final NetworkDesktopComponent networkComponent;
 
 
     /**
      * Create a new save network action with the specified network panel.
      *
-     * @param networkPanel networkPanel, must not be null
+     * @param networkComponent networkComponent, must not be null
      */
-    public SaveNetworkAction(final NetworkPanel networkPanel) {
+    public SaveNetworkAction(final NetworkDesktopComponent networkComponent) {
 
         super("Save");
 
-        if (networkPanel == null) {
+        if (networkComponent == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
@@ -56,11 +55,11 @@ public final class SaveNetworkAction
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        this.networkPanel = networkPanel;
+        this.networkComponent = networkComponent;
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-       //networkPanel.getParentComponent().save();
+       networkComponent.save();
     }
 }

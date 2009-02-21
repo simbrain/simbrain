@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -32,29 +31,29 @@ public final class SaveAsNetworkAction
     extends AbstractAction {
 
     /** Network panel. */
-    private final NetworkPanel networkPanel;
+    private final NetworkDesktopComponent networkComponent;
 
 
     /**
      * Create a new save as network action with the specified network panel.
      *
-     * @param networkPanel networkPanel, must not be null
+     * @param networkComponent networkComponent, must not be null
      */
-    public SaveAsNetworkAction(final NetworkPanel networkPanel) {
+    public SaveAsNetworkAction(final NetworkDesktopComponent networkComponent) {
 
         super("Save As...");
 
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
+        if (networkComponent == null) {
+            throw new IllegalArgumentException("networkComponent must not be null");
         }
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
 
-        this.networkPanel = networkPanel;
+        this.networkComponent = networkComponent;
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        //networkPanel.getParentComponent().showSaveFileDialog();
+        networkComponent.showSaveFileDialog();
     }
 }

@@ -91,6 +91,8 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         JMenu fileMenu = new JMenu("File");
 
         fileMenu.add(new OpenNetworkAction(this));
+        fileMenu.add(new SaveNetworkAction(this));
+        fileMenu.add(new SaveAsNetworkAction(this));
         fileMenu.addSeparator();
         fileMenu.add(new ShowNetworkPreferencesAction(networkPanel));
         fileMenu.addSeparator();

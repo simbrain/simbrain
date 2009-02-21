@@ -68,13 +68,14 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             bp.setTrain(true);
             for(int i = 0; i < epochs; i++) {
                 errorPlot.getModel().getDataset().getSeries(0).add(i, bp.getError());
-                workspace.globalUpdate();    
+		System.out.println("here" + i);
+                workspace.singleUpdate();    
             }
             bp.setTrain(false);
             
 	    // Set Update Method
-            workspace.setCustomUpdateMethod(new BackpropUpdate(network, inputData)); // TODO: Not thread safe.  Must use SwingUtilities.
-
+            workspace.setCustomUpdateController(new BackpropUpdate(network, inputData));
+	    
             // Close training data window
             trainingData.close();
             
@@ -82,7 +83,7 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             System.out.println(workspace); 
 	    
 	    // Custom updating method
-            class BackpropUpdate extends CustomUpdate {
+            class BackpropUpdate implements WorkspaceUpdator.UpdateController {
 
                 NetworkComponent network;
                 DataWorldComponent inputData;
@@ -92,10 +93,10 @@ import org.simbrain.world.dataworld.DataWorldComponent;
                     inputData = data;
                 }
                 
-                public void update(Workspace workspace) {
+                public void doUpdate(WorkspaceUpdator.UpdateController controller) {
                     
                     inputData.doUpdate();
-                    workspace.getCouplingManager().updateAllCouplings();
+		    controls.updateCouplings();
                     network.doUpdate();
                 }
                 

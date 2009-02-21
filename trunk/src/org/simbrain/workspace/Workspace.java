@@ -413,27 +413,30 @@ public class Workspace {
     }
     
     /**
-     * By default, the workspace is updated as followed:
-     *  1) Update couplings
-     *  2) Call "update" on all workspacecomponents
+     * By default, the workspace is updated as followed: 1) Update couplings 2)
+     * Call "update" on all workspacecomponents
      * 
-     * Sometimes this way of updating is not sufficient, and the user will
-     * want updates (in the GUI, presses of the iterate and play buttons) to
-     * update components and couplings in a different way.
-     *  
-     * For an example, see the script in {SimbrainDir}/scriptmenu/addBackpropSim.bsh
+     * Sometimes this way of updating is not sufficient, and the user will want
+     * updates (in the GUI, presses of the iterate and play buttons) to update
+     * components and couplings in a different way.
      * 
-     * @param controller The update controller to use.
-     * @param threads The number of threads for the component updates.
+     * For an example, see the script in
+     * {SimbrainDir}/scriptmenu/addBackpropSim.bsh
+     * 
+     * @param controller
+     *            The update controller to use.
+     * @param threads
+     *            The number of threads for the component updates.
      */
-    public void setCustomUpdateController(final WorkspaceUpdator.UpdateController controller,
+    public void setCustomUpdateController(
+            final WorkspaceUpdator.UpdateController controller,
             final int threads) {
-        synchronized (updatorLock) {
-            if (updator.isRunning()) {
+                synchronized (updatorLock) {
+                if (updator.isRunning()) {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
-            }
-            updator = new WorkspaceUpdator(this, manager, controller, threads);
+                }
+                updator = new WorkspaceUpdator(this, manager, controller, threads);
         }
     }
     

@@ -279,6 +279,7 @@ public class DataWorld extends JPanel {
     public void incrementCurrentRow() {
         if (dataModel.isIterationMode()) {
             table.setColumnSelectionAllowed(false);
+            System.out.println("here");
             if (dataModel.getCurrentRow() >= (table.getRowCount() - 1)) {
                 dataModel.setCurrentRow(0);
             } else {

@@ -10,9 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -22,15 +20,34 @@ import java.util.concurrent.ThreadFactory;
 import org.apache.log4j.Logger;
 
 /**
- * This class manages the workspace updates possibly using
- * multiple threads.
+ * This class manages the workspace updates, possibly using multiple threads.
+ * 
+ * The main part of the default update can be found in the DEFAULT_CONTROLLER
+ * instance. Each component update call is fed to an executor service which uses
+ * as many threads as it's configured to use (it defaults to the number of
+ * available processors which can be changed.) Then the executing thread waits
+ * on a countdown latch. Each component update decrements the latch so that
+ * after the last update is complete, the thread waiting on the latch wakes up
+ * and updates all the couplings.
+ * 
+ * When a single update occurs, it runs off of the AWT event thread. When the
+ * continuous update runs, a new thread is spawned, separate from executor
+ * service threads. The allows the gui to continue refreshing.
+ * 
+ * There's a second executor service that's only there to execute event updates.
+ * This is to support the need for a view on threads.
+ * 
+ * The thread factory is used to create a custom thread class that will be
+ * generated inside the executor. This allows for a clean way to capture the
+ * events using the thread instances themselves which 'know' their thread
+ * number.
  * 
  * @author Matt Watson
  */
 public class WorkspaceUpdator {
+
     /** The static logger for the class. */
     private static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
-    
     /** The parent workspace. */
     private final Workspace workspace;
     /** The coupling manager for the workspace. */

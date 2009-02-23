@@ -69,7 +69,8 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             for(int i = 0; i < epochs; i++) {
                 errorPlot.getModel().getDataset().getSeries(0).add(i, bp.getError());
 		System.out.println("here" + i);
-                workspace.singleUpdate();    
+                workspace.singleUpdate();
+        System.out.println("after" + i);    
             }
             bp.setTrain(false);
             
@@ -93,10 +94,10 @@ import org.simbrain.world.dataworld.DataWorldComponent;
                     inputData = data;
                 }
                 
-                public void doUpdate(WorkspaceUpdator.UpdateController controller) {
+                public void doUpdate(WorkspaceUpdator.UpdateControls controls) {
                     
                     inputData.doUpdate();
-		    controls.updateCouplings();
+		            controls.updateCouplings();
                     network.doUpdate();
                 }
                 

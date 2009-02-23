@@ -462,8 +462,6 @@ public class Workspace {
      * @return the time
      */
     public Number getTime() {
-        synchronized (updatorLock) {
-            return updator.getTime();
-        }
+        return updator.getTime();
     }
 }

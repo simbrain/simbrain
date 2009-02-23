@@ -4,6 +4,7 @@ import org.simbrain.network.layouts.LayersLayout;
 import org.simbrain.network.networks.Backprop;
 import org.simbrain.plot.timeseries.*;
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.updator.*;
 import org.simbrain.world.dataworld.DataWorldComponent;
 
 {
@@ -84,7 +85,7 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             System.out.println(workspace); 
 	    
 	    // Custom updating method
-            class BackpropUpdate implements WorkspaceUpdator.UpdateController {
+            class BackpropUpdate implements UpdateController {
 
                 NetworkComponent network;
                 DataWorldComponent inputData;

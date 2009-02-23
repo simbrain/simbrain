@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.updator.ComponentUpdator;
+import org.simbrain.workspace.updator.UpdateController;
+import org.simbrain.workspace.updator.WorkspaceUpdator;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -66,7 +69,7 @@ public class Workspace {
      * Current directory. So when re-opening this type of component the
      * app remembers where to look.
      */
-    private String currentDirectory =null;
+    private String currentDirectory = null;
 
     /**
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem because
@@ -87,9 +90,18 @@ public class Workspace {
     private Object updatorLock = new Object();
     
     /**
+     * 
+     */
+    private ComponentUpdator componentUpdator = new ComponentUpdator() {
+        public void update(final WorkspaceComponent<?> component) {
+            component.update();
+        }
+    };
+    
+    /**
      * The updator used to manage component updates.
      */
-    private WorkspaceUpdator updator = new WorkspaceUpdator(this, manager);
+    private WorkspaceUpdator updator = new WorkspaceUpdator(this, componentUpdator, manager);
     
     /** used to turn events off during special modifications. */
     private boolean fireEvents = true;
@@ -429,14 +441,15 @@ public class Workspace {
      *            The number of threads for the component updates.
      */
     public void setCustomUpdateController(
-            final WorkspaceUpdator.UpdateController controller,
+            final UpdateController controller,
             final int threads) {
                 synchronized (updatorLock) {
                 if (updator.isRunning()) {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
                 }
-                updator = new WorkspaceUpdator(this, manager, controller, threads);
+                updator = new WorkspaceUpdator(this, componentUpdator, manager,
+                    controller, threads);
         }
     }
     
@@ -445,14 +458,14 @@ public class Workspace {
      * 
      * @param controller The number of threads to use.
      */
-    public void setCustomUpdateController(final WorkspaceUpdator.UpdateController controller) {
+    public void setCustomUpdateController(final UpdateController controller) {
         synchronized (updatorLock) {
             if (updator.isRunning()) {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
             }
             
-            updator = new WorkspaceUpdator(this, manager, controller);
+            updator = new WorkspaceUpdator(this, componentUpdator, manager, controller);
         }
     }
     

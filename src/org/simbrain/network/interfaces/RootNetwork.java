@@ -75,7 +75,7 @@ public class RootNetwork extends Network {
     private double time = 0;
 
     /** Time step. */
-    private double timeStep = .2;
+    private double timeStep = .01;
 
     /** Constant value for Math.log(10); used to approximate log 10. */
     private static final double LOG_10 = Math.log(10);

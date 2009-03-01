@@ -56,7 +56,7 @@ public class Backprop extends Network {
     private double eta = .5;
 
     /** Bias learning rate. */
-    private double biasEta = 0;
+    private double biasEta = .1;
 
     /** Momentum. */
     private double mu = .9;

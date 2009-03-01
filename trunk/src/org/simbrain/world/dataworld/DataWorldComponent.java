@@ -32,6 +32,7 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.odorworld.WorldClipboard;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -139,7 +140,9 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     }
 
     @Override
-    public void update() {  
+    public void update() {
+        dataModel.update();
+        this.fireUpdateEvent();
     }
 
     @Override

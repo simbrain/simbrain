@@ -34,6 +34,9 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.ComponentMenu;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -41,7 +44,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
-public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> { 
+public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> implements WorkspaceComponentListener { 
 
     private static final long serialVersionUID = 1L;
 
@@ -49,7 +52,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private JScrollPane scroller;
 
     /** Data world. */
-    private DataWorld world;
+    private DataWorldPanel worldPanel;
 
     /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
@@ -96,27 +99,28 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     /** Determines whether table is in iteration mode. */
     private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem("Iteration mode");
 
-    /** Determines whether iteration mode uses last column. */
-    private JCheckBoxMenuItem columnIteration = new JCheckBoxMenuItem("Use last column");
+    /** Component. */
+    private final DataWorldComponent component;
     
     /**
      * Default constructor.
      *
      * @param component reference to model component
      */
-    public DataWorldDesktopComponent(final GenericFrame frame, final DataWorldComponent component) {
+    public DataWorldDesktopComponent(final GenericFrame frame, 
+            final DataWorldComponent component) {
 
         super(frame, component);
         
-        component.addListener(new BasicComponentListener());
+        this.component = component;
+        component.addListener(this);
         component.getDataModel().initValues(new Double(0));
 
-        checkIterationMode();
-        addMenuBar(world);
+        addMenuBar(worldPanel);
 
-        world = new DataWorld(this);
+        worldPanel = new DataWorldPanel(component);
         scroller = new JScrollPane();
-        scroller.setViewportView(world);
+        scroller.setViewportView(worldPanel);
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);
     }
@@ -126,7 +130,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
      *
      * @param table Table to be used for world
      */
-    public void addMenuBar(final DataWorld table) {
+    public void addMenuBar(final DataWorldPanel table) {
         open.addActionListener(openListener);
         open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -154,7 +158,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         randomize.addActionListener(randomizeListener);
         randomProps.addActionListener(randomPropsListener);
         iterationMode.addActionListener(iterationModeListener);
-        columnIteration.addActionListener(columnIterationListener);
 
         edit.add(addRow);
         edit.add(addCol);
@@ -167,7 +170,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         edit.add(randomProps);
         edit.addSeparator();
         edit.add(iterationMode);
-        edit.add(columnIteration);
         mb.add(edit);
         
         JMenu producerMenu = new ComponentMenu("Couple",  getWorkspaceComponent().getWorkspace(), getWorkspaceComponent());
@@ -176,16 +178,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         getParentFrame().setJMenuBar(mb);
     }
 
-    /**
-     * Checks iteration mode to enable or disable column iteration.
-     */
-    private void checkIterationMode() {
-        if (iterationMode.getState()) {
-            columnIteration.setEnabled(true);
-        } else {
-            columnIteration.setEnabled(false);
-        }
-    }
 
     private ActionListener openListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
@@ -207,7 +199,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     private ActionListener addRowListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().addNewRow(new Double(0));
+            component.getDataModel().addNewRow(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
@@ -215,7 +207,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     private ActionListener addColListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().addNewColumn(new Double(0));
+            component.getDataModel().addNewColumn(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
@@ -223,7 +215,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
    
     private ActionListener remRowListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().removeLastRow();
+            component.getDataModel().removeLastRow();
             getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
@@ -231,7 +223,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
    
     private ActionListener remColListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().removeLastColumn();
+            component.getDataModel().removeLastColumn();
             getWorkspaceComponent().setChangedSinceLastSave(true);
             pack();
         }
@@ -239,7 +231,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     private ActionListener zeroFillListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().fill(new Double(0));
+            component.getDataModel().fill(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
             repaint();
         }
@@ -248,8 +240,8 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private ActionListener randomizeListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             Random rand = new Random();
-
-            DataModel<Double> model = world.getDataModel();
+            
+            DataModel<Double> model = component.getDataModel();
             int height = model.getRowCount();
             int width = model.getColumnCount();
             int lower = model.getLowerBound();
@@ -267,21 +259,14 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     
     private ActionListener randomPropsListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.displayRandomizeDialog();
+            worldPanel.displayRandomizeDialog();
             getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
     
     private ActionListener iterationModeListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().setIterationMode(iterationMode.getState());
-            checkIterationMode();
-        }
-    };
-    
-    private ActionListener columnIterationListener = new ActionListener() {
-        public void actionPerformed(final ActionEvent e) {
-            world.getDataModel().setLastColumnBasedIteration(columnIteration.getState());
+            component.getDataModel().setIterationMode(iterationMode.getState());
         }
     };
     
@@ -309,14 +294,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     };
 
     @Override
-    protected void update() {
-        // TODO refactor
-        world.getDataModel().update();
-        world.completedInputRound();
-        super.update();
-    }
-
-    @Override
     public void closing() {
     }
 
@@ -330,6 +307,20 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     @Override
     public void postAddInit() {
         pack();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
+        // TODO Auto-generated method stub        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void componentUpdated() {
+        worldPanel.updateRowSelection();
     }
 
 }

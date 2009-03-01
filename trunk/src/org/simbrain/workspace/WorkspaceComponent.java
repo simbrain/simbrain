@@ -166,15 +166,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
     
     /**
-     * Update that goes beyond updating couplings.
-     * Called when global workspace update is called.
-     */
-    public final void doUpdate() {
-        update();
-        fireUpdateEvent();
-    }
-    
-    /**
      * Notify all listeners of a componentUpdated event.
      */
     public final void fireUpdateEvent() {

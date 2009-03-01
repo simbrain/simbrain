@@ -12,9 +12,10 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             NetworkComponent network = new NetworkComponent("Backprop Network");
             workspace.addWorkspaceComponent(network);
 	    desktop.getDesktopComponent(network).getParentFrame().setBounds(46, 57, 400, 400);
-            LayersLayout layout = new LayersLayout(40, 40, LayersLayout.HORIZONTAL);  // TODO: This should not be needed
-            Backprop bp = new Backprop(network.getRootNetwork(), 3, 5, 3, layout);
-            network.getRootNetwork().addNetwork(bp);
+            LayersLayout layout = new LayersLayout(40, 40, LayersLayout.HORIZONTAL);  // TODO: This should not be needed            
+	    // Note: Changing hidden changes ids for other neurons and so messes with couplings
+	    Backprop bp = new Backprop(network.getRootNetwork(), 3, 2, 3, layout); 
+	    network.getRootNetwork().addNetwork(bp);
             bp.randomize();
 
             // Create Training Data
@@ -26,6 +27,7 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             trainingData.getDataModel().set(1, 1, new Double(1));
             trainingData.getDataModel().set(2, 2, new Double(1));
             trainingData.setName("Training Data");
+	    desktop.getDesktopComponent("Training Data").getParentFrame().setIcon(true);
             
             // Create input table
             DataWorldComponent inputData = new DataWorldComponent("Input Data",3,3);
@@ -52,9 +54,9 @@ import org.simbrain.world.dataworld.DataWorldComponent;
             ProducingAttribute train1 = trainingData.getSingleProducingAttribute("Column1");
             ProducingAttribute train2 = trainingData.getSingleProducingAttribute("Column2");
             ProducingAttribute train3 = trainingData.getSingleProducingAttribute("Column3");
-            ConsumingAttribute target1 = network.getConsumingAttribute("Neuron_9", "TargetValue"); 
-            ConsumingAttribute target2 = network.getConsumingAttribute("Neuron_10", "TargetValue"); 
-            ConsumingAttribute target3 = network.getConsumingAttribute("Neuron_11", "TargetValue"); 
+            ConsumingAttribute target1 = network.getConsumingAttribute("Neuron_6", "TargetValue"); 
+            ConsumingAttribute target2 = network.getConsumingAttribute("Neuron_7", "TargetValue"); 
+            ConsumingAttribute target3 = network.getConsumingAttribute("Neuron_8", "TargetValue"); 
             workspace.getCouplingManager().addCoupling(new Coupling(train1, target1));
             workspace.getCouplingManager().addCoupling(new Coupling(train2, target2));
             workspace.getCouplingManager().addCoupling(new Coupling(train3, target3));
@@ -65,41 +67,63 @@ import org.simbrain.world.dataworld.DataWorldComponent;
 	    desktop.getDesktopComponent(errorPlot).getParentFrame().setBounds(509, 232, 351, 281);
 
             // Train network
+            workspace.setCustomUpdateController(new BackpropTrainUpdate(network, inputData, trainingData));
+	    desktop.getDesktopComponent("Backprop Network").getNetworkPanel().setGuiOn(false);
             int epochs = Integer.parseInt(JOptionPane.showInputDialog("Number of epochs"));
             bp.setTrain(true);
             for(int i = 0; i < epochs; i++) {
                 errorPlot.getModel().getDataset().getSeries(0).add(i, bp.getError());
-		System.out.println("here" + i);
                 workspace.singleUpdate();
-        System.out.println("after" + i);    
             }
+	    desktop.getDesktopComponent("Backprop Network").getNetworkPanel().setGuiOn(true);
+	    desktop.getFrame().repaint();
             bp.setTrain(false);
             
 	    // Set Update Method
-            workspace.setCustomUpdateController(new BackpropUpdate(network, inputData));
+            workspace.setCustomUpdateController(new BackpropTestUpdate(network, inputData));
 	    
             // Close training data window
             trainingData.close();
-            
-            // Display Debug Info
-            System.out.println(workspace); 
-	    
-	    // Custom updating method
-            class BackpropUpdate implements UpdateController {
+            	    
+	    // Update method for test mode
+            class BackpropTestUpdate implements UpdateController {
 
                 NetworkComponent network;
                 DataWorldComponent inputData;
                 
-                public BackpropUpdate(NetworkComponent net, DataWorldComponent data) {
+                public BackpropTestUpdate(NetworkComponent net, DataWorldComponent data) {
                     network = net;
                     inputData = data;
                 }
                 
-                public void doUpdate(WorkspaceUpdator.UpdateControls controls) {
+                public void doUpdate(UpdateControls controls) {
                     
-                    inputData.doUpdate();
-		            controls.updateCouplings();
-                    network.doUpdate();
+                    inputData.update();
+		    controls.updateCouplings();
+                    network.update();
+                }
+                
+            }
+	    
+	    // Update method for train mode
+            class BackpropTrainUpdate implements UpdateController {
+
+                NetworkComponent network;
+                DataWorldComponent train;
+                DataWorldComponent test;
+                
+                public BackpropTrainUpdate(NetworkComponent net, DataWorldComponent train, DataWorldComponent test) {
+                    this.train = train;
+		    this.test = test;
+		    network = net;
+                }
+                
+                public void doUpdate(UpdateControls controls) {
+                    
+		    controls.updateCouplings();
+                    network.update();
+                    test.update();
+                    train.update();
                 }
                 
             }

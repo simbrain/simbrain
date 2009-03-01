@@ -52,8 +52,12 @@ public class WorkspaceUpdator {
             List<? extends WorkspaceComponent<?>> components = controls.getComponents();
             
             int componentCount = components.size();
+            if (componentCount < 1) {
+                return;
+            }
             
-            if (componentCount < 1) return;
+            LOGGER.trace("couplings");
+            controls.updateCouplings();
             
             CountDownLatch latch = new CountDownLatch(components.size());
             
@@ -67,9 +71,6 @@ public class WorkspaceUpdator {
                 return;
             }
             
-            LOGGER.trace("couplings");
-            
-            controls.updateCouplings();
         }
     };
     

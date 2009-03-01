@@ -29,7 +29,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Collection;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -40,17 +39,15 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.ConsumingAttributeMenu;
-import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**
- * <b>DataWorld</b> is a jpanel which contains a table object and a that table's model object.
+ * <b>DataWorldPanel</b> is a jpanel which contains a table object and a that table's model object.
  *
- * @author rbartley, jyoshimi
+ * @author jyoshimi
  */
-public class DataWorld extends JPanel {
+public class DataWorldPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,9 +56,6 @@ public class DataWorld extends JPanel {
 
     /** Underlying data. */
     private final DataModel<Double> dataModel;
-
-    /** Back reference. */
-    final DataWorldDesktopComponent ws;
 
     /** Point selected. */
     private Point selectedPoint;
@@ -77,15 +71,12 @@ public class DataWorld extends JPanel {
 
     /** Removes a column. */
     private JMenuItem remCol = new JMenuItem("Delete column");
-
-    /** Local variable used for iterating. */
-    private int thisRowCount = 0;
-
-    /** Local variable used for iterating. */
-    private int currentRowCounter = 0;
     
     /** Grid Color. */
     private Color gridColor =  Color.LIGHT_GRAY;
+    
+    /** Workspace reference .*/
+    private DataWorldComponent component;
         
     
     /**
@@ -93,11 +84,11 @@ public class DataWorld extends JPanel {
      *
      * @param ws World frame to create a new data world within
      */
-    public DataWorld(final DataWorldDesktopComponent ws) {
+    public DataWorldPanel(final DataWorldComponent component) {
         super(new BorderLayout());
-        this.ws = ws;
+        this.component = component;
 
-        this.dataModel = ws.getWorkspaceComponent().getDataModel();
+        this.dataModel = component.getDataModel();
         table = new JXTable(new DataTableModel(dataModel));
         add(table, BorderLayout.CENTER);
         add(table.getTableHeader(), BorderLayout.NORTH);
@@ -108,52 +99,41 @@ public class DataWorld extends JPanel {
         table.setRolloverEnabled(true);
         table.setRowSelectionAllowed(true);
         table.setGridColor(gridColor);
+        updateRowSelection();
         
         addRow.addActionListener(addRowHereListener);
         addCol.addActionListener(addColHereListener);
         
         remRow.addActionListener(remRowHereListener);
         remCol.addActionListener(remColHereListener);
-        
-//        for(int i = 0; i < table.getColumnCount(); i++) {
-//            table.getColumnModel().getColumn(i).setCellRenderer(renderer);
-//        }
-        
+                
    }
     
     private ActionListener addRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            if (getSelectedPoint().x < (getTable().getRowHeight() * getTable().getRowCount())) {
-                getDataModel().insertNewRow(getSelectedRow(), new Double(0));
+            if (getSelectedPoint().x < (table.getRowHeight() * table.getRowCount())) {
+                dataModel.insertNewRow(getSelectedRow(), new Double(0));
             } else {
-                getDataModel().addNewRow(new Double(0));
+                dataModel.addNewRow(new Double(0));
             }
-            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
-            ws.pack();
         }
     };
 
     private ActionListener addColHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            getDataModel().insertNewColumn(getSelectedColumn(), new Double(0));
-            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
-            ws.pack();
+            dataModel.insertNewColumn(getSelectedColumn(), new Double(0));
         }
     };
 
     private ActionListener remRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            getDataModel().removeRow(getSelectedRow());
-            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
-            ws.pack();
+            dataModel.removeRow(getSelectedRow());
         }
     };
 
     private ActionListener remColHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            getDataModel().removeColumn(getSelectedColumn());
-            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
-            ws.pack();
+            dataModel.removeColumn(getSelectedColumn());
         }
     };
 
@@ -163,7 +143,7 @@ public class DataWorld extends JPanel {
      * @return the currently selected column
      */
     public int getSelectedColumn() {
-        return getTable().columnAtPoint(selectedPoint);
+        return table.columnAtPoint(selectedPoint);
     }
 
     /**
@@ -172,7 +152,7 @@ public class DataWorld extends JPanel {
      * @return the currently selected row
      */
     public int getSelectedRow() {
-        return getTable().rowAtPoint(selectedPoint);
+        return table.rowAtPoint(selectedPoint);
     }
 
     private MouseListener mouseListener = new MouseAdapter() {
@@ -183,11 +163,12 @@ public class DataWorld extends JPanel {
          */
         public void mousePressed(final MouseEvent e) {
             selectedPoint = e.getPoint();
+            dataModel.setCurrentRow(getSelectedRow());
             // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
             boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
             if (isRightClick) {
                 JPopupMenu menu = buildPopupMenu();
-                menu.show(DataWorld.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
+                menu.show(DataWorldPanel.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
             }
         }
     };
@@ -206,28 +187,18 @@ public class DataWorld extends JPanel {
             ret.add(remCol);
         }
         ret.addSeparator();
-        JMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", ws.getWorkspaceComponent().getWorkspace(), ws.getWorkspaceComponent().getConsumingAttributes().get(getSelectedColumn()));
+        JMenu producerMenu = new ProducingAttributeMenu(
+                "Receive coupling from", component.getWorkspace(), component
+                        .getConsumingAttributes().get(getSelectedColumn()));
         ret.add(producerMenu);
-        JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", ws.getWorkspaceComponent().getWorkspace(), ws.getWorkspaceComponent().getProducingAttributes().get(getSelectedColumn()));
+        JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to",
+                component.getWorkspace(), component.getProducingAttributes()
+                        .get(getSelectedColumn()));
         ret.add(consumerMenu);
 
         return ret;
     }
 
-    /**
-     * @return World type.
-     */
-    public String getType() {
-        return "DataWorld";
-    }
-
-    /**
-     * @return Returns the table.
-     */
-    public JXTable getTable() {
-        return table;
-    }
-    
     /**
      * Displays the randomize dialog.
      */
@@ -247,7 +218,7 @@ public class DataWorld extends JPanel {
 
         rand.setContentPane(pane);
         rand.pack();
-        rand.setLocationRelativeTo(ws);
+        rand.setLocationRelativeTo(this);
         rand.setVisible(true);
         if (!rand.hasUserCancelled()) {
             dataModel.setLowerBound(Integer.parseInt(lower.getText()));
@@ -256,47 +227,14 @@ public class DataWorld extends JPanel {
 
         repaint();
     }
-    
 
     /**
-     * Increment a number of times equal to the last column.
+     * Select current row.
      */
-    public void incrementUsingLastColumn() {
-        if (currentRowCounter < thisRowCount) {
-            currentRowCounter++;
-        } else {
-            incrementCurrentRow();
-            currentRowCounter = 0;
-            thisRowCount = (int) Double.parseDouble(""
-                    + table.getModel().getValueAt(dataModel.getCurrentRow(),
-                            table.getModel().getColumnCount() - 1));
-        }
-    }
-
-    /**
-     * Increment current row by 1.
-     */
-    public void incrementCurrentRow() {
-        if (dataModel.isIterationMode()) {
-            table.setColumnSelectionAllowed(false);
-            System.out.println("here");
-            if (dataModel.getCurrentRow() >= (table.getRowCount() - 1)) {
-                dataModel.setCurrentRow(0);
-            } else {
-                dataModel.setCurrentRow(dataModel.getCurrentRow() + 1);
-            }
-            table.setRowSelectionInterval(dataModel.getCurrentRow(), dataModel.getCurrentRow());
-        } else {
-            table.setColumnSelectionAllowed(true);
-        }
-    }
-
-
-    /**
-     * @return Returns the model.
-     */
-    public DataModel<Double> getDataModel() {
-        return dataModel;
+    public void updateRowSelection() {
+        table.selectAll(); // TODO: If I don't call this, the line below does
+                           // not work. Not sure why.
+        table.setRowSelectionInterval(dataModel.getCurrentRow(), dataModel.getCurrentRow());
     }
 
     /**
@@ -322,38 +260,10 @@ public class DataWorld extends JPanel {
          * @param arg0 Key event
          */
         public void keyTyped(final KeyEvent arg0) {
-            ws.getWorkspaceComponent().setChangedSinceLastSave(true);
+            System.out.println("Key typed");
         }
     };
 
-
-    /**
-     * Handle iteration mode and column updating.
-     */
-    // TODO associate to update event
-    public void completedInputRound() {
-        if (dataModel.isIterationMode()) {
-            if (dataModel.isLastColumnBasedIteration()) {
-                incrementUsingLastColumn();
-            } else {
-                incrementCurrentRow();
-            }
-        }
-    }
-
-    private ActionListener couplingMenuItemListener = new ActionListener() {
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent event) {
-            if (event.getSource() instanceof CouplingMenuItem) {
-                CouplingMenuItem menuItem = (CouplingMenuItem) event.getSource();
-                Collection<? extends Producer> producers = menuItem.getWorkspaceComponent().getProducers();
-                
-                ws.getWorkspaceComponent().wireCouplings(producers);
-            }
-        }
-    };
     
 //    class DataWorldCellRenderer extends DefaultTableCellRenderer {
 //        public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focused, int row, int column){

@@ -71,8 +71,6 @@ import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
-//import org.simbrain.world.fugueworld.MidiWorldComponent;
-//import org.simbrain.world.fugueworld.MidiWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.oscworld.OscWorldComponent;
@@ -86,7 +84,6 @@ import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
 import bsh.Interpreter;
 import bsh.util.JConsole;
-
 
 /**
  * Creates a Swing-based environment for working with a workspace.
@@ -138,9 +135,6 @@ public class SimbrainDesktop {
     /** Used to track whether the gui has been modified since the last save. */
     private boolean guiChanged = false;
     
-    /** Last clicked point. */
-    private Point lastClickedPoint = null;
-    
     /** The bottom dock. */
     private JTabbedPane bottomDock;
 
@@ -155,6 +149,9 @@ public class SimbrainDesktop {
     
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
+    
+    /** Interpreter for terminal. */
+    Interpreter interpreter;
 
     /** All the components in the workspace. */
     private Map<WorkspaceComponent<?>, GuiComponent<?>> components
@@ -187,7 +184,6 @@ public class SimbrainDesktop {
 
         @SuppressWarnings("unchecked")
         public void componentRemoved(final WorkspaceComponent workspaceComponent) {
-
             GuiComponent<?> component = components.get(workspaceComponent);
             components.remove(component);
             component.getParentFrame().dispose();
@@ -260,6 +256,9 @@ public class SimbrainDesktop {
         frame.pack();
         frame.addWindowListener(windowListener);
         frame.addKeyListener(new WorkspaceKeyAdapter(workspace));
+        
+        // Start terminal
+        new Thread(interpreter).start();
 
         // Make dragging a little faster but perhaps uglier.
         // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
@@ -291,7 +290,7 @@ public class SimbrainDesktop {
      */
     private JConsole getTerminalPanel() {
         JConsole console = new JConsole();
-        Interpreter interpreter = new Interpreter(console);
+        interpreter = new Interpreter(console);
         interpreter.getNameSpace().importPackage("org.simbrain.network.neurons");
         interpreter.getNameSpace().importPackage("org.simbrain.network.connections");
         interpreter.getNameSpace().importPackage("org.simbrain.network.layouts");
@@ -306,19 +305,24 @@ public class SimbrainDesktop {
         interpreter.getErr();
         try {
             interpreter.set("workspace", getWorkspace());
+            interpreter.set("desktop", this);
             interpreter.set("bsh.prompt", ">");
-            interpreter.setErr(System.err);
-            interpreter.setOut(System.out);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        new Thread(interpreter).start();
+
         console.setPreferredSize(new Dimension(400,300));
         return console;
     }
     
-
-    
+    /**
+     * Print text to terminal
+     * 
+     * @param toPrint text to print
+     */
+    public void printToTerminal(final String toPrint) {
+        interpreter.println(toPrint);
+    }
     /**
      * Returns the workspace.
      * 
@@ -569,6 +573,21 @@ public class SimbrainDesktop {
     }
     
     /**
+     * Return a desktop component.
+     *
+     * @param component name of desktop component to return
+     * @return component desktop component, or null if none found
+     */
+    public GuiComponent<?> getDesktopComponent(final String componentName) {
+        WorkspaceComponent<?> wc = workspace.getComponent(componentName);
+        if (wc != null) {
+            return components.get(wc);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Utility class for adding internal frames, which are not
      * wrappers for WorkspaceComponents. Wraps GUI Component in a
      * JInternalFrame for Desktop.
@@ -693,27 +712,16 @@ public class SimbrainDesktop {
         if (isDeserialized) {
            componentFrame.setBounds(guiComponent.getBounds());
         } else {
-            if (lastClickedPoint != null) {
-                componentFrame.setBounds(
-                    (int) lastClickedPoint.getX(),
-                    (int) lastClickedPoint.getY(),
-                    (int) guiComponent.getPreferredSize().getWidth(),
-                    (int) guiComponent.getPreferredSize().getHeight());
-                guiChanged = true;
-            } else if (components.size() == 0) {
+            if (components.size() == 0) {
                 componentFrame.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
                     (int) guiComponent.getPreferredSize().getWidth(),
                     (int) guiComponent.getPreferredSize().getHeight());
                 guiChanged = true;
             } else {
-                GuiComponent<?> lastComponentAdded = null;
-                for (GuiComponent<?> next : components.values()) {
-                    lastComponentAdded = next;
-                }
-                int lastX = (int) lastComponentAdded.getParentFrame().getBounds().getX();
-                int lastY = (int) lastComponentAdded.getParentFrame().getBounds().getY();
-                componentFrame.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY
-                        + DEFAULT_WINDOW_OFFSET,
+                //TODO: When placement hits bottom of desktop restart at top and to right
+                int highestComponentNumber = workspace.getComponentList().size();
+                componentFrame.setBounds(highestComponentNumber * DEFAULT_WINDOW_OFFSET,
+                        highestComponentNumber * DEFAULT_WINDOW_OFFSET,
                     (int) guiComponent.getPreferredSize().getWidth(),
                     (int) guiComponent.getPreferredSize().getHeight());
                 guiChanged = true;
@@ -722,7 +730,6 @@ public class SimbrainDesktop {
 
         // Finish adding component
         guiComponent.addComponentListener(componentListener);
-        lastClickedPoint = null;
         registerComponentInstance(workspaceComponent, guiComponent);
         componentFrame.setContentPane(guiComponent);
         componentFrame.setVisible(true);
@@ -946,7 +953,7 @@ public class SimbrainDesktop {
          * @param mouseEvent Mouse Event
          */
         public void mousePressed(final MouseEvent mouseEvent) {
-            lastClickedPoint = mouseEvent.getPoint();
+            Point lastClickedPoint = mouseEvent.getPoint();
             if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
                 contextMenu.show(frame, (int) lastClickedPoint.getX() + MENU_X_OFFSET,
                     (int) lastClickedPoint.getY() + MENU_Y_OFFSET);

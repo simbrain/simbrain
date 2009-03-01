@@ -3,6 +3,7 @@ package org.simbrain.workspace.gui;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.beans.PropertyVetoException;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuBar;
@@ -22,6 +23,8 @@ public interface GenericFrame {
     public void setTitle(String title);
     
     public String getTitle();
+    
+    public void setIcon(boolean b) throws PropertyVetoException;
     
     public void setJMenuBar(JMenuBar menuBar);
     

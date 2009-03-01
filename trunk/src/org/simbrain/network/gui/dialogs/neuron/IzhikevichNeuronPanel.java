@@ -79,6 +79,9 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Add noise", tsNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
+        
+        this.addBottomText("<html>For a list of useful parameter settings<p>"
+                        + "press the \"Help\" Button.</html>");
     }
 
     /**

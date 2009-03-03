@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.barchart;
 
+import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -109,9 +110,14 @@ public class BarChartComponent extends WorkspaceComponent<ChartListener> {
 
     @Override
     public void update() {
-        for (BarChartConsumer consumer : model.getConsumers()) {
-            model.getDataset().setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
-        }
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                // Add the data
+                for (BarChartConsumer consumer : model.getConsumers()) {
+                    model.getDataset().setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
+                }
+            }
+        });
     }
     
     /**

@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.projection;
 
+import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -245,21 +246,26 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      * Update the entire dataset.  Called when the entire chart dataset is changed.
      */
     public void resetChartDataset() {
-        dataset.getSeries(0).clear();
-        int size = projector.getNumPoints();
-        for (int i = 0; i < size - 2; i++) {
-            double[] point = projector.getProjectedPoint(i);
-            if(point != null) {
-            	// No need to update the chart yet (hence the "false" parameter)
-            	dataset.getSeries(0).add(point[0], point[1], false);
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                // Add the data
+                dataset.getSeries(0).clear();
+                int size = projector.getNumPoints();
+                for (int i = 0; i < size - 2; i++) {
+                    double[] point = projector.getProjectedPoint(i);
+                    if(point != null) {
+                    	// No need to update the chart yet (hence the "false" parameter)
+                    	dataset.getSeries(0).add(point[0], point[1], false);
+                    }
+                }
+                // Notify chart when last datapoint is updated
+                double[] point = projector.getProjectedPoint(size-1);
+                if (point != null) {
+                    dataset.getSeries(0).add(point[0], point[1], true);        	
+                }
+                setUpdateCompleted(true);
             }
-        }
-        // Notify chart when last datapoint is updated
-        double[] point = projector.getProjectedPoint(size-1);
-        if (point != null) {
-            dataset.getSeries(0).add(point[0], point[1], true);        	
-        }
-        setUpdateCompleted(true);
+        });
     }
 
     /**

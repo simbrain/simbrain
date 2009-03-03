@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.timeseries;
 
+import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -171,12 +172,15 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<ChartListener> {
             }
         }
 
-
-        // Add the data
-        for (TimeSeriesConsumer consumer : model.getConsumers()) {
-            model.getDataset().getSeries(consumer.getIndex()).add(
-                    getWorkspace().getTime(), consumer.getValue());
-        }
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                // Add the data
+                for (TimeSeriesConsumer consumer : model.getConsumers()) {
+                    model.getDataset().getSeries(consumer.getIndex()).add(
+                            getWorkspace().getTime(), consumer.getValue());
+                }
+            }
+        });
     }
 
     /**

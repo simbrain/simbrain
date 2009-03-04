@@ -31,14 +31,15 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     private boolean hasSpiked = false;
     /** Recovery. */
     private double recovery = 0;
+    // Default values correspond to "tonic spiking"    
     /** A. */
-    private double a = .2;
+    private double a = .02;
     /** B. */
-    private double b = 2;
+    private double b = .2;
     /** C. */
-    private double c = -56;
+    private double c = -65;
     /** D. */
-    private double d = -16;
+    private double d = 6;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Add noise to the neuron. */

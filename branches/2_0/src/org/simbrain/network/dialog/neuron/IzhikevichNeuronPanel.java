@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
 import org.simnet.neurons.IzhikevichNeuron;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
 
 
 /**
@@ -79,6 +79,9 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Add noise", tsNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
+        
+        this.addBottomText("<html>For a list of useful parameter settings<p>"
+                        + "see the documentation.</html>");
     }
 
     /**

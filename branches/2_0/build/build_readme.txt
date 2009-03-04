@@ -1,6 +1,6 @@
-1. If you like, make relevnt changes to Readme, and dist_basic.sh
+1. If you like, make relevant changes to Readme, and dist_basic.sh
 
-2. Invoke built ant task
+2. Invoke ant task called "build"
 
 3. Run dist_basic.sh
 

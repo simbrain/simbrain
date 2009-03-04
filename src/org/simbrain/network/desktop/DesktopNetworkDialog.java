@@ -47,21 +47,25 @@ public class DesktopNetworkDialog extends NetworkDialog {
      * Called when user cancels out of the dialog.
      */
     public void returnToCurrentPrefs() {
-//        networkPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
-          NetworkGuiSettings.setLineColor(new Color(NetworkGuiPreferences.getLineColor()));
-//        networkPanel.setHotColor(NetworkPreferences.getHotColor());
-//        networkPanel.setCoolColor(NetworkPreferences.getCoolColor());
-//        networkPanel.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
-//        networkPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
+        NetworkGuiSettings.setBackgroundColor(new Color(NetworkGuiPreferences.
+                getBackgroundColor()));
+        NetworkGuiSettings.setLineColor(new Color(NetworkGuiPreferences.getLineColor()));
+        NetworkGuiSettings.setHotColor(NetworkGuiPreferences.getHotColor());
+        NetworkGuiSettings.setCoolColor(NetworkGuiPreferences.getCoolColor());
+        NetworkGuiSettings.setExcitatoryColor(new Color(NetworkGuiPreferences.
+                getExcitatoryColor()));
+        NetworkGuiSettings.setInhibitoryColor(new Color(NetworkGuiPreferences.
+                getInhibitoryColor()));
 //        SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
 //        SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
-//        networkPanel.setSpikingColor(new Color(NetworkPreferences.getSpikingColor()));
-//        networkPanel.setZeroWeightColor(new Color(NetworkPreferences.getZeroWeightColor()));
-//        networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
-//        networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
+        NetworkGuiSettings.setSpikingColor(new Color(NetworkGuiPreferences.getSpikingColor()));
+        NetworkGuiSettings.setZeroWeightColor(new Color(NetworkGuiPreferences.
+                getZeroWeightColor()));
+        NetworkGuiSettings.setMaxDiameter(NetworkGuiPreferences.getMaxDiameter());
+        NetworkGuiSettings.setMinDiameter(NetworkGuiPreferences.getMinDiameter());
 //        networkPanel.getRootNetwork().setTimeStep(NetworkPreferences.getTimeStep());
 //        networkPanel.getRootNetwork().setPrecision(NetworkPreferences.getPrecision());
-//        networkPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
+        NetworkGuiSettings.setNudgeAmount(NetworkGuiPreferences.getNudgeAmount());
         networkPanel.resetColors();
         setIndicatorColor();
         networkPanel.resetSynapseDiameters();
@@ -73,21 +77,21 @@ public class DesktopNetworkDialog extends NetworkDialog {
      * Called when "ok" is pressed.
      */
     public void setAsDefault() {
-//        NetworkPreferences.setBackgroundColor(networkPanel.getBackground().getRGB());
-            NetworkGuiPreferences.setLineColor(NetworkGuiSettings.getLineColor().getRGB());
-//        NetworkPreferences.setHotColor(networkPanel.getHotColor());
-//        NetworkPreferences.setCoolColor(networkPanel.getCoolColor());
-//        NetworkPreferences.setExcitatoryColor(networkPanel.getExcitatoryColor().getRGB());
-//        NetworkPreferences.setInhibitoryColor(networkPanel.getInhibitoryColor().getRGB());
+        NetworkGuiPreferences.setBackgroundColor(NetworkGuiSettings.getBackgroundColor().getRGB());
+        NetworkGuiPreferences.setLineColor(NetworkGuiSettings.getLineColor().getRGB());
+        NetworkGuiPreferences.setHotColor(NetworkGuiSettings.getHotColor());
+        NetworkGuiPreferences.setCoolColor(NetworkGuiSettings.getCoolColor());
+        NetworkGuiPreferences.setExcitatoryColor(NetworkGuiSettings.getExcitatoryColor().getRGB());
+        NetworkGuiPreferences.setInhibitoryColor(NetworkGuiSettings.getInhibitoryColor().getRGB());
 //        NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
 //        NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
-//        NetworkPreferences.setSpikingColor(networkPanel.getSpikingColor().getRGB());
-//        NetworkPreferences.setZeroWeightColor(networkPanel.getZeroWeightColor().getRGB());
-//        NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
-//        NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
+        NetworkGuiPreferences.setSpikingColor(NetworkGuiSettings.getSpikingColor().getRGB());
+        NetworkGuiPreferences.setZeroWeightColor(NetworkGuiSettings.getZeroWeightColor().getRGB());
+        NetworkGuiPreferences.setMaxDiameter(NetworkGuiSettings.getMaxDiameter());
+        NetworkGuiPreferences.setMinDiameter(NetworkGuiSettings.getMinDiameter());
 //        NetworkPreferences.setTimeStep(networkPanel.getRootNetwork().getTimeStep());
 //        NetworkPreferences.setPrecision(networkPanel.getRootNetwork().getPrecision());
-//        NetworkPreferences.setNudgeAmount(networkPanel.getNudgeAmount());
+        NetworkGuiPreferences.setNudgeAmount(NetworkGuiSettings.getNudgeAmount());
     }
 
 }

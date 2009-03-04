@@ -36,8 +36,6 @@ import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.SpikingNeuron;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.synapses.SignalSynapse;
-import org.simbrain.workspace.Workspace;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -178,16 +176,16 @@ public final class SynapseNode
     public void updateColor() {
 
         if (synapse.getStrength() < 0) {
-            circle.setPaint(getNetworkPanel().getInhibitoryColor());
+            circle.setPaint(NetworkGuiSettings.getInhibitoryColor());
         } else if (synapse.getStrength() == 0) {
-            circle.setPaint(getNetworkPanel().getZeroWeightColor());
+            circle.setPaint(NetworkGuiSettings.getZeroWeightColor());
         } else {
-            circle.setPaint(getNetworkPanel().getExcitatoryColor());
+            circle.setPaint(NetworkGuiSettings.getExcitatoryColor());
         }
 
         if (source.getNeuron() instanceof SpikingNeuron) {
             if (((SpikingNeuron) source.getNeuron()).hasSpiked()) {
-                line.setStrokePaint(getNetworkPanel().getSpikingColor());
+                line.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {
                 line.setStrokePaint(NetworkGuiSettings.getLineColor());
             }
@@ -222,13 +220,13 @@ public final class SynapseNode
         }
 
         if (synapse.getStrength() == 0) {
-            diameter = getNetworkPanel().getMinDiameter();
+            diameter = NetworkGuiSettings.getMinDiameter();
         } else if (synapse.getStrength() > 0) {
-            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel().getMinDiameter())
-                    * (strength / upperBound) + getNetworkPanel().getMinDiameter()));
+            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings.getMinDiameter())
+                    * (strength / upperBound) + NetworkGuiSettings.getMinDiameter()));
         } else {
-            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel().getMinDiameter())
-                    * (Math.abs(strength / lowerBound))) + getNetworkPanel().getMinDiameter());
+            diameter = (((NetworkGuiSettings.getMaxDiameter() - NetworkGuiSettings.getMinDiameter())
+                    * (Math.abs(strength / lowerBound))) + NetworkGuiSettings.getMinDiameter());
         }
 
         double delta = (circle.getBounds().getWidth() - diameter) / 2;

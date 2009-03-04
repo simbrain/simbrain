@@ -161,27 +161,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     /** Last selected Neuron. */
     private NeuronNode lastSelectedNeuron = null;
 
-    /** Background color of rootNetwork panel. */
-    private Color backgroundColor = Color.white;
-
-    /** Color of "active" neurons, with positive values. */
-    private float hotColor = Color.red.getRGB();
-    
-    /** Color of "inhibited" neurons, with negative values. */
-    private float coolColor = Color.blue.getRGB();
-
-    /** Color of "excitatory" synapses, with positive values. */
-    private Color excitatoryColor = Color.red;
-
-    /** Color of "inhibitory" synapses, with negative values. */
-    private Color inhibitoryColor = Color.blue;
-
-    /** Color of "spiking" synapse. */
-    private Color spikingColor = Color.yellow;
-
-    /** Color of "zero" weights. */
-    private Color zeroWeightColor = Color.gray;
-
     /** Label which displays current time. */
     private TimeLabel timeLabel;
 
@@ -202,15 +181,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** Show time. */
     private boolean showTime = true;
-
-    /** How much to nudge objects per key click. */
-    private double nudgeAmount = .1;
-
-    /** Maximum diameter of the circle representing the synapse. */
-    private int maxDiameter = 20;
-
-    /** Maximum diameter of the circle representing the synapse. */
-    private int minDiameter = 5;
 
     /** Main tool bar. */
     private JToolBar mainToolBar;
@@ -330,6 +300,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         ToolTipManager.sharedInstance().registerComponent(this);
 
         addKeyListener(new NetworkKeyAdapter(this));
+
 
     }
 
@@ -1014,8 +985,8 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * and resets relevant colors.
      */
     public void resetColors() {
-        for (Iterator i = getLayer().getChildrenIterator(); i.hasNext(); ) {
-            Object obj = i.next();
+        setBackground(NetworkGuiSettings.getBackgroundColor());
+        for (Object obj : getLayer().getChildrenReference()) {
             if (obj instanceof ScreenElement) {
                 ((ScreenElement) obj).resetColors();
             }
@@ -1588,28 +1559,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         return lastSelectedNeuron;
     }
 
-    /**
-     * Set the background color, store it to user preferences, and repaint the
-     * panel.
-     *
-     * @param clr
-     *            new background color for rootNetwork panel
-     */
-    public void setBackgroundColor(final Color clr) {
-        backgroundColor = clr;
-        setBackground(backgroundColor);
-        repaint();
-    }
-
-    /**
-     * Get the background color.
-     *
-     * @return the background color
-     */
-    public Color getBackgroundColor() {
-        return backgroundColor;
-    }
-
 
     /**
      * Return height bottom toolbar is taking up.
@@ -1656,62 +1605,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public void setAutoZoomMode(final boolean autoZoomMode) {
         this.autoZoomMode = autoZoomMode;
         repaint();
-    }
-
-    /**
-     * @return Returns the coolColor.
-     */
-    public float getCoolColor() {
-        return coolColor;
-    }
-
-    /**
-     * @param coolColor The coolColor to set.
-     */
-    public void setCoolColor(final float coolColor) {
-        this.coolColor = coolColor;
-    }
-
-    /**
-     * @return Returns the excitatoryColor.
-     */
-    public Color getExcitatoryColor() {
-        return excitatoryColor;
-    }
-
-    /**
-     * @param excitatoryColor The excitatoryColor to set.
-     */
-    public void setExcitatoryColor(final Color excitatoryColor) {
-        this.excitatoryColor = excitatoryColor;
-    }
-
-    /**
-     * @return Returns the hotColor.
-     */
-    public float getHotColor() {
-        return hotColor;
-    }
-
-    /**
-     * @param hotColor The hotColor to set.
-     */
-    public void setHotColor(final float hotColor) {
-        this.hotColor = hotColor;
-    }
-
-    /**
-     * @return Returns the inhibitoryColor.
-     */
-    public Color getInhibitoryColor() {
-        return inhibitoryColor;
-    }
-
-    /**
-     * @param inhibitoryColor The inhibitoryColor to set.
-     */
-    public void setInhibitoryColor(final Color inhibitoryColor) {
-        this.inhibitoryColor = inhibitoryColor;
     }
 
     /**
@@ -1775,62 +1668,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public void setShowTime(final boolean showTime) {
         this.showTime = showTime;
         timeLabel.setVisible(showTime);
-    }
-
-    /**
-     * @return Returns the spiking synapse color.
-     */
-    public Color getSpikingColor() {
-        return spikingColor;
-    }
-
-    /**
-     * @param spikingColor Sets the spiking synapse color.
-     */
-    public void setSpikingColor(final Color spikingColor) {
-        this.spikingColor = spikingColor;
-    }
-
-    /**
-     * @return Return the nudge amount.
-     */
-    public double getNudgeAmount() {
-        return nudgeAmount;
-    }
-
-    /**
-     * @param nudgeAmount Sets the nudge amount.
-     */
-    public void setNudgeAmount(final double nudgeAmount) {
-        this.nudgeAmount = nudgeAmount;
-    }
-
-    /**
-     * @return Returns the maximum synapse diameter.
-     */
-    public int getMaxDiameter() {
-        return maxDiameter;
-    }
-
-    /**
-     * @param maxDiameter Sets the maximum synapse diameter.
-     */
-    public void setMaxDiameter(final int maxDiameter) {
-        this.maxDiameter = maxDiameter;
-    }
-
-    /**
-     * @return Returns the minimum synapse diameter.
-     */
-    public int getMinDiameter() {
-        return minDiameter;
-    }
-
-    /**
-     * @param minDiameter Sets the minimum synapse diameter.
-     */
-    public void setMinDiameter(final int minDiameter) {
-        this.minDiameter = minDiameter;
     }
 
     /**
@@ -1935,8 +1772,10 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     protected void nudge(final int offsetX, final int offsetY) {
         for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
-            node.getNeuron().setX(node.getNeuron().getX() + (offsetX * nudgeAmount));
-            node.getNeuron().setY(node.getNeuron().getY() + (offsetY * nudgeAmount));        }
+            node.getNeuron().setX(node.getNeuron().getX() + (offsetX
+                    * NetworkGuiSettings.getNudgeAmount()));
+            node.getNeuron().setY(node.getNeuron().getY() + (offsetY
+                    * NetworkGuiSettings.getNudgeAmount()));        }
         repaint();
     }
 
@@ -1967,20 +1806,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public JToolBar getClampToolBar() {
         return clampToolBar;
-    }
-
-    /**
-     * @return the zero weight color.
-     */
-    public Color getZeroWeightColor() {
-        return zeroWeightColor;
-    }
-
-    /**
-     * @param zeroWeightColor Color of the zero weight.
-     */
-    public void setZeroWeightColor(final Color zeroWeightColor) {
-        this.zeroWeightColor = zeroWeightColor;
     }
 
 

@@ -66,7 +66,6 @@ public class NetworkGuiPreferences {
 
         // TOOD: Non-Gui stuff..
         setTimeStep(getDefaultTimeStep());
-        setTimeUnits(getDefaultTimeUnits());
         setPrecision(getDefaultPrecision());
         setWeightValues(getDefaultWeightValues());
         setCurrentDirectory(getDefaultCurrentDirectory());
@@ -136,7 +135,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network hot node color.
-     * @return Perferred hot node color
+     * @return Preferred hot node color
      */
     public static float getHotColor() {
         return NETWORK_PREFERENCES.getFloat("NetworkHotColor", getDefaultHotColor());
@@ -160,7 +159,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network cool node color.
-     * @return Perferred cool node color
+     * @return Preferred cool node color
      */
     public static float getCoolColor() {
         return NETWORK_PREFERENCES.getFloat("NetworkCoolColor", getDefaultCoolColor());
@@ -184,7 +183,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network excitatory color.
-     * @return Perferred excitatory neuron color
+     * @return Preferred excitatory neuron color
      */
     public static int getExcitatoryColor() {
         return NETWORK_PREFERENCES.getInt("NetworkExcitatoryColor", getDefaultExcitatoryColor());
@@ -208,7 +207,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network inhibitory color.
-     * @return Perferred inhibitory neuron color
+     * @return Preferred inhibitory neuron color
      */
     public static int getInhibitoryColor() {
         return NETWORK_PREFERENCES.getInt("NetworkInhibitoryColor", getDefaultInhibitoryColor());
@@ -232,7 +231,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network lasso color.
-     * @return Perferred lasso color
+     * @return Preferred lasso color
      */
     public static int getLassoColor() {
         return NETWORK_PREFERENCES.getInt("NetworkLassoColor", getDefaultLassoColor());
@@ -256,7 +255,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network selection color.
-     * @return Perferred selection color
+     * @return Preferred selection color
      */
     public static int getSelectionColor() {
         return NETWORK_PREFERENCES.getInt("NetworkSelectionColor", getDefaultSelectionColor());
@@ -280,7 +279,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network signal synapse color.
-     * @return Perferred signal synapse color
+     * @return Preferred signal synapse color
      */
     public static int getSignalColor() {
         return NETWORK_PREFERENCES.getInt("SignalSynapse", getDefaultSignalColor());
@@ -304,7 +303,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network zero weight color.
-     * @return Perferred zero weight color
+     * @return Preferred zero weight color
      */
     public static int getZeroWeightColor() {
         return NETWORK_PREFERENCES.getInt("ZeroWeight", getDefaultZeroWeightColor());
@@ -352,7 +351,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network min node radius.
-     * @return Minumum node radius
+     * @return Minimum node radius
      */
     public static int getMinDiameter() {
         return NETWORK_PREFERENCES.getInt("NetworkSizeMin", getDefaultMinDiameter());
@@ -367,7 +366,7 @@ public class NetworkGuiPreferences {
     }
 
     /**
-     * Netowork time step.
+     * Network time step.
      * @param step Time step
      */
     public static void setTimeStep(final double step) {
@@ -375,43 +374,19 @@ public class NetworkGuiPreferences {
     }
 
     /**
-     * Netowork time step.
-     * @return Perferred time step
+     * Network time step.
+     * @return Preferred time step
      */
     public static double getTimeStep() {
         return NETWORK_PREFERENCES.getDouble("TimeStep", getDefaultTimeStep());
     }
 
     /**
-     * Netowork time step.
+     * Network time step.
      * @return Default time step
      */
     public static double getDefaultTimeStep() {
         return .01;
-    }
-
-    /**
-     * Network time units.
-     * @param units Time units
-     */
-    public static void setTimeUnits(final int units) {
-        NETWORK_PREFERENCES.putInt("TimeUnits", units);
-    }
-
-    /**
-     * Network time units.
-     * @return Perferred time units
-     */
-    public static int getTimeUnits() {
-        return NETWORK_PREFERENCES.getInt("TimeUnits", getDefaultTimeUnits());
-    }
-
-    /**
-     * Network time units.
-     * @return Default time units
-     */
-    public static int getDefaultTimeUnits() {
-        return 0;
     }
 
     /**
@@ -424,7 +399,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network precision.
-     * @return Perferred precision
+     * @return Preferred precision
      */
     public static int getPrecision() {
         return NETWORK_PREFERENCES.getInt("NetworkPrecision", getDefaultPrecision());
@@ -472,7 +447,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network nudging.
-     * @return Perferred nudge amount
+     * @return Preferred nudge amount
      */
     public static double getNudgeAmount() {
         return NETWORK_PREFERENCES.getDouble("NetworkNudgeAmount", getDefaultNudgeAmount());
@@ -559,8 +534,8 @@ public class NetworkGuiPreferences {
     }
 
     /**
-     * Sets the spiking syanapse color.
-     * @param rgbColor Color to set spiking syanapse
+     * Sets the spiking synapse color.
+     * @param rgbColor Color to set spiking synapse
      */
     public static void setSpikingColor(final int rgbColor) {
         NETWORK_PREFERENCES.putInt("SpikingColor", rgbColor);
@@ -576,7 +551,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Returns the default spiking synapse color.
-     * @return Default spiking syanpse color
+     * @return Default spiking synapse color
      */
     public static int getDefaultSpikingColor() {
         return Color.YELLOW.getRGB();

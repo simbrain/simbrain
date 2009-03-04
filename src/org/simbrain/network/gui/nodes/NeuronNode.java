@@ -294,9 +294,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         menu.add(new ShowConnectDialogAction(getNetworkPanel()));
         // Connect Action
         if (getNetworkPanel().getSelectedNeurons() != null) {
-            menu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(),
+            menu.add(new ConnectNeuronsAction(getNetworkPanel(),
+                    getNetworkPanel().getSourceModelNeurons(),
                     getNetworkPanel().getSelectedModelNeurons()));
-        }        
+        }
         return menu;
     }
 
@@ -330,16 +331,18 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             circle.setPaint(Color.white);
         } else if (activation > 0) {
             float saturation = checkValid((float) Math.abs(activation / neuron.getUpperBound()));
-            circle.setPaint(Color.getHSBColor(getNetworkPanel().getHotColor(), saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(NetworkGuiSettings.getHotColor(),
+                    saturation, (float) 1));
         } else if (activation < 0) {
             float saturation = checkValid((float) Math.abs(activation / neuron.getLowerBound()));
-            circle.setPaint(Color.getHSBColor(getNetworkPanel().getCoolColor(), saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(NetworkGuiSettings.getCoolColor(),
+                    saturation, (float) 1));
         }
 
         if (neuron instanceof SpikingNeuron) {
             if (((SpikingNeuron) neuron).hasSpiked()) {
-                circle.setStrokePaint(getNetworkPanel().getSpikingColor());
-                outArrow.setStrokePaint(getNetworkPanel().getSpikingColor());
+                circle.setStrokePaint(NetworkGuiSettings.getSpikingColor());
+                outArrow.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {
                 circle.setStrokePaint(NetworkGuiSettings.getLineColor());
                 outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
@@ -737,6 +740,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         circle.setStrokePaint(NetworkGuiSettings.getLineColor());
         inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
         outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+        updateColor();
     }
 
     /**

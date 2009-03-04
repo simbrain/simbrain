@@ -97,7 +97,6 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         fileMenu.add(new ShowNetworkPreferencesAction(networkPanel));
         fileMenu.addSeparator();
 
-        // Do same for close, open, save, save as
         fileMenu.add(new CloseNetworkAction(this));
 
         return fileMenu;

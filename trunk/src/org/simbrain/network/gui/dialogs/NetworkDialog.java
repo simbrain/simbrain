@@ -88,8 +88,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     protected NetworkPanel networkPanel;
 
     /** List of items for combo box. */
-    private String[] objectColorList = {BACKGROUND, COOLNODE, EXCITATORY, HOTNODE,
-            INHIBITORY, LASSO, LINE, SELECTION, SIGNAL, SPIKE, ZERO};
+    private String[] objectColorList = {BACKGROUND, HOTNODE, COOLNODE, EXCITATORY,
+            INHIBITORY, SPIKE, ZERO, LASSO, LINE, SELECTION, SIGNAL};
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -259,7 +259,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
 
                 if (theColor != null) {
-                    networkPanel.setBackgroundColor(theColor);
+                    NetworkGuiSettings.setBackgroundColor(theColor);
                 }
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
@@ -271,25 +271,25 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
 
                 if (theColor != null) {
-                    networkPanel.setHotColor(Utils.colorToFloat(theColor));
+                    NetworkGuiSettings.setHotColor(Utils.colorToFloat(theColor));
                 }
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
 
                 if (theColor != null) {
-                    networkPanel.setCoolColor(Utils.colorToFloat(theColor));
+                    NetworkGuiSettings.setCoolColor(Utils.colorToFloat(theColor));
                 }
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
 
                 if (theColor != null) {
-                    networkPanel.setExcitatoryColor(theColor);
+                    NetworkGuiSettings.setExcitatoryColor(theColor);
                 }
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
 
                 if (theColor != null) {
-                    networkPanel.setInhibitoryColor(theColor);
+                    NetworkGuiSettings.setInhibitoryColor(theColor);
                 }
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
@@ -307,13 +307,13 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 
                 if (theColor != null) {
-                    networkPanel.setSpikingColor(theColor);
+                    NetworkGuiSettings.setSpikingColor(theColor);
                 }
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {
 
                 if (theColor != null) {
-                    networkPanel.setZeroWeightColor(theColor);
+                    NetworkGuiSettings.setZeroWeightColor(theColor);
                 }
 
             }
@@ -340,10 +340,10 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         showTimeBox.setSelected(networkPanel.getShowTime());
         showSubnetOutlineBox.setSelected(networkPanel.getShowSubnetOutline());
         precisionField.setText(Integer.toString(networkPanel.getRootNetwork().getPrecision()));
-        nudgeAmountField.setText(Double.toString(networkPanel.getNudgeAmount()));
+        nudgeAmountField.setText(Double.toString(NetworkGuiSettings.getNudgeAmount()));
         isRoundingBox.setSelected(networkPanel.getRootNetwork().getRoundingOff());
-        weightSizeMaxSlider.setValue(networkPanel.getMaxDiameter());
-        weightSizeMinSlider.setValue(networkPanel.getMinDiameter());
+        weightSizeMaxSlider.setValue(NetworkGuiSettings.getMaxDiameter());
+        weightSizeMinSlider.setValue(NetworkGuiSettings.getMinDiameter());
         if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.BUFFERED)) {
             cbUpdateMethod.setSelectedIndex(0);
         } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.PRIORITYBASED)) {
@@ -357,7 +357,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * Commits changes not handled in action performed.
      */
     private void commitChanges() {
-        networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
+        NetworkGuiSettings.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
         networkPanel.getRootNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         switch (cbUpdateMethod.getSelectedIndex()) {
             case 0:
@@ -384,9 +384,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         JSlider j = (JSlider) e.getSource();
 
         if (j == weightSizeMaxSlider) {
-            networkPanel.setMaxDiameter(j.getValue());
+            NetworkGuiSettings.setMaxDiameter(j.getValue());
         } else if (j == weightSizeMinSlider) {
-            networkPanel.setMinDiameter(j.getValue());
+            NetworkGuiSettings.setMinDiameter(j.getValue());
         }
 
         networkPanel.resetSynapseDiameters();
@@ -399,7 +399,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      */
     public Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color", colorIndicator.getBackground());
+        Color theColor = JColorChooser.showDialog(this,
+                "Choose Color", colorIndicator.getBackground());
         colorChooser.setLocation(200, 200); //Set location of color chooser
         return theColor;
     }
@@ -432,7 +433,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     protected void setIndicatorColor() {
         if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
 
-            colorIndicator.setBackground(networkPanel.getBackground());
+            colorIndicator.setBackground(NetworkGuiSettings.getBackgroundColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
 
@@ -440,19 +441,19 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
 
-            colorIndicator.setBackground(Utils.floatToHue(networkPanel.getHotColor()));
+            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings.getHotColor()));
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
 
-            colorIndicator.setBackground(Utils.floatToHue(networkPanel.getCoolColor()));
+            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings.getCoolColor()));
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
 
-            colorIndicator.setBackground(networkPanel.getExcitatoryColor());
+            colorIndicator.setBackground(NetworkGuiSettings.getExcitatoryColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
 
-            colorIndicator.setBackground(networkPanel.getInhibitoryColor());
+            colorIndicator.setBackground(NetworkGuiSettings.getInhibitoryColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
 
@@ -464,11 +465,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 
-            colorIndicator.setBackground(networkPanel.getSpikingColor());
+            colorIndicator.setBackground(NetworkGuiSettings.getSpikingColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {
 
-            colorIndicator.setBackground(networkPanel.getZeroWeightColor());
+            colorIndicator.setBackground(NetworkGuiSettings.getZeroWeightColor());
 
         }
     }

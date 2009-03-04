@@ -46,6 +46,21 @@ public class NetworkPanelDesktop extends NetworkPanel {
         
         // TODO: Finish this and clean it up
         NetworkGuiSettings.setLineColor(new Color(NetworkGuiPreferences.getLineColor()));
+        NetworkGuiSettings.setBackgroundColor(new Color(NetworkGuiPreferences.
+                getBackgroundColor()));
+        NetworkGuiSettings.setHotColor(NetworkGuiPreferences.getHotColor());
+        NetworkGuiSettings.setCoolColor(NetworkGuiPreferences.getCoolColor());
+        NetworkGuiSettings.setExcitatoryColor(new Color(NetworkGuiPreferences.
+                getExcitatoryColor()));
+        NetworkGuiSettings.setInhibitoryColor(new Color(NetworkGuiPreferences.
+                getInhibitoryColor()));
+        NetworkGuiSettings.setSpikingColor(new Color(NetworkGuiPreferences.getSpikingColor()));
+        NetworkGuiSettings.setZeroWeightColor(new Color(NetworkGuiPreferences.
+                getZeroWeightColor()));
+        NetworkGuiSettings.setMaxDiameter(NetworkGuiPreferences.getMaxDiameter());
+        NetworkGuiSettings.setMinDiameter(NetworkGuiPreferences.getMinDiameter());
+        NetworkGuiSettings.setNudgeAmount(NetworkGuiPreferences.getNudgeAmount());
+        resetColors();
     }
     
     

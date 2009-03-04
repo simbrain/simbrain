@@ -720,8 +720,12 @@ public class SimbrainDesktop {
             } else {
                 //TODO: When placement hits bottom of desktop restart at top and to right
                 int highestComponentNumber = workspace.getComponentList().size();
-                componentFrame.setBounds(highestComponentNumber * DEFAULT_WINDOW_OFFSET,
-                        highestComponentNumber * DEFAULT_WINDOW_OFFSET,
+
+                componentFrame.setBounds(
+                    (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
+                            % (desktop.getWidth() - guiComponent.getPreferredSize().getWidth())),
+                    (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
+                            % (desktop.getHeight() - guiComponent.getPreferredSize().getHeight())),
                     (int) guiComponent.getPreferredSize().getWidth(),
                     (int) guiComponent.getPreferredSize().getHeight());
                 guiChanged = true;

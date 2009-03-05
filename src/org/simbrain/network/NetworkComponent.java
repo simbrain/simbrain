@@ -93,17 +93,18 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
         return RootNetwork.getXStream().toXML(rootNetwork);
     }
 
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
-//        NetworkPreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    @Override
-    public String getCurrentDirectory() {
-//       return NetworkPreferences.getCurrentDirectory();
-        return null;
-    }
+    // TODO: Link to NetworkSettings.
+//    @Override
+//    public void setCurrentDirectory(final String currentDirectory) {
+//        super.setCurrentDirectory(currentDirectory);
+////        NetworkPreferences.setCurrentDirectory(currentDirectory);
+//    }
+//
+//    @Override
+//    public String getCurrentDirectory() {
+////       return NetworkPreferences.getCurrentDirectory();
+//        return null;
+//    }
     
     /**
      * Returns the listeners on this component.
@@ -112,16 +113,6 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
      */
     public Collection<? extends NetworkListener> getListeners() {
         return super.getListeners();
-    }
-
-	/*
-     * (non-Javadoc)
-     * 
-     * @see org.simbrain.workspace.WorkspaceComponent#getTask()
-     */
-    @Override
-    public Runnable getTask() {
-        return new NetworkUpdater(this.getRootNetwork());
     }
 
 }

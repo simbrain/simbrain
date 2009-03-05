@@ -210,20 +210,9 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<ChartListener> {
     public void setFixedWidth(final boolean fixedWidth) {
         this.fixedWidth = fixedWidth;
     }
-
-    @Override
-    public String getCurrentDirectory() {
-        return "." + System.getProperty("file.separator");
-
-    }
-    
+ 
     @Override
     public String getXML() {
         return TimeSeriesModel.getXStream().toXML(model);
-    }
-    
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
     }
 }

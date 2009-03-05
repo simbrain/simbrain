@@ -63,21 +63,22 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
     
-    /** Default priority. */
-    private static final int DEFAULT_PRIORITY = 0;
-    
     /** How to order a list of attributes. */
     public enum AttributeListingStyle { TOTAL, DEFAULT_EACH };
     
     /** Current attribute listing style. */
     private AttributeListingStyle attributeListingStyle = AttributeListingStyle.DEFAULT_EACH;
 
+    /** Default current directory if it is not set elsewhere. */
+    private static final String DEFAULT_CURRENT_DIRECTORY = "."
+            + System.getProperty("file.separator");
+
     /**
      * Current directory. So when re-opening this type of component the app remembers
      * where to look.
      * <p>Subclasses can provide a default value using User Preferences.
      */
-    private String currentDirectory;
+    private String currentDirectory = DEFAULT_CURRENT_DIRECTORY;
 
     /**
      * Current file.  Used when "saving" a component.
@@ -130,22 +131,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     public final void close() {
         closing();
         workspace.removeWorkspaceComponent(this);
-    }
-    
-    /**
-     * This can be overridden to provide a custom means of updating a component.
-     * This is meant to be used if, for example, one component can be updated
-     * in a multi-threaded manner or has special updating needs.
-     * 
-     * See, for example, the way this method is overridden in
-     * org.simbrain.network.NetworkComponent's implementation of this method.
-     * 
-     * If null is returned then default updating is used.
-     * 
-     * @return default value of null
-     */
-    public Runnable getTask() {
-        return null;
     }
     
     /**

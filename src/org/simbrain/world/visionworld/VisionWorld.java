@@ -60,10 +60,9 @@ import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
- * Vision world.
+ * Vision world main canvas.
  */
-public final class VisionWorld
-    extends PCanvas {
+public final class VisionWorld extends PCanvas {
 
     /** serial version ID */
     private static final long serialVersionUID = 1L;

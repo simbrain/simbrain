@@ -36,7 +36,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Data for a JFreeChart ScatterPlot.
+ * Data for a projection component.
  * 
  * TODO:
  *  Color "hot point"
@@ -261,7 +261,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
                 // Notify chart when last datapoint is updated
                 double[] point = projector.getProjectedPoint(size-1);
                 if (point != null) {
-                    dataset.getSeries(0).add(point[0], point[1], true);        	
+                    dataset.getSeries(0).add(point[0], point[1], true);
                 }
                 setUpdateCompleted(true);
             }
@@ -279,53 +279,43 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         System.out.println("--------------------------------------");
     }
 
-
-    @Override
-    public String getCurrentDirectory() {
-        return "." + System.getProperty("file.separator");
-    }
-    
     @Override
     public String getXML() {
         return ProjectionComponent.getXStream().toXML(this);
-    }
-    
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
     }
 
     /**
      * @return whether this component being updated by a thread or not.
      */
-	public boolean isRunning() {
-		return isRunning;
-	}
+    public boolean isRunning() {
+        return isRunning;
+    }
 
-	/**
-	 * This flag allows the user to start and stop iterative projection techniques.
-	 *
-	 * @param b  whether this component being updated by a thread or not.
-	 */
-	public void setRunning(boolean b) {
-		isRunning = b;		
-	}
+    /**
+     * This flag allows the user to start and stop iterative projection
+     * techniques.
+     * 
+     * @param b whether this component being updated by a thread or not.
+     */
+    public void setRunning(boolean b) {
+        isRunning = b;
+    }
 
-	/**
-	 * Swing update flag.
-	 * 
-	 * @param b whether updated is completed
-	 */
-	public void setUpdateCompleted(boolean b) {
-		setUpdateCompleted = b;	
-	}
+    /**
+     * Swing update flag.
+     * 
+     * @param b whether updated is completed
+     */
+    public void setUpdateCompleted(boolean b) {
+        setUpdateCompleted = b;
+    }
 
-	/**
-	 * Swing update flag.
-	 *
-	 * @return whether update is completd or not
-	 */
-	public boolean isUpdateCompleted() {
-		return setUpdateCompleted;
-	}
+    /**
+     * Swing update flag.
+     * 
+     * @return whether update is completd or not
+     */
+    public boolean isUpdateCompleted() {
+        return setUpdateCompleted;
+    }
 }

@@ -54,6 +54,10 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
         networkPanel = new NetworkPanelDesktop(this, component.getRootNetwork());
 
+         //TODO: Wire up preferences
+        // component.setCurrentDirectory(currentDirectory);
+        // component.setCurrentFile(currentFile);
+        
         // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         setLayout(new BorderLayout());
 

@@ -118,6 +118,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      */
     @SuppressWarnings("unchecked")
     public void showOpenFileDialog() {
+
         SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(),
             workspaceComponent.getDescription());
         

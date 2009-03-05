@@ -65,11 +65,15 @@ public class Workspace {
     /** Current workspace file. */
     private File currentFile = null;
 
+    /** Default current directory if it is not set elsewhere. */
+    private static final String DEFAULT_CURRENT_DIRECTORY = "."
+            + System.getProperty("file.separator");
+    
     /**
      * Current directory. So when re-opening this type of component the
      * app remembers where to look.
      */
-    private String currentDirectory = null;
+    private String currentDirectory = DEFAULT_CURRENT_DIRECTORY;
 
     /**
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem because

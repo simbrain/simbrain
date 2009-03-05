@@ -129,17 +129,6 @@ public class BarChartComponent extends WorkspaceComponent<ChartListener> {
             listener.chartSettingsUpdated();
         }
     }
-
-    @Override
-    public String getCurrentDirectory() {
-        return "." + System.getProperty("file.separator");
-
-    }
-    
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
-    }
     
     @Override
     public List<? extends Consumer> getConsumers() {

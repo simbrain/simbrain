@@ -155,21 +155,10 @@ public class ScatterPlotComponent extends WorkspaceComponent<ChartListener> {
             }
         }
     }
-
-    @Override
-    public String getCurrentDirectory() {
-        return "." + System.getProperty("file.separator");
-
-    }
     
     @Override
     public String getXML() {
         return ScatterPlotModel.getXStream().toXML(model);
-    }
-    
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
     }
 
     @Override

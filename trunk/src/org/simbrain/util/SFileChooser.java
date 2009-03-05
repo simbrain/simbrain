@@ -39,15 +39,17 @@ import javax.swing.filechooser.FileFilter;
  * easily.
  */
 public class SFileChooser {
-    /** default serial version id */
+    
+    /** Default serial version id */
     private static final long serialVersionUID = 1L;
     
-    /** 
-     * the map of extension and their descriptions in the order
-     * of their addition
+    /**
+     * The map of extension and their descriptions in the order
+     * of their addition.
      */
     private final LinkedHashMap<String, String> exts = new LinkedHashMap<String, String>();
-    /** the description for the entire set of formats */
+
+    /** The description for the entire set of formats */
     private String description;
     
     /** A memory of the last directory this FileChooser was in. */
@@ -87,21 +89,21 @@ public class SFileChooser {
     }
     
     /**
-     * adds an extension with the provided description
+     * adds an extension with the provided description.
      * 
      * @param extension the extension
      * @param description the description
      */
-    public void addExtension(String description, String extension) {
+    public void addExtension(final String description, final String extension) {
         exts.put(extension, description);
     }
     
     /**
-     * Adds an extension with the default description
+     * Adds an extension with the default description.
      * 
      * @param extension the extension to add
      */
-    public void addExtension(String extension) {
+    public void addExtension(final String extension) {
         addExtension("*." + extension, extension);
     }
     
@@ -128,8 +130,8 @@ public class SFileChooser {
      * @return File if selected
      */
     public File showOpenDialog() {
+
         JFileChooser chooser = new JFileChooser();
-        
         setCurrentDirectory(chooser);
 
         if (exts.size() > 1) {
@@ -154,11 +156,11 @@ public class SFileChooser {
     }
 
     /**
-     * Sets the current directory for the chooser
+     * Sets the current directory for the chooser.
      * 
      * @param chooser the file chooser
      */
-    private void setCurrentDirectory(JFileChooser chooser) {
+    private void setCurrentDirectory(final JFileChooser chooser) {
         File dir = new File(currentDirectory);
 
         try {
@@ -173,7 +175,7 @@ public class SFileChooser {
      * 
      * @return Name of file saved
      */
-    public File showSaveDialog(File file) {
+    public File showSaveDialog(final File file) {
         JFileChooser chooser = new JFileChooser();
         
         setCurrentDirectory(chooser);
@@ -206,12 +208,12 @@ public class SFileChooser {
     }
     
     /**
-     * ASk user whether to overwrite the give existing file
+     * Ask user whether to overwrite the give existing file.
      * 
      * @param file the file in question
      * @return whether the user selected "yes"
      */
-    public boolean confirmOverwrite(File file) {
+    public boolean confirmOverwrite(final File file) {
         String message = "The file \"" + file.getName() + "\" already exists. Overwrite?";
         Object[] options = { "OK", "Cancel" };
         
@@ -221,12 +223,12 @@ public class SFileChooser {
     }
     
     /**
-     * Shows the save dialog for the given string name
+     * Shows the save dialog for the given string name.
      * 
      * @param file the name of the file
      * @return the file name to save to
      */
-    public File showSaveDialog(String file) {
+    public File showSaveDialog(final String file) {
         return showSaveDialog(new File(file));
     }
     
@@ -246,7 +248,7 @@ public class SFileChooser {
         private final String extension;
         private final String description;
         
-        ExtensionFileFilter(String extension, String description) {
+        ExtensionFileFilter(final String extension, final String description) {
             this.extension = extension;
             this.description = description;
         }
@@ -347,7 +349,9 @@ public class SFileChooser {
      * @return The file name with the correct extension
      */
     private File addExtension(final File theFile, final JFileChooser chooser) {
-        if (exts.size() < 1) return theFile;
+        if (exts.size() < 1) {
+            return theFile;
+        }
         
         FileFilter selected = chooser.getFileFilter();
         
@@ -387,9 +391,9 @@ public class SFileChooser {
     /**
      * Sets the file chooser to use image preview viewer.
      *
-     * @param useViewer use image preview viewer 
+     * @param useViewer use image preview viewer.
      */
-    public void setUseImagePreview(boolean useViewer) {
+    public void setUseImagePreview(final boolean useViewer) {
         this.useViewer = useViewer;
     }
 }

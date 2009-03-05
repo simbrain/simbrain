@@ -132,15 +132,4 @@ public class PieChartComponent extends WorkspaceComponent<ChartListener> {
     public String getXML() {
         return PieChartModel.getXStream().toXML(model);
     }
-    
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
-    }
-
-    @Override
-    public String getCurrentDirectory() {
-        return "." + System.getProperty("file.separator");
-
-    }
 }

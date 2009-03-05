@@ -6,6 +6,8 @@ import java.awt.event.InvocationEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 
@@ -14,7 +16,7 @@ class TestEventQueue extends EventQueue {
     
 //    ExecutorService events = Executors.newSingleThreadExecutor();
     final WorkspaceUpdator updator;
-//    Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
+    Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
     boolean paused = false;
     Object lock = new Object();
     
@@ -29,17 +31,17 @@ class TestEventQueue extends EventQueue {
     }
     
     public void runInvocationEvents() {
-//        synchronized(lock) {
-//        
-//            for (AWTEvent event; (event = queue.poll()) != null;) {
-//                LOGGER.debug("event unqueued: " + event);
-//                super.postEvent(event);
-//            }
-//        
-////            holdForInput("");
-//        
-//            paused = false;
-//        }
+        synchronized(lock) {
+        
+            for (AWTEvent event; (event = queue.poll()) != null;) {
+                LOGGER.debug("event unqueued: " + event);
+                super.postEvent(event);
+            }
+        
+//            holdForInput("");
+        
+            paused = false;
+        }
     }
     
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -61,14 +63,13 @@ class TestEventQueue extends EventQueue {
         if (event instanceof InvocationEvent) {
             event = new TestInvocationEvent((InvocationEvent) event, updator);
 //        }
-//            synchronized (lock) {
-//                if (paused) {
-//                    LOGGER.debug("event queued: " + event);
-//                    queue.add(event);
-//                    return;
-//                }
-//            }
-
+            synchronized (lock) {
+                if (paused) {
+                    LOGGER.debug("event queued: " + event);
+                    queue.add(event);
+                    return;
+                }
+            }
         }
 
         super.postEvent(event);

@@ -6,49 +6,64 @@ import java.awt.event.InvocationEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.updator.TestInvocationEvent.Signal;
 
 class TestEventQueue extends EventQueue {
     private static final Logger LOGGER = Logger.getLogger(TestEventQueue.class);
     
-//    ExecutorService events = Executors.newSingleThreadExecutor();
-    final WorkspaceUpdator updator;
-    Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
-    boolean paused = false;
-    Object lock = new Object();
+    private final WorkspaceUpdator updator;
+    private Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
+    private volatile boolean paused = false;
+    private Object lock = new Object();
+    private final Latch latch = new Latch();
     
     TestEventQueue(final WorkspaceUpdator updator) {
         this.updator = updator;
     }
     
-    public void pauseInvocationEvents() {
+    void queueInvocationEvents() {
         synchronized(lock) {
             paused = true;
         }
     }
     
-    public void runInvocationEvents() {
+    void releaseInvocationEvents() {
         synchronized(lock) {
-        
-            for (AWTEvent event; (event = queue.poll()) != null;) {
-                LOGGER.debug("event unqueued: " + event);
-                super.postEvent(event);
-            }
-        
-//            holdForInput("");
-        
             paused = false;
         }
+        
+        runInvocationEvents();
+    }
+    
+    void runInvocationEvents() {
+        Collection<AWTEvent> events = new ArrayList<AWTEvent>();
+        
+        for (AWTEvent event; (event = queue.poll()) != null;) {
+            events.add(event);
+        }
+        
+        latch.counter = new CountDownLatch(events.size());
+        
+        for (AWTEvent event : events) {
+            LOGGER.debug("event unqueued: " + event);
+            super.postEvent(event);
+        }
+        
+        latch.await();
+        
+        latch.counter = null;
     }
     
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     
     static void holdForInput(String out) {
-//        System.out.print(out);
-        
         try {
             reader.readLine();
         } catch (IOException e) {
@@ -57,21 +72,48 @@ class TestEventQueue extends EventQueue {
         }
     }
     
+    private final Signal pass = new Signal() {
+        public void done() {
+            /* no implementation */
+        }
+        
+    };
+    
     public void postEvent(AWTEvent event) {
         LOGGER.debug("event posted: " + event);
         
         if (event instanceof InvocationEvent) {
-            event = new TestInvocationEvent((InvocationEvent) event, updator);
-//        }
-            synchronized (lock) {
+            synchronized(lock) {
                 if (paused) {
+                    event = new TestInvocationEvent((InvocationEvent) event, updator, latch);
                     LOGGER.debug("event queued: " + event);
                     queue.add(event);
                     return;
+                } else {
+                    LOGGER.debug("event passed: " + event);
+                    event = new TestInvocationEvent((InvocationEvent) event, updator, pass);
                 }
             }
         }
 
         super.postEvent(event);
+    }
+    
+    private class Latch implements Signal {
+        volatile CountDownLatch counter;
+        
+        public void done() {
+            CountDownLatch counter = this.counter;
+            
+            counter.countDown();
+        }
+        
+        public void await() {
+            try {
+                counter.await();
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
     }
 }

@@ -82,6 +82,8 @@ public class WorkspaceUpdator {
     private final CouplingManager manager;
     /** */
     private final UpdateController controller;
+    /** The executor service for managing updates. */
+    private final ExecutorService updates;
     /** The executor service for doing updates. */
     private final ExecutorService service;
     /** The executor service for notifying listeners. */
@@ -158,6 +160,7 @@ public class WorkspaceUpdator {
         this.componentUpdator = componentUpdator;
         this.manager = manager;
         this.controller = controller;
+        this.updates = Executors.newSingleThreadExecutor();
         this.service = Executors.newFixedThreadPool(threads, factory);
         this.events = Executors.newSingleThreadExecutor();
         this.eventQueue = new TestEventQueue(this);
@@ -246,24 +249,38 @@ public class WorkspaceUpdator {
     public void run() {
         run = true;
         
-        new Thread(new Runnable() {
+        updates.submit(new Runnable() {
             public void run() {
+                eventQueue.queueInvocationEvents();
+                
                 while (run) {
                     doUpdate();
                 }
+                
+                eventQueue.releaseInvocationEvents();
             }
-        }).start();
+        });
+    }
+    
+    public void runOnce() {
+        updates.submit(new Runnable() {
+            public void run() {
+                eventQueue.queueInvocationEvents();
+                
+                doUpdate();
+                
+                eventQueue.releaseInvocationEvents();
+            }
+        });
     }
     
     /**
      * Executes the updates using the set controller.
      */
-    public void doUpdate() {
+    private void doUpdate() {
         time++;
         
         LOGGER.trace("starting: " + time);
-        
-        eventQueue.pauseInvocationEvents();
         
         controller.doUpdate(controls);
 

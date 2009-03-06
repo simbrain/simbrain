@@ -253,7 +253,7 @@ public class Workspace {
      */
     public void globalUpdate() {
         synchronized (updatorLock) {
-            updator.doUpdate();
+            updator.runOnce();
         }
     }
     

@@ -41,7 +41,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class TimeSeriesPlotComponent extends WorkspaceComponent<ChartListener> {
 
     /** The data model. */
-    private TimeSeriesModel model;
+    private final TimeSeriesModel model;
 
     /** Maximum iteration size if this chart is fixed width. */
     private int maxSize = 100;
@@ -161,20 +161,21 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<ChartListener> {
     @Override
     public void update() {
 
-        // Trim appropriately if fixed width
-        if (fixedWidth) {
-//            System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
-            for (Iterator iterator = model.getDataset().getSeries().iterator(); iterator.hasNext(); ) {
-                XYSeries series = (XYSeries) iterator.next();
-                if (series.getItemCount() > maxSize) {
-                    series.remove(0);
-                }
-            }
-        }
-
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 // Add the data
+                
+                // Trim appropriately if fixed width
+                if (fixedWidth) {
+        //            System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
+                    for (Iterator iterator = model.getDataset().getSeries().iterator(); iterator.hasNext(); ) {
+                        XYSeries series = (XYSeries) iterator.next();
+                        if (series.getItemCount() > maxSize) {
+                            series.remove(0);
+                        }
+                    }
+                }
+        
                 for (TimeSeriesConsumer consumer : model.getConsumers()) {
                     model.getDataset().getSeries(consumer.getIndex()).add(
                             getWorkspace().getTime(), consumer.getValue());

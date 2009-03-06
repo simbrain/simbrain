@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.piechart;
 
+import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -108,14 +109,18 @@ public class PieChartComponent extends WorkspaceComponent<ChartListener> {
 
     @Override
     public void update() {
-        double total = 0;
-        for (PieDataConsumer consumer : model.getConsumers()) {
-            total += consumer.getValue();
-        }
-        if (total == 0) { return; } // TODO: Do something more sensible for this case
-        for (PieDataConsumer consumer : model.getConsumers()) {
-            model.getDataset().setValue(consumer.getIndex(), consumer.getValue() / total);
-        }
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                double total = 0;
+                for (PieDataConsumer consumer : model.getConsumers()) {
+                    total += consumer.getValue();
+                }
+                if (total == 0) { return; } // TODO: Do something more sensible for this case
+                for (PieDataConsumer consumer : model.getConsumers()) {
+                    model.getDataset().setValue(consumer.getIndex(), consumer.getValue() / total);
+                }
+            }
+        });
     }
 
     @Override

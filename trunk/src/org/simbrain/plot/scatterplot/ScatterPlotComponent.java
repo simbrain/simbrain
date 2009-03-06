@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.scatterplot;
 
+import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -136,24 +137,27 @@ public class ScatterPlotComponent extends WorkspaceComponent<ChartListener> {
 
     @Override
     public void update() {
-
-        if (!showHistory) {
-            // Constantly erase. How is performance for this version?
-            for (ScatterPlotConsumer consumer : model.getConsumers()) {
-                model.getDataset().getSeries(consumer.getIndex()).clear();
-                model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
-                        consumer.getY());
-                // System.out.println("--[" + consumer.getIndex() + "]:" +
-                // dataset.getSeries(consumer.getIndex()).getItemCount());
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                if (!showHistory) {
+                    // Constantly erase. How is performance for this version?
+                    for (ScatterPlotConsumer consumer : model.getConsumers()) {
+                        model.getDataset().getSeries(consumer.getIndex()).clear();
+                        model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
+                                consumer.getY());
+                        // System.out.println("--[" + consumer.getIndex() + "]:" +
+                        // dataset.getSeries(consumer.getIndex()).getItemCount());
+                    }
+                } else {
+        
+                    // THE VERSION BELOW KEEPS A HISTORY. THERE IS NO "HOT" POINT
+                    for (ScatterPlotConsumer consumer : model.getConsumers()) {
+                        model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
+                                consumer.getY());
+                    }
+                }
             }
-        } else {
-
-            // THE VERSION BELOW KEEPS A HISTORY. THERE IS NO "HOT" POINT
-            for (ScatterPlotConsumer consumer : model.getConsumers()) {
-                model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
-                        consumer.getY());
-            }
-        }
+        });
     }
     
     @Override

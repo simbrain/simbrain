@@ -19,7 +19,7 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -45,7 +44,6 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.simbrain.network.NetworkUpdater;
 import org.simbrain.network.groups.GeneRec;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
@@ -1695,10 +1693,14 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
                 }
             }
         }
-        timeLabel.update();
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                timeLabel.update();
+            }
+        });
         rootNetwork.getParent().setChangedSinceLastSave(true);  
         repaint();
-    }
+   }
 
     /**
      * Update clamp toolbar buttons and menu items.
@@ -1864,29 +1866,8 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         return ret;
     }
     
-    /**
-     * Create a thread and use it to repeatedly iterate the network.
-     */
-    public void start() {
-    	Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                isRunning = true;
-                NetworkUpdater updater = new NetworkUpdater(getRootNetwork());
-                while (isRunning) {
-                    updater.run();
-                }
-            }
-        });
-    }
 
-    /**
-     * Stop the local network thread.
-     */
-    public void stop() {
-    	isRunning = false;
-    }
-
-    /**
+     /**
      * Set the offset used in multiple pastes.
      */
     public void setPasteDelta() {

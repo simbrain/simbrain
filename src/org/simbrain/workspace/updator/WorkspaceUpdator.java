@@ -45,6 +45,31 @@ public class WorkspaceUpdator {
 
     /** The static logger for the class. */
     static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
+
+    /** Call-back interface for component updates. */
+    private final ComponentUpdator componentUpdator;
+    /** The parent workspace. */
+    private final Workspace workspace;
+    /** The coupling manager for the workspace. */
+    private final CouplingManager manager;
+    /** The Update Controller.  */
+    private final UpdateController controller;
+    /** The executor service for managing updates. */
+    private final ExecutorService updates;
+    /** The executor service for doing updates. */
+    private final ExecutorService service;
+    /** The executor service for notifying listeners. */
+    private final ExecutorService events;
+    /** The listeners on this object. */
+    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+    /** */
+    private final TestEventQueue eventQueue;
+    /** Whether updates should continue to run. */
+    private volatile boolean run = false;
+    /** The number of times the update has run. */
+    private volatile int time = 0;
+    /** The lock used to lock calls on syncAllComponents. */
+    private final Object componentLock = new Object();
     
     /** The default controller. */
     private static final UpdateController DEFAULT_CONTROLLER = new UpdateController() {
@@ -73,32 +98,6 @@ public class WorkspaceUpdator {
             
         }
     };
-    
-    /** Call-back interface for component updates. */
-    private final ComponentUpdator componentUpdator;
-    /** The parent workspace. */
-    private final Workspace workspace;
-    /** The coupling manager for the workspace. */
-    private final CouplingManager manager;
-    /** */
-    private final UpdateController controller;
-    /** The executor service for managing updates. */
-    private final ExecutorService updates;
-    /** The executor service for doing updates. */
-    private final ExecutorService service;
-    /** The executor service for notifying listeners. */
-    private final ExecutorService events;
-    /** The listeners on this object. */
-    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
-    /** */
-    private final TestEventQueue eventQueue;
-    
-    /** Whether updates should continue to run. */
-    private volatile boolean run = false;
-    /** The number of times the update has run. */
-    private volatile int time = 0;
-    /** The lock used to lock calls on syncAllComponents. */
-    private final Object componentLock = new Object();
     
     /** Creates the threads used in the ExecutorService. */
     private final ThreadFactory factory = new ThreadFactory() {
@@ -164,7 +163,6 @@ public class WorkspaceUpdator {
         this.service = Executors.newFixedThreadPool(threads, factory);
         this.events = Executors.newSingleThreadExecutor();
         this.eventQueue = new TestEventQueue(this);
-        
         addListener(new Listener() {
             public void finishedComponentUpdate(
                     final WorkspaceComponent<?> component, final int update, final int thread) {
@@ -359,7 +357,7 @@ public class WorkspaceUpdator {
     }
     
     /**
-     * synchronizes on all components and executes task, returning the
+     * Synchronizes on all components and executes task, returning the
      * result of that callable.
      * 
      * @param <E> The return type of task.
@@ -374,7 +372,7 @@ public class WorkspaceUpdator {
     }
     
     /**
-     * recursively synchronizes on the next component in the iterator and executes
+     * Recursively synchronizes on the next component in the iterator and executes
      * task if there are no more components.
      * 
      * @param <E> The return type of task.

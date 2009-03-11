@@ -1,6 +1,9 @@
 package org.simbrain.network.gui.nodes;
 
+import java.awt.EventQueue;
+
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.plot.barchart.BarChartConsumer;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -27,10 +30,10 @@ public class TimeLabel extends PText {
     }
 
     /**
-     * Update the text based on the netwokr time.
+     * Update the text based on the network time.
      */
     public void update() {
-        setText(networkPanel.getRootNetwork().getTimeLabel());
+       setText(networkPanel.getRootNetwork().getTimeLabel());
     }
 
     /**

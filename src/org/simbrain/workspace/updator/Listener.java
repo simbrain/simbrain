@@ -1,4 +1,4 @@
-package org.simbrain.workspace.updator;
+ package org.simbrain.workspace.updator;
 
 import org.simbrain.workspace.WorkspaceComponent;
 

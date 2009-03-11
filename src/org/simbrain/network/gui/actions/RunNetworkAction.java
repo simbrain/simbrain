@@ -55,7 +55,6 @@ public final class RunNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-    	networkPanel.start();
+    //	networkPanel.start();
     }
-    	
 }

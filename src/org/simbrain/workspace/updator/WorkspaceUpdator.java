@@ -181,7 +181,7 @@ public class WorkspaceUpdator {
             }
         });
         
-        //Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
     }
     
     /**

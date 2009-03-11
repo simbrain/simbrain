@@ -21,6 +21,7 @@ package org.simbrain.console;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -44,6 +45,20 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
     public void postAddInit() {
         setLayout(new BorderLayout());
         JConsole console = new JConsole();
+        Interpreter interprerter = getSimbrainInterpreter(console, super
+                .getWorkspaceComponent().getWorkspace());
+        add("Center", console);
+        new Thread(interprerter).start();
+    }
+    
+    /**
+     * Returns a Simbrain interpreter
+     * 
+     * @param console console for interpreter
+     * @param workspace workaspace references
+     * @return simbrain interpreter
+     */
+    public static Interpreter getSimbrainInterpreter(final JConsole console, final Workspace workspace) {
         Interpreter interpreter = new Interpreter(console);
         interpreter.getNameSpace().importPackage("org.simbrain.network.neurons");
         interpreter.getNameSpace().importPackage("org.simbrain.network.connections");
@@ -58,13 +73,14 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
         interpreter.getOut();
         interpreter.getErr();
         try {
-            interpreter.set("workspace", super.getWorkspaceComponent().getWorkspace());
+            String FS = System.getProperty("file.separator");
+            interpreter.set("workspace", workspace);
             interpreter.set("bsh.prompt", ">");
+            interpreter.eval("addClassPath(\"scripts" + FS + "console\");");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        add("Center", console);
-        new Thread(interpreter).start();
+        return interpreter;
     }
 
     @Override

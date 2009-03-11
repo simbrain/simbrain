@@ -437,7 +437,7 @@ public class Workspace {
      * components and couplings in a different way.
      * 
      * For an example, see the script in
-     * {SimbrainDir}/scriptmenu/addBackpropSim.bsh
+     * {SimbrainDir}/scripts/scriptmenu/addBackpropSim.bsh
      * 
      * @param controller
      *            The update controller to use.

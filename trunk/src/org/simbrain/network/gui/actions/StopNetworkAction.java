@@ -54,6 +54,6 @@ public final class StopNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-    	networkPanel.stop();
+    	//networkPanel.stop();
     }
 }

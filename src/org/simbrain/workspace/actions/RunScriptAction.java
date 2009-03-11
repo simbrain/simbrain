@@ -42,7 +42,7 @@ public final class RunScriptAction extends WorkspaceAction {
     
     /** Script directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "."
-        + System.getProperty("file.separator") + "scriptmenu";
+        + System.getProperty("file.separator") + "scripts"  + System.getProperty("file.separator") + "scriptmenu" ;
 
 
     /**

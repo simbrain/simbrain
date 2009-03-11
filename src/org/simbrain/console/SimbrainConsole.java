@@ -15,10 +15,11 @@ public class SimbrainConsole extends bsh.Console {
         {
             bsh.util.Util.startSplashScreen();
             try {
+                String FS = System.getProperty("file.separator");
                 Interpreter interpreter = new Interpreter();
                 interpreter.getNameSpace().importCommands("org.simbrain.console.commands");
                 interpreter.eval("simbrainConsoleDesktop()");
-                
+                interpreter.eval("addClassPath(\"scripts" + FS + "console\");");
             } catch (EvalError e) {
                 e.printStackTrace();
             }

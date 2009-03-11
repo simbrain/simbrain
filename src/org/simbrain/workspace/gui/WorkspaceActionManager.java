@@ -176,8 +176,8 @@ public class WorkspaceActionManager {
 
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "."
+            + System.getProperty("file.separator") + "scripts"
             + System.getProperty("file.separator") + "scriptmenu";
-
 
     /**
      * Create a new workspace action manager for the specified workspace.
@@ -185,7 +185,7 @@ public class WorkspaceActionManager {
      * @param desktop
      *            workspace, must not be null
      */
-    public WorkspaceActionManager(SimbrainDesktop desktop) {
+    public WorkspaceActionManager(final SimbrainDesktop desktop) {
         Workspace workspace = desktop.getWorkspace();
         clearWorkspaceAction = new ClearWorkspaceAction(workspace);
 

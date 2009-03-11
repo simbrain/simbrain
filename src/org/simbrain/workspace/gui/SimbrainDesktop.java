@@ -290,33 +290,18 @@ public class SimbrainDesktop {
      */
     private JConsole getTerminalPanel() {
         JConsole console = new JConsole();
-        interpreter = new Interpreter(console);
-        interpreter.getNameSpace().importPackage("org.simbrain.network.neurons");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.connections");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.layouts");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.networks");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.interfaces");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.groups");
-        interpreter.getNameSpace().importPackage("org.simbrain.network.synapses");
-        interpreter.getNameSpace().importPackage("org.simbrain.workspace");
-        interpreter.getNameSpace().importCommands(".");
-        interpreter.getNameSpace().importCommands("org.simbrain.console.commands");
-        interpreter.getOut();
-        interpreter.getErr();
+        interpreter = ConsoleDesktopComponent.getSimbrainInterpreter(console, this.getWorkspace());
         try {
-            interpreter.set("workspace", getWorkspace());
             interpreter.set("desktop", this);
-            interpreter.set("bsh.prompt", ">");
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         console.setPreferredSize(new Dimension(400,300));
         return console;
     }
     
     /**
-     * Print text to terminal
+     * Print text to terminal.
      * 
      * @param toPrint text to print
      */

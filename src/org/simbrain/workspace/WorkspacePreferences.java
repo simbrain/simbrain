@@ -40,7 +40,7 @@
 //    private WorkspacePreferences() {
 //        /* no implementation */
 //    }
-//    
+//
 //    /**
 //     * Save all user preferences.
 //     */

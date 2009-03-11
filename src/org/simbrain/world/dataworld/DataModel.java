@@ -289,6 +289,46 @@ public class DataModel<E> {
         parent.setChangedSinceLastSave(true);
     }
 
+    /**
+     * Adds rows or columns.
+     * @param row number of rows to add.
+     * @param col number of columns to add.
+     * @param value to be added to the table.
+     */
+    public void addRowsColumns(final int row, final int col, final E value) {
+        modifyRowsColumns(row + numRows, col + numColumns, value);
+    }
+
+    /**
+     * Adds or removes rows and columns.
+     * @param row Number of rows in table.
+     * @param col Number of columns in table.
+     * @param value to be added in the table.
+     */
+    public void modifyRowsColumns(final int row, final int col, final E value) {
+        int currentColNum = numColumns;
+        int currentRowNum = numRows;
+        if (col > currentColNum) {
+            for (int i = 0; i < col - currentColNum; ++i) {
+                addNewColumn(value);
+            }
+        } else if (col < currentColNum) {
+            for (int i = 0; i < currentColNum - col; ++i) {
+                removeLastColumn();
+            }
+        }
+
+        if (row > currentRowNum) {
+            for (int i = 0; i < row - currentRowNum; ++i) {
+                addNewRow(value);
+            }
+        } else if (row < currentRowNum) {
+            for (int i = 0; i < currentRowNum - row; ++i) {
+                removeLastRow();
+            }
+        }
+    }
+
     public void insertNewColumn(int at, E value) {
         numColumns++;
         for (List<E> row : rowData) {

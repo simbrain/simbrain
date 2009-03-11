@@ -168,7 +168,8 @@ public class DataWorldPanel extends JPanel {
             boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
             if (isRightClick) {
                 JPopupMenu menu = buildPopupMenu();
-                menu.show(DataWorldPanel.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
+                menu.show(DataWorldPanel.this, (int) selectedPoint.getX(),
+                        (int) selectedPoint.getY());
             }
         }
     };

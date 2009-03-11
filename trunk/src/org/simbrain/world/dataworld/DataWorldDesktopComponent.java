@@ -78,8 +78,14 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     /** Add row menu item. */
     private JMenuItem addRow = new JMenuItem("Add a row");
 
+    /** Add multiple rows menu item. */
+    private JMenuItem addRows = new JMenuItem("Add rows...");
+
     /** Add column menu item. */
     private JMenuItem addCol = new JMenuItem("Add a column");
+
+    /** Add multiple columns menu item. */
+    private JMenuItem addColumns = new JMenuItem("Add columns...");
 
     /** Zero fill menu item. */
     private JMenuItem zeroFill = new JMenuItem("ZeroFill the Table");
@@ -89,6 +95,9 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     /** Remove column menu item. */
     private JMenuItem remCol = new JMenuItem("Remove a column");
+
+    /** Set rows and columns menu item. */
+    private JMenuItem setRowsColumns = new JMenuItem("Set rows/columns...");
 
     /** Randomize menu item. */
     private JMenuItem randomize = new JMenuItem("Randomize");
@@ -118,7 +127,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         addMenuBar(worldPanel);
 
-        worldPanel = new DataWorldPanel(component);
+        worldPanel = new DataWorldPanel(this.component);
         scroller = new JScrollPane();
         scroller.setViewportView(worldPanel);
         setLayout(new BorderLayout());
@@ -151,20 +160,26 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         file.addMenuListener(menuListener);
 
         addRow.addActionListener(addRowListener);
+        addRows.addActionListener(addRowsListener);
         addCol.addActionListener(addColListener);
+        addColumns.addActionListener(addColumnsListener);
         remRow.addActionListener(remRowListener);
         remCol.addActionListener(remColListener);
+        setRowsColumns.addActionListener(setRowsColumnsListener);
         zeroFill.addActionListener(zeroFillListener);
         randomize.addActionListener(randomizeListener);
         randomProps.addActionListener(randomPropsListener);
         iterationMode.addActionListener(iterationModeListener);
 
         edit.add(addRow);
+        edit.add(addRows);
         edit.add(addCol);
+        edit.add(addColumns);
         edit.add(zeroFill);
         edit.addSeparator();
         edit.add(remRow);
         edit.add(remCol);
+        edit.add(setRowsColumns);
         edit.addSeparator();
         edit.add(randomize);
         edit.add(randomProps);
@@ -201,7 +216,16 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         public void actionPerformed(final ActionEvent e) {
             component.getDataModel().addNewRow(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
-            pack();
+        }
+    };
+
+    private ActionListener addRowsListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            AddRowsDialog dialog = new AddRowsDialog(component);
+            dialog.setAlwaysOnTop(true);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
 
@@ -209,7 +233,16 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         public void actionPerformed(final ActionEvent e) {
             component.getDataModel().addNewColumn(new Double(0));
             getWorkspaceComponent().setChangedSinceLastSave(true);
-            pack();
+        }
+    };
+
+    private ActionListener addColumnsListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            AddColumnsDialog dialog = new AddColumnsDialog(component);
+            dialog.setAlwaysOnTop(true);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
    
@@ -217,7 +250,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         public void actionPerformed(final ActionEvent e) {
             component.getDataModel().removeLastRow();
             getWorkspaceComponent().setChangedSinceLastSave(true);
-            pack();
         }
     };
    
@@ -225,7 +257,16 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         public void actionPerformed(final ActionEvent e) {
             component.getDataModel().removeLastColumn();
             getWorkspaceComponent().setChangedSinceLastSave(true);
-            pack();
+        }
+    };
+
+    private ActionListener setRowsColumnsListener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            SetRowsColumnsDialog dialog = new SetRowsColumnsDialog(component);
+            dialog.setAlwaysOnTop(true);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            getWorkspaceComponent().setChangedSinceLastSave(true);
         }
     };
 

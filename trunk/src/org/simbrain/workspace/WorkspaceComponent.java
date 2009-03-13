@@ -189,12 +189,59 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
             
         listeners.add(proxy);
     }
-    
+
     /**
-     * Returns a proxy for a plain WorkspaceComponentListener so that
-     * subclasses may treat it as a specialized listener.
+     * Returns a proxy for a plain WorkspaceComponentListener so that subclasses
+     * may treat it as a specialized listener.
      * 
-     * @param listener the listener to wrap
+     * I (Yoshimi) was initially confused by this; in case it helps, here is a
+     * (slightly edited) Q/A session about the issue.
+     * 
+     * QUESTION: I'm not clear why we needed the proxy stuff. Wouldn't just
+     * adding attributeRemoved to WorkspaceComponentListener have been
+     * sufficient?
+     * 
+     * ANSWER: Probably the easiest way to understand this is to comment out the
+     * addComponentListener method and try to resolve the resulting compilation
+     * errors on CouplingManager without uncommenting it.
+     * 
+     * This is one of those traps of generics that I've been talking about.The
+     * issue came up when I tried to make CoupingManager be a
+     * WorkspaceComponentListener. The problem is that WorkspaceComponent has a
+     * generic parameter E that defines the type of the listener. This allows
+     * sub-types of WorkspaceComponent to customize their listeners without a
+     * lot of redundant code. This is really useful and seems like a great use a
+     * of generics, and it is until you want to do something like write a
+     * handler that's general for all WorkspaceComponenetListeners. You can't
+     * add it to the WorkspaceComponent instance. The reason is that in
+     * CouplingManager we refer to the WorkspaceComponentListener as
+     * WorkspaceComponentListener<?> because we don't know (or care) what the
+     * specific type of the workspace component is. When you try to add any old
+     * WorkspaceComponentListener to the WorkspaceComponent<?>, it comes back
+     * with an error that basically says: "hey buddy, you see that '?' You
+     * haven't told me what kind of WorkspaceComponentListener this
+     * WorkspaceComponent takes and I can't be sure what you are providing is
+     * the right one."
+     * 
+     * If you look at the RootNetwork class, it becomes clear why that won't
+     * work. RootNetwork calls all these specialized events on the listener
+     * instances. If those methods weren't there, the code would fail. Really,
+     * it would fail earlier because the Java ensures that you can't assign
+     * WorkspaceComponentListener reference to a NetworkListener variable.
+     * 
+     * So what I did is use a fairly esoteric feature of Java that allows you to
+     * implement an unknown interface at runtime dynamically. And basically all
+     * I do is if the method is implemented by the actual
+     * WorkspaceComponentListener instance, it forwards the event to the
+     * instance, otherwise nothing with the event. That lets observers add
+     * listeners for just the basic WorkspaceComponentListener events without
+     * having every WorkspaceComponent implement special handling for both
+     * standard listeners and the special listeners which would defeat the
+     * purpose.
+     * 
+     * 
+     * @param listener
+     *            the listener to wrap
      * @return a proxy for the listener implementing E
      */
     @SuppressWarnings("unchecked")

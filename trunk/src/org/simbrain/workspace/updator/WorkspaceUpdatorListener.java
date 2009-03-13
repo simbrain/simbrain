@@ -8,7 +8,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  * 
  * @author Matt Watson
  */
-public interface Listener {
+public interface WorkspaceUpdatorListener {
     /**
      * Called when a component update begins.
      *  

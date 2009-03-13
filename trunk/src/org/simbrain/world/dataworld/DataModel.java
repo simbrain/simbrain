@@ -269,7 +269,7 @@ public class DataModel<E> {
         parent.setChangedSinceLastSave(true);
     }
 
-    public void insertNewRow(int at, E value) {
+    public void insertNewRow(final int at, E value) {
         numRows++;
         rowData.add(at, newRow(value));
         for (Listener listener : listeners)
@@ -277,7 +277,7 @@ public class DataModel<E> {
         parent.setChangedSinceLastSave(true);
     }
 
-    public void addNewColumn(E value) {
+    public void addNewColumn(final E value) {
         numColumns++;
         for (List<E> row : rowData) {
             row.add(value);
@@ -349,7 +349,7 @@ public class DataModel<E> {
         parent.setChangedSinceLastSave(true);
     }
 
-    public void removeRow(int at) {
+    public void removeRow(final int at) {
         numRows--;
         rowData.remove(at);
         for (Listener listener : listeners)
@@ -373,10 +373,9 @@ public class DataModel<E> {
     /**
      * Remove column at specified index.
      * 
-     * @param at
-     *            index
+     * @param at index
      */
-    public void removeColumn(int at) {
+    public void removeColumn(final int at) {
         numColumns--;
         for (List<E> row : rowData) {
             row.remove(at);
@@ -396,7 +395,7 @@ public class DataModel<E> {
         return numRows;
     }
 
-    public void initValues(E value) {
+    public void initValues(final E value) {
         if (!initialized) {
             fill(value);
             initialized = true;
@@ -406,7 +405,7 @@ public class DataModel<E> {
     /**
      * Fills the table with the given value.
      */
-    public void fill(E value) {
+    public void fill(final E value) {
         for (List<E> row : rowData) {
             Collections.fill(row, value);
         }
@@ -414,7 +413,7 @@ public class DataModel<E> {
     }
 
     /**
-     * Update datamodel
+     * Update datamodel.
      */
     public void update() {
         if (isIterationMode()) {

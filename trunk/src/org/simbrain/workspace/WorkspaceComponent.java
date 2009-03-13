@@ -139,12 +139,12 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     protected abstract void closing();
 
     /**
-     * called by Workspace to update the state of the component.
+     * Called by Workspace to update the state of the component.
      */
-    protected abstract void update();
+    public abstract void update();
     
     /**
-     * called by Workspace to notify that updates have stopped.
+     * Called by Workspace to notify that updates have stopped.
      */
     protected void stopped() {
         /* no default implementation */

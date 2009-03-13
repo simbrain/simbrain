@@ -99,7 +99,7 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     }
 
     @Override
-    protected void update() {
+    public void update() {
     	world.update();    	
     }
     

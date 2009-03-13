@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.updator.ComponentUpdator;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
 
@@ -92,20 +91,11 @@ public class Workspace {
      * The updator used to manage component updates.
      */
     private Object updatorLock = new Object();
-    
-    /**
-     * 
-     */
-    private ComponentUpdator componentUpdator = new ComponentUpdator() {
-        public void update(final WorkspaceComponent<?> component) {
-            component.update();
-        }
-    };
-    
+   
     /**
      * The updator used to manage component updates.
      */
-    private WorkspaceUpdator updator = new WorkspaceUpdator(this, componentUpdator, manager);
+    private WorkspaceUpdator updator = new WorkspaceUpdator(this, manager);
     
     /** used to turn events off during special modifications. */
     private boolean fireEvents = true;
@@ -452,8 +442,7 @@ public class Workspace {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
                 }
-                updator = new WorkspaceUpdator(this, componentUpdator, manager,
-                    controller, threads);
+                updator = new WorkspaceUpdator(this, manager, controller, threads);
         }
     }
     
@@ -469,7 +458,7 @@ public class Workspace {
                         "Cannot change updator while running.");
             }
             
-            updator = new WorkspaceUpdator(this, componentUpdator, manager, controller);
+            updator = new WorkspaceUpdator(this, manager, controller);
         }
     }
     

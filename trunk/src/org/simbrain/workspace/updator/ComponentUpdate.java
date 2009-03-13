@@ -14,8 +14,6 @@ class ComponentUpdate implements Runnable {
     final WorkspaceComponent<?> component;
     /** count down latch used to update couplings after all components are updated. */
     private final CountDownLatch latch;
-    /** The component updator callback. */
-    private final ComponentUpdator componentUpdator;
     
     /**
      * Creates a new instance with the given component and latch.
@@ -24,11 +22,9 @@ class ComponentUpdate implements Runnable {
      * @param componentUpdator The updator callback.
      * @param latch The latch.
      */
-    ComponentUpdate(final WorkspaceComponent<?> component,
-            final ComponentUpdator componentUpdator, final CountDownLatch latch) {
+    ComponentUpdate(final WorkspaceComponent<?> component, final CountDownLatch latch) {
         this.component = component;
         this.latch = latch;
-        this.componentUpdator = componentUpdator;
     }
 
     /**
@@ -41,7 +37,7 @@ class ComponentUpdate implements Runnable {
         
         WorkspaceUpdator.LOGGER.trace("updating component: " + component);
         
-        componentUpdator.update(component);
+        component.update();
         
         thread.clearCurrentTask(this);
         

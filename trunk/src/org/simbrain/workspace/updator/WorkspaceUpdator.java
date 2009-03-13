@@ -1,5 +1,6 @@
 package org.simbrain.workspace.updator;
 
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

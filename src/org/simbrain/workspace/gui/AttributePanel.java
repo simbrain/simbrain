@@ -19,7 +19,6 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -35,10 +34,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.simbrain.workspace.AbstractAttribute;
+import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.WorkspaceListener;
 
 /**
@@ -46,7 +48,7 @@ import org.simbrain.workspace.WorkspaceListener;
  * and a JList of attributes for that component.
  */
 public class AttributePanel extends JPanel implements ActionListener,
-        MouseListener {
+        MouseListener, WorkspaceComponentListener {
 
     /** Parent frame. */
     private JFrame parentFrame = new JFrame();
@@ -64,7 +66,6 @@ public class AttributePanel extends JPanel implements ActionListener,
     public enum AttributeType {
         Producing, Consuming
     };
-
     private AttributeType attributeType;
 
     /**
@@ -97,6 +98,10 @@ public class AttributePanel extends JPanel implements ActionListener,
         add(componentPanel, BorderLayout.NORTH);
         add(listScroll, BorderLayout.CENTER);
 
+        // Listen to all components
+        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
+            component.addComponentListener(this);
+        }
         // Initialize frame
         parentFrame.setContentPane(this);
         parentFrame.pack();
@@ -107,7 +112,7 @@ public class AttributePanel extends JPanel implements ActionListener,
      */
     public void actionPerformed(final ActionEvent event) {
 
-        // Refresh component lists
+        // Refresh component list
         if (event.getSource() instanceof JComboBox) {
             WorkspaceComponent<?> component = (WorkspaceComponent<?>) ((JComboBox) event
                     .getSource()).getSelectedItem();
@@ -209,21 +214,19 @@ public class AttributePanel extends JPanel implements ActionListener,
             WorkspaceListener {
 
         /** Reference to workspace. */
-        Workspace workspace;
+        private Workspace workspace;
 
         /**
-         * @param workspace
-         *            the workspace
+         * @param workspace the workspace
          */
-        public ComponentDropDownBox(Workspace workspace) {
+        public ComponentDropDownBox(final Workspace workspace) {
             this.workspace = workspace;
             for (WorkspaceComponent<?> component : workspace.getComponentList()) {
                 this.addItem(component);
             }
             if (this.getModel().getSize() > 0) {
                 this.setSelectedIndex(0);
-                AttributePanel.this.refresh((WorkspaceComponent<?>) this
-                        .getItemAt(0));
+                AttributePanel.this.refresh((WorkspaceComponent<?>) this.getItemAt(0));
             }
             workspace.addListener(this);
         }
@@ -238,14 +241,15 @@ public class AttributePanel extends JPanel implements ActionListener,
         /**
          * {@inheritDoc}
          */
-        public void componentAdded(WorkspaceComponent<?> component) {
+        public void componentAdded(final WorkspaceComponent<?> component) {
             this.addItem(component);
+            component.addComponentListener(AttributePanel.this);
         }
 
         /**
          * {@inheritDoc}
          */
-        public void componentRemoved(WorkspaceComponent<?> component) {
+        public void componentRemoved(final WorkspaceComponent<?> component) {
             this.removeItem(component);
             if (this.getItemCount() == 0) {
                 AttributePanel.this.clearList();
@@ -259,6 +263,23 @@ public class AttributePanel extends JPanel implements ActionListener,
             this.removeAllItems();
             AttributePanel.this.clearList();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void attributeRemoved(final AttributeHolder parent, final Attribute attribute) {
+        refresh(parent.getParentComponent());
+    }
+
+    public void componentUpdated() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setTitle(String name) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

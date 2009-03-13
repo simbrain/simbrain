@@ -470,4 +470,13 @@ public class Workspace {
     public Number getTime() {
         return updator.getTime();
     }
+
+    /**
+     * Returns a reference to the workspace updator.
+     *
+     * @return reference to workspace updator.
+     */
+    public WorkspaceUpdator getWorkspaceUpdator() {
+        return updator;
+    }
 }

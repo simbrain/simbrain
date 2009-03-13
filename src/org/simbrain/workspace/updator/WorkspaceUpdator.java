@@ -1,6 +1,5 @@
 package org.simbrain.workspace.updator;
 
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +58,7 @@ public class WorkspaceUpdator {
     /** The executor service for notifying listeners. */
     private final ExecutorService events;
     /** The listeners on this object. */
-    private List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+    private List<WorkspaceUpdatorListener> listeners = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
     /** */
     private final TestEventQueue eventQueue;
     /** Whether updates should continue to run. */
@@ -68,6 +67,8 @@ public class WorkspaceUpdator {
     private volatile int time = 0;
     /** The lock used to lock calls on syncAllComponents. */
     private final Object componentLock = new Object();
+    /** Number of threads used in the update service.*/
+    private int numThreads;
     
     /** The default controller. */
     private static final UpdateController DEFAULT_CONTROLLER = new UpdateController() {
@@ -160,7 +161,8 @@ public class WorkspaceUpdator {
         this.service = Executors.newFixedThreadPool(threads, factory);
         this.events = Executors.newSingleThreadExecutor();
         this.eventQueue = new TestEventQueue(this);
-        addListener(new Listener() {
+        this.numThreads = threads;
+        addListener(new WorkspaceUpdatorListener() {
             public void finishedComponentUpdate(
                     final WorkspaceComponent<?> component, final int update, final int thread) {
                 System.out.println("Update: " + update + " thread: "
@@ -285,7 +287,7 @@ public class WorkspaceUpdator {
      * 
      * @param listener The listener to add.
      */
-    public void addListener(final Listener listener) {
+    public void addListener(final WorkspaceUpdatorListener listener) {
         listeners.add(listener);
     }
     
@@ -294,7 +296,7 @@ public class WorkspaceUpdator {
      * 
      * @param listener The listener to add.
      */
-    public void removeListener(final Listener listener) {
+    public void removeListener(final WorkspaceUpdatorListener listener) {
         listeners.remove(listener);
     }
     
@@ -309,7 +311,7 @@ public class WorkspaceUpdator {
         
         events.submit(new Runnable() {
             public void run() {
-                for (Listener listener : listeners) {
+                for (WorkspaceUpdatorListener listener : listeners) {
                     listener.startingComponentUpdate(component, time, thread);
                 }
             }
@@ -327,7 +329,7 @@ public class WorkspaceUpdator {
         
         events.submit(new Runnable() {
             public void run() {
-                for (Listener listener : listeners) {
+                for (WorkspaceUpdatorListener listener : listeners) {
                     listener.finishedComponentUpdate(component, time, thread);
                 }
             }
@@ -342,7 +344,7 @@ public class WorkspaceUpdator {
         
         events.submit(new Runnable() {
             public void run() {
-                for (Listener listener : listeners) {
+                for (WorkspaceUpdatorListener listener : listeners) {
                     listener.updatedCouplings(time);
                 }
             }
@@ -383,5 +385,12 @@ public class WorkspaceUpdator {
         } else {
             return task.call();
         }
+    }
+
+    /**
+     * @return the numThreads
+     */
+    public int getNumThreads() {
+        return numThreads;
     }
 }

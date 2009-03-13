@@ -67,8 +67,7 @@ public class DataTableModel extends AbstractTableModel {
      *
      * @param model reference to underlying data.
      */
-    DataTableModel(final DataModel<Double> model)
-    {
+    DataTableModel(final DataModel<Double> model) {
         this.model = model;
         model.addListener(listener);
     }

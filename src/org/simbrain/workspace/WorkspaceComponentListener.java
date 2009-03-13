@@ -7,17 +7,20 @@ package org.simbrain.workspace;
  */
 public interface WorkspaceComponentListener {
 
-	/**
+    /**
      * Called when the target workspace component is updated.
      */
     void componentUpdated();
     
-	/**
+    /**
      * Resets the component's name.
      */
-    void setTitle(String name);
+    void setTitle(final String name);
     
 //    void attributeAdded(AttributeHolder parent, Attribute attribute);
     
+    /**
+     * An attribute was removed.
+     */
     void attributeRemoved(AttributeHolder parent, Attribute attribute);
 }

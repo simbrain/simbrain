@@ -2,6 +2,7 @@ package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -32,6 +33,8 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -224,9 +227,10 @@ public class SimbrainDesktop {
         desktop.setPreferredSize(new Dimension(screenSize.width
                 - (WORKSPACE_INSET * 2), screenSize.height - (WORKSPACE_INSET * 3)));
 
-        // Create the TabDoc for bottom
+        // Create the Tabbed Pane for bottom of the desktop
         bottomDock = new JTabbedPane();
         bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
+//        bottomDock.addTab("Thread Viewer", null, this.getThreadViewer(), "Simbrain thread viewer");
         bottomDock.addTab("Components", null, new WorkspaceComponentListPanel(
                 this), "Show workspace components");
         bottomDock.addTab("Producing Attributes", null, new AttributePanel(this.getWorkspace(),
@@ -285,6 +289,62 @@ public class SimbrainDesktop {
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
     }
 
+//    private class ListItem extends JLabel {
+//        public ListItem(String arg) {
+//            super(arg);
+//        }
+//        public String toString() {
+//            return this.getText();
+//        }
+//    }
+//    
+//    private JPanel getThreadViewer() {
+//        JPanel threadViewer = new JPanel();
+//        final JList list = new JList();
+//        final ListItem label1 = new ListItem("Thread 1");
+//        final ListItem label2 = new ListItem("Thread 2");
+//        Vector vector = new Vector();
+//        vector.add(label1);
+//        vector.add(label2);
+//        list.setListData(vector);
+//        threadViewer.add(list);
+//        
+//        workspace.getWorkspaceUpdator().addListener(new org.simbrain.workspace.updator.Listener () {
+//
+//            public void finishedComponentUpdate(
+//                    WorkspaceComponent<?> component, int update, int thread) {
+//                if (thread == 1) {
+//                    label1.setText("Thread 1: updating");
+//                } else {
+//                    label1.setText("Thread 2: updating");
+//                }
+//                list.updateUI();
+//            }
+//
+//            public void startingComponentUpdate(
+//                    WorkspaceComponent<?> component, int update, int thread) {
+//                if (thread == 1) {
+//                    label1.setText("Thread 1: starting");
+//                } else {
+//                    label1.setText("Thread 2: starting");
+//                }
+//                list.updateUI();
+//            }
+//
+//            public void updatedCouplings(int update) {
+//                if (update == 1) {
+//                    label1.setText("Thread 1: updating couplings");
+//                } else {
+//                    label2.setText("Thread 2: updating couplings");
+//                }
+//                list.updateUI();
+//            }
+//            
+//        });
+////        Vector threads = new Vector();
+//        return threadViewer;
+//    }
+    
     /**
      * @return Terminal panel.
      */

@@ -156,7 +156,7 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * {@inheritDoc}
      */
     @Override
-    protected void update() {
+    public void update() {
         for (Bindings bind : model.bindings) {
             bind.setOn(true);
             bind.updateExternal();

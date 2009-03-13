@@ -46,8 +46,6 @@ public class WorkspaceUpdator {
     /** The static logger for the class. */
     static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
 
-    /** Call-back interface for component updates. */
-    private final ComponentUpdator componentUpdator;
     /** The parent workspace. */
     private final Workspace workspace;
     /** The coupling manager for the workspace. */
@@ -130,7 +128,7 @@ public class WorkspaceUpdator {
         public void updateComponent(
                 final WorkspaceComponent<?> component, final CountDownLatch latch) {
             synchronized (component) {
-                service.submit(new ComponentUpdate(component, componentUpdator, latch));
+                service.submit(new ComponentUpdate(component, latch));
             }
         }
 
@@ -153,10 +151,9 @@ public class WorkspaceUpdator {
      * @param controller The update controller.
      * @param threads The number of threads for component updates.
      */
-    public WorkspaceUpdator(final Workspace workspace, final ComponentUpdator componentUpdator,
+    public WorkspaceUpdator(final Workspace workspace,
             final CouplingManager manager, final UpdateController controller, final int threads) {
         this.workspace = workspace;
-        this.componentUpdator = componentUpdator;
         this.manager = manager;
         this.controller = controller;
         this.updates = Executors.newSingleThreadExecutor();
@@ -189,14 +186,12 @@ public class WorkspaceUpdator {
      * default number of threads.
      * 
      * @param workspace The parent workspace.
-     * @param componentUpdator call-back for updating components.
      * @param manager The coupling manager for the workspace.
      * @param controller The update controller.
      */
-    public WorkspaceUpdator(final Workspace workspace, final ComponentUpdator componentUpdator,
-            final CouplingManager manager, final UpdateController controller) {
-        this(workspace, componentUpdator, manager, controller,
-            Runtime.getRuntime().availableProcessors());
+    public WorkspaceUpdator(final Workspace workspace, final CouplingManager manager, 
+            final UpdateController controller) {
+                this(workspace, manager, controller, Runtime.getRuntime().availableProcessors());
     }
     
     /**
@@ -204,12 +199,10 @@ public class WorkspaceUpdator {
      * default number of threads.
      * 
      * @param workspace The parent workspace.
-     * @param componentUpdator call-back for updating components.
      * @param manager The coupling manager for the workspace.
      */
-    public WorkspaceUpdator(final Workspace workspace, final ComponentUpdator componentUpdator,
-            final CouplingManager manager) {
-        this(workspace, componentUpdator, manager, DEFAULT_CONTROLLER,
+    public WorkspaceUpdator(final Workspace workspace, final CouplingManager manager) {
+        this(workspace, manager, DEFAULT_CONTROLLER,
             Runtime.getRuntime().availableProcessors());
     }
     

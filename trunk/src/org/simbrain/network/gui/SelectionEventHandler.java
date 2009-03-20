@@ -25,12 +25,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.util.SimbrainUtils;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
@@ -185,8 +185,8 @@ final class SelectionEventHandler
             Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
 
             if (event.isShiftDown()) {
-                Collection selection = CollectionUtils.union(priorSelection, highlightedNodes);
-                selection.removeAll(CollectionUtils.intersection(priorSelection, highlightedNodes));
+                Collection selection = SimbrainUtils.union(priorSelection, highlightedNodes);
+                selection.removeAll(SimbrainUtils.intersection(priorSelection, highlightedNodes));
                 networkPanel.setSelection(selection);
             } else {
                 networkPanel.setSelection(highlightedNodes);

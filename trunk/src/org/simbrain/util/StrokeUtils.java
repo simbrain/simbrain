@@ -22,10 +22,8 @@ import java.awt.BasicStroke;
 import java.awt.Stroke;
 
 import edu.umd.cs.piccolo.util.PPaintContext;
-
 import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
-import org.apache.commons.lang.SystemUtils;
 
 /**
  * Support for cross-platform fixed width strokes.
@@ -50,7 +48,7 @@ public final class StrokeUtils {
         }
 
         // use the existing stroke on platforms other than MacOSX
-        if (!SystemUtils.IS_OS_MAC_OSX) {
+        if (SimbrainUtils.isMacOSX()) {
             return stroke;
         }
 

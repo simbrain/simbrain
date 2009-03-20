@@ -23,21 +23,16 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
-
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
-import edu.umd.cs.piccolo.PNode;
-
-import edu.umd.cs.piccolo.util.PPaintContext;
-
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
-
-import org.apache.commons.lang.SystemUtils;
-
+import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.StrokeUtils;
-
 import org.simbrain.world.visionworld.SensorMatrix;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.util.PPaintContext;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Abstract sensor matrix node.
@@ -52,13 +47,13 @@ abstract class AbstractSensorMatrixNode
     private static final Paint DEFAULT_GRID_PAINT = Color.BLACK;
 
     /** Default grid stroke. */
-    private static final Stroke DEFAULT_GRID_STROKE = SystemUtils.IS_OS_MAC_OSX ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_GRID_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Default outline paint. */
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = SystemUtils.IS_OS_MAC_OSX ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Grid paint. */
     private Paint gridPaint = DEFAULT_GRID_PAINT;

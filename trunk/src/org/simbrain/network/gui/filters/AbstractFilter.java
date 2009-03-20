@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.gui.filters;
 
+import org.simbrain.util.Predicate;
+
 import edu.umd.cs.piccolo.PNode;
 
 import edu.umd.cs.piccolo.util.PNodeFilter;
-
-import org.apache.commons.collections.Predicate;
 
 /**
  * Abstract filter, implements both <code>PNodeFilter</code>

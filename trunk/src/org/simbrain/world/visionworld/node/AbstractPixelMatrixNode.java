@@ -23,20 +23,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
-
 import java.awt.geom.Rectangle2D;
 
-import edu.umd.cs.piccolo.PNode;
-
-import edu.umd.cs.piccolo.util.PPaintContext;
-
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
-
-import org.apache.commons.lang.SystemUtils;
-
+import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.StrokeUtils;
-
 import org.simbrain.world.visionworld.PixelMatrix;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.util.PPaintContext;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Abstract pixel matrix node.
@@ -51,7 +46,7 @@ abstract class AbstractPixelMatrixNode
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = SystemUtils.IS_OS_MAC_OSX ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Outline paint. */
     private Paint outlinePaint = DEFAULT_OUTLINE_PAINT;

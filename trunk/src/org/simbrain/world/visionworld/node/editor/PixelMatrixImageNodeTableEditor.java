@@ -29,17 +29,14 @@ import java.awt.Stroke;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
-
-import org.apache.commons.lang.SystemUtils;
-
+import org.simbrain.util.SimbrainUtils;
 import org.simbrain.world.visionworld.PixelMatrix;
-
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
+
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Pixel matrix node table editor.
@@ -318,7 +315,7 @@ public final class PixelMatrixImageNodeTableEditor
                     break;
                 case 5:
                     float strokeWidth = ((Float) value).floatValue();
-                    Stroke outlineStroke = SystemUtils.IS_OS_MAC_OSX ?
+                    Stroke outlineStroke = SimbrainUtils.isMacOSX() ?
                         new BasicStroke(strokeWidth) : new PFixedWidthStroke(strokeWidth);
                     pixelMatrixImageNode.setOutlineStroke(outlineStroke);
                     break;

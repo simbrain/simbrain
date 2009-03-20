@@ -19,8 +19,6 @@
 package org.simbrain.network.interfaces;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -34,20 +32,15 @@ import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-
 /**
- * <b>RootNetwork</b> is the top level of the network hierarchy.
- * Subject for all observers.
- * Time is kept track of here.
- * Also keeps track, currently, of couplings to other workspace components.
- * When instantiating a view (including when using Simbrain as an API, or from a command-line, a root network must
- * first be created.  Acts as a "container" for all subsequent networks.
+ * <b>RootNetwork</b> is the top level of the network hierarchy. Subject for all
+ * observers. Time is kept track of here. Also keeps track, currently, of
+ * couplings to other workspace components. When instantiating a view (including
+ * when using Simbrain as an API, or from a command-line, a root network must
+ * first be created. Acts as a "container" for all subsequent networks.
  */
 public class RootNetwork extends Network {
 
@@ -86,22 +79,19 @@ public class RootNetwork extends Network {
     /** Used to temporarily hold weights at their current value. */
     private boolean clampNeurons = false;
 
-    // TODO: Remove this case?
-    /** Custom update script written in beanshell (www.beanshell.org). */
-    private File customUpdateScript = null;
-
     /** Whether network files should use tabs or not. */
     private boolean usingTabs = true;
 
     /**
-     * 	Enumeration for the update methods
-     *  	BUFFER: default update method; based on buffering
-     *  	PRIORITYBASED: user sets the priority for each neuron,
-     *  	sub-neuron and synapse. Default priority value is 0.
-     *  	Elements with smaller priority value are updated first.
-     *  	SCRIPT: update is handled by a script
+     * Enumeration for the update methods.
+     * 
+     * BUFFER: default update method; based on buffering
+     * 
+     * PRIORITYBASED: user sets the priority for each neuron, sub-neuron and
+     * synapse. Default priority value is 0. Elements with smaller priority
+     * value are updated first.
      */
-    public enum UpdateMethod { PRIORITYBASED, SCRIPTBASED, BUFFERED }
+    public enum UpdateMethod { PRIORITYBASED, BUFFERED }
 
     /** Current update method. */
     private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
@@ -136,7 +126,7 @@ public class RootNetwork extends Network {
     /**
      * Used to create an instance of network (Default constructor).
      */
-    public RootNetwork(NetworkComponent parent) {
+    public RootNetwork(final NetworkComponent parent) {
         super();
         this.component = parent;
         init();
@@ -152,19 +142,19 @@ public class RootNetwork extends Network {
     }
     
     /**
-     * Local initialization
+     * Local initialization.
      */
     private void init() {
         setRootNetwork(this);
         this.updatePriorities = new TreeSet<Integer>();
-        this.updatePriorities.add(new Integer(0));  
+        this.updatePriorities.add(new Integer(0));
         this.setId("Root-network");
     }
     
     /**
-     * Only to be called by NetworkComponent
+     * Only to be called by NetworkComponent.
      */
-    public void setParent(NetworkComponent component) {
+    public void setParent(final NetworkComponent component) {
         this.component = component;
     }
     
@@ -196,7 +186,7 @@ public class RootNetwork extends Network {
      */
     private Object readResolve() {
         logger = Logger.getLogger(RootNetwork.class);
-//        listenerList = new HashSet<NetworkListener>();
+        // listenerList = new HashSet<NetworkListener>();
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
         networkIdGenerator = new SimpleId("Network", 1);
@@ -211,12 +201,6 @@ public class RootNetwork extends Network {
      */
     public void updateRootNetwork() {
         logger.debug("updateRootNetwork called");
-
-        if (this.updateMethod == UpdateMethod.SCRIPTBASED) {
-            logger.debug("script-based update method");
-            runScript();
-            return;
-        }
 
         //Update Time
         updateTime();
@@ -254,38 +238,11 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Run a user specified script written in beanshell.
-     */
-    private void runScript() {
-        Interpreter i = new Interpreter(); // Construct an interpreter
-        try {
-            i.set("network", this);
-            i.source(customUpdateScript.getAbsolutePath());
-            i.eval("iterate()");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (EvalError e) {
-            e.printStackTrace();
-        }
-    }
-
-//    public void updateCouplings() {
-//        logger.debug("updateCouplings called");
-//        for (Coupling coupling : getCouplings()) {
-//            logger.debug("updating coupling: " + coupling);
-//            coupling.update();
-//        }
-//    }
-    
-    /**
-     * The core update function of the neural network.  Calls the current update function on each neuron, decays all
-     * the neurons, and checks their bounds.
+     * The core update function of the neural network. Calls the current update
+     * function on each neuron, decays all the neurons, and checks their bounds.
      */
     public void update() {
         logger.debug("update called");
-//        updateCouplings();
         switch (this.updateMethod) {
 	        case PRIORITYBASED:
                 logger.debug("priority-based update");
@@ -305,15 +262,12 @@ public class RootNetwork extends Network {
         }
     }
 
-    /** 
-     * This function is used to update the neuron
-     * and sub-network activation values if the user
-     * chooses to set different priority values for
-     * a subset of neurons and sub-networks. The
-     * priority value determines the order in which
-     * the neurons and sub-networks get updated - smaller
-     * priority value elements will be updated before larger
-     * priority value elements
+    /**
+     * This function is used to update the neuron and sub-network activation
+     * values if the user chooses to set different priority values for a subset
+     * of neurons and sub-networks. The priority value determines the order in
+     * which the neurons and sub-networks get updated - smaller priority value
+     * elements will be updated before larger priority value elements.
      */
     public void updateByPriority() {
         if (this.getUpdatePriorities() == null) {
@@ -470,8 +424,8 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Increment the time counter, using a different method depending on whether this is a continuous or discrete.
-     * network
+     * Increment the time counter, using a different method depending on whether
+     * this is a continuous or discrete. network.
      */
     public void updateTime() {
         if (timeType == CONTINUOUS) {
@@ -582,7 +536,7 @@ public class RootNetwork extends Network {
             listener.neuronAdded(new NetworkEvent<Neuron>(this, added));
         }
         if (getParent() != null) {
-            getParent().setChangedSinceLastSave(true);            
+            getParent().setChangedSinceLastSave(true);
         }
     }
 
@@ -781,22 +735,6 @@ public class RootNetwork extends Network {
         fireClampChanged();
     }
 
-
-    /**
-     * @return the customUpdateScript
-     */
-    public File getCustomUpdateScript() {
-        return customUpdateScript;
-    }
-
-
-    /**
-     * @param customUpdateScript the customUpdateScript to set
-     */
-    public void setCustomUpdateScript(final File customUpdateScript) {
-        this.customUpdateScript = customUpdateScript;
-    }
-
     @Override
     public Network duplicate() {
         // TODO Auto-generated method stub
@@ -853,7 +791,8 @@ public class RootNetwork extends Network {
     public String toString() {
         
         String ret = "Root Network \n================= \n";
-        ret+= "Update method: " + this.getUpdateMethod() + "\t Iterations:" + this.getTime() + "\n";
+        ret += "Update method: " + this.getUpdateMethod() + "\t Iterations:"
+                + this.getTime() + "\n";
         
         for (Neuron n : this.getNeuronList()) {
             ret += (getIndents() + n + "\n");

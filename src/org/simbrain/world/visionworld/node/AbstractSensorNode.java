@@ -23,33 +23,25 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
-
 import java.awt.event.ActionEvent;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PNode;
-
-import edu.umd.cs.piccolo.util.PPaintContext;
-
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-
-import edu.umd.cs.piccolox.util.PFixedWidthStroke;
-
-import org.apache.commons.lang.SystemUtils;
-
+import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.StrokeUtils;
-
 import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.VisionWorld;
-
 import org.simbrain.world.visionworld.dialog.EditSensorDialog;
+
+import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.util.PPaintContext;
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 /**
  * Abstract sensor node.
@@ -67,7 +59,7 @@ abstract class AbstractSensorNode
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = SystemUtils.IS_OS_MAC_OSX ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Default selected paint. */
     private static final Paint DEFAULT_SELECTED_PAINT = Color.GRAY;

@@ -43,7 +43,6 @@ import javax.swing.JToolBar;
 import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.simbrain.network.groups.GeneRec;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
@@ -96,6 +95,7 @@ import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.JMultiLineToolTip;
+import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeHolder;
@@ -811,7 +811,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * @return list of selectedNeurons
      */
     public Collection<NeuronNode> getSelectedNeurons() {
-        return CollectionUtils.select(getSelection(), Filters.getNeuronNodeFilter());
+        return SimbrainUtils.select(getSelection(), Filters.getNeuronNodeFilter());
     }
 
     /**
@@ -820,7 +820,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * @return list of selected Synapses
      */
     public Collection<SynapseNode> getSelectedSynapses() {
-        return CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter());
+        return SimbrainUtils.select(getSelection(), Filters.getSynapseNodeFilter());
     }
 
     /**
@@ -829,7 +829,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * @return list of selected Text objects
      */
     public ArrayList<TextObject> getSelectedText() {
-        return new ArrayList(CollectionUtils.select(getSelection(), Filters.getTextObjectFilter()));
+        return new ArrayList(SimbrainUtils.select(getSelection(), Filters.getTextObjectFilter()));
     }
 
     /**
@@ -975,7 +975,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * @return a collection of all persistent nodes
      */
     public Collection<ScreenElement> getSelectedScreenElements() {
-        return new ArrayList<ScreenElement>(CollectionUtils.select(getSelection(), Filters.getSelectableFilter()));
+        return new ArrayList<ScreenElement>(SimbrainUtils.select(getSelection(), Filters.getSelectableFilter()));
     }
 
     /**

@@ -29,9 +29,6 @@ public class UpdateStatusLabel extends PText {
     /** Standard update action. */
     private Action priorityUpdateAction;
 
-    /** Load update action. */
-    private Action loadAction;
-
     /** Popup menu. */
     private JPopupMenu contextMenu;
 
@@ -48,56 +45,26 @@ public class UpdateStatusLabel extends PText {
         standardUpdateAction = new AbstractAction("Standard update") {
             public void actionPerformed(final ActionEvent event) {
                 netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.BUFFERED);
-                netPanel.getRootNetwork().setCustomUpdateScript(null);
                 update();
             }
         };
         priorityUpdateAction = new AbstractAction("Priority based update") {
             public void actionPerformed(final ActionEvent event) {
-                netPanel.getRootNetwork().setCustomUpdateScript(null);
                 netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.PRIORITYBASED);
                 update();
-            }
-        };
-        loadAction = new AbstractAction("Load custom update script") {
-            public void actionPerformed(final ActionEvent event) {
-                loadCustomUpdateScript();
-                netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.SCRIPTBASED);
             }
         };
         createContextMenu();
     }
 
     /**
-     * Calls loadCustomUpdateScript() to load an update script.
-     */
-    public void loadUpdateScript() {
-        loadCustomUpdateScript();
-    }
-    /**
-     * Load custom update script.
-     */
-    private void loadCustomUpdateScript() {
-        SFileChooser chooser = new SFileChooser(".", "Beanshell Script", "bsh");
-        File theFile = chooser.showOpenDialog();
-        if (theFile != null) {
-            networkPanel.getRootNetwork().setCustomUpdateScript(theFile);
-            update();
-        }
-    }
-
-    /**
      * Update the custom script label.
      */
     public void update() {
-        if (networkPanel.getRootNetwork().getCustomUpdateScript() == null) {
-            if (networkPanel.getRootNetwork().getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-                setText("Update: Priority Based Update");
-            } else {
-                this.setText("Update: Standard Update");
-            }
+        if (networkPanel.getRootNetwork().getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
+            setText("Update: Priority Based Update");
         } else {
-            this.setText("Update: " + networkPanel.getRootNetwork().getCustomUpdateScript().getName());
+            this.setText("Update: Standard Update");
         }
     }
 
@@ -109,7 +76,6 @@ public class UpdateStatusLabel extends PText {
 
         contextMenu.add(standardUpdateAction);
         contextMenu.add(priorityUpdateAction);
-        contextMenu.add(loadAction);
 
     }
     /**
@@ -123,9 +89,6 @@ public class UpdateStatusLabel extends PText {
 
             if (event.isControlDown() || event.getButton() == 2) {
                 contextMenu.show(networkPanel, (int) getX(), (int) getY());
-            }
-            if (event.getClickCount() == 2) {
-                loadCustomUpdateScript();
             }
             event.setHandled(true);
         }

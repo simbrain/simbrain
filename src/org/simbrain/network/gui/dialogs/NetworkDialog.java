@@ -328,8 +328,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             networkPanel.setShowSubnetOutline(showSubnetOutlineBox.isSelected());
         } else if (o == cbUpdateMethod) {
             checkScript();
-        } else if (o == scriptButton) {
-            networkPanel.getUpdateStatusLabel().loadUpdateScript();
         }
     }
 
@@ -348,8 +346,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             cbUpdateMethod.setSelectedIndex(0);
         } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.PRIORITYBASED)) {
             cbUpdateMethod.setSelectedIndex(1);
-        } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.SCRIPTBASED)) {
-            cbUpdateMethod.setSelectedIndex(2);
         }
     }
 
@@ -365,9 +361,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                 break;
             case 1:
                 networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.PRIORITYBASED);
-                break;
-            case 2:
-                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.SCRIPTBASED);
                 break;
             default:
                 break;

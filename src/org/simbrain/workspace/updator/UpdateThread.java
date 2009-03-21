@@ -31,8 +31,8 @@ class UpdateThread extends Thread {
      * 
      * @param update the component update that is executing.
      */
-    void setCurrentTask(final ComponentUpdate update) {
-        updator.notifyUpdateStarted(update.component, thread);
+    void setCurrentTask(final ComponentUpdatePart update) {
+        updator.notifyUpdateStarted(update.getParent(), thread);
     }
     
     /**
@@ -40,7 +40,7 @@ class UpdateThread extends Thread {
      * 
      * @param update The component update to be cleared.
      */
-    void clearCurrentTask(final ComponentUpdate update) {
-        updator.notifyUpdateFinished(update.component, thread);
+    void clearCurrentTask(final ComponentUpdatePart update) {
+        updator.notifyUpdateFinished(update.getParent(), thread);
     }
 }

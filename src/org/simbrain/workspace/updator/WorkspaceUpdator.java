@@ -61,7 +61,7 @@ public class WorkspaceUpdator {
     /** The listeners on this object. */
     private List<WorkspaceUpdatorListener> listeners = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
     /** */
-    private final TestEventQueue eventQueue;
+    private final InterceptingEventQueue eventQueue;
     /** Whether updates should continue to run. */
     private volatile boolean run = false;
     /** The number of times the update has run. */
@@ -129,8 +129,14 @@ public class WorkspaceUpdator {
 
         public void updateComponent(
                 final WorkspaceComponent<?> component, final CountDownLatch latch) {
-            synchronized (component) {
-                service.submit(new ComponentUpdate(component, latch));
+//            synchronized (component) {
+//                service.submit(new ComponentUpdate(component, latch));
+//            }
+            
+            for (Iterator<ComponentUpdatePart> i = component.getUpdateParts(); i.hasNext();) {
+                ComponentUpdatePart part = i.next();
+                
+                service.submit(part.getUpdate(latch));
             }
         }
 
@@ -142,6 +148,19 @@ public class WorkspaceUpdator {
             notifyCouplingsUpdated();
         }
     };
+    
+//    private class IteratorIterable<T> implements Iterable<T> {
+//        private final Iterator<T> iterator;
+//        
+//        public IteratorIterable(Iterator<T> iterator) {
+//            this.iterator = iterator;
+//        }
+//        
+//        public Iterator<T> iterator() {
+//            return iterator;
+//        }
+//        
+//    }
     
     /**
      * Constructor for the updator that uses the provided controller and
@@ -161,7 +180,7 @@ public class WorkspaceUpdator {
         this.updates = Executors.newSingleThreadExecutor();
         this.service = Executors.newFixedThreadPool(threads, factory);
         this.events = Executors.newSingleThreadExecutor();
-        this.eventQueue = new TestEventQueue(this);
+        this.eventQueue = new InterceptingEventQueue(this);
         this.numThreads = threads;
         addListener(new WorkspaceUpdatorListener() {
             public void finishedComponentUpdate(
@@ -363,7 +382,36 @@ public class WorkspaceUpdator {
      */
     public <E> E syncOnAllComponents(final Callable<E> task) throws Exception {
         synchronized (componentLock) {
-            return syncRest(workspace.getComponentList().iterator(), task);
+            Iterator<Object> locks = new Iterator<Object>() {
+                Iterator<? extends WorkspaceComponent> components = workspace.getComponentList().iterator();
+                Iterator<Object> current = null;
+                
+                public boolean hasNext() {
+                    if (current == null || !current.hasNext()) {
+                        return components.hasNext();
+                    } else {
+                        return true;
+                    }
+                }
+
+                public Object next() {
+                    if (current == null || !current.hasNext()) {
+                        if (components.hasNext()) {
+                            current = components.next().getLocks();
+                        } else {
+                            throw new IllegalStateException("no more elements");
+                        }
+                    }
+                    
+                    return current.next();
+                }
+
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            
+            return syncRest(locks, task);
         }
     }
     
@@ -377,7 +425,7 @@ public class WorkspaceUpdator {
      * @return The result of task.
      * @throws Exception If an exception occurs.
      */
-    private static <E> E syncRest(final Iterator<? extends Object> iterator, final Callable<E> task)
+    public static <E> E syncRest(final Iterator<? extends Object> iterator, final Callable<E> task)
             throws Exception {
         if (iterator.hasNext()) {
             synchronized (iterator.next()) {

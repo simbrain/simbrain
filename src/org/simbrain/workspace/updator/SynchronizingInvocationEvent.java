@@ -6,10 +6,10 @@ package org.simbrain.workspace.updator;
 import java.awt.event.InvocationEvent;
 import java.util.concurrent.Callable;
 
-class TestInvocationEvent extends InvocationEvent {
+class SynchronizingInvocationEvent extends InvocationEvent {
         private final InvocationEvent event;
         
-        public TestInvocationEvent(final InvocationEvent event, final WorkspaceUpdator updator, final Signal signal) {
+        public SynchronizingInvocationEvent(final InvocationEvent event, final WorkspaceUpdator updator, final Signal signal) {
             super(event.getSource(), new Runnable() {
                 public void run() {
                     try {

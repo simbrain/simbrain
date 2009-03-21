@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import org.simbrain.workspace.Workspace;
@@ -175,9 +174,7 @@ public class WorkspaceActionManager {
     private final Action propertyTabAction;
 
     /** Location of script menu directory. */
-    private static final String SCRIPT_MENU_DIRECTORY = "."
-            + System.getProperty("file.separator") + "scripts"
-            + System.getProperty("file.separator") + "scriptmenu";
+    private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
     /**
      * Create a new workspace action manager for the specified workspace.
@@ -332,8 +329,7 @@ public class WorkspaceActionManager {
             try {
                 interpreter.set("workspace", workspace);
                 interpreter.set("desktop", desktop);
-                interpreter.source(SCRIPT_MENU_DIRECTORY +
-                        System.getProperty("file.separator") + scriptName);
+                interpreter.source(SCRIPT_MENU_DIRECTORY + '/' + scriptName);
             } catch (FileNotFoundException e) {
                System.out.println("File not found");
                e.printStackTrace();

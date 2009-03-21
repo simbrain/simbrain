@@ -33,10 +33,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.updator.ComponentUpdatePart;
+import org.simbrain.workspace.updator.WorkspaceUpdator;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
@@ -141,7 +145,23 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /**
      * Called by Workspace to update the state of the component.
      */
-    public abstract void update();
+    public void update() {
+        /* no default implementation */
+    }
+    
+    public Iterator<ComponentUpdatePart> getUpdateParts() {
+        Runnable callable = new Runnable() {
+            public void run(){
+                update();
+            }
+        };
+        
+        return Collections.singleton(new ComponentUpdatePart(this, callable, toString(), this)).iterator();
+    }
+    
+    public Iterator<? extends Object> getLocks() {
+        return Collections.singleton(this).iterator();
+    }
     
     /**
      * Called by Workspace to notify that updates have stopped.

@@ -13,10 +13,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.updator.TestInvocationEvent.Signal;
+import org.simbrain.workspace.updator.SynchronizingInvocationEvent.Signal;
 
-class TestEventQueue extends EventQueue {
-    private static final Logger LOGGER = Logger.getLogger(TestEventQueue.class);
+class InterceptingEventQueue extends EventQueue {
+    private static final Logger LOGGER = Logger.getLogger(InterceptingEventQueue.class);
     
     private final WorkspaceUpdator updator;
     private Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
@@ -24,7 +24,7 @@ class TestEventQueue extends EventQueue {
     private Object lock = new Object();
     private final Latch latch = new Latch();
     
-    TestEventQueue(final WorkspaceUpdator updator) {
+    InterceptingEventQueue(final WorkspaceUpdator updator) {
         this.updator = updator;
     }
     
@@ -85,13 +85,13 @@ class TestEventQueue extends EventQueue {
         if (event instanceof InvocationEvent) {
             synchronized(lock) {
                 if (paused) {
-                    event = new TestInvocationEvent((InvocationEvent) event, updator, latch);
+                    event = new SynchronizingInvocationEvent((InvocationEvent) event, updator, latch);
                     LOGGER.debug("event queued: " + event);
                     queue.add(event);
                     return;
                 } else {
                     LOGGER.debug("event passed: " + event);
-                    event = new TestInvocationEvent((InvocationEvent) event, updator, pass);
+                    event = new SynchronizingInvocationEvent((InvocationEvent) event, updator, pass);
                 }
             }
         }

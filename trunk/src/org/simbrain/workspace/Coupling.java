@@ -1,6 +1,14 @@
 package org.simbrain.workspace;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.updator.WorkspaceUpdator;
 
 /**
  * Coupling between a producing attribute and a consuming attribute.
@@ -84,17 +92,27 @@ public final class Coupling<E> {
             final WorkspaceComponent<?> producerComponent
                 = producingAttribute.getParent().getParentComponent();
             
-            final E local;
             
-            synchronized (producerComponent) {
-                local = buffer;
-            }
-            
-            synchronized (consumerComponent) {
-                consumingAttribute.setValue(local);
-                LOGGER.debug(consumingAttribute.getParent().getDescription()
-                    + " just consumed " + producingAttribute.getValue() + " from "
-                    + producingAttribute.getParent().getDescription());
+            try {
+                final E local = WorkspaceUpdator.syncRest(producerComponent.getLocks(), new Callable<E>() {
+                    public E call() throws Exception {
+                        return buffer;
+                    }
+                });
+                
+                WorkspaceUpdator.syncRest(consumerComponent.getLocks(), new Callable<E>() {
+                    public E call() throws Exception {
+                        consumingAttribute.setValue(local);
+                        LOGGER.debug(consumingAttribute.getParent().getDescription()
+                            + " just consumed " + producingAttribute.getValue() + " from "
+                            + producingAttribute.getParent().getDescription());
+                        
+                        return local;
+                    }
+                });
+            } catch (Exception e) {
+                // TODO exception service?
+                e.printStackTrace();
             }
         }
     }

@@ -76,7 +76,7 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
             String FS = System.getProperty("file.separator");
             interpreter.set("workspace", workspace);
             interpreter.set("bsh.prompt", ">");
-            interpreter.eval("addClassPath(\"scripts" + FS + "console\");");
+            interpreter.eval("addClassPath(\"scripts/console\");");
         } catch (Exception e) {
             e.printStackTrace();
         }

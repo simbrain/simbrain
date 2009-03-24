@@ -77,7 +77,19 @@ public final class Coupling<E> {
      * Set value of buffer.
      */
     public void setBuffer() {
-        buffer = producingAttribute.getValue();
+        final WorkspaceComponent<?> producerComponent
+            = producingAttribute.getParent().getParentComponent();
+        
+        try {
+            buffer = Workspace.syncRest(producerComponent.getLocks(), new Callable<E>() {
+                public E call() throws Exception {
+                    return producingAttribute.getValue();
+                }
+            });
+        } catch (Exception e) {
+            // TODO exception service?
+            e.printStackTrace();
+        }
         
         LOGGER.debug("buffer set: " + buffer);
     }
@@ -89,25 +101,16 @@ public final class Coupling<E> {
         if ((consumingAttribute != null) && (producingAttribute != null)) {
             final WorkspaceComponent<?> consumerComponent
                 = consumingAttribute.getParent().getParentComponent();
-            final WorkspaceComponent<?> producerComponent
-                = producingAttribute.getParent().getParentComponent();
-            
             
             try {
-                final E local = WorkspaceUpdator.syncRest(producerComponent.getLocks(), new Callable<E>() {
+                Workspace.syncRest(consumerComponent.getLocks(), new Callable<E>() {
                     public E call() throws Exception {
-                        return buffer;
-                    }
-                });
-                
-                WorkspaceUpdator.syncRest(consumerComponent.getLocks(), new Callable<E>() {
-                    public E call() throws Exception {
-                        consumingAttribute.setValue(local);
+                        consumingAttribute.setValue(buffer);
                         LOGGER.debug(consumingAttribute.getParent().getDescription()
                             + " just consumed " + producingAttribute.getValue() + " from "
                             + producingAttribute.getParent().getDescription());
                         
-                        return local;
+                        return null;
                     }
                 });
             } catch (Exception e) {

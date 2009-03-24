@@ -3,9 +3,6 @@ package org.simbrain.workspace.updator;
 import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.event.InvocationEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Queue;
@@ -13,39 +10,67 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updator.SynchronizingInvocationEvent.Signal;
 
-class InterceptingEventQueue extends EventQueue {
+/**
+ * An event queue implementing the TaskSynchronizationManager interface.
+ * When AWT events are received, each invocation event is wrapped in a
+ * synchronizing object.  If the queueTasks toggle is on, each invocation
+ * event is queued until the releaseTasks() method is called.  When runTasks()
+ * is called, all queued events are executed.
+ * 
+ * @author Matt Watson
+ */
+public class InterceptingEventQueue extends EventQueue implements TaskSynchronizationManager {
+    /** the static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(InterceptingEventQueue.class);
     
-    private final WorkspaceUpdator updator;
+    /** The workspace this object is associated with. */
+    private final Workspace workspace;
+    /** Internal queue for invocation events. */
     private Queue<AWTEvent> queue = new ConcurrentLinkedQueue<AWTEvent>();
-    private volatile boolean paused = false;
+    /** Flag for event queue toggling. */
+    private boolean paused = false;
+    /** Lock for paused flag access. */
     private Object lock = new Object();
+    /** Latch used for tracking when events are done. */
     private final Latch latch = new Latch();
     
-    InterceptingEventQueue(final WorkspaceUpdator updator) {
-        this.updator = updator;
+    /**
+     * Creates a new instance for the given workspace.
+     * 
+     * @param workspace The workspace to associate this event queue with.
+     */
+    public InterceptingEventQueue(final Workspace workspace) {
+        this.workspace = workspace;
     }
     
-    void queueInvocationEvents() {
-        synchronized(lock) {
+    /**
+     * starts queuing tasks.
+     */
+    public void queueTasks() {
+        synchronized (lock) {
             paused = true;
         }
     }
     
-    void releaseInvocationEvents() {
-        synchronized(lock) {
+    /**
+     * releases the queuing flag.
+     */
+    public void releaseTasks() {
+        synchronized (lock) {
             paused = false;
         }
-        
-        runInvocationEvents();
     }
     
-    void runInvocationEvents() {
+    /**
+     * Executes all queued invocation events.
+     */
+    public void runTasks() {
         Collection<AWTEvent> events = new ArrayList<AWTEvent>();
         
-        for (AWTEvent event; (event = queue.poll()) != null;) {
+        for (AWTEvent event; (event = queue.poll()) != null; ) {
             events.add(event);
         }
         
@@ -61,17 +86,9 @@ class InterceptingEventQueue extends EventQueue {
         latch.counter = null;
     }
     
-    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-    
-    static void holdForInput(String out) {
-        try {
-            reader.readLine();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    
+    /**
+     * Simple signal with no implementation.
+     */
     private final Signal pass = new Signal() {
         public void done() {
             /* no implementation */
@@ -79,35 +96,56 @@ class InterceptingEventQueue extends EventQueue {
         
     };
     
-    public void postEvent(AWTEvent event) {
-        LOGGER.debug("event posted: " + event);
+    /**
+     * Posts AWTEvents.  If the event is an InvocationEvent, it's wrapped
+     * in a synchronizingInvocationEvent.  If queuing is on, these invocation
+     * events are queued.
+     * 
+     * @param event The AWTEvent to post.
+     */
+    public void postEvent(final AWTEvent event) {
+        LOGGER.trace("event posted: " + event);
         
         if (event instanceof InvocationEvent) {
-            synchronized(lock) {
+            synchronized (lock) {
                 if (paused) {
-                    event = new SynchronizingInvocationEvent((InvocationEvent) event, updator, latch);
-                    LOGGER.debug("event queued: " + event);
-                    queue.add(event);
-                    return;
+                    LOGGER.trace("event queued: " + event);
+                    
+                    queue.add(new SynchronizingInvocationEvent(
+                        (InvocationEvent) event, workspace, latch));
                 } else {
-                    LOGGER.debug("event passed: " + event);
-                    event = new SynchronizingInvocationEvent((InvocationEvent) event, updator, pass);
+                    LOGGER.trace("event passed: " + event);
+                    
+                    super.postEvent(new SynchronizingInvocationEvent(
+                        (InvocationEvent) event, workspace, pass));
                 }
             }
+        } else {
+            super.postEvent(event);
         }
-
-        super.postEvent(event);
     }
     
+    /**
+     * Signal implementation that wraps a count-down latch.
+     * 
+     * @author Matt Watson
+     */
     private class Latch implements Signal {
-        volatile CountDownLatch counter;
+        /** the underlying latch. */
+        private volatile CountDownLatch counter;
         
+        /**
+         * Called when a task is done.
+         */
         public void done() {
             CountDownLatch counter = this.counter;
             
             counter.countDown();
         }
         
+        /**
+         * Calls await on the latch.
+         */
         public void await() {
             try {
                 counter.await();

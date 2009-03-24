@@ -2,7 +2,6 @@ package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -23,26 +22,21 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
@@ -75,6 +69,7 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.updator.InterceptingEventQueue;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -891,16 +886,22 @@ public class SimbrainDesktop {
 
     }
 
-
     /**
      * Simbrain main method.  Creates a single instance of the Simulation class
      *
      * @param args currently not used
      */
     public static void main(final String[] args) {
+        final Workspace workspace = new Workspace();
+        InterceptingEventQueue eventQueue = new InterceptingEventQueue(workspace);
+        
+        workspace.setTaskSynchronizationManager(eventQueue);
+        
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new SimbrainDesktop(new Workspace()).createAndShowGUI();
+                new SimbrainDesktop(workspace).createAndShowGUI();
             }
         });
     }

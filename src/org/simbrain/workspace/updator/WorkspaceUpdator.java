@@ -1,10 +1,8 @@
 package org.simbrain.workspace.updator;
 
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -27,10 +25,6 @@ import org.simbrain.workspace.WorkspaceComponent;
  * after the last update is complete, the thread waiting on the latch wakes up
  * and updates all the couplings.
  * 
- * When a single update occurs, it runs off of the AWT event thread. When the
- * continuous update runs, a new thread is spawned, separate from executor
- * service threads. The allows the gui to continue refreshing.
- * 
  * There's a second executor service that's only there to execute event updates.
  * This is to support the need for a view on threads.
  * 
@@ -46,6 +40,22 @@ public class WorkspaceUpdator {
     /** The static logger for the class. */
     static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
 
+    /** A synch-manager where the methods do nothing. */
+    private static final TaskSynchronizationManager NO_ACTION_SYNCH_MANAGER
+            = new TaskSynchronizationManager() {
+        public void queueTasks() {
+            /* no implementation */
+        }
+
+        public void releaseTasks() {
+            /* no implementation */
+        }
+
+        public void runTasks() {
+            /* no implementation */
+        }
+    };
+    
     /** The parent workspace. */
     private final Workspace workspace;
     /** The coupling manager for the workspace. */
@@ -59,15 +69,17 @@ public class WorkspaceUpdator {
     /** The executor service for notifying listeners. */
     private final ExecutorService events;
     /** The listeners on this object. */
-    private List<WorkspaceUpdatorListener> listeners = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
-    /** */
-    private final InterceptingEventQueue eventQueue;
+    private final List<WorkspaceUpdatorListener> listeners
+        = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
+    
+    /** creates a default synch-manager that does nothing. */
+    private volatile TaskSynchronizationManager snychManager = NO_ACTION_SYNCH_MANAGER;
+    
     /** Whether updates should continue to run. */
     private volatile boolean run = false;
     /** The number of times the update has run. */
     private volatile int time = 0;
-    /** The lock used to lock calls on syncAllComponents. */
-    private final Object componentLock = new Object();
+    
     /** Number of threads used in the update service.*/
     private int numThreads;
     
@@ -81,15 +93,17 @@ public class WorkspaceUpdator {
                 return;
             }
             
-            LOGGER.trace("couplings");
+            LOGGER.trace("updating couplings");
             controls.updateCouplings();
             
+            LOGGER.trace("creating latch");
             CountDownLatch latch = new CountDownLatch(components.size());
             
+            LOGGER.trace("updating components");
             for (WorkspaceComponent<?> component : components) {
                 controls.updateComponent(component, latch);
             }
-            
+            LOGGER.trace("waiting");
             try {
                 latch.await();
             } catch (InterruptedException e) {
@@ -129,11 +143,7 @@ public class WorkspaceUpdator {
 
         public void updateComponent(
                 final WorkspaceComponent<?> component, final CountDownLatch latch) {
-//            synchronized (component) {
-//                service.submit(new ComponentUpdate(component, latch));
-//            }
-            
-            for (Iterator<ComponentUpdatePart> i = component.getUpdateParts(); i.hasNext();) {
+            for (Iterator<ComponentUpdatePart> i = component.getUpdateParts(); i.hasNext(); ) {
                 ComponentUpdatePart part = i.next();
                 
                 service.submit(part.getUpdate(latch));
@@ -143,31 +153,17 @@ public class WorkspaceUpdator {
         public void updateCouplings() {
             manager.updateAllCouplings();
             
-            LOGGER.trace("couplings updated?");
+            LOGGER.trace("couplings updated");
             
             notifyCouplingsUpdated();
         }
     };
-    
-//    private class IteratorIterable<T> implements Iterable<T> {
-//        private final Iterator<T> iterator;
-//        
-//        public IteratorIterable(Iterator<T> iterator) {
-//            this.iterator = iterator;
-//        }
-//        
-//        public Iterator<T> iterator() {
-//            return iterator;
-//        }
-//        
-//    }
     
     /**
      * Constructor for the updator that uses the provided controller and
      * threads.
      * 
      * @param workspace The parent workspace.
-     * @param componentUpdator call-back for updating components.
      * @param manager The coupling manager for the workspace.
      * @param controller The update controller.
      * @param threads The number of threads for component updates.
@@ -180,7 +176,6 @@ public class WorkspaceUpdator {
         this.updates = Executors.newSingleThreadExecutor();
         this.service = Executors.newFixedThreadPool(threads, factory);
         this.events = Executors.newSingleThreadExecutor();
-        this.eventQueue = new InterceptingEventQueue(this);
         this.numThreads = threads;
         addListener(new WorkspaceUpdatorListener() {
             public void finishedComponentUpdate(
@@ -199,8 +194,19 @@ public class WorkspaceUpdator {
                 System.out.println("Update: " + update + " Updated couplings");
             }
         });
-        
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
+    }
+    
+    /**
+     * Sets the manager.  Setting the manager to null clears the manager.
+     * 
+     * @param manager the new manager.
+     */
+    public void setTaskSynchronizationManager(final TaskSynchronizationManager manager) {
+        if (manager == null) {
+            snychManager = NO_ACTION_SYNCH_MANAGER;
+        } else {
+            snychManager = manager;
+        }
     }
     
     /**
@@ -211,7 +217,7 @@ public class WorkspaceUpdator {
      * @param manager The coupling manager for the workspace.
      * @param controller The update controller.
      */
-    public WorkspaceUpdator(final Workspace workspace, final CouplingManager manager, 
+    public WorkspaceUpdator(final Workspace workspace, final CouplingManager manager,
             final UpdateController controller) {
                 this(workspace, manager, controller, Runtime.getRuntime().availableProcessors());
     }
@@ -227,8 +233,6 @@ public class WorkspaceUpdator {
         this(workspace, manager, DEFAULT_CONTROLLER,
             Runtime.getRuntime().availableProcessors());
     }
-    
-    
     
     /**
      * Returns the 'time' or number of update iterations that have
@@ -264,25 +268,32 @@ public class WorkspaceUpdator {
         
         updates.submit(new Runnable() {
             public void run() {
-                eventQueue.queueInvocationEvents();
+                snychManager.queueTasks();
+                
+                System.out.println("running");
                 
                 while (run) {
                     doUpdate();
                 }
                 
-                eventQueue.releaseInvocationEvents();
+                snychManager.releaseTasks();
+                snychManager.runTasks();
             }
         });
     }
     
+    /**
+     * Submits a single task to the queue.
+     */
     public void runOnce() {
         updates.submit(new Runnable() {
             public void run() {
-                eventQueue.queueInvocationEvents();
+                snychManager.queueTasks();
                 
                 doUpdate();
                 
-                eventQueue.releaseInvocationEvents();
+                snychManager.releaseTasks();
+                snychManager.runTasks();
             }
         });
     }
@@ -297,7 +308,7 @@ public class WorkspaceUpdator {
         
         controller.doUpdate(controls);
 
-        eventQueue.runInvocationEvents();
+        snychManager.runTasks();
         
         LOGGER.trace("done: " + time);
     }
@@ -369,71 +380,6 @@ public class WorkspaceUpdator {
                 }
             }
         });
-    }
-    
-    /**
-     * Synchronizes on all components and executes task, returning the
-     * result of that callable.
-     * 
-     * @param <E> The return type of task.
-     * @param task The task to synchronize.
-     * @return The result of task.
-     * @throws Exception If an exception occurs.
-     */
-    public <E> E syncOnAllComponents(final Callable<E> task) throws Exception {
-        synchronized (componentLock) {
-            Iterator<Object> locks = new Iterator<Object>() {
-                Iterator<? extends WorkspaceComponent> components = workspace.getComponentList().iterator();
-                Iterator<Object> current = null;
-                
-                public boolean hasNext() {
-                    if (current == null || !current.hasNext()) {
-                        return components.hasNext();
-                    } else {
-                        return true;
-                    }
-                }
-
-                public Object next() {
-                    if (current == null || !current.hasNext()) {
-                        if (components.hasNext()) {
-                            current = components.next().getLocks();
-                        } else {
-                            throw new IllegalStateException("no more elements");
-                        }
-                    }
-                    
-                    return current.next();
-                }
-
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-            
-            return syncRest(locks, task);
-        }
-    }
-    
-    /**
-     * Recursively synchronizes on the next component in the iterator and executes
-     * task if there are no more components.
-     * 
-     * @param <E> The return type of task.
-     * @param iterator The iterator of the remaining components to synchronize on.
-     * @param task The task to synchronize.
-     * @return The result of task.
-     * @throws Exception If an exception occurs.
-     */
-    public static <E> E syncRest(final Iterator<? extends Object> iterator, final Callable<E> task)
-            throws Exception {
-        if (iterator.hasNext()) {
-            synchronized (iterator.next()) {
-                return syncRest(iterator, task);
-            }
-        } else {
-            return task.call();
-        }
     }
 
     /**

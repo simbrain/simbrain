@@ -74,7 +74,7 @@ public class NeuronDialog extends StandardDialog {
     private static final Map<Class<? extends Neuron>, Association> ASSOCIATIONS
         = new LinkedHashMap<Class<? extends Neuron>, Association>();
     
-    /* temporary fill of associations.  To be replaced with load from file. */
+    /* Temporary fill of associations.  To be replaced with load from file. */
     static {
         Association association;
         
@@ -193,8 +193,8 @@ public class NeuronDialog extends StandardDialog {
     /** Lower bound field. */
     private JTextField tfLowBound = new JTextField();
     
-    /** Update priority field. */
-    private JTextField tfUpdatePriority = new JTextField();
+    /** Label Field. */
+    private JTextField tfNeuronLabel = new JTextField();
 
     /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper bound");
@@ -214,7 +214,7 @@ public class NeuronDialog extends StandardDialog {
     /** The pnodes which refer to them. */
     private ArrayList<NeuronNode> selectionList;
 
-    /** Used to determin if anything in the workspace has been changed. */
+    /** Used to determine if anything in the workspace has been changed. */
     private boolean neuronsHaveChanged = false;
 
     /**
@@ -253,12 +253,12 @@ public class NeuronDialog extends StandardDialog {
 
         topPanel.addItem("Id:", idLabel);
         topPanel.addItem("Activation", tfActivation);
-        topPanel.addItem("Increment", tfIncrement);
-        topPanel.addItem("Update priority", tfUpdatePriority);
         topPanel.addItemLabel(upperLabel, tfUpBound);
         topPanel.addItemLabel(lowerLabel, tfLowBound);
-        topPanel.addItem("Neuron type", cbNeuronType);
+        topPanel.addItem("Adjustment Increment", tfIncrement);
+        topPanel.addItem("Label (Optional)", tfNeuronLabel);
         //topPanel.addItem("Attribute type", cbNeuronType);
+        topPanel.addItem("Neuron type", cbNeuronType);
 
         mainPanel.add(topPanel);
         mainPanel.add(neuronPanel);
@@ -365,7 +365,7 @@ public class NeuronDialog extends StandardDialog {
         }
         tfActivation.setText(Double.toString(neuronRef.getActivation()));
         tfIncrement.setText(Double.toString(neuronRef.getIncrement()));
-        tfUpdatePriority.setText(Integer.toString(neuronRef.getUpdatePriority()));
+        tfNeuronLabel.setText(neuronRef.getLabel());
         tfLowBound.setText(Double.toString(neuronRef.getLowerBound()));
         tfUpBound.setText(Double.toString(neuronRef.getUpperBound()));
 
@@ -380,8 +380,8 @@ public class NeuronDialog extends StandardDialog {
             tfIncrement.setText(NULL_STRING);
         }
         
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getUpdatePriority")) {
-            tfUpdatePriority.setText(NULL_STRING);
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLabel")) {
+            tfNeuronLabel.setText(NULL_STRING);
         }
         
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLowerBound")) {
@@ -409,8 +409,8 @@ public class NeuronDialog extends StandardDialog {
                 neuronRef.setIncrement(Double.parseDouble(tfIncrement.getText()));
             }
             
-            if (!tfUpdatePriority.getText().equals(NULL_STRING)) {
-                neuronRef.setUpdatePriority(Integer.parseInt(tfUpdatePriority.getText()));
+            if (!tfNeuronLabel.getText().equals(NULL_STRING)) {
+                neuronRef.setLabel(tfNeuronLabel.getText());
             }
             
             if (!tfUpBound.getText().equals(NULL_STRING)) {
@@ -420,6 +420,7 @@ public class NeuronDialog extends StandardDialog {
             if (!tfLowBound.getText().equals(NULL_STRING)) {
                 neuronRef.setLowerBound(Double.parseDouble(tfLowBound.getText()));
             }
+
         }
 
         if (neuronsHaveChanged) {

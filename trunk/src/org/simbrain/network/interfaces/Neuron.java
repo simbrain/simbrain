@@ -42,6 +42,9 @@ public abstract class Neuron implements Producer, Consumer {
     
     /** A unique id for this neuron. */
     private String id = null;
+    
+    /** An optional String description associated with this neuron. */
+    private String label = "";
 
     /** Activation value of the neuron.  The main state variable. */
     protected double activation = 0;
@@ -179,6 +182,7 @@ public abstract class Neuron implements Producer, Consumer {
         n.setX(this.getX());
         n.setY(this.getY());
         n.setUpdatePriority(this.getUpdatePriority());
+        n.setLabel(this.getLabel());
 
         return n;
     }
@@ -1015,5 +1019,19 @@ public abstract class Neuron implements Producer, Consumer {
      */
     public NetworkComponent getParentComponent() {
         return parent.getRootNetwork().getParent();
+    }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label the label to set
+     */
+    public void setLabel(final String label) {
+        this.label = label;
     }
 }

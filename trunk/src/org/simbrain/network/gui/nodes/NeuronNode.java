@@ -96,7 +96,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private String id;
 
     /** Number text inside neuron. */
-    private PText text;
+    private PText activationText;
+
+    /** Number text inside neuron. */
+    private PText labelText = new PText("...");
 
     /** Whether the node is currently moving or not. */
     private boolean isMoving = false;
@@ -137,24 +140,24 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         addChild(circle);
 
         // Handle input and output arrows
-        outArrow = createOutArrow();
-        inArrow = createInArrow();
-        inLabel = createInputLabel();
-        outLabel = createOutputLabel();
-        addChild(outArrow);
-        addChild(inArrow);
-        addChild(inLabel);
-        addChild(outLabel);
-        updateOutArrow();
-        updateInArrow();
-        updateInLabel();
-        updateOutLabel();
+//        outArrow = createOutArrow();
+//        inArrow = createInArrow();
+//        inLabel = createInputLabel();
+//        outLabel = createOutputLabel();
+//        addChild(outArrow);
+//        addChild(inArrow);
+//        addChild(inLabel);
+//        addChild(outLabel); 
+//        updateOutArrow();
+//        updateInArrow();
+//        updateInLabel();
+//        updateOutLabel();
 
-        text = new PText(String.valueOf((int) Math.round(neuron.getActivation())));
-        text.setFont(NEURON_FONT);
-        setTextPosition();
-
-        this.addChild(text);
+        activationText = new PText(String.valueOf((int) Math.round(neuron.getActivation())));
+        activationText.setFont(NEURON_FONT);
+        setActivationTextPosition();
+        addChild(activationText);
+        addChild(labelText);
 
         resetColors();
         update();
@@ -426,11 +429,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     /**
-     * Creates an arrow which designates an on-screen neuron as an input node, which receives signals from an external
-     * environment (the world object).
-     *
+     * Creates an arrow which designates an on-screen neuron as an input node,
+     * which receives signals from an external environment (the world object).
+     * 
      * @return an object representing the input arrow of a PNodeNeuron
-     *
+     * 
      * @see org.simbrain.sim.world
      */
     private PPath createInArrow() {
@@ -467,48 +470,58 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private void updateText() {
         double act = neuron.getActivation();
-        text.setScale(1);
-        setTextPosition();
+        activationText.setScale(1);
+        setActivationTextPosition();
+
+        // Set label text
+        if ((!neuron.getLabel().equalsIgnoreCase(""))
+                || (!neuron.getLabel().equalsIgnoreCase(NeuronDialog.NULL_STRING))) {
+            labelText.setFont(NEURON_FONT);
+            labelText.setText("" + neuron.getLabel());
+            labelText.setOffset(getX() - labelText.getWidth() / 2 + DIAMETER/2,
+                    getY() - DIAMETER/2);
+        }
 
         // 0 (or close to it) is a special case--a black font
         if ((act == 0)) {
             //text.setPaint(Color.black);
-            text.setFont(NEURON_FONT);
-            text.setText("0");
+            activationText.setFont(NEURON_FONT);
+            activationText.setText("0");
             // In all other cases the background color of the neuron is white
             // Between 0 and 1
         } else if ((act > 0) && (neuron.getActivation() < 1)) {
             //text.setPaint(Color.white);
-            text.setFont(NEURON_FONT_BOLD);
-            text.setText(String.valueOf(Utils.round(act, 4)).substring(1, 3));
+            activationText.setFont(NEURON_FONT_BOLD);
+            activationText.setText(String.valueOf(Utils.round(act, 4)).substring(1, 3));
         } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
             //text.setPaint(Color.white);
-            text.setFont(NEURON_FONT_BOLD);
-            text.setText("-" + String.valueOf(Utils.round(act, 4)).substring(2, 4));
+            activationText.setFont(NEURON_FONT_BOLD);
+            activationText.setText("-" + String.valueOf(Utils.round(act, 4)).substring(2, 4));
         } else { // greater than 1 or less than -1
             //text.setPaint(Color.white);
-            text.setFont(NEURON_FONT_BOLD);
+            activationText.setFont(NEURON_FONT_BOLD);
             if (Math.abs(act) < 10) {
-                text.scale(.9);
+                activationText.scale(.9);
             } else if (Math.abs(act) < 100) {
-                text.scale(.8);
-                text.translate(1, 1);
+                activationText.scale(.8);
+                activationText.translate(1, 1);
             } else {
-                text.scale(.7);
-                text.translate(-1, 2);
+                activationText.scale(.7);
+                activationText.translate(-1, 2);
             }
-            text.setText(String.valueOf((int) Math.round(act)));
+            activationText.setText(String.valueOf((int) Math.round(act)));
         }
     }
 
     /**
-     * Set basic position of text int the PNode, which is then adjusted depending on the size of the text.
+     * Set basic position of text in the PNode, which is then adjusted depending
+     * on the size of the text.
      */
-    private void setTextPosition() {
-        if (text == null) {
+    private void setActivationTextPosition() {
+        if (activationText == null) {
             return;
         }
-        text.setOffset(getX() + DIAMETER / 4 + 2, getY() + DIAMETER / 4 + 1);
+        activationText.setOffset(getX() + DIAMETER / 4 + 2, getY() + DIAMETER / 4 + 1);
     }
 
     /**
@@ -670,13 +683,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     /**
-     * @return Returns the id.
-     */
-    public String getId() {
-        return "pnode_" + neuron.getId();
-    }
-
-    /**
      * @param id The id to set.
      */
     public void setId(final String id) {
@@ -739,8 +745,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** @see ScreenElement */
     public void resetColors() {
         circle.setStrokePaint(NetworkGuiSettings.getLineColor());
-        inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
-        outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+//        inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+//        outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
         updateColor();
     }
 

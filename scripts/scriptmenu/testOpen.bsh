@@ -5,7 +5,7 @@ import org.simbrain.workspace.*;
 {
         NetworkComponent networkComponent = new NetworkComponent("Test Opening");
         workspace.addWorkspaceComponent(networkComponent);
-        networkComponent.open(new File("./test.xml"));
+        networkComponent.open(new File("./scripts/scriptmenu/test.xml"));
 	desktop.getDesktopComponent(networkComponent).postAddInit();
 	//source("/Users/jyoshimi/simbrain/scriptmenu/sparseNetwork.bsh");
 }

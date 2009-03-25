@@ -9,7 +9,7 @@ import org.simbrain.world.visionworld.filter.*;
 // load image
 BufferedImage image = null;
 try {
-    image = ImageIO.read(new File("./scriptmenu/sample.jpg"));
+    image = ImageIO.read(new File("./scripts/scriptmenu/sample.jpg"));
 }
 catch (IOException e) {
     e.printStackTrace();

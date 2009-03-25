@@ -33,7 +33,7 @@ import org.simbrain.workspace.*;
 	// LOAD INITIAL IMAGE
 	BufferedImage image =	 null;
 	try {
-	    image = ImageIO.read(new File("./scriptmenu/movie/frame1.tiff"));
+	    image = ImageIO.read(new File("./scripts/scriptmenu/movie/frame1.tiff"));
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
@@ -111,7 +111,7 @@ import org.simbrain.workspace.*;
 			    Thread.sleep(1);
 				BufferedImage image = null;
 				try {
-			    image = ImageIO.read(new File("./scriptmenu/movie/frame"+ i + ".tiff"));
+			    image = ImageIO.read(new File("./scripts/scriptmenu/movie/frame"+ i + ".tiff"));
 			    vision.getVisionWorld().getModel().setPixelMatrix(new BufferedImagePixelMatrix(image));
 			    workspace.globalUpdate();
 			} catch (IOException e) {

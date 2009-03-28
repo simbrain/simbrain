@@ -226,6 +226,9 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** Local thread flag for manually starting and stopping the network. */
     private volatile boolean isRunning;
+    
+    /** Toolbar panel. */
+    JPanel toolbars;
 
     /**
      * Create a new rootNetwork panel.
@@ -248,7 +251,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         // createContextMenuAlt();
 
         //initialize toolbars
-        JPanel toolbars = new JPanel();
+        toolbars = new JPanel(new BorderLayout());
         mainToolBar = this.createMainToolBar();
         editToolBar = this.createEditToolBar();
         clampToolBar = this.createClampToolBar();
@@ -256,10 +259,11 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
         flow.setHgap(0);
         flow.setVgap(0);
-        toolbars.setLayout(flow);
-        toolbars.add(getMainToolBar());
-        toolbars.add(getEditToolBar());
-        toolbars.add(getClampToolBar());
+        JPanel internalToolbar = new JPanel(flow);
+        internalToolbar.add(getMainToolBar());
+        internalToolbar.add(getEditToolBar());
+        internalToolbar.add(getClampToolBar());
+        toolbars.add("Center", internalToolbar);
         super.setLayout(new BorderLayout());
         this.add("North", toolbars);
 
@@ -298,7 +302,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         ToolTipManager.sharedInstance().registerComponent(this);
 
         addKeyListener(new NetworkKeyAdapter(this));
-
 
     }
 
@@ -1405,12 +1408,12 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         centerCamera();
     }
 
-    /** @see NetworkListener */
-    public void couplingChanged(final NetworkEvent<Neuron> e) {
-        NeuronNode changed = findNeuronNode(e.getObject());
-        changed.updateInLabel();
-        changed.updateOutLabel();
-    }
+//    /** @see NetworkListener */
+//    public void couplingChanged(final NetworkEvent<Neuron> e) {
+//        NeuronNode changed = findNeuronNode(e.getObject());
+//        changed.updateInLabel();
+//        changed.updateOutLabel();
+//    }
 
     /** @see NetworkListener */
     public void synapseChanged(final NetworkEvent<Synapse> e) {
@@ -1605,18 +1608,18 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         repaint();
     }
 
-    /**
-     * @param inOutMode The in out mode to set.
-     */
-    public void setInOutMode(final boolean inOutMode) {
-        this.inOutMode = inOutMode;
-        for (Iterator i = getCoupledNodes().iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
-            node.updateInLabel();
-            node.updateOutLabel();
-        }
-        repaint();
-    }
+//    /**
+//     * @param inOutMode The in out mode to set.
+//     */
+//    public void setInOutMode(final boolean inOutMode) {
+//        this.inOutMode = inOutMode;
+//        for (Iterator i = getCoupledNodes().iterator(); i.hasNext(); ) {
+//            NeuronNode node = (NeuronNode) i.next();
+//            node.updateInLabel();
+//            node.updateOutLabel();
+//        }
+//        repaint();
+//    }
 
     /**
      * @return Returns the in out mode.
@@ -1681,20 +1684,20 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
             return;
         }
 
-        for (PNode node : this.getPersistentNodes()) {
-            if (node instanceof NeuronNode) {
-                NeuronNode neuronNode = (NeuronNode) node;
-                neuronNode.update();
-            } else if (node instanceof SynapseNode) {
-                if (node.getVisible()) {
-                    SynapseNode synapseNode = (SynapseNode) node;
-                    synapseNode.updateColor();
-                    synapseNode.updateDiameter();
-                }
-            }
-        }
         EventQueue.invokeLater(new Runnable() {
             public void run() {
+                for (PNode node : getPersistentNodes()) {
+                    if (node instanceof NeuronNode) {
+                        NeuronNode neuronNode = (NeuronNode) node;
+                        neuronNode.update();
+                    } else if (node instanceof SynapseNode) {
+                        if (node.getVisible()) {
+                            SynapseNode synapseNode = (SynapseNode) node;
+                            synapseNode.updateColor();
+                            synapseNode.updateDiameter();
+                        }
+                    }
+                }
                 timeLabel.update();
             }
         });
@@ -2076,6 +2079,14 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
         return new NeuronNode(net, neuron);
+    }
+    
+    /**
+     * Adds an internal menu bar; used in applets.
+     * @param applet
+     */
+    public void addInternalMenuBar() {
+       toolbars.add("North", NetworkMenuBar.getAppletMenuBar(this));
     }
 
 }

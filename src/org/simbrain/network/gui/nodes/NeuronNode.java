@@ -72,16 +72,16 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private static final int ARROW_LINE = 20;
 
     /** Arrow associated with output node. */
-    private PPath outArrow;
+    //private PPath outArrow;
 
     /** Arrow associated with input node. */
-    private PPath inArrow;
+    //private PPath inArrow;
 
     /** Text showing sensory coupling information. */
-    private PText inLabel = new PText();
+    //private PText inLabel = new PText();
 
     /** Text showing motor coupling information. */
-    private PText outLabel = new PText();
+    //private PText outLabel = new PText();
 
     /** Font for input and output labels. */
     public static final Font IN_OUT_FONT = new Font("Arial", Font.PLAIN, 9);
@@ -346,10 +346,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (neuron instanceof SpikingNeuron) {
             if (((SpikingNeuron) neuron).hasSpiked()) {
                 circle.setStrokePaint(NetworkGuiSettings.getSpikingColor());
-                outArrow.setStrokePaint(NetworkGuiSettings.getSpikingColor());
+                //outArrow.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {
                 circle.setStrokePaint(NetworkGuiSettings.getLineColor());
-                outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+                //outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
             }
         }
     }
@@ -524,59 +524,59 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         activationText.setOffset(getX() + DIAMETER / 4 + 2, getY() + DIAMETER / 4 + 1);
     }
 
-    /**
-     * Updates graphics depending on whether this is an input node or not.
-     */
-    public void updateInArrow() {
-        if (neuron.isInput()) {
-            inArrow.setVisible(true);
-        } else {
-            inArrow.setVisible(false);
-        }
-    }
-
-    /**
-     * Updates graphics depending on whether this is an output node or not.
-     */
-    public void updateOutArrow() {
-        if (neuron.isOutput()) {
-            outArrow.setVisible(true);
-        } else {
-            outArrow.setVisible(false);
-        }
-    }
-
-    /**
-     * Update the label showing sensory coupling information.
-     */
-    public void updateInLabel() {
-        if (getNetworkPanel().getInOutMode()) {
-            if (getNeuron().isInput()) {
-               // inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
-                inLabel.setVisible(true);
-            } else {
-                inLabel.setVisible(false);
-            }
-        } else {
-            inLabel.setVisible(false);
-        }
-    }
-
-    /**
-     * Update the label showing sensory coupling information.
-     */
-    public void updateOutLabel() {
-        if (getNetworkPanel().getInOutMode()) {
-            if (getNeuron().isOutput()) {
-               // outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
-                outLabel.setVisible(true);
-            } else {
-                outLabel.setVisible(false);
-            }
-        } else {
-            outLabel.setVisible(false);
-        }
-    }
+//    /**
+//     * Updates graphics depending on whether this is an input node or not.
+//     */
+//    public void updateInArrow() {
+//        if (neuron.isInput()) {
+//            inArrow.setVisible(true);
+//        } else {
+//            inArrow.setVisible(false);
+//        }
+//    }
+//
+//    /**
+//     * Updates graphics depending on whether this is an output node or not.
+//     */
+//    public void updateOutArrow() {
+//        if (neuron.isOutput()) {
+//            outArrow.setVisible(true);
+//        } else {
+//            outArrow.setVisible(false);
+//        }
+//    }
+//
+//    /**
+//     * Update the label showing sensory coupling information.
+//     */
+//    public void updateInLabel() {
+//        if (getNetworkPanel().getInOutMode()) {
+//            if (getNeuron().isInput()) {
+//               // inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
+//                inLabel.setVisible(true);
+//            } else {
+//                inLabel.setVisible(false);
+//            }
+//        } else {
+//            inLabel.setVisible(false);
+//        }
+//    }
+//
+//    /**
+//     * Update the label showing sensory coupling information.
+//     */
+//    public void updateOutLabel() {
+//        if (getNetworkPanel().getInOutMode()) {
+//            if (getNeuron().isOutput()) {
+//               // outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
+//                outLabel.setVisible(true);
+//            } else {
+//                outLabel.setVisible(false);
+//            }
+//        } else {
+//            outLabel.setVisible(false);
+//        }
+//    }
 
     /**
      * Returns String representation of this NeuronNode.

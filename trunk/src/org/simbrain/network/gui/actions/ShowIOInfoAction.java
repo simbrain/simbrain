@@ -60,7 +60,7 @@ public final class ShowIOInfoAction
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
-        networkPanel.setInOutMode(cb.isSelected());
+        //networkPanel.setInOutMode(cb.isSelected());
 
     }
 }

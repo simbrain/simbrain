@@ -516,13 +516,13 @@ public class RootNetwork extends Network {
      * Fire a clamp changed event to all registered model listeners.
      */
     public void fireClampChanged() {
-        for (NetworkListener listener : component.getListeners()) {
-            listener.clampMenuChanged();
-            listener.clampBarChanged();
-        }
-        if (getParent() != null) {
-            getParent().setChangedSinceLastSave(true);
-        }
+//        for (NetworkListener listener : component.getListeners()) {
+//            listener.clampMenuChanged();
+//            listener.clampBarChanged();
+//        }
+//        if (getParent() != null) {
+//            getParent().setChangedSinceLastSave(true);
+//        }
     }
 
 

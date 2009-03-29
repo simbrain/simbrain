@@ -108,7 +108,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     
     @Override
     public void postAddInit() {
-        networkPanel.getLayer().removeAllChildren(); // Maybe in a reset method?
+        networkPanel.clearPanel();
         if (networkPanel.getRootNetwork() != this.getWorkspaceComponent().getRootNetwork()) {
             networkPanel.setRootNetwork(this.getWorkspaceComponent()
                     .getRootNetwork().getRootNetwork());
@@ -118,7 +118,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         networkPanel.repaint();
         networkPanel.clearSelection();
     }
-    
+
     /**
      * Return the network panel for this network frame.
      *

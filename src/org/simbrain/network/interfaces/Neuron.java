@@ -138,6 +138,7 @@ public abstract class Neuron implements Producer, Consumer {
         setX(n.getX());
         setY(n.getY());
         setUpdatePriority(n.getUpdatePriority());
+        setLabel(n.getLabel());
         setAttributeLists();
     }
 
@@ -685,6 +686,14 @@ public abstract class Neuron implements Producer, Consumer {
         return x;
     }
 
+
+    /**
+     * @return Returns the y coordinate.
+     */
+    public double getY() {
+        return y;
+    }
+    
     /**
      * @param x The x coordinate to set.
      */
@@ -708,12 +717,16 @@ public abstract class Neuron implements Producer, Consumer {
             }
         }
     }
-
+    
     /**
-     * @return Returns the y coordinate.
+     * Set position.
+     *
+     * @param x 
+     * @param y
      */
-    public double getY() {
-        return y;
+    public void setLocation(final double x, final double y) {
+        setX(x);
+        setY(y);
     }
 
     /**

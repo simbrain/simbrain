@@ -32,6 +32,7 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Network;
@@ -431,11 +432,15 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
     /** @see PNode */
     protected void layoutChildren() {
-        if (!initialChildLayoutComplete) {
-            updateOutlineBoundsAndPath();
-            initialChildLayoutComplete = true;
-        }
-        updateSynapseNodePositions();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (!initialChildLayoutComplete) {
+                    updateOutlineBoundsAndPath();
+                    initialChildLayoutComplete = true;
+                }
+                updateSynapseNodePositions();
+            }
+        });
     }
 
     /** @see PNode */

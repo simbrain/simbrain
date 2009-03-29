@@ -66,6 +66,7 @@ public class IACNeuron extends Neuron {
      */
     public IACNeuron duplicate() {
         IACNeuron iac = new IACNeuron();
+        iac = (IACNeuron) super.duplicate(iac);
         iac.setDecay(getDecay());
         iac.setRest(getRest());
         iac.setClipping(getClipping());

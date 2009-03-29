@@ -213,9 +213,6 @@ public class RootNetwork extends Network {
 
         // Clear input nodes
         clearInputs();
-
-        // For thread
-        this.setUpdateCompleted(true);
     }
 
     /**

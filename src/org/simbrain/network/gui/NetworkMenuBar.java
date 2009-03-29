@@ -30,12 +30,57 @@ import javax.swing.JMenuBar;
  */
 public class NetworkMenuBar {
 
+    
     public static JMenuBar getAppletMenuBar(final NetworkPanel networkPanel) {
-
+        
         ArrayList<JCheckBoxMenuItem> checkBoxes = new ArrayList<JCheckBoxMenuItem>();
         NetworkActionManager actionManager = networkPanel.getActionManager();
 
         JMenuBar returnMenu = new JMenuBar();
+
+// TODO: The code below works locally but won't work in an unsigned applet.
+//          I have not figured out how to sign applets properly yet so I'm not adding this for now
+        
+//        JMenu fileMenu = new JMenu("File");
+//        JMenuItem openItem = new JMenuItem("Open");
+//        openItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                SFileChooser chooser = new SFileChooser(".", "Open Network");
+//                chooser.addExtension("xml");
+//                File theFile = chooser.showOpenDialog();
+//                if (theFile != null) {
+//                    RootNetwork newNetwork;
+//                    try {
+//                        newNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(new FileInputStream(theFile));
+//                        newNetwork.setParent(networkPanel.getRootNetwork().getParent());
+//                        networkPanel.clearPanel();
+//                        networkPanel.setRootNetwork(newNetwork);
+//                        networkPanel.syncToModel();
+//                        networkPanel.repaint();
+//                    } catch (FileNotFoundException e1) {
+//                        e1.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
+//        fileMenu.add(openItem);
+//        JMenuItem saveItem = new JMenuItem("Save");
+//        saveItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                SFileChooser chooser = new SFileChooser(".", "Save Network");
+//                chooser.addExtension("xml");
+//                File theFile = chooser.showSaveDialog();
+//                if (theFile != null) {
+//                    try {
+//                        RootNetwork.getXStream().toXML(networkPanel.getRootNetwork(), new FileOutputStream(theFile));
+//                    } catch (FileNotFoundException e1) {
+//                        e1.printStackTrace();
+//                    }                    
+//                }
+//            }
+//        });
+//        fileMenu.add(saveItem);
+//        returnMenu.add(fileMenu);
         
         JMenu editMenu = new JMenu("Edit");
         editMenu.add(actionManager.getCutAction());
@@ -92,6 +137,5 @@ public class NetworkMenuBar {
         
         return returnMenu;
     }
-
 
 }

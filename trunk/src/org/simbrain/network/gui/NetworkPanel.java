@@ -1027,7 +1027,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * Used by Castor.
+     * Set Root network.
      *
      * @param rootNetwork The rootNetwork to set.
      */
@@ -1699,6 +1699,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
                     }
                 }
                 timeLabel.update();
+                rootNetwork.setUpdateCompleted(true);
             }
         });
         rootNetwork.getParent().setChangedSinceLastSave(true);  
@@ -2082,11 +2083,32 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     }
     
     /**
+     * Remove all nodes from panel.
+     */
+    public void clearPanel() {
+        getLayer().removeAllChildren();
+    }
+    
+    /**
      * Adds an internal menu bar; used in applets.
      * @param applet
      */
     public void addInternalMenuBar() {
        toolbars.add("North", NetworkMenuBar.getAppletMenuBar(this));
+    }
+
+    /**
+     * @return the isRunning
+     */
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
+     * @param isRunning the isRunning to set
+     */
+    public void setRunning(boolean isRunning) {
+        this.isRunning = isRunning;
     }
 
 }

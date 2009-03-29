@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 
@@ -28,17 +29,16 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Run network action.
  */
-public final class RunNetworkAction
-    extends AbstractAction {
+public final class RunNetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
      * Create a new run network action with the specified network panel.
-     *
-     * @param networkPanel network panel, must not be null
+     * 
+     * @param networkPanel
+     *            network panel, must not be null
      */
     public RunNetworkAction(final NetworkPanel networkPanel) {
         super();
@@ -52,9 +52,24 @@ public final class RunNetworkAction
         putValue(SHORT_DESCRIPTION, "Iterate network update algorithm");
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-    //	networkPanel.start();
+        networkPanel.setRunning(true);
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            public void run() {
+                while (networkPanel.isRunning()) {
+                    networkPanel.getRootNetwork().setUpdateCompleted(false);
+                    networkPanel.getRootNetwork().updateRootNetwork();
+                    while (networkPanel.getRootNetwork().isUpdateCompleted() == false) {
+                        // Block until update is competed
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
     }
 }

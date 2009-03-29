@@ -261,6 +261,22 @@ public abstract class Network {
         }
         return null;
     }
+    
+    /**
+     * Find a neuron with a given label.  Note that labels are not
+     * guaranteed to be unique.
+     *
+     * @param label label to search for.
+     * @return first neuron with that label found, null otherwise
+     */
+    public Neuron getNeuronByLabel(final String label) {
+        for (Neuron neuron : getFlatNeuronList()) {
+            if (neuron.getLabel().equalsIgnoreCase(label)) {
+                return neuron;
+            }
+        }
+        return null;
+    }
 
     /**
      * Find a synapse with a given string id.
@@ -682,25 +698,25 @@ public abstract class Network {
             s.initSpikeResponder();
         }
 
-        CouplingManager manager = rootNetwork.getParent().getWorkspace().getCouplingManager();
-        
-        for (Attribute oldAttr : oldNeuron.getConsumingAttributes()) {
-            Attribute newAttr = find(oldAttr.getKey(),
-                newNeuron.getConsumingAttributes());
-            
-            if (newAttr != null) {
-                manager.replaceCouplings(oldAttr, newAttr);
-            }
-        }
-        
-        for (Attribute oldAttr : oldNeuron.getProducingAttributes()) {
-            Attribute newAttr = find(oldAttr.getKey(),
-                newNeuron.getProducingAttributes());
-            
-            if (newAttr != null) {
-                manager.replaceCouplings(oldAttr, newAttr);
-            }
-        }
+//        CouplingManager manager = rootNetwork.getParent().getWorkspace().getCouplingManager();
+//        
+//        for (Attribute oldAttr : oldNeuron.getConsumingAttributes()) {
+//            Attribute newAttr = find(oldAttr.getKey(),
+//                newNeuron.getConsumingAttributes());
+//            
+//            if (newAttr != null) {
+//                manager.replaceCouplings(oldAttr, newAttr);
+//            }
+//        }
+//        
+//        for (Attribute oldAttr : oldNeuron.getProducingAttributes()) {
+//            Attribute newAttr = find(oldAttr.getKey(),
+//                newNeuron.getProducingAttributes());
+//            
+//            if (newAttr != null) {
+//                manager.replaceCouplings(oldAttr, newAttr);
+//            }
+//        }
         
         rootNetwork.updateTimeType();
     }

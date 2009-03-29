@@ -19,6 +19,10 @@
 package org.simbrain.workspace;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -554,4 +558,31 @@ public class Workspace {
     public WorkspaceUpdator getWorkspaceUpdator() {
         return updator;
     }
+    
+    /**
+     * Helper method to open a workspace component from a file.
+     * 
+     * A call might look like this
+     *  <code>NetworkComponent networkComponent =
+     *      (NetworkComponent) Workspace.open(NetworkComponent.class, new File("Net.xml"));</code>
+     * 
+     * @param fileClass the type of Workpsace component to open; a subclass of WorkspaceComponent.
+     * @param file the File to open
+     * @return the workspace component
+     */
+    public static WorkspaceComponent<?> open (final Class<?> fileClass, final File file) {
+        String extension = file.getName().substring(file.getName().indexOf("."));
+        try {
+            Method method = fileClass.getMethod("open", InputStream.class,
+                    String.class, String.class);
+            WorkspaceComponent<?> wc = (WorkspaceComponent<?>) method.invoke(
+                    null, new FileInputStream(file), file.getName(), extension);
+            return wc;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
 }

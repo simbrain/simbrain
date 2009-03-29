@@ -11,10 +11,10 @@ public class NetworkGuiSettings {
     private static Color backgroundColor = Color.white;
 
     /** Color of "active" neurons, with positive values. */
-    private static float hotColor = Color.red.getRGB();
+    private static float hotColor = Color.RGBtoHSB(255, 0, 0, null)[0];
 
     /** Color of "inhibited" neurons, with negative values. */
-    private static float coolColor = Color.blue.getRGB();
+    private static float coolColor = Color.RGBtoHSB(0, 0, 255, null)[0];
 
     /** Color of "excitatory" synapses, with positive values. */
     private static Color excitatoryColor = Color.red;

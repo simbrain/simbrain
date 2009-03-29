@@ -21,7 +21,7 @@ public class LineLayout implements Layout {
     /** Initial x position of line of neurons. */
     private double initialX;
 
-    /** Initial y position of line of neuorns. */
+    /** Initial y position of line of neurons. */
     private double initialY;
 
     /** Spacing between neurons. */
@@ -58,14 +58,14 @@ public class LineLayout implements Layout {
 
     /** @see Layout */
     public void layoutNeurons(final Network network) {
-        if (layout == HORIZONTAL) {
+        if (layout == VERTICAL) {
             double ypos = initialY;
             for (Neuron neuron : network.getFlatNeuronList()) {
                 neuron.setX(initialX);
                 neuron.setY(ypos);
                 ypos += spacing;
             }
-        } else if (layout == VERTICAL) {
+        } else if (layout == HORIZONTAL) {
             double xpos = initialX;
             for (Neuron neuron : network.getFlatNeuronList()) {
                 neuron.setX(xpos);

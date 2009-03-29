@@ -4,7 +4,7 @@
     <property name="bin" location="bin"/>
     <property name="lib" location="lib"/>
     <property name="docs" location="docs"/>
-    <property name="simulations" location="simulations"/>
+    <property name="scripts" location="scripts"/>
     <property name="resource" value="org/simbrain/resource"/>
     <property name="commands" value="org/simbrain/console"/>
     <property name="workspace" value="org/simbrain/workspace"/>
@@ -139,10 +139,6 @@
         </copy>
         <copy todir="${dist}/docs">
             <fileset dir = "${docs}">
-            </fileset>
-        </copy>
-        <copy todir="${dist}/simulations">
-            <fileset dir = "${simulations}">
             </fileset>
         </copy>
         <copy todir="${dist}" file = "${build}/Readme.txt"/>

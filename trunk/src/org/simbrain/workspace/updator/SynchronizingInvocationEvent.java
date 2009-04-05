@@ -30,7 +30,7 @@ class SynchronizingInvocationEvent extends InvocationEvent {
      * @param signal The signal to call when done.
      */
     public SynchronizingInvocationEvent(final InvocationEvent event,
-            final Workspace workspace, final Signal signal) {
+            final Workspace workspace, final CompletionSignal signal) {
         super(event.getSource(), new Runnable() {
             public void run() {
                 try {
@@ -76,17 +76,5 @@ class SynchronizingInvocationEvent extends InvocationEvent {
      */
     public String paramString() {
         return event.paramString();
-    }
-    
-    /**
-     * Simple interface for calling back when completed.
-     * 
-     * @author Matt Watson
-     */
-    public interface Signal {
-        /**
-         * Signals that the event is done.
-         */
-        void done();
     }
 }

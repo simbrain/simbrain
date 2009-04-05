@@ -81,7 +81,7 @@ public final class Coupling<E> {
             = producingAttribute.getParent().getParentComponent();
         
         try {
-            buffer = Workspace.syncRest(producerComponent.getLocks(), new Callable<E>() {
+            buffer = Workspace.syncRest(producerComponent.getLocks().iterator(), new Callable<E>() {
                 public E call() throws Exception {
                     return producingAttribute.getValue();
                 }
@@ -103,7 +103,7 @@ public final class Coupling<E> {
                 = consumingAttribute.getParent().getParentComponent();
             
             try {
-                Workspace.syncRest(consumerComponent.getLocks(), new Callable<E>() {
+                Workspace.syncRest(consumerComponent.getLocks().iterator(), new Callable<E>() {
                     public E call() throws Exception {
                         consumingAttribute.setValue(buffer);
                         LOGGER.debug(consumingAttribute.getParent().getDescription()

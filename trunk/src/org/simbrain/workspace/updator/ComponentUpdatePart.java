@@ -1,7 +1,5 @@
 package org.simbrain.workspace.updator;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -81,10 +79,10 @@ public class ComponentUpdatePart {
     /**
      * Get's a runnable that counts down the latch after completion.
      * 
-     * @param latch the latch to count down on.
+     * @param signal the latch to count down on.
      * @return The runnable to execute.
      */
-    Runnable getUpdate(final CountDownLatch latch) {
+    Runnable getUpdate(final CompletionSignal signal) {
         return new Runnable() {
             public void run() {
                 synchronized (lock) {
@@ -98,7 +96,7 @@ public class ComponentUpdatePart {
                     
                     thread.clearCurrentTask(ComponentUpdatePart.this);
                     
-                    latch.countDown();
+                    signal.done();
                 }
             }
         };

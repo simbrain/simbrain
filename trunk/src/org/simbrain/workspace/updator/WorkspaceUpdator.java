@@ -1,10 +1,9 @@
 package org.simbrain.workspace.updator;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -93,6 +92,7 @@ public class WorkspaceUpdator {
             List<? extends WorkspaceComponent<?>> components = controls.getComponents();
             
             int componentCount = components.size();
+            
             if (componentCount < 1) {
                 return;
             }
@@ -101,19 +101,15 @@ public class WorkspaceUpdator {
             controls.updateCouplings();
             
             LOGGER.trace("creating latch");
-            CountDownLatch latch = new CountDownLatch(components.size());
+            LatchCompletionSignal latch = new LatchCompletionSignal(componentCount);
             
             LOGGER.trace("updating components");
             for (WorkspaceComponent<?> component : components) {
                 controls.updateComponent(component, latch);
             }
             LOGGER.trace("waiting");
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                return;
-            }
-            
+            latch.await();
+            LOGGER.trace("update complete");
         }
     };
     
@@ -151,13 +147,25 @@ public class WorkspaceUpdator {
             return components;
         }
 
-        /**
-         * Update component.
-         */
-        public void updateComponent(final WorkspaceComponent<?> component, final CountDownLatch latch) {
-            for (Iterator<ComponentUpdatePart> i = component.getUpdateParts(); i.hasNext(); ) {
-                ComponentUpdatePart part = i.next();
-                service.submit(part.getUpdate(latch));
+        public void updateComponent(
+                final WorkspaceComponent<?> component, final CompletionSignal signal) {
+            Collection<ComponentUpdatePart> parts = component.getUpdateParts();
+            
+            final LatchCompletionSignal partsSignal = new LatchCompletionSignal(parts.size()) {
+                public void done() {
+                    super.done();
+                    
+                    /*
+                     * I'm not 100% sure this is safe.  The JavaDocs don't say it isn't
+                     * but they don't say it is either.  If a deadlock occurs in the
+                     * caller to updateComponent, this may be the issue.
+                     */
+                    if (getLatch().getCount() <= 0) signal.done();
+                }
+            };
+            
+            for (ComponentUpdatePart part : parts) {
+                service.submit(part.getUpdate(partsSignal));
             }
         }
 
@@ -191,23 +199,6 @@ public class WorkspaceUpdator {
         this.service = Executors.newFixedThreadPool(threads, factory);
         this.events = Executors.newSingleThreadExecutor();
         this.numThreads = threads;
-        addListener(new WorkspaceUpdatorListener() {
-            public void finishedComponentUpdate(
-                    final WorkspaceComponent<?> component, final int update, final int thread) {
-                System.out.println("Update: " + update + " thread: "
-                    + thread + " finished: " + component);
-            }
-
-            public void startingComponentUpdate(
-                    final WorkspaceComponent<?> component, final int update, final int thread) {
-                System.out.println("Update: " + update + " thread: "
-                    + thread + " updating: " + component);
-            }
-
-            public void updatedCouplings(final int update) {
-                System.out.println("Update: " + update + " Updated couplings");
-            }
-        });
     }
     
     /**
@@ -283,8 +274,6 @@ public class WorkspaceUpdator {
         updates.submit(new Runnable() {
             public void run() {
                 snychManager.queueTasks();
-                
-                System.out.println("running");
                 
                 while (run) {
                     doUpdate();

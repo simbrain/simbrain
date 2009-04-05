@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updator.SynchronizingInvocationEvent.Signal;
 
 /**
  * An event queue implementing the TaskSynchronizationManager interface.
@@ -35,7 +33,7 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
     /** Lock for paused flag access. */
     private Object lock = new Object();
     /** Latch used for tracking when events are done. */
-    private final Latch latch = new Latch();
+    private volatile CompletionSignal signal = null;
     
     /**
      * Creates a new instance for the given workspace.
@@ -68,32 +66,39 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
      * Executes all queued invocation events.
      */
     public void runTasks() {
+        LOGGER.debug("starting runTasks");
+        
         Collection<AWTEvent> events = new ArrayList<AWTEvent>();
         
         for (AWTEvent event; (event = queue.poll()) != null; ) {
             events.add(event);
         }
         
-        latch.counter = new CountDownLatch(events.size());
+        LatchCompletionSignal signal = new LatchCompletionSignal(events.size());
+        
+        this.signal = signal;
         
         for (AWTEvent event : events) {
             LOGGER.debug("event unqueued: " + event);
             super.postEvent(event);
         }
         
-        latch.await();
+        signal.await();
         
-        latch.counter = null;
+        this.signal = null;
+        
+        LOGGER.debug("finished runTasks");
     }
     
     /**
-     * Simple signal with no implementation.
+     * A wrapper which calls the underlying signal.  This is needed because the
+     * synchronizing event is created prior to the latch.  The event needs to have
+     * a reference to call.  Synchronization is critical to making this work properly.
      */
-    private final Signal pass = new Signal() {
+    private final CompletionSignal deQueueSignal = new CompletionSignal() {
         public void done() {
-            /* no implementation */
+            signal.done();
         }
-        
     };
     
     /**
@@ -106,52 +111,24 @@ public class InterceptingEventQueue extends EventQueue implements TaskSynchroniz
     public void postEvent(final AWTEvent event) {
         LOGGER.trace("event posted: " + event);
         
+//        final CompletionSignal signal = this.signal;
+        
         if (event instanceof InvocationEvent) {
             synchronized (lock) {
                 if (paused) {
                     LOGGER.trace("event queued: " + event);
                     
                     queue.add(new SynchronizingInvocationEvent(
-                        (InvocationEvent) event, workspace, latch));
+                        (InvocationEvent) event, workspace, deQueueSignal));
                 } else {
                     LOGGER.trace("event passed: " + event);
                     
                     super.postEvent(new SynchronizingInvocationEvent(
-                        (InvocationEvent) event, workspace, pass));
+                        (InvocationEvent) event, workspace, CompletionSignal.IGNORE));
                 }
             }
         } else {
             super.postEvent(event);
-        }
-    }
-    
-    /**
-     * Signal implementation that wraps a count-down latch.
-     * 
-     * @author Matt Watson
-     */
-    private class Latch implements Signal {
-        /** the underlying latch. */
-        private volatile CountDownLatch counter;
-        
-        /**
-         * Called when a task is done.
-         */
-        public void done() {
-            CountDownLatch counter = this.counter;
-            
-            counter.countDown();
-        }
-        
-        /**
-         * Calls await on the latch.
-         */
-        public void await() {
-            try {
-                counter.await();
-            } catch (InterruptedException e) {
-                return;
-            }
         }
     }
 }

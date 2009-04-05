@@ -1,7 +1,6 @@
 package org.simbrain.workspace.updator;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -28,7 +27,7 @@ public interface UpdateControls {
      * when it is updated.
      * 
      * @param component The component to update.
-     * @param latch The latch to countDown when the update is completed.
+     * @param signal The signal to call done on when complete.
      */
-    void updateComponent(WorkspaceComponent<?> component, CountDownLatch latch);
+    void updateComponent(WorkspaceComponent<?> component, CompletionSignal signal);
 }

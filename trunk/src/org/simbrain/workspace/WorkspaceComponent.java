@@ -33,14 +33,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
-import org.simbrain.workspace.updator.WorkspaceUpdator;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
@@ -149,18 +146,30 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         /* no default implementation */
     }
     
-    public Iterator<ComponentUpdatePart> getUpdateParts() {
+    /**
+     * Returns the collection of update parts for this component.
+     * 
+     * @return The collection of update parts for this component.
+     */
+    public Collection<ComponentUpdatePart> getUpdateParts() {
         Runnable callable = new Runnable() {
-            public void run(){
+            public void run() {
                 update();
             }
         };
         
-        return Collections.singleton(new ComponentUpdatePart(this, callable, toString(), this)).iterator();
+        return Collections.singleton(new ComponentUpdatePart(this, callable, toString(), this));
     }
     
-    public Iterator<? extends Object> getLocks() {
-        return Collections.singleton(this).iterator();
+    /**
+     * Returns the locks for the update parts.  There should be one lock
+     * per part.  These locks need to be the same ones used to lock the
+     * update of each part.
+     * 
+     * @return The locks for the update parts.
+     */
+    public Collection<? extends Object> getLocks() {
+        return Collections.singleton(this);
     }
     
     /**

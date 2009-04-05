@@ -85,6 +85,10 @@ public class WorkspaceUpdator {
     
     /** The default controller. */
     private static final UpdateController DEFAULT_CONTROLLER = new UpdateController() {
+        
+        /**
+         * Default update.
+         */
         public void doUpdate(final UpdateControls controls) {
             List<? extends WorkspaceComponent<?>> components = controls.getComponents();
             
@@ -130,8 +134,14 @@ public class WorkspaceUpdator {
         }
     };
     
-    /** Controls used by Controllers to manage updates. */
+    /**
+     * Default controls used by Controllers to manage updates.
+     */
     private final UpdateControls controls = new UpdateControls() {
+        
+        /**
+         * Get components.
+         */
         public List<? extends WorkspaceComponent<?>> getComponents() {
             List<? extends WorkspaceComponent<?>> components = workspace.getComponentList();
             synchronized (components) {
@@ -141,15 +151,19 @@ public class WorkspaceUpdator {
             return components;
         }
 
-        public void updateComponent(
-                final WorkspaceComponent<?> component, final CountDownLatch latch) {
+        /**
+         * Update component.
+         */
+        public void updateComponent(final WorkspaceComponent<?> component, final CountDownLatch latch) {
             for (Iterator<ComponentUpdatePart> i = component.getUpdateParts(); i.hasNext(); ) {
                 ComponentUpdatePart part = i.next();
-                
                 service.submit(part.getUpdate(latch));
             }
         }
 
+        /**
+         * Update couplings.
+         */
         public void updateCouplings() {
             manager.updateAllCouplings();
             

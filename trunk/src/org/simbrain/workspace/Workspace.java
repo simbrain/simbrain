@@ -508,20 +508,16 @@ public class Workspace {
      * For an example, see the script in
      * {SimbrainDir}/scripts/scriptmenu/addBackpropSim.bsh
      * 
-     * @param controller
-     *            The update controller to use.
-     * @param threads
-     *            The number of threads for the component updates.
+     * @param controller The update controller to use.
+     * @param threads The number of threads for the component updates.
      */
-    public void setCustomUpdateController(
-            final UpdateController controller,
-            final int threads) {
-                synchronized (updatorLock) {
-                if (updator.isRunning()) {
+    public void setCustomUpdateController(final UpdateController controller, final int threads) {
+        synchronized (updatorLock) {
+            if (updator.isRunning()) {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
-                }
-                updator = new WorkspaceUpdator(this, manager, controller, threads);
+            }
+            updator = new WorkspaceUpdator(this, manager, controller, threads);
         }
     }
     

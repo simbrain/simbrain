@@ -416,7 +416,7 @@ public class Workspace {
                 public Object next() {
                     if (current == null || !current.hasNext()) {
                         if (components.hasNext()) {
-                            current = components.next().getLocks();
+                            current = components.next().getLocks().iterator();
                         } else {
                             throw new IllegalStateException("no more elements");
                         }

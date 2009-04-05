@@ -1703,7 +1703,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
             }
         });
         rootNetwork.getParent().setChangedSinceLastSave(true);  
-        repaint();
    }
 
     /**
@@ -2111,4 +2110,16 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         this.isRunning = isRunning;
     }
 
+    /**
+     * Initialize the Gui. Intended to be called after the panel is loaded (in
+     * an applet's start() method, and by the network components postAddInit()
+     * method).
+     */
+    public void initGui() {
+        resetSynapseDiameters();
+        resetColors();
+        repaint();
+        clearSelection();
+    }
+    
 }

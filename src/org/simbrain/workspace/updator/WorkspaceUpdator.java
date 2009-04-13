@@ -83,7 +83,7 @@ public class WorkspaceUpdator {
     private int numThreads;
     
     /** The default controller. */
-    private static final UpdateController DEFAULT_CONTROLLER = new UpdateController() {
+    public static final UpdateController DEFAULT_CONTROLLER = new UpdateController() {
         
         /**
          * Default update.
@@ -276,7 +276,12 @@ public class WorkspaceUpdator {
                 snychManager.queueTasks();
                 
                 while (run) {
-                    doUpdate();
+                    try {
+                        doUpdate();
+                    } catch (Exception e) {
+                        // TODO exception handler
+                        e.printStackTrace();
+                    }
                 }
                 
                 snychManager.releaseTasks();
@@ -293,7 +298,12 @@ public class WorkspaceUpdator {
             public void run() {
                 snychManager.queueTasks();
                 
-                doUpdate();
+                try {
+                    doUpdate();
+                } catch (Exception e) {
+                    // TODO exception handler
+                    e.printStackTrace();
+                }
                 
                 snychManager.releaseTasks();
                 snychManager.runTasks();

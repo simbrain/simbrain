@@ -538,6 +538,15 @@ public class Workspace {
     }
     
     /**
+     * Sets a custom controller with the default number of threads.
+     * 
+     * @param controller The number of threads to use.
+     */
+    public void resetUpdateController() {
+        setCustomUpdateController(WorkspaceUpdator.DEFAULT_CONTROLLER);
+    }
+    
+    /**
      * Returns global time.
      * 
      * @return the time

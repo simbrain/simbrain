@@ -6,9 +6,9 @@ import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 
 /**
- * Subclass this class to create a class which manages the creation of connections
- * between groups of neurons.
- *
+ * Subclasses create connections (collections of synapses) between groups of
+ * neurons.
+ * 
  * @author jyoshimi
  */
 public abstract class ConnectNeurons {
@@ -50,11 +50,11 @@ public abstract class ConnectNeurons {
     /**
      * Apply connection using specified parameters.
      * 
-     * @param network
-     * @param neurons
-     * @param neurons2
+     * @param network reference to parent network
+     * @param neurons source neurons
+     * @param neurons2 target neurons
      */
-    public void connectNeurons(final Network network, final ArrayList neurons, final ArrayList neurons2) {
+    public void connectNeurons(final Network network, final ArrayList<Neuron> neurons, final ArrayList<Neuron> neurons2) {
         this.network = network;
         sourceNeurons = neurons;
         targetNeurons = neurons2;

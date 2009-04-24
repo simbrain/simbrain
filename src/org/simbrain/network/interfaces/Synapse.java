@@ -98,7 +98,7 @@ public abstract class Synapse {
             TDSynapse.getName(), TraceSynapse.getName()
 
     };
-
+    
     public Synapse(Neuron source, Neuron target) {
         setSource(source);
         setTarget(target);
@@ -232,8 +232,10 @@ public abstract class Synapse {
         	this.source.removeTarget(this);
         }
 
-    	this.source = n;
-        n.addTarget(this);
+        if (n != null) {
+            this.source = n;
+            n.addTarget(this);            
+        }
     }
 
     /**
@@ -251,9 +253,11 @@ public abstract class Synapse {
     	if (this.target != null) {
         	this.target.removeSource(this);
         }
-    	
-    	this.target = n;
-        n.addSource(this);
+
+    	if (n != null) {
+            this.target = n;
+            n.addSource(this);    	    
+    	}
     }
 
     /**

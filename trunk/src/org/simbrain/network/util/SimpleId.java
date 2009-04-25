@@ -23,6 +23,8 @@ package org.simbrain.network.util;
  */
 public class SimpleId {
 
+    //TODO: This is fairly weak way of ensuring unique ids.   Better way?
+
     /** The base name of the id. */
     private String rootName;
 
@@ -47,7 +49,6 @@ public class SimpleId {
      */
     public String getId() {
         String id = rootName + "_" + index++;
-        // TODO: for all objects in list, check id.  If id == id, index++ and try again.
         return id;
     }
 }

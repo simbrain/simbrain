@@ -48,7 +48,7 @@ import org.simbrain.workspace.updator.ComponentUpdatePart;
  * component.
  */
 public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
-
+    
     /** The workspace that 'owns' this component. */
     private Workspace workspace;
     
@@ -61,6 +61,15 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = true;
 
+    /**
+     * Whether to display the GUI for this component (obviously only relevant
+     * when Simbrain is run as a GUI).
+     */
+    private Boolean guiOn = true;
+    
+    /** Whether to udpate this component. */
+    private Boolean updateOn = true;
+    
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
     
@@ -702,5 +711,47 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
+    }
+
+    /**
+     * @return the logger
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
+    /**
+     * @param logger the logger to set
+     */
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    /**
+     * @return the guiOn
+     */
+    public Boolean getGuiOn() {
+        return guiOn;
+    }
+
+    /**
+     * @param guiOn the guiOn to set
+     */
+    public void setGuiOn(Boolean guiOn) {
+        this.guiOn = guiOn;
+    }
+
+    /**
+     * @return the updateOn
+     */
+    public Boolean getUpdateOn() {
+        return updateOn;
+    }
+
+    /**
+     * @param updateOn the updateOn to set
+     */
+    public void setUpdateOn(Boolean updateOn) {
+        this.updateOn = updateOn;
     }
 }

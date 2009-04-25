@@ -168,9 +168,6 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "component");
         xstream.omitField(RootNetwork.class, "listenerList");
         xstream.omitField(RootNetwork.class, "updateCompleted");
-        xstream.omitField(RootNetwork.class, "neuronIdGenerator");
-        xstream.omitField(RootNetwork.class, "networkIdGenerator");
-        xstream.omitField(RootNetwork.class, "synapseIdGenerator");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
         return xstream;
@@ -189,9 +186,6 @@ public class RootNetwork extends Network {
         // listenerList = new HashSet<NetworkListener>();
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
-        networkIdGenerator = new SimpleId("Network", 1);
-        neuronIdGenerator = new SimpleId("Neuron", 1);
-        synapseIdGenerator = new SimpleId("Synapse", 1);
         return this;
     }
 

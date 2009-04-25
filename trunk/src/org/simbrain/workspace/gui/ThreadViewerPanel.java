@@ -22,23 +22,45 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 
+/**
+ * Display updator and thread information.
+ *
+ * @author jyoshimi
+ *
+ */
 public class ThreadViewerPanel extends JPanel {
 
+    /** Thread viewer panel. */
+    final JPanel threadViewer = new JPanel(new BorderLayout());
+    
+    /** List. */
+    final JList list = new JList();
+    
+    /** List model. */
+    final ThreadListModel<ListItem> listModel = new ThreadListModel<ListItem>();
+    
+    /** Label for update method name. */
+    final JLabel updateName = new JLabel();
+
+    /**
+     * Constructor for viewer panel.
+     *
+     * @param workspace reference to parent workspace.
+     */
     public ThreadViewerPanel(final Workspace workspace) {
+
         super(new BorderLayout());
-        final JPanel threadViewer = new JPanel(new BorderLayout());
-        final JList list = new JList();
 
-        final ThreadListModel<ListItem> listModel = new ThreadListModel<ListItem>();
-
-        // TODO: Is there a way to get the actual threads?
+        // Set up thread viewer
         for (int i = 1; i <= workspace.getWorkspaceUpdator().getNumThreads(); i++) {
             ListItem label = new ListItem("Thread " + i);
             listModel.add(label);
@@ -46,10 +68,17 @@ public class ThreadViewerPanel extends JPanel {
         list.setModel(listModel);
         JScrollPane scrollPane = new JScrollPane(list);
         threadViewer.add(scrollPane);
-        this.add(threadViewer);
+
+        // Initial setting of update method label
+        updateName.setText("Current update method: "
+                + workspace.getWorkspaceUpdator().getCurrentUpdatorName());
+
+        // Add main components to panel
+        this.add("North", updateName);
+        this.add("Center", threadViewer);
 
         workspace.getWorkspaceUpdator().addListener(
-                new org.simbrain.workspace.updator.WorkspaceUpdatorListener() {
+                new WorkspaceUpdatorListener() {
 
                     public void finishedComponentUpdate(
                             WorkspaceComponent<?> component, int update,
@@ -67,6 +96,10 @@ public class ThreadViewerPanel extends JPanel {
                                 "Thread " + thread + ": starting to update"
                                         + component.getName());
                         threadViewer.repaint();
+                        // TODO: Temporary solution; the below should only
+                        // happen when the updator is changed
+                        updateName.setText("Current update method: "
+                                + workspace.getWorkspaceUpdator().getCurrentUpdatorName());
                     }
 
                     public void updatedCouplings(int update) {
@@ -100,7 +133,7 @@ public class ThreadViewerPanel extends JPanel {
     }
 
     /**
-     * Simple List Model
+     * Simple List Model.
      *
      * @param <ListItem>
      */

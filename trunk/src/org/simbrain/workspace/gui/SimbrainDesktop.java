@@ -229,7 +229,7 @@ public class SimbrainDesktop {
         bottomDock = new JTabbedPane();
         bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
         bottomDock.addTab("Thread Viewer", null, new ThreadViewerPanel(this.getWorkspace()), "Simbrain thread viewer");
-        bottomDock.addTab("Components", null, new WorkspaceComponentListPanel(
+        bottomDock.addTab("Components", null, new ComponentPanel(
                 this), "Show workspace components");
         bottomDock.addTab("Producing Attributes", null, new AttributePanel(this.getWorkspace(),
                 AttributePanel.AttributeType.Producing), "Show producing attributes");

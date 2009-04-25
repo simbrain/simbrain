@@ -25,7 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.WorkspaceComponentListPanel;
+import org.simbrain.workspace.gui.ComponentPanel;
 
 /**
  * Opens and displays a list of the current workspace components.
@@ -57,7 +57,7 @@ public final class OpenWorkspaceComponentListAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent event) {
         final JFrame frame = new JFrame("Component List");
-        JComponent cl = new WorkspaceComponentListPanel(desktop);
+        JComponent cl = new ComponentPanel(desktop);
         frame.setContentPane(cl);
         frame.pack();
         frame.setLocationRelativeTo(null);

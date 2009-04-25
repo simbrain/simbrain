@@ -111,6 +111,10 @@ public class WorkspaceUpdator {
             latch.await();
             LOGGER.trace("update complete");
         }
+
+        public String getName() {
+            return "Default update";
+        }
     };
     
     /** Creates the threads used in the ExecutorService. */
@@ -336,6 +340,15 @@ public class WorkspaceUpdator {
     }
     
     /**
+     * Return list of listeners;
+     * 
+     * @return list of listeners;
+     */
+    public List<WorkspaceUpdatorListener> getListeners() {
+        return listeners;
+    }
+    
+    /**
      * Removes a listener from this instance.
      * 
      * @param listener The listener to add.
@@ -400,5 +413,14 @@ public class WorkspaceUpdator {
      */
     public int getNumThreads() {
         return numThreads;
+    }
+ 
+    /**
+     * Returns the name of the current UpdateController.
+     * 
+     * @return the name of the current update method.
+     */
+    public String getCurrentUpdatorName() {
+        return controller.getName();
     }
 }

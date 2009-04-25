@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
+import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -517,7 +518,8 @@ public class Workspace {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
             }
-            updator = new WorkspaceUpdator(this, manager, controller, threads);
+            WorkspaceUpdator updator = new WorkspaceUpdator(this, manager, controller, threads);
+            swapUpdators(updator);            
         }
     }
     
@@ -532,8 +534,21 @@ public class Workspace {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
             }
-            
-            updator = new WorkspaceUpdator(this, manager, controller);
+            WorkspaceUpdator updator = new WorkspaceUpdator(this, manager, controller);
+            swapUpdators(updator);
+        }
+    }
+    
+    /**
+     * Change out updator.
+     * 
+     * @param newUpdator the new updator
+     */
+    private void swapUpdators(final WorkspaceUpdator newUpdator) {
+        List<WorkspaceUpdatorListener> tempList =  updator.getListeners();                        
+        updator = newUpdator;
+        for(WorkspaceUpdatorListener listener : tempList) {
+            updator.addListener(listener);
         }
     }
     

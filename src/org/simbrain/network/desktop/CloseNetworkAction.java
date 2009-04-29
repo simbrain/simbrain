@@ -46,7 +46,7 @@ public final class CloseNetworkAction
         super("Close");
 
         if (networkDesktopComponent == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
+            throw new IllegalArgumentException("networkDesktopComponent must not be null");
         }
 
         this.networkDesktopComponent = networkDesktopComponent;

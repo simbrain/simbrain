@@ -20,6 +20,8 @@ package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -30,9 +32,14 @@ import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -269,6 +276,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 getNetworkPanel().getSelectedNeurons(), this));
         }
         contextMenu.add(getConnectMenu());
+        contextMenu.add(getQuickConnections());
         contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected
@@ -301,6 +309,69 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                     getNetworkPanel().getSourceModelNeurons(),
                     getNetworkPanel().getSelectedModelNeurons()));
         }
+        return menu;
+    }
+
+    /**
+     * Quick connection sub menu.
+     *
+     * @return Quick connection sub menu
+     */
+    private JMenu getQuickConnections() {
+        JMenu menu = new JMenu("Quick Connect");
+
+        JMenuItem allMenuItem = new JMenuItem("All to All");
+        allMenuItem.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
+                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new AllToAll();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSourceModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
+        JMenuItem oneMenuItem = new JMenuItem("One to One");
+        oneMenuItem.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
+                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new OneToOne();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSourceModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
+        JMenuItem sparseMenuItem = new JMenuItem("Sparse");
+        sparseMenuItem.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
+                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new Sparse();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSourceModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
+        menu.add(allMenuItem);
+        menu.add(oneMenuItem);
+        menu.add(sparseMenuItem);
+
         return menu;
     }
 

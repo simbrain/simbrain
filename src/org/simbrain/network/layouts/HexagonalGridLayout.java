@@ -2,6 +2,7 @@ package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -16,7 +17,7 @@ public class HexagonalGridLayout implements Layout {
     /** Initial x position of line of neurons. */
     private double initialX;
 
-    /** Initial y position of line of neuorns. */
+    /** Initial y position of line of neurons. */
     private double initialY;
 
     /** Number of columns in the layout. */
@@ -42,12 +43,18 @@ public class HexagonalGridLayout implements Layout {
         this.numColumns = numColumns;
     }
 
-    /** @see Layout
-     *  @param network Any network
+    /** 
+     * {@inheritDoc}
      */
     public void layoutNeurons(final Network network) {
-        ArrayList neurons = network.getFlatNeuronList();
-
+        ArrayList<Neuron> neurons = network.getFlatNeuronList();
+        layoutNeurons(neurons);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void layoutNeurons(final List<Neuron> neurons) {
         int rowNum = 0;
         for (int i = 0; i < neurons.size(); i++) {
             Neuron neuron = (Neuron) neurons.get(i);
@@ -64,18 +71,19 @@ public class HexagonalGridLayout implements Layout {
         }
     }
 
-    /** @see Layout
-     *  @param initialPoint initial point
+    /** 
+     *  {@inheritDoc}
      */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
         initialY = initialPoint.getY();
     }
 
-    /** @see Layout
-     *  @return String
+    /**
+     * {@inheritDoc}
      */
     public String getLayoutName() {
         return "Hexagonal Grid";
     }
+
 }

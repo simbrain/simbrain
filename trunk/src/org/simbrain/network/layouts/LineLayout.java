@@ -1,6 +1,7 @@
 package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -12,12 +13,23 @@ import org.simbrain.network.interfaces.Neuron;
  */
 public class LineLayout implements Layout {
 
-    /** Lay neurons out vertically. */
-    public static final int VERTICAL = 0;
+    /** Orientation of the line. */
+    public enum LineOrientation {
+        VERTICAL {
+            public String toString() {
+                return "Vertical";
+            }
+        },
+        HORIZONTAL {
+            public String toString() {
+                return "Horizontal";
+            }
+        }
+    };
 
-    /** Lay neurons out horizontally. */
-    public static final int HORIZONTAL = 1;
-
+    /** Current line orientation. */
+    private LineOrientation orientation = LineOrientation.HORIZONTAL;
+    
     /** Initial x position of line of neurons. */
     private double initialX;
 
@@ -27,8 +39,6 @@ public class LineLayout implements Layout {
     /** Spacing between neurons. */
     private double spacing;
 
-    /** What layout to use: vertical or horizontal. */
-    private int layout;
 
     /**
      * Create a layout.
@@ -38,11 +48,11 @@ public class LineLayout implements Layout {
      * @param spacing spacing between neurons
      * @param layout what layout to use
      */
-    public LineLayout(final double initialx, final double initialy, final double spacing, final int layout) {
+    public LineLayout(final double initialx, final double initialy, final double spacing, final LineOrientation orientation) {
         initialX = initialx;
         initialY = initialy;
         this.spacing = spacing;
-        this.layout = layout;
+        this.orientation = orientation;
     }
 
     /**
@@ -51,29 +61,40 @@ public class LineLayout implements Layout {
      * @param spacing spacing between neurons
      * @param layout what layout to use
      */
-    public LineLayout(final double spacing, final int layout) {
+    public LineLayout(final double spacing, final LineOrientation orientation) {
         this.spacing = spacing;
-        this.layout = layout;
+        this.orientation = orientation;
     }
 
-    /** @see Layout */
+    /** 
+     * {@inheritDoc}
+     */
     public void layoutNeurons(final Network network) {
-        if (layout == VERTICAL) {
+        layoutNeurons(network.getFlatNeuronList());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void layoutNeurons(final List<Neuron> neurons) {
+        if (orientation == LineOrientation.VERTICAL) {
             double ypos = initialY;
-            for (Neuron neuron : network.getFlatNeuronList()) {
+            for (Neuron neuron : neurons) {
                 neuron.setX(initialX);
                 neuron.setY(ypos);
                 ypos += spacing;
             }
-        } else if (layout == HORIZONTAL) {
+        } else if (orientation == LineOrientation.HORIZONTAL) {
             double xpos = initialX;
-            for (Neuron neuron : network.getFlatNeuronList()) {
+            for (Neuron neuron : neurons) {
                 neuron.setX(xpos);
                 neuron.setY(initialY);
                 xpos += spacing;
             }
         }
     }
+    
+    
 
     /** @see Layout */
     public void setInitialLocation(final Point2D initialPoint) {
@@ -85,4 +106,5 @@ public class LineLayout implements Layout {
     public String getLayoutName() {
         return "Line";
     }
+
 }

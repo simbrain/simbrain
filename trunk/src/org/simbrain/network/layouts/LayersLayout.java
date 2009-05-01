@@ -2,6 +2,7 @@ package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -47,17 +48,19 @@ public class LayersLayout implements Layout {
         this.layout = layout;
     }
 
-    /** @see Layout */
+    /** 
+     * {@inheritDoc}
+     */
     public void layoutNeurons(final Network network) {
 
-        ArrayList layers = network.getNetworkList();
+        ArrayList<Network> layers = network.getNetworkList();
 
-        int baseCount = ((Network) layers.get(0)).getNeuronCount();
+        int baseCount = (layers.get(0)).getNeuronCount();
         double y = initialY + layers.size() * vSpacing;
 
             for (int i = 0; i <  layers.size(); i++) {
-                Network currentLayer = (Network) layers.get(i);
-                ArrayList neurons = currentLayer.getFlatNeuronList();
+                Network currentLayer = layers.get(i);
+                ArrayList<Neuron> neurons = currentLayer.getFlatNeuronList();
                 for (int j = 0; j < neurons.size(); j++) {
                     double hOffset  =  ((baseCount - neurons.size()) * hSpacing) / 2;
                     Neuron neuron = (Neuron) neurons.get(j);
@@ -67,14 +70,26 @@ public class LayersLayout implements Layout {
             }
     }
 
-    /** @see Layout */
+    /** 
+     * {@inheritDoc}
+     */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
         initialY = initialPoint.getY();
     }
 
-    /** @see Layout */
+    /** 
+     * {@inheritDoc}
+     */
     public String getLayoutName() {
-        return "Line";
+        return "Layers";
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public void layoutNeurons(List<Neuron> neurons) {
+        //  TODO: No implementation yet; this will requires
+        //      specifying number of layers and a size for each.
     }
 }

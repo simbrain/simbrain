@@ -76,14 +76,16 @@ public class ActorCriticDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-	MultipathLayout layout = new MultipathLayout(40, 80, 2, MultipathLayout.HORIZONTAL);
-	layout.setInitialLocation(networkPanel.getLastClickedPosition());
-	int state = Integer.parseInt(numberOfStateUnits.getText());
-	int actions = Integer.parseInt(numberOfActorUnits.getText());
-	ActorCritic ac = new ActorCritic(networkPanel.getRootNetwork(), state, actions, layout);
-	networkPanel.getRootNetwork().addNetwork(ac);
-	networkPanel.repaint();
-	super.closeDialogOk();
+	MultipathLayout layout = new MultipathLayout(40, 80, 2,
+                MultipathLayout.HORIZONTAL);
+        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        int state = Integer.parseInt(numberOfStateUnits.getText());
+        int actions = Integer.parseInt(numberOfActorUnits.getText());
+        ActorCritic ac = new ActorCritic(networkPanel.getRootNetwork(), state,
+                actions, layout);
+        networkPanel.getRootNetwork().addNetwork(ac);
+        networkPanel.repaint();
+        super.closeDialogOk();
     }
 
     /**

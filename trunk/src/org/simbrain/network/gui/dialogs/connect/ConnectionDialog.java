@@ -67,19 +67,20 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
      * Initialize the connection panel based upon the current connection type.
      */
     private void initPanel() {
-        if (cbConnectionType.getSelectedItem() instanceof AllToAll) {
+        ConnectNeurons connection = (ConnectNeurons) cbConnectionType.getSelectedItem();
+        if (connection instanceof AllToAll) {
             clearOptionPanel();
-            optionsPanel = new AllToAllPanel();
+            optionsPanel = new AllToAllPanel((AllToAll) connection);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
-        } else if (cbConnectionType.getSelectedItem() instanceof OneToOne) {
+        } else if (connection instanceof OneToOne) {
             clearOptionPanel();
-            optionsPanel = new OneToOnePanel();
+            optionsPanel = new OneToOnePanel((OneToOne) connection); 
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
-        } else if (cbConnectionType.getSelectedItem() instanceof Sparse) {
+        } else if (connection instanceof Sparse) {
             clearOptionPanel();
-            optionsPanel = new SparsePanel();
+            optionsPanel = new SparsePanel((Sparse) connection);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         }

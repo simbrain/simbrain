@@ -60,7 +60,6 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-//        Hebbian synapseRef = new Hebbian();
         tfLearningRate.setText(Double.toString(Hebbian.DEFAULT_LEARNING_RATE));
     }
 
@@ -70,7 +69,6 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
     public void commitChanges() {
         for (int i = 0; i < synapseList.size(); i++) {
             Hebbian synapseRef = (Hebbian) synapseList.get(i);
-
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
                 synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
             }

@@ -20,11 +20,13 @@ package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.util.LabelledItemPanel;
 
 
@@ -37,7 +39,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** The synapses being modified. */
-    protected ArrayList synapseList;
+    protected List<Synapse> synapseList;
 
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -86,14 +88,14 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * @return Returns the synapse_list.
      */
-    public ArrayList getSynapseList() {
+    public List<Synapse> getSynapseList() {
         return synapseList;
     }
 
     /**
      * @param synapseList The synapse_list to set.
      */
-    public void setSynapseList(final ArrayList synapseList) {
+    public void setSynapseList(final List<Synapse> synapseList) {
         this.synapseList = synapseList;
     }
 

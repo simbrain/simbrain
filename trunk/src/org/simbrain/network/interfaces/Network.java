@@ -263,19 +263,19 @@ public abstract class Network {
     }
     
     /**
-     * Find a neuron with a given label.  Note that labels are not
-     * guaranteed to be unique.
+     * Find neurons with a given label.
      *
      * @param label label to search for.
-     * @return first neuron with that label found, null otherwise
+     * @return list of neurons with that label found, null otherwise
      */
-    public Neuron getNeuronByLabel(final String label) {
+    public List<Neuron> getNeuronsByLabel(final String label) {
+        ArrayList<Neuron> returnList = new ArrayList<Neuron>();
         for (Neuron neuron : getFlatNeuronList()) {
             if (neuron.getLabel().equalsIgnoreCase(label)) {
-                return neuron;
+                returnList.add(neuron);
             }
         }
-        return null;
+        return returnList;
     }
 
     /**

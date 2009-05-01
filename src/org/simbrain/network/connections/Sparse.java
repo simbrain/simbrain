@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
@@ -19,6 +20,18 @@ public class Sparse extends ConnectNeurons {
     public static double excitatoryProbability = .1;
     /** Probability connection will be an inhibitory weight. */
     public static double inhibitoryProbability = .1;
+    
+    /** Base excitatory synapse. */
+    private Synapse baseExcitatorySynapse = new ClampedSynapse(null, null);
+
+    /** Base inhibitory synapse. */
+    private Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
+    
+    {
+        baseExcitatorySynapse.setStrength(10);
+        baseInhibitorySynapse.setStrength(-10);
+    }
+
 
     //TODO: set weights strengths or synapses
     
@@ -49,14 +62,16 @@ public class Sparse extends ConnectNeurons {
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
                 Neuron target = (Neuron) j.next();
                 if (Math.random() < excitatoryProbability) {
-                    ClampedSynapse excitatory = new ClampedSynapse(source, target);
-                    excitatory.setStrength(10);
-                    network.addSynapse(excitatory);
+                    Synapse synapse = baseExcitatorySynapse.duplicate();
+                    synapse.setSource(source);
+                    synapse.setTarget(target);
+                    network.addSynapse(synapse);
                 }
                 if (Math.random() < inhibitoryProbability) {
-                    ClampedSynapse inhibitory = new ClampedSynapse(source, target);
-                    inhibitory.setStrength(-10);
-                    network.addSynapse(inhibitory);
+                    Synapse synapse = baseInhibitorySynapse.duplicate();
+                    synapse.setSource(source);
+                    synapse.setTarget(target);
+                    network.addSynapse(synapse);
                 }
             }
         }

@@ -21,9 +21,9 @@ package org.simbrain.network.gui.dialogs.connect;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -35,8 +35,11 @@ import org.simbrain.network.interfaces.Synapse;
  */
 public class OneToOnePanel extends AbstractConnectionPanel {
 
+    /** Label showing current type of synapse. */
+    JLabel baseSynapseLabel = new JLabel("");
+    
     /**
-     * This method is the default constructor.
+     * Default constructor.
      */
     public OneToOnePanel(final OneToOne connection) {
         super(connection);
@@ -50,12 +53,15 @@ public class OneToOnePanel extends AbstractConnectionPanel {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                connection.setBaseSynapse(dialog.getSynapseList().get(0));
+                Synapse synapse = dialog.getSynapseList().get(0);
+                connection.setBaseSynapse(synapse);
+                baseSynapseLabel.setText(synapse.getType());
             }
             
         });
+        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
+        this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
-        
     }
 
     /**

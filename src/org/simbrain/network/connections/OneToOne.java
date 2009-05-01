@@ -25,6 +25,11 @@ public class OneToOne extends ConnectNeurons {
     private Synapse baseSynapse = new ClampedSynapse(null, null);
     
     /**
+     * If true, synapses are added in both directions.
+     */
+    private boolean useBidirectionalConnections = false;
+    
+    /**
      * Comparator which orders by X coordinate.
      */
     static final Comparator<Neuron> X_ORDER = new Comparator<Neuron>() {
@@ -80,6 +85,14 @@ public class OneToOne extends ConnectNeurons {
         
         //TODO: Flags for which comparator to use, including no comparator
         //          (Some users might want random but 1-1 couplings)
+        
+        // Comparator comparotorType = X_ORDER;
+        //   If orientation = LineOrientation.HORIZONTAL {
+        //   comparator Type = X_ORDER;
+        //   ... else if... LineOrientation.VERTICAL 
+        //   comparator Type = Y_ORDER;
+        
+        
         Iterator<Neuron> targets = getSortedNeuronList(targetNeurons, X_ORDER)
                 .iterator();
 
@@ -92,6 +105,11 @@ public class OneToOne extends ConnectNeurons {
                 synapse.setSource(source);
                 synapse.setTarget(target);
                 network.addSynapse(synapse);
+                // If bidirectional {
+                //      Synapse synapse2 = baseSynapse.duplicate();
+                 //     synapse2.setSource(target);
+                 //       synapse2.setTarget(source);
+                //  network.addSynapse(synapse2);     }
             } else {
                 return;
             }

@@ -671,7 +671,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * Creates and displays the synapse properties dialog.
      */
     public void showSelectedSynapseProperties() {
-        SynapseDialog dialog = new SynapseDialog(getSelectedSynapses());
+        SynapseDialog dialog = new SynapseDialog(this.getSelectedModelSynapses());
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -841,10 +841,25 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * @return list of selectedNeurons
      */
     public ArrayList<Neuron> getSelectedModelNeurons() {
-        ArrayList ret = new ArrayList();
+        ArrayList<Neuron> ret = new ArrayList<Neuron>();
         for (PNode e : getSelection()) {
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron());
+            }
+        }
+        return ret;
+    }
+    
+    /**
+     * Returns selected synapses.
+     *
+     * @return list of selected synapses
+     */
+    public ArrayList<Synapse> getSelectedModelSynapses() {
+        ArrayList<Synapse> ret = new ArrayList<Synapse>();
+        for (PNode e : getSelection()) {
+            if (e instanceof SynapseNode) {
+                ret.add(((SynapseNode) e).getSynapse());
             }
         }
         return ret;
@@ -1144,6 +1159,21 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         }
         resetColors();
     }
+    
+    /** @see NetworkListener */
+    public void synapseChanged(final NetworkEvent<Synapse> e) {
+        if (e.getOldObject() != null) {
+            // The underlying object has changed
+            SynapseNode synapseNode = findSynapseNode(e.getOldObject());
+            //TODO: Bad smell.  This null pointer check should not be needed.
+            //      Also I think this method is getting called too many times.
+            if (synapseNode != null) { 
+                synapseNode.setSynapse(e.getObject());
+            }
+        }
+        resetColors();
+    }
+
 
     /** @see NetworkListener */
     public void synapseAdded(final NetworkEvent<Synapse> e) {
@@ -1416,15 +1446,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 //    }
 
     /** @see NetworkListener */
-    public void synapseChanged(final NetworkEvent<Synapse> e) {
-        if (e.getOldObject() != null) {
-            // The underlying object has changed
-            findSynapseNode(e.getOldObject()).setSynapse(e.getObject());
-        }
-        resetColors();
-    }
-
-    /** @see NetworkListener */
     public void neuronMoved(final NetworkEvent<Neuron> e) {
         NeuronNode node = this.findNeuronNode(e.getObject());
         if ((node != null) && (!node.isMoving())) {
@@ -1470,8 +1491,8 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * @return the corresponding SynapseNode.
      */
     public SynapseNode findSynapseNode(final Synapse s) {
-        for (Iterator i = getSynapseNodes().iterator(); i.hasNext(); ) {
-            SynapseNode node = ((SynapseNode) i.next());
+        for (Iterator<SynapseNode> i = getSynapseNodes().iterator(); i.hasNext(); ) {
+            SynapseNode node = i.next();
             if (s == node.getSynapse()) {
                 return node;
             }

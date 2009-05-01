@@ -24,6 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.util.LabelledItemPanel;
 
 
@@ -34,6 +35,9 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
+    
+    /** Reference to underlying connection object. */
+    protected ConnectNeurons connection;
 
     /**
      * Adds a new item.
@@ -56,7 +60,8 @@ public abstract class AbstractConnectionPanel extends JPanel {
     /**
      * This method is the default constructor.
      */
-    public AbstractConnectionPanel() {
+    public AbstractConnectionPanel(final ConnectNeurons connection) {
+        this.connection = connection;
         this.setLayout(new BorderLayout());
         this.add(mainPanel, BorderLayout.CENTER);
     }

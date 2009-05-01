@@ -18,6 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import javax.swing.JButton;
+
+import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
+import org.simbrain.network.interfaces.Synapse;
+
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one neuron connections.
@@ -27,7 +38,24 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     /**
      * This method is the default constructor.
      */
-    public OneToOnePanel() {
+    public OneToOnePanel(final OneToOne connection) {
+        super(connection);
+        JButton setSynapseType = new JButton("Set...");
+        setSynapseType.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Synapse> list = new ArrayList<Synapse>();
+                list.add(connection.getBaseSynapse());
+                SynapseDialog dialog = new SynapseDialog(list);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                connection.setBaseSynapse(dialog.getSynapseList().get(0));
+            }
+            
+        });
+        this.addItem("Set Base Synapse Type:", setSynapseType);
+        
     }
 
     /**

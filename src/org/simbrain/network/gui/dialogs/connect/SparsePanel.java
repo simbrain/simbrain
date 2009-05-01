@@ -20,6 +20,7 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import javax.swing.JTextField;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
 
 
@@ -37,7 +38,8 @@ public class SparsePanel extends AbstractConnectionPanel {
     /**
      * This method is the default constructor.
      */
-    public SparsePanel() {
+    public SparsePanel(final ConnectNeurons connection) {
+        super(connection);
         this.addItem("Excitatory", tfExcite);
         this.addItem("Inhibitory", tfInhibit);
     }

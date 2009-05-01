@@ -339,7 +339,7 @@ public final class SynapseNode
 
     /** @see ScreenElement */
     protected JDialog getPropertyDialog() {
-        SynapseDialog dialog = new SynapseDialog(this.getNetworkPanel().getSelectedSynapses());
+        SynapseDialog dialog = new SynapseDialog(this.getNetworkPanel().getSelectedModelSynapses());
         return dialog;
     }
 

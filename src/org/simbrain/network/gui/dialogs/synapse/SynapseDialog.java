@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -36,7 +37,6 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.actions.ShowHelpAction;
-import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuron;
 import org.simbrain.network.interfaces.Synapse;
@@ -55,20 +55,21 @@ import org.simbrain.network.synapses.TraceSynapse;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
-
 /**
- * <b>SynapseDialog</b>.
+ * The <b>SynapseDialog</b> is initialized with a list of synapses. When
+ * the dialog is closed the synapses are changed based on the state of the
+ * dialog.
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
 
+    /** Tabbed pane (only used if a spike responder pane is needed) */
+    private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main panel. */
     private Box mainPanel = Box.createVerticalBox();
-
-    /** Tabbed pane. */
-    private JTabbedPane tabbedPane = new JTabbedPane();
 
     /** Spike response panel. */
     private SpikeResponsePanel spikeResponsePanel = null;
@@ -104,10 +105,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private JComboBox cbSynapseType = new JComboBox(Synapse.getTypeList());
 
     /** The synapses being modified. */
-    private ArrayList synapseList = new ArrayList();
-
-    /** The pnodes which refer to them. */
-    private ArrayList<SynapseNode> selectionList;
+    private List<Synapse> synapseList = new ArrayList<Synapse>();
 
     /** Weights have changed boolean. */
     private boolean weightsHaveChanged = false;
@@ -117,35 +115,25 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
     /** Show Help Action. */
     private ShowHelpAction helpAction = new ShowHelpAction();
-
-    private Map<String, Creator> creatorsByName = new TreeMap<String, Creator>(String.CASE_INSENSITIVE_ORDER);
+    
+    /** Associates synapse creator utilities with synapses by name. */
+    private Map<String, Creator> creatorsByName = new TreeMap<String, Creator>(
+            String.CASE_INSENSITIVE_ORDER);
+    
+    /** Associates synapse creator utilities with synapses by class. */
     private Map<Class, Creator> creatorsByClass = new HashMap<Class, Creator>();
 
     /**
-     * This method is the default constructor.
-     * @param selectedSynapses LIst of synapses that are selected
+     * Constructor for a list of SynapseNodes.
+     *
+     * @param synapseList list of synapses to modify
      */
-    public SynapseDialog(final Collection<SynapseNode> selectedSynapses) {
+    public SynapseDialog(final List<Synapse> synapseList) {
+        this.synapseList = (List<Synapse>) synapseList;
         initializeCreators();
-        selectionList = new ArrayList<SynapseNode>(selectedSynapses);
-        setSynapseList();
         init();
     }
-
-    /**
-     * Get the logical weights from the pnodeNeurons.
-     */
-    public void setSynapseList() {
-        synapseList.clear();
-
-        Iterator i = selectionList.iterator();
-
-        while (i.hasNext()) {
-            SynapseNode w = (SynapseNode) i.next();
-            synapseList.add(w.getSynapse());
-        }
-    }
-
+    
     /** @see StandardDialog */
     protected void closeDialogOk() {
         super.closeDialogOk();
@@ -153,13 +141,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Initialises the components on the panel.
+     * Initializes the components on the panel.
      */
     private void init() {
         setTitle("Synapse Dialog");
 
         initSynapseType();
-        synapsePanel.setSynapseList(synapseList);
         fillFieldValues();
         updateHelp();
 
@@ -182,10 +169,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         mainPanel.add(topPanel);
         mainPanel.add(synapsePanel);
 
-        ArrayList spikeResponders = getSpikeResponders();
-
-        if (spikeResponders.size() > 0) {
-            spikeResponsePanel = new SpikeResponsePanel(spikeResponders, this);
+        // Add tab for setting spike responders, if needed
+        ArrayList<Synapse> spikeRespondingSynapses = getSpikeRespondingSynapses();
+        if (spikeRespondingSynapses.size() > 0) {
+            spikeResponsePanel = new SpikeResponsePanel(spikeRespondingSynapses, this);
             tabbedPane.addTab("Synaptic Efficacy", mainPanel);
             tabbedPane.addTab("Spike Response", spikeResponsePanel);
             setContentPane(tabbedPane);
@@ -196,19 +183,19 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * @return true if any of the selected neurons are spiking neurons.
+     * Retrieve those synapses which are spike responders.
+     * 
+     * @return the list of synapses which are spike responders
      */
-    private ArrayList getSpikeResponders() {
-        ArrayList ret = new ArrayList();
+    private ArrayList<Synapse> getSpikeRespondingSynapses() {
+        ArrayList<Synapse> ret = new ArrayList<Synapse>();
 
-        for (int i = 0; i < synapseList.size(); i++) {
-            Neuron source = ((SynapseNode) selectionList.get(i)).getSynapse().getSource();
-
-            if (source instanceof SpikingNeuron) {
-                ret.add(((SynapseNode) selectionList.get(i)).getSynapse());
+        for (Synapse synapse : synapseList) {
+            Neuron source = synapse.getSource();
+            if ((source instanceof SpikingNeuron) && (source != null)) {
+                ret.add(synapse);
             }
         }
-
         return ret;
     }
 
@@ -221,43 +208,46 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getType")) {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
             cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
-            synapsePanel = new ClampedSynapsePanel();
+            synapsePanel = new ClampedSynapsePanel(); // Default to clamped synapse panel
         } else {
             Creator creator = creatorsByClass.get(synapseRef.getClass());
-            
-            if (creator == null) return;
-            
+            if (creator == null) {
+                return;
+            }
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(creator.getName()));
             synapsePanel = creator.createPanel();
         }
-        
         synapsePanel.setSynapseList(synapseList);
-        synapsePanel.fillFieldValues();        
+        synapsePanel.fillFieldValues();
     }
 
-    private static interface Creator {
-        String getName();
-        Synapse createSynapse(Synapse old);
-        AbstractSynapsePanel createPanel(); 
-    }
-    
     /**
-     * Change all the synapses from their current type  to the new selected type.
+     * Change all the synapses from their current type to the new specified in
+     * the dialog.
      */
     public void changeSynapses() {
+        
         Creator creator = creatorsByName.get(cbSynapseType.getSelectedItem().toString());
-        
-        if (creator == null) return;
-        
+        if (creator == null) {
+            return;
+        }
+
+        //TODO: Only change those that have actually changed?
         for (int i = 0; i < synapseList.size(); i++) {
             Synapse oldSynapse = (Synapse) synapseList.get(i);
             Synapse newSynapse = creator.createSynapse(oldSynapse);
-            oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
+            synapseList.set(i, newSynapse);
+            // Don't need this if the relevant synapses have not yet been added to a network
+            //  (when the dialog is used to set an unattached collection of neurons)
+            if (oldSynapse.getSource() != null) {
+                    oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
+            }
         }
     }
 
     /**
      * Respond to synapse type changes.
+     *
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
@@ -274,7 +264,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             mainPanel.add(synapsePanel);
         }
         
-        //Something different for mixed panel...
         pack();
     }
 
@@ -290,6 +279,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         tfDelay.setText(Integer.toString(synapseRef.getDelay()));
 
         synapsePanel.fillFieldValues();
+        synapsePanel.setSynapseList(synapseList);
 
         if (spikeResponsePanel != null) {
             spikeResponsePanel.fillFieldValues();
@@ -355,8 +345,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             spikeResponsePanel.commitChanges();
         }
 
-        ((Synapse) synapseList.get(0)).getSource().getParentNetwork().getRootNetwork().fireNetworkChanged();
-        setSynapseList();
+        Synapse firstSynapse = synapseList.get(0);
+        if (firstSynapse.getParentNetwork() != null) {
+            firstSynapse.getParentNetwork().getRootNetwork().fireNetworkChanged();
+        }
         synapsePanel.setSynapseList(synapseList);
         synapsePanel.commitChanges();
     }
@@ -374,6 +366,35 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             String spacelessString = cbSynapseType.getSelectedItem().toString().replace(" ", "");
             helpAction.setTheURL("Network/synapse/" + spacelessString + ".html");
         }
+    }
+
+    /**
+     * Utility for producing information associated with synapses.
+     */
+    private static interface Creator {
+
+        /**
+         * Returns the name of the synapse.
+         *
+         * @return name of synapse.
+         */
+        String getName();
+
+        /**
+         * Creates a new synapse based on an old synapse. Used in changing
+         * synapse type.
+         * 
+         * @param old the old synapse
+         * @return the new synapse
+         */
+        Synapse createSynapse(Synapse old);
+        
+        /**
+         * Returns the type of synapse panel associated with this synapse type.
+         * 
+         * @return the new synapse panel.
+         */
+        AbstractSynapsePanel createPanel();
     }
     
     /**
@@ -587,5 +608,19 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         
         creatorsByName.put(TDSynapse.getName(), creator);
         creatorsByClass.put(TDSynapse.class, creator);
+    }
+
+    /**
+     * @return the synapseList
+     */
+    public List<Synapse> getSynapseList() {
+        return synapseList;
+    }
+
+    /**
+     * @param synapseList the synapseList to set
+     */
+    public void setSynapseList(List<Synapse> synapseList) {
+        this.synapseList = synapseList;
     }
 }

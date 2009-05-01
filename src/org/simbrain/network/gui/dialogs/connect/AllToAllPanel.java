@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.connect;
 import javax.swing.JCheckBox;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectNeurons;
 
 
 /**
@@ -34,7 +35,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
     /**
      * This method is the default constructor.
      */
-    public AllToAllPanel() {
+    public AllToAllPanel(ConnectNeurons connection) {
+        super(connection);
         this.addItem("Allow Self Connections", allowSelfConnect);
     }
 

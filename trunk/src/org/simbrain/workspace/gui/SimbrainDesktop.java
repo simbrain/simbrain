@@ -1,7 +1,9 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -29,6 +31,7 @@ import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -64,6 +67,7 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ToggleButton;
+import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -228,20 +232,15 @@ public class SimbrainDesktop {
         // Create the Tabbed Pane for bottom of the desktop
         bottomDock = new JTabbedPane();
         bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
-        bottomDock.addTab("Thread Viewer", null, new ThreadViewerPanel(this.getWorkspace()), "Simbrain thread viewer");
+        bottomDock.addTab("Updator", null, new ThreadViewerPanel(this
+                .getWorkspace()), "Simbrain thread viewer");
         bottomDock.addTab("Components", null, new ComponentPanel(
                 this), "Show workspace components");
-        bottomDock.addTab("Producing Attributes", null, new AttributePanel(this.getWorkspace(),
-                AttributePanel.AttributeType.Producing), "Show producing attributes");
-        bottomDock.addTab("Consuming Attributes", null, new AttributePanel(this.getWorkspace(),
-                AttributePanel.AttributeType.Consuming), "Show consuming attributes");
-
         // List of current couplings for populating couplings panel.
         Vector<Coupling<?>> couplings = new Vector<Coupling<?>>(workspace
                 .getCouplingManager().getCouplings());
         bottomDock.addTab("Couplings", null, new CouplingListPanel(this,
                 couplings), "Show current couplings");
-
         // Set up the main panel
         horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         horizontalSplitter.setDividerLocation((int) (3 * (workspaceBounds
@@ -264,6 +263,7 @@ public class SimbrainDesktop {
 
         // Make dragging a little faster but perhaps uglier.
         // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+
     }
     
     /**
@@ -1031,5 +1031,4 @@ public class SimbrainDesktop {
         }
 
     }
-    
 }

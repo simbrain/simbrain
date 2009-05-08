@@ -18,10 +18,18 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
+import org.simbrain.network.interfaces.Synapse;
 
 
 /**
@@ -32,12 +40,35 @@ public class AllToAllPanel extends AbstractConnectionPanel {
     /** Allow self connection check box. */
     private JCheckBox allowSelfConnect = new JCheckBox();
 
+    /** Connection Label. */
+    private JLabel baseSynapseLabel = new JLabel("");
+
     /**
      * This method is the default constructor.
+     * @param connection type
      */
-    public AllToAllPanel(ConnectNeurons connection) {
+    public AllToAllPanel(final AllToAll connection) {
         super(connection);
         this.addItem("Allow Self Connections", allowSelfConnect);
+        JButton setSynapseType = new JButton("Set...");
+        setSynapseType.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Synapse> list = new ArrayList<Synapse>();
+                list.add(connection.getBaseSynapse());
+                SynapseDialog dialog = new SynapseDialog(list);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                Synapse synapse = dialog.getSynapseList().get(0);
+                connection.setBaseSynapse(synapse);
+                baseSynapseLabel.setText(synapse.getType());
+            }
+            
+        });
+        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
+        this.addItem("Base Synapse Type:", baseSynapseLabel);
+        this.addItem("Set Base Synapse Type:", setSynapseType);
     }
 
     /**

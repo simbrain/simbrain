@@ -48,11 +48,10 @@ public final class SetSourceNeuronsAction
 
         this.networkPanel = networkPanel;
 
+        putValue(NAME, "Clear Source Neurons");
         if (networkPanel.getSelectedNeurons().size() == 0) {
             if (networkPanel.getSourceNeurons().size() == 0) {
                 this.setEnabled(false);
-            } else {
-                putValue(NAME, "Clear Source Neurons");
             }
         } else {
             putValue(NAME, "Set Source Neurons");

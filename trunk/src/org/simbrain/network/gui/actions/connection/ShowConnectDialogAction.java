@@ -42,7 +42,7 @@ public final class ShowConnectDialogAction
      */
     public ShowConnectDialogAction(final NetworkPanel networkPanel) {
 
-        super("Set Connection Properties");
+        super("Set Connection Properties...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

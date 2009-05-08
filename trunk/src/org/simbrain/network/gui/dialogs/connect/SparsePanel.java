@@ -18,10 +18,17 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
+import org.simbrain.network.interfaces.Synapse;
 
 
 /**
@@ -35,13 +42,60 @@ public class SparsePanel extends AbstractConnectionPanel {
     /** Inhibitory Probability. */
     private JTextField tfInhibit = new JTextField();
 
+    /** Label showing current excitatory type of synapse. */
+    private JLabel baseExcitatorySynapseLabel = new JLabel("");
+
+    /** Label showing current inhibitory type of synapse. */
+    private JLabel baseInhibitorySynapseLabel = new JLabel("");
+
     /**
      * This method is the default constructor.
+     * @param connection type
      */
-    public SparsePanel(final ConnectNeurons connection) {
+    public SparsePanel(final Sparse connection) {
         super(connection);
         this.addItem("Excitatory", tfExcite);
         this.addItem("Inhibitory", tfInhibit);
+
+        JButton setExcitatorySynapseType = new JButton("Set...");
+        setExcitatorySynapseType.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Synapse> excitatoryList = new ArrayList<Synapse>();
+                excitatoryList.add(connection.getBaseExcitatorySynapse());
+                SynapseDialog dialog = new SynapseDialog(excitatoryList);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                Synapse excitatorySynapse = dialog.getSynapseList().get(0);
+                connection.setBaseExcitatorySynapse(excitatorySynapse);
+                baseExcitatorySynapseLabel.setText(excitatorySynapse.getType());
+            }
+            
+        });
+        baseExcitatorySynapseLabel.setText(connection.getBaseExcitatorySynapse().getType());
+        this.addItem("Base Excitatory Synapse Type:", baseExcitatorySynapseLabel);
+        this.addItem("Set Base Excitatory Synapse Type:", setExcitatorySynapseType);
+        
+        JButton setInhibitorySynapseType = new JButton("Set...");
+        setInhibitorySynapseType.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
+                inhibitoryList.add(connection.getBaseInhibitorySynapse());
+                SynapseDialog dialog = new SynapseDialog(inhibitoryList);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
+                connection.setBaseInhibitorySynapse(inhibitorySynapse);
+                baseInhibitorySynapseLabel.setText(inhibitorySynapse.getType());
+            }
+            
+        });
+        baseInhibitorySynapseLabel.setText(connection.getBaseInhibitorySynapse().getType());
+        this.addItem("Base Inhibitory Synapse Type:", baseInhibitorySynapseLabel);
+        this.addItem("Set Inhibitory Base Synapse Type:", setInhibitorySynapseType);
     }
 
     /**

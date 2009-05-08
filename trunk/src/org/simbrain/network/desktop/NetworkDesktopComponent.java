@@ -20,12 +20,9 @@ package org.simbrain.network.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 
-import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.gui.NetworkPanel;

@@ -18,7 +18,11 @@
  */
 package org.simbrain.world.dataworld;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -33,6 +37,8 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.world.odorworld.WorldClipboard;
+
+import com.Ostermiller.util.CSVParser;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -92,7 +98,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     }
 
     @Override
-    public void setCurrentDirectory(final String currentDirectory) {        
+    public void setCurrentDirectory(final String currentDirectory) {
         super.setCurrentDirectory(currentDirectory);
         DataWorldPreferences.setCurrentDirectory(currentDirectory);
     }
@@ -154,4 +160,34 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         return DataModel.getXStream().toXML(dataModel);
     }
 
+
+    /**
+     * Read in stored dataset file.
+     * 
+     * @param file Name of file to read in
+     * @throws FileNotFoundException
+     */
+    public void readData(final File file) {
+
+        try {
+            CSVParser theParser = new CSVParser(new FileInputStream(file), "", "", "#");
+
+            // # is a comment delimeter in net files
+            String[][] values = theParser.getAllValues();
+            dataModel.modifyRowsColumns(values.length, values[0].length, new Double(0));
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[0].length; j++) {
+                    System.out.println("-->" + values[i][j]);
+                    if (((String)(values[i][j])).length() > 0) {
+                        dataModel.set(i, j, Double.valueOf(values[i][j]));
+                    }
+                }
+            }
+            
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    
 }

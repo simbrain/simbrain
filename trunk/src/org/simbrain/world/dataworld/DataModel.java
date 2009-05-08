@@ -349,6 +349,11 @@ public class DataModel<E> {
         parent.setChangedSinceLastSave(true);
     }
 
+    /**
+     * Remove a specified row.
+     *
+     * @param at index of row to remove.
+     */
     public void removeRow(final int at) {
         numRows--;
         rowData.remove(at);
@@ -357,15 +362,17 @@ public class DataModel<E> {
         parent.setChangedSinceLastSave(true);
     }
 
+    /**
+     * Remove last column.
+     */
     public void removeLastColumn() {
         numColumns--;
         for (List<E> row : rowData) {
             row.remove(numColumns);
         }
         consumers.add(new ConsumingColumn<E>(this, numColumns));
-        {
-            for (Listener listener : listeners)
-                listener.columnRemoved(numColumns);
+        for (Listener listener : listeners) {
+            listener.columnRemoved(numColumns);
         }
         parent.setChangedSinceLastSave(true);
     }
@@ -387,14 +394,29 @@ public class DataModel<E> {
         parent.setChangedSinceLastSave(true);
     }
 
+    /**
+     * Returns number of columns.
+     *
+     * @return number of columns.
+     */
     public int getColumnCount() {
         return numColumns;
     }
 
+    /**
+     * Retursn number of rows.
+     *
+     * @return number of rows.
+     */
     public int getRowCount() {
         return numRows;
     }
 
+    /**
+     * Initialize table with specified value.
+     *
+     * @param value value to initialize table with.
+     */
     public void initValues(final E value) {
         if (!initialized) {
             fill(value);
@@ -439,6 +461,7 @@ public class DataModel<E> {
         void itemChanged(int row, int column);
     }
 
+    
     // /** Persistable form of matrix data. */
     // private String[][] stringMatrixRepresentation;
 

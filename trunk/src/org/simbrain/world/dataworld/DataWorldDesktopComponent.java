@@ -23,6 +23,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.Random;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -34,6 +35,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.WorkspaceComponentListener;
@@ -116,7 +118,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
      *
      * @param component reference to model component
      */
-    public DataWorldDesktopComponent(final GenericFrame frame, 
+    public DataWorldDesktopComponent(final GenericFrame frame,
             final DataWorldComponent component) {
 
         super(frame, component);
@@ -157,6 +159,17 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         file.add(save);
         file.add(saveAs);
         file.add(close);
+        JMenuItem importItem = new JMenuItem("Import data...");
+        importItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                SFileChooser chooser = new SFileChooser("", "");
+                File theFile = chooser.showOpenDialog();
+                if (theFile != null) {
+                    component.readData(theFile);
+                    }
+            }
+        });
+        file.add(importItem);
         file.addMenuListener(menuListener);
 
         addRow.addActionListener(addRowListener);

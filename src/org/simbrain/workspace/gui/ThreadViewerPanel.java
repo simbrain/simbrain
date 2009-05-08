@@ -51,6 +51,7 @@ public class ThreadViewerPanel extends JPanel {
     /** Label for update method name. */
     final JLabel updateName = new JLabel();
 
+
     /**
      * Constructor for viewer panel.
      *

@@ -256,14 +256,12 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.add(new CutAction(getNetworkPanel()));
         contextMenu.add(new CopyAction(getNetworkPanel()));
         contextMenu.add(new PasteAction(getNetworkPanel()));
+        // Delete action
+        contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
         // Group action
         contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
-        contextMenu.addSeparator();
-
-        // Delete action
-        contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
         //Model Group Action; TODO Make this a submenu with group types
@@ -275,8 +273,16 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(),
                 getNetworkPanel().getSelectedNeurons(), this));
         }
-        contextMenu.add(getConnectMenu());
+
+        contextMenu.addSeparator();
+
         contextMenu.add(getQuickConnections());
+
+        // Set Source Action
+        contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
+        // Show Dialog Action
+        contextMenu.add(new ShowConnectDialogAction(getNetworkPanel()));
+
         contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected
@@ -291,26 +297,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
        return contextMenu;
     }
 
-    /**
-     * Connection sub menu.
-     *
-     * @return Connection sub menu
-     */
-    private JMenu getConnectMenu() {
-        JMenu menu = new JMenu("Connect");
-
-        // Set Source Action
-        menu.add(new SetSourceNeuronsAction(getNetworkPanel()));
-        // Show Dialog Action
-        menu.add(new ShowConnectDialogAction(getNetworkPanel()));
-        // Connect Action
-        if (getNetworkPanel().getSelectedNeurons() != null) {
-            menu.add(new ConnectNeuronsAction(getNetworkPanel(),
-                    getNetworkPanel().getSourceModelNeurons(),
-                    getNetworkPanel().getSelectedModelNeurons()));
-        }
-        return menu;
-    }
 
     /**
      * Quick connection sub menu.
@@ -318,7 +304,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * @return Quick connection sub menu
      */
     private JMenu getQuickConnections() {
-        JMenu menu = new JMenu("Quick Connect");
+        JMenu menu = new JMenu("Connect");
 
         JMenuItem allMenuItem = new JMenuItem("All to All");
         allMenuItem.addActionListener(new ActionListener(){

@@ -21,13 +21,17 @@ package org.simbrain.network.gui.dialogs.connect;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.util.StandardDialog;
 
 
 /**
@@ -36,13 +40,24 @@ import org.simbrain.network.interfaces.Synapse;
 public class OneToOnePanel extends AbstractConnectionPanel {
 
     /** Label showing current type of synapse. */
-    JLabel baseSynapseLabel = new JLabel("");
+    private JLabel baseSynapseLabel = new JLabel("");
+
+    /** Sets the connection orientation. */
+    private JComboBox orientationBox;
+
+    /** Sets whether connections are bi-directional. */
+    private JCheckBox bidirectionalConnection = new JCheckBox();
+
+    /** Connection. */
+    private OneToOne connection = new OneToOne();
     
     /**
      * Default constructor.
      */
     public OneToOnePanel(final OneToOne connection) {
         super(connection);
+        this.connection = connection;
+        orientationBox = new JComboBox(OneToOne.getOrientationTypes());
         JButton setSynapseType = new JButton("Set...");
         setSynapseType.addActionListener(new ActionListener() {
 
@@ -62,18 +77,24 @@ public class OneToOnePanel extends AbstractConnectionPanel {
         baseSynapseLabel.setText(connection.getBaseSynapse().getType());
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
+        this.addItem("Connection Orientaiton: ", orientationBox);
+        this.addItem("Bi-Directional Connection: ", bidirectionalConnection);
     }
 
     /**
      * {@inheritDoc}
      */
     public void commitChanges() {
+        connection.setUseBidirectionalConnections(bidirectionalConnection.isSelected());
+        connection.setConnectOrientation((Comparator)orientationBox.getSelectedItem());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
+        bidirectionalConnection.setSelected(connection.isUseBidirectionalConnections());
+        orientationBox.setSelectedItem(connection.getConnectOrientation());
     }
 
 }

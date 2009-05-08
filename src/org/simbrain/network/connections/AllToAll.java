@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
@@ -13,6 +14,12 @@ import org.simbrain.network.synapses.ClampedSynapse;
  * @author jyoshimi
  */
 public class AllToAll extends ConnectNeurons {
+
+    /**
+     * The synapse to be used as a basis for the connection. Default to a
+     * clamped synapse.
+     */
+    private Synapse baseSynapse = new ClampedSynapse(null, null);
 
     /** Allows neurons to have a self connection. */
     public static boolean allowSelfConnection = true;
@@ -37,12 +44,32 @@ public class AllToAll extends ConnectNeurons {
             for (Neuron target : targetNeurons) {
                 if (!allowSelfConnection) {
                     if (source != target) {
-                    network.addSynapse(new ClampedSynapse(source, target));
+                        Synapse synapse = baseSynapse.duplicate();
+                        synapse.setSource(source);
+                        synapse.setTarget(target);
+                        network.addSynapse(synapse);
                     }
                 } else {
-                    network.addSynapse(new ClampedSynapse(source, target));
+                    Synapse synapse = baseSynapse.duplicate();
+                    synapse.setSource(source);
+                    synapse.setTarget(target);
+                    network.addSynapse(synapse);
                 }
             }
         }
+    }
+
+    /**
+     * @return the baseSynapse
+     */
+    public Synapse getBaseSynapse() {
+        return baseSynapse;
+    }
+
+    /**
+     * @param baseSynapse the baseSynapse to set
+     */
+    public void setBaseSynapse(final Synapse baseSynapse) {
+        this.baseSynapse = baseSynapse;
     }
 }

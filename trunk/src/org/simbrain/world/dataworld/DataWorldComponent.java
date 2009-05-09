@@ -21,27 +21,27 @@ package org.simbrain.world.dataworld;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.SingleAttributeConsumer;
+import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.world.odorworld.WorldClipboard;
 
 import com.Ostermiller.util.CSVParser;
 
 /**
- * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
+ * <b>DataWorldComponent</b> is a data table which other Simbrain components can use.
  */
 public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
     
@@ -50,6 +50,12 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 
     /** Table model. */
     private DataModel<Double> dataModel;
+    
+    /** List of consumers. */
+    private ArrayList<SingleAttributeConsumer<?>> consumers;
+
+    /** List of producers. */
+    private ArrayList<SingleAttributeProducer<?>> producers;
 
     /**
      * Returns the data model for this component.
@@ -66,6 +72,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public DataWorldComponent(final String name) {
         super(name);
         dataModel = new DataModel<Double>(this);
+        init();
     }
 
     /**
@@ -74,6 +81,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public DataWorldComponent(final String name, int columns, int rows) {
         super(name);
         dataModel = new DataModel<Double>(this, columns, rows);
+        init();
     }
 
     
@@ -83,6 +91,51 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         this.dataModel = (DataModel<Double>) dataModel;
         this.dataModel.setParent(this);
     }
+    
+    /**
+     * Initialize consumers and producers.
+     */
+    private void init() {
+        consumers = new ArrayList<SingleAttributeConsumer<?>>();
+        producers = new ArrayList<SingleAttributeProducer<?>>();
+
+        for (int i = 0; i < dataModel.getColumnCount(); i++) {
+            consumers.add(new ConsumingColumn<Double>(dataModel, i));
+            producers.add(new ProducingColumn<Double>(dataModel, i));
+        }
+        
+        dataModel.addListener(listener);
+    }
+    
+    /** Listener. */
+    private final DataModel.Listener listener = new DataModel.Listener() {
+
+        // TODO: Notify attribute change listeners...
+        public void columnAdded(int column) {
+            int index = dataModel.getColumnCount() - 1;
+            consumers.add(new ConsumingColumn<Double>(dataModel, index));
+            producers.add(new ProducingColumn<Double>(dataModel, index));
+        }
+
+        public void columnRemoved(int column) {
+            int index = dataModel.getColumnCount();
+            consumers.remove(index);
+            producers.remove(index);
+        }
+
+        public void dataChanged() {
+        }
+
+        public void itemChanged(int row, int column) {
+        }
+
+        public void rowAdded(int row) {
+        }
+
+        public void rowRemoved(int row) {
+        }
+        
+    };
     
     /**
      * Recreates an instance of this class from a saved component.
@@ -137,12 +190,12 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
      */
     @Override
     public List<? extends Consumer> getConsumers() {
-        return dataModel.getConsumers();
+        return consumers;
     }
     
     @Override
     public List<? extends Producer> getProducers() {
-        return dataModel.getProducers();
+        return producers;
     }
 
     @Override

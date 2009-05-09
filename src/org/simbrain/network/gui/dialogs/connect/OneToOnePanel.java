@@ -45,7 +45,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     /** Sets the connection orientation. */
     private JComboBox orientationBox;
 
-    /** Sets whether connections are bi-directional. */
+    /** Sets whether connections are bidirectional. */
     private JCheckBox bidirectionalConnection = new JCheckBox();
 
     /** Connection. */
@@ -78,7 +78,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
         this.addItem("Connection Orientaiton: ", orientationBox);
-        this.addItem("Bi-Directional Connection: ", bidirectionalConnection);
+        this.addItem("Bidirectional Connection: ", bidirectionalConnection);
     }
 
     /**
@@ -86,15 +86,15 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      */
     public void commitChanges() {
         connection.setUseBidirectionalConnections(bidirectionalConnection.isSelected());
-        connection.setConnectOrientation((Comparator)orientationBox.getSelectedItem());
+        connection.setConnectOrientation((Comparator) orientationBox.getSelectedItem());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        bidirectionalConnection.setSelected(connection.isUseBidirectionalConnections());
-        orientationBox.setSelectedItem(connection.getConnectOrientation());
+        bidirectionalConnection.setSelected(OneToOne.isUseBidirectionalConnections());
+        orientationBox.setSelectedItem(OneToOne.getConnectOrientation());
     }
 
 }

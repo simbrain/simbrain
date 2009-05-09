@@ -26,10 +26,7 @@ public class OneToOne extends ConnectNeurons {
     /**
      * If true, synapses are added in both directions.
      */
-    private boolean useBidirectionalConnections = false;
-
-    /** Orientation of how to connect neurons. */
-    private Comparator<Neuron> connectOrientation = Y_ORDER;
+    private static boolean useBidirectionalConnections = false;
     
     /**
      * Comparator which orders by X coordinate.
@@ -54,7 +51,14 @@ public class OneToOne extends ConnectNeurons {
             return Double.compare(neuron1.getY(), neuron2.getY());
         }
     };
-    
+
+    /** Orientation of how to connect neurons. */
+    private static Comparator<Neuron> connectOrientation = X_ORDER;
+
+    /**
+     * Used for populating combo box with orientation types.
+     * @return Array of connection types.
+     */
     public static Comparator[] getOrientationTypes() {
         return new Comparator[] {X_ORDER, Y_ORDER};
     }
@@ -164,7 +168,7 @@ public class OneToOne extends ConnectNeurons {
     /**
      * @return the useBidirectionalConnections
      */
-    public boolean isUseBidirectionalConnections() {
+    public static boolean isUseBidirectionalConnections() {
         return useBidirectionalConnections;
     }
 
@@ -172,15 +176,15 @@ public class OneToOne extends ConnectNeurons {
     /**
      * @param useBidirectionalConnections the useBidirectionalConnections to set
      */
-    public void setUseBidirectionalConnections(boolean useBidirectionalConnections) {
-        this.useBidirectionalConnections = useBidirectionalConnections;
+    public void setUseBidirectionalConnections(final boolean useBidirectionalConnections) {
+        OneToOne.useBidirectionalConnections = useBidirectionalConnections;
     }
 
 
     /**
      * @return the connectOrientation
      */
-    public Comparator<Neuron> getConnectOrientation() {
+    public static Comparator<Neuron> getConnectOrientation() {
         return connectOrientation;
     }
 
@@ -188,7 +192,7 @@ public class OneToOne extends ConnectNeurons {
     /**
      * @param connectOrientation the connectOrientation to set
      */
-    public void setConnectOrientation(Comparator<Neuron> connectOrientation) {
-        this.connectOrientation = connectOrientation;
+    public void setConnectOrientation(final Comparator<Neuron> connectOrientation) {
+        OneToOne.connectOrientation = connectOrientation;
     }
 }

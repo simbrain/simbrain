@@ -41,10 +41,10 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
-import org.simbrain.util.projection.Projector;
-import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.projection.ProjectionMethod;
+import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.WorkspaceComponentListener;
@@ -99,7 +99,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
     private JLabel pointsLabel = new JLabel();
 
     /** Dimension indicator. */
-    private JLabel dimsLabel = new JLabel();
+    private JLabel dimsLabel = new JLabel(" Dimensions:");
 
     /** Error indicator. */
     private JLabel errorLabel = new JLabel();
@@ -111,7 +111,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
     private PlotActionManager actionManager;
     
     /** The JFreeChart chart. */
-    private JFreeChart chart ;
+    private JFreeChart chart;
     
     /** The dot renderer. */
     private XYDotRenderer renderer;
@@ -124,7 +124,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
      */
     public ProjectionGui (final GenericFrame frame, final ProjectionComponent component) {
         super(frame, component);
-        setPreferredSize(new Dimension(500, 400));        
+        setPreferredSize(new Dimension(500, 400));
         component.addListener(this);
         actionManager = new PlotActionManager(this);
     }
@@ -138,7 +138,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         
         // Generate the graph
          chart = ChartFactory.createScatterPlot("High Dimensional Projection",
-                "Projection X", "Projection Y", getWorkspaceComponent().getDataset(), PlotOrientation.VERTICAL, true, false, false);
+                "Projection X", "Projection Y", getWorkspaceComponent().getDataset(), PlotOrientation.VERTICAL, false, true, false);
         //chart.getXYPlot().getDomainAxis().setRange(-100, 100);
         //chart.getXYPlot().getRangeAxis().setRange(-100, 100);
         chart.getXYPlot().getDomainAxis().setAutoRange(true);
@@ -146,6 +146,16 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         renderer = new XYDotRenderer();
         renderer.setDotWidth(3);
         renderer.setDotHeight(3);
+
+// Tooltip implementation that needs work...
+//
+//        renderer = new XYLineAndShapeRenderer(false, true);
+//        renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
+//            public String generateToolTip(XYDataset dataset, int series, int item) {
+//                return org.simbrain.util.Utils.doubleArrayToString(getWorkspaceComponent().getGauge().getUpstairs().getPoint(item));
+//             }
+//        });
+
         chart.getXYPlot().setRenderer(renderer);
         panel = new ChartPanel(chart);
         
@@ -195,6 +205,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         statusBar.add(dimsLabel);
         errorBar.add(errorLabel);
 
+        // Bottom panel
         bottomPanel.add("North", buttonPanel);
         JPanel southPanel = new JPanel();
         southPanel.add(errorBar);
@@ -205,6 +216,9 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         add("North", theToolBar);
         add("Center", panel);
         add("South", bottomPanel);
+        
+        // Initializes labels
+        componentUpdated();
     }
 
     /**
@@ -300,9 +314,11 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 
         if (e.getActionCommand().equalsIgnoreCase("Add")) {
             getWorkspaceComponent().addSource();
+            componentUpdated(); // TODO: addSource() should fire an event which calls compUpdated(). 
         }
         if (e.getActionCommand().equalsIgnoreCase("Delete")) {
             getWorkspaceComponent().removeSource();
+            componentUpdated();
         }
                
    }

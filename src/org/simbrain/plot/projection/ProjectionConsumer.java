@@ -54,6 +54,7 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
      */
     public void setValue(Double val) {
         value = val;
+        this.getParentComponent().fireUpdateEvent();
     }
 
     /**

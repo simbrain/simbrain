@@ -4,11 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.SingleAttributeConsumer;
-import org.simbrain.workspace.SingleAttributeProducer;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -55,11 +50,7 @@ public class DataModel<E> {
     // TODO: Document this.
     boolean initialized = false;
 
-    /** List of consumers. */
-    private ArrayList<SingleAttributeConsumer<?>> consumers;
 
-    /** List of producers. */
-    private ArrayList<SingleAttributeProducer<?>> producers;
 
     /** The parent component of this model. */
     private DataWorldComponent parent;
@@ -104,13 +95,7 @@ public class DataModel<E> {
      * Initialize data model.
      */
     private void init() {
-        consumers = new ArrayList<SingleAttributeConsumer<?>>();
-        producers = new ArrayList<SingleAttributeProducer<?>>();
 
-        for (int i = 0; i < numColumns; i++) {
-            consumers.add(new ConsumingColumn<E>(this, i));
-            producers.add(new ProducingColumn<E>(this, i));
-        }
 
         listeners = new ArrayList<Listener>();
     }
@@ -126,8 +111,6 @@ public class DataModel<E> {
         xstream.omitField(DataModel.class, "listeners");
         xstream.omitField(DataModel.class, "parent");
         xstream.omitField(DataModel.class, "initialized");
-        xstream.omitField(DataModel.class, "consumers");
-        xstream.omitField(DataModel.class, "producers");
 
         return xstream;
     }
@@ -159,14 +142,6 @@ public class DataModel<E> {
 
     public void removeListener(Listener listener) {
         listeners.remove(listener);
-    }
-
-    public List<? extends Consumer> getConsumers() {
-        return Collections.unmodifiableList(consumers);
-    }
-
-    public List<? extends Producer> getProducers() {
-        return Collections.unmodifiableList(producers);
     }
 
     private List<E> newRow(E value) {
@@ -282,7 +257,6 @@ public class DataModel<E> {
         for (List<E> row : rowData) {
             row.add(value);
         }
-        consumers.add(new ConsumingColumn<E>(this, numColumns - 1));
         for (Listener listener : listeners) {
             listener.columnAdded(numColumns - 1);
         }
@@ -334,7 +308,6 @@ public class DataModel<E> {
         for (List<E> row : rowData) {
             row.add(at, value);
         }
-        consumers.add(new ConsumingColumn<E>(this, at));
         for (Listener listener : listeners) {
             listener.columnAdded(at);
         }
@@ -344,8 +317,9 @@ public class DataModel<E> {
     public void removeLastRow() {
         numRows--;
         rowData.remove(numRows);
-        for (Listener listener : listeners)
-            listener.rowRemoved(numRows);
+        for (Listener listener : listeners) {
+            listener.rowRemoved(numRows);            
+        }
         parent.setChangedSinceLastSave(true);
     }
 
@@ -370,7 +344,6 @@ public class DataModel<E> {
         for (List<E> row : rowData) {
             row.remove(numColumns);
         }
-        consumers.add(new ConsumingColumn<E>(this, numColumns));
         for (Listener listener : listeners) {
             listener.columnRemoved(numColumns);
         }
@@ -387,7 +360,6 @@ public class DataModel<E> {
         for (List<E> row : rowData) {
             row.remove(at);
         }
-        consumers.add(new ConsumingColumn<E>(this, at));
         for (Listener listener : listeners) {
             listener.columnRemoved(at);
         }

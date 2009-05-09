@@ -1,7 +1,5 @@
 package org.simbrain.world.dataworld;
 
-import java.lang.reflect.Type;
-
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**

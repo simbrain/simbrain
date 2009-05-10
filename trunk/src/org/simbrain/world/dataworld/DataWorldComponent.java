@@ -58,20 +58,12 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     private ArrayList<SingleAttributeProducer<?>> producers;
 
     /**
-     * Returns the data model for this component.
-     * 
-     * @return The data model for this component.
-     */
-    public DataModel<Double> getDataModel() {
-        return dataModel;
-    }
-
-    /**
      * This method is the default constructor.
      */
     public DataWorldComponent(final String name) {
         super(name);
         dataModel = new DataModel<Double>(this);
+        this.dataModel.setParent(this);
         init();
     }
 
@@ -81,6 +73,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     public DataWorldComponent(final String name, int columns, int rows) {
         super(name);
         dataModel = new DataModel<Double>(this, columns, rows);
+        this.dataModel.setParent(this);
         init();
     }
 
@@ -90,6 +83,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         super(name);
         this.dataModel = (DataModel<Double>) dataModel;
         this.dataModel.setParent(this);
+        init();
     }
     
     /**
@@ -110,7 +104,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     /** Listener. */
     private final DataModel.Listener listener = new DataModel.Listener() {
 
-        // TODO: Notify attribute change listeners...
         public void columnAdded(int column) {
             int index = dataModel.getColumnCount() - 1;
             consumers.add(new ConsumingColumn<Double>(dataModel, index));
@@ -140,14 +133,15 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     /**
      * Recreates an instance of this class from a saved component.
      * 
-     * @param input
-     * @param name
-     * @param format
-     * @return
+     * @param input input stream
+     * @param name name of file
+     * @param format format of file
+     * @return new component
      */
     public static DataWorldComponent open(InputStream input, String name, String format) {
+        // TODO: Use format  to determine how to open this.
         DataModel<?> model = (DataModel<?>) DataModel.getXStream().fromXML(input);
-        return new DataWorldComponent(name,  model);
+        return new  DataWorldComponent(name,  model);
     }
 
     @Override
@@ -159,6 +153,15 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     @Override
     public String getCurrentDirectory() {
         return DataWorldPreferences.getCurrentDirectory();
+    }
+
+    /**
+     * Returns the data model for this component.
+     * 
+     * @return The data model for this component.
+     */
+    public DataModel<Double> getDataModel() {
+        return dataModel;
     }
 
     /**
@@ -230,7 +233,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
             dataModel.modifyRowsColumns(values.length, values[0].length, new Double(0));
             for (int i = 0; i < values.length; i++) {
                 for (int j = 0; j < values[0].length; j++) {
-                    System.out.println("-->" + values[i][j]);
                     if (((String)(values[i][j])).length() > 0) {
                         dataModel.set(i, j, Double.valueOf(values[i][j]));
                     }

@@ -133,12 +133,13 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
             try {
                 Workspace workspace = workspaceComponent.getWorkspace();
                 
+                workspace.removeWorkspaceComponent(workspaceComponent);
                 workspaceComponent = (E) WorkspaceComponentDeserializer
                     .deserializeWorkspaceComponent(
                     workspaceComponent.getClass(), theFile.getName(),
                     new FileInputStream(theFile), SFileChooser.getExtension(theFile));
                 
-                workspaceComponent.setWorkspace(workspace);
+                workspace.addWorkspaceComponent(workspaceComponent);
                 
                 SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
                 

@@ -154,7 +154,9 @@ public class WorkspaceSerializer {
         
         if (contents.getComponents() != null) {
             for (ArchiveContents.Component component : contents.getComponents()) {
-                if (exclude.contains(component.uri)) continue;
+                if (exclude.contains(component.uri)) {
+                    continue;
+                }
                 
                 WorkspaceComponent<?> wc = componentDeserializer.deserializeWorkspaceComponent(
                     component, new ByteArrayInputStream(entries.get(component.uri)));
@@ -189,13 +191,21 @@ public class WorkspaceSerializer {
                 WorkspaceComponent<?> targetComponent
                     = componentDeserializer.getComponent(coupling.target.uri);
                 
-                workspace.addCoupling(new Coupling(
-                        (ProducingAttribute<?>) sourceComponent.getProducingAttribute(
-                                        coupling.source.attributeHolderID,
-                                        coupling.source.attributeID),
-                        (ConsumingAttribute<?>) targetComponent.getConsumingAttribute(
-                                        coupling.target.attributeHolderID,
-                                        coupling.target.attributeID)));
+                ProducingAttribute<?> producingAttribute = (ProducingAttribute<?>) sourceComponent
+                        .getProducingAttribute(
+                        coupling.source.attributeHolderID,
+                        coupling.source.attributeID);
+                //System.out.println("producing: " + producingAttribute);
+                
+                ConsumingAttribute<?> consumingAttribute = (ConsumingAttribute<?>) targetComponent
+                        .getConsumingAttribute(
+                        coupling.target.attributeHolderID,
+                        coupling.target.attributeID);
+                //System.out.println("consuming: " + consumingAttribute);
+                
+                workspace.addCoupling(new Coupling(producingAttribute, consumingAttribute));
+                        
+                        
             }
         }
     }

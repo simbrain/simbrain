@@ -40,7 +40,6 @@ public class StochasticNeuron extends Neuron {
      * set their parameters.
      */
     public StochasticNeuron() {
-        addConsumerAttributes();
     }
 
     /**
@@ -59,7 +58,6 @@ public class StochasticNeuron extends Neuron {
      */
     public StochasticNeuron(final Neuron n) {
         super(n);
-        addConsumerAttributes();
     }
 
     /**
@@ -107,25 +105,25 @@ public class StochasticNeuron extends Neuron {
         return "Stochastic";
     }
 
-    /**
-     * Make firing probability a consuming attribute
-     */
-    private void addConsumerAttributes() {
-        consumingAttributes().add(new StochasticConsumingAttribute());
-    }
-    
-    private class StochasticConsumingAttribute extends AbstractAttribute
-           implements ConsumingAttribute<Double> {
-        public Consumer getParent() {
-            return StochasticNeuron.this;
-        }
-
-        public void setValue(final Double value) {
-            firingProbability = value;
-        }
-
-        public String getKey() {
-            return "Firing Probability";
-        }
-    }
+//    /**
+//     * Make firing probability a consuming attribute
+//     */
+//    private void addConsumerAttributes() {
+//        consumingAttributes().add(new StochasticConsumingAttribute());
+//    }
+//    
+//    private class StochasticConsumingAttribute extends AbstractAttribute
+//           implements ConsumingAttribute<Double> {
+//        public Consumer getParent() {
+//            return StochasticNeuron.this;
+//        }
+//
+//        public void setValue(final Double value) {
+//            firingProbability = value;
+//        }
+//
+//        public String getKey() {
+//            return "Firing Probability";
+//        }
+//    }
 }

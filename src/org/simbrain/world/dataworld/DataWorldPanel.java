@@ -55,7 +55,7 @@ public class DataWorldPanel extends JPanel {
     private JXTable table;
 
     /** Underlying data. */
-    private final DataModel<Double> dataModel;
+    private final DataTableModel tableModel;
 
     /** Point selected. */
     private Point selectedPoint;
@@ -74,22 +74,19 @@ public class DataWorldPanel extends JPanel {
     
     /** Grid Color. */
     private Color gridColor =  Color.LIGHT_GRAY;
-    
-    /** Workspace reference .*/
-    private DataWorldComponent component;
         
     
     /**
      * Creates a new instance of the data world.
+     * @param dataModel 
      *
      * @param ws World frame to create a new data world within
      */
-    public DataWorldPanel(final DataWorldComponent component) {
+    public DataWorldPanel(DataModel<Double> dataModel) {
         super(new BorderLayout());
-        this.component = component;
+        this.tableModel= new DataTableModel(dataModel);
 
-        this.dataModel = component.getDataModel();
-        table = new JXTable(new DataTableModel(dataModel));
+        table = new JXTable(tableModel);
         add(table, BorderLayout.CENTER);
         add(table.getTableHeader(), BorderLayout.NORTH);
         
@@ -111,29 +108,32 @@ public class DataWorldPanel extends JPanel {
     
     private ActionListener addRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            if (getSelectedPoint().x < (table.getRowHeight() * table.getRowCount())) {
-                dataModel.insertNewRow(getSelectedRow(), new Double(0));
+            if (getSelectedPoint().x < (table.getRowHeight() * table
+                    .getRowCount())) {
+                tableModel.getModel().insertNewRow(getSelectedRow(),
+                        new Double(0));
             } else {
-                dataModel.addNewRow(new Double(0));
+                tableModel.getModel().addNewRow(new Double(0));
             }
         }
     };
 
     private ActionListener addColHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            dataModel.insertNewColumn(getSelectedColumn(), new Double(0));
+            tableModel.getModel().insertNewColumn(getSelectedColumn(),
+                    new Double(0));
         }
     };
 
     private ActionListener remRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            dataModel.removeRow(getSelectedRow());
+            tableModel.getModel().removeRow(getSelectedRow());
         }
     };
 
     private ActionListener remColHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-            dataModel.removeColumn(getSelectedColumn());
+            tableModel.getModel().removeColumn(getSelectedColumn());
         }
     };
 
@@ -163,7 +163,7 @@ public class DataWorldPanel extends JPanel {
          */
         public void mousePressed(final MouseEvent e) {
             selectedPoint = e.getPoint();
-            dataModel.setCurrentRow(getSelectedRow());
+            tableModel.getModel().setCurrentRow(getSelectedRow());
             // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
             boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
             if (isRightClick) {
@@ -188,14 +188,14 @@ public class DataWorldPanel extends JPanel {
             ret.add(remCol);
         }
         ret.addSeparator();
-        JMenu producerMenu = new ProducingAttributeMenu(
-                "Receive coupling from", component.getWorkspace(), component
-                        .getConsumingAttributes().get(getSelectedColumn()));
-        ret.add(producerMenu);
-        JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to",
-                component.getWorkspace(), component.getProducingAttributes()
-                        .get(getSelectedColumn()));
-        ret.add(consumerMenu);
+//        JMenu producerMenu = new ProducingAttributeMenu(
+//                "Receive coupling from", component.getWorkspace(), component
+//                        .getConsumingAttributes().get(getSelectedColumn()));
+//        ret.add(producerMenu);
+//        JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to",
+//                component.getWorkspace(), component.getProducingAttributes()
+//                        .get(getSelectedColumn()));
+//        ret.add(consumerMenu);
 
         return ret;
     }
@@ -208,9 +208,9 @@ public class DataWorldPanel extends JPanel {
         JPanel pane = new JPanel();
         JTextField lower = new JTextField();
         JTextField upper = new JTextField();
-        lower.setText(Integer.toString(dataModel.getLowerBound()));
+        lower.setText(Integer.toString(tableModel.getModel().getLowerBound()));
         lower.setColumns(3);
-        upper.setText(Integer.toString(dataModel.getUpperBound()));
+        upper.setText(Integer.toString(tableModel.getModel().getUpperBound()));
         upper.setColumns(3);
         pane.add(new JLabel("Lower Bound"));
         pane.add(lower);
@@ -222,8 +222,8 @@ public class DataWorldPanel extends JPanel {
         rand.setLocationRelativeTo(this);
         rand.setVisible(true);
         if (!rand.hasUserCancelled()) {
-            dataModel.setLowerBound(Integer.parseInt(lower.getText()));
-            dataModel.setUpperBound(Integer.parseInt(upper.getText()));
+            tableModel.getModel().setLowerBound(Integer.parseInt(lower.getText()));
+            tableModel.getModel().setUpperBound(Integer.parseInt(upper.getText()));
         }
 
         repaint();
@@ -235,7 +235,7 @@ public class DataWorldPanel extends JPanel {
     public void updateRowSelection() {
         table.selectAll(); // TODO: If I don't call this, the line below does
                            // not work. Not sure why.
-        table.setRowSelectionInterval(dataModel.getCurrentRow(), dataModel.getCurrentRow());
+        table.setRowSelectionInterval(tableModel.getModel().getCurrentRow(), tableModel.getModel().getCurrentRow());
     }
 
     /**

@@ -79,7 +79,7 @@ public class DataTableModel extends AbstractTableModel {
     public int getColumnCount() {
         return model.getColumnCount();
     }
-
+    
     public String getColumnName(int columnIndex) {
         return "" + (columnIndex + 1);
     }
@@ -98,5 +98,12 @@ public class DataTableModel extends AbstractTableModel {
 
     public void setValueAt(Object value, int row, int column) {
         model.set(row, column, (Double) value);
+    }
+
+    /**
+     * @return the model
+     */
+    public DataModel<Double> getModel() {
+        return model;
     }
 }

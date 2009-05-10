@@ -239,8 +239,9 @@ public class DataModel<E> {
     public void addNewRow(E value) {
         numRows++;
         rowData.add(newRow(value));
-        for (Listener listener : listeners)
-            listener.rowAdded(numRows - 1);
+        for (Listener listener : listeners) {
+            listener.rowAdded(numRows - 1);            
+        }
         parent.setChangedSinceLastSave(true);
     }
 
@@ -331,8 +332,9 @@ public class DataModel<E> {
     public void removeRow(final int at) {
         numRows--;
         rowData.remove(at);
-        for (Listener listener : listeners)
+        for (Listener listener : listeners) {
             listener.rowRemoved(at);
+        }
         parent.setChangedSinceLastSave(true);
     }
 
@@ -417,6 +419,10 @@ public class DataModel<E> {
                 setCurrentRow(getCurrentRow() + 1);
             }
         }
+    }
+    
+    public void fireModelChanged() {
+        
     }
 
     public interface Listener {

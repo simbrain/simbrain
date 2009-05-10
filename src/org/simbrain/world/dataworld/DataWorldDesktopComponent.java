@@ -57,7 +57,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private DataWorldPanel worldPanel;
 
     /** Menu bar. */
-    private JMenuBar mb = new JMenuBar();
+    private JMenuBar mb;
 
     /** File menu. */
     private JMenu file = new JMenu("File  ");
@@ -129,7 +129,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         addMenuBar(worldPanel);
 
-        worldPanel = new DataWorldPanel(this.component);
+        worldPanel = new DataWorldPanel(component.getDataModel());
         scroller = new JScrollPane();
         scroller.setViewportView(worldPanel);
         setLayout(new BorderLayout());
@@ -142,6 +142,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
      * @param table Table to be used for world
      */
     public void addMenuBar(final DataWorldPanel table) {
+        mb = new JMenuBar();
         open.addActionListener(openListener);
         open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -360,6 +361,9 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     
     @Override
     public void postAddInit() {
+        if (this.getParentFrame().getJMenuBar() == null) {
+            addMenuBar(worldPanel);
+        }
         pack();
     }
 

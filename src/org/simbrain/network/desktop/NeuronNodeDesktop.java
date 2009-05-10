@@ -38,11 +38,11 @@ public class NeuronNodeDesktop extends NeuronNode {
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
-            JMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", workspace, neuron.getDefaultConsumingAttribute());
-            contextMenu.add(producerMenu);
-            JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", workspace, neuron.getDefaultProducingAttribute());
-            contextMenu.add(consumerMenu);
-            contextMenu.addSeparator();
+//            JMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", workspace, neuron.getDefaultConsumingAttribute());
+//            contextMenu.add(producerMenu);
+//            JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", workspace, neuron.getDefaultProducingAttribute());
+//            contextMenu.add(consumerMenu);
+//            contextMenu.addSeparator();
         }
         return contextMenu;
     }

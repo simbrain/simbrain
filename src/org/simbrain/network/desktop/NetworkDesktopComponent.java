@@ -41,7 +41,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
     /** Network panel. */
     private final NetworkPanelDesktop networkPanel;
-
+    
     /**
      * Create a new network frame.
      */
@@ -63,14 +63,14 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         createAndAttachMenus();
     }
     
-    
+    JMenuBar menuBar = null;
 
     /**
      * Create and attach the menus for this network frame.
      */
     private void createAndAttachMenus() {
 
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(networkPanel.createEditMenu());
         menuBar.add(networkPanel.createInsertMenu());
@@ -105,6 +105,12 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     
     @Override
     public void postAddInit() {
+        if (this.getParentFrame().getJMenuBar() == null) {
+            createAndAttachMenus();
+        }
+        
+        //TODO: Below only needs to happen when opening; but currently it happens
+        //      also when creating a new network
         networkPanel.clearPanel();
         if (networkPanel.getRootNetwork() != this.getWorkspaceComponent().getRootNetwork()) {
             networkPanel.setRootNetwork(this.getWorkspaceComponent()

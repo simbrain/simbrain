@@ -228,7 +228,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     private volatile boolean isRunning;
     
     /** Toolbar panel. */
-    JPanel toolbars;
+    private JPanel toolbars;
 
     /**
      * Create a new rootNetwork panel.
@@ -860,26 +860,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         for (PNode e : getSelection()) {
             if (e instanceof SynapseNode) {
                 ret.add(((SynapseNode) e).getSynapse());
-            }
-        }
-        return ret;
-    }
-    
-    public ArrayList<ProducingAttribute<?>> getSelectedProducingAttributes() {
-        ArrayList<ProducingAttribute<?>> ret = new ArrayList<ProducingAttribute<?>>();
-        for (PNode e : getSelection()) {
-            if (e instanceof NeuronNode) {
-                ret.add(((NeuronNode) e).getNeuron().getDefaultProducingAttribute());
-            }
-        }
-        return ret;
-    }
-    
-    public ArrayList<ConsumingAttribute<?>> getSelectedConsumingAttributes() {
-        ArrayList<ConsumingAttribute<?>> ret = new ArrayList<ConsumingAttribute<?>>();
-        for (PNode e : getSelection()) {
-            if (e instanceof NeuronNode) {
-                ret.add(((NeuronNode) e).getNeuron().getDefaultConsumingAttribute());
             }
         }
         return ret;
@@ -2108,7 +2088,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public void clearPanel() {
         getLayer().removeAllChildren();
     }
-    
+        
     /**
      * Adds an internal menu bar; used in applets.
      * @param applet

@@ -20,7 +20,6 @@ package org.simbrain.workspace;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -519,7 +518,7 @@ public class Workspace {
                         "Cannot change updator while running.");
             }
             WorkspaceUpdator updator = new WorkspaceUpdator(this, manager, controller, threads);
-            swapUpdators(updator);            
+            swapUpdators(updator);
         }
     }
     
@@ -545,7 +544,7 @@ public class Workspace {
      * @param newUpdator the new updator
      */
     private void swapUpdators(final WorkspaceUpdator newUpdator) {
-        List<WorkspaceUpdatorListener> tempList =  updator.getListeners();                        
+        List<WorkspaceUpdatorListener> tempList =  updator.getListeners();
         updator = newUpdator;
         for(WorkspaceUpdatorListener listener : tempList) {
             updator.addListener(listener);

@@ -35,7 +35,7 @@ import org.simbrain.workspace.ProducingAttribute;
  * of the neural network occurs here, in the update function.  Subclasses must
  * override update and duplicate (for copy / paste) and cloning generally.
  */
-public abstract class Neuron implements Producer, Consumer {
+public abstract class Neuron  {
 
     /** The maximum number of digits to display in the tool tip. */
     private static final int MAX_DIGITS = 9;
@@ -98,27 +98,12 @@ public abstract class Neuron implements Producer, Consumer {
      *  before other neurons, assign it a smaller priority value.
      */
     private int updatePriority = 0;
-    
-    /** The producing attributes. */
-    private ArrayList<ProducingAttribute<?>> producingAttributes
-        = new ArrayList<ProducingAttribute<?>>();
-
-    /** The consuming attributes. */
-    private ArrayList<ConsumingAttribute<?>> consumingAttributes
-        = new ArrayList<ConsumingAttribute<?>>();
-
-    /** The default producing attribute. */
-    private ProducingAttribute<?> defaultProducingAttribute;
-
-    /** The default consuming attribute. */
-    private ConsumingAttribute<?> defaultConsumingAttribute;
 
     /**
      * Default constructor needed for external calls which create neurons then
      * set their parameters.
      */
     protected Neuron() {
-        setAttributeLists();
     }
 
     /**
@@ -139,31 +124,6 @@ public abstract class Neuron implements Producer, Consumer {
         setY(n.getY());
         setUpdatePriority(n.getUpdatePriority());
         setLabel(n.getLabel());
-        setAttributeLists();
-    }
-
-    /**
-     * Initialization method called by constructors.
-     */
-    private void setAttributeLists() {
-        
-        ActivationAttribute activationAttribute = new ActivationAttribute();
-        producingAttributes().add(activationAttribute);
-        consumingAttributes().add(activationAttribute);
-        defaultProducingAttribute = activationAttribute;
-        defaultConsumingAttribute = activationAttribute;
-
-        UpperBoundAttribute upperBoundAttribute = new UpperBoundAttribute();
-        producingAttributes().add(upperBoundAttribute);
-        consumingAttributes().add(upperBoundAttribute);
-
-        LowerBoundAttribute lowerBoundAttribute = new LowerBoundAttribute();
-        producingAttributes().add(lowerBoundAttribute);
-        consumingAttributes().add(lowerBoundAttribute);
-
-        TargetValueAttribute targetValueAttribute = new TargetValueAttribute();
-        producingAttributes().add(targetValueAttribute);
-        consumingAttributes().add(targetValueAttribute);
     }
 
     /**
@@ -188,26 +148,6 @@ public abstract class Neuron implements Producer, Consumer {
         return n;
     }
 
-    /**
-     * Provides writable access to subclasses.  Avoid making
-     * this public.  Subclasses can override this method.
-     * 
-     * @return the producing attributes for this instance.
-     */
-    protected List<ConsumingAttribute<?>> consumingAttributes() {
-        return consumingAttributes;
-    }
-    
-    /**
-     * Provides writable access to subclasses.  Avoid making
-     * this public.  Subclasses can override this method.
-     * 
-     * @return the consuming attributes for this instance.
-     */
-    protected List<ProducingAttribute<?>> producingAttributes() {
-        return producingAttributes;
-    }
-    
     /**
      * @return the time type.
      */
@@ -786,6 +726,15 @@ public abstract class Neuron implements Producer, Consumer {
     public double getTargetValue() {
         return targetValue;
     }
+    
+    /**
+     * Set target value.
+     *
+     * @param targetValue value to set.
+     */
+    public void setTargetValue(final double targetValue) {
+        this.targetValue = targetValue;
+    }
 
     /**
      * @return updatePriority for the neuron
@@ -822,201 +771,6 @@ public abstract class Neuron implements Producer, Consumer {
     }
     
     /**
-     * {@inheritDoc}
-     */
-    public final List<? extends ProducingAttribute<?>> getProducingAttributes() {
-        return producingAttributes();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final List<? extends ConsumingAttribute<?>> getConsumingAttributes() {
-        return consumingAttributes();
-    }
-
-    /**
-     * Implements the Activation attribute.
-     * 
-     * @author Matt Watson
-     */
-    private class ActivationAttribute extends AbstractAttribute 
-            implements ProducingAttribute<Double>, ConsumingAttribute<Double> {
-        
-        /**
-         * {@inheritDoc}
-         */
-        public String getKey() {
-            return "Activation";
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Double getValue() {
-            return getParent().getActivation();
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void setValue(final Double value) {
-            getParent().setInputValue(value == null ? 0 : value);
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Neuron getParent() {
-            return Neuron.this;
-        }
-    }
-    
-    /**
-     * Implements the Upper bound attribute.
-     * 
-     * @author Matt Watson
-     */
-    private class UpperBoundAttribute extends AbstractAttribute implements ProducingAttribute<Double>,
-            ConsumingAttribute<Double> {
-        
-        /**
-         * {@inheritDoc}
-         */
-        public String getKey() {
-            return "UpperBound";
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Double getValue() {
-            return upperBound;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void setValue(final Double value) {
-            upperBound = value;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Neuron getParent() {
-            return Neuron.this;
-        }
-
-    }
-
-    /**
-     * Implements the Lower bound attribute.
-     * 
-     * @author Matt Watson
-     */
-    private class LowerBoundAttribute extends AbstractAttribute implements ProducingAttribute<Double>,
-            ConsumingAttribute<Double> {
-        
-        /**
-         * {@inheritDoc}
-         */
-        public String getKey() {
-            return "LowerBound";
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Double getValue() {
-            return lowerBound;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void setValue(final Double value) {
-            lowerBound = value;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Neuron getParent() {
-            return Neuron.this;
-        }
-    }
-
-    /**
-     * Implements the Target Value attribute.
-     */
-    private class TargetValueAttribute extends AbstractAttribute implements ProducingAttribute<Double>,
-            ConsumingAttribute<Double> {
-        
-        /**
-         * {@inheritDoc}
-         */
-        public String getAttributeDescription() {
-            return "TargetValue";
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Double getValue() {
-            return targetValue;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public void setValue(final Double value) {
-            targetValue = value;
-        }
-        
-        /**
-         * {@inheritDoc}
-         */
-        public Neuron getParent() {
-            return Neuron.this;
-        }
-
-        public String getKey() {
-            return "TargetValue";
-        }
-    }
-
-    /**
-     * @return the defaultConsumingAttribute
-     */
-    public ConsumingAttribute<?> getDefaultConsumingAttribute() {
-        return defaultConsumingAttribute;
-    }
-
-    /**
-     * @param defaultConsumingAttribute the defaultConsumingAttribute to set
-     */
-    public void setDefaultConsumingAttribute(
-            final ConsumingAttribute<?> defaultConsumingAttribute) {
-        this.defaultConsumingAttribute = defaultConsumingAttribute;
-    }
-
-    /**
-     * @return the defaultProducingAttribute
-     */
-    public ProducingAttribute<?> getDefaultProducingAttribute() {
-        return defaultProducingAttribute;
-    }
-
-    /**
-     * @param defaultProducingAttribute the defaultProducingAttribute to set
-     */
-    public void setDefaultProducingAttribute(
-            final ProducingAttribute<?> defaultProducingAttribute) {
-        this.defaultProducingAttribute = defaultProducingAttribute;
-    }
-
-    /**
      * Returns the id of the neuron.
      * 
      * @return the id of the neuron.
@@ -1047,4 +801,5 @@ public abstract class Neuron implements Producer, Consumer {
     public void setLabel(final String label) {
         this.label = label;
     }
+
 }

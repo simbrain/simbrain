@@ -559,9 +559,9 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public ConsumingAttribute getConsumingAttribute(String consumerId, String attributeId) {
         for (Consumer consumer : getConsumers()) {
+            //System.out.println(consumerId + "==" + consumer.getDescription() + "?");
             if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
                    for(ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
-                       //System.out.println(attribute.getAttributeDescription());
                           if (attribute.getKey().equals(attributeId)) {
                               return attribute;
                           }
@@ -580,7 +580,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public ProducingAttribute getProducingAttribute(String producerId, String attributeId) {
         for (Producer producer : getProducers()) {
-            //System.out.println(producer.getDescription());            
+            //System.out.println(producerId + "==" + producer.getDescription() + "?");
             if (producer.getDescription().equalsIgnoreCase(producerId)) {
                    for(ProducingAttribute attribute : producer.getProducingAttributes()) {
                        //System.out.println(attribute.getAttributeDescription());

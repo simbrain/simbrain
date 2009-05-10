@@ -1,9 +1,25 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -31,7 +47,6 @@ import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -67,7 +82,6 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ToggleButton;
-import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -158,8 +172,8 @@ public class SimbrainDesktop {
     /** Interpreter for terminal. */
     Interpreter interpreter;
 
-    /** All the components in the workspace. */
-    private Map<WorkspaceComponent<?>, GuiComponent<?>> components
+    /** All the guiComponents in the workspace. */
+    private Map<WorkspaceComponent<?>, GuiComponent<?>> guiComponents
         = new LinkedHashMap<WorkspaceComponent<?>, GuiComponent<?>>();
     
     /** Listener on the workspace. */
@@ -189,8 +203,8 @@ public class SimbrainDesktop {
 
         @SuppressWarnings("unchecked")
         public void componentRemoved(final WorkspaceComponent workspaceComponent) {
-            GuiComponent<?> component = components.get(workspaceComponent);
-            components.remove(component);
+            GuiComponent<?> component = guiComponents.get(workspaceComponent);
+            guiComponents.remove(component);
             component.getParentFrame().dispose();
         }
     };
@@ -267,7 +281,7 @@ public class SimbrainDesktop {
     }
     
     /**
-     * Create mappings from components to their GUI wrappers.
+     * Create mappings from guiComponents to their GUI wrappers.
      */
     private static void registerComponents() {
         // TODO use a configuration file
@@ -531,7 +545,7 @@ public class SimbrainDesktop {
     }
     
     /**
-     * This nasty declaration creates a map of the workspace components to their associated
+     * This nasty declaration creates a map of the workspace guiComponents to their associated
      * wrapper class.
      */
     private static final Map<Class<? extends WorkspaceComponent<?>>,
@@ -551,24 +565,27 @@ public class SimbrainDesktop {
     }
     
     /**
-     * Return a workspace component.
-     * @param component component to return
-     * @return component.
+     * Returns the desktop component corresponding to a workspace component.
+     * 
+     * @param component component to check with
+     * @return component guicomponent
      */
     public GuiComponent<?> getDesktopComponent(final WorkspaceComponent<?> component) {
-        return components.get(component);
+        return guiComponents.get(component);
     }
-    
+
     /**
-     * Return a desktop component.
-     *
-     * @param component name of desktop component to return
+     * Returns the desktop component corresponding to a named workspace
+     * component.
+     * 
+     * @param component
+     *            name of desktop component to return
      * @return component desktop component, or null if none found
      */
     public GuiComponent<?> getDesktopComponent(final String componentName) {
         WorkspaceComponent<?> wc = workspace.getComponent(componentName);
         if (wc != null) {
-            return components.get(wc);
+            return guiComponents.get(wc);
         } else {
             return null;
         }
@@ -652,19 +669,20 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Registers instance of gui components.
+     * Registers instance of guiComponents.
+     *
      * @param workspaceComponent Workspace component
      * @param guiComponent GUI component
      */
     public void registerComponentInstance(final WorkspaceComponent workspaceComponent,
             final GuiComponent guiComponent) {
-        components.put(workspaceComponent, guiComponent);
+        guiComponents.put(workspaceComponent, guiComponent);
     }
     
 
     /**
      * Add a new <c>SimbrainComponent</c>.
-     * Handles creation of new components and deserialization of components
+     * Handles creation of new guiComponents and deserialization of guiComponents
      *
      * @param workspaceComponent Workspace Component
      * @param guiComp GUI component
@@ -699,7 +717,7 @@ public class SimbrainDesktop {
         if (isDeserialized) {
            componentFrame.setBounds(guiComponent.getBounds());
         } else {
-            if (components.size() == 0) {
+            if (guiComponents.size() == 0) {
                 componentFrame.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
                     (int) guiComponent.getPreferredSize().getWidth(),
                     (int) guiComponent.getPreferredSize().getHeight());

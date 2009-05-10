@@ -18,18 +18,14 @@
  */
 package org.simbrain.network.interfaces;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.util.SimpleId;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 
 import com.thoughtworks.xstream.XStream;
@@ -170,6 +166,10 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "updateCompleted");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
+//        xstream.omitField(Neuron.class, "fanOut");
+//        xstream.omitField(Neuron.class, "fanIn");
+//        xstream.omitField(Neuron.class, "readOnlyFanOut");
+//        xstream.omitField(Neuron.class, "readOnlyFanIn");
         return xstream;
     }
 
@@ -183,7 +183,6 @@ public class RootNetwork extends Network {
      */
     private Object readResolve() {
         logger = Logger.getLogger(RootNetwork.class);
-        // listenerList = new HashSet<NetworkListener>();
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
         return this;
@@ -463,14 +462,6 @@ public class RootNetwork extends Network {
      */
     public void fireNeuronDeleted(final Neuron deleted) {
         for (NetworkListener listener : component.getListeners()) {
-            for (ConsumingAttribute<?> attribute : deleted.consumingAttributes()) {
-                listener.attributeRemoved(deleted, attribute);
-            }
-            
-            for (ProducingAttribute<?> attribute : deleted.producingAttributes()) {
-                listener.attributeRemoved(deleted, attribute);
-            }
-            
             listener.neuronRemoved(new NetworkEvent<Neuron>(this, deleted));
         }
         if (getParent() != null) {
@@ -809,27 +800,6 @@ public class RootNetwork extends Network {
             ret += group.toString();
         }
         return ret;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<Consumer> getConsumers() {
-        return new ArrayList<Consumer>(getFlatNeuronList());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-//    public List<Coupling> getCouplings() {
-//        return couplings;
-//    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<Producer> getProducers() {
-        return new ArrayList<Producer>(getFlatNeuronList());
     }
 
     /**

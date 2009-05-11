@@ -1,7 +1,6 @@
 package org.simbrain.workspace;
 
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +39,11 @@ public class WorkspaceComponentDeserializer {
     WorkspaceComponent<?> deserializeWorkspaceComponent(final ArchiveContents.Component component,
             final InputStream input) {
         try {
-            Class<WorkspaceComponent<?>> clazz = (Class<WorkspaceComponent<?>>) Class.forName(component.className);
+            Class<WorkspaceComponent<?>> clazz = (Class<WorkspaceComponent<?>>)
+              Class.forName(component.className);
             
-            WorkspaceComponent<?> wc = deserializeWorkspaceComponent(clazz, component.name, input, null);
+            WorkspaceComponent<?> wc = deserializeWorkspaceComponent(
+               clazz, component.name, input, null);
             
             componentKeys.put(component.uri, wc);
             wc.setChangedSinceLastSave(false);
@@ -52,15 +53,24 @@ public class WorkspaceComponentDeserializer {
         }
     }
     
-    public static WorkspaceComponent<?> deserializeWorkspaceComponent(final Class<?> clazz, 
-            String name, final InputStream input, final String format) {
+    /**
+     * Deserialized a component for the given class, input and input format.
+     * 
+     * @param clazz the class of the component
+     * @param name the name of the component
+     * @param input the input stream
+     * @param format the format of the data
+     * @return a new component
+     */
+    public static WorkspaceComponent<?> deserializeWorkspaceComponent(final Class<?> clazz,
+            final String name, final InputStream input, final String format) {
         try {
             Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
                 
             WorkspaceComponent<?> wc = (WorkspaceComponent<?>)
                 method.invoke(null, input, name, format);
                 
-                return wc;
+            return wc;
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

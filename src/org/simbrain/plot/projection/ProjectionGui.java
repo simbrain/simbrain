@@ -127,34 +127,28 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         setPreferredSize(new Dimension(500, 400));
         component.addListener(this);
         actionManager = new PlotActionManager(this);
-    }
-    
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         setLayout(new BorderLayout());
         
         // Generate the graph
-         chart = ChartFactory.createScatterPlot("High Dimensional Projection",
-                "Projection X", "Projection Y", getWorkspaceComponent().getDataset(), PlotOrientation.VERTICAL, false, true, false);
-        //chart.getXYPlot().getDomainAxis().setRange(-100, 100);
-        //chart.getXYPlot().getRangeAxis().setRange(-100, 100);
+        chart = ChartFactory.createScatterPlot("High Dimensional Projection",
+                "Projection X", "Projection Y", getWorkspaceComponent()
+                        .getDataset(), PlotOrientation.VERTICAL, false, true, false);
+        // chart.getXYPlot().getDomainAxis().setRange(-100, 100);
+        // chart.getXYPlot().getRangeAxis().setRange(-100, 100);
         chart.getXYPlot().getDomainAxis().setAutoRange(true);
         chart.getXYPlot().getRangeAxis().setAutoRange(true);
         renderer = new XYDotRenderer();
         renderer.setDotWidth(3);
         renderer.setDotHeight(3);
 
-// Tooltip implementation that needs work...
-//
-//        renderer = new XYLineAndShapeRenderer(false, true);
-//        renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
-//            public String generateToolTip(XYDataset dataset, int series, int item) {
-//                return org.simbrain.util.Utils.doubleArrayToString(getWorkspaceComponent().getGauge().getUpstairs().getPoint(item));
-//             }
-//        });
+        // Tooltip implementation that needs work...
+        //
+        //        renderer = new XYLineAndShapeRenderer(false, true);
+        //        renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
+        //            public String generateToolTip(XYDataset dataset, int series, int item) {
+        //                return org.simbrain.util.Utils.doubleArrayToString(getWorkspaceComponent().getGauge().getUpstairs().getPoint(item));
+        //             }
+        //        });
 
         chart.getXYPlot().setRenderer(renderer);
         panel = new ChartPanel(chart);
@@ -219,6 +213,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         
         // Initializes labels
         componentUpdated();
+    }
+    
+    /**
+     * Initializes frame.
+     */
+    @Override
+    public void postAddInit() {
     }
 
     /**

@@ -11,28 +11,30 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * An n-dimensional generalization of a simple QuadTree structure
- * This is a binary tree that splits elements based on successive 
- * dimensions, repeating as necessary.  There are two types of nodes in 
- * the structure, branches and leaves.  The leaf nodes are a n-dimensional
- * 'space' that contains a number of elements.  When an element is added
- * that increases the number of points in that leaf beyond the threshold
- * specified by MAX, the leaf is split into two new leaves attached to a
- * new branch that replaces the old leaf.  In splitting a leaf, a mid-point
- * is determined which places approximately half of the points from the old 
- * leaf elements in each new leaf.
+ * An n-dimensional generalization of a simple QuadTree structure This is a
+ * binary tree that splits elements based on successive dimensions, repeating as
+ * necessary. There are two types of nodes in the structure, branches and
+ * leaves. The leaf nodes are a n-dimensional 'space' that contains a number of
+ * elements. When an element is added that increases the number of points in
+ * that leaf beyond the threshold specified by MAX, the leaf is split into two
+ * new leaves attached to a new branch that replaces the old leaf. In splitting
+ * a leaf, a mid-point is determined which places approximately half of the
+ * points from the old leaf elements in each new leaf.
  * 
- * <p>In searching for an element, the mid-point of each branch is used to
- * determine the path through the tree.  When the point to be searched is
- * closer than the given tolerance to the midpoint, the other branch is also 
- * followed for correctness.
+ * <p>
+ * In searching for an element, the mid-point of each branch is used to
+ * determine the path through the tree. When the point to be searched is closer
+ * than the given tolerance to the midpoint, the other branch is also followed
+ * for correctness.
  * 
- * <p>A couple of other standard collections are used to provide efficient
+ * <p>
+ * A couple of other standard collections are used to provide efficient
  * index-based access and for reverse lookups of leafs.
  * 
  * @author James Matthew Watson - July 2, 2007
  */
 public class NTree implements Iterable<double[]> {
+
     /** the number of elements to allow in a leaf before splitting */
     static final int MAX = 50; /* determined ad hoc testing and hand-waving optimization theories */
     

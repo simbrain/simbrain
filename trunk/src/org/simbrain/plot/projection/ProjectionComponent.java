@@ -28,12 +28,8 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.util.projection.ProjectPCA;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Data for a projection component.
@@ -49,26 +45,30 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     /** Consumer list. */
     private ArrayList<ProjectionConsumer> consumers= new ArrayList<ProjectionConsumer>();
     
+    /** Data model. */
+    private ProjectionModel projectionModel;
+
     /** Scatter Plot Data. */
     private XYSeriesCollection dataset;
     
-    /** Default number of sources. */
-    private final int DEFAULT_NUMBER_OF_SOURCES = 25; // This is the dimensionality of the hi D dataset
+    /**
+     * Default number of sources. This is the dimensionality of the hi D
+     * projectionModel
+     */
+    private final int DEFAULT_NUMBER_OF_SOURCES = 25;
     
-    /** High Dimensional Projection. */
-    private Projector projector = new Projector();
-
     /** Flag which allows the user to start and stop iterative projection techniques.. */
     private volatile boolean isRunning = true;
 
-	/** Flag for checking that GUI update is completed. */
-	private volatile boolean setUpdateCompleted;
-
+    /** Flag for checking that GUI update is completed. */
+    private volatile boolean setUpdateCompleted;
+    
     /**
      * Create new Projection Component.
      */
     public ProjectionComponent(final String name) {
         super(name);
+        projectionModel = new ProjectionModel(DEFAULT_NUMBER_OF_SOURCES);
         init(DEFAULT_NUMBER_OF_SOURCES);
     }
     
@@ -80,7 +80,41 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      */
     public ProjectionComponent(final String name, final int numDataSources) {
         super(name);
+        projectionModel = new ProjectionModel(numDataSources);
         init(numDataSources);
+    }
+    
+    /**
+     * Create a projection component from an existing set of data.
+     *
+     * @param model projection model
+     * @param name name of component
+     */
+    public ProjectionComponent(final ProjectionModel model, final String name) {
+        super(name);
+        projectionModel = model;
+        int numPoints = projectionModel.getProjector().getNumPoints();
+        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
+        dataset = new XYSeriesCollection();
+        dataset.addSeries(new XYSeries("Data", false, true));
+        
+        // Initialize consuming attributes
+        consumers.clear();
+        for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
+            int currentSize = consumers.size() + 1;
+            ProjectionConsumer newAttribute = new ProjectionConsumer(this,
+                    "Dimension" + currentSize, currentSize);
+            consumers.add(newAttribute);
+        }
+        
+        // Add the data to the chart.
+        for (int i = 0; i < numPoints; i++) {
+            double[] point = projectionModel.getProjector().getProjectedPoint(i);
+            if (point != null) {
+                dataset.getSeries(0).add(point[0], point[1], true);
+            }
+        }
+
     }
     
     /**
@@ -95,18 +129,18 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         for (int i = 0; i < numSources; i++) {
             addSource();
         }
-        projector.init(numSources);
     }
 
     /**
-     * Adds a source to dataset.
+     * Adds a consuming attribute. Increases the dimensionality of the projected
+     * data by one.
      */
     public void addSource() {
         int currentSize = consumers.size() + 1;
         ProjectionConsumer newAttribute = new ProjectionConsumer(this,
                 "Dimension" + currentSize, currentSize);
         consumers.add(newAttribute);
-        projector.init(currentSize);
+        projectionModel.getProjector().init(currentSize);
     }
 
     /**
@@ -118,7 +152,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         if (currentSize > 0) {
         	//dataset.removeSeries(lastSeriesIndex);
             consumers.remove(currentSize);
-            projector.init(currentSize);
+            projectionModel.getProjector().init(currentSize);
         }
     }
  
@@ -132,38 +166,11 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     }
 
     /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(WorkspaceComponent.class, "component");
-        xstream.omitField(WorkspaceComponent.class, "listenerList");
-        xstream.omitField(WorkspaceComponent.class, "workspace");
-        xstream.omitField(WorkspaceComponent.class, "logger");
-        xstream.omitField(ProjectPCA.class, "logger");
-
-        return xstream;
-    }
-
-    /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     * 
-     * @return Initialized object.
-     */
-    private Object readResolve() {
-        System.out.println("ReadResolve.");
-        return this;
-    }
-       
-    /**
      * {@inheritDoc}
      */
-    public static ProjectionComponent open(InputStream input, final String name, final String format) {
-        return (ProjectionComponent) getXStream().fromXML(input);
+    public static ProjectionComponent open(InputStream input,
+            final String name, final String format) {
+        return new ProjectionComponent((ProjectionModel) ProjectionModel.getXStream().fromXML(input), name);
     }
 
     /**
@@ -171,7 +178,9 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(this, output);
+        projectionModel.getProjector().getUpstairs().preSaveInit();
+        projectionModel.getProjector().getDownstairs().preSaveInit();
+        ProjectionModel.getXStream().toXML(projectionModel, output);
     }
 
     @Override
@@ -206,7 +215,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
             temp[i] = consumer.getValue();
             i++;
         }
-        boolean newDatapointWasAdded = projector.addDatapoint(temp);
+        boolean newDatapointWasAdded = projectionModel.getProjector().addDatapoint(temp);
         if (newDatapointWasAdded) {
             resetChartDataset(); // (should rename; see below)
             // TODO: Add a check to see whether the current projection algorith
@@ -222,7 +231,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      * @return projector object.
      */
     public Projector getGauge() {
-        return projector;
+        return projectionModel.getProjector();
     }
     
     /**
@@ -230,7 +239,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      */
     public void clearData() {
         dataset.getSeries(0).clear();
-        projector.reset();
+        projectionModel.getProjector().reset();
         fireUpdateEvent();
     }
     
@@ -238,7 +247,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      * Change projection.
      */
     public void changeProjection() {
-        projector.getCurrentProjectionMethod().project(); // Should this have happened already?
+        projectionModel.getProjector().getCurrentProjectionMethod().project(); // Should this have happened already?
         resetChartDataset();
     }
     
@@ -250,16 +259,16 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
             public void run() {
                 // Add the data
                 dataset.getSeries(0).clear();
-                int size = projector.getNumPoints();
+                int size = projectionModel.getProjector().getNumPoints();
                 for (int i = 0; i < size - 2; i++) {
-                    double[] point = projector.getProjectedPoint(i);
+                    double[] point = projectionModel.getProjector().getProjectedPoint(i);
                     if(point != null) {
                     	// No need to update the chart yet (hence the "false" parameter)
                     	dataset.getSeries(0).add(point[0], point[1], false);
                     }
                 }
                 // Notify chart when last datapoint is updated
-                double[] point = projector.getProjectedPoint(size-1);
+                double[] point = projectionModel.getProjector().getProjectedPoint(size-1);
                 if (point != null) {
                     dataset.getSeries(0).add(point[0], point[1], true);
                 }
@@ -281,7 +290,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
 
     @Override
     public String getXML() {
-        return ProjectionComponent.getXStream().toXML(this);
+        return ProjectionModel.getXStream().toXML(this);
     }
 
     /**

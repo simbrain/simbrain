@@ -26,10 +26,12 @@ import org.apache.log4j.Logger;
 import com.Ostermiller.util.CSVParser;
 
 /**
- * <b>ProjectionMethod</b> is a class describing a projection algorithm, which contains a high dimensional dataset (an
- * "upstairs") and a low-dimensional projection of that high dimensional data (a "downstairs").  Classes which extend
- * this class provide different ways of projecting the high dimensional space to the lowdimensional  space. This class
- * provides general methods for handling pairs of datasets and checking their integrity.
+ * <b>ProjectionMethod</b> is a class describing a projection algorithm, which
+ * contains a high dimensional dataset (an "upstairs") and a low-dimensional
+ * projection of that high dimensional data (a "downstairs"). Classes which
+ * extend this class provide different ways of projecting the high dimensional
+ * space to the lowdimensional space. This class provides general methods for
+ * handling pairs of datasets and checking their integrity.
  */
 public abstract class ProjectionMethod {
 

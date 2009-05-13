@@ -23,7 +23,7 @@ import java.util.prefs.Preferences;
 
 /**
 * <b>NetworkPreferences</b> handles storage and retrieval of User Preferences for the
-* neural network.
+* neural network.  Separated from other settings 
 */
 public final class NetworkPreferences {
 

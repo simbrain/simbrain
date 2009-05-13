@@ -22,17 +22,18 @@ import java.awt.Color;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-
 /**
- * <b>NetworkGuiPreferences</b> handles storage and retrieval of user preferences, e.g.  background color for the network
- * panel, default weight values, etc.
+ * <b>NetworkGuiPreferences</b> stores Gui related preferences using the, e.g. background
+ * color for the network panel, using the java Preferences API.
  */
 public class NetworkGuiPreferences {
     
     /** System specific file separator. */
     private static final String FS = System.getProperty("file.separator");
+    
     /**The main user preference object. */
-    private static final Preferences NETWORK_PREFERENCES = Preferences.userRoot().node("/org/simbrain/network");
+    private static final Preferences NETWORK_PREFERENCES = 
+        Preferences.userRoot().node("/org/simbrain/network");
 
     /**
      * Save all user preferences.
@@ -46,7 +47,7 @@ public class NetworkGuiPreferences {
     }
 
     /**
-     * Reverts all settings to default values;
+     * Reverts all settings to default values.
      */
     public static void restoreDefaults() {
         setBackgroundColor(getDefaultBackgroundColor());
@@ -64,7 +65,7 @@ public class NetworkGuiPreferences {
         setMinDiameter(getDefaultMinDiameter());
         setNudgeAmount(getDefaultNudgeAmount());
 
-        // TOOD: Non-Gui stuff..
+        // TOOD: Non-Gui stuff.. To be moved to separate classes.
         setTimeStep(getDefaultTimeStep());
         setPrecision(getDefaultPrecision());
         setWeightValues(getDefaultWeightValues());
@@ -87,7 +88,7 @@ public class NetworkGuiPreferences {
 
     /**
      * Network background color.
-     * @return Perferred background color
+     * @return Preferred background color
      */
     public static int getBackgroundColor() {
         return NETWORK_PREFERENCES.getInt("NetworkBackgroundColor", getDefaultBackgroundColor());

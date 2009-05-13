@@ -20,7 +20,6 @@ package org.simbrain.network.desktop;
 
 import java.awt.Color;
 
-import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
@@ -38,6 +37,7 @@ import org.simbrain.network.interfaces.RootNetwork;
  */
 public class NetworkPanelDesktop extends NetworkPanel {
 
+    /** Reference to Desktop Component. */
     NetworkDesktopComponent component;
     
     public NetworkPanelDesktop(final NetworkDesktopComponent component, final RootNetwork rootNetwork) {
@@ -72,7 +72,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createEditMenu() {
 
         JMenu editMenu = new JMenu("Edit");
-
+        
         editMenu.add(actionManager.getCutAction());
         editMenu.add(actionManager.getCopyAction());
         editMenu.add(actionManager.getPasteAction());

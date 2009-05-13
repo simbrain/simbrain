@@ -1,7 +1,6 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -19,10 +18,10 @@ public class AllToAll extends ConnectNeurons {
      * The synapse to be used as a basis for the connection. Default to a
      * clamped synapse.
      */
-    private Synapse baseSynapse = new ClampedSynapse(null, null);
+    private static Synapse baseSynapse = new ClampedSynapse(null, null);
 
     /** Allows neurons to have a self connection. */
-    public static boolean allowSelfConnection = true;
+    private static boolean allowSelfConnection = true;
 
     public AllToAll(final Network network, final ArrayList neurons, final ArrayList neurons2) {
         super(network, neurons, neurons2);
@@ -62,14 +61,28 @@ public class AllToAll extends ConnectNeurons {
     /**
      * @return the baseSynapse
      */
-    public Synapse getBaseSynapse() {
+    public static Synapse getBaseSynapse() {
         return baseSynapse;
     }
 
     /**
      * @param baseSynapse the baseSynapse to set
      */
-    public void setBaseSynapse(final Synapse baseSynapse) {
-        this.baseSynapse = baseSynapse;
+    public static void setBaseSynapse(final Synapse theSynapse) {
+        baseSynapse = theSynapse;
+    }
+
+    /**
+     * @return the allowSelfConnection
+     */
+    public static boolean isAllowSelfConnection() {
+        return allowSelfConnection;
+    }
+
+    /**
+     * @param allowSelfConnection the allowSelfConnection to set
+     */
+    public static void setAllowSelfConnection(boolean allowSelfConnection) {
+        AllToAll.allowSelfConnection = allowSelfConnection;
     }
 }

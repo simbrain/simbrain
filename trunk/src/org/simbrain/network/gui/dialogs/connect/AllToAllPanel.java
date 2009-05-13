@@ -27,7 +27,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
@@ -55,18 +54,18 @@ public class AllToAllPanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
-                list.add(connection.getBaseSynapse());
+                list.add(AllToAll.getBaseSynapse());
                 SynapseDialog dialog = new SynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 Synapse synapse = dialog.getSynapseList().get(0);
-                connection.setBaseSynapse(synapse);
+                AllToAll.setBaseSynapse(synapse);
                 baseSynapseLabel.setText(synapse.getType());
             }
             
         });
-        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
+        baseSynapseLabel.setText(AllToAll.getBaseSynapse().getType());
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
     }
@@ -75,14 +74,14 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-         AllToAll.allowSelfConnection = allowSelfConnect.isSelected();
+         AllToAll.setAllowSelfConnection(allowSelfConnect.isSelected());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        allowSelfConnect.setSelected(AllToAll.allowSelfConnection);
+        allowSelfConnect.setSelected(AllToAll.isAllowSelfConnection());
     }
 
 }

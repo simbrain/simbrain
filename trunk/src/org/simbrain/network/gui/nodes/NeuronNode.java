@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
@@ -55,6 +56,10 @@ import org.simbrain.network.gui.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.layouts.HexagonalGridLayout;
+import org.simbrain.network.layouts.LineLayout;
+import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -273,16 +278,17 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(),
                 getNetworkPanel().getSelectedNeurons(), this));
         }
-
         contextMenu.addSeparator();
 
         contextMenu.add(getQuickConnections());
-
         // Set Source Action
         contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
         // Show Dialog Action
         contextMenu.add(new ShowConnectDialogAction(getNetworkPanel()));
+        contextMenu.addSeparator();
 
+        contextMenu.add(getLayoutMenu());
+        
         contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected
@@ -338,6 +344,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             
         });
 
+        JMenuItem radialMenuItem = new JMenuItem("Radial");
+        radialMenuItem.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
+                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new Radial();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSourceModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
         JMenuItem sparseMenuItem = new JMenuItem("Sparse");
         sparseMenuItem.addActionListener(new ActionListener(){
 
@@ -356,7 +378,64 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         menu.add(allMenuItem);
         menu.add(oneMenuItem);
+        menu.add(radialMenuItem);
         menu.add(sparseMenuItem);
+
+        return menu;
+    }
+
+    /**
+     * Layouts sub menu item.
+     * @return layout sub menu
+     */
+    private JMenu getLayoutMenu() {
+        JMenu menu = new JMenu("Layout");
+
+        JMenuItem lineMenuItem = new JMenuItem("Line");
+        lineMenuItem.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                NetworkPanel panel = getNetworkPanel();
+                LineLayout layout = new LineLayout(DIAMETER * 2, LineOrientation.VERTICAL);
+                layout.setInitialLocation(panel.getLastClickedPosition());
+                layout.layoutNeurons(panel.getSelectedModelNeurons());
+                panel.repaint();
+            }
+        });
+
+        JMenuItem hexMenuItem = new JMenuItem("Grid");
+        hexMenuItem.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                NetworkPanel panel = getNetworkPanel();
+                GridLayout layout = new GridLayout(DIAMETER * 2, DIAMETER * 2,
+                        (int) Math.sqrt(panel.getSelectedModelNeurons().size()));
+                layout.setInitialLocation(panel.getLastClickedPosition());
+                layout.layoutNeurons(panel.getSelectedModelNeurons());
+                panel.repaint();
+                
+            }
+            
+        });
+
+        JMenuItem gridMenuItem = new JMenuItem("Hex");
+        gridMenuItem.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                NetworkPanel panel = getNetworkPanel();
+                HexagonalGridLayout layout = new HexagonalGridLayout(DIAMETER * 2,
+                        DIAMETER * 2, (int) Math.sqrt(panel.getSelectedModelNeurons().size()));
+
+                layout.setInitialLocation(panel.getLastClickedPosition());
+                layout.layoutNeurons(panel.getSelectedModelNeurons());
+                panel.repaint();
+            }
+            
+        });
+
+        menu.add(lineMenuItem);
+        menu.add(hexMenuItem);
+        menu.add(gridMenuItem);
 
         return menu;
     }

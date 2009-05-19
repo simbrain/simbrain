@@ -1,12 +1,63 @@
-#summary Configuration tips for Simbrain developers
+#summary How to set up your environment for Simbrain development
 
 = Introduction =
 
-Currently all these notes assume you are using Eclipse.  
+This page is for those who want to contribute to Simbrain development, and for those who are simply interested in using the latest version of Simbrain from code.
 
-= Checkstyle = 
+If you are interested in developing, notes for Eclipse users are below.   You will also need to use checkstyle, a program we use to ensure code consistency.    Of course, you will also need to contact an administrator to become a project member  before you can commit changes.
 
-== Install eclipse checkstyle ==
+== Running the current version of Simbrain from source ==
+
+For those who simply want to run the current version of the code from source, you will need to install (1) the JDK, (2) Ant, and (3) subversion.   Installation notes on each of these is below.   
+
+Once you have installed all three, to run Simbrain, open up a command or terminal window.   To verify you have 1-3 above, try typing 
+
+{{{
+javac
+ant
+svn
+}}}
+
+from the command line.   If something besides an error comes back, you have installed them successfully.   
+
+If you get an error, you may have to set an environment variable.  See the section on environment variables below.
+
+To run Simbrain go to the directory where you installed it, and enter  
+
+{{{
+ant run
+}}}
+
+== JDK ==
+
+Download and install the latest jdk for your computer following instructions [http://java.sun.com/javase/downloads/index.jsp here]
+
+== Ant ==
+
+Download ant [http://ant.apache.org/bindownload.cgi here]
+
+Extract zip file and install.
+
+== Subversion ==
+
+Download and install subversion [http://subversion.tigris.org/ here]. Windows users click on "windows binaries", Mac users click on "Mac OS X binaries", etc.
+
+Checkout the latest version of Simbrain by following the directions [http://code.google.com/p/simbrain/source/checkout here]
+
+== Setting environment variables ==
+
+For Windows users:
+
+  # Right click on my computer then go to properties.
+  # Select the advanced tab and then click on the environment variables button at the bottom
+  # Under System variables, select the Path variable and click edit.
+  # At the end of the paths, make sure there is a ";" ending the line
+  # Add the path to the and bin folder that was extracted earlier (ex C:\Program Files\apache-ant-1.7.1\bin)
+  # Add the path to the Java JDK folder making sure that there is a semicolon separating the two entries. (ex C:\Program Files\Java\jdk1.6.0_03)
+	
+== Checkstyle == 
+
+=== Install eclipse checkstyle ===
 
 From eclipse click on Help > Software Updates
 
@@ -18,7 +69,7 @@ After the eclipse has finished checking the program for requirements and dependa
 
 Finally, restart eclipse when prompted to do so by clicking Yes in the dialog box.
 
-== Configure eclipse checkstyle ==
+=== Configure eclipse checkstyle ===
 
 Right click on the Simbrain project in the package explorer and select Properties and click on Checkstyle in the left frame.
 
@@ -34,16 +85,16 @@ Click on OK and then select Main and select the configuration file that was just
 
 Finally click the check box labeled Checkstyle active for this project to activate checkstyle and click OK to accept the settings. Eclipse will now ask to rebuild the project, click OK and any outstanding checkstyle errors will now be displayed.
 
-== Eclipse Tabs to Spaces ==
+=== Eclipse Tabs to Spaces ===
 
 Since our checkstyle requires spaces, this has to be changed on Eclipse.  Here's an entry on how to do it:
 
 http://blog.dotkam.com/2007/03/21/changing-tabs-to-spaces-in-eclipse/
 
 
-= Log4J = 
+== Log4J ==
 
-== Import log4j JAR into project ==
+=== Import log4j JAR into project ===
 
 Right click on the project and select "properties" from the menu.
 
@@ -51,20 +102,17 @@ Select "Java Build Path" from the frame on the left and then Libraries from the 
 
 Make sure that the log4j jar file is listed. If it is not listed, add it to the build path by clicking on "Add JARs..." then selecting it from the "lib" directory within the build project. After the JAR is verified to be in the build path, click "Ok"
 
-== Configure log4j. ==
+=== Configure log4j ===
 
 Click on "Run" menu then go to "Run Configurations"   From here there are two cases:
 
 (If Running Simbrain for the first time, you must create a run configuraiton.  Double click on "Java Application" in the left frame. Change the name to something like "Simbrain" or some other descriptive term. Next under "Project:" heading click "Browse" and select the Simbrain project folder. Then under the "Main class:" heading type "org.simbrain.workspace.gui.Splasher")
 
- - Import log4j properties file.
+=== Import log4j properties file ===
 
 Assuming the Simbrain run configuration is selected from the left frame:
 
-- select "Classpath" from the right frame and click on "User Entries" in the main panel
-
-- click on the "Advanced" button on the right
-
-- select "Add Folders" in the dialog and click "OK,"
-
-- select the "etc" folder within the project directory. Click "OK" then "Apply" and run the project.
+  # Select "Classpath" from the right frame and click on "User Entries" in the main panel
+  # Click on the "Advanced" button on the right
+  # Select "Add Folders" in the dialog and click "OK,"
+  # Select the "etc" folder within the project directory. Click "OK" then "Apply" and run the project.

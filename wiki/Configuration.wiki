@@ -34,9 +34,13 @@ Download and install the latest jdk for your computer following instructions [ht
 
 == Ant ==
 
+(This is pre-installed on some systems)
+
 Download ant [http://ant.apache.org/bindownload.cgi here]
 
-Extract zip file and install.
+Extract zip file.  You will end up with an ant folder.  Installation simply corresponds to placing this folder in an appropriate location (for example, on windows, C:\\Program Files\)
+
+See: http://ant.apache.org/manual/install.html
 
 == Subversion ==
 
@@ -46,7 +50,7 @@ Checkout the latest version of Simbrain by following the directions [http://code
 
 == Setting environment variables ==
 
-For Windows users:
+For Windows users, ant and jdk must be added to your path, as follows:
 
   # Right click on my computer then go to properties.
   # Select the advanced tab and then click on the environment variables button at the bottom

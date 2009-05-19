@@ -22,10 +22,10 @@ public class Sparse extends ConnectNeurons {
     public static double inhibitoryProbability = .1;
     
     /** Base excitatory synapse. */
-    private Synapse baseExcitatorySynapse = new ClampedSynapse(null, null);
+    private static Synapse baseExcitatorySynapse = new ClampedSynapse(null, null);
 
     /** Base inhibitory synapse. */
-    private Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
+    private static Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
     
     {
         baseExcitatorySynapse.setStrength(10);
@@ -80,56 +80,56 @@ public class Sparse extends ConnectNeurons {
     /**
      * @return the excitatoryProbability
      */
-    public double getExcitatoryProbability() {
+    public static double getExcitatoryProbability() {
         return excitatoryProbability;
     }
 
     /**
      * @param excitatoryProbability the excitatoryProbability to set
      */
-    public void setExcitatoryProbability(final double excitatoryProbability) {
-        this.excitatoryProbability = excitatoryProbability;
+    public static void setExcitatoryProbability(final double excitatoryProbability) {
+        Sparse.excitatoryProbability = excitatoryProbability;
     }
 
     /**
      * @return the inhibitoryProbability
      */
-    public double getInhibitoryProbability() {
+    public static double getInhibitoryProbability() {
         return inhibitoryProbability;
     }
 
     /**
      * @param inhibitoryProbability the inhibitoryProbability to set
      */
-    public void setInhibitoryProbability(final double inhibitoryProbability) {
-        this.inhibitoryProbability = inhibitoryProbability;
+    public static void setInhibitoryProbability(final double inhibitoryProbability) {
+        Sparse.inhibitoryProbability = inhibitoryProbability;
     }
 
     /**
      * @return the baseExcitatorySynapse
      */
-    public Synapse getBaseExcitatorySynapse() {
+    public static Synapse getBaseExcitatorySynapse() {
         return baseExcitatorySynapse;
     }
 
     /**
      * @param baseExcitatorySynapse the baseExcitatorySynapse to set
      */
-    public void setBaseExcitatorySynapse(final Synapse baseExcitatorySynapse) {
-        this.baseExcitatorySynapse = baseExcitatorySynapse;
+    public static void setBaseExcitatorySynapse(final Synapse baseExcitatorySynapse) {
+        Sparse.baseExcitatorySynapse = baseExcitatorySynapse;
     }
 
     /**
      * @return the baseInhibitorySynapse
      */
-    public Synapse getBaseInhibitorySynapse() {
+    public static Synapse getBaseInhibitorySynapse() {
         return baseInhibitorySynapse;
     }
 
     /**
      * @param baseInhibitorySynapse the baseInhibitorySynapse to set
      */
-    public void setBaseInhibitorySynapse(final Synapse baseInhibitorySynapse) {
-        this.baseInhibitorySynapse = baseInhibitorySynapse;
+    public static void setBaseInhibitorySynapse(final Synapse baseInhibitorySynapse) {
+        Sparse.baseInhibitorySynapse = baseInhibitorySynapse;
     }
 }

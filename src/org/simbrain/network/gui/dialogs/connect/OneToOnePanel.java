@@ -85,8 +85,8 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-        connection.setUseBidirectionalConnections(bidirectionalConnection.isSelected());
-        connection.setConnectOrientation((Comparator) orientationBox.getSelectedItem());
+        OneToOne.setUseBidirectionalConnections(bidirectionalConnection.isSelected());
+        OneToOne.setConnectOrientation((Comparator) orientationBox.getSelectedItem());
     }
 
     /**

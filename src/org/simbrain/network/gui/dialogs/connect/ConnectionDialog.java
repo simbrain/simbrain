@@ -9,6 +9,7 @@ import javax.swing.JComboBox;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -20,7 +21,7 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
 
     /** Connection type objects. */
     private ConnectNeurons[] connectionObjects = new ConnectNeurons[] {
-            new AllToAll(), new OneToOne(), new Sparse() };
+            new AllToAll(), new OneToOne(), new Radial(), new Sparse() };
 
     /** Select connection type. */
     private JComboBox cbConnectionType = new JComboBox(connectionObjects);
@@ -78,6 +79,11 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
             optionsPanel = new OneToOnePanel((OneToOne) connection);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
+        } else if (connection instanceof Radial) {
+            clearOptionPanel();
+            optionsPanel = new RadialPanel((Radial) connection);
+            optionsPanel.fillFieldValues();
+            mainPanel.add(optionsPanel);
         } else if (connection instanceof Sparse) {
             clearOptionPanel();
             optionsPanel = new SparsePanel((Sparse) connection);
@@ -85,6 +91,7 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
             mainPanel.add(optionsPanel);
         }
         pack();
+        setLocationRelativeTo(null);
     }
     
     /**

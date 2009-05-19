@@ -20,28 +20,28 @@ import org.simbrain.network.synapses.ClampedSynapse;
 public class Radial extends ConnectNeurons {
 
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
-    private double excitatoryRatio = .4;
+    private static double percentExcitatory = .6;
     
     /** Whether to allow self-connections. */
-    private boolean allowSelfConnections = false;
+    private static boolean allowSelfConnections = false;
 
     /** Template synapse for excitatory synapses. */
-    //private Synapse exctitatorySynapse = new ClampedSynapse(null, null); // TODO
+    private static Synapse baseExcitatorySynapse = new ClampedSynapse(null, null);
 
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
-    private double excitatoryProbability = .8;
+    private static double excitatoryProbability = .8;
     
     /** Radius within which to connect excitatory neurons. */
-    private double excitatoryRadius = 75;
+    private static double excitatoryRadius = 75;
 
     /** Template synapse for inhibitory synapses. */
-    //private Synapse inhibitorySynapse = new ClampedSynapse(null, null); // TODO
+    private static Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
     
     /** Radius within which to connect inhibitory neurons. */
-    private double inhibitoryRadius = 40;
+    private static double inhibitoryRadius = 40;
     
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
-    private double inhibitoryProbability = .8;
+    private static double inhibitoryProbability = .8;
 
     /**
      * See super class description.
@@ -67,7 +67,7 @@ public class Radial extends ConnectNeurons {
     public void connectNeurons() {
         for (Neuron source : sourceNeurons) {
             double rand = Math.random();
-            if (rand < excitatoryRatio) {
+            if (rand < percentExcitatory) {
                 makeExcitatory(source);
             }  else {
                 makeInhibitory(source);
@@ -89,9 +89,11 @@ public class Radial extends ConnectNeurons {
                 }
             }
             if (Math.random() < inhibitoryProbability) {
-                Synapse weight = new ClampedSynapse(source, target);
-                weight.setStrength(-1);
-                network.addSynapse(weight);
+                Synapse synapse = baseInhibitorySynapse.duplicate();
+                synapse.setSource(source);
+                synapse.setTarget(target);
+                synapse.setStrength(-1);
+                network.addSynapse(synapse);
             }
         }
     }
@@ -110,9 +112,11 @@ public class Radial extends ConnectNeurons {
                 }
             }
             if (Math.random() < excitatoryProbability) {
-                Synapse weight = new ClampedSynapse(source, target);
-                weight.setStrength(1);
-                network.addSynapse(weight);
+                Synapse synapse = baseExcitatorySynapse.duplicate();
+                synapse.setSource(source);
+                synapse.setTarget(target);
+                synapse.setStrength(1);
+                network.addSynapse(synapse);
             }
         }
     }
@@ -120,85 +124,113 @@ public class Radial extends ConnectNeurons {
     /**
      * @return the excitatoryRatio
      */
-    public double getExcitatoryRatio() {
-        return excitatoryRatio;
+    public static double getPercentExcitatory() {
+        return percentExcitatory;
     }
 
     /**
-     * @param excitatoryRatio the excitatoryRatio to set
+     * @param percentExcitatory the excitatoryRatio to set
      */
-    public void setExcitatoryRatio(double excitatoryRatio) {
-        this.excitatoryRatio = excitatoryRatio;
+    public static void setPercentExcitatory(final double percentExcitatory) {
+        Radial.percentExcitatory = percentExcitatory;
     }
 
     /**
      * @return the allowSelfConnections
      */
-    public boolean isAllowSelfConnections() {
+    public static boolean isAllowSelfConnections() {
         return allowSelfConnections;
     }
 
     /**
      * @param allowSelfConnections the allowSelfConnections to set
      */
-    public void setAllowSelfConnections(boolean allowSelfConnections) {
-        this.allowSelfConnections = allowSelfConnections;
+    public static void setAllowSelfConnections(final boolean allowSelfConnections) {
+        Radial.allowSelfConnections = allowSelfConnections;
     }
 
     /**
      * @return the excitatoryProbability
      */
-    public double getExcitatoryProbability() {
+    public static double getExcitatoryProbability() {
         return excitatoryProbability;
     }
 
     /**
      * @param excitatoryProbability the excitatoryProbability to set
      */
-    public void setExcitatoryProbability(double excitatoryProbability) {
-        this.excitatoryProbability = excitatoryProbability;
+    public static void setExcitatoryProbability(final double excitatoryProbability) {
+        Radial.excitatoryProbability = excitatoryProbability;
     }
 
     /**
      * @return the excitatoryRadius
      */
-    public double getExcitatoryRadius() {
+    public static double getExcitatoryRadius() {
         return excitatoryRadius;
     }
 
     /**
      * @param excitatoryRadius the excitatoryRadius to set
      */
-    public void setExcitatoryRadius(double excitatoryRadius) {
-        this.excitatoryRadius = excitatoryRadius;
+    public static void setExcitatoryRadius(final double excitatoryRadius) {
+        Radial.excitatoryRadius = excitatoryRadius;
     }
 
     /**
      * @return the inhibitoryRadius
      */
-    public double getInhibitoryRadius() {
+    public static double getInhibitoryRadius() {
         return inhibitoryRadius;
     }
 
     /**
      * @param inhibitoryRadius the inhibitoryRadius to set
      */
-    public void setInhibitoryRadius(double inhibitoryRadius) {
-        this.inhibitoryRadius = inhibitoryRadius;
+    public static void setInhibitoryRadius(final double inhibitoryRadius) {
+        Radial.inhibitoryRadius = inhibitoryRadius;
     }
 
     /**
      * @return the inhibitoryProbability
      */
-    public double getInhibitoryProbability() {
+    public static double getInhibitoryProbability() {
         return inhibitoryProbability;
     }
 
     /**
      * @param inhibitoryProbability the inhibitoryProbability to set
      */
-    public void setInhibitoryProbability(double inhibitoryProbability) {
-        this.inhibitoryProbability = inhibitoryProbability;
+    public static void setInhibitoryProbability(final double inhibitoryProbability) {
+        Radial.inhibitoryProbability = inhibitoryProbability;
+    }
+
+    /**
+     * @return the baseExcitatorySynapse
+     */
+    public static Synapse getBaseExcitatorySynapse() {
+        return baseExcitatorySynapse;
+    }
+
+    /**
+     * @param baseExcitatorySynapse the baseExcitatorySynapse to set
+     */
+    public static void setBaseExcitatorySynapse(final Synapse baseExcitatorySynapse) {
+        Radial.baseExcitatorySynapse = baseExcitatorySynapse;
+    }
+
+    /**
+     * @return the baseInhibitorySynapse
+     */
+    public static Synapse getBaseInhibitorySynapse() {
+        return baseInhibitorySynapse;
+    }
+
+    /**
+     * @param baseInhibitorySynapse the baseInhibitorySynapse to set
+     */
+    public static void setBaseInhibitorySynapse(final Synapse baseInhibitorySynapse) {
+        Radial.baseInhibitorySynapse = baseInhibitorySynapse;
     }
 
 }

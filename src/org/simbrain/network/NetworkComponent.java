@@ -1,5 +1,4 @@
 /*
- * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,16 +36,15 @@ import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.dataworld.ConsumingColumn;
-import org.simbrain.world.dataworld.ProducingColumn;
+import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Network frame.
  */
-public final class NetworkComponent extends WorkspaceComponent<NetworkListener> {
+public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
     /** Reference to root network, the main model network. */
-    private RootNetwork rootNetwork = new RootNetwork(this);
+    private RootNetwork rootNetwork = new RootNetwork();
     
     /** Consumer list. */
     private List<Consumer> consumers = new CopyOnWriteArrayList<Consumer>();
@@ -68,7 +66,6 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
     public NetworkComponent(final String name, final RootNetwork network) {
         super(name);
         this.rootNetwork = network;
-        rootNetwork.setParent(this);
         setChangedSinceLastSave(false);
         init();
     }
@@ -126,16 +123,7 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
 ////       return NetworkPreferences.getCurrentDirectory();
 //        return null;
 //    }
-    
-    /**
-     * Returns the listeners on this component.
-     * 
-     * @return The listeners on this component.
-     */
-    public Collection<? extends NetworkListener> getListeners() {
-        return super.getListeners();
-    }
-    
+        
     /**
      * Initialize consumers, producers, and listener.
      */
@@ -147,7 +135,7 @@ public final class NetworkComponent extends WorkspaceComponent<NetworkListener> 
             producers.add(wrapper);
         }
         
-        this.addListener(new NetworkListener() {
+        rootNetwork.addListener(new NetworkListener() {
 
             public void clampBarChanged() {
                 // TODO Auto-generated method stub

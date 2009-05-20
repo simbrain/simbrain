@@ -20,13 +20,9 @@ package org.simbrain.network.util;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import org.simbrain.network.gui.filters.AbstractFilter;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
-
-import edu.umd.cs.piccolo.PNode;
 
 /**
  * <b>SimnetUtils</b> provides utility classes.

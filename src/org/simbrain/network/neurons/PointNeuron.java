@@ -21,21 +21,15 @@ package org.simbrain.network.neurons;
 import java.util.ArrayList;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
-import org.simbrain.network.interfaces.Group;
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.NetworkEvent;
-import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.networks.KwtaNetwork;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
  * in Cognitive Neuroscience, chapter 2.  All page references below are are to this book.
  */
-public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron {
+public class PointNeuron extends Neuron implements BiasedNeuron {
 
     /** Excitatory Reversal field. */
     private double excitatoryReversal = 55;
@@ -107,7 +101,6 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
      */
     public void postUnmarshallingInit() {
         super.postUnmarshallingInit();
-        this.getParentNetwork().getRootNetwork().getParent().addListener(this);
         this.setInputLists();
     }
 
@@ -174,9 +167,11 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
 
         // Update currents
         current = getLeakCurrent() + getExcitatoryCurrent() + getInhibitoryCurrent();
+        System.out.println("Current: " + current);
 
         // Update voltage
         voltage = voltage - this.getParentNetwork().getRootNetwork().getTimeStep() * current;
+        System.out.println("Voltage: " + voltage);
 
         // Apply output function
         if (outputFunction == NONE) {
@@ -483,105 +478,33 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
         voltage = 0;
     }
 
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void networkChanged() {
-    }
+    //TODO: Re-assess below when taking next pass on these neurons.
+//    /**
+//     * @inheritDoc org.simnet.interfaces.NetworkListener
+//     */
+//    public void synapseRemoved(final NetworkEvent<Synapse> e) {
+//        if (this.isConnected(e.getObject())) {
+//            this.setInputLists();
+//        }
+//    }
+//
+//    /**
+//     * @inheritDoc org.simnet.interfaces.NetworkListener
+//     */
+//    public void synapseAdded(final NetworkEvent<Synapse> e) {
+//        if (this.isConnected(e.getObject())) {
+//            this.setInputLists();            
+//        }
+//    }
+//
+//    /**
+//     * @inheritDoc org.simnet.interfaces.NetworkListener
+//     */
+//    public void synapseChanged(final NetworkEvent<Synapse> e) {
+//        if (this.isConnected(e.getObject())) {
+//            this.setInputLists();
+//        }
+//    }
 
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void couplingChanged(NetworkEvent e) {
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void synapseRemoved(final NetworkEvent<Synapse> e) {
-        if (this.isConnected(e.getObject())) {
-            this.setInputLists();
-        }
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void synapseAdded(final NetworkEvent<Synapse> e) {
-        if (this.isConnected(e.getObject())) {
-            this.setInputLists();            
-        }
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void synapseChanged(final NetworkEvent<Synapse> e) {
-        if (this.isConnected(e.getObject())) {
-            this.setInputLists();
-        }
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void subnetAdded(NetworkEvent e) {
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void clampMenuChanged() {
-    }
-
-    /**
-     * @inheritDoc org.simnet.interfaces.NetworkListener
-     */
-    public void clampBarChanged() {
-    }
-
-    public void componentUpdated() {
-        /* no implementation */
-    }
-
-    public void setTitle(String name) {
-        /* no implementation */
-    }
-
-    public void groupAdded(NetworkEvent<Group> event) {
-        /* no implementation */
-    }
-
-    public void groupChanged(NetworkEvent<Group> event) {
-        /* no implementation */
-    }
-
-    public void groupRemoved(NetworkEvent<Group> event) {
-        /* no implementation */
-    }
-
-    public void neuronAdded(NetworkEvent<Neuron> e) {
-        /* no implementation */
-    }
-
-    public void neuronChanged(NetworkEvent<Neuron> e) {
-        /* no implementation */
-    }
-
-    public void neuronMoved(NetworkEvent<Neuron> e) {
-        /* no implementation */
-    }
-
-    public void neuronRemoved(NetworkEvent<Neuron> e) {
-        /* no implementation */
-    }
-
-    public void subnetRemoved(NetworkEvent<Network> e) {
-        /* no implementation */
-    }
-
-    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
-        /* no implementation */
-    }
 
 }

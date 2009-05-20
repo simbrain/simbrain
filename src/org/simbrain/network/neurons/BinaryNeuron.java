@@ -19,9 +19,6 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.ProducingAttribute;
-
 
 /**
  * <b>BinaryNeuron</b> takes one of two values.  See docs.

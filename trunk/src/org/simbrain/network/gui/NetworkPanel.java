@@ -274,7 +274,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         addInputEventListener(textHandle);
         addInputEventListener(new ContextMenuEventHandler());
 
-        rootNetwork.getParent().addListener(this);
+        rootNetwork.addListener(this);
 
         selectionModel.addSelectionListener(new NetworkSelectionListener()
             {
@@ -1028,6 +1028,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void setRootNetwork(final RootNetwork network) {
         this.rootNetwork = network;
+        rootNetwork.addListener(this);
     }
 
     /**
@@ -1703,7 +1704,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
                 rootNetwork.setUpdateCompleted(true);
             }
         });
-        rootNetwork.getParent().setChangedSinceLastSave(true);  
    }
 
     /**
@@ -1789,7 +1789,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * Close model rootNetwork.
      */
     public void closeNetwork() {
-        getRootNetwork().getParent().removeListener(this);
     }
 
     /**

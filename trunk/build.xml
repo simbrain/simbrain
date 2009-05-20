@@ -13,6 +13,7 @@
     <property name="dist" location="dist"/>
     <property name="build" location="build"/>
     <property name="temp" location="temp"/>
+    <property name="removelogger" location="${temp}/removelogger"/>
     <property name="etc" location="etc"/>
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
     <property name="compile.debug" value="true"/>
@@ -119,6 +120,7 @@
          </classpath>
 	</java>
     </target>
+
     <target name="profile" depends="jar" description="Run using profiler">
         <java jar="${jarfile}" fork="yes">
 		<jvmarg value="-Xprof "/>
@@ -150,39 +152,33 @@
         <delete dir="${temp}"/>
     </target>
 
-    <!-- BUILDS FOR SPECIALIZED JARS FROM HERE ON... -->
-
-    <!-- Remove dependency on log4j.
-    	Move all source to a temporary staging area
-	Replace references to "log4j" with references to internal Logger proxy.
-	Jars built from the staging area do not need log4j.jar 
-	TODO: How to turn this off, for thos who want log4j in the distribution jar? -->    
-    <target name = "removelog4j" depends = "compile" description = "Remove log4j references from source files.">
-    	<mkdir dir="${temp}"/>
-	<copy todir="${temp}">
+    <!-- Replace references to "log4j" with references to internal Logger proxy.-->    
+    <target name = "removelog4j" description = "Remove log4j references from source files.">
+    	<mkdir dir="${removelogger}"/>
+	<copy todir="${removelogger}">
             <fileset dir="${src}">
 	   	 <include name="**/*.java"/>
             </fileset>
         </copy>
-	<replace dir="${temp}" token="import org.apache.log4j.Logger" value="import org.simbrain.util.Logger"/>
+	<replace dir="${removelogger}" token="import org.apache.log4j.Logger" value="import org.simbrain.util.Logger"/>
     </target>
 
     <!-- Build util package, currently used in all specialized distributions. -->
-    <!-- Removelog4j dependency here because all others depend on this  -->
-    <target name="util" depends = "removelog4j" description="Compile utils">
+    <target name="util" depends="removelog4j" description="Compile utils" >
        <mkdir dir="${build}"/>
-       <javac srcdir="${temp}/org/simbrain/util" destdir="${build}" includeAntRuntime="no"
+       <filter token="import org.apache.log4j.Logger" value="import org.simbrain.util.Logger"/>
+       <javac srcdir="${removelogger}/org/simbrain/util" destdir="${build}" includeAntRuntime="no"
             classpathref="lib.path" debug="${comple.debug}">
         	<exclude name="environment/**"/>
         	<exclude name="projection/**"/>
         </javac>
     </target>
 	
-    <!-- Used for creating library distributions -->
-    <target name="workspace" depends="util" description="Compile workspace module">
+    <!-- Compile workspace code -->
+    <target name="workspace" depends="util, removelog4j" description="Compile workspace module">
     	
     	<mkdir dir="${build}"/>
-        <javac srcdir="${temp}/org/simbrain/workspace/" destdir="${build}" includeAntRuntime="no"
+        <javac srcdir="${removelogger}/org/simbrain/workspace/" destdir="${build}" includeAntRuntime="no"
             classpathref="lib.path" debug="${comple.debug}">
 		<exclude name="gui/**"/>
         	<exclude name="actions/**"/>
@@ -192,17 +188,36 @@
         </javac>
     </target>
 
-    <!-- Used for creating the network (with gui) distribution -->
-    <target name="network" depends="workspace" description="Compile network">
+    <!-- Used for creating a minimal network (no gui, no workspace) distribution -->
+    <target name="network" depends="util, removelog4j" description="Compile minimal network">
         <mkdir dir="${build}"/>
-	<javac srcdir="${temp}/${resource}/" destdir="${build}"/>	
+        <javac srcdir="${removelogger}/org/simbrain/network/" destdir="${build}" includeAntRuntime="no"
+            classpathref="lib.path" debug="${comple.debug}">
+            <exclude name="gui/**"/>
+            <exclude name="desktop/**"/>
+            <exclude name="attributes/**"/>
+            <exclude name="NetworkComponent.java"/>
+        </javac>
+    </target>
+
+    <!-- Create a minimal network jar. -->
+    <target name="networkjar" depends="clean, network " description="Create the bare network jar">
+        <mkdir dir="${dist}"/>
+        <mkdir dir="${build}"/>
+		<jar destfile="${dist}/Network.jar" basedir="${build}"/>
+    </target>
+
+    <!-- Network with GUI -->
+    <target name="networkgui" depends="workspace, removelog4j" description="Compile network">
+        <mkdir dir="${build}"/>
+	<javac srcdir="${removelogger}/${resource}/" destdir="${build}"/>	
         <copy todir="${build}/${resource}">
             <fileset dir="${src}/${resource}">
               <exclude name="**/*.class"/>
             </fileset>
         </copy>
         <javac 
-		srcdir="${temp}/org/simbrain/network/" 
+		srcdir="${removelogger}/org/simbrain/network/" 
         	destdir="${build}" 
 		classpathref="lib.path" 
         	includeAntRuntime="no"
@@ -212,23 +227,10 @@
    </target>
    
     <!-- Create network (with GUI) jar.  Can be used in applets. -->
-    <target name="networkjar" depends="clean, network" description="Create the network jar">
+    <target name="networkguijar" depends="clean, networkgui" description="Create the network jar">
         <mkdir dir="${dist}"/>
-	<jar destfile="${dist}/Network.jar" basedir="${build}"/>
+	<jar destfile="${dist}/NetworkGui.jar" basedir="${build}"/>
     </target>
-
-    <!-- Used for creating the minimal network (without gui) distribution -->
-    <target name="minimalnetwork" depends="workspace" description="Compile minimal network">
-        <javac srcdir="${temp}/org/simbrain/network/" destdir="${build}" includeAntRuntime="no"
-            classpathref="lib.path" debug="${comple.debug}">
-            <exclude name="gui/**"/>
-        </javac>
-    </target>
-
-    <!-- Create minimal network jar. -->
-    <target name="minimalnetworkjar" depends="clean, minimalnetwork" description="Create the minimal network jar">
-        <mkdir dir="${dist}"/>
-		<jar destfile="${dist}/MinimalNetwork.jar" basedir="${build}"/>
-    </target>
+	
 	
 </project>

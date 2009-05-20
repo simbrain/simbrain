@@ -18,12 +18,7 @@
  */
 package org.simbrain.network.neurons;
 
-import java.lang.reflect.Type;
-
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.workspace.AbstractAttribute;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
 
 /**
  * <b>StochasticNeuron</b>.

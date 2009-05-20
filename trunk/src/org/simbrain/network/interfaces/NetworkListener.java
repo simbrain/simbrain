@@ -1,13 +1,10 @@
 
 package org.simbrain.network.interfaces;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
-
 /**
  * Model listener.
  */
-public interface NetworkListener extends WorkspaceComponentListener { //extends EventListener {
-
+public interface NetworkListener {
     /**
      * Notify this listener of a NetworkChanged event.
      *

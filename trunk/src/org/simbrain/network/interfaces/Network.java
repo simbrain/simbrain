@@ -25,8 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.util.CopyFactory;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.CouplingManager;
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the main API
@@ -721,22 +719,22 @@ public abstract class Network {
         rootNetwork.updateTimeType();
     }
     
-    /**
-     * Helper method for finding attributes with matching names.
-     * 
-     * @param name The name of the attribute to search for.
-     * @param toSearch The list to search.
-     * @return The found attribute if any.
-     */
-    private static Attribute find(final String name, final List<? extends Attribute> toSearch) {
-        for (Attribute consuming : toSearch) {
-            if (consuming.getKey().equals(name)) {
-                return consuming;
-            }
-        }
-        
-        return null;
-    }
+//    /**
+//     * Helper method for finding attributes with matching names.
+//     * 
+//     * @param name The name of the attribute to search for.
+//     * @param toSearch The list to search.
+//     * @return The found attribute if any.
+//     */
+//    private static Attribute find(final String name, final List<? extends Attribute> toSearch) {
+//        for (Attribute consuming : toSearch) {
+//            if (consuming.getKey().equals(name)) {
+//                return consuming;
+//            }
+//        }
+//        
+//        return null;
+//    }
 
     /**
      * Change synapse type / replace one synapse with another.

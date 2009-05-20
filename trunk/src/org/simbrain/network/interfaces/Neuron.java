@@ -22,13 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.AbstractAttribute;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.ProducingAttribute;
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic"
@@ -777,15 +771,6 @@ public abstract class Neuron  {
      */
     public String getDescription() {
         return getId();
-    }
-
-    /**
-     * Returns the parent component.
-     * 
-     * @return the parent component.
-     */
-    public NetworkComponent getParentComponent() {
-        return parent.getRootNetwork().getParent();
     }
 
     /**

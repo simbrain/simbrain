@@ -46,7 +46,7 @@ public abstract class Group {
      */
     public Group(final RootNetwork net) {
         parent = net;
-        referenceNetwork = new RootNetwork(net.getParent());
+        referenceNetwork = new RootNetwork();
     }
 
     /**

@@ -1,4 +1,4 @@
-#summary One-Running Simbrain from Source
+#summary Running Simbrain from Source
 
 For those who simply want to run the current version of the code from source, you will need to install (1) the JDK, (2) Ant, and (3) subversion.   Installation notes on each of these is below.   
 

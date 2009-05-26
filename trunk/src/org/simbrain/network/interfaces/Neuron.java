@@ -67,12 +67,6 @@ public abstract class Neuron  {
     /** List of synapses attaching to this neuron. */
     private ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
 
-    /** Read only version of the above. */
-    private final List<Synapse> readOnlyFanIn = Collections.unmodifiableList(fanIn);
-
-    /** Read only version of the above. */
-    private final List<Synapse> readOnlyFanOut = Collections.unmodifiableList(fanOut);
-
     /** x-coordinate of this neuron in 2-space. */
     private double x;
 
@@ -163,6 +157,9 @@ public abstract class Neuron  {
      * the parent network has been added.
      */
     public void postUnmarshallingInit() {
+        //TODO: Add checks?
+        fanOut = new ArrayList<Synapse>();
+        fanIn = new ArrayList<Synapse>();
     }
 
     /**
@@ -246,14 +243,14 @@ public abstract class Neuron  {
      * @return the fan in array list.
      */
     public List<Synapse> getFanIn() {
-        return readOnlyFanIn;
+        return fanIn;
     }
 
     /**
      * @return the fan out array list.
      */
     public List<Synapse> getFanOut() {
-        return readOnlyFanOut;
+        return fanOut;
     }
 
     /**

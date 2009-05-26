@@ -138,10 +138,10 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "updateCompleted");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
-//        xstream.omitField(Neuron.class, "fanOut");
-//        xstream.omitField(Neuron.class, "fanIn");
-//        xstream.omitField(Neuron.class, "readOnlyFanOut");
-//        xstream.omitField(Neuron.class, "readOnlyFanIn");
+        xstream.omitField(Neuron.class, "fanOut");
+        xstream.omitField(Neuron.class, "fanIn");
+        xstream.omitField(Neuron.class, "readOnlyFanOut");
+        xstream.omitField(Neuron.class, "readOnlyFanIn");
         return xstream;
     }
 
@@ -157,6 +157,13 @@ public class RootNetwork extends Network {
         logger = Logger.getLogger(RootNetwork.class);
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
+        for(Neuron neuron : this.getFlatNeuronList()) {
+            neuron.postUnmarshallingInit();
+        }
+        for(Synapse synapse: this.getFlatSynapseList()) {
+            synapse.getTarget().getFanIn().add(synapse);
+            synapse.getSource().getFanOut().add(synapse);
+        }
         return this;
     }
 

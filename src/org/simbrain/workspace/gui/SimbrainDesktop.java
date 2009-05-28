@@ -90,6 +90,8 @@ import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.workspace.updator.InterceptingEventQueue;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
+import org.simbrain.world.game.GameComponent;
+import org.simbrain.world.game.GameDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.oscworld.OscWorldComponent;
@@ -299,6 +301,7 @@ public class SimbrainDesktop {
         registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
+        registerComponent(GameComponent.class, GameDesktopComponent.class);
     }
 
     /**

@@ -30,6 +30,7 @@ import javax.swing.Action;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
+import org.simbrain.workspace.actions.NewGameWorldAction;
 import org.simbrain.workspace.actions.GlobalRunAction;
 import org.simbrain.workspace.actions.GlobalStopAction;
 import org.simbrain.workspace.actions.GlobalUpdateAction;
@@ -88,6 +89,9 @@ public class WorkspaceActionManager {
 
     /** New odor world action. */
     private final Action newThreeDeeWorldAction;
+    
+    /** New odor world action. */
+    private final Action newGameWorldAction;
 
     /** New data world action. */
     private final Action newDataWorldAction;
@@ -208,6 +212,7 @@ public class WorkspaceActionManager {
         newOdorWorldAction = new NewOdorWorldAction(workspace);
         newOscWorldAction = new NewOscWorldAction(workspace);
         newThreeDeeWorldAction = new NewThreeDeeWorldAction(workspace);
+        newGameWorldAction = new NewGameWorldAction(workspace);
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
 
@@ -260,7 +265,7 @@ public class WorkspaceActionManager {
     public List<Action> getNewWorldActions() {
         return Arrays.asList(new Action[] { newDataWorldAction,
                 newMidiWorldAction, newOdorWorldAction, newOscWorldAction,
-                newThreeDeeWorldAction, newVisionWorldAction });
+                newThreeDeeWorldAction, newVisionWorldAction, newGameWorldAction });
     }
 
     /**

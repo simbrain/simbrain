@@ -131,6 +131,7 @@ public class AttributePanel extends JPanel implements ActionListener,
             if (attributeType == AttributeType.Producing) {
                 for (ProducingAttribute<?> attribute : component
                         .getProducingAttributes()) {
+                    System.out.println("adding producing attribute: " + attribute);
                     model.addElement(attribute);
                 }
             } else if (attributeType == AttributeType.Consuming) {
@@ -200,7 +201,8 @@ public class AttributePanel extends JPanel implements ActionListener,
             DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
                     .getListCellRendererComponent(list, object, index,
                             isSelected, cellHasFocus);
-            AbstractAttribute attribute = (AbstractAttribute) object;
+            Attribute attribute = (Attribute) object;
+            
             renderer.setText(attribute.getAttributeDescription());
             return renderer;
         }

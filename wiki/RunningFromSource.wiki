@@ -48,7 +48,7 @@ For Windows users, ant and jdk must be added to your path, as follows:
   # Select the advanced tab and then click on the environment variables button at the bottom
   # Under System variables, select the Path variable and click edit.
   # At the end of the paths, make sure there is a ";" ending the line
-  # Add the path to the and bin folder that was extracted earlier (ex C:\Program Files\apache-ant-1.7.1\bin)
+  # Add the path to the ant bin folder that was extracted earlier (ex C:\Program Files\apache-ant-1.7.1\bin)
   # Add the path to the Java JDK folder making sure that there is a semicolon separating the two entries. (ex C:\Program Files\Java\jdk1.6.0_03)
 
 For Windows users, the JAVA_HOME system variable must be set in order for ant to find the jdk java compiler. To do so follow these steps:

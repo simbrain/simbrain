@@ -1,12 +1,47 @@
 #summary Evaluating a Dataset Using PCA
 
-Here is the basic process:
+== Basic Process ==
 
-  * Open Simbrain
-  * Insert a dataworld
-  * Import your data as csv
-  * Set dataworld to iterate
-  * Insert a projection component
-  * Couple the dataworld component to projection
-  * Do a run through the data by pressing global run
-  * The resulting set of points in the projection graph represent a projection of your data
+* Open Simbrain * 
+
+[]
+ 
+* Insert  a dataworld *
+
+ _(Top Level Menu): Insert  > New World > DataWorld_
+
+*Import your data*
+
+ _(DataWorldMenu): File > Import Data..._
+
+ This can be used to import a .csv file (comma-separated-values).  These files can be edited using Excel.   
+
+* Configure dataworld *
+
+ Set dataworld to iterate mode: _(DataWorldMenu): Edit > Iteration Mode_
+
+*  Insert a projection component *
+
+ _(Top Level Menu): Insert  > New Plot > Projection Plot_
+
+ Leave it set to PCA.  You can experiment with other projections after you've brought in all the data.
+
+* Couple the dataworld component to projection*
+
+ _(DataWorldMenu): Couple  > Projection1_
+
+ Todo: explain here about how to set the right number of dimensions in the projection component.
+
+* Do a run through the data by pressing global run *
+
+ Todo: explain here how to check that all the data has been run through.
+
+== Analysis ==
+
+ The resulting set of points in the projection plot represent a projection of your data
+
+== Links ==
+
+http://en.wikipedia.org/wiki/Principal_components_analysis
+
+http://hisee.sourceforge.net/about.html

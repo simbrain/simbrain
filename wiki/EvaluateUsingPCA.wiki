@@ -1,0 +1,12 @@
+#summary Evaluating a Dataset Using PCA
+
+Here is the basic process:
+
+  * Open Simbrain
+  * Insert a dataworld
+  * Import your data as csv
+  * Set dataworld to iterate
+  * Insert a projection component
+  * Couple the dataworld component to projection
+  * Do a run through the data by pressing global run
+  * The resulting set of points in the projection graph represent a projection of your data

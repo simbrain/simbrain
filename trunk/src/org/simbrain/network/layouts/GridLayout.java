@@ -21,13 +21,13 @@ public class GridLayout implements Layout {
     private double initialY;
 
     /** Number of columns in the layout. */
-    private int numColumns;
+    private static int numColumns = 3;
 
     /** Horizontal spacing between neurons. */
-    private double hSpacing;
+    private static double hSpacing = 50;
 
     /** Vertical spacing between neurons. */
-    private double vSpacing;
+    private static double vSpacing = 50;
 
     /**
      * Create a layout.
@@ -37,12 +37,17 @@ public class GridLayout implements Layout {
      * @param numColumns number of columns of neurons
      */
     public GridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
-        this.hSpacing = hSpacing;
-        this.vSpacing = vSpacing;
-        this.numColumns = numColumns;
+        GridLayout.hSpacing = hSpacing;
+        GridLayout.vSpacing = vSpacing;
+        GridLayout.numColumns = numColumns;
     }
 
-    /** 
+    /**
+     * Default constructor.
+     */
+    public GridLayout() { }
+
+    /**
      * {@inheritDoc}
      */
     public void layoutNeurons(final Network network) {
@@ -78,5 +83,52 @@ public class GridLayout implements Layout {
      */
     public String getLayoutName() {
         return "Grid";
+    }
+
+    /**
+     * @return the numColumns
+     */
+    public static int getNumColumns() {
+        return numColumns;
+    }
+
+    /**
+     * @param numColumns the numColumns to set
+     */
+    public static void setNumColumns(final int numColumns) {
+        GridLayout.numColumns = numColumns;
+    }
+
+    /**
+     * @return the hSpacing
+     */
+    public static double getHSpacing() {
+        return hSpacing;
+    }
+
+    /**
+     * @param spacing the hSpacing to set
+     */
+    public static void setHSpacing(final double spacing) {
+        hSpacing = spacing;
+    }
+
+    /**
+     * @return the vSpacing
+     */
+    public static double getVSpacing() {
+        return vSpacing;
+    }
+
+    /**
+     * @param spacing the vSpacing to set
+     */
+    public static void setVSpacing(final double spacing) {
+        vSpacing = spacing;
+    }
+
+    /** @override */
+    public String toString() {
+        return "Grid Layout";
     }
 }

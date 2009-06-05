@@ -115,7 +115,6 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        System.out.println("Commit connection dialog changes.");
         ConnectNeurons.connectionType = (ConnectNeurons)cbConnectionType.getSelectedItem();
         optionsPanel.commitChanges();
     }

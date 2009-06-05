@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -53,6 +54,8 @@ import org.simbrain.network.gui.actions.connection.ConnectNeuronsAction;
 import org.simbrain.network.gui.actions.connection.ConnectNeuronsSimpleAction;
 import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.gui.actions.modelgroups.NewGeneRecGroupAction;
+import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
+import org.simbrain.network.gui.dialogs.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuron;
@@ -60,6 +63,7 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -280,7 +284,23 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         }
         contextMenu.addSeparator();
 
-        contextMenu.add(getQuickConnections());
+        contextMenu.add(getConnections());
+        // Makes quick connections based on the connections settings that were last changed.
+        JMenuItem quickConnectMenuItem = new JMenuItem("Quick Connect");
+        quickConnectMenuItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = ConnectNeurons.connectionType;
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSelectedModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+        contextMenu.add(quickConnectMenuItem);
         // Set Source Action
         contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
         // Show Dialog Action
@@ -288,6 +308,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.addSeparator();
 
         contextMenu.add(getLayoutMenu());
+        contextMenu.add(new ShowLayoutDialogAction());
         
         contextMenu.addSeparator();
 
@@ -305,15 +326,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
 
     /**
-     * Quick connection sub menu.
+     * Connection sub menu.
      *
-     * @return Quick connection sub menu
+     * @return Connection sub menu
      */
-    private JMenu getQuickConnections() {
+    private JMenu getConnections() {
         JMenu menu = new JMenu("Connect");
 
         JMenuItem allMenuItem = new JMenuItem("All to All");
-        allMenuItem.addActionListener(new ActionListener(){
+        allMenuItem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 if (getNetworkPanel().getSourceModelNeurons().isEmpty()
@@ -395,8 +416,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         lineMenuItem.addActionListener(new ActionListener(){
 
             public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
                 NetworkPanel panel = getNetworkPanel();
-                LineLayout layout = new LineLayout(DIAMETER * 2, LineOrientation.VERTICAL);
+                LineLayout layout = new LineLayout();
                 layout.setInitialLocation(panel.getLastClickedPosition());
                 layout.layoutNeurons(panel.getSelectedModelNeurons());
                 panel.repaint();
@@ -407,9 +431,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         hexMenuItem.addActionListener(new ActionListener(){
 
             public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
                 NetworkPanel panel = getNetworkPanel();
-                GridLayout layout = new GridLayout(DIAMETER * 2, DIAMETER * 2,
-                        (int) Math.sqrt(panel.getSelectedModelNeurons().size()));
+                GridLayout layout = new GridLayout();
                 layout.setInitialLocation(panel.getLastClickedPosition());
                 layout.layoutNeurons(panel.getSelectedModelNeurons());
                 panel.repaint();
@@ -422,10 +448,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         gridMenuItem.addActionListener(new ActionListener(){
 
             public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
                 NetworkPanel panel = getNetworkPanel();
-                HexagonalGridLayout layout = new HexagonalGridLayout(DIAMETER * 2,
-                        DIAMETER * 2, (int) Math.sqrt(panel.getSelectedModelNeurons().size()));
-
+                HexagonalGridLayout layout = new HexagonalGridLayout();
                 layout.setInitialLocation(panel.getLastClickedPosition());
                 layout.layoutNeurons(panel.getSelectedModelNeurons());
                 panel.repaint();
@@ -907,6 +934,34 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             SynapseNode synapseNode = (SynapseNode) i.next();
             synapseNode.setGrouped(isGrouped);
         }
+    }
+
+}
+
+/**
+ * Show layout dialog action.
+ *
+ */
+class ShowLayoutDialogAction extends AbstractAction {
+
+    /**
+     * Serial UID.
+     */
+    private static final long serialVersionUID = -3355422356278099294L;
+
+    /**
+     * Show layout dialog action.
+     */
+    public ShowLayoutDialogAction() {
+        super("Layout Properties...");
+    }
+
+    /** @see ActionEvent. */
+    public void actionPerformed(ActionEvent e) {
+        LayoutDialog dialog = new LayoutDialog();
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 
 }

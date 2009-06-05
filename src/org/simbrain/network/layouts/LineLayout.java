@@ -28,7 +28,7 @@ public class LineLayout implements Layout {
     };
 
     /** Current line orientation. */
-    private LineOrientation orientation = LineOrientation.HORIZONTAL;
+    private static LineOrientation orientation = LineOrientation.HORIZONTAL;
     
     /** Initial x position of line of neurons. */
     private double initialX;
@@ -37,7 +37,7 @@ public class LineLayout implements Layout {
     private double initialY;
 
     /** Spacing between neurons. */
-    private double spacing;
+    private static double spacing = 40;
 
 
     /**
@@ -46,27 +46,33 @@ public class LineLayout implements Layout {
      * @param initialx initial x position
      * @param initialy initial y position
      * @param spacing spacing between neurons
-     * @param layout what layout to use
+     * @param orientation of the neurons
      */
-    public LineLayout(final double initialx, final double initialy, final double spacing, final LineOrientation orientation) {
+    public LineLayout(final double initialx, final double initialy,
+            final double spacing, final LineOrientation orientation) {
         initialX = initialx;
         initialY = initialy;
-        this.spacing = spacing;
-        this.orientation = orientation;
+        LineLayout.spacing = spacing;
+        LineLayout.orientation = orientation;
     }
 
     /**
      * Create a layout.
      *
      * @param spacing spacing between neurons
-     * @param layout what layout to use
+     * @param orientation of the neurons
      */
     public LineLayout(final double spacing, final LineOrientation orientation) {
-        this.spacing = spacing;
-        this.orientation = orientation;
+        LineLayout.spacing = spacing;
+        LineLayout.orientation = orientation;
     }
 
-    /** 
+    /**
+     * Default Constructor.
+     */
+    public LineLayout() { }
+
+    /**
      * {@inheritDoc}
      */
     public void layoutNeurons(final Network network) {
@@ -107,4 +113,37 @@ public class LineLayout implements Layout {
         return "Line";
     }
 
+    /**
+     * @return the orientation
+     */
+    public static LineOrientation getOrientation() {
+        return orientation;
+    }
+
+    /**
+     * @param orientation the orientation to set
+     */
+    public static void setOrientation(final LineOrientation orientation) {
+        LineLayout.orientation = orientation;
+        System.out.println("LineLayout orientation: " + LineLayout.orientation);
+    }
+
+    /**
+     * @return the spacing
+     */
+    public static double getSpacing() {
+        return spacing;
+    }
+
+    /**
+     * @param spacing the spacing to set
+     */
+    public static void setSpacing(final double spacing) {
+        LineLayout.spacing = spacing;
+    }
+
+    /** @override */
+    public String toString() {
+        return "Line Layout";
+    }
 }

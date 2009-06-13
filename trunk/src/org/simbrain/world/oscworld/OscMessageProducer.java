@@ -124,16 +124,6 @@ final class OscMessageProducer
     }
 
     /** {@inheritDoc} */
-    public ProducingAttribute<?> getDefaultProducingAttribute() {
-        return attribute;
-    }
-
-    /** {@inheritDoc} */
-    public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {
-        throw new UnsupportedOperationException("default attribute is not modifiable");
-    }
-
-    /** {@inheritDoc} */
     public String toString() {
         return address + ", f";
     }

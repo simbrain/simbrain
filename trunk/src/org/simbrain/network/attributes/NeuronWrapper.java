@@ -51,12 +51,6 @@ public class NeuronWrapper implements Producer, Consumer {
     private ArrayList<ConsumingAttribute<?>> consumingAttributes
         = new ArrayList<ConsumingAttribute<?>>();
 
-    /** The default producing attribute. */
-    private ProducingAttribute<?> defaultProducingAttribute;
-
-    /** The default consuming attribute. */
-    private ConsumingAttribute<?> defaultConsumingAttribute;
-
     /**
      * Constructor.
      *
@@ -68,8 +62,6 @@ public class NeuronWrapper implements Producer, Consumer {
         ActivationAttribute activationAttribute = new ActivationAttribute();
         producingAttributes.add(activationAttribute);
         consumingAttributes.add(activationAttribute);
-        defaultProducingAttribute = activationAttribute;
-        defaultConsumingAttribute = activationAttribute;
 
         UpperBoundAttribute upperBoundAttribute = new UpperBoundAttribute();
         producingAttributes.add(upperBoundAttribute);
@@ -93,37 +85,6 @@ public class NeuronWrapper implements Producer, Consumer {
         return neuron;
     }
     
-    /**
-     * @return the defaultConsumingAttribute
-     */
-    public ConsumingAttribute<?> getDefaultConsumingAttribute() {
-        return defaultConsumingAttribute;
-    }
-
-    /**
-     * @param defaultConsumingAttribute the defaultConsumingAttribute to set
-     */
-    public void setDefaultConsumingAttribute(
-            final ConsumingAttribute<?> defaultConsumingAttribute) {
-        this.defaultConsumingAttribute = defaultConsumingAttribute;
-    }
-
-    /**
-     * @return the defaultProducingAttribute
-     */
-    public ProducingAttribute<?> getDefaultProducingAttribute() {
-        return defaultProducingAttribute;
-    }
-
-    /**
-     * @param defaultProducingAttribute the defaultProducingAttribute to set
-     */
-    public void setDefaultProducingAttribute(
-            final ProducingAttribute<?> defaultProducingAttribute) {
-        this.defaultProducingAttribute = defaultProducingAttribute;
-    }
-
-
     /**
      * {@inheritDoc}
      */

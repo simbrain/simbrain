@@ -435,7 +435,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     
         if (attributeListingStyle.equals(AttributeListingStyle.DEFAULT_EACH)) {
             for (Producer producer : this.getProducers()) {
-                list.add(producer.getDefaultProducingAttribute());
+                list.add(producer.getProducingAttributes().get(0));
             }
         } else if (attributeListingStyle.equals(AttributeListingStyle.TOTAL)) {
             for (Producer producer : this.getProducers()) {
@@ -457,7 +457,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         ArrayList<ConsumingAttribute<?>> list = new ArrayList<ConsumingAttribute<?>>();
         if (attributeListingStyle.equals(AttributeListingStyle.DEFAULT_EACH)) {
             for (Consumer consumer : this.getConsumers()) {
-                list.add(consumer.getDefaultConsumingAttribute());
+                list.add(consumer.getConsumingAttributes().get(0));
             }
         } else if (attributeListingStyle.equals(AttributeListingStyle.TOTAL)) {
             for (Consumer consumer : this.getConsumers()) {
@@ -565,11 +565,11 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * @param consumerId id of single consuming attribute
      * @return the attribute
      */
-    public ConsumingAttribute getSingleConsumingAttribute(final String consumerId) {
+    public ConsumingAttribute<?> getSingleConsumingAttribute(final String consumerId) {
         for (Consumer consumer : getConsumers()) {
             if (consumer instanceof SingleAttributeConsumer) {
                 if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
-                    return consumer.getDefaultConsumingAttribute();
+                    return ((SingleAttributeConsumer<?>)consumer).getAttribute();
                 }
             }
         }
@@ -583,11 +583,11 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * @param producerId id of single producing attribute
      * @return the attribute
      */
-    public ProducingAttribute getSingleProducingAttribute(final String producerId) {
+    public ProducingAttribute<?> getSingleProducingAttribute(final String producerId) {
         for (Producer producer : getProducers()) {
             if (producer instanceof SingleAttributeProducer) {
                 if (producer.getDescription().equalsIgnoreCase(producerId)) {
-                    return producer.getDefaultProducingAttribute();
+                    return ((SingleAttributeProducer<?>)producer).getAttribute();
                 }
             }
         }

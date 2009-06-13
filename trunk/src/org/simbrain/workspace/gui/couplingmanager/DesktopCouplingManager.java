@@ -252,7 +252,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             if (consumer instanceof SingleAttributeConsumer) {
                 renderer.setText(consumer.getDescription());
             } else {
-                renderer.setText(consumer.getDescription() + ":" + consumer.getDefaultConsumingAttribute().getAttributeDescription());                
+                renderer.setText(consumer.getDescription() + ":" + consumer.getConsumingAttributes().get(0).getAttributeDescription());                
             }
             return renderer;
        }
@@ -377,7 +377,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             if (producer instanceof SingleAttributeProducer) {
                 renderer.setText(producer.getDescription());
             } else {
-                renderer.setText(producer.getDescription() + ":" + producer.getDefaultProducingAttribute().getAttributeDescription());                
+                renderer.setText(producer.getDescription() + ":" + producer.getProducingAttributes().get(0).getAttributeDescription());                
             }
             return renderer;
        }
@@ -507,24 +507,6 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             refreshComponentList(component, (JComboBox) event.getSource());
         }
 
-        // Handle consumer attribute setting events
-        if (event.getSource() instanceof ConsumerMenuItem) {
-            ConsumerMenuItem item = (ConsumerMenuItem) event.getSource();
-            for (Consumer consumer : item.getSelectedConsumerList()) {
-                consumer.setDefaultConsumingAttribute(item.getConsumingAttribute());
-            }
-            consumerJList.repaint();
-        }
-
-        // Handle producer attribute setting events
-        if (event.getSource() instanceof ProducerMenuItem) {
-            ProducerMenuItem item = (ProducerMenuItem) event.getSource();
-            for (Producer producer : item.getSelectedProducerList()) {
-                producer.setDefaultProducingAttribute(item.getProducingAttribute());
-            }
-            producerJList.repaint();
-        }
-
         // Handle coupling tray menu items
         if (event.getSource() instanceof CouplingTrayMenuItem) {
             if (event.getActionCommand().equalsIgnoreCase("delete")) {
@@ -548,12 +530,12 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             } else if (button.getActionCommand().equalsIgnoreCase("addAllProducers")) {
                 GenericListModel<Producer> producerList = (GenericListModel<Producer>) producerJList.getModel();
                 for (Producer producer : producerList) {
-                    trayModel.addElement(new Coupling(producer.getDefaultProducingAttribute()));
+                    trayModel.addElement(new Coupling(producer.getProducingAttributes().get(0)));
                 }
             } else if (button.getActionCommand().equalsIgnoreCase("addSelectedProducers")) {
                 ArrayList<Producer> producerList = this.getSelectedProducers();
                 for (Producer producer : producerList) {
-                    trayModel.addElement(new Coupling(producer.getDefaultProducingAttribute()));
+                    trayModel.addElement(new Coupling(producer.getProducingAttributes().get(0)));
                 }
             } else if (button.getActionCommand().equalsIgnoreCase("bindAllConsumers")) {
                 GenericListModel<Consumer> consumerList = (GenericListModel<Consumer>) consumerJList.getModel();
@@ -563,7 +545,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
                 }
                 for (Consumer consumer : consumerList) {
                     if (i < trayModel.getSize()) {
-                        trayModel.bindElementAt(consumer.getDefaultConsumingAttribute(), i++);
+                        trayModel.bindElementAt(consumer.getConsumingAttributes().get(0), i++);
                     }
                 }
             } else if (button.getActionCommand().equalsIgnoreCase("bindSelectedConsumers")) {
@@ -571,7 +553,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
                 int i = couplingTray.getSelectedIndex();
                 for (Consumer consumer : consumerList) {
                     if (i < trayModel.getSize()) {
-                        trayModel.bindElementAt(consumer.getDefaultConsumingAttribute(), i++);
+                        trayModel.bindElementAt(consumer.getConsumingAttributes().get(0), i++);
                     }
                 }
             }

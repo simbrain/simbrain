@@ -106,7 +106,7 @@ public class CouplingTray extends JList implements DropTargetListener {
                     // Create unbound producers
                     int index = this.getSelectedIndex();
                     for (int i = 0; i < list.size(); i++) {
-                        Coupling coupling = new Coupling(((Producer) list.get(i)).getDefaultProducingAttribute());
+                        Coupling coupling = new Coupling(((Producer) list.get(i)).getProducingAttributes().get(0));
                         if (index > -1) {
                             ((ModifiableListModel<Coupling>) this.getModel()).
                             insertElementAt(coupling, index + 1);
@@ -124,7 +124,7 @@ public class CouplingTray extends JList implements DropTargetListener {
                     for (int i = 0; i < list.size(); i++) {
                         //TODO: Here and above!
                         ConsumingAttribute consumer = (((Consumer) list.get(i)).
-                                getDefaultConsumingAttribute());
+                                getConsumingAttributes().get(0));
                         index = start + i;
                         if (index >= this.getModel().getSize()) {
                             break;

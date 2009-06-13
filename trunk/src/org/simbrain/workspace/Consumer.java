@@ -3,7 +3,8 @@ package org.simbrain.workspace;
 import java.util.List;
 
 /**
- * Consumer.
+ * A consumer is an object that contains two or more consuming attributes. If it
+ * has just one consuming attribute use SingleAttributeConsumer.
  */
 public interface Consumer extends AttributeHolder {
 
@@ -15,17 +16,4 @@ public interface Consumer extends AttributeHolder {
      */
     List<? extends ConsumingAttribute<?>> getConsumingAttributes();
 
-    /**
-     * Returns the default attribute for this consumer.
-     *
-     * @return the default attribute
-     */
-    ConsumingAttribute<?> getDefaultConsumingAttribute();
-
-    /**
-     * Sets the default consuming attribute for this consumer.
-     *
-     * @param consumingAttribute the default consuming attribute to set.
-     */
-    void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute);
 }

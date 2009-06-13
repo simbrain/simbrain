@@ -66,16 +66,6 @@ abstract class AbstractMidiConsumer
         return Collections.singletonList(trigger);
     }
 
-    /** {@inheritDoc} */
-    public final ConsumingAttribute<?> getDefaultConsumingAttribute() {
-        return trigger;
-    }
-
-    /** {@inheritDoc} */
-    public final void setDefaultConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
-        throw new UnsupportedOperationException("default attribute is not modifiable");
-    }
-
     /**
      * Trigger attribute.
      */

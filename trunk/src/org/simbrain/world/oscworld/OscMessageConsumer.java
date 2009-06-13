@@ -111,16 +111,6 @@ final class OscMessageConsumer
     }
 
     /** {@inheritDoc} */
-    public ConsumingAttribute<?> getDefaultConsumingAttribute() {
-        return attribute;
-    }
-
-    /** {@inheritDoc} */
-    public void setDefaultConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
-        throw new UnsupportedOperationException("default attribute is not modifiable");
-    }
-
-    /** {@inheritDoc} */
     public String toString() {
         return address + ", f";
     }

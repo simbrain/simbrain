@@ -173,7 +173,7 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         for (Consumer consumer : getConsumers()) {
             if (producerIterator.hasNext()) {
                 Coupling<?> coupling = new Coupling(producerIterator.next()
-                    .getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                    .getProducingAttributes().get(0), consumer.getConsumingAttributes().get(0));
                 getWorkspace().addCoupling(coupling);
             }
         }

@@ -17,7 +17,7 @@ public abstract class SingleAttributeProducer<E> extends AbstractAttribute imple
      * 
      * @return This object.
      */
-    public ProducingAttribute<E> getDefaultProducingAttribute() {
+    public ProducingAttribute<E> getAttribute() {
         return this;
     }
     
@@ -27,6 +27,6 @@ public abstract class SingleAttributeProducer<E> extends AbstractAttribute imple
      * @return A list containing this object.
      */
     public List<ProducingAttribute<E>> getProducingAttributes() {
-        return Collections.singletonList(getDefaultProducingAttribute());
+        return Collections.singletonList(getAttribute());
     }
 }

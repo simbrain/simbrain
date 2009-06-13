@@ -3,7 +3,8 @@ package org.simbrain.workspace;
 import java.util.List;
 
 /**
- * Producer.
+ * A producer is an object that contains two or more producing attributes. If it
+ * has just one producing attribute use SingleAttributeProducer.
  */
 public interface Producer extends AttributeHolder {
 
@@ -15,18 +16,4 @@ public interface Producer extends AttributeHolder {
      */
     List<? extends ProducingAttribute<?>> getProducingAttributes();
 
-    /**
-     * Returns the default attribute for this producer.
-     *
-     * @return the default attribute
-     */
-    ProducingAttribute<?> getDefaultProducingAttribute();
-
-    /**
-     * Sets the default producing attribute for this producer.
-     *
-     * @param producingAttribute the default producing attribute to set.
-     */
-    void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
-    
 }

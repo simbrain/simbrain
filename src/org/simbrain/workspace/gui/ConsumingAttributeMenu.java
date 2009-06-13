@@ -85,7 +85,7 @@ public class ConsumingAttributeMenu extends JMenu implements WorkspaceListener {
                             		workspace, 
                             		consumer.getDescription(),
                             		sourceProducingAttribute, 
-                            		consumer.getDefaultConsumingAttribute());
+                            		consumer.getConsumingAttributes().get(0));
                         componentMenu.add(item);
                     } else {
                         JMenu consumerItem = new JMenu(consumer.getDescription());

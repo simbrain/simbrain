@@ -23,10 +23,10 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class Agent implements TwoDEntity, Consumer, Producer {
 
     /** Current heading / orientation. */
-	private double heading = DEFAULT_HEADING;
-	
-	/** Current Location. */
-	private double[] location = new double[2];
+    private double heading = DEFAULT_HEADING;
+
+    /** Current Location. */
+    private double[] location = new double[2];
 
     /** Initial heading of agent. */
     private final static double DEFAULT_HEADING = 300;
@@ -34,17 +34,11 @@ public class Agent implements TwoDEntity, Consumer, Producer {
     /** List of things this agent can do. */
     private ArrayList<ConsumingAttribute<Double>> effectorList = new ArrayList<ConsumingAttribute<Double>>();
 
-    /** Default effector. */
-    private ConsumingAttribute<Double> defaultEffector;
-
     /** List of things this agent can sense. */
-    private ArrayList<SmellSensor> sensorList = new ArrayList<SmellSensor>();	
+    private ArrayList<SmellSensor> sensorList = new ArrayList<SmellSensor>();
 
-    /** Default sensor. */
-    private ProducingAttribute<Double> defaultSensor;
-
-	/** Environment this agent is embedded in. */
-	private TwoDEnvironment environment;
+    /** Environment this agent is embedded in. */
+    private TwoDEnvironment environment;
 
     /** Name. */
     private String name;
@@ -151,36 +145,8 @@ public class Agent implements TwoDEntity, Consumer, Producer {
 	/**
      * {@inheritDoc}
      */
-	public ConsumingAttribute<?> getDefaultConsumingAttribute() {
-		return defaultEffector;
-	}
-
-	/**
-     * {@inheritDoc}
-     */
-	public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute) {
-		this.defaultEffector = (Effector) consumingAttribute;
-	}
-
-	/**
-     * {@inheritDoc}
-     */
 	public List<? extends ProducingAttribute<?>> getProducingAttributes() {
 		return sensorList;
-	}
-
-	/**
-     * {@inheritDoc}
-     */
-	public ProducingAttribute<?> getDefaultProducingAttribute() {
-		return defaultSensor;
-	}
-
-	/**
-     * {@inheritDoc}
-     */
-	public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute) {
-		this.defaultSensor = (Sensor) producingAttribute;
 	}
 
 	/**

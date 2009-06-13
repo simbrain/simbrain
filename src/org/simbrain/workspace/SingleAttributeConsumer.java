@@ -17,7 +17,7 @@ public abstract class SingleAttributeConsumer<E> extends AbstractAttribute imple
      * 
      * @return This object.
      */
-    public ConsumingAttribute<E> getDefaultConsumingAttribute() {
+    public ConsumingAttribute<E> getAttribute() {
         return this;
     }
 
@@ -27,7 +27,7 @@ public abstract class SingleAttributeConsumer<E> extends AbstractAttribute imple
      * @return a list containing this object.
      */
     public List<ConsumingAttribute<E>> getConsumingAttributes() {
-        return Collections.singletonList(getDefaultConsumingAttribute());
+        return Collections.singletonList(getAttribute());
     }
 
     /**
@@ -39,11 +39,4 @@ public abstract class SingleAttributeConsumer<E> extends AbstractAttribute imple
         return this;
     }
     
-    /**
-     * Has no effect.
-     * 
-     * @param consumingAttribute The value is ignored.
-     */
-    public void setDefaultConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
-    }
 }

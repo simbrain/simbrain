@@ -30,12 +30,6 @@ public abstract class Bindings implements Consumer, Producer {
     /** Once on has been set, the bindings remain on until the next iterator call is made. */
     private volatile boolean bind = false;
     
-    /** The default consuming attribute for this set of Bindings. */
-    private ConsumingAttribute<?> defaultConsumingAttribute = null;
-    
-    /** The default consuming attribute for this set of Bindings. */
-    private ProducingAttribute<?> defaultProducingAttribute = null;
-    
     /**
      * Creates a new bindings object for the given agent
      * and component.
@@ -225,33 +219,5 @@ public abstract class Bindings implements Consumer, Producer {
     public String getDescription() {
 //        return "3D Agent";
         return description;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
-        defaultConsumingAttribute = consumingAttribute;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ConsumingAttribute<?> getDefaultConsumingAttribute() {
-        return defaultConsumingAttribute;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {
-        this.defaultProducingAttribute = producingAttribute;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ProducingAttribute<?> getDefaultProducingAttribute() {
-        return defaultProducingAttribute;
     }
 }

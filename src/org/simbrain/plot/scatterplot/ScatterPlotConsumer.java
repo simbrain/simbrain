@@ -125,19 +125,6 @@ public class ScatterPlotConsumer implements Consumer {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public ConsumingAttribute<Double> getDefaultConsumingAttribute() {
-        return attributeList.get(0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute) {
-    }
-    
-    /**
      * Scatter plot attribute.
      */
     private abstract class ScatterPlotAttribute extends AbstractAttribute implements ConsumingAttribute<Double> {

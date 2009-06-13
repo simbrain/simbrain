@@ -15,13 +15,10 @@ import org.simbrain.workspace.WorkspaceComponent;
  * @author Matt Watson
  */
 public class GameAttributes implements Producer, Consumer {
-    /** the default producing attribute. */
-    private ProducingAttribute<?> defaultProducing;
-    /** the default producing attribute. */
-    private ConsumingAttribute<?> defaultConsuming;
-    /** the parent component. */
+
+    /** The parent component. */
     private final WorkspaceComponent<?> parent;
-    /** the game model. */
+    /** The game model. */
     private final GameModel model;
     
     /**
@@ -33,20 +30,6 @@ public class GameAttributes implements Producer, Consumer {
     public GameAttributes(final WorkspaceComponent<?> parent, final GameModel model) {
         this.parent = parent;
         this.model = model;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ProducingAttribute<?> getDefaultProducingAttribute() {
-        return defaultProducing;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {
-        defaultProducing = producingAttribute;
     }
     
     /**
@@ -96,20 +79,6 @@ public class GameAttributes implements Producer, Consumer {
         }
         
         return attributes;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ConsumingAttribute<?> getDefaultConsumingAttribute() {
-        return defaultConsuming;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
-        defaultConsuming = consumingAttribute;
     }
 
     public List<? extends ProducingAttribute<?>> getProducingAttributes() {

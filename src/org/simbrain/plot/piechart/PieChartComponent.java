@@ -122,16 +122,6 @@ public class PieChartComponent extends WorkspaceComponent<ChartListener> {
             }
         });
     }
-
-    @Override
-    public List<? extends Consumer> getConsumers() {
-        return (List<? extends Consumer>) model.getConsumers();
-    }
-
-    @Override
-    public List<? extends Producer> getProducers() {
-        return Collections.<Producer>emptyList();
-    }
     
     @Override
     public String getXML() {

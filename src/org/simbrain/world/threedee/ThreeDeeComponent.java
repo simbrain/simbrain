@@ -132,22 +132,6 @@ public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentList
      * {@inheritDoc}
      */
     @Override
-    public Collection<? extends Producer> getProducers() {
-        return Collections.unmodifiableCollection(model.bindings);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<? extends Consumer> getConsumers() {
-        return Collections.unmodifiableCollection(model.bindings);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void closing() {
         model.environment.killTimer();
     }

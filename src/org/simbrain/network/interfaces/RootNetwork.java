@@ -200,7 +200,7 @@ public class RootNetwork extends Network {
 
         // Clear input nodes
         clearInputs();
-
+        
         // For thread
         this.setUpdateCompleted(true);
     }
@@ -213,15 +213,15 @@ public class RootNetwork extends Network {
         logger.debug("update called");
         switch (this.updateMethod) {
 	        case PRIORITYBASED:
-                logger.debug("priority-based update");
-	            updateByPriority();
-	            updateAllSynapses();
-	            break;
-	        default:
-                logger.debug("default update");
-	            updateAllNeurons();
-	            updateAllSynapses();
-	            updateAllNetworks();
+            logger.debug("priority-based update");
+            updateByPriority();
+            updateAllSynapses();
+            break;
+        default:
+            logger.debug("default update");
+            updateAllNeurons();
+            updateAllSynapses();
+            updateAllNetworks();
         }
         if (groupList != null) {
             for (Group n : groupList) {

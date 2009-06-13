@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
@@ -57,6 +58,14 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
+
+    //TODO: Check these for thread safety...
+    
+    /** Consumer list. */
+    private final List<Consumer> consumers = new CopyOnWriteArrayList<Consumer>();
+
+    /** Producer list. */
+    private final List<Producer> producers = new CopyOnWriteArrayList<Producer>();
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = true;
@@ -416,15 +425,6 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
 
     /**
-     * Returns the consumers associated with this component.
-     * 
-     * @return The consumers associated with this component.
-     */
-    public Collection<? extends Consumer> getConsumers() {
-        return Collections.emptySet();
-    }
-
-    /**
      * Return producing attributes in a particular order, for use in creating couplings.
      * 
      * @return custom list of producing attributes.
@@ -505,14 +505,58 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
         // no implementation
     }
 
-    
     /**
      * Returns the producers associated with this component.
      * 
      * @return The producers associated with this component.
      */
-    public Collection<? extends Producer> getProducers() {
-        return Collections.emptySet();
+    public List<Producer> getProducers() {
+        return producers;
+    }
+    
+    /**
+     * Returns the consumers associated with this component.
+     * 
+     * @return The consumers associated with this component.
+     */
+    public List<Consumer> getConsumers() {
+        return consumers;
+    }
+    
+    /**
+     * Adds the specified consumer.
+     *
+     * @param consumer consumer to add.
+     */
+    public void addConsumer(final Consumer consumer) {
+        consumers.add(consumer);
+    }
+
+    /**
+     * Adds the specified producer.
+     *
+     * @param producer producer to add.
+     */
+    public void addProducer(final Producer producer) {
+        producers.add(producer);
+    }
+    
+    /**
+     * Removes specified consumer.
+     *
+     * @param consumer consumer to remove
+     */
+    public void removeConsumer(final Consumer consumer) {
+        consumers.remove(consumer);
+    }
+    
+    /**
+     * Removes specified producer.
+     *
+     * @param producer producer to remove
+     */
+    public void removeProducer(final Producer producer) {
+        producers.remove(producer);
     }
     
     /**

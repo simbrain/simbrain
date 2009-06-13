@@ -145,18 +145,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<ChartListener> {
     public void closing() {
         // TODO Auto-generated method stub
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<? extends Consumer> getConsumers() {
-        return (List<? extends Consumer>) model.getConsumers();
-    }
-
-    @Override
-    public List<? extends Producer> getProducers() {
-        return Collections.<Producer>emptyList();
-    }
     
     @Override
     public void update() {

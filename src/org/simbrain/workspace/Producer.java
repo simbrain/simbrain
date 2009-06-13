@@ -29,5 +29,4 @@ public interface Producer extends AttributeHolder {
      */
     void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
     
-    
 }

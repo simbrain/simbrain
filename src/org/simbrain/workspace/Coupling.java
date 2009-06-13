@@ -1,14 +1,8 @@
 package org.simbrain.workspace;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.updator.WorkspaceUpdator;
 
 /**
  * Coupling between a producing attribute and a consuming attribute.

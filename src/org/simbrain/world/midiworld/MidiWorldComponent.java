@@ -26,10 +26,6 @@ public final class MidiWorldComponent
     /** MIDI out. */
     private final MidiOut midiOut;
 
-    /** List of MIDI consumers. */
-    private final List<AbstractMidiConsumer> consumers;
-
-
     /**
      * Create a new MIDI world component with the specified name.
      *
@@ -38,7 +34,6 @@ public final class MidiWorldComponent
     public MidiWorldComponent(final String name) {
         super(name);
         midiOut = MidiIO.getInstance().getMidiOut(0, 0);
-        consumers = new ArrayList<AbstractMidiConsumer>();
 
         // TODO:  just for now...
         addNote(40, 80, 600);
@@ -60,11 +55,6 @@ public final class MidiWorldComponent
         // empty
     }
 
-    /** {@inheritDoc} */
-    public Collection<? extends Consumer> getConsumers() {
-        return Collections.unmodifiableList(consumers);
-    }
-
     /**
      * Return the MIDI out for this MIDI world component.
      *
@@ -84,7 +74,7 @@ public final class MidiWorldComponent
     void addController(final int number, final int value) {
         Controller controller = new Controller(number, value);
         MidiControllerConsumer consumer = new MidiControllerConsumer(controller, this);
-        consumers.add(consumer);
+        getConsumers().add(consumer);
         // fire event?
     }
 
@@ -99,7 +89,7 @@ public final class MidiWorldComponent
     void addNote(final int pitch, final int velocity, final int length) {
         Note note = new Note(pitch, velocity, length);
         MidiNoteConsumer consumer = new MidiNoteConsumer(note, this);
-        consumers.add(consumer);
+        getConsumers().add(consumer);
         // fire event?
     }
 
@@ -112,7 +102,7 @@ public final class MidiWorldComponent
     void addProgramChange(final int number) {
         ProgramChange programChange = new ProgramChange(number);
         MidiProgramChangeConsumer consumer = new MidiProgramChangeConsumer(programChange, this);
-        consumers.add(consumer);
+        getConsumers().add(consumer);
         // fire event?
     }
 }

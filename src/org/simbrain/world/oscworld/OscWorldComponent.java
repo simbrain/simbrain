@@ -53,12 +53,6 @@ public final class OscWorldComponent
     /** OSC port out. */
     private final OSCPortOut oscPortOut;
 
-    /** List of OSC consumers. */
-    private final EventList<OscMessageConsumer> consumers;
-
-    /** List of OSC producers. */
-    private final EventList<OscMessageProducer> producers;
-
     /** Default OSC out host. */
     private static final InetAddress DEFAULT_OSC_OUT_HOST;
 
@@ -98,8 +92,6 @@ public final class OscWorldComponent
         catch (SocketException e) {
             throw new RuntimeException("could not create OSC port out", e);
         }
-        consumers = GlazedLists.eventList(new ArrayList<OscMessageConsumer>());
-        producers = GlazedLists.eventList(new ArrayList<OscMessageProducer>());
     }
 
 
@@ -120,16 +112,6 @@ public final class OscWorldComponent
     /** {@inheritDoc} */
     public void update() {
         // empty
-    }
-
-    /** {@inheritDoc} */
-    public Collection<? extends Consumer> getConsumers() {
-        return Collections.unmodifiableList(consumers);
-    }
-
-    /** {@inheritDoc} */
-    public Collection<? extends Producer> getProducers() {
-        return Collections.unmodifiableList(producers);
     }
 
     // TODO:  make these bound properties
@@ -187,13 +169,15 @@ public final class OscWorldComponent
         return oscPortOut;
     }
 
+    //TODO: Moving consumer, producer lists to top level breaks this stuff which uses glazed lists..
+    
     /**
      * Add the specified OSC message consumer list event listener.
      *
      * @param listener OSC message consumer list event listener to add
      */
     void addConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
-        consumers.addListEventListener(listener);
+//        getConsumers().addListEventListener(listener);
     }
 
     /**
@@ -202,13 +186,9 @@ public final class OscWorldComponent
      * @param listener OSC message consumer list event listener to remove
      */
     void removeConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
-        consumers.removeListEventListener(listener);
+ //       getConsumers().removeListEventListener(listener);
     }
 
-    // TODO:  remove from API
-    EventList<OscMessageConsumer> getConsumersEventList() {
-        return consumers;
-    }
 
     /**
      * Add the specified OSC message producer list event listener.
@@ -216,7 +196,7 @@ public final class OscWorldComponent
      * @param listener OSC message producer list event listener to add
      */
     void addProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
-        producers.addListEventListener(listener);
+   //     getConsumers().addListEventListener(listener);
     }
 
     /**
@@ -225,12 +205,7 @@ public final class OscWorldComponent
      * @param listener OSC message producer list event listener to remove
      */
     void removeProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
-        producers.removeListEventListener(listener);
-    }
-
-    // TODO:  remove from API
-    EventList<OscMessageProducer> getProducersEventList() {
-        return producers;
+//        getConsumers().removeListEventListener(listener);
     }
 
     /**
@@ -241,7 +216,7 @@ public final class OscWorldComponent
      */
     public void addInMessage(final String address) {
         OscMessageProducer producer = new OscMessageProducer(address, this);
-        producers.add(producer);
+        addProducer(producer);
     }
 
     /**
@@ -252,6 +227,6 @@ public final class OscWorldComponent
      */
     public void addOutMessage(final String address) {
         OscMessageConsumer consumer = new OscMessageConsumer(address, this);
-        consumers.add(consumer);
+        addConsumer(consumer);
     }
 }

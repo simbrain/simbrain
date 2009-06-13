@@ -45,42 +45,6 @@ public class GameAttributes implements Producer, Consumer {
     /**
      * {@inheritDoc}
      */
-    public List<ProducingAttribute<Double>> getProducingAttributes() {
-        List<ProducingAttribute<Double>> attributes = new ArrayList<ProducingAttribute<Double>>();
-        
-        for (int i = 0; i < model.size(); i++) {
-            for (int j = 0; j < model.size(); j++) {
-                final int x = i;
-                final int y = j;
-                
-                attributes.add(new ProducingAttribute<Double>() {
-
-                    public Producer getParent() {
-                        return GameAttributes.this;
-                    }
-
-                    public Double getValue() {
-                        return model.get(x, y);
-                    }
-
-                    public String getAttributeDescription() {
-                        return model.getName() + " at " + x + "," + y;
-                    }
-
-                    public String getKey() {
-                        return x + "," + y;
-                    }
-                    
-                });
-            }
-        }
-        
-        return attributes;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
     public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {
         defaultProducing = producingAttribute;
     }
@@ -146,5 +110,10 @@ public class GameAttributes implements Producer, Consumer {
      */
     public void setDefaultConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
         defaultConsuming = consumingAttribute;
+    }
+
+    public List<? extends ProducingAttribute<?>> getProducingAttributes() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -165,13 +165,4 @@ public class ScatterPlotComponent extends WorkspaceComponent<ChartListener> {
         return ScatterPlotModel.getXStream().toXML(model);
     }
 
-    @Override
-    public List<? extends Consumer> getConsumers() {
-        return (List<? extends Consumer>) model.getConsumers();
-    }
-    
-    @Override
-    public List<? extends Producer> getProducers() {
-        return Collections.<Producer>emptyList();
-    }
 }

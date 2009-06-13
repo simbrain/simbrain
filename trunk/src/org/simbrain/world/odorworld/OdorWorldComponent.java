@@ -88,15 +88,6 @@ public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
         // TODO Auto-generated method stub
     }
     
-    @Override
-    public List<? extends Consumer> getConsumers() {
-        return world.getConsumers();
-    }
-    
-    @Override
-    public List<? extends Producer> getProducers() {
-        return world.getProducers();
-    }
 
     @Override
     public void update() {

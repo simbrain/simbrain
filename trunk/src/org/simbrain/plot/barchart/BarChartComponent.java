@@ -45,6 +45,7 @@ public class BarChartComponent extends WorkspaceComponent<ChartListener> {
     public BarChartComponent(final String name) {
         super(name);
         model = new BarChartModel(this);
+        initConsumers();
     }
 
     /**
@@ -58,6 +59,7 @@ public class BarChartComponent extends WorkspaceComponent<ChartListener> {
         super(name);
         this.model = model;
         this.model.setParent(this);
+        initConsumers();
     }
 
     /**
@@ -70,6 +72,13 @@ public class BarChartComponent extends WorkspaceComponent<ChartListener> {
         super(name);
         model = new BarChartModel(this);
         model.addDataSources(numDataSources);
+        initConsumers();
+    }
+    
+    private void initConsumers() {
+        for(Consumer consumer : model.getConsumers()) {
+            this.addConsumer(consumer);
+        }
     }
 
     /**
@@ -128,16 +137,6 @@ public class BarChartComponent extends WorkspaceComponent<ChartListener> {
         for (ChartListener listener : this.getListeners()) {
             listener.chartSettingsUpdated();
         }
-    }
-    
-    @Override
-    public List<? extends Consumer> getConsumers() {
-        return (List<? extends Consumer>) model.getConsumers();
-    }
-    
-    @Override
-    public List<? extends Producer> getProducers() {
-        return Collections.<Producer>emptyList();
     }
 
     @Override

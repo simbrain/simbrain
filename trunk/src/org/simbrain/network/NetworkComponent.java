@@ -45,13 +45,7 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
 
     /** Reference to root network, the main model network. */
     private RootNetwork rootNetwork = new RootNetwork();
-    
-    /** Consumer list. */
-    private List<Consumer> consumers = new CopyOnWriteArrayList<Consumer>();
-
-    /** Producer list. */
-    private List<Producer> producers = new CopyOnWriteArrayList<Producer>();
-    
+        
     /**
      * Create a new network component.
      */
@@ -97,16 +91,6 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
     }
     
     @Override
-    public Collection<? extends Consumer> getConsumers() {
-        return consumers;
-    }
-    
-    @Override
-    public Collection<? extends Producer> getProducers() {
-        return producers;
-    }
-    
-    @Override
     public String getXML() {
         return RootNetwork.getXStream().toXML(rootNetwork);
     }
@@ -125,14 +109,14 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
 //    }
         
     /**
-     * Initialize consumers, producers, and listener.
+     * Initialize getConsumers(), getProducers(), and listener.
      */
     private void init() {
 
         for(Neuron neuron : rootNetwork.getFlatNeuronList()) {
             NeuronWrapper wrapper = new NeuronWrapper(neuron, this);
-            consumers.add(wrapper);
-            producers.add(wrapper);
+            addConsumer(wrapper);
+            addProducer(wrapper);
         }
         
         rootNetwork.addListener(new NetworkListener() {
@@ -169,8 +153,8 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
 
             public void neuronAdded(NetworkEvent<Neuron> e) {
                 NeuronWrapper wrapper = new NeuronWrapper(e.getObject(), NetworkComponent.this);
-                consumers.add(wrapper);
-                producers.add(wrapper);
+                addConsumer(wrapper);
+                addProducer(wrapper);
             }
 
             public void neuronChanged(NetworkEvent<Neuron> e) {
@@ -184,18 +168,18 @@ public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponen
             }
 
             public void neuronRemoved(NetworkEvent<Neuron> e) {
-                for (Consumer consumer : consumers) {
+                for (Consumer consumer : getConsumers()) {
                     if (consumer instanceof NeuronWrapper) {
                         if (((NeuronWrapper)consumer).getNeuron() == e.getObject()) {
-                            consumers.remove(consumer);
+                            removeConsumer(consumer);
                             break;
                         }
                     }
                 }
-                for (Producer producer : producers) {
+                for (Producer producer : getProducers()) {
                     if (producer instanceof NeuronWrapper) {
                         if (((NeuronWrapper)producer).getNeuron() == e.getObject()) {
-                            producers.remove(producer);
+                            removeProducer(producer);
                         }
                     }
                 }

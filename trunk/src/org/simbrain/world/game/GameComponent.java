@@ -1,11 +1,7 @@
 package org.simbrain.world.game;
 
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Collections;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.world.game.tictactoe.TicTacToeModel;
@@ -20,7 +16,7 @@ public class GameComponent extends WorkspaceComponent<WorkspaceComponentListener
     private final TicTacToeModel model = new TicTacToeModel();
     
     /**
-     * the attributes that wraps the model to make it act as a producer
+     * The attributes that wrap the model to make it act as a producer
      * and a consumer.
      */
     private final GameAttributes attributes = new GameAttributes(this, model);
@@ -30,8 +26,8 @@ public class GameComponent extends WorkspaceComponent<WorkspaceComponentListener
      */
     public GameComponent() {
         super("Tic Tac Toe");
-        
         setAttributeListingStyle(AttributeListingStyle.TOTAL);
+        addConsumer(attributes);
     }
 
     /**
@@ -62,19 +58,5 @@ public class GameComponent extends WorkspaceComponent<WorkspaceComponentListener
         throw new UnsupportedOperationException();
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<? extends Consumer> getConsumers() {
-        return Collections.singleton(attributes);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<? extends Producer> getProducers() {
-        return Collections.singleton(attributes);
-    }
+        
 }

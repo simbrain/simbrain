@@ -51,12 +51,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     /** Table model. */
     private DataModel<Double> dataModel;
     
-    /** List of consumers. */
-    private ArrayList<SingleAttributeConsumer<?>> consumers;
-
-    /** List of producers. */
-    private ArrayList<SingleAttributeProducer<?>> producers;
-
     /**
      * This method is the default constructor.
      */
@@ -90,12 +84,9 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
      * Initialize consumers and producers.
      */
     private void init() {
-        consumers = new ArrayList<SingleAttributeConsumer<?>>();
-        producers = new ArrayList<SingleAttributeProducer<?>>();
-
         for (int i = 0; i < dataModel.getColumnCount(); i++) {
-            consumers.add(new ConsumingColumn<Double>(dataModel, i));
-            producers.add(new ProducingColumn<Double>(dataModel, i));
+            addConsumer(new ConsumingColumn<Double>(dataModel, i));
+            addProducer(new ProducingColumn<Double>(dataModel, i));
         }
         
         dataModel.addListener(listener);
@@ -106,14 +97,14 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
 
         public void columnAdded(int column) {
             int index = dataModel.getColumnCount() - 1;
-            consumers.add(new ConsumingColumn<Double>(dataModel, index));
-            producers.add(new ProducingColumn<Double>(dataModel, index));
+            addConsumer(new ConsumingColumn<Double>(dataModel, index));
+            addProducer(new ProducingColumn<Double>(dataModel, index));
         }
 
         public void columnRemoved(int column) {
             int index = dataModel.getColumnCount();
-            consumers.remove(index);
-            producers.remove(index);
+            getProducers().remove(index);
+            getProducers().remove(index);
         }
 
         public void dataChanged() {
@@ -175,9 +166,9 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
     @SuppressWarnings("unchecked")
     void wireCouplings(final Collection<? extends Producer> producers) {
         /* Handle Coupling wire-up */
-        LOGGER.debug("wiring " + producers.size() + " producers");
+        LOGGER.debug("wiring " + getProducers().size() + " producers");
 
-       Iterator<? extends Producer> producerIterator = producers.iterator();
+       Iterator<? extends Producer> producerIterator = getProducers().iterator();
 
         for (Consumer consumer : getConsumers()) {
             if (producerIterator.hasNext()) {
@@ -186,19 +177,6 @@ public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentLis
                 getWorkspace().addCoupling(coupling);
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<? extends Consumer> getConsumers() {
-        return consumers;
-    }
-    
-    @Override
-    public List<? extends Producer> getProducers() {
-        return producers;
     }
 
     @Override

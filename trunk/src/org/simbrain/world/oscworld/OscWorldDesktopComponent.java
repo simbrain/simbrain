@@ -76,9 +76,14 @@ public final class OscWorldDesktopComponent
         Action closeAction = new CloseAction();
         Action createOscInMessageAction = new CreateOscInMessageAction();
         Action createOscOutMessageAction = new CreateOscOutMessageAction();
-        consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
-        producers = new JList(new EventListModel(oscWorldComponent.getProducersEventList()));
+//        consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
+//        producers = new JList(new EventListModel(oscWorldComponent.getProducersEventList()));
 
+        // TODO: Unbreak below!
+        consumers = new JList();
+        producers = new JList();
+
+        
         consumers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         consumers.setVisibleRowCount(16);
         consumers.addMouseListener(new MouseAdapter() {

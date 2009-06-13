@@ -28,6 +28,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.projection.Projector;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentListener;
 
@@ -42,9 +43,6 @@ import org.simbrain.workspace.WorkspaceComponentListener;
  */
 public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentListener> {
 
-    /** Consumer list. */
-    private ArrayList<ProjectionConsumer> consumers= new ArrayList<ProjectionConsumer>();
-    
     /** Data model. */
     private ProjectionModel projectionModel;
 
@@ -99,12 +97,12 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         dataset.addSeries(new XYSeries("Data", false, true));
         
         // Initialize consuming attributes
-        consumers.clear();
+        getConsumers().clear();
         for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
-            int currentSize = consumers.size() + 1;
+            int currentSize = getConsumers().size() + 1;
             ProjectionConsumer newAttribute = new ProjectionConsumer(this,
                     "Dimension" + currentSize, currentSize);
-            consumers.add(newAttribute);
+            getConsumers().add(newAttribute);
         }
         
         // Add the data to the chart.
@@ -136,10 +134,10 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      * data by one.
      */
     public void addSource() {
-        int currentSize = consumers.size() + 1;
+        int currentSize = getConsumers().size() + 1;
         ProjectionConsumer newAttribute = new ProjectionConsumer(this,
                 "Dimension" + currentSize, currentSize);
-        consumers.add(newAttribute);
+        addConsumer(newAttribute);
         projectionModel.getProjector().init(currentSize);
     }
 
@@ -147,11 +145,11 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
      * Removes a source from the dataset.
      */
     public void removeSource() {
-        int currentSize = consumers.size() - 1;
+        int currentSize = getConsumers().size() - 1;
 
         if (currentSize > 0) {
         	//dataset.removeSeries(lastSeriesIndex);
-            consumers.remove(currentSize);
+            getConsumers().remove(currentSize);
             projectionModel.getProjector().init(currentSize);
         }
     }
@@ -194,13 +192,7 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
         // TODO Auto-generated method stub
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<ProjectionConsumer> getConsumers() {
-        return consumers;
-    }
-
+   
     /**
      * Get the current state of the consumers, send this to the projection algorithm,
      * and update the graphics.
@@ -211,8 +203,9 @@ public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentLi
     	// Create a new double array to be sent as a new "point" to the projection dataset
         double[] temp = new double[getConsumers().size()];
         int i = 0;
-        for (ProjectionConsumer consumer : getConsumers()) {
-            temp[i] = consumer.getValue();
+        for (Consumer consumer : getConsumers()) {
+            // TODO: Class cast exception below?
+            temp[i] = ((ProjectionConsumer)consumer).getValue();
             i++;
         }
         boolean newDatapointWasAdded = projectionModel.getProjector().addDatapoint(temp);

@@ -114,7 +114,7 @@ final class OscMessageProducer
     }
 
     /** {@inheritDoc} */
-    public WorkspaceComponent<?> getParentComponent() {
+    public WorkspaceComponent getParentComponent() {
         return component;
     }
 

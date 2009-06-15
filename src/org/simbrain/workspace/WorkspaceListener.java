@@ -6,6 +6,7 @@ package org.simbrain.workspace;
  * @author Matt Watson
  */
 public interface WorkspaceListener {
+
     /**
      * Event when the workspace is requested to be cleared
      * listeners should not clear themselves until the
@@ -25,12 +26,12 @@ public interface WorkspaceListener {
      * 
      * @param component The component that was added.
      */
-    void componentAdded(WorkspaceComponent<?> component);
+    void componentAdded(WorkspaceComponent component);
     
     /**
      * Called when a component is removed.
      * 
      * @param component The component that was removed.
      */
-    void componentRemoved(WorkspaceComponent<?> component);
+    void componentRemoved(WorkspaceComponent component);
 }

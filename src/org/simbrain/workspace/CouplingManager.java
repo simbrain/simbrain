@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -37,13 +38,13 @@ public class CouplingManager {
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
     /** All couplings for the workspace. */
-    private List<Coupling<?>> all = new ArrayList<Coupling<?>>();
+    private List<Coupling<?>> all = new CopyOnWriteArrayList<Coupling<?>>();
     /** The couplings indexed by the source and target combination. */
     private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings = newMap();
     /** The couplings indexed by source. */
-    private Map<WorkspaceComponent<?>, List<Coupling<?>>> sourceCouplings = newMap();
+    private Map<WorkspaceComponent, List<Coupling<?>>> sourceCouplings = newMap();
     /** The couplings indexed by target. */
-    private Map<WorkspaceComponent<?>, List<Coupling<?>>> targetCouplings = newMap();
+    private Map<WorkspaceComponent, List<Coupling<?>>> targetCouplings = newMap();
     /** The couplings indexed by consuming attribute, which is unique. */
     private Map<ConsumingAttribute<?>, Coupling<?>> consumingAttributes = newMap();
     /** Default priority. */
@@ -53,8 +54,9 @@ public class CouplingManager {
     /** List of listeners to fire updates when couplings are changed. */
     private ArrayList<CouplingComponentListener> couplingManagerListeners
       = new ArrayList<CouplingComponentListener>();
-
+    
     /**
+     * 
      * Helper method to cleanup nasty generics declarations.
      * 
      * @param <K> The key type.
@@ -89,7 +91,7 @@ public class CouplingManager {
      * @return A list of the couplings between the provided source and target.
      */
     public Collection<? extends Coupling<?>> getCouplings(
-            final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
+            final WorkspaceComponent source, final WorkspaceComponent target) {
         Collection<Coupling<?>> couplings = sourceTargetCouplings.get(
                 new SourceTarget(source, target));
         
@@ -126,6 +128,26 @@ public class CouplingManager {
     public Coupling<?> findCoupling(final String sourceId, final String targetId) {
         return null;
     }
+    
+    /**
+     * Removes all couplings associated with a producer or consumer.
+     *
+     * @param holder consumer or producer.
+     */
+    public void removeAttachedCouplings(final AttributeHolder holder) {
+        for (Coupling<?> coupling : getCouplings()) {
+            if (holder instanceof Consumer) {
+                if (coupling.getConsumingAttribute().getParent() == holder) {
+                    removeCoupling(coupling);
+                }
+            }
+            if (holder instanceof Producer) {
+                if (coupling.getProducingAttribute().getParent() == holder) {
+                    removeCoupling(coupling);
+                }
+            }
+        }
+    }
 
     /**
      * returns whether the coupling is referenced by this manager.
@@ -156,16 +178,11 @@ public class CouplingManager {
         
         all.add(coupling);
         
-        WorkspaceComponent<?> source = coupling.getProducingAttribute()
+        WorkspaceComponent source = coupling.getProducingAttribute()
             .getParent().getParentComponent();
-        WorkspaceComponent<?> target = coupling.getConsumingAttribute()
+        WorkspaceComponent target = coupling.getConsumingAttribute()
             .getParent().getParentComponent();
-        
-        AttributeListener listener = new AttributeListener(coupling);
-        
-        source.addComponentListener(listener);
-        target.addComponentListener(listener);
-        
+
         SourceTarget sourceTarget = new SourceTarget(source, target);
 
         sourceTargetCouplings.put(sourceTarget, addCouplingToList(
@@ -177,55 +194,6 @@ public class CouplingManager {
             targetCouplings.get(source), coupling));
         fireCouplingListUpdated();
     }
-    
-    /**
-     * Listener for attribute changes.
-     * 
-     * @author Matt Watson
-     */
-    class AttributeListener implements WorkspaceComponentListener {
-        /** The coupling this listener is associated with. */
-        final Coupling<?> coupling;
-        
-        /**
-         * Creates a new listener for the given coupling.
-         * 
-         * @param coupling the coupling associated with this listener.
-         */
-        AttributeListener(final Coupling<?> coupling) {
-            this.coupling = coupling;
-        }
-        
-        /**
-         * called when the attribute is removed and deletes the associated coupling.
-         * 
-         * @param parent the parent of the attribute that was removed.
-         * @param consumer the attribute that is removed.
-         */
-        public void attributeRemoved(final AttributeHolder parent, final Attribute attribute) {
-            if (coupling.getConsumingAttribute().equals(attribute)
-            ||  coupling.getProducingAttribute().equals(attribute))
-            {
-                removeCoupling(coupling);
-            }
-        }
-
-        /**
-         * Called when the component is updated.
-         */
-        public void componentUpdated() {
-            /* no implementation */
-        }
-
-        /**
-         * Called when the component title is changed.
-         * 
-         * @param name the new title.
-         */
-        public void setTitle(final String name) {
-            /* no implementation */
-        }
-    };
     
     /**
      * Replaces any couplings where the old attribute is the source or
@@ -285,7 +253,7 @@ public class CouplingManager {
      *
      * @param component component to check.
      */
-    public void removeCouplings(final WorkspaceComponent<?> component) {
+    public void removeCouplings(final WorkspaceComponent component) {
         ArrayList<Coupling<?>> toRemove = new ArrayList<Coupling<?>>();
         for (Coupling<?> coupling : getCouplings()) {
             if (coupling.getConsumingAttribute().getParent().getParentComponent() == component) {
@@ -315,9 +283,9 @@ public class CouplingManager {
      * @param coupling The coupling to remove.
      */
     public void removeCoupling(final Coupling<?> coupling) {
-        WorkspaceComponent<?> source = coupling.getProducingAttribute()
+        WorkspaceComponent source = coupling.getProducingAttribute()
             .getParent().getParentComponent();
-        WorkspaceComponent<?> target = coupling.getConsumingAttribute()
+        WorkspaceComponent target = coupling.getConsumingAttribute()
             .getParent().getParentComponent();
         
         SourceTarget sourceTarget = new SourceTarget(source, target);
@@ -359,9 +327,9 @@ public class CouplingManager {
         private static final int ARBITRARY_PRIME = 57;
         
         /** The source component. */
-        private final WorkspaceComponent<?> source;
+        private final WorkspaceComponent source;
         /** The target component. */
-        private final WorkspaceComponent<?> target;
+        private final WorkspaceComponent target;
         
         /**
          * Creates an instance.
@@ -369,7 +337,7 @@ public class CouplingManager {
          * @param source The source.
          * @param target The target.
          */
-        SourceTarget(final WorkspaceComponent<?> source, final WorkspaceComponent<?> target) {
+        SourceTarget(final WorkspaceComponent source, final WorkspaceComponent target) {
             if (source == null) throw new IllegalArgumentException("source cannot be null");
             if (target == null) throw new IllegalArgumentException("target cannot be null");
             

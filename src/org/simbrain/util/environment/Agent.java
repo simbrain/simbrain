@@ -159,7 +159,7 @@ public class Agent implements TwoDEntity, Consumer, Producer {
 	/**
      * {@inheritDoc}
      */
-	public WorkspaceComponent<?> getParentComponent() {
+	public WorkspaceComponent getParentComponent() {
 		return environment.getParent();
 	}
 

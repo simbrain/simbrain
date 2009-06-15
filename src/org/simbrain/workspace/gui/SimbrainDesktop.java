@@ -175,8 +175,8 @@ public class SimbrainDesktop {
     Interpreter interpreter;
 
     /** All the guiComponents in the workspace. */
-    private Map<WorkspaceComponent<?>, GuiComponent<?>> guiComponents
-        = new LinkedHashMap<WorkspaceComponent<?>, GuiComponent<?>>();
+    private Map<WorkspaceComponent, GuiComponent<?>> guiComponents
+        = new LinkedHashMap<WorkspaceComponent, GuiComponent<?>>();
     
     /** Listener on the workspace. */
     private final WorkspaceListener listener = new WorkspaceListener() {
@@ -551,9 +551,9 @@ public class SimbrainDesktop {
      * This nasty declaration creates a map of the workspace guiComponents to their associated
      * wrapper class.
      */
-    private static final Map<Class<? extends WorkspaceComponent<?>>,
+    private static final Map<Class<? extends WorkspaceComponent>,
             Class<? extends GuiComponent<?>>> wrappers =
-                new HashMap<Class<? extends WorkspaceComponent<?>>,
+                new HashMap<Class<? extends WorkspaceComponent>,
         Class<? extends GuiComponent<?>>>();
     
     /**
@@ -562,7 +562,7 @@ public class SimbrainDesktop {
      * @param component The component class.
      * @param gui The gui class.
      */
-    private static void registerComponent(final Class<? extends WorkspaceComponent<?>> component,
+    private static void registerComponent(final Class<? extends WorkspaceComponent> component,
             final Class<? extends GuiComponent<?>> gui) {
         wrappers.put(component, gui);
     }
@@ -573,7 +573,7 @@ public class SimbrainDesktop {
      * @param component component to check with
      * @return component guicomponent
      */
-    public GuiComponent<?> getDesktopComponent(final WorkspaceComponent<?> component) {
+    public GuiComponent<?> getDesktopComponent(final WorkspaceComponent component) {
         return guiComponents.get(component);
     }
 
@@ -586,7 +586,7 @@ public class SimbrainDesktop {
      * @return component desktop component, or null if none found
      */
     public GuiComponent<?> getDesktopComponent(final String componentName) {
-        WorkspaceComponent<?> wc = workspace.getComponent(componentName);
+        WorkspaceComponent wc = workspace.getComponent(componentName);
         if (wc != null) {
             return guiComponents.get(wc);
         } else {
@@ -764,9 +764,9 @@ public class SimbrainDesktop {
      */
     @SuppressWarnings("unchecked")
     static GuiComponent<?> createDesktopComponent(final GenericFrame parentFrame,
-            final WorkspaceComponent<?> component) {
-        Class<? extends WorkspaceComponent<?>> componentClass =
-            (Class<? extends WorkspaceComponent<?>>) component.getClass();
+            final WorkspaceComponent component) {
+        Class<? extends WorkspaceComponent> componentClass =
+            (Class<? extends WorkspaceComponent>) component.getClass();
         Class<? extends GuiComponent<?>> guiClass = wrappers.get(componentClass);
         
         if (guiClass == null) {

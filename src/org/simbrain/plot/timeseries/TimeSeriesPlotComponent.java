@@ -21,14 +21,9 @@ package org.simbrain.plot.timeseries;
 import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.jfree.data.xy.XYSeries;
-import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -38,7 +33,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  *          Custom component listener to reflect number of consumers
  *          Ability to reset the plot.
  */
-public class TimeSeriesPlotComponent extends WorkspaceComponent<ChartListener> {
+public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     /** The data model. */
     private final TimeSeriesModel model;
@@ -130,9 +125,10 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent<ChartListener> {
      * dialog.
      */
     public void updateSettings() {
-        for (ChartListener listener : this.getListeners()) {
-            listener.chartSettingsUpdated();
-        }
+        //TODO!
+//        for (ChartListener listener : this.getListeners()) {
+//            listener.chartSettingsUpdated();
+//        }
     }
 
     @Override

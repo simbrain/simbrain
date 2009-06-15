@@ -2,7 +2,6 @@ package org.simbrain.workspace;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -75,7 +74,7 @@ public class WorkspaceSerializer {
      */
     private void serializeComponents(final WorkspaceComponentSerializer serializer,
             final ArchiveContents archive, final ZipOutputStream zipStream) throws IOException {
-        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
+        for (WorkspaceComponent component : workspace.getComponentList()) {
             ArchiveContents.Component archiveComp = archive.addComponent(component);
             
             ZipEntry entry = new ZipEntry(archiveComp.uri);
@@ -158,7 +157,7 @@ public class WorkspaceSerializer {
                     continue;
                 }
                 
-                WorkspaceComponent<?> wc = componentDeserializer.deserializeWorkspaceComponent(
+                WorkspaceComponent wc = componentDeserializer.deserializeWorkspaceComponent(
                     component, new ByteArrayInputStream(entries.get(component.uri)));
     
                 if (component.desktopComponent != null) {
@@ -186,9 +185,9 @@ public class WorkspaceSerializer {
                     continue;
                 }
                 
-                WorkspaceComponent<?> sourceComponent
+                WorkspaceComponent sourceComponent
                     = componentDeserializer.getComponent(coupling.source.uri);
-                WorkspaceComponent<?> targetComponent
+                WorkspaceComponent targetComponent
                     = componentDeserializer.getComponent(coupling.target.uri);
                 
                 ProducingAttribute<?> producingAttribute = (ProducingAttribute<?>) sourceComponent

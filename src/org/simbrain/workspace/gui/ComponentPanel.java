@@ -80,14 +80,14 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
     /**
      * {@inheritDoc}
      */
-    public void componentAdded(WorkspaceComponent<?> component) {
+    public void componentAdded(WorkspaceComponent component) {
        model.addRow(component);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void componentRemoved(WorkspaceComponent<?> component) {
+    public void componentRemoved(WorkspaceComponent component) {
         model.removeRow(component);
     }
 
@@ -116,7 +116,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
         String[] columnNames = {"Component", "Type", "Gui On", "Update On"};
         
         /** Internal list of components. */
-        private ArrayList<WorkspaceComponent<?>> data = new ArrayList<WorkspaceComponent<?>>();      
+        private ArrayList<WorkspaceComponent> data = new ArrayList<WorkspaceComponent>();      
 
         /**
          * {@inheritDoc}
@@ -194,7 +194,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
         /**
          * Add a new component to the list.
          */
-        public void addRow(WorkspaceComponent<?> component) {
+        public void addRow(WorkspaceComponent component) {
             data.add(component);
             fireTableStructureChanged();
         }
@@ -212,7 +212,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
          *
          * @param component the component to remove.
          */
-        public void removeRow(WorkspaceComponent<?> component) {
+        public void removeRow(WorkspaceComponent component) {
             data.remove(component);
             fireTableStructureChanged();
         }

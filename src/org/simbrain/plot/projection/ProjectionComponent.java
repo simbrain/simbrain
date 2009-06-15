@@ -41,7 +41,7 @@ import org.simbrain.workspace.WorkspaceComponentListener;
  *  Add ability to plot multiple projections at once.
  *  Option of connecting data-points with lines
  */
-public class ProjectionComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class ProjectionComponent extends WorkspaceComponent {
 
     /** Data model. */
     private ProjectionModel projectionModel;

@@ -264,7 +264,7 @@ public class NeuronWrapper implements Producer, Consumer {
     /**
      * {@inheritDoc}
      */
-    public WorkspaceComponent<?> getParentComponent() {
+    public WorkspaceComponent getParentComponent() {
         return parent;
     }
 }

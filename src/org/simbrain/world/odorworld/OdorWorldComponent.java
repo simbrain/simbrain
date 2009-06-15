@@ -31,7 +31,7 @@ import org.simbrain.workspace.WorkspaceComponentListener;
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link OdorWorldPanel}.
  */
-public class OdorWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class OdorWorldComponent extends WorkspaceComponent {
 
     /** Reference to model world. */
     private OdorWorld world = new OdorWorld(this);

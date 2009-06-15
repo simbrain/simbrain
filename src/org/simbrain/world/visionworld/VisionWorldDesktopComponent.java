@@ -26,6 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
 
+import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -46,7 +47,6 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
      */
     public VisionWorldDesktopComponent(GenericFrame frame, final VisionWorldComponent component) {
         super(frame, component);
-        component.addListener(new BasicComponentListener());
         this.setPreferredSize(new Dimension(400,400));
 
         // Sets a reference within vision world for use by actions.
@@ -87,10 +87,10 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
         add("Center", component.getVisionWorld());
     }
 
-    public void postAddInit() { 
-        setSize(450, 400); 
-        setVisible(true); 
-     } 
+    public void postAddInit() {
+        setSize(450, 400);
+        setVisible(true);
+    } 
 
     @Override
     public void closing() {

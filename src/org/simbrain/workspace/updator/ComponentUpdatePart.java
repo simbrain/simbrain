@@ -9,7 +9,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class ComponentUpdatePart {
     /** The parent component. */
-    private final WorkspaceComponent<?> parent;
+    private final WorkspaceComponent parent;
     /** The runnable task. */
     private final Runnable runnable;
     /** The description of the part. */
@@ -25,7 +25,7 @@ public class ComponentUpdatePart {
      * @param description The description of the part.
      * @param lock The lock to use.
      */
-    public ComponentUpdatePart(final WorkspaceComponent<?> parent, final Runnable runnable,
+    public ComponentUpdatePart(final WorkspaceComponent parent, final Runnable runnable,
             final String description, final Object lock) {
         this.parent = parent;
         this.runnable = runnable;
@@ -41,7 +41,7 @@ public class ComponentUpdatePart {
      * @param runnable The task to execute.
      * @param description The description of the part.
      */
-    public ComponentUpdatePart(final WorkspaceComponent<?> parent, final Runnable runnable,
+    public ComponentUpdatePart(final WorkspaceComponent parent, final Runnable runnable,
             final String description) {
         this.parent = parent;
         this.runnable = runnable;
@@ -54,7 +54,7 @@ public class ComponentUpdatePart {
      * 
      * @return the parent of this component.
      */
-    public WorkspaceComponent<?> getParent() {
+    public WorkspaceComponent getParent() {
         return parent;
     }
     

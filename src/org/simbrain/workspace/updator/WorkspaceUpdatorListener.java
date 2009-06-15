@@ -16,7 +16,7 @@ public interface WorkspaceUpdatorListener {
      * @param update The number of the update.
      * @param thread The thread doing the update.
      */
-    void startingComponentUpdate(WorkspaceComponent<?> component, int update, int thread);
+    void startingComponentUpdate(WorkspaceComponent component, int update, int thread);
     
     /**
      * Called when a component update ends.
@@ -25,7 +25,7 @@ public interface WorkspaceUpdatorListener {
      * @param update The number of the update.
      * @param thread The thread doing the update.
      */
-    void finishedComponentUpdate(WorkspaceComponent<?> component, int update, int thread);
+    void finishedComponentUpdate(WorkspaceComponent component, int update, int thread);
     
     /**
      * Called when the couplings are updated.

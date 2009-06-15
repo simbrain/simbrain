@@ -115,12 +115,9 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
                     getWorkspaceComponent().getModel().getUpperBound());
         }
 
-        getWorkspaceComponent().addListener(new ChartListener() {
+        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
 
             public void componentUpdated() {
-            }
-
-            public void setTitle(String name) {
             }
 
             // TODO: Explore parameters in
@@ -137,12 +134,6 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
                             getWorkspaceComponent().getModel().getLowerBound(),
                             getWorkspaceComponent().getModel().getUpperBound());
                 }
-            }
-
-            public void attributeRemoved(AttributeHolder parent, Attribute attribute)
-            {
-                // TODO Auto-generated method stub
-                
             }
         });
         this.getWorkspaceComponent().updateSettings();

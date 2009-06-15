@@ -13,8 +13,8 @@ public class WorkspaceComponentSerializer {
     /** The last component id. */
     private int lastComponent = 0;
     /** Map of components to their ids. */
-    private final Map<WorkspaceComponent<?>, Integer> componentIds
-        = new IdentityHashMap<WorkspaceComponent<?>, Integer>();
+    private final Map<WorkspaceComponent, Integer> componentIds
+        = new IdentityHashMap<WorkspaceComponent, Integer>();
     private final OutputStream stream;
     
     WorkspaceComponentSerializer(final OutputStream stream) {
@@ -27,7 +27,7 @@ public class WorkspaceComponentSerializer {
      * @param component The component to return an id for.
      * @return The component's id.
      */
-    int getId(final WorkspaceComponent<?> component) {
+    int getId(final WorkspaceComponent component) {
         Integer id = componentIds.get(component);
         
         if (id == null) {
@@ -45,7 +45,7 @@ public class WorkspaceComponentSerializer {
      * @param stream The stream to write to.
      * @return The id for the component that was serialized.
      */
-    int serializeComponent(final WorkspaceComponent<?> component) {
+    int serializeComponent(final WorkspaceComponent component) {
         component.save(stream, null);
         
         return getId(component);

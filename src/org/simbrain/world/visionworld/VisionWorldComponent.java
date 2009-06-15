@@ -37,7 +37,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Vision world frame.
  */
-public final class VisionWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {//implements CouplingContainer {
+public final class VisionWorldComponent extends WorkspaceComponent {//implements CouplingContainer {
 
     /** Vision world. */
     private final VisionWorld visionWorld;

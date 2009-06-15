@@ -141,11 +141,8 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
                 getWorkspaceComponent().getModel().getUpperDomainBoundary());
 
         // Notifies chart when changes are made within the dialog.
-        getWorkspaceComponent().addListener(new ChartListener() {
+        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
             public void componentUpdated() {
-            }
-
-            public void setTitle(final String name) {
             }
 
             public void chartSettingsUpdated() {
@@ -178,11 +175,6 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
                             getWorkspaceComponent().getModel().getLowerDomainBoundary(),
                             getWorkspaceComponent().getModel().getUpperDomainBoundary());
                 }
-            }
-
-            public void attributeRemoved(AttributeHolder holder,
-                    Attribute attribute) {
-                
             }
         });
         getWorkspaceComponent().updateSettings();

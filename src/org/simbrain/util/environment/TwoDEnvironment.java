@@ -18,6 +18,6 @@ public interface TwoDEnvironment {
 	public List<SmellSource> getSmellSources();
 
 	/** Reference to WorkspaceComponet. */
-	public WorkspaceComponent<?> getParent();
+	public WorkspaceComponent getParent();
 	
 }

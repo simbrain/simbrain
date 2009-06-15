@@ -14,8 +14,8 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class WorkspaceComponentDeserializer {
     /** A map of keys to their components. */
-    private final Map<String, WorkspaceComponent<?>> componentKeys
-        = new HashMap<String, WorkspaceComponent<?>>();
+    private final Map<String, WorkspaceComponent> componentKeys
+        = new HashMap<String, WorkspaceComponent>();
     
     /**
      * Returns the workspace component associated with the given uri.
@@ -23,7 +23,7 @@ public class WorkspaceComponentDeserializer {
      * @param uri The uri for the component to retrieve.
      * @return The component for the uri.
      */
-    WorkspaceComponent<?> getComponent(final String uri) {
+    WorkspaceComponent getComponent(final String uri) {
         return componentKeys.get(uri);
     }
     
@@ -36,13 +36,13 @@ public class WorkspaceComponentDeserializer {
      * @return The deserialized WorkspaceComponent.
      */
     @SuppressWarnings("unchecked")
-    WorkspaceComponent<?> deserializeWorkspaceComponent(final ArchiveContents.Component component,
+    WorkspaceComponent deserializeWorkspaceComponent(final ArchiveContents.Component component,
             final InputStream input) {
         try {
-            Class<WorkspaceComponent<?>> clazz = (Class<WorkspaceComponent<?>>)
+            Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>)
               Class.forName(component.className);
             
-            WorkspaceComponent<?> wc = deserializeWorkspaceComponent(
+            WorkspaceComponent wc = deserializeWorkspaceComponent(
                clazz, component.name, input, null);
             
             componentKeys.put(component.uri, wc);
@@ -62,12 +62,12 @@ public class WorkspaceComponentDeserializer {
      * @param format the format of the data
      * @return a new component
      */
-    public static WorkspaceComponent<?> deserializeWorkspaceComponent(final Class<?> clazz,
+    public static WorkspaceComponent deserializeWorkspaceComponent(final Class<?> clazz,
             final String name, final InputStream input, final String format) {
         try {
             Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
                 
-            WorkspaceComponent<?> wc = (WorkspaceComponent<?>)
+            WorkspaceComponent wc = (WorkspaceComponent)
                 method.invoke(null, input, name, format);
                 
             return wc;
@@ -91,8 +91,8 @@ public class WorkspaceComponentDeserializer {
     GuiComponent<?> deserializeDesktopComponent(final String className,
             final WorkspaceComponent component, final InputStream input, final String name) {
         try {
-            Class<WorkspaceComponent<?>> clazz
-                = (Class<WorkspaceComponent<?>>) Class.forName(className);
+            Class<WorkspaceComponent> clazz
+                = (Class<WorkspaceComponent>) Class.forName(className);
             Method method = clazz.getMethod("open", WorkspaceComponent.class,
                 InputStream.class, String.class);
             

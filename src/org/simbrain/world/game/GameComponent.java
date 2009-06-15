@@ -11,7 +11,7 @@ import org.simbrain.world.game.tictactoe.TicTacToeModel;
  * 
  * @author Matt Watson
  */
-public class GameComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class GameComponent extends WorkspaceComponent {
     /** The game model. */
     private final TicTacToeModel model = new TicTacToeModel();
     

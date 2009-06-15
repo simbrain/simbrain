@@ -106,21 +106,13 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         );
         chartPanel.setChart(chart);
 
-        getWorkspaceComponent().addListener(new ChartListener() {
+        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
             public void componentUpdated() {
-            }
-
-            public void setTitle(final String name) {
             }
 
             public void chartSettingsUpdated() {
                 chart.getPlot().setOutlineVisible(getWorkspaceComponent()
                         .getModel().isOutlineVisible());
-            }
-
-            public void attributeRemoved(AttributeHolder holder,
-                    Attribute attribute) {
-                
             }
         });
         getWorkspaceComponent().updateSettings();

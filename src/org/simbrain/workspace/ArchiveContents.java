@@ -18,8 +18,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 class ArchiveContents {
     /** A map of all the components to their uris. */
-    private transient Map<WorkspaceComponent<?>, String> componentUris
-        = new HashMap<WorkspaceComponent<?>, String>();
+    private transient Map<WorkspaceComponent, String> componentUris
+        = new HashMap<WorkspaceComponent, String>();
     /** All of the components in the archive. */
     private List<Component> components = new ArrayList<Component>();
     /** All of the couplings in the archive. */
@@ -42,7 +42,7 @@ class ArchiveContents {
      * @param workspaceComponent The workspace component to add.
      * @return The component created for this WorkspaceComponent.
      */
-    Component addComponent(final WorkspaceComponent<?> workspaceComponent) {
+    Component addComponent(final WorkspaceComponent workspaceComponent) {
         Component component = new Component(serializer, workspaceComponent);
         components.add(component);
         
@@ -126,7 +126,7 @@ class ArchiveContents {
          * @param component The workspace component this entry represents.
          */
         private Component(final WorkspaceComponentSerializer serializer,
-                final WorkspaceComponent<?> component) {
+                final WorkspaceComponent component) {
             this.className = component.getClass().getCanonicalName();
             this.id = serializer.getId(component);
             this.name = component.getName();
@@ -221,7 +221,7 @@ class ArchiveContents {
              */
             Attribute(final ArchiveContents parent,
                     final org.simbrain.workspace.Attribute attribute) {
-                WorkspaceComponent<?> comp = attribute.getParent().getParentComponent();
+                WorkspaceComponent comp = attribute.getParent().getParentComponent();
                 
                 this.uri = parent.componentUris.get(comp);
                 this.attributeID = attribute.getKey();

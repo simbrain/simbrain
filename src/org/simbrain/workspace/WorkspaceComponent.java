@@ -22,19 +22,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
@@ -45,10 +37,8 @@ import org.simbrain.workspace.updator.ComponentUpdatePart;
  * Extend this class to create your own component type.  Gui representations of
  * a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
  * 
- * @param <E> The type of the workspace listener associated with this
- * component.
  */
-public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
+public abstract class WorkspaceComponent {
     
     /** The workspace that 'owns' this component. */
     private Workspace workspace;
@@ -104,14 +94,14 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * Subclasses can provide a default value using User Preferences.
      */
     private File currentFile;
+
+    /** The set of all WorkspaceComponentListeners on this component. */
+    private final Collection<WorkspaceComponentListener> workspaceComponentListeners = 
+        new HashSet<WorkspaceComponentListener>();
     
-    /** WorkspaceComponentListeners mapped to their proxies. */
-    private final Map<WorkspaceComponentListener, E> componentListeners
-        = new HashMap<WorkspaceComponentListener, E>();
-    
-    
-    /** The set of all listeners on this component. */
-    private final Collection<E> listeners = new HashSet<E>();
+    /** List of attribute listeners. */
+    private final Collection<AttributeHolderListener> attributeListeners = 
+        new HashSet<AttributeHolderListener>();
     
     /**
      * Construct a workspace component.
@@ -147,7 +137,7 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     /**
      * Closes the WorkspaceComponent.
      */
-    public final void close() {
+    public void close() {
         closing();
         workspace.removeWorkspaceComponent(this);
     }
@@ -198,10 +188,10 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
     
     /**
-     * Notify all listeners of a componentUpdated event.
+     * Notify all workspaceComponentListeners of a componentUpdated event.
      */
     public final void fireUpdateEvent() {
-        for (WorkspaceComponentListener listener : listeners) {
+        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
             listener.componentUpdated();
         }
     }
@@ -214,172 +204,57 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
     }
     
     /**
-     * Returns the listeners on this component.
+     * Returns the WorkspaceComponentListeners on this component.
      * 
-     * @return The listeners on this component.
+     * @return The WorkspaceComponentListeners on this component.
      */
-    protected Collection<? extends E> getListeners() {
-        return Collections.unmodifiableCollection(listeners);
+    public Collection<WorkspaceComponentListener> getWorkspaceComponentListeners() {
+        return Collections.unmodifiableCollection(workspaceComponentListeners);
     }
     
     /**
-     * Adds a listener to this component.
+     * Adds a WorkspaceComponentListener to this component.
      * 
-     * @param listener the Listener to add.
+     * @param listener the WorkspaceComponentListener to add.
      */
-    public void addComponentListener(final WorkspaceComponentListener listener) {
-        E proxy = getProxy(listener);
-        if (proxy == null) throw new IllegalArgumentException(
-            "this workspace component class: " + getClass().getName()
-            + " is not designed to allow standard WorkspaceComponentListeners. "
-            + "Please review the developer documentation on this subject or seek assistance.");
-            
-        listeners.add(proxy);
-    }
-
-    /**
-     * Returns a proxy for a plain WorkspaceComponentListener so that subclasses
-     * may treat it as a specialized listener.
-     * 
-     * I (Yoshimi) was initially confused by this; in case it helps, here is a
-     * (slightly edited) Q/A session about the issue.
-     * 
-     * QUESTION: I'm not clear why we needed the proxy stuff. Wouldn't just
-     * adding attributeRemoved to WorkspaceComponentListener have been
-     * sufficient?
-     * 
-     * ANSWER: Probably the easiest way to understand this is to comment out the
-     * addComponentListener method and try to resolve the resulting compilation
-     * errors on CouplingManager without uncommenting it.
-     * 
-     * This is one of those traps of generics that I've been talking about.The
-     * issue came up when I tried to make CoupingManager be a
-     * WorkspaceComponentListener. The problem is that WorkspaceComponent has a
-     * generic parameter E that defines the type of the listener. This allows
-     * sub-types of WorkspaceComponent to customize their listeners without a
-     * lot of redundant code. This is really useful and seems like a great use a
-     * of generics, and it is until you want to do something like write a
-     * handler that's general for all WorkspaceComponenetListeners. You can't
-     * add it to the WorkspaceComponent instance. The reason is that in
-     * CouplingManager we refer to the WorkspaceComponentListener as
-     * WorkspaceComponentListener<?> because we don't know (or care) what the
-     * specific type of the workspace component is. When you try to add any old
-     * WorkspaceComponentListener to the WorkspaceComponent<?>, it comes back
-     * with an error that basically says: "hey buddy, you see that '?' You
-     * haven't told me what kind of WorkspaceComponentListener this
-     * WorkspaceComponent takes and I can't be sure what you are providing is
-     * the right one."
-     * 
-     * If you look at the RootNetwork class, it becomes clear why that won't
-     * work. RootNetwork calls all these specialized events on the listener
-     * instances. If those methods weren't there, the code would fail. Really,
-     * it would fail earlier because the Java ensures that you can't assign
-     * WorkspaceComponentListener reference to a NetworkListener variable.
-     * 
-     * So what I did is use a fairly esoteric feature of Java that allows you to
-     * implement an unknown interface at runtime dynamically. And basically all
-     * I do is if the method is implemented by the actual
-     * WorkspaceComponentListener instance, it forwards the event to the
-     * instance, otherwise nothing with the event. That lets observers add
-     * listeners for just the basic WorkspaceComponentListener events without
-     * having every WorkspaceComponent implement special handling for both
-     * standard listeners and the special listeners which would defeat the
-     * purpose.
-     * 
-     * 
-     * @param listener
-     *            the listener to wrap
-     * @return a proxy for the listener implementing E
-     */
-    @SuppressWarnings("unchecked")
-    private E getProxy(final WorkspaceComponentListener listener) {
-        Type superclass = getClass().getGenericSuperclass();
-        
-        Type[] typeArguments = ((ParameterizedType) superclass).getActualTypeArguments();
-        
-        if (typeArguments == null || typeArguments.length <= 0) return null;
-            
-        Type type = ((ParameterizedType) superclass).getActualTypeArguments()[0];
-        
-        if (!(type instanceof Class<?>)) return null;
-        
-        Class<?>[] clazz = {(Class<?>) type};
-        
-        if (!WorkspaceComponentListener.class.isAssignableFrom(clazz[0])) return null;
-        
-        return (E) Proxy.newProxyInstance(getClass().getClassLoader(),
-            clazz, new ProxyInvocationHandler(listener));
+    public void addWorkspaceComponentListener(final WorkspaceComponentListener listener) {
+        workspaceComponentListeners.add(listener);
     }
     
     /**
-     * A invocation handler for listener proxies.
+     * Adds a WorkspaceComponentListener to this component.
      * 
-     * @author Matt Watson
+     * @param listener the WorkspaceComponentListener to add.
      */
-    private class ProxyInvocationHandler implements InvocationHandler {
-        /** The underlying listener. */
-        final WorkspaceComponentListener listener;
-        
-        /**
-         * Creates a new instance for the provided listener.
-         * 
-         * @param listener the listener to wrap.
-         */
-        ProxyInvocationHandler(final WorkspaceComponentListener listener) {
-            this.listener = listener;
-        }
-        
-        /**
-         * If the method called is a WorkspaceComponentListener method, invokes
-         * that method, otherwise, does nothing.
-         * 
-         * @param proxy the proxy object
-         * @param method the method being called
-         * @param args the arguments to that method
-         * @return the result of the method call or null
-         * @throws InvocationTargetException if something goes wrong
-         * @throws IllegalAccessException if the security maanger prevents the call
-         */
-        public Object invoke(final Object proxy, final Method method, final Object[] args)
-                throws InvocationTargetException, IllegalAccessException {
-            try {
-                Class<?> listenerClass = listener.getClass();
-                Method implementation = listenerClass.getMethod(method.getName(),
-                    method.getParameterTypes());
-                
-                return implementation.invoke(listener, args);
-            } catch (NoSuchMethodException e) {
-                return null;
-            }
-        }
+    public void removeWorkspaceComponentListener(final WorkspaceComponentListener listener) {
+        workspaceComponentListeners.remove(listener);
     }
     
     /**
-     * Adds a listener to this component.
+     * Returns the Attribute Listeners on this component.
      * 
-     * @param listener the Listener to add.
+     * @return The Attribute Listeners on this component.
      */
-    public void addListener(final E listener) {
-        listeners.add(listener);
+    public Collection<AttributeHolderListener> getAttributeListeners() {
+        return Collections.unmodifiableCollection(attributeListeners);
     }
     
     /**
-     * Adds a listener to this component.
+     * Adds a AttributeHolderListener to this component.
      * 
-     * @param listener the Listener to add.
+     * @param listener the AttributeHolderListener to add.
      */
-    public void removeComponentListener(final WorkspaceComponentListener listener) {
-        listeners.remove(componentListeners.get(listener));
-        componentListeners.remove(listener);
+    public void addAttributeListener(final AttributeHolderListener listener) {
+        attributeListeners.add(listener);
     }
     
     /**
-     * Removes a listener to this component.
+     * Adds a AttributeHolderListener to this component.
      * 
-     * @param listener the Listener to add.
+     * @param listener the AttributeHolderListener to add.
      */
-    public void removeListener(final E listener) {
-        listeners.add(listener);
+    public void removeAttributeListener(final AttributeHolderListener listener) {
+        attributeListeners.remove(listener);
     }
 
     /**
@@ -405,9 +280,10 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public void setName(final String name) {
         this.name = name;
-        for (WorkspaceComponentListener listener : this.getListeners()) {
-            listener.setTitle(name);
-        }
+        //TODO: Think about this
+//        for (WorkspaceComponentListener listener : this.getListeners()) {
+//            listener.setTitle(name);
+//        }
     }
 
     /**
@@ -530,6 +406,9 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public void addConsumer(final Consumer consumer) {
         consumers.add(consumer);
+        for (AttributeHolderListener listener : attributeListeners) {
+            listener.consumerAdded(consumer);
+        }
     }
 
     /**
@@ -539,6 +418,9 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      */
     public void addProducer(final Producer producer) {
         producers.add(producer);
+        for (AttributeHolderListener listener : attributeListeners) {
+            listener.producerAdded(producer);
+        }
     }
     
     /**
@@ -547,7 +429,11 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * @param consumer consumer to remove
      */
     public void removeConsumer(final Consumer consumer) {
+        workspace.getCouplingManager().removeAttachedCouplings(consumer);
         consumers.remove(consumer);
+        for (AttributeHolderListener listener : attributeListeners) {
+            listener.consumerRemoved(consumer);
+        }
     }
     
     /**
@@ -556,7 +442,11 @@ public abstract class WorkspaceComponent<E extends WorkspaceComponentListener> {
      * @param producer producer to remove
      */
     public void removeProducer(final Producer producer) {
+        workspace.getCouplingManager().removeAttachedCouplings(producer);
         producers.remove(producer);
+        for (AttributeHolderListener listener : attributeListeners) {
+            listener.producerRemoved(producer);
+        }
     }
     
     /**

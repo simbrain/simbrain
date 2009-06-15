@@ -21,7 +21,7 @@ import promidi.ProgramChange;
  * MIDI world component.
  */
 public final class MidiWorldComponent
-    extends WorkspaceComponent<WorkspaceComponentListener> {
+    extends WorkspaceComponent {
 
     /** MIDI out. */
     private final MidiOut midiOut;

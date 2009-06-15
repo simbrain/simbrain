@@ -36,9 +36,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.util.SFileChooser;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.ComponentMenu;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -46,7 +43,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
-public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> implements WorkspaceComponentListener { 
+public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> { 
 
     private static final long serialVersionUID = 1L;
 
@@ -124,7 +121,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         super(frame, component);
         
         this.component = component;
-        component.addListener(this);
+        
         component.getDataModel().initValues(new Double(0));
 
         addMenuBar(worldPanel);
@@ -136,6 +133,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         add(scroller, BorderLayout.CENTER);
     }
 
+    
     /**
      * Creates the Menu Bar and adds it to the frame.
      *
@@ -367,18 +365,15 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         pack();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
-        // TODO Auto-generated method stub        
-    }
 
-    /**
-     * {@inheritDoc}
+    /* (non-Javadoc)
+     * @see org.simbrain.workspace.gui.GuiComponent#update()
      */
-    public void componentUpdated() {
+    @Override
+    protected void update() {
+        super.update();
         worldPanel.updateRowSelection();
     }
+
 
 }

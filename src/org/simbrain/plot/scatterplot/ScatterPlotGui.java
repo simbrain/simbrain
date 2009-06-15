@@ -129,11 +129,8 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
         renderer = new XYDotRenderer();
         chart.getXYPlot().setRenderer(renderer);
 
-        getWorkspaceComponent().addListener(new ChartListener() {
+        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
             public void componentUpdated() {
-            }
-
-            public void setTitle(final String name) {
             }
 
             public void chartSettingsUpdated() {
@@ -158,11 +155,6 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
                     renderer.setSeriesPaint(i, getWorkspaceComponent()
                             .getModel().getChartSeriesPaint().get(i));
                 }
-            }
-
-            public void attributeRemoved(AttributeHolder holder,
-                    Attribute attribute) {
-                
             }
         });
         getWorkspaceComponent().updateSettings();

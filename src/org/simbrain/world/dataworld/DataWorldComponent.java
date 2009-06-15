@@ -43,7 +43,7 @@ import com.Ostermiller.util.CSVParser;
 /**
  * <b>DataWorldComponent</b> is a data table which other Simbrain components can use.
  */
-public class DataWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class DataWorldComponent extends WorkspaceComponent {
     
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);

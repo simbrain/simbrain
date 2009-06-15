@@ -82,7 +82,7 @@ public class ThreadViewerPanel extends JPanel {
                 new WorkspaceUpdatorListener() {
 
                     public void finishedComponentUpdate(
-                            WorkspaceComponent<?> component, int update,
+                            WorkspaceComponent component, int update,
                             int thread) {
                         listModel.getElementAt(thread - 1).setText(
                                 "Thread " + thread + ": finished updating "
@@ -91,7 +91,7 @@ public class ThreadViewerPanel extends JPanel {
                     }
 
                     public void startingComponentUpdate(
-                            WorkspaceComponent<?> component, int update,
+                            WorkspaceComponent component, int update,
                             int thread) {
                         listModel.getElementAt(thread - 1).setText(
                                 "Thread " + thread + ": starting to update"

@@ -18,8 +18,6 @@
  */
 package org.simbrain.plot.barchart;
 
-import java.lang.reflect.Type;
-
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**

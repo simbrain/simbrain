@@ -125,7 +125,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         consumerComboBox.addActionListener(this);
         if (consumerComboBox.getModel().getSize() > 0) {
             consumerComboBox.setSelectedIndex(0);
-            refreshComponentList((WorkspaceComponent<?>)componentList.getElementAt(0), consumerComboBox);
+            refreshComponentList((WorkspaceComponent)componentList.getElementAt(0), consumerComboBox);
         }
         rightPanel.add("North", consumerComboBox);
         rightPanel.add("Center", rightScrollPane);
@@ -183,7 +183,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
 
       if (producerComboBox.getModel().getSize() > 0) {
             producerComboBox.setSelectedIndex(0);
-            this.refreshComponentList((WorkspaceComponent<?>)componentList.getElementAt(0), producerComboBox);
+            this.refreshComponentList((WorkspaceComponent)componentList.getElementAt(0), producerComboBox);
         }
 
         leftPanel.add("North", producerComboBox);

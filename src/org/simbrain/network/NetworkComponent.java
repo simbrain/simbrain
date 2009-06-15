@@ -41,7 +41,7 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 /**
  * Network frame.
  */
-public final class NetworkComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public final class NetworkComponent extends WorkspaceComponent {
 
     /** Reference to root network, the main model network. */
     private RootNetwork rootNetwork = new RootNetwork();

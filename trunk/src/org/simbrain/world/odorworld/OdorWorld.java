@@ -74,7 +74,7 @@ public class OdorWorld implements TwoDEnvironment {
         this.parent = parent;
     }
     
-    public WorkspaceComponent<?> getParent() {
+    public WorkspaceComponent getParent() {
         return parent;
     }
 

@@ -16,15 +16,41 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot;
+package org.simbrain.workspace;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
-
-public interface ChartListener extends WorkspaceComponentListener {
+/**
+ * Listener for consumer and producer events.
+ *
+ * @author jyoshimi
+ */
+public interface AttributeHolderListener {
 
     /**
-     * The chart settings have been updated.
+     * A Consumer was removed.
+     *
+     * @param consumer the removed consumer
      */
-    void chartSettingsUpdated();
+    public void consumerRemoved(final Consumer consumer);
+    
+    /**
+     * A consumer was added.
+     * 
+     * @param consumer the added consumer.
+     */
+    public void consumerAdded(final Consumer consumer);
 
+    /**
+     * A producer was removed.
+     *
+     * @param producer removed producer
+     */
+    public void producerRemoved(final Producer producer);
+ 
+    /**
+     * A producer was added
+     *
+     * @param producer the added producer
+     */
+    public void producerAdded(final Producer producer);
+    
 }

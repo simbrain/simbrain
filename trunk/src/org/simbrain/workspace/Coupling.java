@@ -71,7 +71,7 @@ public final class Coupling<E> {
      * Set value of buffer.
      */
     public void setBuffer() {
-        final WorkspaceComponent<?> producerComponent
+        final WorkspaceComponent producerComponent
             = producingAttribute.getParent().getParentComponent();
         
         try {
@@ -93,7 +93,7 @@ public final class Coupling<E> {
      */
     public void update() {
         if ((consumingAttribute != null) && (producingAttribute != null)) {
-            final WorkspaceComponent<?> consumerComponent
+            final WorkspaceComponent consumerComponent
                 = consumingAttribute.getParent().getParentComponent();
             
             try {

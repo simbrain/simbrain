@@ -26,7 +26,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * 
  * @author Matt Watson
  */
-public class ThreeDeeComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class ThreeDeeComponent extends WorkspaceComponent {
     private final ThreeDeeModel model;
     private final Timer timer;
     

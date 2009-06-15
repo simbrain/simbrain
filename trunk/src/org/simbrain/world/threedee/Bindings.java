@@ -89,7 +89,7 @@ public abstract class Bindings implements Consumer, Producer {
     /**
      * {@inheritDoc}
      */
-    public WorkspaceComponent<?> getParentComponent() {
+    public WorkspaceComponent getParentComponent() {
         return component;
     }
     

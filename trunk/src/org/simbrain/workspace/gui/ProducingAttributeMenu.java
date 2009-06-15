@@ -47,14 +47,14 @@ public class ProducingAttributeMenu extends JMenu implements WorkspaceListener {
     /**
      * {@inheritDoc}
      */
-	public void componentAdded(WorkspaceComponent<?> component) {
+	public void componentAdded(WorkspaceComponent component) {
 		updateMenu();
 	}
 
     /**
      * {@inheritDoc}
      */
-	public void componentRemoved(WorkspaceComponent<?> component) {
+	public void componentRemoved(WorkspaceComponent component) {
 		updateMenu();
 	}
 
@@ -70,7 +70,7 @@ public class ProducingAttributeMenu extends JMenu implements WorkspaceListener {
 	 */
 	private void updateMenu() {
 		this.removeAll();
-        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
+        for (WorkspaceComponent component : workspace.getComponentList()) {
 
             Collection<? extends Producer> producers = component.getProducers();
 

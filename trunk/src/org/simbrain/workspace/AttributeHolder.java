@@ -12,7 +12,7 @@ public interface AttributeHolder {
      * 
      * @return The parent component for this object.
      */
-    WorkspaceComponent<?> getParentComponent();
+    WorkspaceComponent getParentComponent();
     
     /**
      * Returns a description for this attribute holder.

@@ -61,8 +61,8 @@ public class Workspace {
     private final CouplingManager manager = new CouplingManager();
     
     /** List of workspace components. */
-    private List<WorkspaceComponent<?>> componentList = Collections
-        .synchronizedList(new ArrayList<WorkspaceComponent<?>>());
+    private List<WorkspaceComponent> componentList = Collections
+        .synchronizedList(new ArrayList<WorkspaceComponent>());
 
     /** Sentinel for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
@@ -176,7 +176,7 @@ public class Workspace {
      * 
      * @param component The component to add.
      */
-    public void addWorkspaceComponent(final WorkspaceComponent<?> component) {
+    public void addWorkspaceComponent(final WorkspaceComponent component) {
         LOGGER.debug("adding component: " + component);
         componentList.add(component);
         component.setWorkspace(this);
@@ -214,7 +214,7 @@ public class Workspace {
      *
      * @param component The component to remove.
      */
-    public void removeWorkspaceComponent(final WorkspaceComponent<?> component) {
+    public void removeWorkspaceComponent(final WorkspaceComponent component) {
         LOGGER.debug("removing component: " + component);
         for (WorkspaceListener listener : listeners) {
             listener.componentRemoved(component);
@@ -230,7 +230,7 @@ public class Workspace {
      */
     void updateStopped() {
         synchronized (componentList) {
-            for (WorkspaceComponent<?> component : componentList) {
+            for (WorkspaceComponent component : componentList) {
                 component.doStopped();
             }
         }
@@ -288,12 +288,12 @@ public class Workspace {
      * Disposes all Simbrain Windows.
      */
     public void removeAllComponents() {
-        ArrayList<WorkspaceComponent<?>> toRemove = new ArrayList<WorkspaceComponent<?>>();
+        ArrayList<WorkspaceComponent> toRemove = new ArrayList<WorkspaceComponent>();
         synchronized (componentList) {
-            for (WorkspaceComponent<?> component : componentList) {
+            for (WorkspaceComponent component : componentList) {
                 toRemove.add(component);
             }
-            for (WorkspaceComponent<?> component : toRemove) {
+            for (WorkspaceComponent component : toRemove) {
                 removeWorkspaceComponent(component);
             }
         }
@@ -310,7 +310,7 @@ public class Workspace {
         } else {
             boolean hasChanged = false;
             synchronized (componentList) {
-                for (WorkspaceComponent<?> window : componentList) {
+                for (WorkspaceComponent window : componentList) {
                     if (window.hasChangedSinceLastSave()) {
                         hasChanged = true;
                     }
@@ -361,7 +361,7 @@ public class Workspace {
     /**
      * @return the componentList
      */
-    public List<? extends WorkspaceComponent<?>> getComponentList() {
+    public List<? extends WorkspaceComponent> getComponentList() {
         return Collections.unmodifiableList(componentList);
     }
     
@@ -371,9 +371,9 @@ public class Workspace {
      * @param id name of component
      * @return Workspace Component
      */
-    public WorkspaceComponent<?> getComponent(final String id) {
+    public WorkspaceComponent getComponent(final String id) {
         synchronized (componentList) {
-            for (WorkspaceComponent<?> component : componentList) {
+            for (WorkspaceComponent component : componentList) {
                 if (component.getName().equalsIgnoreCase(id)) {
                     return component;
                 }
@@ -401,7 +401,7 @@ public class Workspace {
     public <E> E syncOnAllComponents(final Callable<E> task) throws Exception {
         synchronized (componentLock) {
             Iterator<Object> locks = new Iterator<Object>() {
-                Iterator<? extends WorkspaceComponent<?>> components
+                Iterator<? extends WorkspaceComponent> components
                     = getComponentList().iterator();
                 Iterator<? extends Object> current = null;
                 
@@ -472,7 +472,7 @@ public class Workspace {
                new StringBuilder("Number of components: " + componentList.size() + "\n");
         int i = 0;
         synchronized (componentList) {
-            for (WorkspaceComponent<?> component : componentList) {
+            for (WorkspaceComponent component : componentList) {
                 builder.append("Component " + ++i + ":" + component.getName() + "\n");
             }
         }
@@ -589,12 +589,12 @@ public class Workspace {
      * @param file the File to open
      * @return the workspace component
      */
-    public static WorkspaceComponent<?> open (final Class<?> fileClass, final File file) {
+    public static WorkspaceComponent open (final Class<?> fileClass, final File file) {
         String extension = file.getName().substring(file.getName().indexOf("."));
         try {
             Method method = fileClass.getMethod("open", InputStream.class,
                     String.class, String.class);
-            WorkspaceComponent<?> wc = (WorkspaceComponent<?>) method.invoke(
+            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(
                     null, new FileInputStream(file), file.getName(), extension);
             return wc;
         } catch (RuntimeException e) {

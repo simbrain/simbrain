@@ -17,7 +17,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class GameAttributes implements Producer, Consumer {
 
     /** The parent component. */
-    private final WorkspaceComponent<?> parent;
+    private final WorkspaceComponent parent;
     /** The game model. */
     private final GameModel model;
     
@@ -27,7 +27,7 @@ public class GameAttributes implements Producer, Consumer {
      * @param parent the parent component.
      * @param model the game model.
      */
-    public GameAttributes(final WorkspaceComponent<?> parent, final GameModel model) {
+    public GameAttributes(final WorkspaceComponent parent, final GameModel model) {
         this.parent = parent;
         this.model = model;
     }
@@ -42,7 +42,7 @@ public class GameAttributes implements Producer, Consumer {
     /**
      * {@inheritDoc}
      */
-    public WorkspaceComponent<?> getParentComponent() {
+    public WorkspaceComponent getParentComponent() {
         return parent;
     }
     

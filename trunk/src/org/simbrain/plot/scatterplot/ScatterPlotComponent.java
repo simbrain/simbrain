@@ -32,7 +32,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Data for a JFreeChart ScatterPlot.
  */
-public class ScatterPlotComponent extends WorkspaceComponent<ChartListener> {
+public class ScatterPlotComponent extends WorkspaceComponent {
 
     /** Show plot history. */
     private boolean showHistory = false;
@@ -130,9 +130,10 @@ public class ScatterPlotComponent extends WorkspaceComponent<ChartListener> {
      * dialog.
      */
     public void updateSettings() {
-        for (ChartListener listener : this.getListeners()) {
-            listener.chartSettingsUpdated();
-        }
+        //TODO!
+//        for (ChartListener listener : this.getListeners()) {
+//            listener.chartSettingsUpdated();
+//        }
     }
 
     @Override

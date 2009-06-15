@@ -54,7 +54,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Display a Scatter Plot.
  */
-public class ProjectionGui extends GuiComponent<ProjectionComponent> implements WorkspaceComponentListener, ActionListener {
+public class ProjectionGui extends GuiComponent<ProjectionComponent> implements ActionListener {
     
     /** Projector on/off checkbox. */
     private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.png"));
@@ -125,7 +125,6 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
     public ProjectionGui (final GenericFrame frame, final ProjectionComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
-        component.addListener(this);
         actionManager = new PlotActionManager(this);
         setLayout(new BorderLayout());
         
@@ -212,7 +211,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         add("South", bottomPanel);
         
         // Initializes labels
-        componentUpdated();
+        update();
     }
     
     /**
@@ -248,10 +247,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
     public void closing() {
     }
 
-    /**
-     * {@inheritDoc}
+    /* (non-Javadoc)
+     * @see org.simbrain.workspace.gui.GuiComponent#update()
      */
-    public void componentUpdated() {
+    @Override
+    protected void update() {
+        super.update();
     	chart.fireChartChanged();
         // Update labels, etc.
         dimsLabel.setText("     Dimensions: " + getWorkspaceComponent().getGauge().getUpstairs().getDimensions());
@@ -293,7 +294,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
             if (btemp == iterateBtn) {
                 getWorkspaceComponent().getGauge().iterate(1);
                 getWorkspaceComponent().resetChartDataset();
-                componentUpdated();
+                update();
             } else if (btemp == clearBtn) {
                 getWorkspaceComponent().clearData();
             } else if (btemp == playBtn) {
@@ -315,11 +316,11 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 
         if (e.getActionCommand().equalsIgnoreCase("Add")) {
             getWorkspaceComponent().addSource();
-            componentUpdated(); // TODO: addSource() should fire an event which calls compUpdated(). 
+            update(); // TODO: addSource() should fire an event which calls compUpdated(). 
         }
         if (e.getActionCommand().equalsIgnoreCase("Delete")) {
             getWorkspaceComponent().removeSource();
-            componentUpdated();
+            update();
         }
                
    }
@@ -337,9 +338,5 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
             playBtn.setEnabled(false);
             iterateBtn.setEnabled(false);
         }
-    }
-
-    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
-        /* no implementation */
     }
 }

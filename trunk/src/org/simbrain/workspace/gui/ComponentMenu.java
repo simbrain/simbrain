@@ -21,7 +21,7 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
     Workspace workspace;
     
     /** The component to couple to. */
-    WorkspaceComponent<?> sourceComponent;
+    WorkspaceComponent sourceComponent;
     
     /**
      * @param menuName the name of the menu
@@ -29,7 +29,7 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
      * @param sourceComponent the source component
      */
     public ComponentMenu(final String menuName, final Workspace workspace,
-            WorkspaceComponent<?> sourceComponent) {
+            WorkspaceComponent sourceComponent) {
         super(menuName);
         this.workspace = workspace;
         this.sourceComponent = sourceComponent;
@@ -47,14 +47,14 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
     /**
      * {@inheritDoc}
      */
-	public void componentAdded(WorkspaceComponent<?> component) {
+	public void componentAdded(WorkspaceComponent component) {
         updateMenu();
     }
 
     /**
      * {@inheritDoc}
      */
-	public void componentRemoved(WorkspaceComponent<?> component) {
+	public void componentRemoved(WorkspaceComponent component) {
         updateMenu();
     }
 
@@ -70,8 +70,8 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
      */
     private void updateMenu() {
         this.removeAll();
-        for (WorkspaceComponent<?> component : workspace.getComponentList()) {
-            final WorkspaceComponent<?> targetComponent = component;
+        for (WorkspaceComponent component : workspace.getComponentList()) {
+            final WorkspaceComponent targetComponent = component;
             JMenuItem componentMenuItem = new JMenuItem(targetComponent
                     .getName());
             componentMenuItem.addActionListener(new ActionListener() {

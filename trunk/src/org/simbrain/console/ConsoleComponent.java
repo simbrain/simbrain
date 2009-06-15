@@ -27,7 +27,7 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 /**
  * Component corresponding to a beanshell window.
  */
-public class ConsoleComponent extends  WorkspaceComponent<WorkspaceComponentListener> {
+public class ConsoleComponent extends  WorkspaceComponent {
     private static final long serialVersionUID = 1L;
 
     /**

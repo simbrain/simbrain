@@ -89,7 +89,7 @@ public class WorkspaceUpdator {
          * Default update.
          */
         public void doUpdate(final UpdateControls controls) {
-            List<? extends WorkspaceComponent<?>> components = controls.getComponents();
+            List<? extends WorkspaceComponent> components = controls.getComponents();
             
             int componentCount = components.size();
             
@@ -104,7 +104,7 @@ public class WorkspaceUpdator {
             LatchCompletionSignal latch = new LatchCompletionSignal(componentCount);
             
             LOGGER.trace("updating components");
-            for (WorkspaceComponent<?> component : components) {
+            for (WorkspaceComponent component : components) {
                 controls.updateComponent(component, latch);
             }
             LOGGER.trace("waiting");
@@ -142,17 +142,17 @@ public class WorkspaceUpdator {
         /**
          * Get components.
          */
-        public List<? extends WorkspaceComponent<?>> getComponents() {
-            List<? extends WorkspaceComponent<?>> components = workspace.getComponentList();
+        public List<? extends WorkspaceComponent> getComponents() {
+            List<? extends WorkspaceComponent> components = workspace.getComponentList();
             synchronized (components) {
-                components = new ArrayList<WorkspaceComponent<?>>(components);
+                components = new ArrayList<WorkspaceComponent>(components);
             }
             
             return components;
         }
 
         public void updateComponent(
-                final WorkspaceComponent<?> component, final CompletionSignal signal) {
+                final WorkspaceComponent component, final CompletionSignal signal) {
             Collection<ComponentUpdatePart> parts = component.getUpdateParts();
             
             final LatchCompletionSignal partsSignal = new LatchCompletionSignal(parts.size()) {
@@ -363,7 +363,7 @@ public class WorkspaceUpdator {
      * @param component The component to update.
      * @param thread The number of the thread doing the update.
      */
-    void notifyUpdateStarted(final WorkspaceComponent<?> component, final int thread) {
+    void notifyUpdateStarted(final WorkspaceComponent component, final int thread) {
         final int time = this.time;
         
         events.submit(new Runnable() {
@@ -381,7 +381,7 @@ public class WorkspaceUpdator {
      * @param component The component to update.
      * @param thread The number of the thread doing the update.
      */
-    void notifyUpdateFinished(final WorkspaceComponent<?> component, final int thread) {
+    void notifyUpdateFinished(final WorkspaceComponent component, final int thread) {
         final int time = this.time;
         
         events.submit(new Runnable() {

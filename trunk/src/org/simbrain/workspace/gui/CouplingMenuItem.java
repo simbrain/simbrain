@@ -21,7 +21,7 @@ public class CouplingMenuItem extends JMenuItem {
     private ConsumingAttribute<?> consumingAttribute = null;
 
     /** Reference to a coupling container. */
-    private WorkspaceComponent<?> component = null;
+    private WorkspaceComponent component = null;
 
     /**
      * The type of menu item being created. These items can be used to draw
@@ -43,7 +43,7 @@ public class CouplingMenuItem extends JMenuItem {
      * @param component The component that this menuItem belongs to.
      * @param type The type of event this menuItem should fire.
      */
-    public CouplingMenuItem(final WorkspaceComponent<?> component, final EventType type) {
+    public CouplingMenuItem(final WorkspaceComponent component, final EventType type) {
         this.component = component;
         this.eventType = type;
         setSelected(true);
@@ -80,7 +80,7 @@ public class CouplingMenuItem extends JMenuItem {
     /**
      * @return the container
      */
-    public WorkspaceComponent<?> getWorkspaceComponent() {
+    public WorkspaceComponent getWorkspaceComponent() {
         return component;
     }
 

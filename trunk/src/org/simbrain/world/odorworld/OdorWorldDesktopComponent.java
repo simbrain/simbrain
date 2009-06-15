@@ -44,7 +44,7 @@ import com.thoughtworks.xstream.XStream;
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link OdorWorldPanel}.
  */
-public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> implements WorkspaceComponentListener {
+public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +59,6 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
      */
     public OdorWorldDesktopComponent(GenericFrame frame, OdorWorldComponent component) {
         super(frame, component);
-        component.addListener(this);
         init();
     }
 
@@ -126,11 +125,14 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         // TODO Auto-generated method stub
     }
 
-    public void componentUpdated() {
-        worldPanel.repaint();        
+    
+    /* (non-Javadoc)
+     * @see org.simbrain.workspace.gui.GuiComponent#update()
+     */
+    @Override
+    public void update() {
+        worldPanel.repaint();
     }
 
-    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
-        /* no implementation */
-    }
+
 }

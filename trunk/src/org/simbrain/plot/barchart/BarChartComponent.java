@@ -32,7 +32,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Data for a JFreeChart pie chart.
  */
-public class BarChartComponent extends WorkspaceComponent<ChartListener> {
+public class BarChartComponent extends WorkspaceComponent {
 
     /** Data model. */
     private BarChartModel model;
@@ -134,9 +134,10 @@ public class BarChartComponent extends WorkspaceComponent<ChartListener> {
      * dialog.
      */
     public void updateSettings() {
-        for (ChartListener listener : this.getListeners()) {
-            listener.chartSettingsUpdated();
-        }
+        //TODO!
+//        for (ChartListener listener : this.getListeners()) {
+//            listener.chartSettingsUpdated();
+//        }
     }
 
     @Override

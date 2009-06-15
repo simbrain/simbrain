@@ -45,7 +45,7 @@ import org.simbrain.workspace.WorkspaceComponentListener;
  * OSC world component.
  */
 public final class OscWorldComponent
-    extends WorkspaceComponent<WorkspaceComponentListener> {
+    extends WorkspaceComponent {
 
     /** OSC port in. */
     private final OSCPortIn oscPortIn;

@@ -26,14 +26,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
+import org.simbrain.workspace.AttributeHolderListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentDeserializer;
@@ -47,7 +47,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * 
  * @param <E> the type of the workspace component.
  */
-public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPanel {
+public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel {
 
     /** serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -79,6 +79,13 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
         }
+        // Add a default update listener
+        workspaceComponent.addWorkspaceComponentListener(new WorkspaceComponentListener() {
+            public void componentUpdated() {
+                GuiComponent.this.update();
+            }
+            
+        });
         
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
@@ -132,7 +139,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
             
             try {
                 Workspace workspace = workspaceComponent.getWorkspace();
-                
+
                 workspace.removeWorkspaceComponent(workspaceComponent);
                 workspaceComponent = (E) WorkspaceComponentDeserializer
                     .deserializeWorkspaceComponent(
@@ -218,7 +225,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      * @param name the name of the desktop component.
      * @return a new component.
      */
-    public static GuiComponent<?> open(final WorkspaceComponent<?> component,
+    public static GuiComponent<?> open(final WorkspaceComponent component,
             final InputStream istream, final String name) {
         
 //        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
@@ -290,40 +297,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent<?>> extends JPan
      */
     public E getWorkspaceComponent() {
         return workspaceComponent;
-    }
-    
-    /**
-     * ComponentListener base.
-     * 
-     * @author Matt Watson
-     */
-    protected class BasicComponentListener implements WorkspaceComponentListener {
-        /**
-         * The constructor for this inner class.
-         */
-        public BasicComponentListener() {
-            /* need a public constructor for subclasses */
-        }
-        
-        /**
-         * Called when a component is updated.
-         */
-        public void componentUpdated() {
-            update();
-        }
-
-        /**
-         * Sets the title of this window.
-         * 
-         * @param name the name of the window.
-         */
-        public void setTitle(final String name) {
-            parentFrame.setTitle(name);
-        }
-
-        public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
-            /* no implementation */
-        }
     }
             
     /**

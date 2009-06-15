@@ -32,7 +32,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Daa for a JFreeChart pie chart.
  */
-public class PieChartComponent extends WorkspaceComponent<ChartListener> {
+public class PieChartComponent extends WorkspaceComponent {
 
     /** Data model. */
     private PieChartModel model;
@@ -91,9 +91,10 @@ public class PieChartComponent extends WorkspaceComponent<ChartListener> {
      * Update chart settings.  Called, e.g., when things are modified using a dialog.
      */
     public void updateSettings() {
-        for (ChartListener listener : this.getListeners()) {
-                listener.chartSettingsUpdated();
-        }
+        //TODO!
+//        for (ChartListener listener : this.getListeners()) {
+//                listener.chartSettingsUpdated();
+//        }
     }
 
     @Override

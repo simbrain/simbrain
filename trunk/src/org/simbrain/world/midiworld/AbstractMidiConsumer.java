@@ -57,7 +57,7 @@ abstract class AbstractMidiConsumer
     }
 
     /** {@inheritDoc} */
-    public final WorkspaceComponent<?> getParentComponent() {
+    public final WorkspaceComponent getParentComponent() {
         return component;
     }
 

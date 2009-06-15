@@ -20,7 +20,7 @@ public interface UpdateControls {
      * 
      * @return the components in the workspace.
      */
-    List<? extends WorkspaceComponent<?>> getComponents();
+    List<? extends WorkspaceComponent> getComponents();
     
     /**
      * Submits a component for update, calling countDown on the given latch
@@ -29,5 +29,5 @@ public interface UpdateControls {
      * @param component The component to update.
      * @param signal The signal to call done on when complete.
      */
-    void updateComponent(WorkspaceComponent<?> component, CompletionSignal signal);
+    void updateComponent(WorkspaceComponent component, CompletionSignal signal);
 }

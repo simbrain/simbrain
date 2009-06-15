@@ -232,7 +232,7 @@ public class WorkspaceChangedDialog extends JDialog {
 //        
 //        checkboxes.setLayout(layout);
 //        
-//        for (WorkspaceComponent<?> component : desktop.getWorkspace().getComponentList()) {
+//        for (WorkspaceComponent component : desktop.getWorkspace().getComponentList()) {
 //            JLabel label = new JLabel(component.getName());
 //            JCheckBox checkbox = new JCheckBox();
 //            checkbox.setSelected(true);

@@ -101,7 +101,7 @@ final class OscMessageConsumer
     }
 
     /** {@inheritDoc} */
-    public WorkspaceComponent<?> getParentComponent() {
+    public WorkspaceComponent getParentComponent() {
         return component;
     }
 

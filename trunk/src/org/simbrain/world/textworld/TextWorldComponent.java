@@ -36,7 +36,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * <b>TextWorldComponent</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
  * data.  The main environment codes is in {@link TextWorld}.
  */
-public class TextWorldComponent extends WorkspaceComponent<WorkspaceComponentListener> {
+public class TextWorldComponent extends WorkspaceComponent {
     /**
      * Creates a new frame of type TextWorld.
      * @param ws Workspace to add frame to

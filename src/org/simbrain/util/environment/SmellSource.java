@@ -28,11 +28,8 @@ import org.simbrain.util.Utils;
  * Standardly these objects represent "distal stimuli" relative to an organism.
  *  
  */
-public class SmellSource implements TwoDEntity {
+public class SmellSource {
 
-	/** Environment this agent is embedded in. */
-	private TwoDEnvironment environment;
-	
 	/** Vector of stimulus values associated to object. */
     private double[] stimulusVector;
 
@@ -92,9 +89,8 @@ public class SmellSource implements TwoDEntity {
      * @param addNoise Add noise
      * @param noiseLevel Level of noise
      */
-    public SmellSource(final TwoDEnvironment environment, final double[] distalstim, final DecayFunction decay,
+    public SmellSource(final double[] distalstim, final DecayFunction decay,
             final double disp, final boolean addNoise, final double noiseLevel) {
-        this.environment = environment;
     	this.stimulusVector = distalstim;
         this.decayFunction = decay;
         this.stimulusDispersion = disp;
@@ -107,8 +103,7 @@ public class SmellSource implements TwoDEntity {
      *
      * @param distalstim Distal stimulus
      */
-    public SmellSource(final TwoDEnvironment environment, final double[] distalstim, final DecayFunction decay, final double[] location) {
-        this.environment = environment;
+    public SmellSource(final double[] distalstim, final DecayFunction decay, final double[] location) {
         this.stimulusVector = distalstim;
         this.decayFunction = decay;
         this.location = location;
@@ -399,7 +394,4 @@ public class SmellSource implements TwoDEntity {
 		this.location = location;
 	}
 
-	public TwoDEnvironment getEnvironment() {
-		return environment;
-	}
 }

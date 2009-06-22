@@ -18,22 +18,18 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
 import org.simbrain.util.environment.SmellSourcePanel;
-import org.simbrain.world.odorworld.entities.StaticEntity;
+import org.simbrain.world.odorworld.entities.BasicEntity;
 
 
 /**
@@ -51,7 +47,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 
     /** The entity for which this dialog is called. */
-    private StaticEntity entityRef = null;
+    private BasicEntity entityRef = null;
 
     /** The visual container for the sub panels. */
     private Box mainPanel = Box.createVerticalBox();
@@ -60,7 +56,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     private JTextField tfEntityName = new JTextField();
 
     /** The Combobox from which to choose the entity image. */
-    //private JComboBox cbImageName = new JComboBox(StaticEntity.imagesRenderer());
+    //private JComboBox cbImageName = new JComboBox(BasicEntity.imagesRenderer());
     //private JComboBox cbImageName = new JComboBox(null);
 
     /** The renderer to display the combobox. */
@@ -89,7 +85,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
      *
      * @param we reference to the world entity whose smell signature is being adjusted
      */
-    public DialogOdorWorldEntity(final StaticEntity we) {
+    public DialogOdorWorldEntity(final BasicEntity we) {
         entityRef = we;
         init();
         this.pack();

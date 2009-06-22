@@ -1,13 +1,15 @@
-package org.simbrain.util.environment.sensors;
+package org.simbrain.world.odorworld.sensors;
+
+import java.util.List;
 
 import org.simbrain.util.SimbrainMath;
-import org.simbrain.util.environment.Agent;
 import org.simbrain.util.environment.SmellSource;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
  * A sensor which detector a specified component of a set of stimulus vectors.
  */
-public class SmellSensor extends Sensor {
+public class SmellSensor implements Sensor {
 
     /** Which dimension of the stimulus to read. */
     private final int dimension;
@@ -34,20 +36,9 @@ public class SmellSensor extends Sensor {
      * @param sensorName name
      * @param dim stimulus dimension
      */
-    public SmellSensor(Agent parent, String name, final int dim, final double theta) {
-    	super(parent, name);
+    public SmellSensor(OdorWorldEntity parent, String name, final int dim, final double theta) {
         this.dimension = dim;
         this.theta = theta;
-    }
-    
-    /**
-     * Construct a sensor centered on agent
-     */
-    public SmellSensor(Agent parent, String name, final int dim) {
-    	super(parent, name);
-        this.dimension = dim;
-        this.theta = 0;
-        this.radius = 0;
     }
 
     /**
@@ -57,22 +48,14 @@ public class SmellSensor extends Sensor {
     public int getDimension() {
         return dimension;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public String getKey() {
-        return getName() + "[" + dimension + "]";
-    }
-    
 
 	/**
 	 * @return the location
 	 */
 	public double[] getLocation() {
-		int x = (int) (getParent().getSuggestedLocation()[0] + (radius * Math.cos(theta)));
-		int y = (int) (getParent().getSuggestedLocation()[1] - (radius * Math.sin(theta)));
-		return new double[]{x, y};		
+//		int x = (int) (getParent().getSuggestedLocation()[0] + (radius * Math.cos(theta)));
+//		int y = (int) (getParent().getSuggestedLocation()[1] - (radius * Math.sin(theta)));
+		return new double[]{1, 1};		
 	}
 	
 	/**
@@ -83,21 +66,24 @@ public class SmellSensor extends Sensor {
 	public void update() {
 		// Maybe a check so that only attributes which are bound are updated?
 		Double val = new Double(0);
-		for (SmellSource source : getParent().getEnvironment()
-				.getSmellSources()) {
-			// Check that this is not attached to the same object
-			if (dimension <= source.getStimulus().length) {
-				val += source.getStimulus(dimension, SimbrainMath.distance(this
-						.getLocation(), source.getSuggestedLocation()));
-			}
-			currentValue = val;
-		}
+//		for (SmellSource source : getParent().getObjec
+//				.getSmellSources()) {
+//			// Check that this is not attached to the same object
+//			if (dimension <= source.getStimulus().length) {
+//				val += source.getStimulus(dimension, SimbrainMath.distance(this
+//						.getLocation(), source.getSuggestedLocation()));
+//			}
+//			currentValue = val;
+//		}
 	}
 
-	/**
-     * {@inheritDoc}
-     */
-	public Double getValue() {
-		return currentValue;
-	}
+    public List<Class> getApplicableTypes() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Double getValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

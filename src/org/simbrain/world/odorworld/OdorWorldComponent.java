@@ -20,36 +20,80 @@ package org.simbrain.world.odorworld;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.world.odorworld.attributes.EntityWrapper;
+import org.simbrain.world.odorworld.attributes.RotationConsumer;
+import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.RotationEffector;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
- * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
- * data.  The main environment codes is in {@link OdorWorldPanel}.
+ * <b>WorldPanel</b> is the container for the world component. Handles toolbar
+ * buttons, and serializing of world data. The main environment codes is in
+ * {@link OdorWorldPanel}.
  */
 public class OdorWorldComponent extends WorkspaceComponent {
 
     /** Reference to model world. */
-    private OdorWorld world = new OdorWorld(this);
+    private OdorWorld world = new OdorWorld();
     
     /**
      * Default constructor.
      */
     public OdorWorldComponent(final String name) {
         super(name);
-        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
+        init();
     }
     
     @SuppressWarnings("unchecked")
     private OdorWorldComponent(final String name, final OdorWorld world) {
         super(name);
         this.world = world;
+        init();
+    }
+
+    /**
+     * Initialize this component.
+     */
+    private void init() {
         this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
-        world.setParent(this);
+        world.addListener(new WorldListener() {
+            public void updated() {
+                fireUpdateEvent();
+            }
+
+            public void effectorAdded(final Effector effector) {
+                if (effector instanceof RotationEffector) {
+                    addConsumer(new RotationConsumer(OdorWorldComponent.this,
+                            (RotationEffector) effector));
+                }
+            }
+
+            public void effectorRemoved(final Effector effector) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            public void entityAdded(final OdorWorldEntity entity) {
+                addConsumer(new EntityWrapper(OdorWorldComponent.this, entity));
+                addProducer(new EntityWrapper(OdorWorldComponent.this, entity));
+            }
+
+            public void entityRemoved(final OdorWorldEntity entity) {
+                // TODO Auto-generated method stub
+            }
+
+            public void sensorAdded(final Sensor sensor) {
+                // TODO Auto-generated method stub
+            }
+
+            public void sensorRemoved(Sensor sensor) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
     }
 
     /**
@@ -78,20 +122,14 @@ public class OdorWorldComponent extends WorkspaceComponent {
         OdorWorld.getXStream().toXML(world, output);
     }
     
-    public OdorWorld getWorld() {
-        return world;
-    }
-    
-
     @Override
     public void closing() {
         // TODO Auto-generated method stub
     }
     
-
     @Override
     public void update() {
-    	world.update();    	
+        world.update();
     }
     
     @Override
@@ -103,5 +141,14 @@ public class OdorWorldComponent extends WorkspaceComponent {
     @Override
     public String getCurrentDirectory() {
        return OdorWorldPreferences.getCurrentDirectory();
+    }
+    
+    /**
+     * Returns a reference to the odor world.
+     *
+     * @return the odor world object.
+     */
+    public OdorWorld getWorld() {
+        return world;
     }
 }

@@ -20,8 +20,8 @@ package org.simbrain.world.odorworld;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,35 +32,20 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.MovingEntity;
-import org.simbrain.world.odorworld.entities.StaticEntity;
-import org.simbrain.world.odorworld.entities.Wall;
 
 /**
- * <b>OdorWorld</b> is the lowest-level environment panel which contains most of the world's "logic". Creature and
- * flower/food icons are drawn here. Movement of the mouse in response to clicks and (very  minimal) world-editing
- * features are also handled here.   Finally, the stimulus to the network is  calculated here, on the  basis of the
- * creature's distance from objects, as follows:
- *
- * <ul>
- * <li>
- * Get the vector of values, the "smell signature," associated with each object.
- * </li>
- * <li>
- * Scale this signature by the creature's distance fromm each object.
- * </li>
- * <li>
- * Use the sum of these scaled smell signatures as input to the creature's network.
- * </li>
- * </ul>
+ * <b>OdorWorldPanel</b> represent the OdorWorld. 
  */
 public class OdorWorldPanel extends JPanel implements KeyListener {
 
+    //TODO: Move most of this input stuff to an input manager...
+    
     private static final long serialVersionUID = 1L;
 
     /** Reference to model world. */
@@ -93,102 +78,12 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     /** Distance in y direction. */
     private int distanceY = 0;
 
-    /** Contains the world. */
-    private OdorWorldDesktopComponent parentFrame;
-
     /** World menu. */
     private OdorWorldMenu menu;
 
     /** Whether world has been updated yet; used by thread. */
     private boolean updateCompleted;
-
-    final ActionListener copyListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            WorldClipboard.copyItem(selectedEntity);
-        }
-    };
     
-    final ActionListener cutListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            WorldClipboard.cutItem(selectedEntity, OdorWorldPanel.this);
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-    
-    final ActionListener pasteListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            WorldClipboard.pasteItem(selectedPoint, OdorWorldPanel.this);
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-    
-    final ActionListener clearAllListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            world.clearAllEntities();
-            getParentFrame().repaint();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);   
-        }
-    };
-    
-    final ActionListener deleteListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            world.removeEntity(selectedEntity);
-            getParentFrame().repaint();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-        
-    final ActionListener addListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            world.addStaticEntity(new double[]{selectedPoint.x, selectedPoint.y});
-            getParentFrame().repaint();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        } 
-    };
-    
-    final ActionListener propsListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            showGeneralDialog();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-        
-    final ActionListener objectPropsListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            showEntityDialog((StaticEntity) selectedEntity);
-            getParentFrame().repaint();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-    
-    int mouseCounter = 0;
-    
-    final ActionListener addAgentListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            MovingEntity mouse = new MovingEntity(world, 
-                "Mouse " + (++mouseCounter), new double[]{selectedPoint.x, selectedPoint.y});            
-            world.addEntity(mouse);
-            getParentFrame().repaint();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-        
-    final ActionListener wallListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            drawingWalls = true;
-            getParentFrame().repaint();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-        
-    final ActionListener wallPropsListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            showWallDialog((Wall) selectedEntity);
-            getParentFrame().repaint();
-            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-
     /**
      * Default constructor.
      */
@@ -199,9 +94,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      * Construct a world, set its background color.
      * @param wf the frame in which this world is rendered
      */
-    public OdorWorldPanel(final OdorWorldDesktopComponent parent) {
-        parentFrame = parent;
-        world = parent.getWorkspaceComponent().getWorld();
+    public OdorWorldPanel(final OdorWorld world) {
+        this.world = world;
 
         setBackground(backgroundColor);
         this.addMouseListener(mouseListener);
@@ -214,7 +108,90 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         menu.initMenu();
     }
 
-
+//    final ActionListener copyListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            WorldClipboard.copyItem(selectedEntity);
+//        }
+//    };
+//    
+//    final ActionListener cutListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            WorldClipboard.cutItem(selectedEntity, OdorWorldPanel.this);
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        }
+//    };
+//    
+//    final ActionListener pasteListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            WorldClipboard.pasteItem(selectedPoint, OdorWorldPanel.this);
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        }
+//    };
+//    
+//    final ActionListener clearAllListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            world.clearAllEntities();
+////            getParentFrame().repaint();
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);   
+//        }
+//    };
+//    
+//    final ActionListener deleteListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            world.removeEntity(selectedEntity);
+////            getParentFrame().repaint();
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        }
+//    };
+        
+    final ActionListener addListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            world.addBasicEntity(new double[]{selectedPoint.x, selectedPoint.y});
+//            getParentFrame().repaint();
+//            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+        } 
+    };
+    
+//    final ActionListener propsListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            showGeneralDialog();
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        }
+//    };
+//        
+//    final ActionListener objectPropsListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            showEntityDialog((BasicEntity) selectedEntity);
+////            getParentFrame().repaint();
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        }
+//    };
+//    
+//    int mouseCounter = 0;
+//    
+    final ActionListener addAgentListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            world.addRotatingSprite(new double[]{selectedPoint.x, selectedPoint.y});
+//            getParentFrame().repaint();
+//            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+        }
+    };
+//        
+//    final ActionListener wallListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            drawingWalls = true;
+////            getParentFrame().repaint();
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        }
+//    };
+//        
+//    final ActionListener wallPropsListener = new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//            showWallDialog((Wall) selectedEntity);
+////            getParentFrame().repaint();
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        }
+//    };
 
     private final MouseListener mouseListener = new MouseAdapter() {
 
@@ -227,43 +204,37 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             // Select Entity
             selectedEntity = null;
             selectedPoint = mouseEvent.getPoint();
-            for (int i = 0; (i < world.getEntityList().size()) && (selectedEntity == null); i++) {
-                final OdorWorldEntity entity = (OdorWorldEntity) world.getEntityList().get(i);
-                if (entity.getBounds().contains(selectedPoint)) {
-                    selectedEntity = entity;
+            for(OdorWorldEntity sprite: world.getObjectList()) {
+                if(sprite.getBounds().contains(selectedPoint))  {
+                    selectedEntity = sprite;
                 }
             }
-
             if (selectedEntity != null) {
-                distanceX = (int) selectedEntity.getLocation()[0] - mouseEvent.getPoint().x;
-                distanceY = (int) selectedEntity.getLocation()[1] - mouseEvent.getPoint().y;
-                if (selectedEntity instanceof MovingEntity) {
-                    world.setCurrentCreature((MovingEntity) selectedEntity);	
-                }
+                distanceX = (int) selectedEntity.getX() - mouseEvent.getPoint().x;
+                distanceY = (int) selectedEntity.getY() - mouseEvent.getPoint().y;
             }
 
-            //submits point for wall drawing
+            // Submits point for wall drawing
             if (drawingWalls) {
                 mouseEvent.getPoint();
                 setWallPoint1(selectedPoint);
             }
 
-            //Show popupmenu for right click
+            // Show popupmenu for right click
             if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
                 final JPopupMenu menu = buildPopupMenu(selectedEntity);
-                menu.show(OdorWorldPanel.this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
-            } else if (mouseEvent.getClickCount() == 2) { //open dialogue for that world-item
-                if (selectedEntity instanceof Wall) {
-                    showWallDialog((Wall) selectedEntity);
-                } else {
-                    showEntityDialog(selectedEntity);
-                }
-
-                getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+                menu.show(OdorWorldPanel.this, (int) selectedPoint.getX(),
+                        (int) selectedPoint.getY());
+            }
+            
+            // Handle Double clicks
+            else if (mouseEvent.getClickCount() == 2) { 
+                JDialog dialog = new JDialog();
+                dialog.setContentPane(new ReflectivePropertyEditor(selectedEntity, dialog));
+                dialog.pack();
+                dialog.setVisible(true);
             }
 
-            final java.awt.Container container = getParent().getParent();
-            container.repaint();
         }
 
         /**
@@ -273,9 +244,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         public void mouseReleased(final MouseEvent mouseEvent) {
             if (drawingWalls) {
                 setWallPoint2(mouseEvent.getPoint());
-                world.addWall();
                 draggingPoint = null;
-                getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
             }
         }
     };
@@ -294,9 +263,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
             final Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
             if ((selectedEntity != null) && getBounds().intersects((selectedEntity.getBounds()))) {
-                selectedEntity.setLocation(new double[]{test.x, test.y});
+                selectedEntity.setX((int) test.x);
+                selectedEntity.setY((int) test.y);
                 repaint();
-                getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
             }
         }
     };
@@ -324,27 +293,24 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             //this.fireWorldChanged();
         }
 
-        //TODO!
-
-        if (k.getKeyCode() == KeyEvent.VK_UP) {
-            world.getCurrentCreature().moveStraight();
-        }// else if (k.getKeyCode() == KeyEvent.VK_DOWN) {
-//            world.getCurrentCreature().goStraightBackward(1);
-//        } else if (k.getKeyCode() == KeyEvent.VK_RIGHT) {
-//            world.getCurrentCreature().turnRight(OdorWorld.manualMotionTurnIncrement);
-//        } else if (k.getKeyCode() == KeyEvent.VK_LEFT) {
-//            world.getCurrentCreature().turnLeft(OdorWorld.manualMotionTurnIncrement);
-//        } else if ((k.getKeyCode() == KeyEvent.VK_DELETE) || (k.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
-//            world.removeEntity(selectedEntity);
-//            this.getParentFrame().repaint();
-//        }
+        //        if (k.getKeyCode() == KeyEvent.VK_UP) {
+        //            world.getCurrentCreature().moveStraight();
+        //        } else if (k.getKeyCode() == KeyEvent.VK_DOWN) {
+        //            world.getCurrentCreature().goStraightBackward(1);
+        //        } else if (k.getKeyCode() == KeyEvent.VK_RIGHT) {
+        //            world.getCurrentCreature().turnRight(OdorWorld.manualMotionTurnIncrement);
+        //        } else if (k.getKeyCode() == KeyEvent.VK_LEFT) {
+        //            world.getCurrentCreature().turnLeft(OdorWorld.manualMotionTurnIncrement);
+        //        } else if ((k.getKeyCode() == KeyEvent.VK_DELETE) || (k.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
+        //            world.removeEntity(selectedEntity);
+        //            this.getParentFrame().repaint();
+        //        }
 
         if (k.getKeyCode() != KeyEvent.VK_SPACE) {
             //this.fireWorldChanged();
         }
 
         repaint();
-        this.getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
     }
 
     /**
@@ -382,88 +348,56 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         super.paintComponent(g);
         paintWorld(g);
     }
-
+    
     /**
      * Paint all the objects in the world.
      *
      * @param g Reference to the world's graphics object
      */
     public void paintWorld(final Graphics g) {
+        world.draw((Graphics2D) g, this.getWidth(), this.getHeight());
 
-        for(OdorWorldEntity entity : world.getEntityList()) {
-        	if (entity.getLifeCycleObject() != null) {
-        		if (entity.getLifeCycleObject().isDead()) {
-        			continue;
-        		}
-        	}
-        	entity.paintEntity(this, g);
-        }
- 
-        g.setColor(Color.WHITE);
-        setBackground(backgroundColor);
-
-        // For editing walls.  TODO: Move to wall class.
-        if (drawingWalls && (draggingPoint != null)) {
-            final Point upperLeft = determineUpperLeft(getWallPoint1(), draggingPoint);
-            final int width = Math.abs(getWallPoint1().x - draggingPoint.x);
-            final int height = Math.abs(getWallPoint1().y - draggingPoint.y);
-            g.setColor(Color.BLACK);
-            g.drawRect(upperLeft.x, upperLeft.y, width, height);
-        }
+        //        // For editing walls.  TODO: Move to wall class.
+        //        if (drawingWalls && (draggingPoint != null)) {
+        //            final Point upperLeft = determineUpperLeft(getWallPoint1(), draggingPoint);
+        //            final int width = Math.abs(getWallPoint1().x - draggingPoint.x);
+        //            final int height = Math.abs(getWallPoint1().y - draggingPoint.y);
+        //            g.setColor(Color.BLACK);
+        //            g.drawRect(upperLeft.x, upperLeft.y, width, height);
+        //        }
     }
 
-    /**
-     * Call up a {@link DialogOdorWorldEntity} for a world object nearest to a specified point.
-     *
-     * @param theEntity the non-creature entity closest to this point will have a dialog called up
-     */
-    public void showEntityDialog(final OdorWorldEntity theEntity) {
-//    	
-//        DialogOdorWorldEntity theDialog = null;
-//
-//        if (theEntity != null) {
-//            theDialog = new DialogOdorWorldEntity(theEntity);
-//            theDialog.pack();
-//            theDialog.setLocationRelativeTo(null);
-//            theDialog.setVisible(true);
-//
-//            if (!theDialog.hasUserCancelled()) {
-//                theDialog.commitChanges();
-//
-//                //TODO!
-////                if (theEntity instanceof OdorWorldAgent) {
-////                    theDialog.getStimPanel().commitChanges();
-////                    theDialog.getAgentPanel().commitChanges();
-////                    theDialog.commitChanges();
-////                } else {
-////                    theDialog.getStimPanel().commitChanges();
-////                    theDialog.commitChanges();
-////                }
-//            }
-//
-//            repaint();
-//        }
-    }
+    //        /**
+    //         * Call up a {@link DialogOdorWorldEntity} for a world object nearest to a specified point.
+    //         *
+    //         * @param theEntity the non-creature entity closest to this point will have a dialog called up
+    //         */
+    //        public void showEntityDialog(final OdorWorldEntity sprite) {
+    //        	
+    //            DialogOdorWorldEntity theDialog = null;
+    //    
+    //            if (theEntity != null) {
+    //                theDialog = new DialogOdorWorldEntity(theEntity);
+    //                theDialog.pack();
+    //                theDialog.setLocationRelativeTo(null);
+    //                theDialog.setVisible(true);
+    //    
+    //                if (!theDialog.hasUserCancelled()) {
+    //                    theDialog.commitChanges();
+    //                        if (theEntity instanceof OdorWorldAgent) {
+    //                        theDialog.getStimPanel().commitChanges();
+    //                        theDialog.getAgentPanel().commitChanges();
+    //                        theDialog.commitChanges();
+    //                    } else {
+    //                        theDialog.getStimPanel().commitChanges();
+    //                        theDialog.commitChanges();
+    //                    }
+    //                }
+    //    
+    //                repaint();
+    //            }
+    //    }
 
-    /**
-     * Shows the wall properties dialog box.
-     * @param theWall Wall for which to set properties
-     */
-    public void showWallDialog(final Wall theWall) {
-        DialogOdorWorldWall theDialog = null;
-
-        theDialog = new DialogOdorWorldWall(this, theWall);
-        theDialog.pack();
-        theDialog.setVisible(true);
-
-        // TODO
-        if (!theDialog.hasUserCancelled()) {
-//            theDialog.getStimPanel().commitChanges();
-            theDialog.commitChanges();
-        }
-
-        repaint();
-    }
 
     /**
      * Shows the general world preferences dialog.
@@ -501,41 +435,27 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         ret.add(menu.getCutItem());
         ret.add(menu.getDeleteItem());
 
-        if (theEntity instanceof StaticEntity) {
-            ret.addSeparator();
-            ret.add(menu.getObjectPropsItem());
-        } else if (theEntity instanceof Wall) {
-            ret.addSeparator();
-            ret.add(menu.getWallPropsItem());
-        } else {
-            if (WorldClipboard.getClipboardEntity() != null) {
-                ret.add(menu.getPasteItem());
-                ret.addSeparator();
-            }
+        //        if (theEntity instanceof BasicEntity) {
+        //            ret.addSeparator();
+        //            ret.add(menu.getObjectPropsItem());
+        //        } else if (theEntity instanceof Wall) {
+        //            ret.addSeparator();
+        //            ret.add(menu.getWallPropsItem());
+        //        } else {
+                
+        //        if (WorldClipboard.getClipboardEntity() != null) {
+        //            ret.add(menu.getPasteItem());
+        //            ret.addSeparator();
+        //        }
 
-            ret.add(menu.getAddItem());
-            ret.add(menu.getAddAgentItem());
-            ret.add(menu.getWallItem());
-        }
+        ret.add(menu.getAddItem());
+        ret.add(menu.getAddAgentItem());
+        ret.add(menu.getWallItem());
 
         ret.addSeparator();
         ret.add(menu.getPropsItem());
 
         return ret;
-    }
-
-    /**
-     * @return Returns the parentFrame.
-     */
-    public OdorWorldDesktopComponent getParentFrame() {
-        return parentFrame;
-    }
-
-    /**
-     * @param parentFrame The parentFrame to set.
-     */
-    public void setParentFrame(final OdorWorldDesktopComponent parentFrame) {
-        this.parentFrame = parentFrame;
     }
 
     /**
@@ -611,7 +531,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     /**
      * @param world the world to set
      */
-    public void setWorld(OdorWorld world) {
+    public void setWorld(final OdorWorld world) {
         this.world = world;
     }
 }

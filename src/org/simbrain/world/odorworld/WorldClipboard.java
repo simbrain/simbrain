@@ -21,9 +21,7 @@ package org.simbrain.world.odorworld;
 import java.awt.Point;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.MovingEntity;
-import org.simbrain.world.odorworld.entities.StaticEntity;
-import org.simbrain.world.odorworld.entities.Wall;
+import org.simbrain.world.odorworld.entities.BasicEntity;
 
 
 /**
@@ -56,7 +54,7 @@ public final class WorldClipboard {
      */
     public static void cutItem(final OdorWorldEntity selectedEntity, final OdorWorldPanel parent) {
         setClipboardEntity(selectedEntity);
-        parent.getWorld().getEntityList().remove(selectedEntity);
+        //parent.getWorld().getEntityList().remove(selectedEntity);
         parent.repaint();
     }
 
@@ -103,7 +101,7 @@ public final class WorldClipboard {
      *
      * @param entity Entity to copy
      */
-    public static void copyEntity(final StaticEntity entity) {
+    public static void copyEntity(final BasicEntity entity) {
 //        OdorWorldEntity temp = new OdorWorldEntity();
 //        temp.setImageName(entity.getImageName());
 //        temp.setName("Copy of " + entity.getName());
@@ -112,27 +110,27 @@ public final class WorldClipboard {
 //        setClipboardEntity(temp);
     }
 
-    /**
-     * Copy an agent from a world.
-     *
-     * @param agent Agent to be copied
-     */
-    public static void copyAgent(final MovingEntity agent) {
-        MovingEntity temp = agent.copy();
-//        setClipboardEntity(temp);  // TODO
-    }
+//    /**
+//     * Copy an agent from a world.
+//     *
+//     * @param agent Agent to be copied
+//     */
+//    public static void copyAgent(final MovingEntity agent) {
+//        MovingEntity temp = agent.copy();
+////        setClipboardEntity(temp);  // TODO
+//    }
 
-    /**
-     * Copy a wall from a world.
-     *
-     * @param wall Wall to copy
-     */
-    public static void copyWall(final Wall wall) {
-        Wall temp = new Wall(wall.getParent());
-        temp.setWidth(wall.getWidth());
-        temp.setHeight(wall.getHeight());
-       // setClipboardEntity(temp);
-    }
+//    /**
+//     * Copy a wall from a world.
+//     *
+//     * @param wall Wall to copy
+//     */
+//    public static void copyWall(final Wall wall) {
+//        Wall temp = new Wall(wall.getParent());
+//        temp.setWidth(wall.getWidth());
+//        temp.setHeight(wall.getHeight());
+//       // setClipboardEntity(temp);
+//    }
 
     /**
      * @param clipboardEntity The clipboardEntity to set.

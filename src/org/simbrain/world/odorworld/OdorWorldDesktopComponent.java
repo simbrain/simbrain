@@ -20,25 +20,9 @@ package org.simbrain.world.odorworld;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 
-import javax.swing.JScrollPane;
-
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
-import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
-
-import com.thoughtworks.xstream.XStream;
-
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
@@ -57,37 +41,34 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     /**
      * Default constructor.
      */
-    public OdorWorldDesktopComponent(GenericFrame frame, OdorWorldComponent component) {
+    public OdorWorldDesktopComponent(GenericFrame frame,
+            OdorWorldComponent component) {
         super(frame, component);
-        init();
-    }
-
-    /**
-     * Initializes frame.
-     */
-    public void init() {
         setLayout(new BorderLayout());
-        worldPanel = new OdorWorldPanel(this);
-        setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(),worldPanel.getWorld().getWorldHeight()));
+        worldPanel = new OdorWorldPanel(component.getWorld());
+        worldPanel.setPreferredSize(new Dimension(256,256));
         add("Center", worldPanel);
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
-        this.addComponentListener(new ComponentListener() {  
+        this.getParentFrame().pack();
 
-				public void componentHidden(ComponentEvent arg0) {
-				}
+        //        this.addComponentListener(new ComponentListener() {
+        //
+        //            public void componentHidden(ComponentEvent arg0) {
+        //            }
+        //
+        //            public void componentMoved(ComponentEvent arg0) {
+        //            }
+        //
+        //            public void componentResized(ComponentEvent arg0) {
+        //                 worldPanel.getWorld().setWorldWidth(worldPanel.getWidth());
+        //                 worldPanel.getWorld().setWorldHeight(worldPanel.getHeight());
+        //            }
+        //
+        //            public void componentShown(ComponentEvent arg0) {
+        //            }
+        //        });
 
-				public void componentMoved(ComponentEvent arg0) {
-				}
-
-				public void componentResized(ComponentEvent arg0) {
-					worldPanel.getWorld().setWorldWidth(worldPanel.getWidth());
-					worldPanel.getWorld().setWorldHeight(worldPanel.getHeight());					
-				}
-
-				public void componentShown(ComponentEvent arg0) {
-				}
-        });
     }
 
     /**
@@ -101,7 +82,8 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     
     @Override
     public void postAddInit() {
-        worldPanel.setWorld(this.getWorkspaceComponent().getWorld());
+        OdorWorld world = this.getWorkspaceComponent().getWorld();
+        worldPanel.setWorld(world);
         worldPanel.repaint();
     }
 
@@ -125,7 +107,6 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         // TODO Auto-generated method stub
     }
 
-    
     /* (non-Javadoc)
      * @see org.simbrain.workspace.gui.GuiComponent#update()
      */
@@ -133,6 +114,5 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     public void update() {
         worldPanel.repaint();
     }
-
 
 }

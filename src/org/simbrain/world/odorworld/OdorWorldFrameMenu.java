@@ -164,19 +164,19 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getEditMenu().addSeparator();
         getEditMenu().add(getClearAllItem());
 
-        getCutItem().addActionListener(parentFrame.getWorldPanel().cutListener);
-        getCutItem().setAccelerator(KeyStroke.getKeyStroke(
-                                                      KeyEvent.VK_X,
-                                                      Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getCopyItem().addActionListener(parentFrame.getWorldPanel().copyListener);
-        getCopyItem().setAccelerator(KeyStroke.getKeyStroke(
-                                                       KeyEvent.VK_C,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getPasteItem().addActionListener(parentFrame.getWorldPanel().pasteListener);
-        getPasteItem().setAccelerator(KeyStroke.getKeyStroke(
-                                                        KeyEvent.VK_V,
-                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getClearAllItem().addActionListener(parentFrame.getWorldPanel().clearAllListener);
+//        getCutItem().addActionListener(parentFrame.getWorldPanel().cutListener);
+//        getCutItem().setAccelerator(KeyStroke.getKeyStroke(
+//                                                      KeyEvent.VK_X,
+//                                                      Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+//        getCopyItem().addActionListener(parentFrame.getWorldPanel().copyListener);
+//        getCopyItem().setAccelerator(KeyStroke.getKeyStroke(
+//                                                       KeyEvent.VK_C,
+//                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+//        getPasteItem().addActionListener(parentFrame.getWorldPanel().pasteListener);
+//        getPasteItem().setAccelerator(KeyStroke.getKeyStroke(
+//                                                        KeyEvent.VK_V,
+//                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+//        getClearAllItem().addActionListener(parentFrame.getWorldPanel().clearAllListener);
     }
 
     /**

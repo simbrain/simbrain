@@ -113,8 +113,8 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        worldWidth.setText(Integer.toString(worldPanel.getWorld().getWorldWidth()));
-        worldHeight.setText(Integer.toString(worldPanel.getWorld().getWorldHeight()));
+//        worldWidth.setText(Integer.toString(worldPanel.getWorld().getWorldWidth()));
+//        worldHeight.setText(Integer.toString(worldPanel.getWorld().getWorldHeight()));
 //        updateDrag.setSelected(theWorld.getUpdateWhileDragging());
 //        useLocalBounds.setSelected(theWorld.getUseLocalBounds());
 
@@ -133,8 +133,8 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      * Set world values based on fields.
      */
     public void setValues() {
-        worldPanel.getWorld().setWorldWidth(Integer.parseInt(worldWidth.getText()));
-        worldPanel.getWorld().setWorldHeight(Integer.parseInt(worldHeight.getText()));
+//        worldPanel.getWorld().setWorldWidth(Integer.parseInt(worldWidth.getText()));
+//        worldPanel.getWorld().setWorldHeight(Integer.parseInt(worldHeight.getText()));
         worldPanel.setBackgroundColor(theColor.getRGB());
         //worldPanel.getParentFrame().setMaxSize();
     }

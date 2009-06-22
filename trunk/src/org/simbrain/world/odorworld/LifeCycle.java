@@ -6,9 +6,9 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * Manage the lifecycle of an entity that can come into and go out of existence.
  */
 public class LifeCycle {
-	
-	/** Whether it's dead or not. */
-	private boolean isDead = false;
+
+    /** Whether it's dead or not. */
+    private boolean isDead = false;
 
     /** Number of bites to eat edible item. */
     private int bitesToDie = 200;
@@ -18,16 +18,16 @@ public class LifeCycle {
 
     /** Likelihood eaten item will return. */
     private double resurrectionProb = .01;
-    
-	/** Parent entity. */
-	OdorWorldEntity parent;
-	
-	/**
-	 * @param entity
-	 */
-	public LifeCycle(OdorWorldEntity entity) {
-		this.parent = entity;		
-	}
+
+    /** Parent entity. */
+    OdorWorldEntity parent;
+
+    /**
+     * @param entity
+     */
+    public LifeCycle(OdorWorldEntity entity) {
+        this.parent = entity;
+    }
 
     /**
      * @return how may bites until it's a goner...
@@ -37,7 +37,8 @@ public class LifeCycle {
     }
 
     /**
-     * @param bitesToDie Bites to eat an item.
+     * @param bitesToDie
+     *            Bites to eat an item.
      */
     public void setBitesToDie(final int bitesToDie) {
         this.bitesToDie = bitesToDie;
@@ -51,7 +52,8 @@ public class LifeCycle {
     }
 
     /**
-     * @param resurrectionProb Likelihood entity will reappear.
+     * @param resurrectionProb
+     *            Likelihood entity will reappear.
      */
     public void setResurrectionProb(final double resurrectionProb) {
         this.resurrectionProb = resurrectionProb;
@@ -66,53 +68,56 @@ public class LifeCycle {
 
     /**
      * Number of times bitten.
-     * @param bites Number of bites.
+     * 
+     * @param bites
+     *            Number of bites.
      */
     public void setBites(final int bites) {
         this.bites = bites;
     }
 
-	/**
-	 * @return the parent
-	 */
-	public OdorWorldEntity getParent() {
-		return parent;
-	}
+    /**
+     * @return the parent
+     */
+    public OdorWorldEntity getParent() {
+        return parent;
+    }
 
-	/**
-	 * Take one step closer to death.
-	 */
-	public void bite() {
-		bites++;	
-	}
-	
-	/**
-	 * @return the isDead
-	 */
-	public boolean isDead() {
-		return isDead;
-	}
+    /**
+     * Take one step closer to death.
+     */
+    public void bite() {
+        bites++;
+    }
 
-	/**
-	 * @param isDead the isDead to set
-	 */
-	public void setDead(boolean isDead) {
-		this.isDead = isDead;
-	}
+    /**
+     * @return the isDead
+     */
+    public boolean isDead() {
+        return isDead;
+    }
 
-	/**
-	 * Life and death.
-	 */
-	public void update() {
-		if (isDead) {
-			if (Math.random() < this.getResurrectionProb()) {
-				isDead = false; // Resurrect
-				bites = 0;
-			}
-		} else {
-			if (this.getBites() > this.getBitesToDie()) {
-				isDead = true; // Terminate
-			}
-		}
-	}
+    /**
+     * @param isDead
+     *            the isDead to set
+     */
+    public void setDead(boolean isDead) {
+        this.isDead = isDead;
+    }
+
+    /**
+     * Life and death.
+     */
+    public void update() {
+        if (isDead) {
+            if (Math.random() < this.getResurrectionProb()) {
+                isDead = false; // Resurrect
+                bites = 0;
+            }
+        } else {
+            if (this.getBites() > this.getBitesToDie()) {
+                isDead = true; // Terminate
+            }
+        }
+    }
 }

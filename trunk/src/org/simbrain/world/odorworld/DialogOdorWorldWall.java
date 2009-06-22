@@ -33,13 +33,12 @@ import javax.swing.event.ChangeListener;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
-import org.simbrain.world.odorworld.entities.Wall;
 
 
 /**
  * <b>DialogOdorWorldWall</b> is a dialog box for setting the properties of a wall.
  */
-public class DialogOdorWorldWall extends StandardDialog implements ActionListener, ChangeListener {
+public class DialogOdorWorldWall extends StandardDialog implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,9 +53,6 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 
     /** The world in which the wall is. */
     private OdorWorldPanel worldPanel = null;
-
-    /** The wall for which this dialog is called. */
-    private Wall wall = null;
 
     /** The panel containing untabbed settings. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
@@ -86,17 +82,6 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     private JCheckBox edible = new JCheckBox();
 
     /**
-     * This method is the default constructor.
-     * @param dworld the called from
-     * @param selectedWall the wall called for
-     */
-    public DialogOdorWorldWall(final OdorWorldPanel dworld, final Wall selectedWall) {
-        wall = selectedWall;
-        worldPanel = dworld;
-        init();
-    }
-
-    /**
      * This method initialises the components on the topPanel.
      */
     private void init() {
@@ -117,8 +102,6 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 
         //Add Action Listeners
         colorButton.addActionListener(this);
-        width.addChangeListener(this);
-        height.addChangeListener(this);
 
         edible.addActionListener(this);
 
@@ -169,22 +152,6 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 //        edible.setSelected(wall.getEdible());
 //        bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
 //        bitesToDie.setEnabled(wall.getEdible());
-    }
-
-    /**
-     * Makes slider movement change immediate.
-     * @param e Change Event
-     */
-    public void stateChanged(final ChangeEvent e) {
-        JSlider j = (JSlider) e.getSource();
-
-        if (j == width) {
-            wall.setWidth(j.getValue());
-            worldPanel.repaint();
-        } else if (j == height) {
-            wall.setHeight(j.getValue());
-            worldPanel.repaint();
-        }
     }
 
     /**

@@ -19,9 +19,6 @@ package org.simbrain.network;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.attributes.NeuronWrapper;
 import org.simbrain.network.interfaces.Group;
@@ -31,12 +28,9 @@ import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Network frame.
@@ -208,24 +202,7 @@ public final class NetworkComponent extends WorkspaceComponent {
             public void synapseRemoved(NetworkEvent<Synapse> e) {
                 // TODO Auto-generated method stub
                 
-            }
-
-            public void attributeRemoved(AttributeHolder parent,
-                    Attribute attribute) {
-                // TODO Auto-generated method stub
-                
-            }
-
-            public void componentUpdated() {
-                // TODO Auto-generated method stub
-                
-            }
-
-            public void setTitle(String name) {
-                // TODO Auto-generated method stub
-                
-            }
-            
+            }            
         });
     }
 

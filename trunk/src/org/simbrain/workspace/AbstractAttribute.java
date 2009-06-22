@@ -7,6 +7,10 @@ public abstract class AbstractAttribute implements Attribute {
      * the attribute.
      */
     public String getAttributeDescription() {
-        return this.getParent().getDescription() + ":" + getKey();
+        if ((this instanceof SingleAttributeProducer)
+                || (this instanceof SingleAttributeConsumer)) {
+            return getKey();
+        }
+        return this.getParent().getDescription() + ":" + getKey();        
     }
 }

@@ -26,24 +26,23 @@ import org.simbrain.world.odorworld.OdorWorld;
  */
 public class BasicEntity extends OdorWorldEntity {
 
-
     /**
      * Construct a basic entity.
      *
      * @param world reference to parent world
-     * @param anim animation associated with this entity.
+     * @param animation animation associated with this entity.
      */
-    public BasicEntity(OdorWorld world, Animation anim) {
+    public BasicEntity(final OdorWorld world, final Animation anim) {
         super(world, anim);
     }
 
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the velocity.
      */
-    public void update(long elapsedTime) {
+    public void update(final long elapsedTime) {
         x += dx * elapsedTime;
         y += dy * elapsedTime;
-        anim.update(elapsedTime);
+        animation.update(elapsedTime);
     }
 
     /**

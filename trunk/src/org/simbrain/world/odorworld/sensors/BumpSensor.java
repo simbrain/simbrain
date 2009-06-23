@@ -37,11 +37,11 @@ public class BumpSensor implements Sensor {
     /**
      * {@inheritDoc}
      */
-    public Double getValue() {
-        if (wasBumped()) {
-            return new Double(bumpValue);
-        } else
-            return new Double(0);
+    public void update() {
+//        if (wasBumped()) {
+//            return new Double(bumpValue);
+//        } else
+//            return new Double(0);
     }
 
     /**

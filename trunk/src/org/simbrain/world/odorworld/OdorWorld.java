@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.entities.Animation;
@@ -32,6 +34,7 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -66,9 +69,9 @@ public class OdorWorld {
      */
     OdorWorld() {
         renderer = new OdorWorldRenderer();
-        map = new TileMap(8,8);
+        map = new TileMap(8, 8);
         
-        renderer.setBackground(ResourceManager.getImage("dirt.jpg"));
+        //renderer.setBackground(ResourceManager.getImage("dirt.jpg"));
         //map.setTile(1, 2, ResourceManager.getImage("Tulip.gif"));
         //map.setTile(3, 3, ResourceManager.getImage("Tulip.gif"));
         //map.setTile(5, 5, ResourceManager.getImage("Tulip.gif"));
@@ -79,6 +82,7 @@ public class OdorWorld {
      */
     public void update() {
         for (OdorWorldEntity object : entityList) {
+            object.updateSensors();
             object.applyEffectors();
             updateSprite(object, 1); // time defaults to 1 now
         }
@@ -92,7 +96,8 @@ public class OdorWorld {
      * @param tileX x position of entity
      * @param tileY y position of entity
      */
-    private void addEntity(OdorWorldEntity entity, int tileX, int tileY) {
+    private void addEntity(final OdorWorldEntity entity, final int tileX,
+            final int tileY) {
 
             entity.setX(tileX);
             entity.setY(tileY);
@@ -118,34 +123,39 @@ public class OdorWorld {
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        //        xstream.omitField(BasicEntity.class, "image");
-        //        xstream.omitField(BasicEntity.class, "parent");
-        //        xstream.omitField(OdorWorld.class, "parent");
+        xstream.omitField(OdorWorld.class, "listenerList");
+        xstream.omitField(OdorWorld.class, "map");
+        xstream.omitField(OdorWorldEntity.class, "animation");
+        xstream.omitField(OdorWorldEntity.class, "parentWorld");
+        xstream.omitField(RotatingEntity.class, "map");
         return xstream;
     }
     
     /**
-     * Add a basic entity at specified point. 
+     * Add a basic entity at specified point.
      * 
      * @param p the location where the object should be added
      */
     public void addBasicEntity(final double[] p) {
         
         Animation anim = new Animation();
-        anim.addFrame(ResourceManager.getImage("Gouda.gif"), 150);
-        //anim.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
-        //anim.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
+        anim.addFrame(ResourceManager.getImage("Swiss.gif"), 150);
+        //animation.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
+        //animation.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
 
         BasicEntity entity = new BasicEntity(this, anim);
-        addEntity(entity, (int)p[0], (int)p[1]);
-        //object.setSmellSource(new SmellSource(this, new double[] {1, 1, 0, 0}, SmellSource.DecayFunction.GAUSSIAN, object.getSuggestedLocation()));
+        addEntity(entity, (int) p[0], (int) p[1]);
+        entity.setSmellSource(
+                new SmellSource(SimbrainMath.randomVector(5),
+                SmellSource.DecayFunction.GAUSSIAN, 
+                entity.getLocation()));
         fireUpdateEvent();
     }
     
     /**
      * Currently mouse is the only option!
      */
-    public void addRotatingSprite(final double[] p) {
+    public void addRotatingEntity(final double[] p) {
         
         TreeMap<Double, Animation>  images = new TreeMap<Double,Animation>(); 
         images.put(7.5, new Animation(ResourceManager.getImage("Mouse_0.gif")));
@@ -173,12 +183,11 @@ public class OdorWorld {
         images.put(337.5, new Animation(ResourceManager.getImage("Mouse_330.gif")));
         images.put(352.5, new Animation(ResourceManager.getImage("Mouse_345.gif")));
 
-        RotatingEntity sprite = new RotatingEntity(this, images);
-        sprite.addEffector(new RotationEffector(sprite));
-        addEntity(sprite, (int)p[0], (int)p[1]);
+        RotatingEntity entity = new RotatingEntity(this, images);
+        entity.addEffector(new RotationEffector(entity));
+        entity.addSensor(new SmellSensor(entity));
+        addEntity(entity, (int) p[0], (int) p[1]);
         fireUpdateEvent();
-
-    
     }
     
 
@@ -418,7 +427,7 @@ public class OdorWorld {
      * @param entity entity that was added
      */
     public void fireEntityAdded(final OdorWorldEntity entity) {
-        for (WorldListener listener: listenerList) {
+        for (WorldListener listener : listenerList) {
             listener.entityAdded(entity);
         }
     }
@@ -429,7 +438,7 @@ public class OdorWorld {
      * @param entity entity that was removed
      */
     public void fireEntityRemoved(final OdorWorldEntity entity) {
-        for (WorldListener listener: listenerList) {
+        for (WorldListener listener : listenerList) {
             listener.entityRemoved(entity);
         }
     }
@@ -440,7 +449,7 @@ public class OdorWorld {
      * @param sensor sensor that was added
      */
     public void fireSensorAdded(final Sensor sensor) {
-        for (WorldListener listener: listenerList) {
+        for (WorldListener listener : listenerList) {
             listener.sensorAdded(sensor);
         }
     }
@@ -451,7 +460,7 @@ public class OdorWorld {
      * @param sensor sensor that was removed
      */
     public void fireSensorRemoved(final Sensor sensor) {
-        for (WorldListener listener: listenerList) {
+        for (WorldListener listener : listenerList) {
             listener.sensorRemoved(sensor);
         }
     }
@@ -462,7 +471,7 @@ public class OdorWorld {
      * @param effector effector that was added
      */
     public void fireEffectorAdded(final Effector effector) {
-        for (WorldListener listener: listenerList) {
+        for (WorldListener listener : listenerList) {
             listener.effectorAdded(effector);
         }
     }
@@ -473,7 +482,7 @@ public class OdorWorld {
      * @param effector effector that was removed
      */
     public void fireEffectorRemoved(final Effector effector) {
-        for (WorldListener listener: listenerList) {
+        for (WorldListener listener : listenerList) {
             listener.effectorRemoved(effector);
         }
     }
@@ -482,9 +491,9 @@ public class OdorWorld {
      * Fire an update event.
      */
     public void fireUpdateEvent() {
-        for (WorldListener listener: listenerList) {
+        for (WorldListener listener : listenerList) {
             listener.updated();
         }
     }
-
+    
 }

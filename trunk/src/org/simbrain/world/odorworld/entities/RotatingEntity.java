@@ -48,24 +48,24 @@ public class RotatingEntity extends OdorWorldEntity {
      * @param d the orientation, in degrees
      */
     public void setOrientation(final double d) {
-        System.out.println("setOrientation:" + d);
+        //System.out.println("setOrientation:" + d);
         heading = d;
     }
     
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the velocity.
      */
-    public void update(long elapsedTime) {
+    public void update(final long elapsedTime) {
         
         heading = heading % 360;
         SortedMap<Double, Animation> headMap = map.headMap(heading);
         
         if (headMap.size() > 0) {
-            anim = map.get(headMap.lastKey());
+            animation = map.get(headMap.lastKey());
         } else {
-            anim = map.get(map.firstKey());
+            animation = map.get(map.firstKey());
         }
-        anim.update(elapsedTime);
+        animation.update(elapsedTime);
     }
     
     /**

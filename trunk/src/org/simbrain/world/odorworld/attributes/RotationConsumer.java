@@ -8,6 +8,7 @@ public class RotationConsumer extends SingleAttributeConsumer<Double> {
 
     RotationEffector effector;
 
+    /** Parent component for this attribute holder. */
     WorkspaceComponent parent;
     
     public RotationConsumer(WorkspaceComponent component, RotationEffector effector) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Sensor {
 
-    public Double getValue();
+    public void update();
     
     public List<Class> getApplicableTypes();
     

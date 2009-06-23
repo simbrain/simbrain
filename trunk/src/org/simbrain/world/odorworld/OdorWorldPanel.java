@@ -171,7 +171,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 //    
     final ActionListener addAgentListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            world.addRotatingSprite(new double[]{selectedPoint.x, selectedPoint.y});
+            world.addRotatingEntity(new double[]{selectedPoint.x, selectedPoint.y});
 //            getParentFrame().repaint();
 //            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
         }

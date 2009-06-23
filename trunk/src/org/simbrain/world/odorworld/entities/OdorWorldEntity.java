@@ -19,7 +19,7 @@ public abstract class OdorWorldEntity {
      * Animation used to depict this object. If the animation has one frame this
      * is equivalent to just using a single image to represent it.
      */
-    protected Animation anim;
+    protected Animation animation;
     
     /** X Position. */
     protected float x;
@@ -28,10 +28,10 @@ public abstract class OdorWorldEntity {
     protected float y;
 
     /** X Velocity. */
-    protected float dx = .1f;
+    protected float dx = .05f;
 
     /** Y Velocity. */
-    protected float dy = .1f;
+    protected float dy = .05f;
     
     /** Sensors. */
     private List<Sensor> sensors= new ArrayList<Sensor>();
@@ -57,8 +57,8 @@ public abstract class OdorWorldEntity {
      */
     public abstract void collideVertical();
 
-    /** Back reference to parent world. */
-    private OdorWorld world;
+    /** Back reference to parent parentWorld. */
+    private OdorWorld parentWorld;
 
     /** Name of this entity. */
     private String name;
@@ -66,12 +66,12 @@ public abstract class OdorWorldEntity {
     /**
      * Construtor.
      *
-     * @param world parent world.
-     * @param anim default animation.
+     * @param parentWorld parent parentWorld.
+     * @param animation default animation.
      */
     public OdorWorldEntity(final OdorWorld world, final Animation anim) {        
-        this.anim = anim;
-        this.world = world;
+        this.animation = anim;
+        this.parentWorld = world;
         anim.start();
     }
 
@@ -108,7 +108,7 @@ public abstract class OdorWorldEntity {
      * image.
      */
     public int getWidth() {
-        return anim.getImage().getWidth(null);
+        return animation.getImage().getWidth(null);
     }
 
     /**
@@ -116,7 +116,7 @@ public abstract class OdorWorldEntity {
      * image.
      */
     public int getHeight() {
-        return anim.getImage().getHeight(null);
+        return animation.getImage().getHeight(null);
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * Set the entity's name
+     * Set the entity's name.
      *
      * @param string name for entity.
      */
@@ -173,7 +173,7 @@ public abstract class OdorWorldEntity {
      * Gets this OdorWorldEntity's current image.
      */
     public Image getImage() {
-        return anim.getImage();
+        return animation.getImage();
     }
     
     /**
@@ -192,7 +192,7 @@ public abstract class OdorWorldEntity {
      */
     public void addEffector(final Effector effector) {
         effectors.add(effector);
-        world.fireEffectorAdded(effector);
+        parentWorld.fireEffectorAdded(effector);
     }
 
     /**
@@ -202,7 +202,7 @@ public abstract class OdorWorldEntity {
      */
     public void addSensor(final Sensor sensor) {
         sensors.add(sensor);
-        world.fireSensorAdded(sensor);
+        parentWorld.fireSensorAdded(sensor);
     }
 
     /**
@@ -217,9 +217,39 @@ public abstract class OdorWorldEntity {
     /**
      * Update all sensors.
      */
-    public void readSensors() {
+    public void updateSensors() {
         for (Sensor sensor : sensors) {
-            // Not sure yet...
+            sensor.update();
         }
+    }
+
+    /**
+     * @return the smellSource
+     */
+    public SmellSource getSmellSource() {
+        return smellSource;
+    }
+
+    /**
+     * @param smellSource the smellSource to set
+     */
+    public void setSmellSource(final SmellSource smellSource) {
+        this.smellSource = smellSource;
+    }
+
+    /**
+     * @return the parentWorld
+     */
+    public OdorWorld getParentWorld() {
+        return parentWorld;
+    }
+
+    /**
+     * Returns the location of the entity as a double array.
+     *
+     * @return location of the entity.
+     */
+    public double[] getLocation() {
+        return new double[] { x, y };
     }
 }

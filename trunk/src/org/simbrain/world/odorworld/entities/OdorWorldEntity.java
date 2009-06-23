@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.behaviors.Behavior;
+import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
@@ -32,16 +34,25 @@ public abstract class OdorWorldEntity {
 
     /** Y Velocity. */
     protected float dy = .05f;
-    
+
+    /** Back reference to parent parentWorld. */
+    private OdorWorld parentWorld;
+
+    /** Name of this entity. */
+    private String name;
+
     /** Sensors. */
     private List<Sensor> sensors= new ArrayList<Sensor>();
     
     /** Effectors. */
     private List<Effector> effectors = new ArrayList<Effector>();
-    
+        
+    /** Behavior. */
+    protected Behavior behavior = new StationaryBehavior();
+
     /** Smell Source (if any). */
     private SmellSource smellSource = null;
-    
+
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the velocity.
      */
@@ -50,21 +61,19 @@ public abstract class OdorWorldEntity {
     /**
      * Called before update() if the creature collided with a tile horizontally.
      */
-    public abstract void collideHorizontal();
+    public void collideHorizontal() {
+        behavior.collisionX();
+    }
 
     /**
      * Called before update() if the creature collided with a tile vertically.
      */
-    public abstract void collideVertical();
-
-    /** Back reference to parent parentWorld. */
-    private OdorWorld parentWorld;
-
-    /** Name of this entity. */
-    private String name;
+    public void collideVertical() {
+        behavior.collissionY();
+    }
 
     /**
-     * Construtor.
+     * Constructor.
      *
      * @param parentWorld parent parentWorld.
      * @param animation default animation.
@@ -76,22 +85,22 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-        Gets this OdorWorldEntity's current x position.
-    */
+     * Gets this OdorWorldEntity's current x position.
+     */
     public float getX() {
         return x;
     }
 
     /**
-        Gets this OdorWorldEntity's current y position.
-    */
+     * Gets this OdorWorldEntity's current y position.
+     */
     public float getY() {
         return y;
     }
 
     /**
-        Sets this OdorWorldEntity's current x position.
-    */
+     * Sets this OdorWorldEntity's current x position.
+     */
     public void setX(float x) {
         this.x = x;
     }

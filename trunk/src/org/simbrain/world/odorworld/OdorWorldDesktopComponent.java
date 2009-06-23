@@ -82,9 +82,10 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     
     @Override
     public void postAddInit() {
-        OdorWorld world = this.getWorkspaceComponent().getWorld();
-        worldPanel.setWorld(world);
-        worldPanel.repaint();
+        // Commented this out since it has no obvious effect
+//        OdorWorld world = this.getWorkspaceComponent().getWorld();
+//        worldPanel.setWorld(world);
+//        worldPanel.repaint();
     }
 
     /**
@@ -110,9 +111,10 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     /* (non-Javadoc)
      * @see org.simbrain.workspace.gui.GuiComponent#update()
      */
-    @Override
-    public void update() {
-        worldPanel.repaint();
-    }
+//    @Override
+    // Commented this out since it has no obvious effect
+//    protected void update() {
+//        worldPanel.repaint();
+//    }
 
 }

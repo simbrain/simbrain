@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.behaviors.NewtonianBouncer;
 
 
 /**
@@ -34,29 +35,15 @@ public class BasicEntity extends OdorWorldEntity {
      */
     public BasicEntity(final OdorWorld world, final Animation anim) {
         super(world, anim);
+        behavior = new NewtonianBouncer(this);
     }
 
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the velocity.
      */
     public void update(final long elapsedTime) {
-        x += dx * elapsedTime;
-        y += dy * elapsedTime;
+        behavior.apply(elapsedTime);
         animation.update(elapsedTime);
-    }
-
-    /**
-     * Called before update() if the creature collided with a tile horizontally.
-     */
-    public void collideHorizontal() {
-        setVelocityX(-getVelocityX());
-    }
-
-    /**
-     * Called before update() if the creature collided with a tile vertically.
-     */
-    public void collideVertical() {
-        setVelocityY(-getVelocityY());
     }
 
 }

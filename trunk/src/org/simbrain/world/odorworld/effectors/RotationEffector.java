@@ -55,7 +55,7 @@ public class RotationEffector implements Effector {
             return;
         }
         double offset =  turnIncrement * scaleFactor;
-        parentObject.setOrientation(parentObject.getHeading()
+        parentObject.setHeading(parentObject.getHeading()
                 + offset);
     }
 

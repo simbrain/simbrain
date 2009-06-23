@@ -24,10 +24,12 @@ import java.io.OutputStream;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.attributes.EntityWrapper;
 import org.simbrain.world.odorworld.attributes.RotationConsumer;
+import org.simbrain.world.odorworld.attributes.SmellProducer;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -86,7 +88,9 @@ public class OdorWorldComponent extends WorkspaceComponent {
             }
 
             public void sensorAdded(final Sensor sensor) {
-                // TODO Auto-generated method stub
+                if (sensor instanceof SmellSensor) {
+                    addProducer(new SmellProducer(OdorWorldComponent.this, (SmellSensor) sensor));
+                }
             }
 
             public void sensorRemoved(Sensor sensor) {

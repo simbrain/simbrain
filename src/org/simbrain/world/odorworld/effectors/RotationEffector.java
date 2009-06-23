@@ -6,17 +6,18 @@ import java.util.List;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * Rotate agent.
+ * Effector which rotates agent by a specified amount.
  */
 public class RotationEffector implements Effector {
 
+    /** Reference to parent object. */
     private RotatingEntity parentObject;
 
     /** Translation. */
     private double turnIncrement = 1;
 
     /** Makes the difference between Right and Left and how much. */
-    private double scaleFactor = 1;
+    private double scaleFactor = 0;
 
     /** Obvious... */
     private final static double DEGREES_IN_A_CIRCLE = 360;
@@ -24,7 +25,7 @@ public class RotationEffector implements Effector {
     /**
      * Constructor.
      */
-    public RotationEffector(RotatingEntity agent) {
+    public RotationEffector(final RotatingEntity agent) {
         parentObject = agent;
     }
 
@@ -34,26 +35,25 @@ public class RotationEffector implements Effector {
      * @param value the value to compute
      * @return value's "absolute angle"
      */
-    private double computeAngle(final double value) {
-        double val = value;
+    private double computeAngle(final double val) {
+        double retVal = val; 
         while (val >= DEGREES_IN_A_CIRCLE) {
-            val -= DEGREES_IN_A_CIRCLE;
+            retVal -= DEGREES_IN_A_CIRCLE;
         }
-
         while (val < 0) {
-            val += DEGREES_IN_A_CIRCLE;
+            retVal += DEGREES_IN_A_CIRCLE;
         }
 
-        return val;
+        return retVal;
     }
 
     /**
      * {@inheritDoc}
      */
     public void activate() {
-//        if (scaleFactor == 0) {
-//            return;
-//        }
+        if (scaleFactor == 0) {
+            return;
+        }
         double offset =  turnIncrement * scaleFactor;
         parentObject.setOrientation(parentObject.getHeading()
                 + offset);

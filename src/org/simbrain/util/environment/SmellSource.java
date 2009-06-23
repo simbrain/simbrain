@@ -34,32 +34,30 @@ public class SmellSource {
     private double[] stimulusVector;
 
     /** Location of the distal stimulus. */
-    private double[] location; 
+    private double[] location;
 
     /** Decay Functions. */
     public enum DecayFunction {
-    	
-    	STEP("Step"), 
-    	LINEAR("Linear"),
-    	GAUSSIAN("Gaussian"),
-    	QUADRATIC("Quadratic");
-    	
-    	/** Name of decay function. */
-    	private String name;
-    	
-    	/**
-    	 * Constructor.
-    	 *
-    	 * @param name name.
-    	 */
-    	DecayFunction(String name) {
-    		this.name = name;
-    	}
-    	
-    	@Override
-    	public String toString() {
-    		return name;
-    	}
+
+    	STEP("Step"), LINEAR("Linear"), GAUSSIAN("Gaussian"), QUADRATIC(
+                "Quadratic");
+
+        /** Name of decay function. */
+        private String name;
+
+        /**
+         * Constructor.
+         * 
+         * @param name name.
+         */
+        DecayFunction(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     };
 
     /** Method for calculating decay of stimulus as a function of distance from object. */
@@ -181,7 +179,7 @@ public class SmellSource {
      *
      * @return the stimulus string
      */
-    public String getStimulusS() {
+    public String getStimulusString() {
         return Utils.getVectorString(stimulusVector, ",");
     }
 
@@ -249,10 +247,11 @@ public class SmellSource {
     }
 
     /**
-     * Calculate what impact the object will have on the creature's receptors (input nodes) based on its distance from
-     * this object and its features (whether it is a "noisy object", and how the stimulus decays).  That is, calculate
-     * the proximal stimulus this distal stimulus gives rise to.
-     *
+     * Calculate what impact the object will have on the creature's receptors
+     * (input nodes) based on its distance from this object and its features
+     * (whether it is a "noisy object", and how the stimulus decays). That is,
+     * calculate the proximal stimulus this distal stimulus gives rise to.
+     * 
      * @param distance distance of creature from object
      * @return proximal stimulus to creature caused by this object
      */
@@ -302,14 +301,15 @@ public class SmellSource {
         //Add noise to object vector
         if (addNoise) {
             SimbrainMath.addNoise(stimulusVector, noiseLevel);
-        }    	
+        }
     }
     
     /**
-     * Calculate what impact the object will have on the creature's receptors (input nodes) based on its distance from
-     * this object and its features (whether it is a "noisy object", and how the stimulus decays).  That is, calculate
-     * the proximal stimulus this distal stimulus gives rise to.
-     *
+     * Calculate what impact the object will have on the creature's receptors
+     * (input nodes) based on its distance from this object and its features
+     * (whether it is a "noisy object", and how the stimulus decays). That is,
+     * calculate the proximal stimulus this distal stimulus gives rise to.
+     * 
      * @param distance distance of creature from object
      * @return proximal stimulus to creature caused by this object
      */
@@ -324,13 +324,15 @@ public class SmellSource {
                 }
             } else if (decayFunction == DecayFunction.LINEAR) {
                 if (distance < peak) {
-                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
+                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance)
+                            / (stimulusDispersion - peak);
                     if (scalingFactor < 0) {
                         scalingFactor = 0;
                     }
                     ret = val * scalingFactor;
                 } else {
-                    double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
+                    double scalingFactor = (stimulusDispersion - distance)
+                            / (stimulusDispersion - peak);
                     ret = val * scalingFactor;
                 }
             } else if (decayFunction == DecayFunction.GAUSSIAN) {
@@ -341,7 +343,8 @@ public class SmellSource {
                 double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
                 ret = val * scalingFactor;
             } else if (decayFunction == DecayFunction.QUADRATIC) {
-                double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
+                double scalingFactor = 1 - Math.pow((distance - peak)
+                        / (stimulusDispersion - peak), 2);
 
                 if (scalingFactor < 0) {
                     scalingFactor = 0;
@@ -383,14 +386,14 @@ public class SmellSource {
 	/**
 	 * @return the location
 	 */
-	public double[] getSuggestedLocation() {
+	public double[] getLocation() {
 		return location;
 	}
 
 	/**
 	 * @param location the location to set
 	 */
-	public void setSuggestedLocation(double[] location) {
+	public void getLocation(double[] location) {
 		this.location = location;
 	}
 

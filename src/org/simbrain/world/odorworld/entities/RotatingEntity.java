@@ -47,15 +47,26 @@ public class RotatingEntity extends OdorWorldEntity {
      *
      * @param d the orientation, in degrees
      */
-    public void setOrientation(final double d) {
+    public void setHeading(final double d) {
         //System.out.println("setOrientation:" + d);
         heading = d;
     }
     
     /**
+     * Returns the current heading, in degrees.
+     *
+     * @return current heading.
+     */
+    public double getHeading() {
+        return heading;
+    }
+
+    /**
      * Updates this OdorWorldEntity's Animation and its position based on the velocity.
      */
     public void update(final long elapsedTime) {
+        
+        behavior.apply(elapsedTime);
         
         heading = heading % 360;
         SortedMap<Double, Animation> headMap = map.headMap(heading);
@@ -67,24 +78,5 @@ public class RotatingEntity extends OdorWorldEntity {
         }
         animation.update(elapsedTime);
     }
-    
-    /**
-     * Called before update() if the creature collided with a tile horizontally.
-     */
-    public void collideHorizontal() {
-        // No implementation
-    }
-
-    /**
-     * Called before update() if the creature collided with a tile vertically.
-     */
-    public void collideVertical() {
-        // No implementation
-    }
-
-    public double getHeading() {
-        return heading;
-    }
-
 
 }

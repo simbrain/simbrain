@@ -231,6 +231,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             else if (mouseEvent.getClickCount() == 2) { 
                 JDialog dialog = new JDialog();
                 dialog.setContentPane(new ReflectivePropertyEditor(selectedEntity, dialog));
+                dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
             }
@@ -345,8 +346,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      */
     @Override
     public void paintComponent(final Graphics g) {
-        super.paintComponent(g);
+        //super.paintComponent(g); // Does not seem to do anything.
         paintWorld(g);
+        super.repaint(); // This fixes issues I was having, but is seems funny...
     }
     
     /**

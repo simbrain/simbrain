@@ -285,22 +285,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.addSeparator();
 
         contextMenu.add(getConnections());
-        // Makes quick connections based on the connections settings that were last changed.
-        JMenuItem quickConnectMenuItem = new JMenuItem("Quick Connect");
-        quickConnectMenuItem.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = ConnectNeurons.connectionType;
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSelectedModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-        contextMenu.add(quickConnectMenuItem);
+        contextMenu.add(getQuickConnections());
         // Set Source Action
         contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
         // Show Dialog Action
@@ -392,6 +377,82 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 ConnectNeurons connection = new Sparse();
                 connection.connectNeurons(getNetworkPanel().getRootNetwork(),
                         getNetworkPanel().getSourceModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
+        menu.add(allMenuItem);
+        menu.add(oneMenuItem);
+        menu.add(radialMenuItem);
+        menu.add(sparseMenuItem);
+
+        return menu;
+    }
+
+    /**
+     * Quick connections sub menu item.
+     * @return quick connections
+     */
+    private JMenu getQuickConnections() {
+        
+        JMenu menu = new JMenu("Quick Connect");
+
+        JMenuItem allMenuItem = new JMenuItem("All to All");
+        allMenuItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new AllToAll();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSelectedModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
+        JMenuItem oneMenuItem = new JMenuItem("One to One");
+        oneMenuItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new OneToOne();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSelectedModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
+        JMenuItem radialMenuItem = new JMenuItem("Radial");
+        radialMenuItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new Radial();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSelectedModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
+
+        JMenuItem sparseMenuItem = new JMenuItem("Sparse");
+        sparseMenuItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new Sparse();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSelectedModelNeurons(),
                         getNetworkPanel().getSelectedModelNeurons());
             }
             
@@ -953,7 +1014,7 @@ class ShowLayoutDialogAction extends AbstractAction {
      * Show layout dialog action.
      */
     public ShowLayoutDialogAction() {
-        super("Layout Properties...");
+        super("Set Layout Properties...");
     }
 
     /** @see ActionEvent. */

@@ -263,9 +263,9 @@ public class WorkspaceActionManager {
      * @return New worlds actions.
      */
     public List<Action> getNewWorldActions() {
-        return Arrays.asList(new Action[] { newDataWorldAction,
-                newMidiWorldAction, newOdorWorldAction, newOscWorldAction,
-                newThreeDeeWorldAction, newVisionWorldAction, newGameWorldAction });
+        return Arrays.asList(new Action[] { newThreeDeeWorldAction,
+                newDataWorldAction, newGameWorldAction, newMidiWorldAction,
+                newOdorWorldAction, newOscWorldAction, newVisionWorldAction });
     }
 
     /**

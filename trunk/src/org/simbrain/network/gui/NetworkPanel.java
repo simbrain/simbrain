@@ -32,10 +32,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
@@ -48,6 +50,7 @@ import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
+import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
@@ -335,15 +338,18 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 
         contextMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(createNewNetworkMenu());
+
+        contextMenu.addSeparator();
+        for (Action action : actionManager.getClipboardActions()) {
+            contextMenu.add(action);
+        }
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getSetSourceNeuronsAction());
         contextMenu.add(actionManager.getShowConnectDialogAction());
         contextMenu.addSeparator();
 
-        for (Action action : actionManager.getClipboardActions()) {
-            contextMenu.add(action);
-        }
+        contextMenu.add(getLayoutMenu());
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
@@ -364,6 +370,21 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      */
     JPopupMenu getContextMenu() {
         return contextMenu;
+    }
+
+    private JMenuItem getLayoutMenu() {
+        JMenuItem layoutProperties = new JMenuItem("Set Layout Properties...");
+        layoutProperties.addActionListener(new ActionListener() {
+
+            /** @see ActionEvent. */
+            public void actionPerformed(ActionEvent e) {
+                LayoutDialog dialog = new LayoutDialog();
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+        });
+        return layoutProperties;
     }
 
     /**

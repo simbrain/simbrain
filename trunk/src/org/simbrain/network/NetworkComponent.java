@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.simbrain.network.attributes.NeuronWrapper;
+import org.simbrain.network.attributes.SynapseWrapper;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.NetworkEvent;
@@ -112,6 +113,12 @@ public final class NetworkComponent extends WorkspaceComponent {
             addConsumer(wrapper);
             addProducer(wrapper);
         }
+
+        for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+            SynapseWrapper wrapper = new SynapseWrapper(synapse, this);
+            addConsumer(wrapper);
+            addProducer(wrapper);
+        }
         
         rootNetwork.addListener(new NetworkListener() {
 
@@ -190,7 +197,9 @@ public final class NetworkComponent extends WorkspaceComponent {
             }
 
             public void synapseAdded(NetworkEvent<Synapse> e) {
-                // TODO Auto-generated method stub
+                SynapseWrapper wrapper = new SynapseWrapper(e.getObject(), NetworkComponent.this);
+                addConsumer(wrapper);
+                addProducer(wrapper);
                 
             }
 
@@ -200,9 +209,22 @@ public final class NetworkComponent extends WorkspaceComponent {
             }
 
             public void synapseRemoved(NetworkEvent<Synapse> e) {
-                // TODO Auto-generated method stub
-                
-            }            
+                for (Consumer consumer : getConsumers()) {
+                    if (consumer instanceof SynapseWrapper) {
+                        if (((SynapseWrapper)consumer).getSynapse() == e.getObject()) {
+                            removeConsumer(consumer);
+                            break;
+                        }
+                    }
+                }
+                for (Producer producer : getProducers()) {
+                    if (producer instanceof SynapseWrapper) {
+                        if (((SynapseWrapper)producer).getSynapse() == e.getObject()) {
+                            removeProducer(producer);
+                        }
+                    }
+                }
+            }
         });
     }
 

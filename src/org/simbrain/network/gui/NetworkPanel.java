@@ -372,6 +372,10 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         return contextMenu;
     }
 
+    /**
+     * Creates a menu item for setting layout properties.
+     * @return layout menu properties menu item
+     */
     private JMenuItem getLayoutMenu() {
         JMenuItem layoutProperties = new JMenuItem("Set Layout Properties...");
         layoutProperties.addActionListener(new ActionListener() {

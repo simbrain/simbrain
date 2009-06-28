@@ -19,9 +19,7 @@
 package org.simbrain.plot.piechart;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -36,11 +34,9 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.simbrain.plot.ChartListener;
+import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -106,10 +102,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         );
         chartPanel.setChart(chart);
 
-        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
-            public void componentUpdated() {
-            }
-
+        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
             public void chartSettingsUpdated() {
                 chart.getPlot().setOutlineVisible(getWorkspaceComponent()
                         .getModel().isOutlineVisible());

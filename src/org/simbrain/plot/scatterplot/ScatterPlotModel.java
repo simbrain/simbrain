@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -34,7 +35,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Model for a JFreeChart Scatter plot.
  */
-public class ScatterPlotModel {
+public class ScatterPlotModel extends ChartModel {
 
     /** Consumer list. */
     private ArrayList<ScatterPlotConsumer> consumers = new ArrayList<ScatterPlotConsumer>();

@@ -19,24 +19,13 @@
 package org.simbrain.plot;
 
 /**
- * Listen for changes in a chart model object. Currently adding and deleting
- * data sources.
+ * Listener for changes in a chart model's settings.
  */
-public interface ChartListener {
+public interface ChartSettingsListener {
 
     /**
-     * A data source was added at the specified index.
-     *
-     * @param index the index of the added data source
+     * The chart settings have been updated.
      */
-    public void dataSourceAdded(final int index);
-
-    /**
-     * A data source was removed at the specified index.
-     * 
-     * @param index the index of the data source that was removed
-     */
-    public void dataSourceRemoved(final int index);
-
+    void chartSettingsUpdated();
 
 }

@@ -19,10 +19,9 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -30,19 +29,13 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Data for a JFreeChart pie chart.
  */
-public class BarChartModel {
-
-    /** Consumer list. */
-    private ArrayList<BarChartConsumer> consumers = new ArrayList<BarChartConsumer>();
+public class BarChartModel extends ChartModel {
     
     /** JFreeChart dataset for bar charts. */
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
     /** Initial number of data sources. */
     private static final int INITIAL_DATA_SOURCES = 6;
-
-    /** Parent Component. */
-    private BarChartComponent parentComponent;
 
     /** Color of bars in barchart. */
     private Color barColor = Color.red;
@@ -62,9 +55,7 @@ public class BarChartModel {
      * Bar chart model constructor.
      * @param parent component
      */
-    public BarChartModel(final BarChartComponent parent) {
-        parentComponent = parent;
-        defaultInit();
+    public BarChartModel() {
     }
 
     /**
@@ -79,28 +70,10 @@ public class BarChartModel {
     /**
      * Default initialization.
      */
-    private void defaultInit() {
+    public void defaultInit() {
         addDataSources(INITIAL_DATA_SOURCES);
     }
     
-    /**
-     * Returns parent component.
-     *
-     * @return parent component.
-     */
-    public BarChartComponent getParent() {
-        return parentComponent;
-    }
-
-    /**
-     * Set the parent.
-     *
-     * @param parent the parent
-     */
-    public void setParent(final BarChartComponent parent) {
-        this.parentComponent = parent;
-    }
-
     /**
      * Create specified number of set of data sources.
      * Adds these two existing data sources.
@@ -108,32 +81,44 @@ public class BarChartModel {
      * @param numDataSources number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
+        int currentIndex = dataset.getColumnCount();
         for (int i = 0; i < numDataSources; i++) {
-            addColumn();
+            addColumn(currentIndex + i);
         }
     }
 
     /**
      * Adds a new column to the dataset.
      */
-    public void addColumn() {
-        int columnIndex = consumers.size() + 1;
-        BarChartConsumer newAttribute = new BarChartConsumer(this, "BarChartData"
-                + (columnIndex), columnIndex);
-        consumers.add(newAttribute);
+    public void addColumn(final int index) {
+        dataset.addValue(0, new Integer(1), new Integer(index));
+        fireDataSourceAdded(index);
     }
 
     /**
-     * Removes the last column from the dataset.
+     * Adds a bar to the bar chart dataset.
+     */
+    public void addColumn() {
+        addColumn(dataset.getColumnCount());
+    }
+    
+    /**
+     * Removes the last bar from the bar chart data.
      */
     public void removeColumn() {
-        int lastColumnIndex = dataset.getColumnCount() - 1;
-
-        if (lastColumnIndex >= 0) {
-            dataset.removeColumn(lastColumnIndex);
-            consumers.remove(lastColumnIndex);
+        if (dataset.getColumnCount() > 1) {
+            removeColumn(dataset.getColumnCount() - 1);
         }
     }
+    
+    //TODO: Change names from row / column to "bars"?
+    
+    public void removeColumn(final int index) {
+        dataset.removeColumn(index);
+        fireDataSourceRemoved(index);
+    }
+    
+
     
     /**
      * Returns a properly initialized xstream object.
@@ -142,8 +127,6 @@ public class BarChartModel {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(BarChartModel.class, "parentComponent");
-        xstream.omitField(BarChartModel.class, "consumers");
         return xstream;
     }
 
@@ -156,24 +139,9 @@ public class BarChartModel {
      * @return Initialized object.
      */
     private Object readResolve() {
-        consumers = new ArrayList<BarChartConsumer>();
         return this;
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<BarChartConsumer> getConsumers() {
-        return consumers;
-    }
-    
-    /**
-     * Updates the chart to reflect changes.
-     */
-    public void update() {
-        this.getParent().updateSettings();
-    }
-
     /**
      * Used for debugging model.
      */
@@ -200,6 +168,7 @@ public class BarChartModel {
      */
     public void setBarColor(final Color barColor) {
         this.barColor = barColor;
+        fireSettingsChanged();
     }
 
     /**
@@ -214,6 +183,7 @@ public class BarChartModel {
      */
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
+        fireSettingsChanged();
     }
 
     /**
@@ -228,6 +198,7 @@ public class BarChartModel {
      */
     public void setUpperBound(final double upperBound) {
         this.upperBound = upperBound;
+        fireSettingsChanged();
     }
 
     /**
@@ -242,6 +213,7 @@ public class BarChartModel {
      */
     public void setLowerBound(final double lowerBound) {
         this.lowerBound = lowerBound;
+        fireSettingsChanged();
     }
 
     /**
@@ -251,6 +223,8 @@ public class BarChartModel {
     public void setRange(final double lowerBound, final double upperBound) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
+        fireSettingsChanged();
     }
+
 
 }

@@ -18,15 +18,10 @@
  */
 package org.simbrain.plot.barchart;
 
-import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.List;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -44,8 +39,9 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     public BarChartComponent(final String name) {
         super(name);
-        model = new BarChartModel(this);
-        initConsumers();
+        model = new BarChartModel();
+        addListener();
+        model.defaultInit();
     }
 
     /**
@@ -58,8 +54,7 @@ public class BarChartComponent extends WorkspaceComponent {
     public BarChartComponent(final String name, final BarChartModel model) {
         super(name);
         this.model = model;
-        this.model.setParent(this);
-        initConsumers();
+        addListener();
     }
 
     /**
@@ -70,17 +65,36 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     public BarChartComponent(final String name, final int numDataSources) {
         super(name);
-        model = new BarChartModel(this);
+        model = new BarChartModel();
+        addListener();
         model.addDataSources(numDataSources);
-        initConsumers();
-    }
-    
-    private void initConsumers() {
-        for(Consumer consumer : model.getConsumers()) {
-            this.addConsumer(consumer);
-        }
     }
 
+    /**
+     * Add chart listener to model.
+     */
+    private void addListener() {
+        
+        model.addListener(new ChartListener() {
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int index) {            
+                BarChartConsumer newAttribute = new BarChartConsumer(BarChartComponent.this, index);
+                addConsumer(newAttribute);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                BarChartConsumer toBeRemoved = (BarChartConsumer) getConsumers().get(index);
+                removeConsumer(toBeRemoved);
+            }
+            
+        });
+  }
     /**
      * Returns model.
      *
@@ -115,29 +129,6 @@ public class BarChartComponent extends WorkspaceComponent {
 
     @Override
     public void closing() {
-    }
-
-    @Override
-    public void update() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                // Add the data
-                for (BarChartConsumer consumer : model.getConsumers()) {
-                    model.getDataset().setValue(consumer.getValue(), new Integer(1), consumer.getIndex());
-                }
-            }
-        });
-    }
-    
-    /**
-     * Update chart settings. Called, e.g., when things are modified using a
-     * dialog.
-     */
-    public void updateSettings() {
-        //TODO!
-//        for (ChartListener listener : this.getListeners()) {
-//            listener.chartSettingsUpdated();
-//        }
     }
 
     @Override

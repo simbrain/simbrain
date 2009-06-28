@@ -22,17 +22,15 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.entities.Animation;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.BasicEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
@@ -90,6 +88,25 @@ public class OdorWorld {
     }
 
     /**
+     * Add an Odor World Entity.
+     *
+     * @param entity the entity to add
+     */
+    public void addEntity(final OdorWorldEntity entity) {
+        // TODO: As usual, need a system for naming things..
+        entity.setName(entity.getClass().getSimpleName() + "-" + (entityList.size()+1));
+
+        //centerSprite(sprite, tileX,tileY);
+
+        // Add entity to the map
+        map.addSprite(entity);
+        entityList.add(entity);
+        
+        // Fire entity added event
+        fireEntityAdded(entity);
+    }
+
+    /**
      * Add an odor world entity.
      * 
      * @param entity entity to add
@@ -104,31 +121,7 @@ public class OdorWorld {
             entity.setVelocityX( -1 + (float) Math.random() * 2);
             entity.setVelocityY(-1 + (float) Math.random() * 2);
             
-            // TODO: As usual, need a system for naming things..
-            entity.setName(entity.getClass().getSimpleName() + "-" + (entityList.size()+1));
-
-            //centerSprite(sprite, tileX,tileY);
-
-            // Add entity to the map
-            map.addSprite(entity);
-            entityList.add(entity);
-            
-            // Fire entity added event
-            fireEntityAdded(entity);
-    }
-    
-    /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
-     */
-    static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(OdorWorld.class, "listenerList");
-        xstream.omitField(OdorWorld.class, "map");
-        xstream.omitField(OdorWorldEntity.class, "animation");
-        xstream.omitField(OdorWorldEntity.class, "parentWorld");
-        xstream.omitField(RotatingEntity.class, "map");
-        return xstream;
+            addEntity(entity);
     }
     
     /**
@@ -138,8 +131,7 @@ public class OdorWorld {
      */
     public void addBasicEntity(final double[] p) {
         
-        Animation anim = new Animation();
-        anim.addFrame(ResourceManager.getImage("Swiss.gif"), 150);
+        Animation anim = new Animation("Swiss.gif");
         //animation.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
         //animation.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
 
@@ -156,41 +148,24 @@ public class OdorWorld {
      * Currently mouse is the only option!
      */
     public void addRotatingEntity(final double[] p) {
-        
-        TreeMap<Double, Animation>  images = new TreeMap<Double,Animation>(); 
-        images.put(7.5, new Animation(ResourceManager.getImage("Mouse_0.gif")));
-        images.put(22.5, new Animation(ResourceManager.getImage("Mouse_15.gif")));
-        images.put(37.5, new Animation(ResourceManager.getImage("Mouse_30.gif")));
-        images.put(52.5, new Animation(ResourceManager.getImage("Mouse_45.gif")));
-        images.put(67.5, new Animation(ResourceManager.getImage("Mouse_60.gif")));
-        images.put(82.5, new Animation(ResourceManager.getImage("Mouse_75.gif")));
-        images.put(97.5, new Animation(ResourceManager.getImage("Mouse_90.gif")));
-        images.put(112.5, new Animation(ResourceManager.getImage("Mouse_105.gif")));
-        images.put(127.5, new Animation(ResourceManager.getImage("Mouse_120.gif")));
-        images.put(142.5, new Animation(ResourceManager.getImage("Mouse_135.gif")));
-        images.put(157.5, new Animation(ResourceManager.getImage("Mouse_150.gif")));
-        images.put(172.5, new Animation(ResourceManager.getImage("Mouse_165.gif")));
-        images.put(187.5, new Animation(ResourceManager.getImage("Mouse_180.gif")));
-        images.put(202.5, new Animation(ResourceManager.getImage("Mouse_195.gif")));
-        images.put(217.5, new Animation(ResourceManager.getImage("Mouse_210.gif")));
-        images.put(232.5, new Animation(ResourceManager.getImage("Mouse_225.gif")));
-        images.put(247.5, new Animation(ResourceManager.getImage("Mouse_240.gif")));
-        images.put(262.5, new Animation(ResourceManager.getImage("Mouse_255.gif")));
-        images.put(277.5, new Animation(ResourceManager.getImage("Mouse_270.gif")));
-        images.put(292.5, new Animation(ResourceManager.getImage("Mouse_285.gif")));
-        images.put(307.5, new Animation(ResourceManager.getImage("Mouse_300.gif")));
-        images.put(322.5, new Animation(ResourceManager.getImage("Mouse_315.gif")));
-        images.put(337.5, new Animation(ResourceManager.getImage("Mouse_330.gif")));
-        images.put(352.5, new Animation(ResourceManager.getImage("Mouse_345.gif")));
-
-        RotatingEntity entity = new RotatingEntity(this, images);
+        RotatingEntity entity = new RotatingEntity(this);
         entity.addEffector(new RotationEffector(entity));
         entity.addSensor(new SmellSensor(entity));
         addEntity(entity, (int) p[0], (int) p[1]);
         fireUpdateEvent();
     }
     
-
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(OdorWorld.class, "listenerList");
+        xstream.omitField(Animation.class, "frames");
+        return xstream;
+    }
+    
     /**
      * Standard method call made to objects after they are deserialized.
      * See:
@@ -200,10 +175,10 @@ public class OdorWorld {
      * @return Initialized object.
      */
     private Object readResolve() {
-    //        for (OdorWorldEntity entity : entityList) {
-    //        	entity.setParent(this);
-    //        	entity.postSerializationInit();
-    //        }
+        listenerList = new ArrayList<WorldListener>();
+        for (OdorWorldEntity entity : entityList) {
+            entity.postSerializationInit();
+        }
         return this;
     }
 

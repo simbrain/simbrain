@@ -22,11 +22,10 @@ import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 
 /**
- * <b>Stimulus</b> represent a distal stimulus in the form of a vector.  It can have noise added and 
- * has built in functions to compute decay. 
+ * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
+ * have noise added and has built in functions to compute decay.
  * 
  * Standardly these objects represent "distal stimuli" relative to an organism.
- *  
  */
 public class SmellSource {
 
@@ -105,6 +104,16 @@ public class SmellSource {
         this.stimulusVector = distalstim;
         this.decayFunction = decay;
         this.location = location;
+    }
+    
+    /**
+     * Construct a smell source from a specified stimulus vector, using defaults
+     * otherwise.
+     * 
+     * @param distalstim the stimulus vector
+     */
+    public SmellSource(final double[] distalstim) {
+        this.stimulusVector = distalstim;
     }
 
     /**
@@ -297,6 +306,9 @@ public class SmellSource {
         return ret;
     }
     
+    /**
+     * Update the source.
+     */
     public void update() {
         //Add noise to object vector
         if (addNoise) {
@@ -370,31 +382,43 @@ public class SmellSource {
     }
 
 	/**
-	 * @return the decayFunction
-	 */
-	public DecayFunction getDecayFunction() {
-		return decayFunction;
-	}
+     * @return the decayFunction
+     */
+    public DecayFunction getDecayFunction() {
+        return decayFunction;
+    }
 
-	/**
-	 * @param decayFunction the decayFunction to set
-	 */
-	public void setDecayFunction(DecayFunction decayFunction) {
-		this.decayFunction = decayFunction;
-	}
+    /**
+     * @param decayFunction
+     *            the decayFunction to set
+     */
+    public void setDecayFunction(DecayFunction decayFunction) {
+        this.decayFunction = decayFunction;
+    }
 
-	/**
-	 * @return the location
-	 */
-	public double[] getLocation() {
-		return location;
-	}
+    /**
+     * @return the location
+     */
+    public double[] getLocation() {
+        return location;
+    }
 
-	/**
-	 * @param location the location to set
-	 */
-	public void getLocation(double[] location) {
-		this.location = location;
-	}
+    /**
+     * Return location of this smell source.
+     *
+     * @param location the location to set
+     */
+    public void getLocation(final double[] location) {
+        this.location = location;
+    }
+
+    /**
+     * Set the location of this smell source.
+     * 
+     * @param location
+     */
+    public void setLocation(final double[] location) {
+        this.location = location;
+    }
 
 }

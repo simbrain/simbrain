@@ -21,7 +21,7 @@ public abstract class OdorWorldEntity {
      * Animation used to depict this object. If the animation has one frame this
      * is equivalent to just using a single image to represent it.
      */
-    protected Animation animation;
+    private Animation animation;
     
     /** X Position. */
     protected float x;
@@ -56,7 +56,7 @@ public abstract class OdorWorldEntity {
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the velocity.
      */
-    public abstract void update(long elapsedTime);
+    public abstract void update(final long elapsedTime);
     
     /**
      * Called before update() if the creature collided with a tile horizontally.
@@ -73,15 +73,28 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * Constructor.
+     * Construct an entity from an animoation.
+     *
      *
      * @param parentWorld parent parentWorld.
-     * @param animation default animation.
+     * @param animation animation to use.
      */
     public OdorWorldEntity(final OdorWorld world, final Animation anim) {        
         this.animation = anim;
         this.parentWorld = world;
         anim.start();
+    }
+
+    /**
+     * Construct an odor worl dentity from a single image location.
+     *
+     * @param world parent world
+     * @param imageLocation the image location 
+     */
+    public OdorWorldEntity(final OdorWorld world, final String imageLocation) {
+        this.animation = new Animation(imageLocation);
+        this.parentWorld = world;
+        animation.start();
     }
 
     /**
@@ -101,14 +114,14 @@ public abstract class OdorWorldEntity {
     /**
      * Sets this OdorWorldEntity's current x position.
      */
-    public void setX(float x) {
+    public void setX(final float x) {
         this.x = x;
     }
 
     /**
      * Sets this OdorWorldEntity's current y position.
      */
-    public void setY(float y) {
+    public void setY(final float y) {
         this.y = y;
     }
 
@@ -148,7 +161,7 @@ public abstract class OdorWorldEntity {
      * Sets the horizontal velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
-    public void setVelocityX(float dx) {
+    public void setVelocityX(final float dx) {
         this.dx = dx;
     }
 
@@ -156,7 +169,7 @@ public abstract class OdorWorldEntity {
      * Sets the vertical velocity of this OdorWorldEntity in pixels per
      * millisecond.
      */
-    public void setVelocityY(float dy) {
+    public void setVelocityY(final float dy) {
         this.dy = dy;
     }
     
@@ -244,6 +257,7 @@ public abstract class OdorWorldEntity {
      */
     public void setSmellSource(final SmellSource smellSource) {
         this.smellSource = smellSource;
+        smellSource.setLocation(this.getLocation());
     }
 
     /**
@@ -260,5 +274,37 @@ public abstract class OdorWorldEntity {
      */
     public double[] getLocation() {
         return new double[] { x, y };
+    }
+    
+    /**
+     * Set the location of this entity.
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     */
+    public void setLocation(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    /**
+     * @return the animation associated with this entity
+     */
+    public Animation getAnimation() {
+        return animation;
+    }
+
+    /**
+     * @param animation the animation to set
+     */
+    public void setAnimation(final Animation animation) {
+        this.animation = animation;
+    }
+
+    /**
+     * Initialize the animation from stored image location(s). 
+     */
+    public void postSerializationInit() {
+        getAnimation().initializeImages();
     }
 }

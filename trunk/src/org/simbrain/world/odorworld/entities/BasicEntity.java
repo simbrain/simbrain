@@ -27,8 +27,11 @@ import org.simbrain.world.odorworld.behaviors.NewtonianBouncer;
  */
 public class BasicEntity extends OdorWorldEntity {
 
+    /** Default image. */
+    private static final String DEFAULT_IMAGE = "Swiss.gif";
+
     /**
-     * Construct a basic entity.
+     * Construct a basic entity witha specified animation.
      *
      * @param world reference to parent world
      * @param animation animation associated with this entity.
@@ -39,11 +42,32 @@ public class BasicEntity extends OdorWorldEntity {
     }
 
     /**
+     * Construct a default entity.
+     *
+     * @param world parent world.
+     */
+    public BasicEntity(final OdorWorld world) {
+        super(world, DEFAULT_IMAGE);
+        behavior = new NewtonianBouncer(this);
+    }
+
+    /**
+     * Construct a basic entity with a single image location. 
+     *
+     * @param world parent world
+     * @param imageLocation image location
+     */
+    public BasicEntity(final OdorWorld world, final String imageLocation) {
+        super(world, imageLocation);
+        behavior = new NewtonianBouncer(this);
+    }
+
+    /**
      * Updates this OdorWorldEntity's Animation and its position based on the velocity.
      */
     public void update(final long elapsedTime) {
         behavior.apply(elapsedTime);
-        animation.update(elapsedTime);
+        getAnimation().update(elapsedTime);
     }
 
 }

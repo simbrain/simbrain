@@ -18,24 +18,20 @@
  */
 package org.simbrain.plot.barchart;
 
+import java.awt.EventQueue;
+
 import org.simbrain.workspace.SingleAttributeConsumer;
 
 /**
- * Represents one possible data value in a bar chart.
+ * Represents a bar in a bar chart.
  */
 public class BarChartConsumer extends SingleAttributeConsumer<Double> {
 
-    /** Reference to gauge. */
-    private BarChartModel data;
+    /** Reference to BarChartComponent. */
+    private BarChartComponent component;
         
-    /** Name. */
-    private final String name;
-    
     /** Index. */
     private Integer index;
-    
-    /** Value. */
-    private Double value = new Double(0);
     
     /**
      * Construct  BarChartConsumer.
@@ -43,21 +39,29 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
      * @param plot the parent component
      * @param name the name of this consumer (displayed in the plot)
      */
-    public BarChartConsumer(BarChartModel data, String name, Integer index) {
-        this.data = data;
-        this.name = name;
+    public BarChartConsumer(final BarChartComponent component, final Integer index) {
+        this.component = component;
         this.index = index;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setValue(Double val) {
-        value = val;
+    public void setValue(final Double val) {
+      EventQueue.invokeLater(new Runnable() {
+      public void run() {
+          component.getModel().getDataset().setValue(val, new Integer(1), index);
+      }
+  });
+
+        
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getKey() {
-        return name;
+        return "BarChartData" + index;
     }
     
     /**
@@ -71,7 +75,7 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public BarChartComponent getParentComponent() {
-        return data.getParent();
+        return component;
     }
 
     /**
@@ -81,15 +85,6 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
      */
     public Integer getIndex() {
             return index;
-    }
-    
-    /**
-     * Return current value.
-     *
-     * @return value
-     */
-    public Double getValue() {
-            return value;
     }
     
 }

@@ -35,12 +35,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.simbrain.plot.ChartListener;
+import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.util.propertyeditor.TestObject;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -49,7 +46,7 @@ import org.simbrain.workspace.gui.GuiComponent;
  */
 public class BarChartGui extends GuiComponent<BarChartComponent> implements ActionListener {
 
-    /** Chart gui. */
+    /** Main JFreeChart object. */
     private JFreeChart chart;
 
     /** Panel for chart. */
@@ -95,8 +92,9 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
      */
     @Override
     public void postAddInit() {
+        
         // Generate the graph
-        chart = ChartFactory.createBarChart("Bar Chart Demo 1", // chart title
+        chart = ChartFactory.createBarChart("Bar Chart", // chart title
                 "Category", // domain axis label
                 "Value", // range axis label
                 this.getWorkspaceComponent().getModel().getDataset(), // data
@@ -115,20 +113,23 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
                     getWorkspaceComponent().getModel().getUpperBound());
         }
 
-        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
-
-            public void componentUpdated() {
-            }
+        // Add a chart setting listener
+        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
 
             // TODO: Explore parameters in
             // chart, chart.getCategoryPlot(),
             // chart.getCategoryPlot().getRenderer(), chartPanel..
             public void chartSettingsUpdated() {
+                
+                // Update colors
                 chart.getCategoryPlot().getRenderer().setSeriesPaint(0,
                         getWorkspaceComponent().getModel().getBarColor());
+                
+                // Update auto-range
                 chart.getCategoryPlot().getRangeAxis().setAutoRange(
                         getWorkspaceComponent().getModel().isAutoRange());
-                // For now change color for just one series...
+
+                // Update ranges
                 if (!getWorkspaceComponent().getModel().isAutoRange()) {
                     chart.getCategoryPlot().getRangeAxis().setRange(
                             getWorkspaceComponent().getModel().getLowerBound(),
@@ -136,8 +137,9 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
                 }
             }
         });
-        this.getWorkspaceComponent().updateSettings();
-
+        
+        // Fire the chart listener to update settings
+        getWorkspaceComponent().getModel().fireSettingsChanged();
     }
 
     /**
@@ -175,13 +177,12 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
             JDialog dialog = new JDialog();
-            dialog.setContentPane(new ReflectivePropertyEditor(getWorkspaceComponent().getModel(), dialog));
-//            BarChartDialog dialog = new BarChartDialog(chart, getWorkspaceComponent().getModel());
+            dialog.setContentPane(new ReflectivePropertyEditor(
+                    getWorkspaceComponent().getModel(), dialog));
             dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-            getWorkspaceComponent().getModel().update();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
             this.getWorkspaceComponent().getModel().removeColumn();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {

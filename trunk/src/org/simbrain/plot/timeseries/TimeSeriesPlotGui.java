@@ -35,11 +35,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.simbrain.plot.ChartListener;
+import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -141,10 +139,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
                 getWorkspaceComponent().getModel().getUpperDomainBoundary());
 
         // Notifies chart when changes are made within the dialog.
-        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
-            public void componentUpdated() {
-            }
-
+        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
             public void chartSettingsUpdated() {
                 chart.getXYPlot().getDomainAxis().setFixedAutoRange(
                         getWorkspaceComponent().getModel().getWindowSize());

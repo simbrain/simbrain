@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -30,7 +31,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Data model for a time series plot.
  */
-public class TimeSeriesModel {
+public class TimeSeriesModel extends ChartModel {
 
     /** Consumer list. */
     private ArrayList<TimeSeriesConsumer> consumers = new ArrayList<TimeSeriesConsumer>();

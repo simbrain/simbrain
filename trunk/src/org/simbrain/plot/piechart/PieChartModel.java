@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.jfree.data.general.DefaultPieDataset;
+import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -30,7 +31,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * Model for saving pie charts.
  * 
  */
-public class PieChartModel {
+public class PieChartModel extends ChartModel {
 
     /** Initial Number of data sources. */
     private static final int INITIAL_DATA_SOURCES = 6;

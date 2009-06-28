@@ -19,14 +19,12 @@
 package org.simbrain.plot.scatterplot;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -37,12 +35,8 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
-import org.simbrain.plot.ChartListener;
+import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.util.propertyeditor.TestObject;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -129,11 +123,8 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
         renderer = new XYDotRenderer();
         chart.getXYPlot().setRenderer(renderer);
 
-        getWorkspaceComponent().addWorkspaceComponentListener(new ChartListener() {
-            public void componentUpdated() {
-            }
-
-            public void chartSettingsUpdated() {
+        getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
+             public void chartSettingsUpdated() {
                 chart.getXYPlot().getDomainAxis().setAutoRange(
                         getWorkspaceComponent().getModel().isAutoDomain());
                 if (!getWorkspaceComponent().getModel().isAutoDomain()) {

@@ -18,9 +18,6 @@
  */
 package org.simbrain.plot.piechart;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.plot.ChartModel;
 
@@ -36,56 +33,26 @@ public class PieChartModel extends ChartModel {
     /** Initial Number of data sources. */
     private static final int INITIAL_DATA_SOURCES = 6;
 
-    /** Parent Component. */
-    private PieChartComponent parentComponent;
-
-    /** Consumer list. */
-    private ArrayList<PieDataConsumer> consumers = new ArrayList<PieDataConsumer>();
-
     /** JFreeChart dataset for pie charts. */
     private DefaultPieDataset dataset = new DefaultPieDataset();
 
     /** Should the chart outline be visible. */
     private boolean outlineVisible = true;
+ 
+    /** Current total value of all data items in pie chart dataset. */
+    private double total = 0;
 
     /**
      * Default constructor.
-     * @param parent component
      */
-    public PieChartModel(final PieChartComponent parent) {
-        parentComponent = parent;
-        defaultInit();
+    public PieChartModel() {
     }
 
     /**
      * Default initialization.
      */
-    private void defaultInit() {
+    public void defaultInit() {
         addDataSources(INITIAL_DATA_SOURCES);
-    }
-
-    /**
-     * @return parent component.
-     */
-    public PieChartComponent getParent() {
-        return parentComponent;
-    }
-
-    /**
-     * Set the parent component.
-     * 
-     * @param parent
-     *            the parent
-     */
-    public void setParent(final PieChartComponent parent) {
-        this.parentComponent = parent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<PieDataConsumer> getConsumers() {
-        return consumers;
     }
 
     /**
@@ -105,30 +72,20 @@ public class PieChartModel extends ChartModel {
      * Adds a data source to the plot.
      */
     public void addDataSource() {
-        int currentSize = consumers.size() + 1;
-        PieDataConsumer newAttribute = new PieDataConsumer(this, "PieData"
-                + (currentSize), currentSize);
-        consumers.add(newAttribute);
-        // dataset.setValue(dataset.getKey(currentSize), -1);
+        Integer index = dataset.getItemCount();
+        dataset.setValue(index, 1);
+        this.fireDataSourceAdded(index);
     }
 
     /**
      * Removes a data source from the plot.
      */
     public void removeDataSource() {
-        int lastSeriesIndex = consumers.size() - 1;
-
-        if (lastSeriesIndex >= 0) {
-            consumers.remove(lastSeriesIndex);
+        int removalIndex = dataset.getItemCount()    - 1;
+        if (removalIndex > 0) {
+            this.fireDataSourceRemoved(removalIndex);
+            dataset.remove(removalIndex);
         }
-        clearChart();
-    }
-
-    /**
-     * Updates the chart to reflect changes.
-     */
-    public void update() {
-        this.getParent().updateSettings();
     }
 
     /**
@@ -138,6 +95,17 @@ public class PieChartModel extends ChartModel {
         dataset.clear();
     }
 
+
+    /**
+     * Updates the total value across all data items.
+     */
+    public void updateTotalValue() {
+        total = 0;
+        for (int i = 0; i < dataset.getItemCount(); i++) {
+            total += dataset.getValue(i).doubleValue();
+        }
+    }
+    
     /**
      * @return the data set.
      */
@@ -152,8 +120,6 @@ public class PieChartModel extends ChartModel {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(PieChartModel.class, "parentComponent");
-        xstream.omitField(PieChartModel.class, "consumers");
         return xstream;
     }
 
@@ -165,7 +131,6 @@ public class PieChartModel extends ChartModel {
      * @return Initialized object.
      */
     private Object readResolve() {
-        consumers = new ArrayList<PieDataConsumer>();
         return this;
     }
 
@@ -181,6 +146,14 @@ public class PieChartModel extends ChartModel {
      */
     public void setOutlineVisible(final boolean outlineVisible) {
         this.outlineVisible = outlineVisible;
+        fireSettingsChanged();
+    }
+
+    /**
+     * @return the total
+     */
+    public double getTotal() {
+        return total;
     }
 
 }

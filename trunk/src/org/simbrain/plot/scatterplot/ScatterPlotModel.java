@@ -37,23 +37,20 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class ScatterPlotModel extends ChartModel {
 
-    /** Consumer list. */
-    private ArrayList<ScatterPlotConsumer> consumers = new ArrayList<ScatterPlotConsumer>();
-    
     /** Scatter Plot Data. */
     private XYSeriesCollection dataset = new XYSeriesCollection();
     
     /** Default number of sources. */
     private static final int DEFAULT_DATA_SOURCES = 5;
 
-    /** Parent Component. */
-    private ScatterPlotComponent parentComponent;
+    /** Show plot history. */
+    private boolean showHistory = false;
 
     /** Auto domain. */
-    private boolean autoDomain = false;
+    private boolean autoDomain = true;
 
     /** Auto range. */
-    private boolean autoRange = false;
+    private boolean autoRange = true;
 
     /** Upper range boundary. */
     private double upperRangeBoundary = 10;
@@ -68,20 +65,17 @@ public class ScatterPlotModel extends ChartModel {
     private double lowerDomainBoundary = 0;
 
     /** Size of chart dot. */
-    private int dotSize = 1;
+    private int dotSize = 5;
 
     /** Color for series. */
     private List<Paint> chartSeriesPaint = new LinkedList<Paint>();
-
 
     /**
      * Scatter plot model constructor.
      * @param parent component
      */
-    public ScatterPlotModel(final ScatterPlotComponent parent) {
-        parentComponent = parent;
+    public ScatterPlotModel() {
         setChartColors();
-        defaultInit();
     }
 
     /**
@@ -94,24 +88,8 @@ public class ScatterPlotModel extends ChartModel {
     /**
      * Default Initialization.
      */
-    private void defaultInit() {
+    public void defaultInit() {
         addDataSources(DEFAULT_DATA_SOURCES);
-    }
-
-    /**
-     * @return parent component.
-     */
-    public ScatterPlotComponent getParent() {
-        return parentComponent;
-    }
-
-    /**
-     * Set the parent component.
-     *
-     * @param parent the parent component
-     */
-    public void setParent(final ScatterPlotComponent parent) {
-        parentComponent = parent;
     }
 
     /**
@@ -141,23 +119,21 @@ public class ScatterPlotModel extends ChartModel {
      * Adds a data source.
      */
     public void addDataSource() {
-        int currentSize = consumers.size();
-        ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(this, "ScatterPlot"
-                + (currentSize), currentSize);
-        consumers.add(newAttribute);
-        dataset.addSeries(new XYSeries(currentSize));
+        Integer index = dataset.getSeriesCount();
+        dataset.addSeries(new XYSeries(index));
+        this.fireDataSourceAdded(index);
     }
 
     /**
      * Removes a data source.
      */
     public void removeDataSource() {
-        int lastSeriesIndex = dataset.getSeriesCount() - 1;
+        Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
 
         if (lastSeriesIndex >= 0) {
+            this.fireDataSourceRemoved(lastSeriesIndex);
             dataset.removeSeries(lastSeriesIndex);
-            consumers.remove(lastSeriesIndex);
-            chartSeriesPaint.remove(lastSeriesIndex);
+            //chartSeriesPaint.remove(lastSeriesIndex);
         }
     }
 
@@ -171,12 +147,6 @@ public class ScatterPlotModel extends ChartModel {
         }
     }
 
-    /**
-     * Updates the chart.
-     */
-    public void update() {
-        getParent().updateSettings();
-    }
 
     /**
      * Returns a properly initialized xstream object.
@@ -184,8 +154,6 @@ public class ScatterPlotModel extends ChartModel {
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(ScatterPlotModel.class, "parentComponent");
-        xstream.omitField(ScatterPlotModel.class, "consumers");
         return xstream;
     }
 
@@ -198,15 +166,7 @@ public class ScatterPlotModel extends ChartModel {
      * @return Initialized object.
      */
     private Object readResolve() {
-        consumers = new ArrayList<ScatterPlotConsumer>();
         return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<ScatterPlotConsumer> getConsumers() {
-        return consumers;
     }
 
     /**
@@ -221,6 +181,7 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void setAutoDomain(final boolean autoDomain) {
         this.autoDomain = autoDomain;
+        fireSettingsChanged();
     }
 
     /**
@@ -235,6 +196,7 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
+        fireSettingsChanged();
     }
 
     /**
@@ -249,6 +211,7 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void setUpperRangeBoundary(final double upperRangeBoundary) {
         this.upperRangeBoundary = upperRangeBoundary;
+        fireSettingsChanged();
     }
 
     /**
@@ -263,6 +226,7 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void setLowerRangeBoundary(final double lowerRangeBoundary) {
         this.lowerRangeBoundary = lowerRangeBoundary;
+        fireSettingsChanged();
     }
 
     /**
@@ -277,6 +241,7 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void setUpperDomainBoundary(final double upperDomainBoundary) {
         this.upperDomainBoundary = upperDomainBoundary;
+        fireSettingsChanged();
     }
 
     /**
@@ -305,6 +270,7 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void setDotSize(final int dotSize) {
         this.dotSize = dotSize;
+        fireSettingsChanged();
     }
 
     /**
@@ -319,5 +285,21 @@ public class ScatterPlotModel extends ChartModel {
      */
     public void setChartSeriesPaint(final List<Paint> chartSeriesPaint) {
         this.chartSeriesPaint = chartSeriesPaint;
+        fireSettingsChanged();
     }
-}
+
+    /**
+     * @return the show history.
+     */
+    public boolean isShowHistory() {
+        return showHistory;
+    }
+
+    /**
+     * Boolean show history.
+     * @param value show history
+     */
+    public void setShowHistory(final boolean value) {
+        showHistory = value;
+        fireSettingsChanged();
+    }}

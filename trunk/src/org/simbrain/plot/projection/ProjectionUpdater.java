@@ -25,37 +25,37 @@ import javax.swing.SwingUtilities;
  */
 public class ProjectionUpdater implements Runnable {
 
-	/** Reference to projection component. */
-	private ProjectionComponent component;
+    /** Reference to projection component. */
+    private ProjectionComponent component;
 
-	/**
-	 * @param component
-	 */
-	public ProjectionUpdater(ProjectionComponent component) {
-		super();
-		this.component = component;
-	}
+    /**
+     * @param component
+     */
+    public ProjectionUpdater(ProjectionComponent component) {
+        super();
+        this.component = component;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void run() {
-		while (!component.isRunning()) {
-			try {
-				component.setUpdateCompleted(false);
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						component.getGauge().iterate(1);
-						component.resetChartDataset();
-						component.fireUpdateEvent();
-					}					
-				});
-				while (!component.isUpdateCompleted()) {
-					Thread.sleep(1); // TODO: make this settable? 
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public void run() {
+        while (!component.isRunning()) {
+            try {
+                component.setUpdateCompleted(false);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        component.getGauge().iterate(1);
+                        component.resetChartDataset();
+                        component.fireUpdateEvent();
+                    }
+                });
+                while (!component.isUpdateCompleted()) {
+                    Thread.sleep(1); // TODO: make this settable?
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

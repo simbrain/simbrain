@@ -108,7 +108,6 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
                         .getModel().isOutlineVisible());
             }
         });
-        getWorkspaceComponent().updateSettings();
     }
 
     /**
@@ -152,7 +151,6 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-            getWorkspaceComponent().getModel().update();
         } else if (e.getActionCommand().equalsIgnoreCase("Delete")) {
             this.getWorkspaceComponent().getModel().removeDataSource();
         }

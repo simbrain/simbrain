@@ -18,9 +18,6 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
@@ -33,20 +30,14 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class TimeSeriesModel extends ChartModel {
 
-    /** Consumer list. */
-    private ArrayList<TimeSeriesConsumer> consumers = new ArrayList<TimeSeriesConsumer>();
-    
     /** Time Series Data. */
     private XYSeriesCollection dataset = new XYSeriesCollection();
 
-    /** Parent Component. */
-    private TimeSeriesPlotComponent parentComponent;
-
     /** Default number of data sources for plot initialization. */
-    private static final int INITIAL_DATA_SOURCES = 10;
+    private static final int INITIAL_DATA_SOURCES = 5;
 
     /** Should fixed window size be used. */
-    private boolean fixedWindow = false;
+    private boolean fixedWindow = true;
 
     /** Should the domain automatically change to reflect the data. */
     private boolean autoDomain = true;
@@ -61,27 +52,32 @@ public class TimeSeriesModel extends ChartModel {
     private double upperDomainBoundary = 1;
 
     /** Lower boundary of the chart domain. */
-    private double lowerDomainBoundary = -0;
+    private double lowerDomainBoundary = 0;
 
     /** Upper boundary of the chart range. */
     private double upperRangeBoundary = 1;
 
     /** Lower boundary of the chart range. */
     private double lowerRangeBoundary = 0;
+    
+    /** Maximum iteration size if this chart is fixed width. */
+    private int maxSize = 100;
+
+    /** Whether this chart if fixed width or not. */
+    private boolean fixedWidth = true;
+
 
     /**
      * Time series model constructor.
      * @param parent component
      */
-    public TimeSeriesModel(final TimeSeriesPlotComponent parent) {
-        parentComponent = parent;
-        defaultInit();
+    public TimeSeriesModel() {
     }
 
     /**
      * Default plot initialization.
      */
-    private void defaultInit() {
+    public void defaultInit() {
         addDataSources(INITIAL_DATA_SOURCES);
     }
 
@@ -111,11 +107,11 @@ public class TimeSeriesModel extends ChartModel {
      * Removes a data source from the chart.
      */
     public void removeDataSource() {
-        int lastSeriesIndex = dataset.getSeriesCount() - 1;
+        Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
 
         if (lastSeriesIndex >= 0) {
+            this.fireDataSourceRemoved(lastSeriesIndex);
             dataset.removeSeries(lastSeriesIndex);
-            consumers.remove(lastSeriesIndex);
         }
     }
 
@@ -123,18 +119,9 @@ public class TimeSeriesModel extends ChartModel {
      * Adds a data source to the chart.
      */
     public void addDataSource() {
-        int currentSize = consumers.size();
-        TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(this, ""
-                + (currentSize), currentSize);
-        consumers.add(newAttribute);
+        Integer currentSize = dataset.getSeriesCount();
         dataset.addSeries(new XYSeries(currentSize));
-    }
-
-    /**
-     * Updates the chart settings.
-     */
-    public void update() {
-        getParent().updateSettings();
+        this.fireDataSourceAdded(currentSize);
     }
 
     /**
@@ -145,37 +132,12 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
-     * Sets the parent component.
-     *
-     * @param parent component
-     */
-    public void setParent(final TimeSeriesPlotComponent parent) {
-        parentComponent = parent;
-    }
-
-    /**
-     * @return parent component.
-     */
-    public TimeSeriesPlotComponent getParent() {
-        return parentComponent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Collection<TimeSeriesConsumer> getConsumers() {
-        return consumers;
-    }
-
-    /**
      * Returns a properly initialized xstream object.
      *
      * @return the XStream object
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-        xstream.omitField(TimeSeriesModel.class, "parentComponent");
-        xstream.omitField(TimeSeriesModel.class, "consumers");
         return xstream;
     }
 
@@ -188,7 +150,6 @@ public class TimeSeriesModel extends ChartModel {
      * @return Initialized object.
      */
     private Object readResolve() {
-        consumers = new ArrayList<TimeSeriesConsumer>();
         return this;
     }
 
@@ -204,6 +165,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setFixedWindow(final boolean fixedWindow) {
         this.fixedWindow = fixedWindow;
+        fireSettingsChanged();
     }
 
     /**
@@ -218,6 +180,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setAutoDomain(final boolean autoDomain) {
         this.autoDomain = autoDomain;
+        fireSettingsChanged();
     }
 
     /**
@@ -232,6 +195,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
+        fireSettingsChanged();
     }
 
     /**
@@ -246,6 +210,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setWindowSize(final int windowSize) {
         this.windowSize = windowSize;
+        fireSettingsChanged();
     }
 
     /**
@@ -260,6 +225,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setUpperDomainBoundary(final double upperDomainBoundary) {
         this.upperDomainBoundary = upperDomainBoundary;
+        fireSettingsChanged();
     }
 
     /**
@@ -274,6 +240,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setLowerDomainBoundary(final double lowerDomainBoundary) {
         this.lowerDomainBoundary = lowerDomainBoundary;
+        fireSettingsChanged();
     }
 
     /**
@@ -288,6 +255,7 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setUpperRangeBoundary(final double upperRangeBoundary) {
         this.upperRangeBoundary = upperRangeBoundary;
+        fireSettingsChanged();        
     }
 
     /**
@@ -302,5 +270,37 @@ public class TimeSeriesModel extends ChartModel {
      */
     public void setLowerRangeBoundary(final double lowerRangeBoundary) {
         this.lowerRangeBoundary = lowerRangeBoundary;
+        fireSettingsChanged();        
     }
+
+    /**
+     * @return the maxSize
+     */
+    public int getMaxSize() {
+        return maxSize;
+    }
+
+    /**
+     * @param maxSize the maxSize to set
+     */
+    public void setMaxSize(final int maxSize) {
+        this.maxSize = maxSize;
+        fireSettingsChanged();
+    }
+
+    /**
+     * @return the fixedWidth
+     */
+    public boolean isFixedWidth() {
+        return fixedWidth;
+    }
+
+    /**
+     * @param fixedWidth the fixedWidth to set
+     */
+    public void setFixedWidth(final boolean fixedWidth) {
+        this.fixedWidth = fixedWidth;
+        fireSettingsChanged();
+    }
+    
 }

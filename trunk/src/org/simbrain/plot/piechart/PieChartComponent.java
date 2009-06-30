@@ -18,15 +18,10 @@
  */
 package org.simbrain.plot.piechart;
 
-import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.List;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -43,7 +38,9 @@ public class PieChartComponent extends WorkspaceComponent {
      */
     public PieChartComponent(final String name) {
         super(name);
-        model = new PieChartModel(this);
+        model = new PieChartModel();
+        addListener();
+        model.defaultInit();
     }
     
     /**
@@ -55,8 +52,34 @@ public class PieChartComponent extends WorkspaceComponent {
     public PieChartComponent(final String name, final PieChartModel model) {
         super(name);
         this.model = model;
-        model.setParent(this);
+        addListener();
     }
+    
+    /**
+     * Add chart listener to model.
+     */
+    private void addListener() {
+        
+        model.addListener(new ChartListener() {
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int index) {
+                PieDataConsumer newAttribute = new PieDataConsumer(PieChartComponent.this, index);
+                addConsumer(newAttribute);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                PieDataConsumer toBeRemoved = (PieDataConsumer) getConsumers().get(index);
+                removeConsumer(toBeRemoved);
+            }
+            
+        });
+  }
 
 
     /**
@@ -87,15 +110,6 @@ public class PieChartComponent extends WorkspaceComponent {
         PieChartModel.getXStream().toXML(model, output);
     }
 
-    /**
-     * Update chart settings.  Called, e.g., when things are modified using a dialog.
-     */
-    public void updateSettings() {
-        //TODO!
-//        for (ChartListener listener : this.getListeners()) {
-//                listener.chartSettingsUpdated();
-//        }
-    }
 
     @Override
     public boolean hasChangedSinceLastSave() {
@@ -110,18 +124,7 @@ public class PieChartComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                double total = 0;
-                for (PieDataConsumer consumer : model.getConsumers()) {
-                    total += consumer.getValue();
-                }
-                if (total == 0) { return; } // TODO: Do something more sensible for this case
-                for (PieDataConsumer consumer : model.getConsumers()) {
-                    model.getDataset().setValue(consumer.getIndex(), consumer.getValue() / total);
-                }
-            }
-        });
+        model.updateTotalValue();
     }
     
     @Override

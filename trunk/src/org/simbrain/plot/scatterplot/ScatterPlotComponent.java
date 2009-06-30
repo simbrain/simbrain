@@ -21,12 +21,9 @@ package org.simbrain.plot.scatterplot;
 import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.List;
 
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -34,11 +31,15 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public class ScatterPlotComponent extends WorkspaceComponent {
 
-    /** Show plot history. */
-    private boolean showHistory = false;
-
     /** Data Model. */
     private ScatterPlotModel model;
+    
+    /**
+     * Initialize component.
+     */
+    {
+        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
+    }
 
     /**
      * Create new PieChart Component.
@@ -47,7 +48,9 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      */
     public ScatterPlotComponent(final String name) {
         super(name);
-        model = new ScatterPlotModel(this);
+        model = new ScatterPlotModel();
+        addListener();
+        model.defaultInit();
     }
     
     /**
@@ -60,7 +63,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     public ScatterPlotComponent(final String name, final ScatterPlotModel model) {
         super(name);
         this.model = model;
-        this.model.setParent(this);
+        addListener();
     }
 
     /**
@@ -71,9 +74,36 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      */
     public ScatterPlotComponent(final String name, final int numDataSources) {
         super(name);
-        model = new ScatterPlotModel(this);
+        model = new ScatterPlotModel();
+        addListener();
         model.addDataSources(numDataSources);
     }
+    
+    /**
+     * Add chart listener to model.
+     */
+    private void addListener() {
+        
+        model.addListener(new ChartListener() {
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int index) {
+                ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(ScatterPlotComponent.this, index);
+                addConsumer(newAttribute);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                ScatterPlotConsumer toBeRemoved = (ScatterPlotConsumer) getConsumers().get(index);
+                removeConsumer(toBeRemoved);
+            }
+            
+        });
+  }
 
     /**
      * @return the model.
@@ -110,60 +140,29 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         ScatterPlotModel.getXStream().toXML(model, output);
     }
 
-    /**
-     * @return the show history.
-     */
-    public boolean isShowHistory() {
-        return showHistory;
-    }
-
-    /**
-     * Boolean show history.
-     * @param value show history
-     */
-    public void setShowHistory(final boolean value) {
-        showHistory = value;
-    }
-
-    /**
-     * Update chart settings. Called, e.g., when things are modified using a
-     * dialog.
-     */
-    public void updateSettings() {
-        //TODO!
-//        for (ChartListener listener : this.getListeners()) {
-//            listener.chartSettingsUpdated();
-//        }
+    @Override
+    public String getXML() {
+        return ScatterPlotModel.getXStream().toXML(model);
     }
 
     @Override
     public void update() {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
-                if (!showHistory) {
-                    // Constantly erase. How is performance for this version?
-                    for (ScatterPlotConsumer consumer : model.getConsumers()) {
-                        model.getDataset().getSeries(consumer.getIndex()).clear();
-                        model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
-                                consumer.getY());
-                        // System.out.println("--[" + consumer.getIndex() + "]:" +
-                        // dataset.getSeries(consumer.getIndex()).getItemCount());
+                // Constantly erase. How is performance for this version?
+                for (Consumer consumer : getConsumers()) {
+                    ScatterPlotConsumer s_consumer = (ScatterPlotConsumer) consumer;
+                    Integer index = s_consumer.getIndex();
+                    if (!model.isShowHistory()) {
+                        getModel().getDataset().getSeries(index).clear();
                     }
-                } else {
-        
-                    // THE VERSION BELOW KEEPS A HISTORY. THERE IS NO "HOT" POINT
-                    for (ScatterPlotConsumer consumer : model.getConsumers()) {
-                        model.getDataset().getSeries(consumer.getIndex()).add(consumer.getX(),
-                                consumer.getY());
-                    }
+                    model.getDataset().getSeries(index).add(s_consumer.getX(),
+                            s_consumer.getY());
+                    // System.out.println("[" + consumer.getIndex() + "]:" +
+                    // dataset.getSeries(consumer.getIndex()).getItemCount());
                 }
             }
         });
-    }
-    
-    @Override
-    public String getXML() {
-        return ScatterPlotModel.getXStream().toXML(model);
     }
 
 }

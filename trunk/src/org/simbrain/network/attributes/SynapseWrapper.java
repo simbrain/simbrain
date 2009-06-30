@@ -32,8 +32,6 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a synapse object and provides all consuming and producing attributes.
- *
- * @author jyoshimi
  */
 public class SynapseWrapper implements Producer, Consumer {
 
@@ -54,13 +52,13 @@ public class SynapseWrapper implements Producer, Consumer {
     /**
      * Constructor.
      *
-     * @param synapse neuron this wraps.
-     * @param component network component.
+     * @param synapse synapse this wraps.
+     * @param component parent component.
      */
     public SynapseWrapper(final Synapse synapse, final NetworkComponent component) {
         this.synapse = synapse;
         this.parent = component;
-        ActivationAttribute activationAttribute = new ActivationAttribute();
+        StrengthAttribute activationAttribute = new StrengthAttribute();
         producingAttributes.add(activationAttribute);
         consumingAttributes.add(activationAttribute);
     }
@@ -89,32 +87,30 @@ public class SynapseWrapper implements Producer, Consumer {
     }
 
     /**
-     * Implements the Activation attribute.
-     * 
-     * @author Matt Watson
+     * Implements a Strength attribute.
      */
-    private class ActivationAttribute extends AbstractAttribute
+    private class StrengthAttribute extends AbstractAttribute
             implements ProducingAttribute<Double>, ConsumingAttribute<Double> {
         
         /**
          * {@inheritDoc}
          */
         public String getKey() {
-            return "Activation";
+            return "Strength";
         }
         
         /**
          * {@inheritDoc}
          */
         public Double getValue() {
-            return synapse.getValue();
+            return synapse.getStrength();
         }
         
         /**
          * {@inheritDoc}
          */
         public void setValue(final Double value) {
-//            synapse.setInputValue(value == null ? 0 : value);
+            synapse.setStrength(value == null ? 0 : value);
         }
         
         /**

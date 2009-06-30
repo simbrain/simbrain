@@ -98,12 +98,14 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
     @Override
     public void postAddInit() {
         
+        // Convenience reference
+        final TimeSeriesModel model = getWorkspaceComponent().getModel();
         // Generate the graph
         chart = ChartFactory.createXYLineChart(
             "Time series", // Title
             "Iterations", // x-axis Label
             "Value(s)", // y-axis Label
-            this.getWorkspaceComponent().getModel().getDataset(), // Dataset
+            model.getDataset(), // Dataset
             PlotOrientation.VERTICAL, // Plot Orientation
             true, // Show Legend
             true, // Use tooltips
@@ -111,68 +113,37 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
         );
         chartPanel.setChart(chart);
 
-        // Sets the initial fixed width for the chart.
-        chart.getXYPlot().getDomainAxis().setFixedAutoRange(getWorkspaceComponent().
-                getModel().getWindowSize());
-
-        chart.getXYPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().
-                getModel().isAutoRange());
-        chart.getXYPlot().getDomainAxis().setAutoRange(getWorkspaceComponent().
-                getModel().isAutoDomain());
-
-        getWorkspaceComponent().setFixedWidth(getWorkspaceComponent().getModel().isFixedWindow());
-        getWorkspaceComponent().setMaxSize(getWorkspaceComponent().getModel().getWindowSize());
-
-        if (getWorkspaceComponent().getModel().isFixedWindow()) {
-            chart.getXYPlot().getDomainAxis().setFixedAutoRange(getWorkspaceComponent().
-                    getModel().getWindowSize());
-        } else {
-            chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
-        }
-        
-
-        chart.getXYPlot().getRangeAxis().setRange(getWorkspaceComponent().
-                getModel().getLowerRangeBoundary(),
-                getWorkspaceComponent().getModel().getUpperRangeBoundary());
-        chart.getXYPlot().getDomainAxis().setRange(getWorkspaceComponent().
-                getModel().getLowerDomainBoundary(),
-                getWorkspaceComponent().getModel().getUpperDomainBoundary());
-
-        // Notifies chart when changes are made within the dialog.
+        // Create listener
         getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
             public void chartSettingsUpdated() {
-                chart.getXYPlot().getDomainAxis().setFixedAutoRange(
-                        getWorkspaceComponent().getModel().getWindowSize());
-
-                chart.getXYPlot().getRangeAxis().setAutoRange(
-                        getWorkspaceComponent().getModel().isAutoRange());
-                chart.getXYPlot().getDomainAxis().setAutoRange(
-                        getWorkspaceComponent().getModel().isAutoDomain());
-
-                getWorkspaceComponent().setFixedWidth(
-                        getWorkspaceComponent().getModel().isFixedWindow());
-                if (getWorkspaceComponent().getModel().isFixedWindow()) {
-                    getWorkspaceComponent().setMaxSize(
-                            getWorkspaceComponent().getModel().getWindowSize());
+                
+                
+                chart.getXYPlot().getDomainAxis().setFixedAutoRange(model.getWindowSize());
+                chart.getXYPlot().getDomainAxis().setAutoRange(model.isAutoDomain());
+                chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
+                
+                if (model.isFixedWindow()) {
                     chart.getXYPlot().getDomainAxis().setFixedAutoRange(
-                            getWorkspaceComponent().getModel().getWindowSize());
+                            model.getWindowSize());
                 } else {
                     chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
                 }
 
-                if (!getWorkspaceComponent().getModel().isAutoRange()) {
+                if (!model.isAutoRange()) {
                     chart.getXYPlot().getRangeAxis().setRange(
-                            getWorkspaceComponent().getModel().getLowerRangeBoundary(),
-                            getWorkspaceComponent().getModel().getUpperRangeBoundary());
+                            model.getLowerRangeBoundary(),
+                            model.getUpperRangeBoundary());
                 }
-                if (!getWorkspaceComponent().getModel().isAutoDomain()) {
+                if (!model.isAutoDomain()) {
                     chart.getXYPlot().getDomainAxis().setRange(
-                            getWorkspaceComponent().getModel().getLowerDomainBoundary(),
-                            getWorkspaceComponent().getModel().getUpperDomainBoundary());
+                            model.getLowerDomainBoundary(),
+                            model.getUpperDomainBoundary());
                 }
             }
         });
-        getWorkspaceComponent().updateSettings();
+
+        // Invoke an initial event in order to set default settings
+        model.fireSettingsChanged();
     }
 
     /**
@@ -215,7 +186,6 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-            getWorkspaceComponent().getModel().update();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Delete")) {
             this.getWorkspaceComponent().getModel().removeDataSource();
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {

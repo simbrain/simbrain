@@ -147,7 +147,7 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
         dotSizeField.setText(Integer.toString(model.getDotSize()));
         autoRange.setSelected(model.isAutoRange());
         autoDomain.setSelected(model.isAutoRange());
-        showHistory.setSelected(model.getParent().isShowHistory());
+        showHistory.setSelected(model.isShowHistory());
         maxRangeField.setText(Double.toString(model.getUpperRangeBoundary()));
         minRangeField.setText(Double.toString(model.getLowerRangeBoundary()));
         maxDomainField.setText(Double.toString(model.getUpperDomainBoundary()));
@@ -173,8 +173,7 @@ public class ScatterPlotDialog extends StandardDialog implements ActionListener 
         model.setDotSize(Integer.parseInt(dotSizeField.getText()));
         model.setChartSeriesPaint(theColor);
 
-        model.getParent().setShowHistory(showHistory.isSelected());
-        model.update();
+        model.setShowHistory(showHistory.isSelected());
     }
 
     /** @see ActionListener */

@@ -18,7 +18,6 @@
  */
 package org.simbrain.plot.scatterplot;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +31,8 @@ import org.simbrain.workspace.ConsumingAttribute;
 public class ScatterPlotConsumer implements Consumer {
 
     /** Reference to gauge. */
-    private ScatterPlotModel data;
+    private ScatterPlotComponent component;
         
-    /** Name. */
-    private final String name;
-    
     /** Index. */
     private Integer index;
 
@@ -58,10 +54,8 @@ public class ScatterPlotConsumer implements Consumer {
      * @param name the name of this consumer (displayed in the plot)
      * @param index of plot series
      */
-    public ScatterPlotConsumer(final ScatterPlotModel data,
-            final String name, final Integer index) {
-        this.data = data;
-        this.name = name;
+    public ScatterPlotConsumer(final ScatterPlotComponent component, final Integer index) {
+        this.component= component;
         this.index = index;
         attributeList.add(xAttribute);
         attributeList.add(yAttribute);
@@ -91,14 +85,14 @@ public class ScatterPlotConsumer implements Consumer {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return name;
+        return "ScatterPlot-";
     }
     
     /**
      * {@inheritDoc}
      */
     public ScatterPlotComponent getParentComponent() {
-        return data.getParent();
+        return component;
     }
 
     /**
@@ -138,13 +132,6 @@ public class ScatterPlotConsumer implements Consumer {
         public Consumer getParent() {
             return ScatterPlotConsumer.this;
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Double getValue() {
-                return value;
-        }
         
         /**
          * {@inheritDoc}
@@ -152,6 +139,16 @@ public class ScatterPlotConsumer implements Consumer {
         public void setValue(final Double val) {
             value = val;
         }
+        
+        /**
+         * Return the value for this attribute.
+         * 
+         * @return x or y value
+         */
+        public Double getValue() {
+            return value;
+        }
+
     }
     
     /**

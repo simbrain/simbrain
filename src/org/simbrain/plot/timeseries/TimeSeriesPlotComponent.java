@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.util.Iterator;
 
 import org.jfree.data.xy.XYSeries;
+import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -38,12 +40,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     /** The data model. */
     private final TimeSeriesModel model;
 
-    /** Maximum iteration size if this chart is fixed width. */
-    private int maxSize = 100;
-
-    /** Whether this chart if fixed width or not. */
-    private boolean fixedWidth = true;
-
     /**
      * Create new time series plot component.
      *
@@ -51,7 +47,9 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      */
     public TimeSeriesPlotComponent(final String name) {
         super(name);
-        model = new TimeSeriesModel(this);
+        model = new TimeSeriesModel();
+        addListener();
+        model.defaultInit();
     }
 
     /**
@@ -64,7 +62,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public TimeSeriesPlotComponent(final String name, final TimeSeriesModel model) {
         super(name);
         this.model = model;
-        this.model.setParent(this);
+        addListener();
+        model.defaultInit();
     }
 
     /**
@@ -75,9 +74,37 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      */
     public TimeSeriesPlotComponent(final String name, final int numDataSources) {
         super(name);
-        model = new TimeSeriesModel(this);
+        model = new TimeSeriesModel();
+        addListener();
         model.addDataSources(numDataSources);
     }
+
+    /**
+     * Add chart listener to model.
+     */
+    private void addListener() {
+        
+        model.addListener(new ChartListener() {
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int index) {
+                TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(
+                        TimeSeriesPlotComponent.this, index);
+                addConsumer(newAttribute);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers().get(index);
+                removeConsumer(toBeRemoved);
+            }
+            
+        });
+  }
 
     /**
      * @return the model.
@@ -95,7 +122,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @return Initialized object.
      */
     private Object readResolve() {
-        System.out.println("ReadResolve.");
         return this;
     }
 
@@ -120,17 +146,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         TimeSeriesModel.getXStream().toXML(model, output);
     }
 
-    /**
-     * Update chart settings. Called, e.g., when things are modified using a
-     * dialog.
-     */
-    public void updateSettings() {
-        //TODO!
-//        for (ChartListener listener : this.getListeners()) {
-//            listener.chartSettingsUpdated();
-//        }
-    }
-
     @Override
     public boolean hasChangedSinceLastSave() {
         // TODO Auto-generated method stub
@@ -150,50 +165,24 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
                 // Add the data
                 
                 // Trim appropriately if fixed width
-                if (fixedWidth) {
-        //            System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
-                    for (Iterator iterator = model.getDataset().getSeries().iterator(); iterator.hasNext(); ) {
+                if (model.isFixedWidth()) {
+                    // System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
+                    for (Iterator iterator = model.getDataset().getSeries()
+                            .iterator(); iterator.hasNext();) {
                         XYSeries series = (XYSeries) iterator.next();
-                        if (series.getItemCount() > maxSize) {
+                        if (series.getItemCount() > model.getMaxSize()) {
                             series.remove(0);
                         }
                     }
                 }
         
-                for (TimeSeriesConsumer consumer : model.getConsumers()) {
-                    model.getDataset().getSeries(consumer.getIndex()).add(
-                            getWorkspace().getTime(), consumer.getValue());
+                for (Consumer consumer : getConsumers()) {
+                    TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
+                    model.getDataset().getSeries(t_consumer.getIndex()).add(
+                            getWorkspace().getTime(), t_consumer.getValue());
                 }
             }
         });
-    }
-
-    /**
-     * @return the maxSize
-     */
-    public int getMaxSize() {
-        return maxSize;
-    }
-
-    /**
-     * @param maxSize the maxSize to set
-     */
-    public void setMaxSize(final int maxSize) {
-        this.maxSize = maxSize;
-    }
-
-    /**
-     * @return the fixedWidth
-     */
-    public boolean isFixedWidth() {
-        return fixedWidth;
-    }
-
-    /**
-     * @param fixedWidth the fixedWidth to set
-     */
-    public void setFixedWidth(final boolean fixedWidth) {
-        this.fixedWidth = fixedWidth;
     }
  
     @Override

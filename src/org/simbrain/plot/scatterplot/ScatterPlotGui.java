@@ -148,8 +148,9 @@ public class ScatterPlotGui extends GuiComponent<ScatterPlotComponent> implement
                 }
             }
         });
-        getWorkspaceComponent().updateSettings();
-
+        
+        // Activate settings above!
+        component.getModel().fireSettingsChanged();
     }
 
     /**

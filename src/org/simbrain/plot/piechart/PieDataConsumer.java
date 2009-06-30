@@ -18,7 +18,7 @@
  */
 package org.simbrain.plot.piechart;
 
-import java.lang.reflect.Type;
+import java.awt.EventQueue;
 
 import org.simbrain.workspace.SingleAttributeConsumer;
 
@@ -28,29 +28,21 @@ import org.simbrain.workspace.SingleAttributeConsumer;
 public class PieDataConsumer extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
-    private PieChartModel data;
+    private PieChartComponent component;
         
-    /** Name. */
-    private final String name;
-    
     /** Index. */
     private Integer index;
-    
-    /** Value. */
-    private Double value = new Double(0);
     
     /**
      * Construct a PieDataConsumer.
      * 
-     * @param data
-     *            the parent component
-     * @param name
-     *            the name of this consumer (displayed in the plot)
+     * @param data the parent component
+     * @param name the name of this consumer (displayed in the plot)
      * @param index of the plot item
      */
-    public PieDataConsumer(final PieChartModel data, final String name, final Integer index) {
-        this.data = data;
-        this.name = name;
+    public PieDataConsumer(final PieChartComponent component,
+            final Integer index) {
+        this.component = component;
         this.index = index;
     }
 
@@ -58,14 +50,22 @@ public class PieDataConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public void setValue(final Double val) {
-        value = val;
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                double total = component.getModel().getTotal();
+                if (total == 0) {
+                    return;
+                } 
+                component.getModel().getDataset().setValue(index, val / total);
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     public String getKey() {
-        return name;
+        return "PieData-"+index;
     }
     
     /**
@@ -79,7 +79,7 @@ public class PieDataConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public PieChartComponent getParentComponent() {
-        return data.getParent();
+        return component;
     }
 
     /**
@@ -90,15 +90,5 @@ public class PieDataConsumer extends SingleAttributeConsumer<Double> {
     public Integer getIndex() {
             return index;
     }
-    
-    /**
-     * Return current value.
-     *
-     * @return value
-     */
-    public Double getValue() {
-            return value;
-    }
-    
 }
 

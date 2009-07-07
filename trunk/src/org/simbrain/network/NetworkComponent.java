@@ -34,7 +34,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Network frame.
+ * Network component.
  */
 public final class NetworkComponent extends WorkspaceComponent {
 
@@ -59,9 +59,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         init();
     }
     
-
-    
-    public static NetworkComponent open(final InputStream input, final String name, final String format) {
+     public static NetworkComponent open(final InputStream input, final String name, final String format) {
         RootNetwork newNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(input);
         return new NetworkComponent(name, newNetwork);
     }
@@ -71,6 +69,10 @@ public final class NetworkComponent extends WorkspaceComponent {
         RootNetwork.getXStream().toXML(rootNetwork, output);
     }
     
+    /**
+     * Returns the root network.
+     * @return the root network
+     */
     public RootNetwork getRootNetwork() {
         return rootNetwork;
     }
@@ -108,7 +110,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        for(Neuron neuron : rootNetwork.getFlatNeuronList()) {
+        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
             NeuronWrapper wrapper = new NeuronWrapper(neuron, this);
             addConsumer(wrapper);
             addProducer(wrapper);
@@ -122,52 +124,81 @@ public final class NetworkComponent extends WorkspaceComponent {
         
         rootNetwork.addListener(new NetworkListener() {
 
+            /**
+             * {@inheritDoc}
+             */
             public void clampBarChanged() {
                 // TODO Auto-generated method stub
                 
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void clampMenuChanged() {
                 // TODO Auto-generated method stub
                 
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void groupAdded(NetworkEvent<Group> event) {
                 // TODO Auto-generated method stub
                 
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void groupChanged(NetworkEvent<Group> event) {
                 // TODO Auto-generated method stub
                 
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void groupRemoved(NetworkEvent<Group> event) {
                 // TODO Auto-generated method stub
                 
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void networkChanged() {
                 // TODO Auto-generated method stub
                 
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void neuronAdded(NetworkEvent<Neuron> e) {
                 NeuronWrapper wrapper = new NeuronWrapper(e.getObject(), NetworkComponent.this);
                 addConsumer(wrapper);
                 addProducer(wrapper);
             }
 
-            public void neuronChanged(NetworkEvent<Neuron> e) {
-                // TODO Auto-generated method stub
-                
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronTypeChanged(NetworkEvent<Neuron> e) {
+                NeuronWrapper wrapper = (NeuronWrapper) getConsumer(e.getOldObject().getId());
+                wrapper.setNeuron(e.getObject());
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void neuronMoved(NetworkEvent<Neuron> e) {
                 // TODO Auto-generated method stub
-                
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void neuronRemoved(NetworkEvent<Neuron> e) {
                 for (Consumer consumer : getConsumers()) {
                     if (consumer instanceof NeuronWrapper) {
@@ -186,16 +217,24 @@ public final class NetworkComponent extends WorkspaceComponent {
                 }
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void subnetAdded(NetworkEvent<Network> e) {
                 // TODO Auto-generated method stub
-                
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void subnetRemoved(NetworkEvent<Network> e) {
                 // TODO Auto-generated method stub
                 
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void synapseAdded(NetworkEvent<Synapse> e) {
                 SynapseWrapper wrapper = new SynapseWrapper(e.getObject(), NetworkComponent.this);
                 addConsumer(wrapper);
@@ -203,11 +242,17 @@ public final class NetworkComponent extends WorkspaceComponent {
                 
             }
 
-            public void synapseChanged(NetworkEvent<Synapse> e) {
-                // TODO Auto-generated method stub
-                
+            /**
+             * {@inheritDoc}
+             */
+            public void synapseTypeChanged(NetworkEvent<Synapse> e) {
+                SynapseWrapper wrapper = (SynapseWrapper) getConsumer(e.getOldObject().getId());
+                wrapper.setSynapse(e.getObject());
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public void synapseRemoved(NetworkEvent<Synapse> e) {
                 for (Consumer consumer : getConsumers()) {
                     if (consumer instanceof SynapseWrapper) {
@@ -225,9 +270,17 @@ public final class NetworkComponent extends WorkspaceComponent {
                     }
                 }
             }
+
+            public void neuronChanged(NetworkEvent<Neuron> e) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            public void synapseChanged(NetworkEvent<Synapse> e) {
+                // TODO Auto-generated method stub
+                
+            }
         });
     }
-
-    
-    
+        
 }

@@ -301,7 +301,7 @@ public class NeuronDialog extends StandardDialog {
     /**
      * Change all the neurons from their current type to the new selected type.
      */
-    public void changeNeurons() {
+    public void changeNeuronTypes() {
         
         Object selected = cbNeuronType.getSelectedItem();
         
@@ -312,7 +312,7 @@ public class NeuronDialog extends StandardDialog {
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron oldNeuron = (Neuron) neuronList.get(i);
             Neuron newNeuron = association.getNeuron(oldNeuron);
-            newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            newNeuron.getParentNetwork().changeNeuronType(oldNeuron, newNeuron);
         }
     }
 
@@ -424,7 +424,7 @@ public class NeuronDialog extends StandardDialog {
         }
 
         if (neuronsHaveChanged) {
-            changeNeurons();
+            changeNeuronTypes();
         }
 
         ((Neuron) neuronList.get(0)).getParentNetwork().getRootNetwork().fireNetworkChanged();

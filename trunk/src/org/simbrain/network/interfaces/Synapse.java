@@ -209,11 +209,15 @@ public abstract class Synapse {
      * Cleans up this Synapse that has been deleted.
      */
     void delete() {
-        if (source != null) source.removeTarget(this);
-        if (target != null) target.removeSource(this);
+        if (source != null)
+            source.removeTarget(this);
+        if (target != null)
+            target.removeSource(this);
 
-        if (parentNetwork != null) parentNetwork.getSynapseList().remove(this);
-        else System.out.println("parentNetwork is null");
+        if (parentNetwork != null)
+            parentNetwork.getSynapseList().remove(this);
+        else
+            System.out.println("parentNetwork is null");
     }
 
     /**
@@ -321,7 +325,7 @@ public abstract class Synapse {
         if (strength < upperBound) {
             strength += increment;
         }
-        this.getParentNetwork().getRootNetwork().fireSynapseChanged(null, this);
+        this.getParentNetwork().getRootNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -331,7 +335,7 @@ public abstract class Synapse {
         if (strength > lowerBound) {
             strength -= increment;
         }
-    }
+        this.getParentNetwork().getRootNetwork().fireSynapseChanged(this);    }
 
     /**
      * Increase the absolute value of this weight by increment amount.
@@ -344,6 +348,7 @@ public abstract class Synapse {
         } else if (strength == 0) {
             strength = 0;
         }
+        this.getParentNetwork().getRootNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -357,6 +362,7 @@ public abstract class Synapse {
         } else if (strength == 0) {
             strength = 0;
         }
+        this.getParentNetwork().getRootNetwork().fireSynapseChanged(this);
     }
 
 
@@ -371,6 +377,7 @@ public abstract class Synapse {
         if (symmetric != null) {
             symmetric.setStrength(strength);
         }
+        this.getParentNetwork().getRootNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -396,7 +403,7 @@ public abstract class Synapse {
      */
     public void randomize() {
         strength = getRandomValue();
-        this.getSource().getParentNetwork().getRootNetwork().fireSynapseChanged(null, this);
+        this.getParentNetwork().getRootNetwork().fireSynapseChanged(this);
     }
 
     /**

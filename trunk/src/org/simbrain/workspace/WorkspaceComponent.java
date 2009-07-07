@@ -483,7 +483,23 @@ public abstract class WorkspaceComponent {
         }
         return null;
     }
-
+    
+    /**
+    * Finds a consumer by name and returns it, or none if it is not found.
+    *
+    * @param consumerId the name of the consumer (attribute holder)
+    * @return the the consumer
+    */
+    public Consumer getConsumer(final String consumerId) {
+        for (Consumer consumer : getConsumers()) {
+            //System.out.println(consumerId + "==" + consumer.getDescription() + "?");
+            if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
+                return consumer;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Get a consuming attribute, using the id of the attribute holder and the attribute itself.
      *
@@ -491,19 +507,34 @@ public abstract class WorkspaceComponent {
      * @param attributeId the name of the attribute
      * @return the consuming attribute
      */
-    public ConsumingAttribute getConsumingAttribute(String consumerId, String attributeId) {
-        for (Consumer consumer : getConsumers()) {
-            //System.out.println(consumerId + "==" + consumer.getDescription() + "?");
-            if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
-                   for(ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
-                          if (attribute.getKey().equals(attributeId)) {
-                              return attribute;
-                          }
-                   }
+    public ConsumingAttribute<?> getConsumingAttribute(final String consumerId,
+            final String attributeId) {
+        Consumer consumer = getConsumer(consumerId);
+        if (consumer != null) {
+            for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
+                if (attribute.getKey().equals(attributeId)) {
+                    return attribute;
+                }
             }
         }
         return null;
     }
+
+    /**
+     * Finds a producer by name and returns it, or none if it is not found.
+     *
+     * @param producerId the name of the producer (attribute holder)
+     * @return the producer
+     */
+     public Producer getProducer(final String producerId) {
+         for (Producer producer : getProducers()) {
+             //System.out.println(producerId + "==" + producer.getDescription() + "?");
+             if (producer.getDescription().equalsIgnoreCase(producerId)) {
+                 return producer;
+             }
+         }
+         return null;
+     }
 
     /**
      * Get a producing attribute, using the id of the attribute holder and the attribute itself.
@@ -512,21 +543,18 @@ public abstract class WorkspaceComponent {
      * @param attributeId the name of the attribute
      * @return the producing attribute
      */
-    public ProducingAttribute getProducingAttribute(String producerId, String attributeId) {
-        for (Producer producer : getProducers()) {
-            //System.out.println(producerId + "==" + producer.getDescription() + "?");
-            if (producer.getDescription().equalsIgnoreCase(producerId)) {
-                   for(ProducingAttribute attribute : producer.getProducingAttributes()) {
-                       //System.out.println(attribute.getAttributeDescription());
-                          if (attribute.getKey().equals(attributeId)) {
-                              return attribute;
-                          }
-                   }
+    public ProducingAttribute<?> getProducingAttribute(final String producerId,
+            final String attributeId) {
+        Producer producer = getProducer(producerId);
+        if (producer != null) {
+            for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
+                if (attribute.getKey().equals(attributeId)) {
+                    return attribute;
+                }
             }
         }
         return null;
     }
-
     
     /**
      * Sets the workspace for this component.  Called by the

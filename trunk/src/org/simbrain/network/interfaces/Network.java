@@ -666,16 +666,25 @@ public abstract class Network {
     }
 
     /**
-     * Replace one neuron with another.
+     * Change neuron type.
      *
      * @param oldNeuron out with the old
      * @param newNeuron in with the new...
      */
-    public void changeNeuron(final Neuron oldNeuron, final Neuron newNeuron) {
+    public void changeNeuronType(final Neuron oldNeuron, final Neuron newNeuron) {
+      
+        // TODO: The code for changing neuron and synapse types may need to be
+        // refactored. Lots of stuff has to happen (here, in the listeners, and
+        // in the source for Neuron and Synapses themselves; see their duplicate()
+        // method). There is redundant code. Whenever I come back to this stuff I have to spend
+        // some time figuring out what's going on. And this is a place bugs periodically emerge. When
+        // features are added it's easy to forget about this stuff. So, for these reasons, it
+        // smells like a refactor might be useful. Then again it's working, at least for now.
+        
         newNeuron.setId(oldNeuron.getId());
         newNeuron.setParentNetwork(this);
 
-        rootNetwork.fireNeuronChanged(oldNeuron, newNeuron);
+        rootNetwork.fireNeuronTypeChanged(oldNeuron, newNeuron);
 
         for (Synapse s : new ArrayList<Synapse>(oldNeuron.getFanIn())) {
             s.setTarget(newNeuron);
@@ -684,7 +693,6 @@ public abstract class Network {
         for (Synapse s : new ArrayList<Synapse>(oldNeuron.getFanOut())) {
             s.setSource(newNeuron);
         }
-
         getNeuronList().remove(oldNeuron);
         getNeuronList().add(newNeuron);
         for (Neuron neuron : getNeuronList()) {
@@ -695,61 +703,33 @@ public abstract class Network {
         for (Synapse s : newNeuron.getFanOut()) {
             s.initSpikeResponder();
         }
-
-//        CouplingManager manager = rootNetwork.getParent().getWorkspace().getCouplingManager();
-//        
-//        for (Attribute oldAttr : oldNeuron.getConsumingAttributes()) {
-//            Attribute newAttr = find(oldAttr.getKey(),
-//                newNeuron.getConsumingAttributes());
-//            
-//            if (newAttr != null) {
-//                manager.replaceCouplings(oldAttr, newAttr);
-//            }
-//        }
-//        
-//        for (Attribute oldAttr : oldNeuron.getProducingAttributes()) {
-//            Attribute newAttr = find(oldAttr.getKey(),
-//                newNeuron.getProducingAttributes());
-//            
-//            if (newAttr != null) {
-//                manager.replaceCouplings(oldAttr, newAttr);
-//            }
-//        }
-        
         rootNetwork.updateTimeType();
     }
     
-//    /**
-//     * Helper method for finding attributes with matching names.
-//     * 
-//     * @param name The name of the attribute to search for.
-//     * @param toSearch The list to search.
-//     * @return The found attribute if any.
-//     */
-//    private static Attribute find(final String name, final List<? extends Attribute> toSearch) {
-//        for (Attribute consuming : toSearch) {
-//            if (consuming.getKey().equals(name)) {
-//                return consuming;
-//            }
-//        }
-//        
-//        return null;
-//    }
-
     /**
-     * Change synapse type / replace one synapse with another.
+     * Change synapse type; replace one synapse with another.
      * deletes the old synapse
      *
      * @param oldSynapse out with the old
      * @param newSynapse in with the new...
      */
-    public void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
-//        newSynapse.setTarget(oldSynapse.getTarget());
-//        newSynapse.setSource(oldSynapse.getSource());
-        deleteSynapse(oldSynapse);
-        addSynapse(newSynapse);
+    public void changeSynapseType(final Synapse oldSynapse, final Synapse newSynapse) {
+        
+        // Initialize the new synapse
+        newSynapse.setTarget(oldSynapse.getTarget());
+        newSynapse.setSource(oldSynapse.getSource());
+        newSynapse.setId(oldSynapse.getId());
+        newSynapse.setParentNetwork(this);
+        newSynapse.initSpikeResponder();
+        synapseList.add(newSynapse);
+        
+        // Fire event now, before the old synapse is deleted; otherwise
+        //      problems in listeners
+        rootNetwork.fireSynapseTypeChanged(oldSynapse, newSynapse);
 
-        rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
+        // Delete the old synapse
+        oldSynapse.delete();
+
     }
 
     /**

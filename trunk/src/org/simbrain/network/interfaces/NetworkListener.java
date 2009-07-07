@@ -5,18 +5,25 @@ package org.simbrain.network.interfaces;
  * Model listener.
  */
 public interface NetworkListener {
+
     /**
      * Notify this listener of a NetworkChanged event.
-     *
      */
     void networkChanged();
 
     /**
-     * Notify this listener of a NeuronChanged event.
+     * Notify this listener of a Neuron changed event.
      *
      * @param e event
      */
     void neuronChanged(NetworkEvent<Neuron> e);
+
+    /**
+     * Notify this listener of a Neuron type changed event.
+     *
+     * @param e event
+     */
+    void neuronTypeChanged(NetworkEvent<Neuron> e);
 
     /**
      * Notify this listener of a Neuron added event.
@@ -40,25 +47,32 @@ public interface NetworkListener {
     void neuronRemoved(NetworkEvent<Neuron> e);
 
     /**
-     * Notify this listener of a Neuron removed event.
+     * Notify this listener of a synapse removed event.
      *
      * @param e event
      */
     void synapseRemoved(NetworkEvent<Synapse> e);
 
     /**
-     * Notify this listener of a Neuron removed event.
+     * Notify this listener of a synapse added event.
      *
      * @param e event
      */
     void synapseAdded(NetworkEvent<Synapse> e);
 
     /**
-     * Notify this listener of a Neuron removed event.
+     * Notify this listener of a synapse changed event.
      *
      * @param e event
      */
     void synapseChanged(NetworkEvent<Synapse> e);
+
+    /**
+     * Notify this listener of a synapse type changed event.
+     *
+     * @param e event
+     */
+    void synapseTypeChanged(NetworkEvent<Synapse> e);
 
     /**
      * Notify this listener of a subnetwork added event.

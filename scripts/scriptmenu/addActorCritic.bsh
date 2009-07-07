@@ -8,10 +8,11 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.OdorWorldAgent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.world.odorworld.OdorWorldEntity;
+import org.simbrain.world.odorworld.*;
+import org.simbrain.world.odorworld.sensors.*;
+import org.simbrain.world.odorworld.entities.*;
+import org.simbrain.util.environment.SmellSource;
+
 {
 
 	// Variables
@@ -20,35 +21,40 @@ import org.simbrain.world.odorworld.OdorWorldEntity;
 
         // Make a 2-d environment
         OdorWorldComponent odorWorld = new OdorWorldComponent("Odor World");
-        odorWorld.getWorld().setWorldHeight(worldHeight);
-        odorWorld.getWorld().setWorldWidth(worldWidth);
         workspace.addWorkspaceComponent(odorWorld);
         desktop.getDesktopComponent(odorWorld).getParentFrame().setBounds(508, 34, worldWidth, worldHeight);
         // Mouse
-        OdorWorldAgent mouse = new OdorWorldAgent(odorWorld, "MightyMouse", "Mouse.gif", 200,200, OdorWorld.INIT_ORIENTATION);
-        mouse.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
-        odorWorld.getWorld().addAgent(mouse);
+        RotatingEntity mouse = new RotatingEntity(odorWorld.getWorld());
+	mouse.setLocation(200,200);
+	mouse.addSensor(new SmellSensor(mouse));
+        mouse.setSmellSource(new SmellSource(new double[] {0, 0, 0, 0, 0, 0, 0, 0 }));
+        odorWorld.getWorld().addEntity(mouse);
+
         // Cheese 1
-        OdorWorldEntity cheese = new OdorWorldEntity(odorWorld.getWorld(), "Swiss.gif", 100, 100);
-        cheese.getStimulus().setStimulusVector(new double[] {5, 0, 3, 0, 0, 0, 0, 0 });
+        BasicEntity cheese = new BasicEntity(odorWorld.getWorld());
+	cheese.setLocation(100,100);
+        cheese.setSmellSource(new SmellSource(new double[]{5, 0, 3, 0, 0, 0, 0, 0 }));
         odorWorld.getWorld().addEntity(cheese);
-        cheese.getStimulus().setDispersion(200);
-        // Cheese 2
-        OdorWorldEntity cheese2 = new OdorWorldEntity(odorWorld.getWorld(), "Swiss.gif", 100, 140);
+        //cheese.getStimulus().setDispersion(200);
+        // Cheese 2 
+	/*
+        BasicEntity cheese2 = new BasicEntity(odorWorld.getWorld(), "Swiss.gif", 100, 140);
         cheese2.getStimulus().setStimulusVector(new double[] {5, 0, 3, 0, 0, 0, 0, 0 });
         odorWorld.getWorld().addEntity(cheese2);
         cheese2.getStimulus().setDispersion(200);
         // Poison 1
-        OdorWorldEntity poison1 = new OdorWorldEntity(odorWorld.getWorld(), "Poison.gif", 240, 280);
+        BasicEntity poison1 = new BasicEntity(odorWorld.getWorld(), "Poison.gif", 240, 280);
         poison1.getStimulus().setStimulusVector(new double[] {0, 5, -3, 0, 0, 0, 0, 0 });
         poison1.getStimulus().setDispersion(200);
         odorWorld.getWorld().addEntity(poison1);
         // Poison 2
-        OdorWorldEntity poison2 = new OdorWorldEntity(odorWorld.getWorld(), "Poison.gif", 280, 280);
+        BasicEntity poison2 = new BasicEntity(odorWorld.getWorld(), "Poison.gif", 280, 280);
         poison2.getStimulus().setStimulusVector(new double[] {0, 5, -3, 0, 0, 0, 0, 0 });
         poison2.getStimulus().setDispersion(200);
         odorWorld.getWorld().addEntity(poison2);
 
+	*/
+	
         // Create Network
         NetworkComponent network = new NetworkComponent("Adaptive Critic Network");
         workspace.addWorkspaceComponent(network);
@@ -70,7 +76,7 @@ import org.simbrain.world.odorworld.OdorWorldEntity;
         }
             
         //Couple Mouse Whiskers to adaptive critic neurons
-        ProducingAttribute leftWhisker1 = odorWorld.getProducingAttribute("MightyMouse","Left[1]");
+        ProducingAttribute leftWhisker1 = odorWorld.getProducingAttribute("Smell sensor","Smell-1");
         ProducingAttribute rightWhisker1 = odorWorld.getProducingAttribute("MightyMouse","Right[1]");
         ProducingAttribute leftWhisker2 = odorWorld.getProducingAttribute("MightyMouse","Left[2]");
         ProducingAttribute rightWhisker2 = odorWorld.getProducingAttribute("MightyMouse","Right[2]");

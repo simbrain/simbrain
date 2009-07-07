@@ -38,7 +38,7 @@ public class SynapseWrapper implements Producer, Consumer {
     /** Parent component. */
     private NetworkComponent parent;
     
-    /** Wrapped Neuron. */
+    /** Wrapped synapse. */
     private Synapse synapse;
     
     /** The producing attributes. */
@@ -64,14 +64,23 @@ public class SynapseWrapper implements Producer, Consumer {
     }
     
     /**
-     * Returns the wrapped neuron.
+     * Returns the wrapped synapse.
      *
-     * @return the neuron
+     * @return the synapse
      */
     public Synapse getSynapse() {
         return synapse;
     }
-    
+
+    /**
+     * Sets the wrapped synapse.
+     *
+     * @return the synapse
+     */
+    public void setSynapse(Synapse synapse) {
+        this.synapse = synapse;
+    }
+
     /**
      * {@inheritDoc}
      */

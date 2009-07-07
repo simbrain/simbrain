@@ -490,16 +490,28 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Fire a neuron changed event to all registered model listeners.
+     * Fire a neuron type changed event to all registered model listeners.
      *
      * @param old the previous neuron, before the change
      * @param changed the new, changed neuron
      */
-    public void fireNeuronChanged(final Neuron old, final Neuron changed) {
+    public void fireNeuronTypeChanged(final Neuron old, final Neuron changed) {
         for (NetworkListener listener : listeners) {
-            listener.neuronChanged(new NetworkEvent<Neuron>(this, old, changed));
+            listener.neuronTypeChanged(new NetworkEvent<Neuron>(this, old, changed));
         }
     }
+    
+    /**
+     * Fire a neuron changed event to all registered model listeners.
+     *
+     * @param changed new, changed neuron
+     */
+    public void fireNeuronChanged(final Neuron changed) {
+        for (NetworkListener listener : listeners) {
+            listener.neuronChanged(new NetworkEvent<Neuron>(this, changed));
+        }
+    }
+
 
     /**
      * Fire a neuron added event to all registered model listeners.
@@ -524,14 +536,25 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Fire a neuron deleted event to all registered model listeners.
+     * Fire a synapse changed event to all registered model listeners.
+     *
+     * @param changed new, changed synapse
+     */
+    public void fireSynapseChanged(final Synapse changed) {
+        for (NetworkListener listener : listeners) {
+            listener.synapseChanged(new NetworkEvent<Synapse>(this, changed));
+        }
+    }
+
+    /**
+     * Fire a synapse type changed event to all registered model listeners.
      *
      * @param old old synapse, before the change
      * @param changed new, changed synapse
      */
-    public void fireSynapseChanged(final Synapse old, final Synapse changed) {
+    public void fireSynapseTypeChanged(final Synapse old, final Synapse changed) {
         for (NetworkListener listener : listeners) {
-            listener.synapseChanged(new NetworkEvent<Synapse>(this, old, changed));
+            listener.synapseTypeChanged(new NetworkEvent<Synapse>(this, old, changed));
         }
     }
 

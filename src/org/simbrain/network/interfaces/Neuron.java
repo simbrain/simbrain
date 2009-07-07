@@ -260,7 +260,7 @@ public abstract class Neuron  {
         if (activation < upperBound) {
             activation += increment;
         }
-        this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
+        this.getParentNetwork().getRootNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -270,7 +270,7 @@ public abstract class Neuron  {
         if (activation > lowerBound) {
             activation -= increment;
         }
-        this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
+        this.getParentNetwork().getRootNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -342,9 +342,7 @@ public abstract class Neuron  {
      */
     public void randomize() {
         setActivation(getRandomValue());
-        if (this.getParentNetwork() != null) {
-            this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
-        }
+        this.getParentNetwork().getRootNetwork().fireNeuronChanged(this);
     }
 
     /**

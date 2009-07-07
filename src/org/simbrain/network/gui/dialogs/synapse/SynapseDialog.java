@@ -225,7 +225,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      * Change all the synapses from their current type to the new specified in
      * the dialog.
      */
-    public void changeSynapses() {
+    public void changeSynapseTypes() {
         
         Creator creator = creatorsByName.get(cbSynapseType.getSelectedItem().toString());
         if (creator == null) {
@@ -240,7 +240,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             // Don't need this if the relevant synapses have not yet been added to a network
             //  (when the dialog is used to set an unattached collection of neurons)
             if (oldSynapse.getSource() != null) {
-                    oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
+                    oldSynapse.getSource().getParentNetwork().changeSynapseType(oldSynapse, newSynapse);
             }
         }
     }
@@ -338,7 +338,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         }
 
         if (weightsHaveChanged) {
-            changeSynapses();
+            changeSynapseTypes();
         }
 
         if (spikeResponsePanel != null) {

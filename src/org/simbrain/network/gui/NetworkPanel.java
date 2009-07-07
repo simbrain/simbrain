@@ -1153,33 +1153,28 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** @see NetworkListener */
     public void neuronChanged(final NetworkEvent<Neuron> e) {
-        if (e.getOldObject() == null) {
-            // The underlying object has not changed
-            NeuronNode node = findNeuronNode(e.getObject());
-            node.update();
-        } else {
-            // The underlying object has changed
-            NeuronNode node = findNeuronNode(e.getOldObject());
-            node.setNeuron(e.getObject());
-            node.update();
-        }
-        resetColors();
+        NeuronNode node = findNeuronNode(e.getObject());
+        node.update();
+    }
+
+    /** @see NetworkListener */
+    public void neuronTypeChanged(final NetworkEvent<Neuron> e) {
+        NeuronNode neuronNode = findNeuronNode(e.getOldObject());
+        neuronNode.setNeuron(e.getObject());
     }
     
     /** @see NetworkListener */
     public void synapseChanged(final NetworkEvent<Synapse> e) {
-        if (e.getOldObject() != null) {
-            // The underlying object has changed
-            SynapseNode synapseNode = findSynapseNode(e.getOldObject());
-            //TODO: Bad smell.  This null pointer check should not be needed.
-            //      Also I think this method is getting called too many times.
-            if (synapseNode != null) { 
-                synapseNode.setSynapse(e.getObject());
-            }
-        }
-        resetColors();
+        SynapseNode synapseNode = findSynapseNode(e.getObject());
+        synapseNode.updateColor();
+        synapseNode.updateDiameter();
     }
 
+    /** @see NetworkListener */
+    public void synapseTypeChanged(final NetworkEvent<Synapse> e) {
+        SynapseNode synapseNode = findSynapseNode(e.getOldObject());
+        synapseNode.setSynapse(e.getObject());
+    }
 
     /** @see NetworkListener */
     public void synapseAdded(final NetworkEvent<Synapse> e) {

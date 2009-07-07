@@ -29,18 +29,21 @@ public final class NetworkEvent<T>
     extends EventObject {
 
     /** New version of object */
-	private T theObject;
+    private T theObject;
 
-	/** Previous version of object. */
-	private T oldObject;
+    /** Previous version of object. */
+    private T oldObject;
 
 	/**
-	 * Create a network event with a new and old object.
-	 *
-     * @param net reference to parent network.
-     * @param oldThing old version of object.
-	 * @param theThing reference to relevant object.
-	 */
+     * Create a network event with a new and old object.
+     * 
+     * @param net
+     *            reference to parent network.
+     * @param oldThing
+     *            old version of object.
+     * @param theThing
+     *            reference to relevant object.
+     */
     public NetworkEvent(Network net, final T oldThing, final T theThing) {
         super(net);
         this.theObject = theThing;
@@ -48,7 +51,7 @@ public final class NetworkEvent<T>
     }
     
     /**
-     * Create a network event with a new object only.
+     * Create a network event with one object only.
      *
      * @param net reference to parent network.
      * @param theThing reference to relevant object.

@@ -86,6 +86,15 @@ public class NeuronWrapper implements Producer, Consumer {
     }
     
     /**
+     * Sets the wrapped neuron.
+     *
+     * @param object theneuorn to set
+     */
+    public void setNeuron(final Neuron neuron) {
+        this.neuron = neuron;
+    }
+    
+    /**
      * {@inheritDoc}
      */
     public final List<? extends ProducingAttribute<?>> getProducingAttributes() {
@@ -267,4 +276,5 @@ public class NeuronWrapper implements Producer, Consumer {
     public WorkspaceComponent getParentComponent() {
         return parent;
     }
+
 }

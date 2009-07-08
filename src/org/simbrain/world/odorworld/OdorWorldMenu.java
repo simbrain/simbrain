@@ -25,12 +25,12 @@ import javax.swing.JMenuItem;
  * <b>OdorWorldMenu</b>.
  */
 public class OdorWorldMenu {
-    /** Parent world. */
+
+	/** Parent world. */
     private OdorWorldPanel parentWorld;
+    
     /** Delete menu item. */
     private JMenuItem deleteItem = new JMenuItem("Delete object");
-    /** Add menu item. */
-    private JMenuItem addItem = new JMenuItem("Add new object");
     /** Add agent menu item. */
     private JMenuItem addAgentItem = new JMenuItem("Add new agent");
     /** Objects properties menu item. */
@@ -63,8 +63,6 @@ public class OdorWorldMenu {
     public void initMenu() {
 //        getDeleteItem().addActionListener(parentWorld.deleteListener);
 //        getObjectPropsItem().addActionListener(parentWorld.objectPropsListener);
-        getAddItem().addActionListener(parentWorld.addListener);
-        getAddAgentItem().addActionListener(parentWorld.addAgentListener);
 //        getPropsItem().addActionListener(parentWorld.propsListener);
 //        getWallItem().addActionListener(parentWorld.wallListener);
 //        getWallPropsItem().addActionListener(parentWorld.wallPropsListener);
@@ -85,20 +83,6 @@ public class OdorWorldMenu {
      */
     public JMenuItem getAddAgentItem() {
         return addAgentItem;
-    }
-
-    /**
-     * @param addItem The addItem to set.
-     */
-    public void setAddItem(final JMenuItem addItem) {
-        this.addItem = addItem;
-    }
-
-    /**
-     * @return Returns the addItem.
-     */
-    public JMenuItem getAddItem() {
-        return addItem;
     }
 
     /**

@@ -31,6 +31,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.util.Utils;
+import org.simbrain.world.odorworld.actions.OpenWorldAction;
 
 
 /**
@@ -48,8 +49,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     private JMenuItem saveItem = new JMenuItem("Save");
     /** Save as menu item. */
     private JMenuItem saveAsItem = new JMenuItem("Save As");
-    /** Open menu item. */
-    private JMenuItem openItem = new JMenuItem("Open world");
     /** Preferences menu item. */
     private JMenuItem prefsItem = new JMenuItem("World preferences");
     /** Close menu item. */
@@ -76,12 +75,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame) {
         parentFrame = frame;
     }
-
-    private final ActionListener openItemListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            parentFrame.showOpenFileDialog();
-        }
-    };
     
     private final ActionListener saveListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -112,7 +105,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      * Sets up menus.
      */
     public void setUpMenus() {
-        parentFrame.getParentFrame().setJMenuBar(this);
 
         setUpFileMenu();
 
@@ -128,7 +120,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      */
     public void setUpFileMenu() {
         add(getFileMenu());
-        getFileMenu().add(getOpenItem());
+        getFileMenu().add(new OpenWorldAction(parentFrame));
         getFileMenu().add(getSaveItem());
         getFileMenu().add(getSaveAsItem());
         getFileMenu().addSeparator();
@@ -144,10 +136,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
                                                        KeyEvent.VK_S,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         getSaveAsItem().addActionListener(saveAsListener);
-        getOpenItem().addActionListener(openItemListener);
-        getOpenItem().setAccelerator(KeyStroke.getKeyStroke(
-                                                       KeyEvent.VK_O,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         getPrefsItem().addActionListener(prefsListener);
     }
 
@@ -318,20 +306,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      */
     public JMenu getHelpMenu() {
         return helpMenu;
-    }
-
-    /**
-     * @param openItem The openItem to set.
-     */
-    public void setOpenItem(final JMenuItem openItem) {
-        this.openItem = openItem;
-    }
-
-    /**
-     * @return Returns the openItem.
-     */
-    public JMenuItem getOpenItem() {
-        return openItem;
     }
 
     /**

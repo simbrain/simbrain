@@ -33,10 +33,12 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.world.odorworld.actions.AddEntityAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -144,13 +146,12 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 //        }
 //    };
         
-    final ActionListener addListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            world.addBasicEntity(new double[]{selectedPoint.x, selectedPoint.y});
-//            getParentFrame().repaint();
-//            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        } 
-    };
+//        public void actionPerformed(ActionEvent e) {
+//            world.addBasicEntity(new double[]{selectedPoint.x, selectedPoint.y});
+////            getParentFrame().repaint();
+////            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
+//        } 
+//    };
     
 //    final ActionListener propsListener = new ActionListener() {
 //        public void actionPerformed(ActionEvent e) {
@@ -424,6 +425,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         return selectedEntity;
     }
 
+    //TODO: Move the menu stuff here!
+    
     /**
      * Create a popup menu based on location of mouse click.
      *
@@ -449,9 +452,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         //            ret.add(menu.getPasteItem());
         //            ret.addSeparator();
         //        }
+        
 
-        ret.add(menu.getAddItem());
-        ret.add(menu.getAddAgentItem());
+        ret.add(new JMenuItem(new AddEntityAction(this)));
         ret.add(menu.getWallItem());
 
         ret.addSeparator();
@@ -536,4 +539,14 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     public void setWorld(final OdorWorld world) {
         this.world = world;
     }
+
+    /**
+     * Returns the last point clicked on.
+     * 
+     * @return the last selected point
+     */
+	public Point getSelectedPoint() {
+		return selectedPoint;
+	}
+
 }

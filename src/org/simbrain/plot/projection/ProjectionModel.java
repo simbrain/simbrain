@@ -18,6 +18,11 @@
  */
 package org.simbrain.plot.projection;
 
+import java.awt.EventQueue;
+
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.ChartModel;
 import org.simbrain.util.projection.Dataset;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
@@ -28,18 +33,57 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Main data for a projection chart.
  */
-public class ProjectionModel {
+public class ProjectionModel extends ChartModel {
 
     /** High Dimensional Projection. */
     private Projector projector = new Projector();
+    
+    /** Scatter Plot Data. */
+    private XYSeriesCollection dataset;
+
+    /** Flag which allows the user to start and stop iterative projection techniques.. */
+    private volatile boolean isRunning = true;
+
+    /** Flag for checking that GUI update is completed. */
+    private volatile boolean setUpdateCompleted;
     
     /**
      * Default constructor.
      *
      * @param numDataSources dimension of the data.
      */
-    public ProjectionModel(final int numDataSources) {
-        projector.init(numDataSources);
+    public ProjectionModel() {
+    }
+    
+    public void init(final int numDataSources) {
+        dataset = new XYSeriesCollection();
+        dataset.addSeries(new XYSeries("Data", false, true));
+        for (int i = 0; i < numDataSources; i++) {
+            addSource();
+        }
+    }
+    
+    
+    /**
+     * Adds a consuming attribute. Increases the dimensionality of the projected
+     * data by one.
+     */
+    public void addSource() {
+    	int index = projector.getDimensions() + 1;
+    	projector.init(index);  
+        fireDataSourceAdded(index);
+    }
+
+    /**
+     * Removes a source from the dataset.
+     */
+    public void removeSource() {
+        int currentSize = projector.getDimensions()  - 1;
+
+        if (currentSize > 0) {
+            projector.init(currentSize);
+            fireDataSourceRemoved(currentSize);
+        }
     }
 
     /**
@@ -78,6 +122,92 @@ public class ProjectionModel {
         projector.getUpstairs().postOpenInit();
         projector.getDownstairs().postOpenInit();
         return this;
+    }
+
+	/**
+	 * @return the dataset
+	 */
+	public XYSeriesCollection getDataset() {
+		return dataset;
+	}
+
+	/** 
+	 * Convenience method for adding points to dataset.
+	 *
+	 * @param x x dimension of point to add
+	 * @param y y dimension of point to add
+	 */
+	public void addPoint(double x, double y) {
+		dataset.getSeries(0).add(x, y, true);
+    }
+
+	/**
+	 * Resets the JFreeChart data and re-adds all the datapoint. Invoked when the projector must be
+	 * applied to an entire dataset.
+	 */
+	public void resetData() {
+		// TODO: Add a check to see whether the current projection algorithm
+		// resets all the data or simply involves adding a single new datapoint.
+		// Add a property to projectionMethods like
+		// newPointsAffectWholeDataset(). If true, then this should be called;
+		// otherwise it should not have to be.
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				// Add the data
+				dataset.getSeries(0).clear();
+				int size = projector.getNumPoints();
+				for (int i = 0; i < size - 2; i++) {
+					double[] point = projector.getProjectedPoint(i);
+					if (point != null) {
+						// No need to update the chart yet (hence the "false"
+						// parameter)
+						dataset.getSeries(0).add(point[0], point[1], false);
+					}
+				}				
+				// Notify chart when last datapoint is updated
+				double[] point = projector.getProjectedPoint(size - 1);
+				if (point != null) {
+					dataset.getSeries(0).add(point[0], point[1], true);
+				}
+				setUpdateCompleted(true);
+			}
+		});
+
+	}
+
+    /**
+     * @return whether this component being updated by a thread or not.
+     */
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
+     * This flag allows the user to start and stop iterative projection
+     * techniques.
+     * 
+     * @param b whether this component being updated by a thread or not.
+     */
+    public void setRunning(boolean b) {
+        isRunning = b;
+    }
+
+    /**
+     * Swing update flag.
+     * 
+     * @param b whether updated is completed
+     */
+    public void setUpdateCompleted(final boolean b) {
+        setUpdateCompleted = b;
+    }
+
+    /**
+     * Swing update flag.
+     * 
+     * @return whether update is completed or not
+     */
+    public boolean isUpdateCompleted() {
+        return setUpdateCompleted;
     }
 
 }

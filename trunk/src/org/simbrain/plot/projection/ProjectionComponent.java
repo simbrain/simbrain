@@ -18,19 +18,13 @@
  */
 package org.simbrain.plot.projection;
 
-import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.ChartListener;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Data for a projection component.
@@ -45,28 +39,24 @@ public class ProjectionComponent extends WorkspaceComponent {
 
     /** Data model. */
     private ProjectionModel projectionModel;
-
-    /** Scatter Plot Data. */
-    private XYSeriesCollection dataset;
     
     /**
      * Default number of sources. This is the dimensionality of the hi D
      * projectionModel
      */
     private final int DEFAULT_NUMBER_OF_SOURCES = 25;
-    
-    /** Flag which allows the user to start and stop iterative projection techniques.. */
-    private volatile boolean isRunning = true;
 
-    /** Flag for checking that GUI update is completed. */
-    private volatile boolean setUpdateCompleted;
+    /** Initialize projection component. */
+    {
+        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
+    }
     
     /**
      * Create new Projection Component.
      */
     public ProjectionComponent(final String name) {
         super(name);
-        projectionModel = new ProjectionModel(DEFAULT_NUMBER_OF_SOURCES);
+        projectionModel = new ProjectionModel();
         init(DEFAULT_NUMBER_OF_SOURCES);
     }
     
@@ -78,7 +68,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     public ProjectionComponent(final String name, final int numDataSources) {
         super(name);
-        projectionModel = new ProjectionModel(numDataSources);
+        projectionModel = new ProjectionModel();
         init(numDataSources);
     }
     
@@ -92,76 +82,47 @@ public class ProjectionComponent extends WorkspaceComponent {
         super(name);
         projectionModel = model;
         int numPoints = projectionModel.getProjector().getNumPoints();
-        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
-        dataset = new XYSeriesCollection();
-        dataset.addSeries(new XYSeries("Data", false, true));
-        
-        // Initialize consuming attributes
         getConsumers().clear();
-        for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
-            int currentSize = getConsumers().size() + 1;
-            ProjectionConsumer newAttribute = new ProjectionConsumer(this,
-                    "Dimension" + currentSize, currentSize);
-            getConsumers().add(newAttribute);
-        }
+        init(numPoints);
         
         // Add the data to the chart.
         for (int i = 0; i < numPoints; i++) {
             double[] point = projectionModel.getProjector().getProjectedPoint(i);
             if (point != null) {
-                dataset.getSeries(0).add(point[0], point[1], true);
+            	projectionModel.addPoint(point[0], point[1]);
             }
         }
-
     }
     
-    /**
-     * Initialize plot.
-     *
-     * @param numSources number of data sources
-     */
-    private void init(final int numSources) {
-        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
-        dataset = new XYSeriesCollection();
-        dataset.addSeries(new XYSeries("Data", false, true));
-        for (int i = 0; i < numSources; i++) {
-            addSource();
-        }
-    }
+	/**
+	 * Initialize plot.
+	 * 
+	 * @param numSources number of data sources
+	 */
+	private void init(final int numSources) {
+		projectionModel.addListener(new ChartListener() {
 
-    /**
-     * Adds a consuming attribute. Increases the dimensionality of the projected
-     * data by one.
-     */
-    public void addSource() {
-        int currentSize = getConsumers().size() + 1;
-        ProjectionConsumer newAttribute = new ProjectionConsumer(this,
-                "Dimension" + currentSize, currentSize);
-        addConsumer(newAttribute);
-        projectionModel.getProjector().init(currentSize);
-    }
+			/**
+			 * {@inheritDoc}
+			 */
+			public void dataSourceAdded(final int index) {
+				ProjectionConsumer newAttribute = new ProjectionConsumer(
+						ProjectionComponent.this, index);
+				addConsumer(newAttribute);
+			}
 
-    /**
-     * Removes a source from the dataset.
-     */
-    public void removeSource() {
-        int currentSize = getConsumers().size() - 1;
+			/**
+			 * {@inheritDoc}
+			 */
+			public void dataSourceRemoved(final int index) {
+				ProjectionConsumer toBeRemoved = (ProjectionConsumer) getConsumers()
+						.get(index);
+				removeConsumer(toBeRemoved);
+			}
 
-        if (currentSize > 0) {
-        	//dataset.removeSeries(lastSeriesIndex);
-            getConsumers().remove(currentSize);
-            projectionModel.getProjector().init(currentSize);
-        }
-    }
- 
-    /**
-     * Return JFreeChart xy dataset.
-     * 
-     * @return dataset
-     */
-    public XYDataset getDataset() { 
-        return dataset;
-    }
+		});
+		projectionModel.init(numSources);
+	}
 
     /**
      * {@inheritDoc}
@@ -191,7 +152,6 @@ public class ProjectionComponent extends WorkspaceComponent {
     public void closing() {
         // TODO Auto-generated method stub
     }
-
    
     /**
      * Get the current state of the consumers, send this to the projection algorithm,
@@ -210,11 +170,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         }
         boolean newDatapointWasAdded = projectionModel.getProjector().addDatapoint(temp);
         if (newDatapointWasAdded) {
-            resetChartDataset(); // (should rename; see below)
-            // TODO: Add a check to see whether the current projection algorith
-            //		 resets all the data or simply involves adding a single  new datapoint
-            //		 If only one new datapoint is added it should be added to the dataset
-            //		  and "resetChartDataset" should not be called.
+            resetChartDataset(); 
         }
     }
     
@@ -231,7 +187,6 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Clear the dataset.
      */
     public void clearData() {
-        dataset.getSeries(0).clear();
         projectionModel.getProjector().reset();
         fireUpdateEvent();
     }
@@ -248,26 +203,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Update the entire dataset.  Called when the entire chart dataset is changed.
      */
     public void resetChartDataset() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                // Add the data
-                dataset.getSeries(0).clear();
-                int size = projectionModel.getProjector().getNumPoints();
-                for (int i = 0; i < size - 2; i++) {
-                    double[] point = projectionModel.getProjector().getProjectedPoint(i);
-                    if(point != null) {
-                    	// No need to update the chart yet (hence the "false" parameter)
-                    	dataset.getSeries(0).add(point[0], point[1], false);
-                    }
-                }
-                // Notify chart when last datapoint is updated
-                double[] point = projectionModel.getProjector().getProjectedPoint(size-1);
-                if (point != null) {
-                    dataset.getSeries(0).add(point[0], point[1], true);
-                }
-                setUpdateCompleted(true);
-            }
-        });
+    	projectionModel.resetData();
     }
 
     /**
@@ -275,8 +211,9 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     public void debug() {
         System.out.println("------------ Print contents of dataset ------------");
-        for (int i = 0; i < dataset.getSeries(0).getItemCount(); i++) {
-                System.out.println("<" + i + "> " + dataset.getSeries(0).getDataItem(i).getX() + "," + dataset.getSeries(0).getDataItem(i).getY());
+        Projector projector = projectionModel.getProjector();
+        for (int i = 0; i < projector.getNumPoints(); i++) {
+                System.out.println("<" + i + "> " + projector.getProjectedPoint(i)[0] + "," + projector.getProjectedPoint(i)[1]);
             }
         System.out.println("--------------------------------------");
     }
@@ -286,38 +223,10 @@ public class ProjectionComponent extends WorkspaceComponent {
         return ProjectionModel.getXStream().toXML(this);
     }
 
-    /**
-     * @return whether this component being updated by a thread or not.
-     */
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    /**
-     * This flag allows the user to start and stop iterative projection
-     * techniques.
-     * 
-     * @param b whether this component being updated by a thread or not.
-     */
-    public void setRunning(boolean b) {
-        isRunning = b;
-    }
-
-    /**
-     * Swing update flag.
-     * 
-     * @param b whether updated is completed
-     */
-    public void setUpdateCompleted(boolean b) {
-        setUpdateCompleted = b;
-    }
-
-    /**
-     * Swing update flag.
-     * 
-     * @return whether update is completd or not
-     */
-    public boolean isUpdateCompleted() {
-        return setUpdateCompleted;
-    }
+	/**
+	 * @return the projectionModel
+	 */
+	public ProjectionModel getProjectionModel() {
+		return projectionModel;
+	}
 }

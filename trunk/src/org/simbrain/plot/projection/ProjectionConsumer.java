@@ -27,9 +27,6 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
     private ProjectionComponent plot;
-        
-    /** Name. */
-    private final String name;
     
     /** Index. */
     private Integer index;
@@ -43,9 +40,8 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
      * @param plot the parent component
      * @param name the name of this consumer (displayed in the plot)
      */
-    public ProjectionConsumer(ProjectionComponent plot, String name, Integer index) {
+    public ProjectionConsumer(ProjectionComponent plot,Integer index) {
         this.plot = plot;
-        this.name = name;
         this.index = index;
     }
 
@@ -61,7 +57,7 @@ public class ProjectionConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public String getKey() {
-        return name;
+        return "Dimension" + index;
     }
     
     /**

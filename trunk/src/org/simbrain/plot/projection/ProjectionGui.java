@@ -41,13 +41,11 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
+import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -130,8 +128,9 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         
         // Generate the graph
         chart = ChartFactory.createScatterPlot("High Dimensional Projection",
-                "Projection X", "Projection Y", getWorkspaceComponent()
-                        .getDataset(), PlotOrientation.VERTICAL, false, true, false);
+				"Projection X", "Projection Y", getWorkspaceComponent()
+						.getProjectionModel().getDataset(),
+				PlotOrientation.VERTICAL, false, true, false);
         // chart.getXYPlot().getDomainAxis().setRange(-100, 100);
         // chart.getXYPlot().getRangeAxis().setRange(-100, 100);
         chart.getXYPlot().getDomainAxis().setAutoRange(true);
@@ -209,6 +208,25 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         add("North", theToolBar);
         add("Center", panel);
         add("South", bottomPanel);
+        
+        //Add listener
+        getWorkspaceComponent().getProjectionModel().addListener(new ChartListener() {
+
+        	/**
+        	 * Update bottom stats when a data source is added.
+        	 */
+			public void dataSourceAdded(int index) {
+				update();
+			}
+
+        	/**
+        	 * Update bottom stats when a data source is removed
+        	 */
+			public void dataSourceRemoved(int index) {
+				update();
+			}
+        	
+        });
         
         // Initializes labels
         update();
@@ -298,15 +316,15 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
             } else if (btemp == clearBtn) {
                 getWorkspaceComponent().clearData();
             } else if (btemp == playBtn) {
-                if (getWorkspaceComponent().isRunning()) {
+                if (getWorkspaceComponent().getProjectionModel().isRunning()) {
                     playBtn.setIcon(ResourceManager.getImageIcon("Stop.png"));
                     playBtn.setToolTipText("Stop iterating projection algorithm");
-                    getWorkspaceComponent().setRunning(false);
+                    getWorkspaceComponent().getProjectionModel().setRunning(false);
                     Executors.newSingleThreadExecutor().execute(new ProjectionUpdater(getWorkspaceComponent()));                    
                 } else {
                     playBtn.setIcon(ResourceManager.getImageIcon("Play.png"));
                     playBtn.setToolTipText("Start iterating projection algorithm");
-                    getWorkspaceComponent().setRunning(true);
+                    getWorkspaceComponent().getProjectionModel().setRunning(true);
                 }
             } else if (btemp == randomBtn) {
                getWorkspaceComponent().getGauge().getDownstairs().randomize(100);
@@ -315,12 +333,10 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         }
 
         if (e.getActionCommand().equalsIgnoreCase("Add")) {
-            getWorkspaceComponent().addSource();
-            update(); // TODO: addSource() should fire an event which calls compUpdated(). 
+            getWorkspaceComponent().getProjectionModel().addSource();
         }
         if (e.getActionCommand().equalsIgnoreCase("Delete")) {
-            getWorkspaceComponent().removeSource();
-            update();
+            getWorkspaceComponent().getProjectionModel().removeSource();
         }
                
    }

@@ -40,9 +40,9 @@ public class ProjectionUpdater implements Runnable {
      * {@inheritDoc}
      */
     public void run() {
-        while (!component.isRunning()) {
+        while (!component.getProjectionModel().isRunning()) {
             try {
-                component.setUpdateCompleted(false);
+                component.getProjectionModel().setUpdateCompleted(false);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         component.getGauge().iterate(1);
@@ -50,7 +50,7 @@ public class ProjectionUpdater implements Runnable {
                         component.fireUpdateEvent();
                     }
                 });
-                while (!component.isUpdateCompleted()) {
+                while (!component.getProjectionModel().isUpdateCompleted()) {
                     Thread.sleep(1); // TODO: make this settable?
                 }
             } catch (InterruptedException e) {

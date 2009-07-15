@@ -548,6 +548,7 @@ public class Workspace {
         updator = newUpdator;
         for(WorkspaceUpdatorListener listener : tempList) {
             updator.addListener(listener);
+            listener.changedUpdateController();
         }
     }
     

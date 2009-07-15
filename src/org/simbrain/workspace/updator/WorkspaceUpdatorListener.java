@@ -9,7 +9,8 @@ import org.simbrain.workspace.WorkspaceComponent;
  * @author Matt Watson
  */
 public interface WorkspaceUpdatorListener {
-    /**
+
+	/**
      * Called when a component update begins.
      *  
      * @param component The component being updated.
@@ -33,4 +34,10 @@ public interface WorkspaceUpdatorListener {
      * @param update The number of the update.
      */
     void updatedCouplings(int update);
+    
+    /**
+     * Called when the update controller is changed.
+     */
+    void changedUpdateController();
+    
 }

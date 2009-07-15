@@ -50,7 +50,9 @@ public class ThreadViewerPanel extends JPanel {
     
     /** Label for update method name. */
     final JLabel updateName = new JLabel();
-
+    
+    /** Reference to parent workspace. */
+    final Workspace workspace;
 
     /**
      * Constructor for viewer panel.
@@ -60,6 +62,7 @@ public class ThreadViewerPanel extends JPanel {
     public ThreadViewerPanel(final Workspace workspace) {
 
         super(new BorderLayout());
+        this.workspace = workspace;
 
         // Set up thread viewer
         for (int i = 1; i <= workspace.getWorkspaceUpdator().getNumThreads(); i++) {
@@ -71,8 +74,7 @@ public class ThreadViewerPanel extends JPanel {
         threadViewer.add(scrollPane);
 
         // Initial setting of update method label
-        updateName.setText("Current update method: "
-                + workspace.getWorkspaceUpdator().getCurrentUpdatorName());
+        updateStats();
 
         // Add main components to panel
         this.add("North", updateName);
@@ -109,7 +111,20 @@ public class ThreadViewerPanel extends JPanel {
                         threadViewer.repaint();
                     }
 
+					public void changedUpdateController() {
+						updateStats();
+					}
+
                 });
+    }
+    
+	/**
+	 * Update the labels on the thread viewer panel, of which there is currently
+	 * just one.
+	 */
+    private void updateStats() {
+        updateName.setText("Current update method: "
+                + workspace.getWorkspaceUpdator().getCurrentUpdatorName());    	
     }
 
     /**

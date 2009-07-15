@@ -298,4 +298,18 @@ public class SimbrainMath {
         }
         return returnVector;
     }
+    
+    /**
+     * Round a double value to a specified number of places.
+     * 
+     * (From user dforbu on the Sun Java Programming forum).
+     * 
+     * @param d double value to round
+     * @param places placed to round do
+     * @return rounded value
+     */
+    public static final double roundDouble(double d, int places) {
+        return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10,
+            (double) places);
+    }
 }

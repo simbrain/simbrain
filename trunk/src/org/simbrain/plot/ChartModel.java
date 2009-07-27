@@ -22,7 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for chart model classes.  Maintains listeners.
+ * Base class for chart model classes. Maintains listeners.
+ * 
+ * TODO: Some charts have update happening inside the consumer setVal function.
+ * This makes it impossible to "turn the component off". It's also a bit
+ * inefficient, since a graphics update fired every time. See projection for a
+ * perhaps better model.
  */
 public class ChartModel {
 

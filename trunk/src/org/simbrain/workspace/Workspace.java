@@ -237,6 +237,24 @@ public class Workspace {
     }
     
     /**
+     * Convenience method forwarded to singleUpdate; recognizable name so useful in API.
+     */
+    public void iterate() {
+    	singleUpdate();
+    }
+    
+    /**
+     * Iterate for a specified number of steps;
+     * 
+     * @param numIterations
+     */
+    public void iterate(final int numIterations) {
+    	for (int i = 0; i < numIterations; i++) {
+    		iterate();
+    	}
+    }
+    
+    /**
      * Update all couplings on all components once.
      */
     public void singleUpdate() {
@@ -544,14 +562,17 @@ public class Workspace {
      * @param newUpdator the new updator
      */
     private void swapUpdators(final WorkspaceUpdator newUpdator) {
-        List<WorkspaceUpdatorListener> tempList =  updator.getListeners();
+    	
+        List<WorkspaceUpdatorListener> updatorListenerList =  updator.getListeners();
         updator = newUpdator;
-        for(WorkspaceUpdatorListener listener : tempList) {
+        for(WorkspaceUpdatorListener listener : updatorListenerList) {
             updator.addListener(listener);
+        }
+        for(WorkspaceUpdatorListener listener : updatorListenerList) {
             listener.changedUpdateController();
         }
     }
-    
+        
     /**
      * Sets a custom controller with the default number of threads.
      * 

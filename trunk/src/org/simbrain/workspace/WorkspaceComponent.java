@@ -197,6 +197,25 @@ public abstract class WorkspaceComponent {
     }
     
     /**
+     * Notify all workspaceComponentListeners that the gui has been turned on or off.
+     */
+    public final void fireGuiToggleEvent() {
+        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+            listener.guiToggled();
+        }
+    }
+
+    /**
+     * Notify all workspaceComponentListeners of a component has been turned on or off.
+     */
+    public final void fireComponentToggleEvent() {
+        for (WorkspaceComponentListener listener : workspaceComponentListeners) {
+            listener.componentOnOffToggled();
+        }
+    }
+
+    
+    /**
      * Called after a global update ends.
      */
     final void doStopped() {
@@ -701,6 +720,7 @@ public abstract class WorkspaceComponent {
      */
     public void setGuiOn(Boolean guiOn) {
         this.guiOn = guiOn;
+        this.fireGuiToggleEvent();
     }
 
     /**
@@ -715,5 +735,6 @@ public abstract class WorkspaceComponent {
      */
     public void setUpdateOn(Boolean updateOn) {
         this.updateOn = updateOn;
+        this.fireComponentToggleEvent();
     }
 }

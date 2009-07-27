@@ -26,14 +26,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.workspace.AttributeHolderListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentDeserializer;
@@ -81,10 +79,27 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
         // Add a default update listener
         workspaceComponent.addWorkspaceComponentListener(new WorkspaceComponentListener() {
-            public void componentUpdated() {
-                GuiComponent.this.update();
-            }
             
+        	/**
+        	 * {@inheritDoc}
+        	 */
+        	public void componentUpdated() {
+                GuiComponent.this.update();            		
+            }
+
+        	/**
+        	 * {@inheritDoc}
+        	 */
+			public void componentOnOffToggled() {
+				// No implementation.
+			}
+
+        	/**
+        	 * {@inheritDoc}
+        	 */
+			public void guiToggled() {
+            	GuiComponent.this.getParentFrame().setVisible(workspaceComponent.getGuiOn());
+			}
         });
         
         logger.trace(this.getClass().getCanonicalName() + " created");
@@ -116,7 +131,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * Update that goes beyond updating couplings.
      * Called when global workspace update is called.
      */
-    protected void update() {
+    protected void update() {    	
         repaint();
     }
 

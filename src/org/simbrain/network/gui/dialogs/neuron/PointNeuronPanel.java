@@ -46,7 +46,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfLC = new JTextField();
     
     /** Output function. */
-    private JComboBox cbOutputFunction = new JComboBox(PointNeuron.getFunctionList());
+    private JComboBox cbOutputFunction = new JComboBox();
     
     /** Threshold for output function. */
     private JTextField tfThreshold = new JTextField();
@@ -167,7 +167,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
-        cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
+        //cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
@@ -196,9 +196,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
             if (!tfLC.getText().equals(NULL_STRING)) {
                 neuronRef.setLeakConductance(Double.parseDouble(tfLC.getText()));
             }
-            if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING)) {
-                neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
-            }
+//            if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING)) {
+//                neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
+//            }
             if (!tfThreshold.getText().equals(NULL_STRING)) {
                 neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
             }

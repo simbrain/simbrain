@@ -38,7 +38,41 @@ public class WorkspaceUpdator {
 
     /** The static logger for the class. */
     static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
+    
+    /** The parent workspace. */
+    private final Workspace workspace;
+    
+    /** The coupling manager for the workspace. */
+    private final CouplingManager manager;
+    
+    /** The Update Controller.  */
+    private final UpdateController controller;
+    
+    /** The executor service for managing updates. */
+    private final ExecutorService updates;
+    
+    /** The executor service for doing updates. */
+    private ExecutorService service;
+    
+    /** The executor service for notifying listeners. */
+    private final ExecutorService events;
 
+    /** The listeners on this object. */
+    private final List<WorkspaceUpdatorListener> listeners
+        = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
+    
+    /** creates a default synch-manager that does nothing. */
+    private volatile TaskSynchronizationManager snychManager = NO_ACTION_SYNCH_MANAGER;
+    
+    /** Whether updates should continue to run. */
+    private volatile boolean run = false;
+
+    /** The number of times the update has run. */
+    private volatile int time = 0;
+    
+    /** Number of threads used in the update service.*/
+    private int numThreads;
+    
     /** A synch-manager where the methods do nothing. */
     private static final TaskSynchronizationManager NO_ACTION_SYNCH_MANAGER
             = new TaskSynchronizationManager() {
@@ -54,33 +88,6 @@ public class WorkspaceUpdator {
             /* no implementation */
         }
     };
-    
-    /** The parent workspace. */
-    private final Workspace workspace;
-    /** The coupling manager for the workspace. */
-    private final CouplingManager manager;
-    /** The Update Controller.  */
-    private final UpdateController controller;
-    /** The executor service for managing updates. */
-    private final ExecutorService updates;
-    /** The executor service for doing updates. */
-    private final ExecutorService service;
-    /** The executor service for notifying listeners. */
-    private final ExecutorService events;
-    /** The listeners on this object. */
-    private final List<WorkspaceUpdatorListener> listeners
-        = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
-    
-    /** creates a default synch-manager that does nothing. */
-    private volatile TaskSynchronizationManager snychManager = NO_ACTION_SYNCH_MANAGER;
-    
-    /** Whether updates should continue to run. */
-    private volatile boolean run = false;
-    /** The number of times the update has run. */
-    private volatile int time = 0;
-    
-    /** Number of threads used in the update service.*/
-    private int numThreads;
     
     /** The default controller. */
     public static final UpdateController DEFAULT_CONTROLLER = new UpdateController() {
@@ -118,7 +125,7 @@ public class WorkspaceUpdator {
     };
     
     /** Creates the threads used in the ExecutorService. */
-    private final ThreadFactory factory = new ThreadFactory() {
+    private class UpdatorThreadFactory implements ThreadFactory {
         /** Numbers the threads sequentially. */
         private int nextThread = 1;
         
@@ -151,9 +158,15 @@ public class WorkspaceUpdator {
             return components;
         }
 
-        public void updateComponent(
-                final WorkspaceComponent component, final CompletionSignal signal) {
-            Collection<ComponentUpdatePart> parts = component.getUpdateParts();
+        public void updateComponent(final WorkspaceComponent component, final CompletionSignal signal) {
+
+        	// If update is turned off on this component, return
+        	if (component.getUpdateOn() == false) {
+        		signal.done();
+        		return;
+        	}
+        	
+        	Collection<ComponentUpdatePart> parts = component.getUpdateParts();
             
             final LatchCompletionSignal partsSignal = new LatchCompletionSignal(parts.size()) {
                 public void done() {
@@ -200,7 +213,7 @@ public class WorkspaceUpdator {
         this.manager = manager;
         this.controller = controller;
         this.updates = Executors.newSingleThreadExecutor();
-        this.service = Executors.newFixedThreadPool(threads, factory);
+        this.service = Executors.newFixedThreadPool(threads, new UpdatorThreadFactory());
         this.events = Executors.newSingleThreadExecutor();
         this.numThreads = threads;
     }
@@ -414,6 +427,24 @@ public class WorkspaceUpdator {
     public int getNumThreads() {
         return numThreads;
     }
+    
+    /**
+     * Set number of threads in updator.
+     *
+     * @param numThreads number of threads.
+     */
+	public void setNumThreads(final int numThreads) {
+		if(isRunning()) {
+			stop();
+		}
+		this.numThreads = numThreads;
+        this.service = Executors.newFixedThreadPool(numThreads, new UpdatorThreadFactory());
+        for(WorkspaceUpdatorListener listener : listeners) {
+            listener.changeNumThreads();
+        }
+
+	}
+
  
     /**
      * Returns the name of the current UpdateController.
@@ -423,4 +454,5 @@ public class WorkspaceUpdator {
     public String getCurrentUpdatorName() {
         return controller.getName();
     }
+
 }

@@ -40,4 +40,9 @@ public interface WorkspaceUpdatorListener {
      */
     void changedUpdateController();
     
+    /**
+     * Called when the number of threads on an update controller is changed.
+     */
+    void changeNumThreads();
+    
 }

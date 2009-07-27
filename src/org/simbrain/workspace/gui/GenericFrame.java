@@ -48,4 +48,6 @@ public interface GenericFrame {
 
     public Rectangle getBounds();
     
+    public void setVisible(boolean isVisible);
+    
 }

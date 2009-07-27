@@ -34,7 +34,12 @@ import org.simbrain.workspace.WorkspaceListener;
 
 /**
  * Displays a list of all currently open workspace components.
- *
+ * 
+ * TODO: Will need to make each row of the list be an object wrapping the
+ * component. This is so the rows can listen for workspacecomponent changes, and
+ * also so users can right click on the rows and use them as a to set parameters
+ * of the represented component. Once it's fixed, the test of this will be
+ * setting component properties via terminal and seeing the change reflected.
  */
 public class ComponentPanel extends JPanel implements WorkspaceListener  {
 
@@ -44,16 +49,12 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
     /** Table model. */
     private ComponentTableModel model;
     
-    /** Reference to Simbrain desktop. */
-    private SimbrainDesktop desktop;
-    
     /**
      * Workspace component list panel constructor.
      * @param desktop reference.
      */
     public ComponentPanel(final SimbrainDesktop desktop) {
         super(new BorderLayout());
-        this.desktop = desktop;
         desktop.getWorkspace().addListener(this);
 
         // Set up table
@@ -108,7 +109,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
     }
     
     /**
-     * Table mode which represents workspace components.
+     * Table model which represents workspace components.
      */
     class ComponentTableModel extends AbstractTableModel {
         
@@ -195,7 +196,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
          * Add a new component to the list.
          */
         public void addRow(WorkspaceComponent component) {
-            data.add(component);
+            data.add(component);       
             fireTableStructureChanged();
         }
         

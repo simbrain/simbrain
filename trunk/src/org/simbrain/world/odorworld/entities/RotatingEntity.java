@@ -13,7 +13,7 @@ import org.simbrain.world.odorworld.OdorWorld;
 public class RotatingEntity extends OdorWorldEntity {
 
     /** Images for various angles. */
-    TreeMap<Double, Animation>  map;
+    TreeMap<Double, Animation>  map = DEFAULT_MAP;
     
     /** Current heading / orientation. */
     private double heading = DEFAULT_HEADING;
@@ -66,18 +66,17 @@ public class RotatingEntity extends OdorWorldEntity {
       *
       * @param world parent world
       */
-    public RotatingEntity(OdorWorld world) {
-        super(world, DEFAULT_MAP.get(DEFAULT_MAP.firstKey()));
+    public RotatingEntity() {
+        super(DEFAULT_MAP.get(DEFAULT_MAP.firstKey()));
     }
 
     /**
      * Create a rotating entity using specified map.
      * 
-     * @param world parent world
      * @param map the map to use
      */
-    public RotatingEntity(final OdorWorld world, final TreeMap<Double, Animation>  map) {
-        super(world, map.get(map.firstKey()));  // Default to animation for 0 degrees
+    public RotatingEntity(final TreeMap<Double, Animation>  map) {
+        super(map.get(map.firstKey()));  // Default to animation for 0 degrees
         this.map = map;
     }
     
@@ -116,7 +115,7 @@ public class RotatingEntity extends OdorWorldEntity {
         
         behavior.apply(elapsedTime);
         
-        heading = heading % 360;
+        heading = heading % 360; // reset heading
         SortedMap<Double, Animation> headMap = map.headMap(heading);
         
         if (headMap.size() > 0) {

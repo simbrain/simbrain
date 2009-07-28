@@ -28,7 +28,6 @@ import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Main data for a projection chart.
@@ -46,6 +45,10 @@ public class ProjectionModel extends ChartModel {
 
     /** Flag for checking that GUI update is completed. */
     private volatile boolean setUpdateCompleted;
+
+    /** Index of current item; used to paint it a different color. */
+	private int currentItemIndex = 0;
+
     
     /**
      * Default constructor.
@@ -100,7 +103,7 @@ public class ProjectionModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = ChartModel.getXStream();
         xstream.omitField(Projector.class, "logger");
         xstream.omitField(Projector.class, "currentState");
         xstream.omitField(ProjectionMethod.class, "logger");
@@ -140,7 +143,7 @@ public class ProjectionModel extends ChartModel {
 	public void addPoint(double x, double y) {
 		dataset.getSeries(0).add(x, y, true);
     }
-
+	
 	/**
 	 * Resets the JFreeChart data and re-adds all the datapoint. Invoked when the projector must be
 	 * applied to an entire dataset.
@@ -209,5 +212,19 @@ public class ProjectionModel extends ChartModel {
     public boolean isUpdateCompleted() {
         return setUpdateCompleted;
     }
+
+	/**
+	 * @return the currentItemIndex
+	 */
+	public int getCurrentItemIndex() {
+		return currentItemIndex;
+	}
+
+	/**
+	 * @param currentItemIndex the currentItemIndex to set
+	 */
+	public void setCurrentItemIndex(int currentItemIndex) {
+		this.currentItemIndex = currentItemIndex;
+	}
 
 }

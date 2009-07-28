@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -67,8 +68,8 @@ public class OneToOne extends ConnectNeurons {
     /**
      * {@inheritDoc}
      */
-    public OneToOne(final Network network, final ArrayList<Neuron> neurons,
-            final ArrayList<Neuron> neurons2) {
+    public OneToOne(final Network network, final List<Neuron> neurons,
+            final List<Neuron> neurons2) {
         super(network, neurons, neurons2);
     }
 
@@ -88,7 +89,7 @@ public class OneToOne extends ConnectNeurons {
      * @param comparator the comparator.
      * @return the sorted list.
      */
-    private ArrayList<Neuron> getSortedNeuronList(final ArrayList<Neuron> neuronList,
+    private List<Neuron> getSortedNeuronList(final List<? extends Neuron> neuronList,
             final Comparator<Neuron> comparator) {
         ArrayList<Neuron> list = new ArrayList<Neuron>();
         list.addAll(neuronList);

@@ -153,7 +153,7 @@ public class ScatterPlotModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = ChartModel.getXStream();
         return xstream;
     }
 

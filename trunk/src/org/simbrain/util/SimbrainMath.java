@@ -298,6 +298,22 @@ public class SimbrainMath {
         }
         return returnVector;
     }
+   
+    /**
+     * Returns a vector of random values between min and max.
+     * 
+     * @param length number of components in the vector
+     * @param min minimum value for random values
+     * @param max maximum value for random values
+     * @return the random vector
+     */
+    public static double[] randomVector(final int length, final double min, final double max) {
+    	double[] returnVector = new double[length];
+        for (int i = 0; i < returnVector.length; i++) {
+            returnVector[i] = min + Math.random() * Math.abs(max - min);
+        }
+        return returnVector;
+    }
     
     /**
      * Round a double value to a specified number of places.

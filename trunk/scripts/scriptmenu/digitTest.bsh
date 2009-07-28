@@ -1,0 +1,100 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.workspace.*;
+import javax.swing.JInternalFrame;
+import java.util.*;
+
+{
+
+	// Parameters 
+	int NUM_NEURONS = 35;
+	double GRID_SPACE = 40;
+
+        // Add network
+        NetworkComponent networkComponent = new NetworkComponent("Digit Network");
+        RootNetwork network = networkComponent.getRootNetwork();
+        workspace.addWorkspaceComponent(networkComponent);
+        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(25, 38, 400, 500);
+
+	// Digit network
+        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, 5);
+        layout.setInitialLocation(new Point(10, 10));
+	List sourceNeurons = new ArrayList();
+        for (int i = 0; i < NUM_NEURONS; i++) {
+            ClampedNeuron neuron = new ClampedNeuron();
+            network.addNeuron(neuron);
+	    sourceNeurons.add(neuron);
+        }
+        layout.layoutNeurons(network);
+
+	// Add single point neuron
+	PointNeuron pointNeuron = new PointNeuron();
+	network.addNeuron(pointNeuron);
+	pointNeuron.setLocation(103, -34);
+	((NetworkDesktopComponent)desktop.getDesktopComponent(networkComponent)).getNetworkPanel().centerCamera();
+	
+	// Connect digit network to point neuron
+	AllToAll connectDigitsToPoint = new AllToAll(network, sourceNeurons, Collections.singletonList(pointNeuron));
+    	connectDigitsToPoint.connectNeurons();
+
+	// Start making the buttons!
+	JInternalFrame internalFrame = new JInternalFrame("Load Digits", true, true);
+	JPanel panel = new JPanel();
+
+	JButton button1 = new JButton("Load \"1\"");
+		button1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				network.clearActivations();
+				network.getNeuron("Neuron_3").setActivation(1);
+				network.getNeuron("Neuron_7").setActivation(1);
+				network.getNeuron("Neuron_8").setActivation(1);
+				network.getNeuron("Neuron_11").setActivation(1);
+				network.getNeuron("Neuron_13").setActivation(1);
+				network.getNeuron("Neuron_18").setActivation(1);
+				network.getNeuron("Neuron_23").setActivation(1);
+				network.getNeuron("Neuron_28").setActivation(1);
+				network.getNeuron("Neuron_31").setActivation(1);
+				network.getNeuron("Neuron_32").setActivation(1);
+				network.getNeuron("Neuron_33").setActivation(1);
+				network.getNeuron("Neuron_34").setActivation(1);
+				network.getNeuron("Neuron_35").setActivation(1);
+				workspace.iterate();
+
+	}});
+	panel.add(button1);
+	JButton button2 = new JButton("Load \"2\"");
+		button2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				network.clearActivations();
+				network.getNeuron("Neuron_2").setActivation(1);
+				network.getNeuron("Neuron_3").setActivation(1);
+				network.getNeuron("Neuron_4").setActivation(1);
+				network.getNeuron("Neuron_6").setActivation(1);
+				network.getNeuron("Neuron_10").setActivation(1);
+				network.getNeuron("Neuron_15").setActivation(1);
+				network.getNeuron("Neuron_18").setActivation(1);
+				network.getNeuron("Neuron_19").setActivation(1);
+				network.getNeuron("Neuron_22").setActivation(1);
+				network.getNeuron("Neuron_26").setActivation(1);
+				network.getNeuron("Neuron_31").setActivation(1);
+				network.getNeuron("Neuron_32").setActivation(1);
+				network.getNeuron("Neuron_33").setActivation(1);
+				network.getNeuron("Neuron_34").setActivation(1);
+				network.getNeuron("Neuron_35").setActivation(1);
+				workspace.iterate();
+
+	}});
+	panel.add(button2);
+
+	// Set up Frame
+	internalFrame.setBounds(450,38,200,400);
+	internalFrame.getContentPane().add(panel);
+	internalFrame.setVisible(true);
+	desktop.addInternalFrame(internalFrame);
+
+}

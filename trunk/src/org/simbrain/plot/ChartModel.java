@@ -21,6 +21,9 @@ package org.simbrain.plot;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 /**
  * Base class for chart model classes. Maintains listeners.
  * 
@@ -43,7 +46,7 @@ public class ChartModel {
      * @param listener listener to add.
      */
     public void addListener(ChartListener listener) {
-        listenerList.add(listener);
+    	 listenerList.add(listener);
     }
     
     /**
@@ -86,4 +89,15 @@ public class ChartModel {
             listener.dataSourceRemoved(index);
         }
     }
+
+    /**
+     * Creates an xtream object with relevant fields omitted.
+     * @return
+     */
+	public static XStream getXStream() {
+    	XStream xstream = new XStream(new DomDriver());
+    	xstream.omitField(ChartModel.class, "listenerList");
+    	xstream.omitField(ChartModel.class, "settingsListenerList");
+    	return xstream;
+	}
 }

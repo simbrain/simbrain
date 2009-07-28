@@ -2,6 +2,7 @@ package org.simbrain.network.connections;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -18,6 +19,7 @@ public class Sparse extends ConnectNeurons {
 
     /** Probability connection will be an excitatory weight. */
     public static double excitatoryProbability = .1;
+
     /** Probability connection will be an inhibitory weight. */
     public static double inhibitoryProbability = .1;
     
@@ -42,7 +44,7 @@ public class Sparse extends ConnectNeurons {
      * @param neurons source neurons.
      * @param neurons2 target neurons.
      */
-    public Sparse(final Network network, final ArrayList neurons, final ArrayList neurons2) {
+    public Sparse(final Network network, final List<? extends Neuron> neurons, final List<? extends Neuron> neurons2) {
         super(network, neurons, neurons2);
     }
     

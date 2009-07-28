@@ -1,6 +1,6 @@
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -23,7 +23,7 @@ public class AllToAll extends ConnectNeurons {
     /** Allows neurons to have a self connection. */
     private static boolean allowSelfConnection = true;
 
-    public AllToAll(final Network network, final ArrayList neurons, final ArrayList neurons2) {
+    public AllToAll(final Network network, final List<? extends Neuron> neurons, final List<? extends Neuron> neurons2) {
         super(network, neurons, neurons2);
     }
 

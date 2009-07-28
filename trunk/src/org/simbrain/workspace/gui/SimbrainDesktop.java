@@ -185,13 +185,15 @@ public class SimbrainDesktop {
             return true;
         }
         
-        public void workspaceCleared() {
-            if (changesExist()) {
-                save();
-            }
-            frame.setTitle("Simbrain");
-            return;
-        }
+		public void workspaceCleared() {
+			if (changesExist()) {
+				save();
+			}
+			desktop.removeAll();
+			desktop.repaint();
+			frame.setTitle("Simbrain");
+			return;
+		}
         
         /**
          * Add a new <c>SimbrainComponent</c>.
@@ -971,6 +973,7 @@ public class SimbrainDesktop {
          */
         public void mousePressed(final MouseEvent mouseEvent) {
             Point lastClickedPoint = mouseEvent.getPoint();
+            //System.out.println("desktop-->" + lastClickedPoint); //TODO: Make this visible somehow
             if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
                 contextMenu.show(frame, (int) lastClickedPoint.getX() + MENU_X_OFFSET,
                     (int) lastClickedPoint.getY() + MENU_Y_OFFSET);

@@ -19,9 +19,12 @@
 package org.simbrain.plot.projection;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 import java.util.concurrent.Executors;
 
 import javax.swing.Action;
@@ -39,8 +42,14 @@ import javax.swing.JToolBar;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
+import org.jfree.chart.renderer.xy.XYItemRendererState;
+import org.jfree.data.xy.XYDataset;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
@@ -116,6 +125,40 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 
     /** The JFreeChart panel specialized for displaying JFreeCharts. */
     private ChartPanel panel;
+    
+    /**
+     * Subclass of dot renderer which colors the "current" data item differently.
+     */
+    private class CustomRenderer extends XYDotRenderer {
+
+		/* (non-Javadoc)
+		 * @see org.jfree.chart.renderer.xy.XYDotRenderer#drawItem(java.awt.Graphics2D, org.jfree.chart.renderer.xy.XYItemRendererState, java.awt.geom.Rectangle2D, org.jfree.chart.plot.PlotRenderingInfo, org.jfree.chart.plot.XYPlot, org.jfree.chart.axis.ValueAxis, org.jfree.chart.axis.ValueAxis, org.jfree.data.xy.XYDataset, int, int, org.jfree.chart.plot.CrosshairState, int)
+		 */
+		@Override
+		public void drawItem(Graphics2D graphics, XYItemRendererState arg1,
+				Rectangle2D arg2, PlotRenderingInfo arg3, XYPlot arg4,
+				ValueAxis arg5, ValueAxis arg6, XYDataset arg7, int series,
+				int item, CrosshairState state, int pass) {
+
+			//System.out.println("item = " + item + "   currentIndex = " + getWorkspaceComponent().getProjectionModel().currentItemIndex);
+
+			/**
+			 * TODO: 
+			 * 	(1) Use non-deprecated methods
+			 * 	(2) Make it possible to turn this off
+			 *  (3) Optimize (do all these setPaints slow things down?) 
+			 */
+			
+			if (item == getWorkspaceComponent().getProjectionModel().getCurrentItemIndex() - 1) {
+				this.setPaint(Color.red, false);
+			} else {
+				this.setPaint(Color.green.brighter(), false);
+			}
+			super.drawItem(graphics, arg1, arg2, arg3, arg4, arg5, arg6, arg7, series, item,
+					state, pass);
+		}
+    	
+    }
 
     /**
      * Construct the ScatterPlot.
@@ -133,11 +176,14 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 				PlotOrientation.VERTICAL, false, true, false);
         // chart.getXYPlot().getDomainAxis().setRange(-100, 100);
         // chart.getXYPlot().getRangeAxis().setRange(-100, 100);
+        chart.getXYPlot().setBackgroundPaint(Color.white);
+        chart.getXYPlot().setDomainGridlinePaint(Color.gray);
+        chart.getXYPlot().setRangeGridlinePaint(Color.gray);
         chart.getXYPlot().getDomainAxis().setAutoRange(true);
         chart.getXYPlot().getRangeAxis().setAutoRange(true);
-        renderer = new XYDotRenderer();
-        renderer.setDotWidth(3);
-        renderer.setDotHeight(3);
+        renderer = new CustomRenderer();
+        renderer.setDotWidth(5);
+        renderer.setDotHeight(5);
 
         // Tooltip implementation that needs work...
         //

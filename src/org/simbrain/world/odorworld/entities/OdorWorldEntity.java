@@ -75,25 +75,20 @@ public abstract class OdorWorldEntity {
     /**
      * Construct an entity from an animoation.
      *
-     *
-     * @param parentWorld parent parentWorld.
      * @param animation animation to use.
      */
-    public OdorWorldEntity(final OdorWorld world, final Animation anim) {        
+    public OdorWorldEntity(final Animation anim) {        
         this.animation = anim;
-        this.parentWorld = world;
         anim.start();
     }
 
     /**
      * Construct an odor worl dentity from a single image location.
      *
-     * @param world parent world
      * @param imageLocation the image location 
      */
-    public OdorWorldEntity(final OdorWorld world, final String imageLocation) {
+    public OdorWorldEntity(final String imageLocation) {
         this.animation = new Animation(imageLocation);
-        this.parentWorld = world;
         animation.start();
     }
 
@@ -268,6 +263,13 @@ public abstract class OdorWorldEntity {
     }
 
     /**
+	 * @param parentWorld the parentWorld to set
+	 */
+	public void setParentWorld(OdorWorld parentWorld) {
+		this.parentWorld = parentWorld;
+	}
+
+	/**
      * Returns the location of the entity as a double array.
      *
      * @return location of the entity.

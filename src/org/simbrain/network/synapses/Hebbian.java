@@ -47,11 +47,13 @@ public class Hebbian extends Synapse {
         id = theId;
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param s Synapse to make of the type
-     */
+	/**
+	 * This constructor is used when creating a neuron of one type from another
+	 * neuron of another type Only values common to different types of neuron
+	 * are copied.
+	 * 
+	 * @param s Synapse to make of the type
+	 */
     public Hebbian(final Synapse s) {
         super(s);
     }

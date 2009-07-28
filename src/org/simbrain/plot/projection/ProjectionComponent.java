@@ -74,6 +74,7 @@ public class ProjectionComponent extends WorkspaceComponent {
     
     /**
      * Create a projection component from an existing set of data.
+     * Used in deserializing.
      *
      * @param model projection model
      * @param name name of component
@@ -87,7 +88,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         
         // Add the data to the chart.
         for (int i = 0; i < numPoints; i++) {
-            double[] point = projectionModel.getProjector().getProjectedPoint(i);
+            double[] point = projectionModel.getProjector().getDownstairs().getPoint(i);
             if (point != null) {
             	projectionModel.addPoint(point[0], point[1]);
             }
@@ -170,6 +171,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         }
         boolean newDatapointWasAdded = projectionModel.getProjector().addDatapoint(temp);
         if (newDatapointWasAdded) {
+        	projectionModel.setCurrentItemIndex(projectionModel.getDataset().getItemCount(0));
             resetChartDataset(); 
         }
     }

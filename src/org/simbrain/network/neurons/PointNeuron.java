@@ -501,13 +501,11 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 		
 	}
 
-	@Override
 	public double getBias() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public void setBias(double bias) {
 		// TODO Auto-generated method stub
 		

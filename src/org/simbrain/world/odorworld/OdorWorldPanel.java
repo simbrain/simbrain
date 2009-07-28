@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.world.odorworld.actions.AddAgentAction;
 import org.simbrain.world.odorworld.actions.AddEntityAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -170,13 +171,6 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 //    
 //    int mouseCounter = 0;
 //    
-    final ActionListener addAgentListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            world.addRotatingEntity(new double[]{selectedPoint.x, selectedPoint.y});
-//            getParentFrame().repaint();
-//            getParentFrame().getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
 //        
 //    final ActionListener wallListener = new ActionListener() {
 //        public void actionPerformed(ActionEvent e) {
@@ -455,7 +449,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         
 
         ret.add(new JMenuItem(new AddEntityAction(this)));
-        ret.add(menu.getWallItem());
+        ret.add(new JMenuItem(new AddAgentAction(this)));
 
         ret.addSeparator();
         ret.add(menu.getPropsItem());

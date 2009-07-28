@@ -19,7 +19,6 @@
 package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.behaviors.NewtonianBouncer;
 
 
 /**
@@ -33,33 +32,27 @@ public class BasicEntity extends OdorWorldEntity {
     /**
      * Construct a basic entity witha specified animation.
      *
-     * @param world reference to parent world
      * @param animation animation associated with this entity.
      */
-    public BasicEntity(final OdorWorld world, final Animation anim) {
-        super(world, anim);
-        behavior = new NewtonianBouncer(this);
+    public BasicEntity(final Animation anim) {
+        super(anim);
+        //behavior = new StationaryBehavior();
     }
 
     /**
      * Construct a default entity.
-     *
-     * @param world parent world.
      */
-    public BasicEntity(final OdorWorld world) {
-        super(world, DEFAULT_IMAGE);
-        behavior = new NewtonianBouncer(this);
+    public BasicEntity() {
+        super(DEFAULT_IMAGE);
     }
 
     /**
      * Construct a basic entity with a single image location. 
      *
-     * @param world parent world
      * @param imageLocation image location
      */
-    public BasicEntity(final OdorWorld world, final String imageLocation) {
-        super(world, imageLocation);
-        behavior = new NewtonianBouncer(this);
+    public BasicEntity(final String imageLocation) {
+        super(imageLocation);
     }
 
     /**

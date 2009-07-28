@@ -22,6 +22,7 @@ import java.awt.Color;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.plot.ChartModel;
+import org.simbrain.util.projection.Projector;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -126,7 +127,7 @@ public class BarChartModel extends ChartModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = ChartModel.getXStream();
         return xstream;
     }
 
@@ -225,6 +226,5 @@ public class BarChartModel extends ChartModel {
         this.upperBound = upperBound;
         fireSettingsChanged();
     }
-
 
 }

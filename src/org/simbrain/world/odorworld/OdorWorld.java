@@ -23,16 +23,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.util.SimbrainMath;
-import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.entities.Animation;
-import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -95,7 +89,9 @@ public class OdorWorld {
     public void addEntity(final OdorWorldEntity entity) {
         // TODO: As usual, need a system for naming things..
         entity.setName(entity.getClass().getSimpleName() + "-" + (entityList.size()+1));
-
+        
+        entity.setParentWorld(this);
+        
         //centerSprite(sprite, tileX,tileY);
 
         // Add entity to the map
@@ -106,54 +102,50 @@ public class OdorWorld {
         fireEntityAdded(entity);
     }
 
-    /**
-     * Add an odor world entity.
-     * 
-     * @param entity entity to add
-     * @param tileX x position of entity
-     * @param tileY y position of entity
-     */
-    private void addEntity(final OdorWorldEntity entity, final int tileX,
-            final int tileY) {
-
-            entity.setX(tileX);
-            entity.setY(tileY);
-            entity.setVelocityX( -1 + (float) Math.random() * 2);
-            entity.setVelocityY(-1 + (float) Math.random() * 2);
-            
-            addEntity(entity);
-    }
+//    /**
+//     * Add an odor world entity.
+//     * 
+//     * @param entity entity to add
+//     * @param tileX x position of entity
+//     * @param tileY y position of entity
+//     */
+//    private void addEntity(final OdorWorldEntity entity, final int tileX, final int tileY) {
+//
+//            entity.setX(tileX);
+//            entity.setY(tileY);
+//            entity.setVelocityX( -1 + (float) Math.random() * 2);
+//            entity.setVelocityY(-1 + (float) Math.random() * 2);
+//            addEntity(entity);
+//    }
     
-    /**
-     * Add a basic entity at specified point.
-     * 
-     * @param p the location where the object should be added
-     */
-    public void addBasicEntity(final double[] p) {
-        
-        Animation anim = new Animation("Swiss.gif");
-        //animation.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
-        //animation.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
-
-        BasicEntity entity = new BasicEntity(this, anim);
-        addEntity(entity, (int) p[0], (int) p[1]);
-        entity.setSmellSource(
-                new SmellSource(SimbrainMath.randomVector(5),
-                SmellSource.DecayFunction.GAUSSIAN, 
-                entity.getLocation()));
-        fireUpdateEvent();
-    }
-    
-    /**
-     * Currently mouse is the only option!
-     */
-    public void addRotatingEntity(final double[] p) {
-        RotatingEntity entity = new RotatingEntity(this);
-        entity.addEffector(new RotationEffector(entity));
-        entity.addSensor(new SmellSensor(entity));
-        addEntity(entity, (int) p[0], (int) p[1]);
-        fireUpdateEvent();
-    }
+//    //TODO: way to add an entity with an animation
+//
+//    /**
+//     * Add a basic entity at specified point.
+//     * 
+//     * @param p the location where the object should be added
+//     */
+//    public void addBasicEntity(final int x, final int y, final String imageName) {
+//        
+//        Animation anim = new Animation(imageName);
+//        //animation.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
+//        //animation.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
+//
+//        BasicEntity entity = new BasicEntity(this, anim);
+//        addEntity(entity, x, y);
+//        fireUpdateEvent();
+//    }
+//    
+//    /**
+//     * Currently mouse is the only option!
+//     */
+//    public void addRotatingEntity(final double[] p) {
+//        RotatingEntity entity = new RotatingEntity(this);
+//        entity.addEffector(new RotationEffector(entity));
+//        entity.addSensor(new SmellSensor(entity));
+//        addEntity(entity, (int) p[0], (int) p[1]);
+//        fireUpdateEvent();
+//    }
     
     /**
      * Returns a properly initialized xstream object.

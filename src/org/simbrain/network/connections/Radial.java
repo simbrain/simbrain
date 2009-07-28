@@ -1,6 +1,7 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -50,7 +51,7 @@ public class Radial extends ConnectNeurons {
      * @param neurons source neurons.
      * @param neurons2 target neurons.
      */
-    public Radial(final Network network, final ArrayList neurons, final ArrayList neurons2) {
+    public Radial(final Network network, final List<? extends Neuron> neurons, final ArrayList<? extends Neuron> neurons2) {
         super(network, neurons, neurons2);
     }
 

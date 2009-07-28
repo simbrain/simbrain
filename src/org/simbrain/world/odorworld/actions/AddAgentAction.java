@@ -23,13 +23,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.world.odorworld.OdorWorldPanel;
-import org.simbrain.world.odorworld.entities.BasicEntity;
-
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
  * Open plot action.
  */
-public final class AddEntityAction extends AbstractAction {
+public final class AddAgentAction extends AbstractAction {
 
 	/**
 	 * Reference to Panel; the action refers to the panel because it needs
@@ -42,8 +41,8 @@ public final class AddEntityAction extends AbstractAction {
      *
      * @param component GUI component, must not be null.
      */
-    public AddEntityAction(final OdorWorldPanel worldPanel) {
-        super("Add Entity");
+    public AddAgentAction(final OdorWorldPanel worldPanel) {
+        super("Add Agent");
         this.worldPanel = worldPanel;
 //        putValue(SMALL_ICON, ResourceManager.getImageIcon("PixelMatrix.png"));
 //        putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
@@ -52,7 +51,7 @@ public final class AddEntityAction extends AbstractAction {
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-    	BasicEntity entity = new BasicEntity();
+    	RotatingEntity entity = new RotatingEntity();
     	entity.setLocation(worldPanel.getSelectedPoint().x, worldPanel.getSelectedPoint().y);
     	worldPanel.getWorld().addEntity(entity);
     }

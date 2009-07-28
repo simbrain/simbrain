@@ -31,7 +31,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Action for opening an Odor World.
  */
-public final class OpenWorldAction
+public final class SaveWorldAsAction
     extends AbstractAction {
 
     /** Plot GUI component. */
@@ -42,21 +42,19 @@ public final class OpenWorldAction
      *
      * @param component GUI component, must not be null.
      */
-    public OpenWorldAction(final GuiComponent component) {
-        super("Open World...");
+    public SaveWorldAsAction(final GuiComponent component) {
+        super("Save World As...");
         if (component == null) {
             throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-        putValue(SHORT_DESCRIPTION, "Open odor world");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
+        putValue(SHORT_DESCRIPTION, "Save odor world As");
     }
 
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        component.showOpenFileDialog();
+        component.showSaveFileDialog();
     }
 }

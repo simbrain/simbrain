@@ -26,37 +26,47 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.world.odorworld.DialogOdorWorld;
+import org.simbrain.world.odorworld.OdorWorldPanel;
 
 /**
  * Action for opening an Odor World.
  */
-public final class OpenWorldAction
+public final class ShowWorldPrefsAction
     extends AbstractAction {
 
     /** Plot GUI component. */
-    private final GuiComponent component;
+    private final OdorWorldPanel component;
 
     /**
      * Create a new open plot action.
      *
      * @param component GUI component, must not be null.
      */
-    public OpenWorldAction(final GuiComponent component) {
-        super("Open World...");
+    public ShowWorldPrefsAction(final OdorWorldPanel component) {
+        super("World Preferences...");
         if (component == null) {
             throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-        putValue(SHORT_DESCRIPTION, "Open odor world");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SHORT_DESCRIPTION, "Odor world preferences...");
     }
 
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        component.showOpenFileDialog();
+        DialogOdorWorld theDialog = new DialogOdorWorld(component);
+        theDialog.pack();
+        theDialog.setLocationRelativeTo(null);
+        theDialog.setVisible(true);
+
+        if (!theDialog.hasUserCancelled()) {
+            theDialog.setValues();
+        }
+
+        component.repaint();
     }
 }

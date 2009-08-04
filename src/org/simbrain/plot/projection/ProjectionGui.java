@@ -21,10 +21,9 @@ package org.simbrain.plot.projection;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
 import java.util.concurrent.Executors;
 
 import javax.swing.Action;
@@ -42,14 +41,8 @@ import javax.swing.JToolBar;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
-import org.jfree.chart.renderer.xy.XYItemRendererState;
-import org.jfree.data.xy.XYDataset;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
@@ -59,10 +52,10 @@ import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Display a Scatter Plot.
+ * Display a projection plot.
  */
 public class ProjectionGui extends GuiComponent<ProjectionComponent> implements ActionListener {
-    
+
     /** Projector on/off checkbox. */
     private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.png"));
 
@@ -113,62 +106,47 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 
     /** Show error option. */
     private boolean showError = true;
- 
+
     /** Plot Action Manager. */
     private PlotActionManager actionManager;
-    
+
     /** The JFreeChart chart. */
     private JFreeChart chart;
-    
+
     /** The dot renderer. */
     private XYDotRenderer renderer;
 
     /** The JFreeChart panel specialized for displaying JFreeCharts. */
     private ChartPanel panel;
-    
+
     /**
      * Subclass of dot renderer which colors the "current" data item differently.
      */
     private class CustomRenderer extends XYDotRenderer {
 
-		/* (non-Javadoc)
-		 * @see org.jfree.chart.renderer.xy.XYDotRenderer#drawItem(java.awt.Graphics2D, org.jfree.chart.renderer.xy.XYItemRendererState, java.awt.geom.Rectangle2D, org.jfree.chart.plot.PlotRenderingInfo, org.jfree.chart.plot.XYPlot, org.jfree.chart.axis.ValueAxis, org.jfree.chart.axis.ValueAxis, org.jfree.data.xy.XYDataset, int, int, org.jfree.chart.plot.CrosshairState, int)
-		 */
+        /**
+         * TODO: Make it possible to turn this off
+         */
+
 		@Override
-		public void drawItem(Graphics2D graphics, XYItemRendererState arg1,
-				Rectangle2D arg2, PlotRenderingInfo arg3, XYPlot arg4,
-				ValueAxis arg5, ValueAxis arg6, XYDataset arg7, int series,
-				int item, CrosshairState state, int pass) {
-
-			//System.out.println("item = " + item + "   currentIndex = " + getWorkspaceComponent().getProjectionModel().currentItemIndex);
-
-			/**
-			 * TODO: 
-			 * 	(1) Use non-deprecated methods
-			 * 	(2) Make it possible to turn this off
-			 *  (3) Optimize (do all these setPaints slow things down?) 
-			 */
-			
-			if (item == getWorkspaceComponent().getProjectionModel().getCurrentItemIndex() - 1) {
-				this.setPaint(Color.red, false);
-			} else {
-				this.setPaint(Color.green.brighter(), false);
-			}
-			super.drawItem(graphics, arg1, arg2, arg3, arg4, arg5, arg6, arg7, series, item,
-					state, pass);
+		public Paint getItemPaint(int row, int column) {
+			if (column == getWorkspaceComponent().getProjectionModel().getCurrentItemIndex() - 1) {
+				return Color.red;
+            } else {
+                return Color.green.brighter();
+            }
 		}
-    	
     }
 
     /**
      * Construct the ScatterPlot.
      */
-    public ProjectionGui (final GenericFrame frame, final ProjectionComponent component) {
+    public ProjectionGui(final GenericFrame frame, final ProjectionComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
         actionManager = new PlotActionManager(this);
         setLayout(new BorderLayout());
-        
+
         // Generate the graph
         chart = ChartFactory.createScatterPlot("High Dimensional Projection",
 				"Projection X", "Projection Y", getWorkspaceComponent()
@@ -185,18 +163,18 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         renderer.setDotWidth(5);
         renderer.setDotHeight(5);
 
-        // Tooltip implementation that needs work...
-        //
-        //        renderer = new XYLineAndShapeRenderer(false, true);
-        //        renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
-        //            public String generateToolTip(XYDataset dataset, int series, int item) {
-        //                return org.simbrain.util.Utils.doubleArrayToString(getWorkspaceComponent().getGauge().getUpstairs().getPoint(item));
-        //             }
-        //        });
+      // This is not currently supported...
+//		renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
+//			public String generateToolTip(XYDataset dataset, int series,
+//					int item) {
+//				return Utils.doubleArrayToString(getWorkspaceComponent()
+//						.getGauge().getUpstairs().getPoint(item));
+//			}
+//		});
 
         chart.getXYPlot().setRenderer(renderer);
         panel = new ChartPanel(chart);
-        
+
         // Toolbar
         onOffBox.setToolTipText("Turn gauge on or off");
         openBtn.setToolTipText("Open high-dimensional data");
@@ -229,7 +207,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         JButton addButton = new JButton("Add");
         addButton.setActionCommand("Add");
         addButton.addActionListener(this);
-        
+
         // Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
@@ -237,7 +215,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 
         // Setup Menu Bar
         createAttachMenuBar();
-        
+
         // Status Bar
         statusBar.add(pointsLabel);
         statusBar.add(dimsLabel);
@@ -249,12 +227,12 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         southPanel.add(errorBar);
         southPanel.add(statusBar);
         bottomPanel.add("South", southPanel);
-        
+
         // Put all panels together
         add("North", theToolBar);
         add("Center", panel);
         add("South", bottomPanel);
-        
+
         //Add listener
         getWorkspaceComponent().getProjectionModel().addListener(new ChartListener() {
 
@@ -271,13 +249,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 			public void dataSourceRemoved(int index) {
 				update();
 			}
-        	
+
         });
-        
+
         // Initializes labels
         update();
     }
-    
+
     /**
      * Initializes frame.
      */
@@ -290,15 +268,16 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
      * @return menu bar
      */
     private void createAttachMenuBar() {
-        JMenuBar bar = new JMenuBar();
 
-        JMenu fileMenu = new JMenu("File");
+        final JMenuBar bar = new JMenuBar();
+        final JMenu fileMenu = new JMenu("File");
+
         for (Action action : actionManager.getOpenSavePlotActions()) {
             fileMenu.add(action);
         }
 
-        JMenu editMenu = new JMenu("Edit");
-        JMenuItem preferences = new JMenuItem("Preferences...");
+        final JMenu editMenu = new JMenu("Edit");
+        final JMenuItem preferences = new JMenuItem("Preferences...");
         preferences.addActionListener(this);
         preferences.setActionCommand("dialog");
         editMenu.add(preferences);
@@ -325,7 +304,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
             errorLabel.setText(" Error:" + getWorkspaceComponent().getGauge().getError());
         }
     }
-  
+
     /**
      * {@inheritDoc}
      */
@@ -337,7 +316,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
             String selectedGauge = ((JComboBox) e1).getSelectedItem().toString();
             getWorkspaceComponent().getGauge().setCurrentProjectionMethod(selectedGauge);
             getWorkspaceComponent().changeProjection();
-            
+
             ProjectionMethod proj = getWorkspaceComponent().getGauge().getCurrentProjectionMethod();
             if (proj == null) {
                 return;
@@ -373,8 +352,8 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
                     getWorkspaceComponent().getProjectionModel().setRunning(true);
                 }
             } else if (btemp == randomBtn) {
-               getWorkspaceComponent().getGauge().getDownstairs().randomize(100);
-               getWorkspaceComponent().resetChartDataset();
+                getWorkspaceComponent().getGauge().getDownstairs().randomize(100);
+                getWorkspaceComponent().resetChartDataset();
             }
         }
 
@@ -384,13 +363,13 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
         if (e.getActionCommand().equalsIgnoreCase("Delete")) {
             getWorkspaceComponent().getProjectionModel().removeSource();
         }
-               
    }
-    
+
     /**
-     * Enable or disable buttons depending on whether the current projection algorithm allows for iterations or not.
+     * Enable or disable buttons depending on whether the current projection
+     * algorithm allows for iterations or not.
      *
-     * @param b whether the current projection algorithm can be iterated or not
+     * @param b whether the current projection algorithm can be iterated
      */
     private void setToolbarIterable(final boolean b) {
         if (b) {

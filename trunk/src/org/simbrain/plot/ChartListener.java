@@ -29,14 +29,14 @@ public interface ChartListener {
      *
      * @param index the index of the added data source
      */
-    public void dataSourceAdded(final int index);
+    void dataSourceAdded(final int index);
 
     /**
      * A data source was removed at the specified index.
-     * 
+     *
      * @param index the index of the data source that was removed
      */
-    public void dataSourceRemoved(final int index);
+    void dataSourceRemoved(final int index);
 
 
 }

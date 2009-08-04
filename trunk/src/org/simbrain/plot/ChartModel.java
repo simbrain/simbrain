@@ -26,7 +26,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Base class for chart model classes. Maintains listeners.
- * 
+ *
  * TODO: Some charts have update happening inside the consumer setVal function.
  * This makes it impossible to "turn the component off". It's also a bit
  * inefficient, since a graphics update fired every time. See projection for a
@@ -46,9 +46,9 @@ public class ChartModel {
      * @param listener listener to add.
      */
     public void addListener(ChartListener listener) {
-    	 listenerList.add(listener);
+        listenerList.add(listener);
     }
-    
+
     /**
      * Add a ChartSettings listener.
      *
@@ -67,7 +67,7 @@ public class ChartModel {
             listener.chartSettingsUpdated();
         }
     }
-    
+
     /**
      * Fire data source added event.
      *
@@ -94,10 +94,10 @@ public class ChartModel {
      * Creates an xtream object with relevant fields omitted.
      * @return
      */
-	public static XStream getXStream() {
-    	XStream xstream = new XStream(new DomDriver());
-    	xstream.omitField(ChartModel.class, "listenerList");
-    	xstream.omitField(ChartModel.class, "settingsListenerList");
-    	return xstream;
-	}
+    public static XStream getXStream() {
+        final XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(ChartModel.class, "listenerList");
+        xstream.omitField(ChartModel.class, "settingsListenerList");
+        return xstream;
+    }
 }

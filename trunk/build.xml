@@ -31,7 +31,7 @@
     <target name="install" description="Install jar" depends="jar">
     </target>
 
-    <taskdef resource="checkstyletask.properties" classpath="${etc}/checkstyle-all-4.4.jar"/>
+    <taskdef resource="checkstyletask.properties" classpath="${etc}/checkstyle-all-5.0.jar"/>
 
     <target name="checkstyle" description="Generates a report of code convention violations">
       <checkstyle config="${etc}/checkstyle.xml">

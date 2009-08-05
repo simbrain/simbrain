@@ -113,12 +113,12 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
-        cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
+//        cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
-        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
+//        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
+//        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
         
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getExcitatoryReversal")) {
@@ -136,9 +136,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getLeakConductance")) {
             tfLC.setText(NULL_STRING);
         }
-        if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
-            neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
-        }
+//        if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
+//            neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
+//        }
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getThreshold")) {
             tfThreshold.setText(NULL_STRING);
         }
@@ -171,8 +171,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
-        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
+//        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
+//        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
     }
 
     /**
@@ -202,18 +202,18 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
             if (!tfThreshold.getText().equals(NULL_STRING)) {
                 neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
             }
-            if (!tfGain.getText().equals(NULL_STRING)) {
-                neuronRef.setGain(Double.parseDouble(tfGain.getText()));
-            }
-            if (!tfBias.getText().equals(NULL_STRING)) {
-                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-            }
-            if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
-                neuronRef.setTimeAveraging(Double.parseDouble(tfTimeAveraging.getText()));
-            }
-            if (!tfNormFactor.getText().equals(NULL_STRING)) {
-                neuronRef.setNormFactor(Double.parseDouble(tfNormFactor.getText()));
-            }
+//            if (!tfGain.getText().equals(NULL_STRING)) {
+//                neuronRef.setGain(Double.parseDouble(tfGain.getText()));
+//            }
+//            if (!tfBias.getText().equals(NULL_STRING)) {
+//                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+//            }
+//            if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
+//                neuronRef.setTimeAveraging(Double.parseDouble(tfTimeAveraging.getText()));
+//            }
+//            if (!tfNormFactor.getText().equals(NULL_STRING)) {
+//                neuronRef.setNormFactor(Double.parseDouble(tfNormFactor.getText()));
+//            }
 
         }
     }

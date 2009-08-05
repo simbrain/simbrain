@@ -40,7 +40,8 @@ import org.simbrain.plot.projection.*;
 	BasicEntity object1 = new BasicEntity("Swiss.gif");
 	object1.setLocation(36,107);
 	object1.setSmellSource(
-                new SmellSource(SimbrainMath.randomVector(5, 0, 100),
+                new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.3,0.0,0.0,0.0,0.0,0.0,0.0}
+                , 100),
                 SmellSource.DecayFunction.GAUSSIAN, 
                 object1.getLocation()));
 	world.addEntity(object1);	
@@ -48,33 +49,37 @@ import org.simbrain.plot.projection.*;
 	BasicEntity object2 = new BasicEntity("Gouda.gif");
 	object2.setLocation(169,32);
 	object2.setSmellSource(
-                new SmellSource(SimbrainMath.randomVector(5, 0, 100),
+                new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.0,0.3,0.0,0.0,0.0,0.0,0.0}
+                , 100),
                 SmellSource.DecayFunction.GAUSSIAN, 
-                object2.getLocation()));
+                object1.getLocation()));
 	world.addEntity(object2);	
 
 	BasicEntity object3 = new BasicEntity("Bluecheese.gif");
 	object3.setLocation(304,87);
 	object3.setSmellSource(
-                new SmellSource(SimbrainMath.randomVector(5, 0, 100),
+                new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.0,0.0,0.0,0.3,0.0,0.0,0.0}
+                , 100),
                 SmellSource.DecayFunction.GAUSSIAN, 
-                object3.getLocation()));
+                object1.getLocation()));
 	world.addEntity(object3);
 
 	BasicEntity object4 = new BasicEntity("Tulip.gif");
 	object4.setLocation(80,351);
 	object4.setSmellSource(
-                new SmellSource(SimbrainMath.randomVector(5, 0, 100),
+                new SmellSource(SimbrainMath.multVector(new double[]{0.0,0.3,0.0,0.7,0.0,0.0,0.0,0.0}
+                , 100),
                 SmellSource.DecayFunction.GAUSSIAN, 
-                object4.getLocation()));
+                object1.getLocation()));
 	world.addEntity(object4);
 	
 	BasicEntity object5 = new BasicEntity("Pansy.gif");
 	object5.setLocation(251,370);
 	object5.setSmellSource(
-                new SmellSource(SimbrainMath.randomVector(5, 0, 100),
+                new SmellSource(SimbrainMath.multVector(new double[]{0.0,0.0,0.3,0.7,0.0,0.0,0.0,0.0}
+                , 100),
                 SmellSource.DecayFunction.GAUSSIAN, 
-                object5.getLocation()));
+                object1.getLocation()));
 	world.addEntity(object5);	
 	
 	

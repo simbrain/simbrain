@@ -60,7 +60,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * Initialize this component.
      */
     private void init() {
-        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
         world.addListener(new WorldListener() {
             public void updated() {
                 fireUpdateEvent();
@@ -75,7 +74,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
             public void effectorRemoved(final Effector effector) {
                 // TODO Auto-generated method stub
-                
             }
 
             public void entityAdded(final OdorWorldEntity entity) {

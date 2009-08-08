@@ -24,6 +24,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.listeners.GroupListener;
+import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.listeners.NetworkListener;
+import org.simbrain.network.listeners.NeuronListener;
+import org.simbrain.network.listeners.SubnetworkListener;
+import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
@@ -39,7 +45,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public class RootNetwork extends Network {
 
     public static final String NEURON_ID_PREFIX = "Neuron";
-    
+
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(RootNetwork.class);
 
@@ -78,12 +84,14 @@ public class RootNetwork extends Network {
 
     /**
      * Enumeration for the update methods.
-     * 
+     *
      * BUFFER: default update method; based on buffering
-     * 
+      
      * PRIORITYBASED: user sets the priority for each neuron, sub-neuron and
      * synapse. Default priority value is 0. Elements with smaller priority
      * value are updated first.
+     * 
+     * TODO: Remove this?
      */
     public enum UpdateMethod { PRIORITYBASED, BUFFERED }
 
@@ -104,12 +112,25 @@ public class RootNetwork extends Network {
 
     /** Synapse Id generator. */
     private SimpleId synapseIdGenerator = new SimpleId("Synapse", 1);
-    
-    private List<NetworkListener> listeners = new ArrayList<NetworkListener>();
+
+    /** List of objects registered to observe general network events. */
+    private List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
+
+    /** List of objects registered to observe neuron-related network events. */
+    private List<NeuronListener> neuronListeners = new ArrayList<NeuronListener>();
+
+    /** List of objects registered to observe synapse-related network events. */
+    private List<SynapseListener> synapseListeners = new ArrayList<SynapseListener>();
+
+    /** List of objects registered to observe subnetwork-related network events. */
+    private List<SubnetworkListener> subnetworkListeners = new ArrayList<SubnetworkListener>();
+
+    /** List of objects registered to observe group-related network events. */
+    private List<GroupListener> groupListeners = new ArrayList<GroupListener>();
 
     /**
      * When using from a console.
-     * 
+     *
      * @param id String id of this network
      */
     public RootNetwork() {
@@ -439,7 +460,7 @@ public class RootNetwork extends Network {
      * @param deleted neuron which has been deleted
      */
     public void fireNeuronDeleted(final Neuron deleted) {
-        for (NetworkListener listener : listeners) {
+        for (NeuronListener listener : neuronListeners) {
             listener.neuronRemoved(new NetworkEvent<Neuron>(this, deleted));
         }
     }
@@ -449,7 +470,7 @@ public class RootNetwork extends Network {
      */
     public void fireNetworkChanged() {
 
-        for (NetworkListener listener : listeners) {
+        for (NetworkListener listener : networkListeners) {
             listener.networkChanged();
         }
     }
@@ -459,7 +480,7 @@ public class RootNetwork extends Network {
      * @param moved Neuron that has been moved
      */
     public void fireNeuronMoved(final Neuron moved) {
-        for (NetworkListener listener : listeners) {
+        for (NeuronListener listener : neuronListeners) {
             listener.neuronMoved(new NetworkEvent<Neuron>(this, moved));
         }
     }
@@ -468,6 +489,7 @@ public class RootNetwork extends Network {
      * Fire a clamp changed event to all registered model listeners.
      */
     public void fireClampChanged() {
+        // TODO: NeuronsClamped, SynapsesClamped
 //        for (NetworkListener listener : component.getListeners()) {
 //            listener.clampMenuChanged();
 //            listener.clampBarChanged();
@@ -484,7 +506,7 @@ public class RootNetwork extends Network {
      * @param added neuron which was added
      */
     public void fireNeuronAdded(final Neuron added) {
-        for (NetworkListener listener : listeners) {
+        for (NeuronListener listener : neuronListeners) {
             listener.neuronAdded(new NetworkEvent<Neuron>(this, added));
         }
     }
@@ -496,18 +518,18 @@ public class RootNetwork extends Network {
      * @param changed the new, changed neuron
      */
     public void fireNeuronTypeChanged(final Neuron old, final Neuron changed) {
-        for (NetworkListener listener : listeners) {
+        for (NeuronListener listener : neuronListeners) {
             listener.neuronTypeChanged(new NetworkEvent<Neuron>(this, old, changed));
         }
     }
-    
+
     /**
      * Fire a neuron changed event to all registered model listeners.
      *
      * @param changed new, changed neuron
      */
     public void fireNeuronChanged(final Neuron changed) {
-        for (NetworkListener listener : listeners) {
+        for (NeuronListener listener : neuronListeners) {
             listener.neuronChanged(new NetworkEvent<Neuron>(this, changed));
         }
     }
@@ -519,7 +541,7 @@ public class RootNetwork extends Network {
      * @param added synapse which was added
      */
     public void fireSynapseAdded(final Synapse added) {
-        for (NetworkListener listener : listeners) {
+        for (SynapseListener listener : synapseListeners) {
             listener.synapseAdded(new NetworkEvent<Synapse>(this, added));
         }
     }
@@ -530,7 +552,7 @@ public class RootNetwork extends Network {
      * @param deleted synapse which was deleted
      */
     public void fireSynapseDeleted(final Synapse deleted) {
-        for (NetworkListener listener : listeners) {
+        for (SynapseListener listener : synapseListeners) {
             listener.synapseRemoved(new NetworkEvent<Synapse>(this, deleted));
         }
     }
@@ -541,7 +563,7 @@ public class RootNetwork extends Network {
      * @param changed new, changed synapse
      */
     public void fireSynapseChanged(final Synapse changed) {
-        for (NetworkListener listener : listeners) {
+        for (SynapseListener listener : synapseListeners) {
             listener.synapseChanged(new NetworkEvent<Synapse>(this, changed));
         }
     }
@@ -553,7 +575,7 @@ public class RootNetwork extends Network {
      * @param changed new, changed synapse
      */
     public void fireSynapseTypeChanged(final Synapse old, final Synapse changed) {
-        for (NetworkListener listener : listeners) {
+        for (SynapseListener listener : synapseListeners) {
             listener.synapseTypeChanged(new NetworkEvent<Synapse>(this, old, changed));
         }
     }
@@ -584,7 +606,7 @@ public class RootNetwork extends Network {
      * @param added synapse which was added
      */
     public void fireSubnetAdded(final RootNetwork added) {
-        for (NetworkListener listener : listeners) {
+        for (SubnetworkListener listener : subnetworkListeners) {
             listener.subnetAdded(new NetworkEvent<Network>(this, added));
         }
     }
@@ -595,7 +617,7 @@ public class RootNetwork extends Network {
      * @param deleted synapse which was deleted
      */
     public void fireSubnetDeleted(final Network deleted) {
-        for (NetworkListener listener : listeners) {
+        for (SubnetworkListener listener : subnetworkListeners) {
             listener.subnetRemoved(new NetworkEvent<Network>(this, deleted));
         }
     }
@@ -606,7 +628,7 @@ public class RootNetwork extends Network {
      * @param added synapse which was added
      */
     public void fireSubnetAdded(final Network added) {
-        for (NetworkListener listener : listeners) {
+        for (SubnetworkListener listener : subnetworkListeners) {
             listener.subnetAdded(new NetworkEvent<Network>(this, added));
         }
     }
@@ -617,34 +639,35 @@ public class RootNetwork extends Network {
      * @param added Group that has been added
      */
     public void fireGroupAdded(final Group added) {
-        for (NetworkListener listener : listeners) {
+        for (GroupListener listener : groupListeners) {
             listener.groupAdded(new NetworkEvent<Group>(this, added));
         }
     }
 
     /**
-     * Fire a group changed event to all registered model listeners.
+     * Fire a group deleted event to all registered model listeners.
      *
-     * @param old Old group
-     * @param changed New changed group
+     * @param deleted Group to be deleted
      */
-    public void fireGroupChanged(final Group old, final Group changed) {
-        for (NetworkListener listener : listeners) {
-            listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
+    public void fireGroupDeleted(final Group deleted) {
+        for (GroupListener listener : groupListeners) {
+            listener.groupRemoved(new NetworkEvent<Group>(this, deleted));
         }
     }
 
     /**
      * Fire a group changed event to all registered model listeners.
-     *
-     * @param deleted Group to be deleted
+     * 
+     * @param old Old group
+     * @param changed New changed group
      */
-    public void fireGroupDeleted(final Group deleted) {
-        for (NetworkListener listener : listeners) {
-            listener.groupRemoved(new NetworkEvent<Group>(this, deleted));
+    public void fireGroupChanged(final Group old, final Group changed) {
+
+        for (GroupListener listener : groupListeners) {
+            listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
         }
     }
-    
+
     /**
      * @return Clamped weights.
      */
@@ -809,7 +832,7 @@ public class RootNetwork extends Network {
     public SimpleId getNetworkIdGenerator() {
         return networkIdGenerator;
     }
-    
+
     /**
      * Return the generator for synapse ids.
      *
@@ -819,11 +842,59 @@ public class RootNetwork extends Network {
         return synapseIdGenerator;
     }
 
-    public void addListener(NetworkListener listener) {
-        if (listeners == null) {
-            listeners = new ArrayList<NetworkListener>();
-        }
-        listeners.add(listener);
+    /**
+     * Register a network listener.
+     *
+     * @param listener the observer to register
+     */
+    public void addNetworkListener(final NetworkListener listener) {
+        networkListeners.add(listener);
     }
+
+    /**
+     * Register a neuron listener.
+     *
+     * @param listener the observer to register
+     */
+    public void addNeuronListener(final NeuronListener listener) {
+        neuronListeners.add(listener);
+    }
+
+    /**
+     * Register a synapse listener.
+     *
+     * @param listener the observer to register
+     */
+    public void addSynapseListener(final SynapseListener listener) {
+        synapseListeners.add(listener);
+    }
+
+    /**
+     * Remove a synapse listener.
+     *
+     * @param synapseListener the observer to remove
+     */
+    public void removeSynapseListener(SynapseListener synapseListener) {
+        synapseListeners.remove(synapseListener);
+    }
+
+    /**
+     * Register a subnetwork listener.
+     *
+     * @param listener the observer to register
+     */
+    public void addSubnetworkListener(final SubnetworkListener listener) {
+        subnetworkListeners.add(listener);
+    }
+
+    /**
+     * Register a group listener.
+     *
+     * @param listener the observer to register
+     */
+    public void addGroupListener(final GroupListener listener) {
+        groupListeners.add(listener);
+    }
+
 
 }

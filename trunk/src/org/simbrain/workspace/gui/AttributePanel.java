@@ -70,7 +70,7 @@ public class AttributePanel extends JPanel implements ActionListener,
 
     /**
      * Creates a new attribute list panel.
-     * 
+     *
      * @param workspace
      *            reference to workspace
      */
@@ -106,7 +106,7 @@ public class AttributePanel extends JPanel implements ActionListener,
         parentFrame.setContentPane(this);
         parentFrame.pack();
     }
-    
+
     /**
      * Add a listener to the specified workspace component.
      *
@@ -130,7 +130,7 @@ public class AttributePanel extends JPanel implements ActionListener,
             public void producerRemoved(Producer producer) {
                 refresh(producer.getParentComponent());
             }
-            
+
         });
 
     }
@@ -159,7 +159,7 @@ public class AttributePanel extends JPanel implements ActionListener,
             if (attributeType == AttributeType.Producing) {
                 for (ProducingAttribute<?> attribute : component
                         .getProducingAttributes()) {
-                    System.out.println("adding producing attribute: " + attribute);
+                    //System.out.println("adding producing attribute: " + attribute);
                     model.addElement(attribute);
                 }
             } else if (attributeType == AttributeType.Consuming) {

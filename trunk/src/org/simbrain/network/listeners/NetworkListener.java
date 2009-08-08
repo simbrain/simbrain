@@ -16,21 +16,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network;
+package org.simbrain.network.listeners;
 
 
 /**
- * This class stores preferences for the logical network.
- * Like NetworkGuiSettings, this will be a base preference storing class, which can then be used
- * either on its own, or with user preferences.
- * 
- * @see org.simbrain.network.gui.NetworkGuiSettings.
- * 
- * NOTE: We have obviously not added this functionality yet.
+ * Listener interface for receiving general network events. Classes interested
+ * in responding to such events are registered with a RootNetwork, which
+ * broadcasts those events to registered observer classes.
  */
-public class NetworkSettings {
+public interface NetworkListener {
 
-    //TODO: Start filling this in!
+    /**
+     * Invoked during network update, when the structure of a network does not
+     * change, but activations, synapse strengths, etc. change.
+     */
+    void networkChanged();
 
-   
+    // TODO: Add clamp events here?
+    // TODO: Add some kind of setting event here, for centering camera, etc?
+
+    //  /**
+    //  * Notify listeners that all neurons have been clamped.
+    //  */
+    // void neuronsClamped();
+    //  /**
+    //  * Invoked when all synapse are clamped.
+    //  */
+    // void synapsesClamped();
+
 }

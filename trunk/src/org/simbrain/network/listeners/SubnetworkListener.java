@@ -16,21 +16,31 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network;
+package org.simbrain.network.listeners;
 
+import org.simbrain.network.interfaces.Network;
 
 /**
- * This class stores preferences for the logical network.
- * Like NetworkGuiSettings, this will be a base preference storing class, which can then be used
- * either on its own, or with user preferences.
- * 
- * @see org.simbrain.network.gui.NetworkGuiSettings.
- * 
- * NOTE: We have obviously not added this functionality yet.
+ * Listener interface for receiving network events relating to subnetworks.
+ * Classes interested in responding to such events are registered with a
+ * RootNetwork, which broadcasts those events to registered observer classes.
  */
-public class NetworkSettings {
+public interface SubnetworkListener {
 
-    //TODO: Start filling this in!
+    /**
+     * Invoked when a subnetwork is added.
+     *
+     * @param networkEvent
+     *            network event which holds reference to old and new subnetwork
+     */
+    void subnetAdded(NetworkEvent<Network> networkEvent);
 
-   
+    /**
+     * Invoked when a subnetwork is removed.
+     *
+     * @param networkEvent
+     *            network event which holds reference to old and new subnetwork
+     */
+    void subnetRemoved(NetworkEvent<Network> networkEvent);
+
 }

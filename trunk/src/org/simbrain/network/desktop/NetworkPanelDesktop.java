@@ -32,18 +32,18 @@ import org.simbrain.network.interfaces.RootNetwork;
 
 /**
  * Extension of Network Panel with functions used in a desktop setting.
- * 
+ *
  * @author jyoshimi
  */
 public class NetworkPanelDesktop extends NetworkPanel {
 
     /** Reference to Desktop Component. */
     NetworkDesktopComponent component;
-    
+
     public NetworkPanelDesktop(final NetworkDesktopComponent component, final RootNetwork rootNetwork) {
         super(rootNetwork);
         this.component = component;
-        
+
         // TODO: Finish this and clean it up
         NetworkGuiSettings.setLineColor(new Color(NetworkGuiPreferences.getLineColor()));
         NetworkGuiSettings.setBackgroundColor(new Color(NetworkGuiPreferences.
@@ -72,7 +72,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createEditMenu() {
 
         JMenu editMenu = new JMenu("Edit");
-        
+
         editMenu.add(actionManager.getCutAction());
         editMenu.add(actionManager.getCopyAction());
         editMenu.add(actionManager.getPasteAction());

@@ -39,18 +39,13 @@ public class ProjectionComponent extends WorkspaceComponent {
 
     /** Data model. */
     private ProjectionModel projectionModel;
-    
+
     /**
      * Default number of sources. This is the dimensionality of the hi D
      * projectionModel
      */
     private final int DEFAULT_NUMBER_OF_SOURCES = 25;
 
-    /** Initialize projection component. */
-    {
-        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
-    }
-    
     /**
      * Create new Projection Component.
      */
@@ -59,7 +54,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         projectionModel = new ProjectionModel();
         init(DEFAULT_NUMBER_OF_SOURCES);
     }
-    
+
     /**
      * Initializes a JFreeChart with specific number of data sources.
      *
@@ -71,7 +66,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         projectionModel = new ProjectionModel();
         init(numDataSources);
     }
-    
+
     /**
      * Create a projection component from an existing set of data.
      * Used in deserializing.
@@ -85,7 +80,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         int numPoints = projectionModel.getProjector().getNumPoints();
         getConsumers().clear();
         init(numPoints);
-        
+
         // Add the data to the chart.
         for (int i = 0; i < numPoints; i++) {
             double[] point = projectionModel.getProjector().getDownstairs().getPoint(i);
@@ -94,10 +89,10 @@ public class ProjectionComponent extends WorkspaceComponent {
             }
         }
     }
-    
+
 	/**
 	 * Initialize plot.
-	 * 
+	 *
 	 * @param numSources number of data sources
 	 */
 	private void init(final int numSources) {

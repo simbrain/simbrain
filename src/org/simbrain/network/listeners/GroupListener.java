@@ -16,40 +16,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.network.listeners;
+
+import org.simbrain.network.interfaces.Group;
 
 /**
- * Listener for consumer and producer events.
- *
- * @author jyoshimi
+ * Listener interface for receiving network events relating to model groups.
+ * Classes interested in responding to such events are registered with a
+ * RootNetwork, which broadcasts those events to registered observer classes.
  */
-public interface AttributeHolderListener {
+public interface GroupListener {
 
     /**
-     * A Consumer was removed.
+     * Invoked when a group is added.
      *
-     * @param consumer the removed consumer
+     * @param e network event which holds reference to old and new group
      */
-    public void consumerRemoved(final Consumer consumer);
+    void groupAdded(NetworkEvent<Group> e);
 
     /**
-     * A consumer was added.
+     * Invoked when a group is removed.
      *
-     * @param consumer the added consumer.
+     * @param e network event which holds reference to removed group.
      */
-    public void consumerAdded(final Consumer consumer);
+    void groupRemoved(NetworkEvent<Group> e);
 
     /**
-     * A producer was removed.
+     * Invoked when a group is changed.
      *
-     * @param producer removed producer
+     * @param networkEvent event which holds reference to old and changed group.
      */
-    public void producerRemoved(final Producer producer);
+    void groupChanged(NetworkEvent<Group> networkEvent);
 
-    /**
-     * A producer was added.
-     *
-     * @param producer the added producer
-     */
-    public void producerAdded(final Producer producer);
 }

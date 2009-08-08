@@ -37,10 +37,10 @@ public class SynapseWrapper implements Producer, Consumer {
 
     /** Parent component. */
     private NetworkComponent parent;
-    
+
     /** Wrapped synapse. */
     private Synapse synapse;
-    
+
     /** The producing attributes. */
     private ArrayList<ProducingAttribute<?>> producingAttributes
         = new ArrayList<ProducingAttribute<?>>();
@@ -48,6 +48,9 @@ public class SynapseWrapper implements Producer, Consumer {
     /** The consuming attributes. */
     private ArrayList<ConsumingAttribute<?>> consumingAttributes
         = new ArrayList<ConsumingAttribute<?>>();
+
+    /** True if network is using synapse attributes. */
+    private static boolean isUsingSynapseAttributes;
 
     /**
      * Constructor.
@@ -62,7 +65,7 @@ public class SynapseWrapper implements Producer, Consumer {
         producingAttributes.add(activationAttribute);
         consumingAttributes.add(activationAttribute);
     }
-    
+
     /**
      * Returns the wrapped synapse.
      *
@@ -100,28 +103,28 @@ public class SynapseWrapper implements Producer, Consumer {
      */
     private class StrengthAttribute extends AbstractAttribute
             implements ProducingAttribute<Double>, ConsumingAttribute<Double> {
-        
+
         /**
          * {@inheritDoc}
          */
         public String getKey() {
             return "Strength";
         }
-        
+
         /**
          * {@inheritDoc}
          */
         public Double getValue() {
             return synapse.getStrength();
         }
-        
+
         /**
          * {@inheritDoc}
          */
         public void setValue(final Double value) {
             synapse.setStrength(value == null ? 0 : value);
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -143,4 +146,19 @@ public class SynapseWrapper implements Producer, Consumer {
     public WorkspaceComponent getParentComponent() {
         return parent;
     }
+
+    /**
+     * @return the isUsingSynapseAttributes
+     */
+    public static boolean isUsingSynapseAttributes() {
+        return isUsingSynapseAttributes;
+    }
+
+    /**
+     * @param isUsingSynapseAttributes the isUsingSynapseAttributes to set
+     */
+    public static void setUsingSynapseAttributes(boolean isUsingSynapseAttributes) {
+        SynapseWrapper.isUsingSynapseAttributes = isUsingSynapseAttributes;
+    }
+
 }

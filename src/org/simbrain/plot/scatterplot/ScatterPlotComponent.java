@@ -33,13 +33,6 @@ public class ScatterPlotComponent extends WorkspaceComponent {
 
     /** Data Model. */
     private ScatterPlotModel model;
-    
-    /**
-     * Initialize component.
-     */
-    {
-        this.setAttributeListingStyle(AttributeListingStyle.TOTAL);
-    }
 
     /**
      * Create new PieChart Component.
@@ -52,7 +45,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         addListener();
         model.defaultInit();
     }
-    
+
     /**
      * Create new BarChart Component from a specified model.
      * Used in deserializing.

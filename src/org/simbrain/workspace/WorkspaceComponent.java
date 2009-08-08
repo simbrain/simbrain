@@ -33,24 +33,25 @@ import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
 
 /**
- * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}.
- * Extend this class to create your own component type.  Gui representations of
- * a workspace component should extend {@link org.simbrain.workspace.gui.GuiComponent}.
- * 
+ * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}
+ * . Extend this class to create your own component type. Gui representations of
+ * a workspace component should extend
+ * {@link org.simbrain.workspace.gui.GuiComponent}.
+ *
  */
 public abstract class WorkspaceComponent {
-    
+
     /** The workspace that 'owns' this component. */
     private Workspace workspace;
-    
+
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(WorkspaceComponent.class);
-    
+
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
     //TODO: Check these for thread safety...
-    
+
     /** Consumer list. */
     private final List<Consumer> consumers = new CopyOnWriteArrayList<Consumer>();
 
@@ -65,18 +66,12 @@ public abstract class WorkspaceComponent {
      * when Simbrain is run as a GUI).
      */
     private Boolean guiOn = true;
-    
-    /** Whether to udpate this component. */
+
+    /** Whether to update this component. */
     private Boolean updateOn = true;
-    
+
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
-    
-    /** How to order a list of attributes. */
-    public enum AttributeListingStyle { TOTAL, DEFAULT_EACH };
-    
-    /** Current attribute listing style. */
-    private AttributeListingStyle attributeListingStyle = AttributeListingStyle.DEFAULT_EACH;
 
     /** Default current directory if it is not set elsewhere. */
     private static final String DEFAULT_CURRENT_DIRECTORY = "."
@@ -257,19 +252,19 @@ public abstract class WorkspaceComponent {
     public Collection<AttributeHolderListener> getAttributeListeners() {
         return Collections.unmodifiableCollection(attributeListeners);
     }
-    
+
     /**
      * Adds a AttributeHolderListener to this component.
-     * 
+     *
      * @param listener the AttributeHolderListener to add.
      */
     public void addAttributeListener(final AttributeHolderListener listener) {
         attributeListeners.add(listener);
     }
-    
+
     /**
      * Adds a AttributeHolderListener to this component.
-     * 
+     *
      * @param listener the AttributeHolderListener to add.
      */
     public void removeAttributeListener(final AttributeHolderListener listener) {
@@ -278,7 +273,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the name of this component.
-     * 
+     *
      * @return The name of this component.
      */
     public String getName() {
@@ -320,23 +315,22 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Return producing attributes in a particular order, for use in creating couplings.
-     * 
+     * Return producing attributes in a particular order, for use in creating
+     * couplings.
+     *
+     * Can be overridden if the attributes should be displayed in some special
+     * order.
+     *
      * @return custom list of producing attributes.
      */
     public ArrayList<ProducingAttribute<?>> getProducingAttributes() {
-        
+
         ArrayList<ProducingAttribute<?>> list = new ArrayList<ProducingAttribute<?>>();
-    
-        if (attributeListingStyle.equals(AttributeListingStyle.DEFAULT_EACH)) {
-            for (Producer producer : this.getProducers()) {
-                list.add(producer.getProducingAttributes().get(0));
-            }
-        } else if (attributeListingStyle.equals(AttributeListingStyle.TOTAL)) {
-            for (Producer producer : this.getProducers()) {
-                for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
-                    list.add(attribute);
-                }
+
+        for (Producer producer : this.getProducers()) {
+            for (ProducingAttribute<?> attribute : producer
+                    .getProducingAttributes()) {
+                list.add(attribute);
             }
         }
         return list;
@@ -344,27 +338,32 @@ public abstract class WorkspaceComponent {
 
     /**
      * Return consuming attributes in a specified order.
-     * 
+     *
+     * Can be overridden if the attributes should be displayed in some special
+     * order.
+     *
      * @return custom list of producing attributes.
      */
     public ArrayList<ConsumingAttribute<?>> getConsumingAttributes() {
-        
-        ArrayList<ConsumingAttribute<?>> list = new ArrayList<ConsumingAttribute<?>>();
-        if (attributeListingStyle.equals(AttributeListingStyle.DEFAULT_EACH)) {
-            for (Consumer consumer : this.getConsumers()) {
-                list.add(consumer.getConsumingAttributes().get(0));
-            }
-        } else if (attributeListingStyle.equals(AttributeListingStyle.TOTAL)) {
-            for (Consumer consumer : this.getConsumers()) {
-                for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
-                    list.add(attribute);
-                }
 
+        ArrayList<ConsumingAttribute<?>> list = new ArrayList<ConsumingAttribute<?>>();
+        for (Consumer consumer : this.getConsumers()) {
+            for (ConsumingAttribute<?> attribute : consumer
+                    .getConsumingAttributes()) {
+                list.add(attribute);
             }
         }
         return list;
     }
-        
+    
+//    public void addAttribute(Class<?> producerType, Attribute attribute) {
+//        for (Producer producer : producers) {
+//            if (producer.getClass() == producerType) {
+//                // producer.addAttribute(attribute);
+//            }
+//        }
+//    }
+
     /**
      * Open a workspace component from a file.  Currently assumes xml.
      *
@@ -381,7 +380,7 @@ public abstract class WorkspaceComponent {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Override for use with open service.
      *
@@ -393,7 +392,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Override for use with save service.
-     * 
+     *
      * @param reader the reader to deserialize from.
      */
     public final void deserializeFromReader(final FileReader reader) {
@@ -402,7 +401,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the producers associated with this component.
-     * 
+     *
      * @return The producers associated with this component.
      */
     public List<Producer> getProducers() {
@@ -417,7 +416,7 @@ public abstract class WorkspaceComponent {
     public List<Consumer> getConsumers() {
         return consumers;
     }
-    
+
     /**
      * Adds the specified consumer.
      *
@@ -441,7 +440,7 @@ public abstract class WorkspaceComponent {
             listener.producerAdded(producer);
         }
     }
-    
+
     /**
      * Removes specified consumer.
      *
@@ -454,7 +453,7 @@ public abstract class WorkspaceComponent {
             listener.consumerRemoved(consumer);
         }
     }
-    
+
     /**
      * Removes specified producer.
      *
@@ -467,7 +466,33 @@ public abstract class WorkspaceComponent {
             listener.producerRemoved(producer);
         }
     }
-    
+
+    /**
+     * Remove all producers of the specified type.
+     *
+     * @param producerType the type of producer to be removed
+     */
+    public void removeProducers(final Class<?> producerType) {
+        for (Producer producer : producers) {
+            if (producer.getClass() == producerType) {
+                removeProducer(producer);
+            }
+        }
+    }
+
+    /**
+     * Remove all consumers of the specified type.
+     *
+     * @param consumerType the type of consumer to be removed
+     */
+    public void removeConsumers(final Class<?> consumerType) {
+        for (Consumer consumer : consumers) {
+            if (consumer.getClass() == consumerType) {
+                removeConsumer(consumer);
+            }
+        }
+    }
+
     /**
      * Get a SingleConsumingAttribute by name.
      *
@@ -607,24 +632,6 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Returns the attribute listing style.
-     * 
-     * @return The attribute listing style.
-     */
-    public AttributeListingStyle getAttributeListingStyle() {
-        return attributeListingStyle;
-    }
-
-    /**
-     * Sets the attribute listing style.
-     * 
-     * @param style the listing style.
-     */
-    public void setAttributeListingStyle(final AttributeListingStyle style) {
-        this.attributeListingStyle = style;
-    }
-    
-    /**
      * The overall name for the set of supported formats.
      *
      * @return the description
@@ -632,7 +639,7 @@ public abstract class WorkspaceComponent {
     public String getDescription() {
         return null;
     }
-    
+
     /**
      * The file extension for a component type, e.g. By default, "xml".
      *
@@ -641,7 +648,7 @@ public abstract class WorkspaceComponent {
     public String getDefaultFormat() {
         return "xml";
     }
-    
+
     /**
      * Set to true when a component changes, set to false after a component is saved.
      *

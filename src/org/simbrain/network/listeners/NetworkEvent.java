@@ -16,9 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.listeners;
 
 import java.util.EventObject;
+
+import org.simbrain.network.interfaces.Network;
 
 /**
  * Network event which holds an old and new version of some type of object.
@@ -36,7 +38,7 @@ public final class NetworkEvent<T>
 
 	/**
      * Create a network event with a new and old object.
-     * 
+     *
      * @param net
      *            reference to parent network.
      * @param oldThing
@@ -49,7 +51,7 @@ public final class NetworkEvent<T>
         this.theObject = theThing;
         this.oldObject = oldThing;
     }
-    
+
     /**
      * Create a network event with one object only.
      *
@@ -89,7 +91,5 @@ public final class NetworkEvent<T>
     public void setOldObject(T oldObject) {
         this.oldObject = oldObject;
     }
-
-
 
 }

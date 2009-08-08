@@ -14,19 +14,18 @@ import org.simbrain.world.game.tictactoe.TicTacToeModel;
 public class GameComponent extends WorkspaceComponent {
     /** The game model. */
     private final TicTacToeModel model = new TicTacToeModel();
-    
+
     /**
      * The attributes that wrap the model to make it act as a producer
      * and a consumer.
      */
     private final GameAttributes attributes = new GameAttributes(this, model);
-    
+
     /**
      * Creates a new game component.
      */
     public GameComponent() {
         super("Tic Tac Toe");
-        setAttributeListingStyle(AttributeListingStyle.TOTAL);
         addConsumer(attributes);
     }
 

@@ -42,12 +42,11 @@ import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
  * workspace. Essentially, an instance of a workspace corresponds to a single
  * simulation (though at some point it will be possible to link multiple
  * workspaces on different machines together).
- * 
- * A workspace can be visualized via a
- * {@link org.simbrain.workspace.gui.SimbrainDesktop}.
- * 
+ *
+ * A workspace can be visualized via a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
+ *
  * @see org.simbrain.workspace.Coupling
- * 
+ *
  */
 public class Workspace {
 
@@ -56,10 +55,10 @@ public class Workspace {
 
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
-    
+
     /** The coupling manager for this workspace. */
     private final CouplingManager manager = new CouplingManager();
-    
+
     /** List of workspace components. */
     private List<WorkspaceComponent> componentList = Collections
         .synchronizedList(new ArrayList<WorkspaceComponent>());
@@ -581,10 +580,10 @@ public class Workspace {
     public void resetUpdateController() {
         setCustomUpdateController(WorkspaceUpdator.DEFAULT_CONTROLLER);
     }
-    
+
     /**
      * Returns global time.
-     * 
+     *
      * @return the time
      */
     public Number getTime() {
@@ -599,10 +598,10 @@ public class Workspace {
     public WorkspaceUpdator getWorkspaceUpdator() {
         return updator;
     }
-    
+
     /**
      * Helper method to open a workspace component from a file.
-     * 
+     *
      * A call might look like this
      *  <code>NetworkComponent networkComponent =
      *      (NetworkComponent) Workspace.open(NetworkComponent.class, new File("Net.xml"));</code>
@@ -625,5 +624,15 @@ public class Workspace {
             throw new RuntimeException(e);
         }
     }
-    
+
+//    /**
+//     * Add an attribute of the specified  name to the specified attributeholder
+//     *  Maybe put this in a separate utility class?
+//     * @param attributeHolder the class 
+//     * @param methodName
+//     */
+//    public void addDoubleProducer(AttributeHolder attributeHolder, String attibuteName) {
+//            // Find method in attributeholder
+//            //... add
+//    }
 }

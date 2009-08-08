@@ -523,13 +523,11 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 		this.inhibitoryReversal = inhibitoryReversal;
 	}
 
-	@Override
 	public double getBias() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public void setBias(double bias) {
 		// TODO Auto-generated method stub
 		

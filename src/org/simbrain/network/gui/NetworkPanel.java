@@ -32,7 +32,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -79,11 +78,15 @@ import org.simbrain.network.gui.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.NetworkEvent;
-import org.simbrain.network.interfaces.NetworkListener;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.listeners.GroupListener;
+import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.listeners.NetworkListener;
+import org.simbrain.network.listeners.NeuronListener;
+import org.simbrain.network.listeners.SubnetworkListener;
+import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.networks.Backprop;
 import org.simbrain.network.networks.Competitive;
 import org.simbrain.network.networks.Elman;
@@ -102,8 +105,6 @@ import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeHolder;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.ProducingAttribute;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -115,7 +116,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Network panel.
  */
-public class NetworkPanel extends PCanvas implements NetworkListener {
+public class NetworkPanel extends PCanvas  {
 
     /** The model neural-rootNetwork object. */
     private RootNetwork rootNetwork;
@@ -156,11 +157,14 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     /** Last clicked position. */
     private Point2D lastClickedPosition;
 
-    /** Tracks number of pastes that have occurred; used to correctly position pasted objects. */
-    private double numberOfPastes = 0;
+    /**
+     * Tracks number of pastes that have occurred; used to correctly position
+     * pasted objects.
+     */
+    private double numberOfPastes;
 
     /** Last selected Neuron. */
-    private NeuronNode lastSelectedNeuron = null;
+    private NeuronNode lastSelectedNeuron;
 
     /** Label which displays current time. */
     private TimeLabel timeLabel;
@@ -195,12 +199,16 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     /** Source neurons. */
     private Collection<NeuronNode> sourceNeurons = new ArrayList<NeuronNode>();
 
-    /** A list of check boxes pertaining to "clamp" information.
-     * They are updated when the rootNetwork clamp status changes. */
+    /**
+     * A list of check boxes pertaining to "clamp" information. They are updated
+     * when the rootNetwork clamp status changes.
+     */
     protected ArrayList<JCheckBoxMenuItem> checkBoxes = new ArrayList<JCheckBoxMenuItem>();
 
-    /** A list of toggle buttons pertaining to "clamp" information.
-     * They are updated when the rootNetwork clamp status changes. */
+    /**
+     * A list of toggle buttons pertaining to "clamp" information. They are
+     * updated when the rootNetwork clamp status changes.
+     */
     private ArrayList<JToggleButton> toggleButton = new ArrayList<JToggleButton>();
 
     /** Beginning position used in calculating offsets for multiple pastes. */
@@ -229,7 +237,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** Local thread flag for manually starting and stopping the network. */
     private volatile boolean isRunning;
-    
+
     /** Toolbar panel. */
     private JPanel toolbars;
 
@@ -277,7 +285,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         addInputEventListener(textHandle);
         addInputEventListener(new ContextMenuEventHandler());
 
-        rootNetwork.addListener(this);
+        addNetworkListeners();
 
         selectionModel.addSelectionListener(new NetworkSelectionListener()
             {
@@ -305,6 +313,200 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         ToolTipManager.sharedInstance().registerComponent(this);
 
         addKeyListener(new NetworkKeyAdapter(this));
+
+    }
+
+    /**
+     * Register and define all network listeners
+     */
+    private void addNetworkListeners() {
+
+        // Handle general network events
+        rootNetwork.addNetworkListener(new NetworkListener() {
+
+            public void networkChanged() {
+
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        for (PNode node : getPersistentNodes()) {
+                            if (node instanceof NeuronNode) {
+                                NeuronNode neuronNode = (NeuronNode) node;
+                                neuronNode.update();
+                            } else if (node instanceof SynapseNode) {
+                                if (node.getVisible()) {
+                                    SynapseNode synapseNode = (SynapseNode) node;
+                                    synapseNode.updateColor();
+                                    synapseNode.updateDiameter();
+                                }
+                            }
+                        }
+                        timeLabel.update();
+                        rootNetwork.setUpdateCompleted(true);
+                    }
+                });
+            }
+        });
+
+        // Handle Neuron Events
+        rootNetwork.addNeuronListener(new NeuronListener() {
+
+            public void neuronAdded(final NetworkEvent<Neuron> e) {
+                addNeuron(e.getObject());
+            }
+
+            public void neuronRemoved(final NetworkEvent<Neuron> e) {
+                NeuronNode node = findNeuronNode(e.getObject());
+                node.removeFromParent();
+                centerCamera();
+            }
+
+            public void neuronChanged(final NetworkEvent<Neuron> e) {
+                NeuronNode node = findNeuronNode(e.getObject());
+                node.update();
+            }
+
+            public void neuronTypeChanged(final NetworkEvent<Neuron> e) {
+                NeuronNode neuronNode = findNeuronNode(e.getOldObject());
+                neuronNode.setNeuron(e.getObject());
+            }
+
+            public void neuronMoved(final NetworkEvent<Neuron> e) {
+                NeuronNode node = findNeuronNode(e.getObject());
+                if ((node != null) && (!node.isMoving())) {
+                    node.pullViewPositionFromModel();
+                }
+            }
+
+        });
+
+        // Handle Synapse Events
+        rootNetwork.addSynapseListener(new SynapseListener() {
+
+            public void synapseChanged(final NetworkEvent<Synapse> e) {
+                SynapseNode synapseNode = findSynapseNode(e.getObject());
+                synapseNode.updateColor();
+                synapseNode.updateDiameter();
+            }
+
+            public void synapseTypeChanged(final NetworkEvent<Synapse> e) {
+                SynapseNode synapseNode = findSynapseNode(e.getOldObject());
+                synapseNode.setSynapse(e.getObject());
+            }
+
+            public void synapseAdded(final NetworkEvent<Synapse> e) {
+                NetworkPanel.this.addSynapse(e.getObject());
+            }
+
+            public void synapseRemoved(final NetworkEvent<Synapse> e) {
+                SynapseNode toDelete = findSynapseNode(e.getObject());
+                if (toDelete != null) {
+                    toDelete.getTarget().getConnectedSynapses()
+                            .remove(toDelete);
+                    toDelete.getSource().getConnectedSynapses()
+                            .remove(toDelete);
+                    getLayer().removeChild(toDelete);
+                }
+            }
+        });
+
+        // Handle Subnetwork Events
+        rootNetwork.addSubnetworkListener(new SubnetworkListener() {
+
+            public void subnetAdded(final NetworkEvent<Network> e) {
+                NetworkPanel.this.addSubnetwork(e.getObject());
+            }
+
+            public void subnetRemoved(final NetworkEvent<Network> e) {
+                SubnetworkNode subnet = findSubnetworkNode(e.getObject());
+                if (subnet != null) {
+                    NetworkPanel.this.getLayer().removeChild(subnet);
+                }
+                centerCamera();
+            }
+        });
+
+        // Handle Group Events
+        rootNetwork.addGroupListener(new GroupListener() {
+            /** @see NetworkListener */
+            public void groupAdded(final NetworkEvent<Group> e) {
+
+                // Make a list of neuron and synapse nodes
+                ArrayList<PNode> nodes = new ArrayList<PNode>();
+                for (Network network : e.getObject().getNetworkList()) {
+                    SubnetworkNode node = findSubnetworkNode(network);
+                    if (node != null) {
+                        nodes.add(node);
+                    }
+                }
+                for (Neuron neuron : e.getObject().getNeuronList()) {
+                    NeuronNode node = findNeuronNode(neuron);
+                    if (node != null) {
+                        nodes.add(node);
+                    }
+                }
+                for (Synapse synapse : e.getObject().getWeightList()) {
+                    SynapseNode node = findSynapseNode(synapse);
+                    if (node != null) {
+                        nodes.add(node);
+                    }
+                }
+
+                // Populate group node and add it
+                ModelGroupNode neuronGroup = getModelGroupNodeFromGroup(e
+                        .getObject());
+                for (PNode node : nodes) {
+                    neuronGroup.addReference(node);
+                }
+                getLayer().addChild(neuronGroup);
+                neuronGroup.updateBounds();
+            }
+
+            /** @see NetworkListener */
+            public void groupChanged(final NetworkEvent<Group> e) {
+                // Not sure if this method works properly. Performance seems to
+                // degrade after this method is called.
+                // I suppose the proper way is to compare the group before and
+                // after and just change what changed but I'm not sure of the
+                // best way to do that
+                ModelGroupNode groupNode = findModelGroupNode(e.getObject());
+                groupNode.getOutlinedObjects().clear();
+                
+                // Make a list of neuron and synapse nodes
+                ArrayList<PNode> nodes = new ArrayList<PNode>();
+                for (Network network : e.getObject().getNetworkList()) {
+                    SubnetworkNode node = findSubnetworkNode(network);
+                    if (node != null) {
+                        nodes.add(node);
+                    }
+                }
+                for (Neuron neuron : e.getObject().getNeuronList()) {
+                    NeuronNode node = findNeuronNode(neuron);
+                    if (node != null) {
+                        nodes.add(node);
+                    }
+                }
+                for (Synapse synapse : e.getObject().getWeightList()) {
+                    SynapseNode node = findSynapseNode(synapse);
+                    if (node != null) {
+                        nodes.add(node);
+                    }
+                }
+
+                // Populate group node and add it
+                for (PNode node : nodes) {
+                    groupNode.addReference(node);
+                }
+                groupNode.updateBounds();
+            }
+
+            /** @see NetworkListener */
+            public void groupRemoved(final NetworkEvent<Group> event) {
+                ModelGroupNode node = findModelGroupNode(event.getObject());
+                node.removeFromParent();
+            }
+
+        });
+
 
     }
 
@@ -504,7 +706,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      * Remove the default event listeners.
      */
     private void removeDefaultEventListeners() {
-
         PInputEventListener panEventHandler = getPanEventHandler();
         PInputEventListener zoomEventHandler = getZoomEventHandler();
         removeInputEventListener(panEventHandler);
@@ -874,7 +1075,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         }
         return ret;
     }
-    
+
     /**
      * Returns selected synapses.
      *
@@ -989,7 +1190,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public Collection<ScreenElement> getSelectableNodes() {
         return getLayer().getAllNodes(Filters.getSelectableFilter(), null);
     }
-    
 
     /**
      * Return a collection of all persistent nodes, that is all neuron
@@ -1002,8 +1202,8 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * Called by rootNetwork preferences as preferences are changed.  Iterates through screen elemenets
-     * and resets relevant colors.
+     * Called by rootNetwork preferences as preferences are changed. Iterates
+     * through screen elemenets and resets relevant colors.
      */
     public void resetColors() {
         setBackground(NetworkGuiSettings.getBackgroundColor());
@@ -1016,8 +1216,8 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * Called by rootNetwork preferences as preferences are changed.  Iterates through screen elemenets
-     * and resets relevant colors.
+     * Called by rootNetwork preferences as preferences are changed. Iterates
+     * through screen elemenets and resets relevant colors.
      */
     public void resetSynapseDiameters() {
         for (SynapseNode synapse : getSynapseNodes()) {
@@ -1053,7 +1253,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void setRootNetwork(final RootNetwork network) {
         this.rootNetwork = network;
-        rootNetwork.addListener(this);
     }
 
     /**
@@ -1130,12 +1329,10 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         repaint();
     }
 
-    public void neuronAdded(final NetworkEvent<Neuron> e) {
-        neuronAdded(e.getObject());
-    }
-    
-    /** @inheritDoc org.simnet.interfaces.NetworkListener#neuronAdded */
-    public void neuronAdded(final Neuron neuron) {
+    /**
+     * Add representation of specified neuron to network panel.
+     */
+    private void addNeuron(final Neuron neuron) {
         if (this.findNeuronNode(neuron) != null) {
             return;
         }
@@ -1144,46 +1341,11 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         selectionModel.setSelection(Collections.singleton(node));
     }
 
-    /** @see NetworkListener */
-    public void neuronRemoved(final NetworkEvent<Neuron> e) {
-        NeuronNode node = findNeuronNode(e.getObject());
-        node.removeFromParent();
-        centerCamera();
-    }
-
-    /** @see NetworkListener */
-    public void neuronChanged(final NetworkEvent<Neuron> e) {
-        NeuronNode node = findNeuronNode(e.getObject());
-        node.update();
-    }
-
-    /** @see NetworkListener */
-    public void neuronTypeChanged(final NetworkEvent<Neuron> e) {
-        NeuronNode neuronNode = findNeuronNode(e.getOldObject());
-        neuronNode.setNeuron(e.getObject());
-    }
-    
-    /** @see NetworkListener */
-    public void synapseChanged(final NetworkEvent<Synapse> e) {
-        SynapseNode synapseNode = findSynapseNode(e.getObject());
-        synapseNode.updateColor();
-        synapseNode.updateDiameter();
-    }
-
-    /** @see NetworkListener */
-    public void synapseTypeChanged(final NetworkEvent<Synapse> e) {
-        SynapseNode synapseNode = findSynapseNode(e.getOldObject());
-        synapseNode.setSynapse(e.getObject());
-    }
-
-    /** @see NetworkListener */
-    public void synapseAdded(final NetworkEvent<Synapse> e) {
-        synapseAdded(e.getObject());
-    }
-
-    /** @see NetworkListener */
-    public void synapseAdded(final Synapse synapse) {
-        if (this.findSynapseNode(synapse) != null) {
+    /**
+     * Add representation of specified synapse to network panel.
+     */
+    private void addSynapse(final Synapse synapse) {
+        if (findSynapseNode(synapse) != null) {
             return;
         }
 
@@ -1193,140 +1355,16 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
             return;
         }
 
-        SynapseNode node = new SynapseNode(this, source, target, synapse);
+        SynapseNode node = new SynapseNode(NetworkPanel.this, source,
+                target, synapse);
         getLayer().addChild(node);
         node.moveToBack();
     }
 
-    /** @see NetworkListener */
-    public void synapseRemoved(final NetworkEvent<Synapse> e) {
-        SynapseNode toDelete = findSynapseNode(e.getObject());
-        if (toDelete != null) {
-            toDelete.getTarget().getConnectedSynapses().remove(toDelete);
-            toDelete.getSource().getConnectedSynapses().remove(toDelete);
-            getLayer().removeChild(toDelete);
-        }
-    }
-
-    /** @see NetworkListener */
-    public void groupAdded(final NetworkEvent<Group> e) {
-
-        // Make a list of neuron and synapse nodes
-        ArrayList<PNode> nodes = new ArrayList<PNode>();
-        for (Network network : e.getObject().getNetworkList()) {
-            SubnetworkNode node = this.findSubnetworkNode(network);
-            if (node != null) {
-                nodes.add(node);
-            }
-        }
-        for (Neuron neuron : e.getObject().getNeuronList()) {
-            NeuronNode node = this.findNeuronNode(neuron);
-            if (node != null) {
-                nodes.add(node);
-            }
-        }
-        for (Synapse synapse : e.getObject().getWeightList()) {
-            SynapseNode node = this.findSynapseNode(synapse);
-            if (node != null) {
-                nodes.add(node);
-            }
-        }
-
-        // Populate group node and add it
-        ModelGroupNode neuronGroup = getModelGroupNodeFromGroup(e.getObject());
-        for (PNode node : nodes) {
-            neuronGroup.addReference(node);
-        }
-        this.getLayer().addChild(neuronGroup);
-        neuronGroup.updateBounds();
-    }
-
     /**
-     * Returns the appropriate ModelGroupNode.
-     *
-     * @param group the model group
-     * @return the ModelGroupNode
+     * Add representation of specified subnetwork to network panel.
      */
-    private ModelGroupNode getModelGroupNodeFromGroup(final Group group) {
-        ModelGroupNode ret = null;
-
-        if (group instanceof GeneRec) {
-            ret = new GeneRecNode(this, (GeneRec) group);
-        }
-        return ret;
-    }
-
-
-    /** @see NetworkListener */
-    public void groupChanged(final NetworkEvent<Group> e) {
-        // Not sure if this method works properly
-        //  Performance seems to degrade after this method is called
-        //  I suppose the proper way is to compare the group before and after
-        //  and just change what changed but I'm not sure of the best way to do that
-        ModelGroupNode groupNode = findModelGroupNode(e.getObject());
-        groupNode.getOutlinedObjects().clear();
-        // Make a list of neuron and synapse nodes
-        ArrayList<PNode> nodes = new ArrayList<PNode>();
-        for (Network network : e.getObject().getNetworkList()) {
-            SubnetworkNode node = this.findSubnetworkNode(network);
-            if (node != null) {
-                nodes.add(node);
-            }
-        }
-        for (Neuron neuron : e.getObject().getNeuronList()) {
-            NeuronNode node = this.findNeuronNode(neuron);
-            if (node != null) {
-                nodes.add(node);
-            }
-        }
-        for (Synapse synapse : e.getObject().getWeightList()) {
-            SynapseNode node = this.findSynapseNode(synapse);
-            if (node != null) {
-                nodes.add(node);
-            }
-        }
-
-        // Populate group node and add it
-        for (PNode node : nodes) {
-            groupNode.addReference(node);
-        }
-        groupNode.updateBounds();
-    }
-
-
-    /** @see NetworkListener */
-    public void groupRemoved(final NetworkEvent<Group> event) {
-        ModelGroupNode node = findModelGroupNode(event.getObject());
-        node.removeFromParent();
-    }
-
-    /** @see NetworkListener */
-    public void subnetAdded(final NetworkEvent<Network> e) {
-        subnetAdded(e.getObject());
-    }
-    
-    /**
-     * Synchronize model and view.
-     */
-    public void syncToModel() {
-        for (Network network : rootNetwork.getNetworkList()) {
-            subnetAdded(network);
-            for (Neuron neuron : network.getNeuronList()) {
-                neuronAdded(neuron);
-            }
-            for (Synapse synapse : network.getSynapseList()) {
-                synapseAdded(synapse);
-            }
-        }
-        for (Neuron neuron : rootNetwork.getNeuronList()) {
-            neuronAdded(neuron);
-        }
-        for (Synapse synapse : rootNetwork.getSynapseList()) {
-            synapseAdded(synapse);
-        }
-    }
-    
-    public void subnetAdded(final Network network) {
+    private void addSubnetwork(final Network network) {
 
         // Only top-level subnets are added.  Special graphical representation
         //   for subnetworks of subnets is contained in org.simbrain.network.nodes.subnetworks
@@ -1337,7 +1375,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         // Make a list of neuron nodes
         ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
         for (Neuron neuron : network.getFlatNeuronList()) {
-            neuronAdded(neuron);
+            addNeuron(neuron);
             NeuronNode node = findNeuronNode(neuron);
             if (node != null) {
                 neuronNodes.add(node);
@@ -1363,7 +1401,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 
         // Add synapses
         for (Synapse synapse : network.getFlatSynapseList()) {
-            synapseAdded(synapse);
+            addSynapse(synapse);
             SynapseNode node = findSynapseNode(synapse);
             if (node != null) {
                 this.getLayer().addChild(node);
@@ -1375,11 +1413,10 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
 
     /**
      * Convert a subnetwork into a subnetwork node.
-     * 
-     * @param upperLeft
-     *            for intializing location of subnetworknode
-     * @param subnetwork
-     *            the subnetwork itself
+     *
+     * TODO: Cheesy design!
+     * @param upperLeft for intializing location of subnetworknode
+     * @param subnetwork the subnetwork itself
      * @return the subnetworknode
      */
     private SubnetworkNode getSubnetworkNodeFromSubnetwork(final Point2D upperLeft, final Network subnetwork) {
@@ -1409,6 +1446,44 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         return ret;
     }
 
+
+
+    /**
+     * Returns the appropriate ModelGroupNode.
+     *
+     * @param group the model group
+     * @return the ModelGroupNode
+     */
+    private ModelGroupNode getModelGroupNodeFromGroup(final Group group) {
+        ModelGroupNode ret = null;
+
+        if (group instanceof GeneRec) {
+            ret = new GeneRecNode(this, (GeneRec) group);
+        }
+        return ret;
+    }
+
+    /**
+     * Synchronize model and view.
+     */
+    public void syncToModel() {
+        for (Network network : rootNetwork.getNetworkList()) {
+            addSubnetwork(network);
+            for (Neuron neuron : network.getNeuronList()) {
+                addNeuron(neuron);
+            }
+            for (Synapse synapse : network.getSynapseList()) {
+                addSynapse(synapse);
+            }
+        }
+        for (Neuron neuron : rootNetwork.getNeuronList()) {
+            addNeuron(neuron);
+        }
+        for (Synapse synapse : rootNetwork.getSynapseList()) {
+            addSynapse(synapse);
+        }
+    }
+
     /**
      * Find the upper left corner of the subnet nodes.
      *
@@ -1430,32 +1505,9 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         return new Point2D.Double(x, y);
     }
 
-    /** @see NetworkListener */
-    public void subnetRemoved(final NetworkEvent<Network> e) {
-        SubnetworkNode subnet = this.findSubnetworkNode(e.getObject());
-        if (subnet != null) {
-            this.getLayer().removeChild(subnet);
-        }
-        centerCamera();
-    }
-
-//    /** @see NetworkListener */
-//    public void couplingChanged(final NetworkEvent<Neuron> e) {
-//        NeuronNode changed = findNeuronNode(e.getObject());
-//        changed.updateInLabel();
-//        changed.updateOutLabel();
-//    }
-
-    /** @see NetworkListener */
-    public void neuronMoved(final NetworkEvent<Neuron> e) {
-        NeuronNode node = this.findNeuronNode(e.getObject());
-        if ((node != null) && (!node.isMoving())) {
-            node.pullViewPositionFromModel();
-        }
-     }
-
     /**
-     * Returns the view model group corresponding to the model group, or null if not found.
+     * Returns the view model group corresponding to the model group, or null if
+     * not found.
      *
      * @param group the group to look for
      * @return the corresponding model group
@@ -1561,8 +1613,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
                 element.setGrouped(true);
             }
         }
-        
-        
+
         vgn = new ViewGroupNode(this, elements);
         this.getLayer().addChild(vgn);
         this.setSelection(Collections.singleton(vgn));
@@ -1693,38 +1744,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         timeLabel.setVisible(showTime);
     }
 
-    /**
-     * Update the rootNetwork, gauges, and world. This is where the main control
-     * between components happens. Called by world component (on clicks), and
-     * the rootNetwork-thread.
-     */
-    public void networkChanged() {
 
-    	//TODO: Remove the below and does all this always need to happen in updates?
-        if (guiOn == false) {
-            timeLabel.update(); // Show time only
-            return;
-        }
-
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                for (PNode node : getPersistentNodes()) {
-                    if (node instanceof NeuronNode) {
-                        NeuronNode neuronNode = (NeuronNode) node;
-                        neuronNode.update();
-                    } else if (node instanceof SynapseNode) {
-                        if (node.getVisible()) {
-                            SynapseNode synapseNode = (SynapseNode) node;
-                            synapseNode.updateColor();
-                            synapseNode.updateDiameter();
-                        }
-                    }
-                }
-                timeLabel.update();
-                rootNetwork.setUpdateCompleted(true);
-            }
-        });
-   }
 
     /**
      * Update clamp toolbar buttons and menu items.
@@ -1877,7 +1897,7 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public Collection<NeuronNode> getSourceNeurons() {
         return sourceNeurons;
     }
-    
+
     /**
      * @return the model source neurons (used in connecting groups of neurons)
      */
@@ -1888,7 +1908,6 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         }
         return ret;
     }
-    
 
      /**
      * Set the offset used in multiple pastes.
@@ -2100,14 +2119,14 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
     public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
         return new NeuronNode(net, neuron);
     }
-    
+
     /**
      * Remove all nodes from panel.
      */
     public void clearPanel() {
         getLayer().removeAllChildren();
     }
-        
+
     /**
      * Adds an internal menu bar; used in applets.
      * @param applet
@@ -2141,5 +2160,5 @@ public class NetworkPanel extends PCanvas implements NetworkListener {
         repaint();
         clearSelection();
     }
-    
+
 }

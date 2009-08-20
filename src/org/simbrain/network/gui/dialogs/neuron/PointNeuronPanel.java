@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.neurons.PointNeuron;
+import org.simbrain.network.neurons.PointNeuron.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
 
 
@@ -44,10 +45,12 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
     /** Leak Conductance field. */
     private JTextField tfLC = new JTextField();
-    
+
     /** Output function. */
-    private JComboBox cbOutputFunction = new JComboBox();
-    
+    private JComboBox cbOutputFunction = new JComboBox(new OutputFunction[] {
+            OutputFunction.DISCRETE_SPIKING, OutputFunction.LINEAR,
+            OutputFunction.RATE_CODE, OutputFunction.NOISY_RATE_CODE});
+
     /** Threshold for output function. */
     private JTextField tfThreshold = new JTextField();
 
@@ -74,10 +77,10 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
     /** Inputs tab. */
     private LabelledItemPanel inputsTab = new LabelledItemPanel();
-    
+
     /** Output Function tab. */
     private LabelledItemPanel outputFunctionTab = new LabelledItemPanel();
-    
+
     /**
      * Creates an instance of this panel.
      * @param net Network
@@ -113,7 +116,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
-//        cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
+        cbOutputFunction.setSelectedItem(neuronRef.getCurrentOutputFunction());
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
@@ -147,12 +150,6 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         }
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getBias")) {
             tfBias.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getTimeAveraging")) {
-            tfTimeAveraging.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getNormFactor")) {
-            tfNormFactor.setText(NULL_STRING);
         }
     }
 
@@ -197,17 +194,17 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
                 neuronRef.setLeakConductance(Double.parseDouble(tfLC.getText()));
             }
 //            if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING)) {
-//                neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
+                neuronRef.setCurrentOutputFunction((OutputFunction) cbOutputFunction.getSelectedItem());
 //            }
             if (!tfThreshold.getText().equals(NULL_STRING)) {
                 neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
             }
-//            if (!tfGain.getText().equals(NULL_STRING)) {
-//                neuronRef.setGain(Double.parseDouble(tfGain.getText()));
-//            }
-//            if (!tfBias.getText().equals(NULL_STRING)) {
-//                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-//            }
+            if (!tfGain.getText().equals(NULL_STRING)) {
+                neuronRef.setGain(Double.parseDouble(tfGain.getText()));
+            }
+            if (!tfBias.getText().equals(NULL_STRING)) {
+                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+            }
 //            if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
 //                neuronRef.setTimeAveraging(Double.parseDouble(tfTimeAveraging.getText()));
 //            }

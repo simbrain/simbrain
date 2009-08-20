@@ -20,16 +20,14 @@ package org.simbrain.network.neurons;
 
 import java.util.ArrayList;
 
-import javax.swing.ComboBoxModel;
-
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.util.SimbrainMath;
 
 /**
- * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
- * in Cognitive Neuroscience, chapter 2.  All page references below are are to this book.
+ * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations in
+ * Cognitive Neuroscience, chapter 2. All page references below are are to this
+ * book.
  */
 public class PointNeuron extends Neuron implements BiasedNeuron {
 
@@ -39,18 +37,21 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 
     /** Inhibitory inputs for connected Synapses. */
     private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
- 
+
 	/** Time average constant for updating the net current field. (p. 43-44)*/
 	private double netTimeConstant = 0.7;
 
 	/** Max excitatory conductance field. Conductance if all channels are open. (p. 49)*/ 
 	private double excitatoryMaxConductance = 0.4;
-	
+
 	/** Excitatory conductance field. Proportion of channels open. */
 	private double excitatoryConductance = 0;
 
+	/** Default value for membrane potential. */
+	private static final double MEMBRANE_POTENTIAL = .15;
+
 	/** Membrane potential field. (p. 45)*/
-	private double membranePotential = 0.15;
+	private double membranePotential = MEMBRANE_POTENTIAL;
 
 	/** Excitatory reversal potential field. (p. 45)*/
 	private double excitatoryReversal = 1;
@@ -58,16 +59,21 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 	/** Leak reversal potential field. (p. 45)*/
 	private double leakReversal = 0.15;
 
-	/** Max leak conductance field. Conductance if all channels are open. (p. 49)*/
+    /**
+     * Max leak conductance field. Conductance if all channels are open. (p. 49)
+     */
 	private double leakMaxConductance = 2.8;
 
 	/** Leak Conductance field. Proportion of channels open. (p. 49)*/
 	private double leakConductance = 1;
-	
+
 	/** Net current field. Sum of all currents. */
 	private double netCurrent = 0;
 
-	/** Time averaging constant for updating the membrane potential field. (p. 37, Equation 2.7)*/
+    /**
+     * Time averaging constant for updating the membrane potential field. (p.
+     * 37, Equation 2.7)
+     */
 	private double potentialTimeConstant = 0.1;
 
 	/** Excitatory current field. */
@@ -78,36 +84,59 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 
 	/** Inhibitory current field. */
 	private double inhibitoryCurrent = 0;
-	
+
 	/** Inhibitory reversal field. */
 	private double inhibitoryReversal = 0.15;
-	
-	/** Availalbe output functions. (p. 45-48) */
-	private enum OutputFunction {DISCRETE_SPIKING, RATE_CODE, NOISY_RATE_CODE};
 
-	/** Sets output function. */
+	/** Output functions. (p. 45-48) */
+    public enum OutputFunction {
+        DISCRETE_SPIKING {
+            public String toString() {
+                return "Discrete Spiking";
+            }
+        },
+        LINEAR {
+            public String toString() {
+                return "Linear";
+            }
+        },
+        RATE_CODE {
+            public String toString() {
+                return "Rate Code";
+            }
+        },
+        NOISY_RATE_CODE {
+            public String toString() {
+                return "Noisy Rate Code";
+            }
+        }
+    };
+
+	/** Current output function. */
 	private OutputFunction currentOutputFunction = OutputFunction.DISCRETE_SPIKING;
-	
+
 	/** Gain factor for output function. (p. 46)*/
-	private int gain = 600;
+	private double gain = 600;
 
 	/** Threshold of excitation field. (p. 45)*/
 	private double threshold = 0.25;
-	
-	/** Duration of spike for DISCRETE_SPIKING output function. 
-	 * Used to extend spike across multiple cycles. (p. 46) */
-	private double dur = 1; //TODO: Implement and verify against Emergent
-	
-	/** Membrane potential after spike for DISCRETE_SPIKING output function. (p. 46) */
+
+    /**
+     * Duration of spike for DISCRETE_SPIKING output function. Used to extend
+     * spike across multiple cycles (p. 46).
+     */
+	private int duration = 1; //TODO: Implement and verify against Emergent
+
+    /**
+     * Membrane potential after spike for DISCRETE_SPIKING output function. (p.
+     * 46)
+     */
 	private double refractoryPotential = 0;
-    
+
     /**
      * Default constructor needed for external calls which create neurons then
      * set their parameters.
      */
-	
-	
-	
     public PointNeuron() {
     }
 
@@ -118,7 +147,7 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
         super.postUnmarshallingInit();
         this.setInputLists();
     }
-    
+
     /**
      * Update the lists of excitatory and inhibitory currents based on synapse
      * values.
@@ -126,7 +155,7 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
     private void setInputLists() {
         excitatoryInputs.clear();
         inhibitoryInputs.clear();
-        
+
         for (Synapse synapse : getFanIn()) {
             if (synapse.getStrength() > 0) {
                 excitatoryInputs.add(synapse);
@@ -166,13 +195,16 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
         cn = (PointNeuron) super.duplicate(cn);
         return cn;
     }
-    
 
     /**
      * @inheritDoc org.simnet.interfaces.Neuron
      */
     public void clear() {
         activation = 0;
+        membranePotential = MEMBRANE_POTENTIAL;
+        excitatoryCurrent = 0;
+        leakCurrent = 0;
+        inhibitoryCurrent = 0;
         setInputLists();
     }
 
@@ -216,20 +248,22 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 				setBuffer(0);
 			}
 		} else if (currentOutputFunction == OutputFunction.RATE_CODE) {
-			double val = (gain * getPositiveComponent(membranePotential - threshold))
+			double val = 
+			        (gain * getPositiveComponent(membranePotential - threshold))
 					/ (gain	* getPositiveComponent(membranePotential - threshold) + 1);
 			setBuffer(val);
+        } else if (currentOutputFunction == OutputFunction.LINEAR) {
+            setBuffer(gain * getPositiveComponent(membranePotential - threshold));
+        } else if (currentOutputFunction == OutputFunction.NOISY_RATE_CODE) {
+            setBuffer(1);
+        }
 
-		} else if (currentOutputFunction == OutputFunction.NOISY_RATE_CODE) {
-			setBuffer(1);
-		}
 		/** Display current values of variables for diagnostics. */
 		printState();
 	}
-	
+
     /**
-     * @
-     * @inheritDoc org.simnet.interfaces.Neuron
+     * {@inheritDoc}
      */
 	public String getToolTipText() {
 		return "Activation: " + activation + "\nMembrane Potential: "
@@ -238,7 +272,6 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 				+ "\nLeak current: " + leakCurrent;
 	}
 
-	
 	private void printState() {
 //		System.out.println("getExcitatoryInputs:" + getExcitatoryInputs());
 //		System.out.println("excitatoryConductance:" + excitatoryConductance);
@@ -259,29 +292,26 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 		System.out.println("output:" + activation);
 	}
 
-	
-	/** Input times weight */ 
-	//TODO: Expand for projection level scaling.
-	
 	/**
-	 * 
+	 * Returns excitatory inputs.
 	 */
 	private double getExcitatoryInputs() {
 
 		double retVal =0;
 		if (excitatoryInputs.size() > 0) {
-	        	for (Synapse synapse : excitatoryInputs) {
-		            Neuron source = synapse.getSource();
-		            retVal += source.getActivation() * synapse.getStrength();
-	        	}
+            for (Synapse synapse : excitatoryInputs) {
+                Neuron source = synapse.getSource();
+                retVal += source.getActivation() * synapse.getStrength();
+            }
 		}
-         	return retVal;
+		return retVal;
 	}
-	
+
 	/**
-	 * 
-	 * @param val
-	 * @return
+	 * Returns the positive component of a number.
+	 *
+	 * @param val value to consider
+	 * @return positive component
 	 */
 	private double getPositiveComponent(double val) {
 
@@ -449,14 +479,14 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 	/**
 	 * @return the gain
 	 */
-	public int getGain() {
+	public double getGain() {
 		return gain;
 	}
 
 	/**
 	 * @param gain the gain to set
 	 */
-	public void setGain(int gain) {
+	public void setGain(double gain) {
 		this.gain = gain;
 	}
 
@@ -472,20 +502,6 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 	 */
 	public void setThreshold(double threshold) {
 		this.threshold = threshold;
-	}
-
-	/**
-	 * @return the dur
-	 */
-	public double getDur() {
-		return dur;
-	}
-
-	/**
-	 * @param dur the dur to set
-	 */
-	public void setDur(double dur) {
-		this.dur = dur;
 	}
 
 	/**
@@ -550,6 +566,20 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 	public double getThresholdInhibitoryConductance() {
 		// TODO Auto-generated method stub
 		return 0;
-	}	
+	}
+
+    /**
+     * @return the duration
+     */
+    public int getDuration() {
+        return duration;
+    }
+
+    /**
+     * @param duration the duration to set
+     */
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }	
 	
 }

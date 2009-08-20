@@ -136,7 +136,7 @@ public class RootNetwork extends Network {
     public RootNetwork() {
         init();
     }
-    
+
     /**
      * Local initialization.
      */
@@ -155,7 +155,11 @@ public class RootNetwork extends Network {
         XStream xstream = new XStream(new DomDriver());
         xstream.omitField(RootNetwork.class, "logger");
         xstream.omitField(RootNetwork.class, "component");
-        xstream.omitField(RootNetwork.class, "listeners");
+        xstream.omitField(RootNetwork.class, "groupListeners");
+        xstream.omitField(RootNetwork.class, "neuronListeners");
+        xstream.omitField(RootNetwork.class, "networkListeners");
+        xstream.omitField(RootNetwork.class, "subnetworkListeners");
+        xstream.omitField(RootNetwork.class, "synapseListeners");
         xstream.omitField(RootNetwork.class, "updateCompleted");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
@@ -178,6 +182,12 @@ public class RootNetwork extends Network {
         logger = Logger.getLogger(RootNetwork.class);
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
+        networkListeners = new ArrayList<NetworkListener>();
+        neuronListeners = new ArrayList<NeuronListener>();
+        synapseListeners = new ArrayList<SynapseListener>();
+        subnetworkListeners = new ArrayList<SubnetworkListener>();
+        groupListeners = new ArrayList<GroupListener>();
+
         for(Neuron neuron : this.getFlatNeuronList()) {
             neuron.postUnmarshallingInit();
         }
@@ -857,7 +867,7 @@ public class RootNetwork extends Network {
      * @param listener the observer to register
      */
     public void addNeuronListener(final NeuronListener listener) {
-        neuronListeners.add(listener);
+            neuronListeners.add(listener);
     }
 
     /**

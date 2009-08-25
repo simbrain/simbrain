@@ -23,29 +23,39 @@ import java.util.ArrayList;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.listeners.SynapseListener;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations in
  * Cognitive Neuroscience, chapter 2. All page references below are are to this
  * book.
  */
-public class PointNeuron extends Neuron implements BiasedNeuron {
+public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron {
 
-
-	/** Excitatory inputs for connected Synapses. */
+    /** Excitatory inputs for connected Synapses. */
     private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
 
     /** Inhibitory inputs for connected Synapses. */
     private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
 
-	/** Time average constant for updating the net current field. (p. 43-44)*/
+    /** Time average constant for updating the net current field. (p. 43-44) */
 	private double netTimeConstant = 0.7;
 
-	/** Max excitatory conductance field. Conductance if all channels are open. (p. 49)*/ 
+    /**
+     * Max excitatory conductance field. Conductance if all channels are open.
+     * (p. 49)
+     */
 	private double excitatoryMaxConductance = 0.4;
 
 	/** Excitatory conductance field. Proportion of channels open. */
-	private double excitatoryConductance = 0;
+	private double excitatoryConductance;
+
+	/** Current inhibitory conductance. */
+    private double inhibitoryConductance;
+
+    /** Maximal inhibitory conductance. */
+    private double inhibitoryMaxConductance = 1;
 
 	/** Default value for membrane potential. */
 	private static final double MEMBRANE_POTENTIAL = .15;
@@ -68,7 +78,7 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 	private double leakConductance = 1;
 
 	/** Net current field. Sum of all currents. */
-	private double netCurrent = 0;
+	private double netCurrent;
 
     /**
      * Time averaging constant for updating the membrane potential field. (p.
@@ -77,13 +87,13 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 	private double potentialTimeConstant = 0.1;
 
 	/** Excitatory current field. */
-	private double excitatoryCurrent = 0;
+	private double excitatoryCurrent;
 
 	/** Leak current field. */
-	private double leakCurrent = 0;
+	private double leakCurrent;
 
 	/** Inhibitory current field. */
-	private double inhibitoryCurrent = 0;
+	private double inhibitoryCurrent;
 
 	/** Inhibitory reversal field. */
 	private double inhibitoryReversal = 0.15;
@@ -113,13 +123,13 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
     };
 
 	/** Current output function. */
-	private OutputFunction currentOutputFunction = OutputFunction.DISCRETE_SPIKING;
+    private OutputFunction currentOutputFunction = OutputFunction.DISCRETE_SPIKING;
 
 	/** Gain factor for output function. (p. 46)*/
 	private double gain = 600;
 
 	/** Threshold of excitation field. (p. 45)*/
-	private double threshold = 0.25;
+	private double thresholdPotential = 0.25;
 
     /**
      * Duration of spike for DISCRETE_SPIKING output function. Used to extend
@@ -131,7 +141,10 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
      * Membrane potential after spike for DISCRETE_SPIKING output function. (p.
      * 46)
      */
-	private double refractoryPotential = 0;
+	private double refractoryPotential;
+
+	/** Bias term. */
+    private double bias;
 
     /**
      * Default constructor needed for external calls which create neurons then
@@ -141,13 +154,20 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
     }
 
     /**
-     * Init.
+     * Initialize after opening network.
      */
     public void postUnmarshallingInit() {
         super.postUnmarshallingInit();
-        this.setInputLists();
     }
 
+    @Override
+    public void init() {
+        setInputLists();
+        if (this.getParentNetwork() != null) {
+            this.getParentNetwork().getRootNetwork().addSynapseListener(this);
+        }
+
+    }
     /**
      * Update the lists of excitatory and inhibitory currents based on synapse
      * values.
@@ -157,11 +177,26 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
         inhibitoryInputs.clear();
 
         for (Synapse synapse : getFanIn()) {
-            if (synapse.getStrength() > 0) {
-                excitatoryInputs.add(synapse);
-            } else {
-                inhibitoryInputs.add(synapse);
-            }
+            addSynapseToList(synapse);
+        }
+    }
+
+    /**
+     * Adds a synapse to the appropriate internal list.
+     *
+     * @param synapse synapse to add.
+     */
+    private void addSynapseToList(Synapse synapse) {
+        if (excitatoryInputs.contains(synapse)) {
+            excitatoryInputs.remove(synapse);
+        }
+        if (inhibitoryInputs.contains(synapse)) {
+            inhibitoryInputs.remove(synapse);
+        }
+        if (synapse.getStrength() > 0) {
+            excitatoryInputs.add(synapse);
+        } else {
+            inhibitoryInputs.add(synapse);
         }
     }
 
@@ -178,34 +213,25 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
         postUnmarshallingInit();
     }
 
-    /**
-     * @inheritDoc Network.
-     */
+    @Override
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
-    /**
-     * Returns a duplicate PointNeuron (used, e.g., in copy/paste).
-     *
-     * @return Duplicated neuron
-     */
+    @Override
     public PointNeuron duplicate() {
         PointNeuron cn = new PointNeuron();
         cn = (PointNeuron) super.duplicate(cn);
         return cn;
     }
 
-    /**
-     * @inheritDoc org.simnet.interfaces.Neuron
-     */
+    @Override
     public void clear() {
         activation = 0;
         membranePotential = MEMBRANE_POTENTIAL;
         excitatoryCurrent = 0;
         leakCurrent = 0;
         inhibitoryCurrent = 0;
-        setInputLists();
     }
 
 	@Override
@@ -217,14 +243,21 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 		 */
 		excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance
 				+ netTimeConstant * (getExcitatoryInputs());
-		// TODO: Add scaling parameters and bias term.
+		// TODO: Add scaling parameters and bias term (when adding update kwta)
 
 		/**
 		 * Calculate the excitatory current given the time averaged excitatory
-		 * conductance. (p. 37 eq. 2.5)
+		 * conductance. (p. 37 equation 2.5)
 		 */
 		excitatoryCurrent = excitatoryConductance * excitatoryMaxConductance
 				* (membranePotential - excitatoryReversal);
+
+		// Calculate the inhibitory current.
+        inhibitoryCurrent = inhibitoryConductance * inhibitoryMaxConductance
+                * (membranePotential - inhibitoryReversal);
+
+        // TODO: Add a method to update inhibitory conductance analogously to
+        // excitatory, using any inhibitory synapses.
 
 		/** Calculate the leak current.(p. 37 eq. 2.5) */
 		leakCurrent = leakConductance * leakMaxConductance
@@ -241,7 +274,7 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 
 		/** Apply output function. (p. 45-48) */
 		if (currentOutputFunction == OutputFunction.DISCRETE_SPIKING) {
-			if (membranePotential > threshold) {
+			if (membranePotential > thresholdPotential) {
 				setBuffer(1);
 				membranePotential = refractoryPotential;
 			} else {
@@ -249,17 +282,36 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 			}
 		} else if (currentOutputFunction == OutputFunction.RATE_CODE) {
 			double val = 
-			        (gain * getPositiveComponent(membranePotential - threshold))
-					/ (gain	* getPositiveComponent(membranePotential - threshold) + 1);
+			        (gain * getPositiveComponent(membranePotential - thresholdPotential))
+					/ (gain	* getPositiveComponent(membranePotential - thresholdPotential) + 1);
 			setBuffer(val);
         } else if (currentOutputFunction == OutputFunction.LINEAR) {
-            setBuffer(gain * getPositiveComponent(membranePotential - threshold));
+            setBuffer(gain * getPositiveComponent(membranePotential - thresholdPotential));
         } else if (currentOutputFunction == OutputFunction.NOISY_RATE_CODE) {
             setBuffer(1);
         }
 
 		/** Display current values of variables for diagnostics. */
-		printState();
+		//printState();
+	}
+
+    /**
+     * Returns the inhibitory conductance that would set this point neuron's
+     * voltage at its threshold potential.
+     *
+     * See M/R p. 101, equation 3.2
+     *
+     * @return the value of that equation
+     */
+	public double getInhibitoryThresholdConductance() {
+        double excitatoryTerm = excitatoryConductance
+                * excitatoryMaxConductance
+                * (excitatoryReversal - thresholdPotential);
+        double leakTerm = leakConductance * leakMaxConductance
+                * (leakReversal - thresholdPotential);
+
+        return (excitatoryTerm + leakTerm)
+                / (thresholdPotential - inhibitoryReversal);
 	}
 
     /**
@@ -272,32 +324,42 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 				+ "\nLeak current: " + leakCurrent;
 	}
 
+	/**
+	 * Print debugging information.
+	 */
 	private void printState() {
-//		System.out.println("getExcitatoryInputs:" + getExcitatoryInputs());
-//		System.out.println("excitatoryConductance:" + excitatoryConductance);
-//		System.out.println("excitatoryMaxConductance:" + excitatoryMaxConductance);
-//		System.out.println("excitatoryReversal:" + excitatoryReversal);
-//	
-//		System.out.println("leakConductance:" + leakConductance);
-//		System.out.println("leakMaxConductance:" + leakMaxConductance);
-//		System.out.println("leakReversal" + leakReversal);
-		
-		System.out.println("excitatoryCurrent:" + excitatoryCurrent);	
-		System.out.println("leakCurrent:" + leakCurrent);
-		
-		System.out.println("netCurrent:" + netCurrent);
-		
+		//System.out.println("getExcitatoryInputs:" + getExcitatoryInputs());
+		//System.out.println("excitatoryConductance:" + excitatoryConductance);
+        // System.out.println("excitatoryMaxConductance:" +
+        // excitatoryMaxConductance);
+		//System.out.println("excitatoryReversal:" + excitatoryReversal);
+		//System.out.println("leakConductance:" + leakConductance);
+		//System.out.println("leakMaxConductance:" + leakMaxConductance);
+		//System.out.println("leakReversal" + leakReversal);
+        //System.out.println("Number of excitatory inputs: "
+        //        + excitatoryInputs.size());
+        //System.out.println("Number of inhibitory inputs:"
+        //        + inhibitoryInputs.size());
+
+	    System.out.println("\nNeuron: " + this.getId());
+        System.out.println("excitatoryCurrent:" + excitatoryCurrent);
+        System.out.println("inhibitoryCurrent:" + inhibitoryCurrent);
+        System.out.println("inhibitoryConductance:" + inhibitoryConductance);
+        System.out.println("leakCurrent:" + leakCurrent);
+        System.out.println("netCurrent:" + netCurrent);
 		System.out.println("membranPotential:" + membranePotential);
-		
 		System.out.println("output:" + activation);
 	}
 
-	/**
-	 * Returns excitatory inputs.
-	 */
+    /**
+     * Returns net input to this neuron (source activations times weights), from
+     * excitatory sources only.
+     *
+     * @return net input
+     */
 	private double getExcitatoryInputs() {
 
-		double retVal =0;
+		double retVal = 0;
 		if (excitatoryInputs.size() > 0) {
             for (Synapse synapse : excitatoryInputs) {
                 Neuron source = synapse.getSource();
@@ -493,15 +555,15 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 	/**
 	 * @return the threshold
 	 */
-	public double getThreshold() {
-		return threshold;
+	public double getThresholdPotential() {
+		return thresholdPotential;
 	}
 
 	/**
 	 * @param threshold the threshold to set
 	 */
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
+	public void setThresholdPotential(double threshold) {
+		this.thresholdPotential = threshold;
 	}
 
 	/**
@@ -539,16 +601,6 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 		this.inhibitoryReversal = inhibitoryReversal;
 	}
 
-	public double getBias() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public void setBias(double bias) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	/**
 	 * @return the excitatoryCurrent
 	 */
@@ -563,11 +615,6 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
 		this.excitatoryCurrent = excitatoryCurrent;
 	}
 
-	public double getThresholdInhibitoryConductance() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
     /**
      * @return the duration
      */
@@ -580,6 +627,89 @@ public class PointNeuron extends Neuron implements BiasedNeuron {
      */
     public void setDuration(int duration) {
         this.duration = duration;
-    }	
-	
+    }
+
+    /**
+     * @return the inhibitoryConductance
+     */
+    public double getInhibitoryConductance() {
+        return inhibitoryConductance;
+    }
+
+    /**
+     * @param inhibitoryConductance the inhibitoryConductance to set
+     */
+    public void setInhibitoryConductance(double inhibitoryConductance) {
+        this.inhibitoryConductance = inhibitoryConductance;
+    }
+
+    /**
+     * @return the inhibitoryMaxConductance
+     */
+    public double getInhibitoryMaxConductance() {
+        return inhibitoryMaxConductance;
+    }
+
+    /**
+     * @param inhibitoryMaxConductance the inhibitoryMaxConductance to set
+     */
+    public void setInhibitoryMaxConductance(double inhibitoryMaxConductance) {
+        this.inhibitoryMaxConductance = inhibitoryMaxConductance;
+    }
+
+    /**
+     * @return the bias
+     */
+    public double getBias() {
+        return bias;
+    }
+
+    /**
+     * @param bias the bias to set
+     */
+    public void setBias(double bias) {
+        this.bias = bias;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
+        Synapse synapse = networkEvent.getObject();
+        if (synapse.getTarget() == this) {
+            addSynapseToList(synapse);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
+        Synapse synapse = networkEvent.getObject();
+        if (synapse.getTarget() == this) {
+            addSynapseToList(synapse);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
+        Synapse synapse = networkEvent.getObject();
+        if (synapse.getTarget() == this) {
+            if (excitatoryInputs.contains(synapse)) {
+                excitatoryInputs.remove(synapse);
+            }
+            if (inhibitoryInputs.contains(synapse)) {
+                inhibitoryInputs.remove(synapse);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void synapseTypeChanged(NetworkEvent<Synapse> networkEvent) {
+        // No implementation
+    }
 }

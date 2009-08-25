@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.networks;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -26,14 +27,13 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.PointNeuron;
 
-
 /**
- * <b>KwtaNetwork</b> implements a k Winner Take All network.  The k neurons receiving the most
- * excitatory input will become active. The network determines what constantl level of inhibition
- * across all network neurons will result in those k neurons being active about threshold.
- * From O'Reilley and Munakata, Computational Explorations in Cognitive Neuroscience, p. 110.
- * All page references below are are to this book.
- *
+ * <b>KwtaNetwork</b> implements a k Winner Take All network. The k neurons
+ * receiving the most excitatory input will become active. The network
+ * determines what level of inhibition across all network neurons will result in
+ * those k neurons being active about threshold. From O'Reilley and Munakata,
+ * Computational Explorations in Cognitive Neuroscience, p. 110. All page
+ * references below are are to this book.
  */
 public class KwtaNetwork extends Network {
 
@@ -49,17 +49,21 @@ public class KwtaNetwork extends Network {
      */
     private double q = 0.25;
 
-    /** Current threshold conducatnce. */
-    private double currentThresholdConductance = 0;
+    /**
+     * Current inhibitory conductance to be applied to all neurons in the
+     * subnetwork.
+     */
+    private double inhibitoryConductance;
 
     /**
-     * Default connstructor.
+     * Default constructor.
      */
     public KwtaNetwork() {
     }
 
     /**
-     * Default connstructor.
+     * Default constructor.
+     *
      * @param layout for layout of Neurons.
      * @param k for the number of Neurons in the Kwta Network.
      * @param root reference to RootNetwork.
@@ -67,66 +71,68 @@ public class KwtaNetwork extends Network {
     public KwtaNetwork(final RootNetwork root, final int k, final Layout layout) {
         super();
         this.setRootNetwork(root);
-        // When these neurons are added
-        //  the root network notifies all observers.
-        //  network panel addes the neuron
         for (int i = 0; i < k; i++) {
             addNeuron(new PointNeuron());
         }
         layout.layoutNeurons(this);
-        getRootNetwork().fireNetworkChanged();
     }
 
     /**
-     * The core update function of the neural network.  Calls the current update function on each neuron, decays all
-     * the neurons, and checks their bounds.
+     * Update the kwta network. Sort the neurons by excitatory conductance,
+     * determine the threshold conductance, apply this conductance to all point
+     * neurons, and update the point neurons.
      */
     public void update() {
         sortNeurons();
         setCurrentThresholdCurrent();
         updateAllNeurons();
-        updateAllSynapses();
-        //System.out.println("|-->" + currentThresholdConductance);
     }
 
     /**
-     * See p. 101, equation 3.3
-     *
+     * See p. 101, equation 3.3.
      */
     private void setCurrentThresholdCurrent() {
-        double kPlusOne = ((PointNeuron) getNeuronList().get(k)).getThresholdInhibitoryConductance();
-        currentThresholdConductance = kPlusOne
-            + q * (((PointNeuron) this.getNeuronList().get(k - 1)).getThresholdInhibitoryConductance() - kPlusOne);
+
+        double highest = ((PointNeuron) this.getNeuronList().get(k))
+              .getInhibitoryThresholdConductance();
+        double secondHighest = ((PointNeuron) this.getNeuronList().get(k-1))
+            .getInhibitoryThresholdConductance();
+
+        inhibitoryConductance = secondHighest + q * (highest - secondHighest);
+
+        // System.out.println("highest " + highest + "  secondHighest "
+        //  + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
+
+        // Set inhibitory conductances in the layer
+        for (PointNeuron neuron : this.getNeuronList()) {
+            neuron.setInhibitoryConductance(inhibitoryConductance);
+        }
     }
 
     /**
-     * See p. 101.
-     * They say complete sort not necessary.  But why not?
+     * Sort neurons by their excitatory conductance. See p. 101.
      */
     private void sortNeurons() {
         Collections.sort(this.getNeuronList(), new PointNeuronComparator());
     }
 
     /**
-     * Used to sort PointNeurons by excitatory current.
+     * Used to sort PointNeurons by excitatory conductance.
      */
-    class PointNeuronComparator implements Comparator {
+    class PointNeuronComparator implements Comparator<PointNeuron> {
 
         /**
-         * @inheritDoc Comparator.
+         * {@inheritDoc}
          */
-        public int compare(Object arg0, Object arg1) {
-            return (int) (((PointNeuron)arg0).getExcitatoryCurrent() - ((PointNeuron)arg1).getExcitatoryCurrent());
+        public int compare(PointNeuron neuron1, PointNeuron neuron2) {
+            return (int) (neuron1.getExcitatoryConductance() - neuron2
+                    .getExcitatoryConductance());
         }
     }
 
-    /**
-     * Returns threhsold conductance.
-     *
-     * @return threshold conductance.
-     */
-    public double getThresholdInhibitoryConductance() {
-        return currentThresholdConductance;
+    @Override
+    public ArrayList<PointNeuron> getNeuronList() {
+        return (ArrayList<PointNeuron>) super.getNeuronList();
     }
 
     /**
@@ -151,7 +157,7 @@ public class KwtaNetwork extends Network {
         }
     }
 
-    /** @Override */
+    @Override
     public Network duplicate() {
         KwtaNetwork net = new KwtaNetwork();
         net = (KwtaNetwork) super.duplicate(net);

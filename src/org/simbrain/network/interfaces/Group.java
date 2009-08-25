@@ -19,6 +19,7 @@
 package org.simbrain.network.interfaces;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <b>Group</b> a group of neurons, synapses, and networks which are separately contained in the
@@ -125,7 +126,7 @@ public abstract class Group {
             if (object instanceof Neuron) {
                 if (!possibleOverlaps.contains(object)) {
                     final Neuron neuron = (Neuron) object;
-                    referenceNetwork.getNeuronList().add(neuron);
+                    referenceNetwork.addNeuron(neuron);
                 }
             } else if (object instanceof Synapse) {
                 if (!possibleOverlaps.contains(object)) {
@@ -204,7 +205,7 @@ public abstract class Group {
      * @return a list of neurons
      * @see org.simbrain.network.interfaces.Network#getNeuronList()
      */
-    public ArrayList<Neuron> getNeuronList() {
+    public List<? extends Neuron> getNeuronList() {
         return referenceNetwork.getNeuronList();
     }
 

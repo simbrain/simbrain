@@ -117,7 +117,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
         cbOutputFunction.setSelectedItem(neuronRef.getCurrentOutputFunction());
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+        tfThreshold.setText(Double.toString(neuronRef.getThresholdPotential()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
 //        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
@@ -142,7 +142,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 //        if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
 //            neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
 //        }
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getThreshold")) {
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getThresholdPotential")) {
             tfThreshold.setText(NULL_STRING);
         }
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getGain")) {
@@ -165,7 +165,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
         //cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+        tfThreshold.setText(Double.toString(neuronRef.getThresholdPotential()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
 //        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
@@ -197,7 +197,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
                 neuronRef.setCurrentOutputFunction((OutputFunction) cbOutputFunction.getSelectedItem());
 //            }
             if (!tfThreshold.getText().equals(NULL_STRING)) {
-                neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
+                neuronRef.setThresholdPotential(Double.parseDouble(tfThreshold.getText()));
             }
             if (!tfGain.getText().equals(NULL_STRING)) {
                 neuronRef.setGain(Double.parseDouble(tfGain.getText()));

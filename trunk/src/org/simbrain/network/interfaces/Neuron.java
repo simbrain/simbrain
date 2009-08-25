@@ -151,6 +151,10 @@ public abstract class Neuron  {
      */
     public abstract void update();
 
+    /**
+     * Override if initialization is needed.
+     */
+    public void init() {}
 
     /**
      * Perform any initialization required when creating a neuron, but after

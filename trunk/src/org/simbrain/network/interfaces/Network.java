@@ -192,7 +192,7 @@ public abstract class Network {
     /**
      * @return List of neurons in network.
      */
-    public ArrayList<Neuron> getNeuronList() {
+    public List<? extends Neuron> getNeuronList() {
         return this.neuronList;
     }
 
@@ -303,6 +303,7 @@ public abstract class Network {
             rootNetwork.fireNeuronAdded(neuron);
             neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
         }
+        neuron.init();
     }
 
     /**
@@ -672,7 +673,7 @@ public abstract class Network {
      * @param newNeuron in with the new...
      */
     public void changeNeuronType(final Neuron oldNeuron, final Neuron newNeuron) {
-      
+
         // TODO: The code for changing neuron and synapse types may need to be
         // refactored. Lots of stuff has to happen (here, in the listeners, and
         // in the source for Neuron and Synapses themselves; see their duplicate()
@@ -694,11 +695,11 @@ public abstract class Network {
             s.setSource(newNeuron);
         }
         getNeuronList().remove(oldNeuron);
-        getNeuronList().add(newNeuron);
+        addNeuron(newNeuron);
         for (Neuron neuron : getNeuronList()) {
             neuron.setParentNetwork(this);
         }
-        
+
         // If the neuron is a spiker, add spikeResponders to target weights, else remove them
         for (Synapse s : newNeuron.getFanOut()) {
             s.initSpikeResponder();

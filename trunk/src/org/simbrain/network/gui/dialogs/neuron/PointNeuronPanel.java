@@ -120,7 +120,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfThreshold.setText(Double.toString(neuronRef.getThresholdPotential()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
-//        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
+        tfTimeAveraging.setText(Double.toString(neuronRef.getNetTimeConstant()));
 //        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
         
         //Handle consistency of multiple selections
@@ -168,7 +168,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfThreshold.setText(Double.toString(neuronRef.getThresholdPotential()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
-//        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
+        tfTimeAveraging.setText(Double.toString(neuronRef.getNetTimeConstant()));
 //        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
     }
 
@@ -205,9 +205,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
             if (!tfBias.getText().equals(NULL_STRING)) {
                 neuronRef.setBias(Double.parseDouble(tfBias.getText()));
             }
-//            if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
-//                neuronRef.setTimeAveraging(Double.parseDouble(tfTimeAveraging.getText()));
-//            }
+            if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
+                neuronRef.setNetTimeConstant((Double.parseDouble(tfTimeAveraging.getText())));
+            }
 //            if (!tfNormFactor.getText().equals(NULL_STRING)) {
 //                neuronRef.setNormFactor(Double.parseDouble(tfNormFactor.getText()));
 //            }

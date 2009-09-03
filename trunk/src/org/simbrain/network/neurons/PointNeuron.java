@@ -58,10 +58,10 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
     private double inhibitoryMaxConductance = 1;
 
 	/** Default value for membrane potential. */
-	private static final double MEMBRANE_POTENTIAL = .15;
+	private static final double DEFAULT_MEMBRANE_POTENTIAL = .15;
 
 	/** Membrane potential field. (p. 45)*/
-	private double membranePotential = MEMBRANE_POTENTIAL;
+	private double membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
 
 	/** Excitatory reversal potential field. (p. 45)*/
 	private double excitatoryReversal = 1;
@@ -162,6 +162,7 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
 
     @Override
     public void init() {
+        this.setLowerBound(0);
         setInputLists();
         if (this.getParentNetwork() != null) {
             this.getParentNetwork().getRootNetwork().addSynapseListener(this);
@@ -228,10 +229,15 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
     @Override
     public void clear() {
         activation = 0;
-        membranePotential = MEMBRANE_POTENTIAL;
+        membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
+        excitatoryConductance = 0;
+        inhibitoryConductance = 0;
+        leakConductance = 0;        
         excitatoryCurrent = 0;
         leakCurrent = 0;
         inhibitoryCurrent = 0;
+        netCurrent = 0;
+
     }
 
 	@Override
@@ -284,9 +290,10 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
 			double val = 
 			        (gain * getPositiveComponent(membranePotential - thresholdPotential))
 					/ (gain	* getPositiveComponent(membranePotential - thresholdPotential) + 1);
-			setBuffer(val);
+			setBuffer(clip(val));
         } else if (currentOutputFunction == OutputFunction.LINEAR) {
-            setBuffer(gain * getPositiveComponent(membranePotential - thresholdPotential));
+            double val = gain * getPositiveComponent(membranePotential - thresholdPotential);
+            setBuffer(clip(val));
         } else if (currentOutputFunction == OutputFunction.NOISY_RATE_CODE) {
             setBuffer(1);
         }

@@ -228,16 +228,16 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
 
     @Override
     public void clear() {
-        activation = 0;
         membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
+        activation = 0;
+        setBuffer(0);
         excitatoryConductance = 0;
         inhibitoryConductance = 0;
-        leakConductance = 0;        
+        leakConductance = 0;
         excitatoryCurrent = 0;
         leakCurrent = 0;
         inhibitoryCurrent = 0;
         netCurrent = 0;
-
     }
 
 	@Override
@@ -348,13 +348,13 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
         //System.out.println("Number of inhibitory inputs:"
         //        + inhibitoryInputs.size());
 
-	    System.out.println("\nNeuron: " + this.getId());
+	    //System.out.println("\nNeuron: " + this.getId());
         System.out.println("excitatoryCurrent:" + excitatoryCurrent);
         System.out.println("inhibitoryCurrent:" + inhibitoryCurrent);
         System.out.println("inhibitoryConductance:" + inhibitoryConductance);
         System.out.println("leakCurrent:" + leakCurrent);
         System.out.println("netCurrent:" + netCurrent);
-		System.out.println("membranPotential:" + membranePotential);
+		System.out.println("membranePotential:" + membranePotential);
 		System.out.println("output:" + activation);
 	}
 

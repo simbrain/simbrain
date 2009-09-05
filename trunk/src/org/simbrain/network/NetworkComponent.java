@@ -89,7 +89,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        rootNetwork.updateRootNetwork();
+        rootNetwork.update();
     }
 
     @Override

@@ -33,10 +33,10 @@ public abstract class Neuron  {
 
     /** The maximum number of digits to display in the tool tip. */
     private static final int MAX_DIGITS = 9;
-    
+
     /** A unique id for this neuron. */
     private String id = null;
-    
+
     /** An optional String description associated with this neuron. */
     private String label = "";
 
@@ -704,7 +704,7 @@ public abstract class Neuron  {
     public void clear() {
        activation = 0;
     }
-    
+
     /**
      * Returns string for tool tip or short description.
      * @return tool tip text

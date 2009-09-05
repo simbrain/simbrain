@@ -246,13 +246,6 @@ public abstract class Group {
     }
 
     /**
-     * @see org.simbrain.network.interfaces.RootNetwork#updateRootNetwork()
-     */
-    public void updateRootNetwork() {
-        referenceNetwork.updateRootNetwork();
-    }
-
-    /**
      * @return the parent
      */
     public RootNetwork getParent() {

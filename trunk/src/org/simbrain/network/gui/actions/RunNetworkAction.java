@@ -59,7 +59,7 @@ public final class RunNetworkAction extends AbstractAction {
             public void run() {
                 while (networkPanel.isRunning()) {
                     networkPanel.getRootNetwork().setUpdateCompleted(false);
-                    networkPanel.getRootNetwork().updateRootNetwork();
+                    networkPanel.getRootNetwork().update();
                     while (networkPanel.getRootNetwork().isUpdateCompleted() == false) {
                         // Block until update is competed
                         try {

@@ -59,6 +59,7 @@ import org.simbrain.network.gui.dialogs.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -75,7 +76,7 @@ import edu.umd.cs.piccolo.nodes.PText;
 public class NeuronNode extends ScreenElement implements PropertyChangeListener {
 
     private static final Logger LOGGER = Logger.getLogger(NeuronNode.class);
-    
+
     private static final long serialVersionUID = 1L;
 
     /** The logical neuron this screen element represents. */
@@ -261,11 +262,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         JPopupMenu contextMenu = new JPopupMenu();
 
-        // Cut, copy, paste
+        // Cut, copy, paste, delte
         contextMenu.add(new CutAction(getNetworkPanel()));
         contextMenu.add(new CopyAction(getNetworkPanel()));
         contextMenu.add(new PasteAction(getNetworkPanel()));
-        // Delete action
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
@@ -294,7 +294,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         contextMenu.add(getLayoutMenu());
         contextMenu.add(new ShowLayoutDialogAction());
-        
+
         contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected
@@ -304,9 +304,25 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             contextMenu.addSeparator();
         }
 
+        // Add property set item
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
+        contextMenu.addSeparator();
 
-       return contextMenu;
+        // View incoming weight action (TODO: Migrate to actions).
+        JMenuItem viewIncomingItem = new JMenuItem("View incoming weight(s)");
+        viewIncomingItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                for (Synapse synapse : neuron.getFanIn()) {
+                    Neuron sourceNeuron = synapse.getSource();
+                    sourceNeuron.setActivation(synapse.getStrength());
+                    neuron.getParentNetwork().getRootNetwork()
+                            .fireNeuronChanged(sourceNeuron);
+                }
+            }
+        });
+        contextMenu.add(viewIncomingItem);
+
+        return contextMenu;
     }
 
 

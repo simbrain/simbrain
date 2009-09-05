@@ -34,6 +34,7 @@ import org.simbrain.network.synapses.SubtractiveNormalizationSynapse;
 import org.simbrain.network.synapses.TDSynapse;
 import org.simbrain.network.synapses.TraceSynapse;
 import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
+import org.simbrain.util.Utils;
 
 
 /**
@@ -53,6 +54,10 @@ public abstract class Synapse {
 
     /** Synapse id. */
     protected String id = null;
+
+    /** The maximum number of digits to display in the tool tip. */
+    private static final int MAX_DIGITS = 2;
+
 
     /**
      * Parent network.  Cant' just use getSouce().getParent() because synapses
@@ -381,16 +386,26 @@ public abstract class Synapse {
     }
 
     /**
+     * Returns string for tool tip or short description.
+     *
+     * @return tool tip text
+     */
+    public String getToolTipText() {
+        return "(" + id + ") Strength: "
+                + Utils.round(this.getStrength(), MAX_DIGITS);
+    }
+
+    /**
      * Returns symmetric synapse if there is one, null otherwise.
      * @return the symmetric synapse, if any.
      */
     public Synapse getSymmetricSynapse() {
     	List<Synapse> targetsOut = this.getTarget().getFanOut();
     	int index = targetsOut.indexOf(this.getSource());
-    	
+
     	return (index < 0) ? null : targetsOut.get(index);
-    	
-//        for (Synapse synapse : this.getTarget().getFanOut()) {
+
+    	//        for (Synapse synapse : this.getTarget().getFanOut()) {
 //            if (synapse.getTarget() == this.getSource()) {
 //                return synapse;
 //            }

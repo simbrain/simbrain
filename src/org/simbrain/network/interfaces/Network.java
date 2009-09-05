@@ -27,15 +27,16 @@ import org.apache.log4j.Logger;
 import org.simbrain.network.util.CopyFactory;
 
 /**
- * <b>Network</b> provides core neural network functionality and is the the main API
- * for external calls. Network objects are sets of neurons and  weights connecting them.
- * Much of the  actual update and  learning logic occurs (currently) in the individual nodes.
+ * <b>Network</b> provides core neural network functionality and is the the main
+ * API for external calls. Network objects are sets of neurons and weights
+ * connecting them. Much of the actual update and learning logic occurs
+ * (currently) in the individual nodes.
  */
 public abstract class Network {
 
     /** The initial time-step for the network. */
     private static final double DEFAULT_TIME_STEP = .2;
-    
+
     /** Logger. */
     private Logger logger = Logger.getLogger(Network.class);
 
@@ -79,7 +80,7 @@ public abstract class Network {
      */
     public Network() {
     }
-    
+
     /**
      * Update the network.
      */
@@ -469,16 +470,37 @@ public abstract class Network {
      * Set the activation level of all neurons to zero.
      */
     public void clearActivations() {
-        for (Neuron n : neuronList) {
-            n.setActivation(0);
+        setActivations(0);
+    }
+
+    /**
+     * Sets all neurons to a specified value.
+     *
+     * @param value value to set
+     */
+    public void setActivations(final double value) {
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            neuron.setActivation(value);
+        }
+    }
+
+    /**
+     * Sets all weights to a specified value.
+     *
+     * @param value value to set
+     */
+    public void setWeights(final double value) {
+        for (Synapse synapse : this.getFlatSynapseList()) {
+            synapse.setStrength(value);
         }
     }
 
     /**
      * Returns the "state" of the network--the activation level of its neurons.
      * Used by the gauge component.
-     *
-     * @return an array representing the activation levels of all the neurons in this network
+     * 
+     * @return an array representing the activation levels of all the neurons in
+     *         this network
      */
     public double[] getState() {
         double[] ret = new double[this.getNeuronCount()];

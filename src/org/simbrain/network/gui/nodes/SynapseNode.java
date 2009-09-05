@@ -299,7 +299,7 @@ public final class SynapseNode
 
     /** @see ScreenElement */
     protected String getToolTipText() {
-        return String.valueOf(synapse.getStrength());
+        return String.valueOf(synapse.getToolTipText());
     }
 
     /** @see ScreenElement */

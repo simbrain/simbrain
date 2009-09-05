@@ -198,42 +198,9 @@ public class RootNetwork extends Network {
         return this;
     }
 
-    /**
-     * Externally called update function which coordinates input and output neurons and
-     * connections with worlds and gauges.
-     */
+    @Deprecated
     public void updateRootNetwork() {
-        logger.debug("updateRootNetwork called");
-
-        //Update Time
-        updateTime();
-
-        // Call root network update function
         update();
-
-        // Notify network listeners
-        this.fireNetworkChanged();
-
-        // Clear input nodes
-        clearInputs();
-    }
-
-    /**
-     * Helper method for custom scripts, to handle basic non-logical updates.
-     */
-    public void updateRootNetworkStandard() {
-
-        //Update Time
-        updateTime();
-
-        // Notify network listeners
-        this.fireNetworkChanged();
-
-        // Clear input nodes
-        clearInputs();
-        
-        // For thread
-        this.setUpdateCompleted(true);
     }
 
     /**
@@ -241,7 +208,12 @@ public class RootNetwork extends Network {
      * function on each neuron, decays all the neurons, and checks their bounds.
      */
     public void update() {
+
         logger.debug("update called");
+
+        //Update Time
+        updateTime();
+
         switch (this.updateMethod) {
 	        case PRIORITYBASED:
             logger.debug("priority-based update");
@@ -259,6 +231,12 @@ public class RootNetwork extends Network {
                 n.update();
             }
         }
+
+        // Notify network listeners
+        this.fireNetworkChanged();
+
+        // Clear input nodes
+        clearInputs();
     }
 
     /**
@@ -342,7 +320,7 @@ public class RootNetwork extends Network {
         }
         return null;
     }
-    
+
     /**
      * Clears out input values of network nodes, which otherwise linger and
      * cause problems.
@@ -905,6 +883,5 @@ public class RootNetwork extends Network {
     public void addGroupListener(final GroupListener listener) {
         groupListeners.add(listener);
     }
-
 
 }

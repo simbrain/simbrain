@@ -123,7 +123,7 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
     };
 
 	/** Current output function. */
-    private OutputFunction currentOutputFunction = OutputFunction.DISCRETE_SPIKING;
+    private OutputFunction outputFunction = OutputFunction.DISCRETE_SPIKING;
 
 	/** Gain factor for output function. (p. 46)*/
 	private double gain = 600;
@@ -151,13 +151,6 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
      * set their parameters.
      */
     public PointNeuron() {
-    }
-
-    /**
-     * Initialize after opening network.
-     */
-    public void postUnmarshallingInit() {
-        super.postUnmarshallingInit();
     }
 
     @Override
@@ -279,22 +272,22 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
 		membranePotential += -potentialTimeConstant * netCurrent;
 
 		/** Apply output function. (p. 45-48) */
-		if (currentOutputFunction == OutputFunction.DISCRETE_SPIKING) {
+		if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
 			if (membranePotential > thresholdPotential) {
 				setBuffer(1);
 				membranePotential = refractoryPotential;
 			} else {
 				setBuffer(0);
 			}
-		} else if (currentOutputFunction == OutputFunction.RATE_CODE) {
+		} else if (outputFunction == OutputFunction.RATE_CODE) {
 			double val = 
 			        (gain * getPositiveComponent(membranePotential - thresholdPotential))
 					/ (gain	* getPositiveComponent(membranePotential - thresholdPotential) + 1);
 			setBuffer(clip(val));
-        } else if (currentOutputFunction == OutputFunction.LINEAR) {
+        } else if (outputFunction == OutputFunction.LINEAR) {
             double val = gain * getPositiveComponent(membranePotential - thresholdPotential);
             setBuffer(clip(val));
-        } else if (currentOutputFunction == OutputFunction.NOISY_RATE_CODE) {
+        } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
             setBuffer(1);
         }
 
@@ -534,15 +527,15 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
 	/**
 	 * @return the currentOutputFunction
 	 */
-	public OutputFunction getCurrentOutputFunction() {
-		return currentOutputFunction;
+	public OutputFunction getOutputFunction() {
+		return outputFunction;
 	}
 
 	/**
 	 * @param currentOutputFunction the currentOutputFunction to set
 	 */
-	public void setCurrentOutputFunction(OutputFunction currentOutputFunction) {
-		this.currentOutputFunction = currentOutputFunction;
+	public void setOutputFunction(OutputFunction currentOutputFunction) {
+		this.outputFunction = currentOutputFunction;
 	}
 
 	/**

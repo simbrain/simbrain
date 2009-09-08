@@ -26,16 +26,19 @@ import org.simbrain.network.interfaces.Synapse;
  * <b>HebbianCPCA</b>.
  */
 public class HebbianCPCA extends Synapse {
-    /** default Learning rate. */
-    public static final double DEFAULT_LEARNING_RATE = 1;
-    /** default Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
+
+    /** Default Learning rate. */
+    public static final double DEFAULT_LEARNING_RATE = .005;
+    /**
+     * Default Maximum weight value (see equation 4.19 in O'Reilly and
+     * Munakata).
+     */
     public static final double DEFAULT_M = .5 / .15;
     /** default Weight offset. */
     public static final double DEFAULT_THETA = 1;
     /** default Sigmoidal function. */
     public static final double DEFAULT_LAMBDA = 1;
-    
-    
+
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
     /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
@@ -57,13 +60,15 @@ public class HebbianCPCA extends Synapse {
 //    	  setSource(src);
 //        setTarget(tar);
         super(src, tar);
-        strength = val;
+        this.setStrength(val);
         id = theId;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type Only values common to different types of neuron
+     * are copied.
+     * 
      * @param s Synapse to make of the type
      */
     public HebbianCPCA(final Synapse s) {
@@ -98,8 +103,6 @@ public class HebbianCPCA extends Synapse {
      */
     public HebbianCPCA(final Neuron source, final Neuron target) {
         super(source, target);
-//    	  setSource(source);
-//        setTarget(target);
     }
 
     /**
@@ -109,14 +112,16 @@ public class HebbianCPCA extends Synapse {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
 
-        double deltaW = learningRate * ((output * input) - (output * strength));
-        deltaW = learningRate * (output * input * (m - strength) + output * (1 - input) * (-strength));
-        strength = sigmoidal(strength);
-        strength = clip(strength + deltaW);
+        double deltaW = learningRate * ((output * input) - (output * getStrength())); // Equation 4.12
+        //deltaW = learningRate * (output * input * (m - strength) + output * (1 - input) * (-strength));
+        //strength = sigmoidal(strength);
+        //strength = clip(strength + deltaW);
+        setStrength(getStrength() + deltaW);
     }
 
     /**
-     * Sigmoidal Funcation (see equation 4.23 in O'Reilly and Munakata).
+     * Sigmoidal Function (see equation 4.23 in O'Reilly and Munakata).
+     *
      * @param arg value to send to sigmoidal
      * @return value of sigmoidal
      */

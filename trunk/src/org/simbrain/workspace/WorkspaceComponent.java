@@ -21,7 +21,9 @@ package org.simbrain.workspace;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}
@@ -44,19 +48,23 @@ public abstract class WorkspaceComponent {
     /** The workspace that 'owns' this component. */
     private Workspace workspace;
 
-    /** The static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(WorkspaceComponent.class);
-
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
-    //TODO: Check these for thread safety...
+    /** The set of all WorkspaceComponentListeners on this component. */
+    private final Collection<WorkspaceComponentListener> workspaceComponentListeners;
 
     /** Consumer list. */
-    private final List<Consumer> consumers = new CopyOnWriteArrayList<Consumer>();
+    private final List<Consumer> consumers;
 
     /** Producer list. */
-    private final List<Producer> producers = new CopyOnWriteArrayList<Producer>();
+    private final List<Producer> producers;
+
+    /** Available attribute types. */
+    protected final List<String> attributeTypes;
+
+    /** List of attribute listeners. */
+    private final Collection<AttributeHolderListener> attributeListeners;
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = true;
@@ -90,17 +98,20 @@ public abstract class WorkspaceComponent {
      */
     private File currentFile;
 
-    /** The set of all WorkspaceComponentListeners on this component. */
-    private final Collection<WorkspaceComponentListener> workspaceComponentListeners = 
-        new HashSet<WorkspaceComponentListener>();
-    
-    /** List of attribute listeners. */
-    private final Collection<AttributeHolderListener> attributeListeners = 
-        new HashSet<AttributeHolderListener>();
-    
+    /**
+     * Initializer
+     */
+    {
+        consumers = new CopyOnWriteArrayList<Consumer>();
+        producers = new CopyOnWriteArrayList<Producer>();
+        attributeTypes = new ArrayList<String>();
+        workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
+        attributeListeners = new HashSet<AttributeHolderListener>();
+    }
+
     /**
      * Construct a workspace component.
-     * 
+     *
      * @param name The name of the component.
      */
     public WorkspaceComponent(final String name) {
@@ -109,20 +120,22 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Used when saving a workspace.  All changed workspace components are saved using
-     * this method.
+     * Used when saving a workspace. All changed workspace components are saved
+     * using this method.
      *
-     * @param output the stream of data to write the data to.
-     * @param format a key used to define the requested format.
+     * @param output
+     *            the stream of data to write the data to.
+     * @param format
+     *            a key used to define the requested format.
      */
     public abstract void save(OutputStream output, String format);
-    
+
     /**
      * Returns a list of the formats that this component supports.
-     * 
+     *
      * <p>The default behavior is to return an empty list.  This means
      * that there is one format.
-     * 
+     *
      * @return a list of the formats that this component supports.
      */
     public List<? extends String> getFormats() {
@@ -136,7 +149,7 @@ public abstract class WorkspaceComponent {
         closing();
         workspace.removeWorkspaceComponent(this);
     }
-    
+
     /**
      * Perform cleanup after closing.
     */
@@ -148,10 +161,10 @@ public abstract class WorkspaceComponent {
     public void update() {
         /* no default implementation */
     }
-    
+
     /**
      * Returns the collection of update parts for this component.
-     * 
+     *
      * @return The collection of update parts for this component.
      */
     public Collection<ComponentUpdatePart> getUpdateParts() {
@@ -160,28 +173,28 @@ public abstract class WorkspaceComponent {
                 update();
             }
         };
-        
+
         return Collections.singleton(new ComponentUpdatePart(this, callable, toString(), this));
     }
-    
+
     /**
-     * Returns the locks for the update parts.  There should be one lock
-     * per part.  These locks need to be the same ones used to lock the
-     * update of each part.
+     * Returns the locks for the update parts. There should be one lock per
+     * part. These locks need to be the same ones used to lock the update of
+     * each part.
      * 
      * @return The locks for the update parts.
      */
     public Collection<? extends Object> getLocks() {
         return Collections.singleton(this);
     }
-    
+
     /**
      * Called by Workspace to notify that updates have stopped.
      */
     protected void stopped() {
         /* no default implementation */
     }
-    
+
     /**
      * Notify all workspaceComponentListeners of a componentUpdated event.
      */
@@ -527,7 +540,7 @@ public abstract class WorkspaceComponent {
         }
         return null;
     }
-    
+
     /**
     * Finds a consumer by name and returns it, or none if it is not found.
     *
@@ -538,12 +551,13 @@ public abstract class WorkspaceComponent {
         for (Consumer consumer : getConsumers()) {
             //System.out.println(consumerId + "==" + consumer.getDescription() + "?");
             if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
+                //System.out.println(consumer.getDescription() + "==" + consumerId + "?");
                 return consumer;
             }
         }
         return null;
     }
-    
+
     /**
      * Get a consuming attribute, using the id of the attribute holder and the attribute itself.
      *
@@ -556,6 +570,7 @@ public abstract class WorkspaceComponent {
         Consumer consumer = getConsumer(consumerId);
         if (consumer != null) {
             for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
+                //System.out.println(attribute.getKey() + "==" + attributeId + "?");
                 if (attribute.getKey().equals(attributeId)) {
                     return attribute;
                 }
@@ -570,15 +585,16 @@ public abstract class WorkspaceComponent {
      * @param producerId the name of the producer (attribute holder)
      * @return the producer
      */
-     public Producer getProducer(final String producerId) {
-         for (Producer producer : getProducers()) {
-             //System.out.println(producerId + "==" + producer.getDescription() + "?");
-             if (producer.getDescription().equalsIgnoreCase(producerId)) {
-                 return producer;
-             }
-         }
-         return null;
-     }
+    public Producer getProducer(final String producerId) {
+        for (Producer producer : getProducers()) {
+            // System.out.println(producerId + "==" + producer.getDescription()
+            // + "?");
+            if (producer.getDescription().equalsIgnoreCase(producerId)) {
+                return producer;
+            }
+        }
+        return null;
+    }
 
     /**
      * Get a producing attribute, using the id of the attribute holder and the attribute itself.
@@ -600,10 +616,52 @@ public abstract class WorkspaceComponent {
         return null;
     }
     
+    public ProducingAttribute<Double> createDoubleProducingAttribute(final Producer producer,
+            final String getterName, final String key, final String description) {
+        if (producer == null) {
+            return null;
+        } else {
+            return new ProducingAttribute<Double>() {
+                public Producer getParent() {
+                    return producer;
+                }
+                public Double getValue() {
+                    Method theMethod = null;
+                    Double theVal = new Double(0);
+                    try {
+                        theMethod = producer.getClass().getMethod(getterName,(Class[]) null);
+                    } catch (SecurityException e1) {
+                        e1.printStackTrace();
+                    } catch (NoSuchMethodException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    try {
+                        if (theMethod != null) {
+                            theVal = (Double) theMethod.invoke(producer, null);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return theVal;
+                }
+
+                public String getAttributeDescription() {
+                    return description;
+                }
+
+                public String getKey() {
+                    return key;
+                }
+            };
+        }
+    }
+
+
     /**
      * Sets the workspace for this component.  Called by the
      * workspace right after this component is created.
-     * 
+     *
      * @param workspace The workspace for this component.
      */
     public void setWorkspace(final Workspace workspace) {
@@ -612,13 +670,13 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the workspace associated with this component.
-     * 
+     *
      * @return The workspace associated with this component.
      */
     public Workspace getWorkspace() {
         return workspace;
     }
-    
+
     /**
      * Called when a coupling that this workspace owns the target
      * or source of is removed from the workspace.  This method
@@ -655,7 +713,7 @@ public abstract class WorkspaceComponent {
      * @param changedSinceLastSave whether this component has changed since the last save.
      */
     public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        LOGGER.debug("component changed");
+        logger.debug("component changed");
         this.changedSinceLastSave = changedSinceLastSave;
     }
 
@@ -744,4 +802,12 @@ public abstract class WorkspaceComponent {
         this.updateOn = updateOn;
         this.fireComponentToggleEvent();
     }
+
+    /**
+     * @return the attributeTypes
+     */
+    public List<String> getAttributeTypes() {
+        return attributeTypes;
+    }
+
 }

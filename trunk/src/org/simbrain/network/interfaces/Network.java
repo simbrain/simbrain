@@ -716,7 +716,8 @@ public abstract class Network {
         for (Synapse s : new ArrayList<Synapse>(oldNeuron.getFanOut())) {
             s.setSource(newNeuron);
         }
-        getNeuronList().remove(oldNeuron);
+        neuronList.remove(oldNeuron);
+        neuronList.add(oldNeuron);
         addNeuron(newNeuron);
         for (Neuron neuron : getNeuronList()) {
             neuron.setParentNetwork(this);
@@ -728,7 +729,7 @@ public abstract class Network {
         }
         rootNetwork.updateTimeType();
     }
-    
+
     /**
      * Change synapse type; replace one synapse with another.
      * deletes the old synapse

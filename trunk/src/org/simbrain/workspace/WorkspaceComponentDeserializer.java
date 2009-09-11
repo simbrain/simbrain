@@ -16,23 +16,25 @@ public class WorkspaceComponentDeserializer {
     /** A map of keys to their components. */
     private final Map<String, WorkspaceComponent> componentKeys
         = new HashMap<String, WorkspaceComponent>();
-    
+
     /**
      * Returns the workspace component associated with the given uri.
-     * 
+     *
      * @param uri The uri for the component to retrieve.
      * @return The component for the uri.
      */
     WorkspaceComponent getComponent(final String uri) {
         return componentKeys.get(uri);
     }
-    
+
     /**
-     * Deserializes a workspace component using the information from the provided
-     * component and input stream.
-     * 
-     * @param component The component entry from the archive contents.
-     * @param input The input stream to read data from.
+     * Deserializes a workspace component using the information from the
+     * provided component and input stream.
+     *
+     * @param component
+     *            The component entry from the archive contents.
+     * @param input
+     *            The input stream to read data from.
      * @return The deserialized WorkspaceComponent.
      */
     @SuppressWarnings("unchecked")
@@ -52,10 +54,10 @@ public class WorkspaceComponentDeserializer {
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
      * Deserialized a component for the given class, input and input format.
-     * 
+     *
      * @param clazz the class of the component
      * @param name the name of the component
      * @param input the input stream
@@ -69,7 +71,7 @@ public class WorkspaceComponentDeserializer {
                 
             WorkspaceComponent wc = (WorkspaceComponent)
                 method.invoke(null, input, name, format);
-                
+
             return wc;
         } catch (RuntimeException e) {
             throw e;
@@ -77,10 +79,10 @@ public class WorkspaceComponentDeserializer {
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
      * Deserializes a desktop component given a class, input stream and name.
-     * 
+     *
      * @param className The class name for the DesktopComponent
      * @param component The desktop component entry for the desktop component.
      * @param input The input stream.

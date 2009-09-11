@@ -51,7 +51,7 @@ public class BarChartModel extends ChartModel {
     private double lowerBound = 0;
 
 //    private Range chartRange = new Range(0, 10);
-    
+
     /**
      * Bar chart model constructor.
      * @param parent component
@@ -67,14 +67,14 @@ public class BarChartModel extends ChartModel {
     public DefaultCategoryDataset getDataset() {
         return dataset;
     }
-    
+
     /**
      * Default initialization.
      */
     public void defaultInit() {
         addDataSources(INITIAL_DATA_SOURCES);
     }
-    
+
     /**
      * Create specified number of set of data sources.
      * Adds these two existing data sources.
@@ -102,7 +102,7 @@ public class BarChartModel extends ChartModel {
     public void addColumn() {
         addColumn(dataset.getColumnCount());
     }
-    
+
     /**
      * Removes the last bar from the bar chart data.
      */
@@ -111,16 +111,14 @@ public class BarChartModel extends ChartModel {
             removeColumn(dataset.getColumnCount() - 1);
         }
     }
-    
+
     //TODO: Change names from row / column to "bars"?
-    
+
     public void removeColumn(final int index) {
         dataset.removeColumn(index);
         fireDataSourceRemoved(index);
     }
-    
 
-    
     /**
      * Returns a properly initialized xstream object.
      *
@@ -136,13 +134,13 @@ public class BarChartModel extends ChartModel {
      * See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
         return this;
     }
-    
+
     /**
      * Used for debugging model.
      */

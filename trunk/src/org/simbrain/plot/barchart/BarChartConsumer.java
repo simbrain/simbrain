@@ -29,13 +29,13 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
 
     /** Reference to BarChartComponent. */
     private BarChartComponent component;
-        
+
     /** Index. */
     private Integer index;
-    
+
     /**
      * Construct  BarChartConsumer.
-     * 
+     *
      * @param plot the parent component
      * @param name the name of this consumer (displayed in the plot)
      */
@@ -48,13 +48,13 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
      * {@inheritDoc}
      */
     public void setValue(final Double val) {
-      EventQueue.invokeLater(new Runnable() {
-      public void run() {
-          component.getModel().getDataset().setValue(val, new Integer(1), index);
-      }
-  });
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                component.getModel().getDataset().setValue(val, new Integer(1),
+                        index);
+            }
+        });
 
-        
     }
 
     /**
@@ -63,7 +63,7 @@ public class BarChartConsumer extends SingleAttributeConsumer<Double> {
     public String getKey() {
         return "BarChartData" + index;
     }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -102,7 +102,7 @@ public class ScatterPlotModel extends ChartModel {
         chartSeriesPaint.add(Color.YELLOW);
         chartSeriesPaint.add(Color.PINK);
     }
-    
+
     /**
      * Create specified number of set of data sources.
      * Adds these two existing data sources.

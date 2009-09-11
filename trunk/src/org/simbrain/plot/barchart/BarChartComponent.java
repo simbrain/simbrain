@@ -25,7 +25,7 @@ import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Data for a JFreeChart pie chart.
+ * Data for a JFreeChart bar chart.
  */
 public class BarChartComponent extends WorkspaceComponent {
 
@@ -54,7 +54,18 @@ public class BarChartComponent extends WorkspaceComponent {
     public BarChartComponent(final String name, final BarChartModel model) {
         super(name);
         this.model = model;
+        initializeAttributes();
         addListener();
+    }
+
+    /**
+     * Initialize consuming attributes.
+     */
+    private void initializeAttributes() {
+        this.getConsumers().clear();
+        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
+            addConsumer(new BarChartConsumer(this, i));
+        }
     }
 
     /**
@@ -74,14 +85,15 @@ public class BarChartComponent extends WorkspaceComponent {
      * Add chart listener to model.
      */
     private void addListener() {
-        
+
         model.addListener(new ChartListener() {
 
             /**
              * {@inheritDoc}
              */
-            public void dataSourceAdded(final int index) {            
-                BarChartConsumer newAttribute = new BarChartConsumer(BarChartComponent.this, index);
+            public void dataSourceAdded(final int index) {
+                BarChartConsumer newAttribute = new BarChartConsumer(
+                        BarChartComponent.this, index);
                 addConsumer(newAttribute);
             }
 
@@ -89,10 +101,10 @@ public class BarChartComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                BarChartConsumer toBeRemoved = (BarChartConsumer) getConsumers().get(index);
+                BarChartConsumer toBeRemoved = (BarChartConsumer) getConsumers()
+                        .get(index);
                 removeConsumer(toBeRemoved);
             }
-            
         });
   }
     /**

@@ -116,7 +116,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
-        cbOutputFunction.setSelectedItem(neuronRef.getCurrentOutputFunction());
+        cbOutputFunction.setSelectedItem(neuronRef.getOutputFunction());
         tfThreshold.setText(Double.toString(neuronRef.getThresholdPotential()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
@@ -194,7 +194,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
                 neuronRef.setLeakConductance(Double.parseDouble(tfLC.getText()));
             }
 //            if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING)) {
-                neuronRef.setCurrentOutputFunction((OutputFunction) cbOutputFunction.getSelectedItem());
+                neuronRef.setOutputFunction((OutputFunction) cbOutputFunction.getSelectedItem());
 //            }
             if (!tfThreshold.getText().equals(NULL_STRING)) {
                 neuronRef.setThresholdPotential(Double.parseDouble(tfThreshold.getText()));

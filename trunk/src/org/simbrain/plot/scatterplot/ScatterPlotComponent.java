@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.simbrain.plot.ChartListener;
+import org.simbrain.plot.barchart.BarChartConsumer;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -56,6 +57,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     public ScatterPlotComponent(final String name, final ScatterPlotModel model) {
         super(name);
         this.model = model;
+        initializeAttributes();
         addListener();
     }
 
@@ -71,7 +73,17 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         addListener();
         model.addDataSources(numDataSources);
     }
-    
+
+    /**
+     * Initialize consuming attributes.
+     */
+    private void initializeAttributes() {
+        this.getConsumers().clear();
+        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+            addConsumer(new ScatterPlotConsumer(this, i));
+        }
+    }
+
     /**
      * Add chart listener to model.
      */

@@ -73,7 +73,7 @@ public class ScatterPlotConsumer implements Consumer {
 
     /**
      * Return value for y attribute.
-     * 
+     *
      * @return value for y attribute.
      *
      */
@@ -85,9 +85,9 @@ public class ScatterPlotConsumer implements Consumer {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "ScatterPlot-";
+        return "ScatterPlot-" + index;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -101,7 +101,7 @@ public class ScatterPlotConsumer implements Consumer {
     public String getAttributeDescription() {
         return getDescription();
     }
-    
+
     /**
      * Return index.
      *

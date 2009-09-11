@@ -23,13 +23,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -53,8 +57,12 @@ public class AttributePanel extends JPanel implements ActionListener,
     /** Parent frame. */
     private JFrame parentFrame = new JFrame();
 
-    /** Workspace components. */
+    /** Drop down box for workspace components. */
     private ComponentDropDownBox componentList;
+
+    /** Drop down box for attributes. */
+    private AttributeDropDownBox attributeDropDownBox = new AttributeDropDownBox(
+            "Extra Attributes");
 
     /** List of Attributes in a specified Component. */
     private JList attributeList;
@@ -84,19 +92,26 @@ public class AttributePanel extends JPanel implements ActionListener,
         attributeList.setCellRenderer(new AttributeCellRenderer());
         attributeList.addMouseListener(this);
 
-        // Scroll pane
-        JScrollPane listScroll = new JScrollPane(attributeList);
-        listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-        // Component list
+        // Component list box
         componentList = new ComponentDropDownBox(workspace);
         componentList.addActionListener(this);
         JPanel componentPanel = new JPanel();
         componentPanel.setLayout(new BorderLayout());
         componentPanel.add(componentList, BorderLayout.WEST);
         add(componentPanel, BorderLayout.NORTH);
+
+        // Scroll pane
+        JScrollPane listScroll = new JScrollPane(attributeList);
+        listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(listScroll, BorderLayout.CENTER);
+
+        // Bottom panel
+        JPanel bottomPanel = new JPanel();
+        JMenuBar bar = new JMenuBar();
+        bar.add(attributeDropDownBox);
+        bottomPanel.add(bar);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         // Listen for attribute changes
         for (WorkspaceComponent component : workspace.getComponentList()) {
@@ -156,6 +171,7 @@ public class AttributePanel extends JPanel implements ActionListener,
         // Set Attribute list
         if (component != null) {
             model.clear();
+            attributeDropDownBox.initializeDropDownBox(component); // TODO: Disaggregate into producer / consumer
             if (attributeType == AttributeType.Producing) {
                 for (ProducingAttribute<?> attribute : component
                         .getProducingAttributes()) {
@@ -180,7 +196,7 @@ public class AttributePanel extends JPanel implements ActionListener,
 
     /**
      * Returns selected attributes.
-     * 
+     *
      * @return list of selected attributes.
      */
     public ArrayList<?> getSelectedAttributes() {
@@ -230,11 +246,73 @@ public class AttributePanel extends JPanel implements ActionListener,
                     .getListCellRendererComponent(list, object, index,
                             isSelected, cellHasFocus);
             Attribute attribute = (Attribute) object;
-            
+
             renderer.setText(attribute.getAttributeDescription());
             return renderer;
         }
 
+    }
+
+    /**
+     * A JMenu whose items can be used to add or remove custom attribute types
+     * to particular components.
+     *
+     * NOTE: This is currently experimental and not fully implemented!
+     *
+     * The idea is that components can provide a list of methods that can be
+     * called which are used to add custom attributes to the method. These can
+     * be called in the attribute panel since it's where the attributes are
+     * viewed and edited.
+     *
+     * TODO: 
+     *  - Only display if a component has some methods 
+     *  - Change lists from lists of strings to lists of objects containing a description 
+     *     and a method name.
+     */
+    private class AttributeDropDownBox extends JMenu  {
+
+        /**
+         * Constructor
+         */
+        public AttributeDropDownBox(final String string) {
+            super(string);
+        }
+
+        /**
+         * Initialize dropdown box with attribute-related methods that can be
+         * called on workspace components.
+         *
+         * @param component
+         */
+        public void initializeDropDownBox(final WorkspaceComponent component) {
+            this.removeAll();
+            for(final String string : component.getAttributeTypes()) {
+                JCheckBoxMenuItem theItem = new JCheckBoxMenuItem(string);
+                theItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg0) {
+                        Method theMethod = null;
+                        try {
+                            theMethod = component.getClass().getMethod(string,
+                                    new Class[] { boolean.class });
+                        } catch (SecurityException e1) {
+                            e1.printStackTrace();
+                        } catch (NoSuchMethodException e1) {
+                            e1.printStackTrace();
+                        }
+
+                        try {
+                            if (theMethod != null) {
+                                theMethod.invoke(component,
+                                        new Object[] { false });
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                this.add(theItem);
+            }
+        }
     }
 
     /**

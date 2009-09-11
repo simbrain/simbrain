@@ -40,36 +40,84 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     /** Reference to model world. */
     private OdorWorld world = new OdorWorld();
-    
+
     /**
      * Default constructor.
      */
     public OdorWorldComponent(final String name) {
         super(name);
-        init();
+        addListener();
     }
-    
+
     @SuppressWarnings("unchecked")
     private OdorWorldComponent(final String name, final OdorWorld world) {
         super(name);
         this.world = world;
-        init();
+        initializeAttributes();
+        addListener();
+    }
+
+    /**
+     * Initialize odor world attributes.
+     */
+    private void initializeAttributes() {
+        getConsumers().clear();
+        for (OdorWorldEntity entity : world.getObjectList()) {
+            addEntityAttributes(entity);
+            for (Sensor sensor : entity.getSensors()) {
+                addSensorAttributes(sensor);
+            }
+            for (Effector effector : entity.getEffectors()) {
+                addEffectorAttributes(effector);
+            }
+        }
+    }
+
+    /**
+     * Add attributes associated with this sensor.
+     *
+     * @param sensor the sensor
+     */
+    private void addSensorAttributes(final Sensor sensor) {
+        if (sensor instanceof SmellSensor) {
+            addProducer(new SmellProducer(OdorWorldComponent.this,
+                    (SmellSensor) sensor));
+        }
+    }
+
+    /**
+     * Add attributes associated with this effector.
+     *
+     * @param effector the effector
+     */
+    private void addEffectorAttributes(final Effector effector) {
+        if (effector instanceof RotationEffector) {
+            addConsumer(new RotationConsumer(OdorWorldComponent.this,
+                    (RotationEffector) effector));
+        }
+    }
+
+    /**
+     * Add attributes associated with this entity.
+     *
+     * @param entity the entity
+     */
+    private void addEntityAttributes(final OdorWorldEntity entity) {
+        addConsumer(new EntityWrapper(this, entity));
+        addProducer(new EntityWrapper(this, entity));
     }
 
     /**
      * Initialize this component.
      */
-    private void init() {
+    private void addListener() {
         world.addListener(new WorldListener() {
+
             public void updated() {
                 fireUpdateEvent();
             }
-
             public void effectorAdded(final Effector effector) {
-                if (effector instanceof RotationEffector) {
-                    addConsumer(new RotationConsumer(OdorWorldComponent.this,
-                            (RotationEffector) effector));
-                }
+                addEffectorAttributes(effector);
             }
 
             public void effectorRemoved(final Effector effector) {
@@ -77,8 +125,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
             }
 
             public void entityAdded(final OdorWorldEntity entity) {
-                addConsumer(new EntityWrapper(OdorWorldComponent.this, entity));
-                addProducer(new EntityWrapper(OdorWorldComponent.this, entity));
+                addEntityAttributes(entity);
             }
 
             public void entityRemoved(final OdorWorldEntity entity) {
@@ -86,14 +133,11 @@ public class OdorWorldComponent extends WorkspaceComponent {
             }
 
             public void sensorAdded(final Sensor sensor) {
-                if (sensor instanceof SmellSensor) {
-                    addProducer(new SmellProducer(OdorWorldComponent.this, (SmellSensor) sensor));
-                }
+                addSensorAttributes(sensor);
             }
 
             public void sensorRemoved(Sensor sensor) {
                 // TODO Auto-generated method stub
-                
             }
         });
     }

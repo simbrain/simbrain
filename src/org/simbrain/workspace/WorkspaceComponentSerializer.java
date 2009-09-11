@@ -29,15 +29,13 @@ public class WorkspaceComponentSerializer {
      */
     int getId(final WorkspaceComponent component) {
         Integer id = componentIds.get(component);
-        
         if (id == null) {
             id = lastComponent++;
             componentIds.put(component, id);
         }
-        
         return id;
     }
-    
+
     /**
      * Serializes a component and returns the id for that component.
      * 
@@ -47,7 +45,6 @@ public class WorkspaceComponentSerializer {
      */
     int serializeComponent(final WorkspaceComponent component) {
         component.save(stream, null);
-        
         return getId(component);
     }
 }

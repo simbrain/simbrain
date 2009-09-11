@@ -43,10 +43,10 @@ public abstract class OdorWorldEntity {
 
     /** Sensors. */
     private List<Sensor> sensors= new ArrayList<Sensor>();
-    
+
     /** Effectors. */
     private List<Effector> effectors = new ArrayList<Effector>();
-        
+
     /** Behavior. */
     protected Behavior behavior = new StationaryBehavior();
 
@@ -54,10 +54,11 @@ public abstract class OdorWorldEntity {
     private SmellSource smellSource = null;
 
     /**
-     * Updates this OdorWorldEntity's Animation and its position based on the velocity.
+     * Updates this OdorWorldEntity's Animation and its position based on the
+     * velocity.
      */
     public abstract void update(final long elapsedTime);
-    
+
     /**
      * Called before update() if the creature collided with a tile horizontally.
      */
@@ -77,7 +78,7 @@ public abstract class OdorWorldEntity {
      *
      * @param animation animation to use.
      */
-    public OdorWorldEntity(final Animation anim) {        
+    public OdorWorldEntity(final Animation anim) {
         this.animation = anim;
         anim.start();
     }
@@ -308,5 +309,33 @@ public abstract class OdorWorldEntity {
      */
     public void postSerializationInit() {
         getAnimation().initializeImages();
+    }
+
+    /**
+     * @return the sensors
+     */
+    public List<Sensor> getSensors() {
+        return sensors;
+    }
+
+    /**
+     * @param sensors the sensors to set
+     */
+    public void setSensors(List<Sensor> sensors) {
+        this.sensors = sensors;
+    }
+
+    /**
+     * @return the effectors
+     */
+    public List<Effector> getEffectors() {
+        return effectors;
+    }
+
+    /**
+     * @param effectors the effectors to set
+     */
+    public void setEffectors(List<Effector> effectors) {
+        this.effectors = effectors;
     }
 }

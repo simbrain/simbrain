@@ -24,19 +24,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.SingleAttributeConsumer;
-import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -44,13 +39,13 @@ import com.Ostermiller.util.CSVParser;
  * <b>DataWorldComponent</b> is a data table which other Simbrain components can use.
  */
 public class DataWorldComponent extends WorkspaceComponent {
-    
+
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
     private DataModel<Double> dataModel;
-    
+
     /**
      * This method is the default constructor.
      */
@@ -79,7 +74,7 @@ public class DataWorldComponent extends WorkspaceComponent {
         this.dataModel.setParent(this);
         init();
     }
-    
+
     /**
      * Initialize consumers and producers.
      */
@@ -88,10 +83,10 @@ public class DataWorldComponent extends WorkspaceComponent {
             addConsumer(new ConsumingColumn<Double>(dataModel, i));
             addProducer(new ProducingColumn<Double>(dataModel, i));
         }
-        
+
         dataModel.addListener(listener);
     }
-    
+
     /** Listener. */
     private final DataModel.Listener listener = new DataModel.Listener() {
 

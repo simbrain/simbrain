@@ -42,7 +42,7 @@ public class PieChartComponent extends WorkspaceComponent {
         addListener();
         model.defaultInit();
     }
-    
+
     /**
      * Initializes a jfreechart with specific number of data sources.
      *
@@ -52,14 +52,25 @@ public class PieChartComponent extends WorkspaceComponent {
     public PieChartComponent(final String name, final PieChartModel model) {
         super(name);
         this.model = model;
+        initializeAttributes();
         addListener();
     }
-    
+
+    /**
+     * Initialize consuming attributes.
+     */
+    private void initializeAttributes() {
+        this.getConsumers().clear();
+        for (int i = 0; i < model.getDataset().getItemCount(); i++) {
+            addConsumer(new PieDataConsumer(this, i));
+        }
+    }
+
     /**
      * Add chart listener to model.
      */
     private void addListener() {
-        
+
         model.addListener(new ChartListener() {
 
             /**

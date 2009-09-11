@@ -75,7 +75,7 @@ public abstract class Neuron  {
 
     /** If true then do not update this neuron. */
     private boolean clamped = false;
-    
+
     /** Target value. */
     private double targetValue = 0;
 

@@ -36,7 +36,7 @@ public class ProjectionModel extends ChartModel {
 
     /** High Dimensional Projection. */
     private Projector projector = new Projector();
-    
+
     /** Scatter Plot Data. */
     private XYSeriesCollection dataset;
 
@@ -49,7 +49,6 @@ public class ProjectionModel extends ChartModel {
     /** Index of current item; used to paint it a different color. */
 	private int currentItemIndex = 0;
 
-    
     /**
      * Default constructor.
      *
@@ -57,7 +56,13 @@ public class ProjectionModel extends ChartModel {
      */
     public ProjectionModel() {
     }
-    
+
+    /**
+     * Initialize the projection model with a certain number of data sources.
+     * 
+     * @param numDataSources
+     *            number of sources to initialize model with.
+     */
     public void init(final int numDataSources) {
         dataset = new XYSeriesCollection();
         dataset.addSeries(new XYSeries("Data", false, true));
@@ -65,15 +70,14 @@ public class ProjectionModel extends ChartModel {
             addSource();
         }
     }
-    
-    
+
     /**
      * Adds a consuming attribute. Increases the dimensionality of the projected
      * data by one.
      */
     public void addSource() {
     	int index = projector.getDimensions() + 1;
-    	projector.init(index);  
+    	projector.init(index);
         fireDataSourceAdded(index);
     }
 

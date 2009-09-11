@@ -10,13 +10,13 @@ import org.apache.log4j.Logger;
  * @param <E> coupling attribute value type
  */
 public final class Coupling<E> {
-    
+
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Coupling.class);
-    
+
     /** An arbitrary prime for creating better hash distributions. */
     private static final int ARBITRARY_PRIME = 59;
-    
+
     /** Producing attribute for this coupling. */
     private ProducingAttribute<E> producingAttribute;
 
@@ -25,12 +25,13 @@ public final class Coupling<E> {
 
     /** Value of buffer. */
     private E buffer;
-    
+
     /**
-     * Create a coupling between a specified consuming attribute, without yet specifying
-     * the corresponding producing attribute.
+     * Create a coupling between a specified consuming attribute, without yet
+     * specifying the corresponding producing attribute.
      *
-     * @param consumingAttribute the attribute that consumes.
+     * @param consumingAttribute
+     *            the attribute that consumes.
      */
     public Coupling(final ConsumingAttribute<E> consumingAttribute) {
         super();
@@ -38,10 +39,11 @@ public final class Coupling<E> {
     }
 
     /**
-     * Create a coupling between a specified producing attribute, without yet specifying
-     * the corresponding consuming attribute.
+     * Create a coupling between a specified producing attribute, without yet
+     * specifying the corresponding consuming attribute.
      *
-     * @param producingAttribute the attribute that produces.
+     * @param producingAttribute
+     *            the attribute that produces.
      */
     public Coupling(final ProducingAttribute<E> producingAttribute) {
         super();
@@ -59,9 +61,9 @@ public final class Coupling<E> {
     public Coupling(final ProducingAttribute<E> producingAttribute,
                     final ConsumingAttribute<E> consumingAttribute) {
         LOGGER.debug("new Coupling");
-        LOGGER.debug("producing " + producingAttribute.getAttributeDescription());
-        LOGGER.debug("consuming " + consumingAttribute.getAttributeDescription());
-        
+//        System.out.println("producing " + producingAttribute.getAttributeDescription());
+//        System.out.println("consuming " + consumingAttribute.getAttributeDescription());
+
         this.producingAttribute = producingAttribute;
         this.consumingAttribute = consumingAttribute;
     }
@@ -73,7 +75,7 @@ public final class Coupling<E> {
     public void setBuffer() {
         final WorkspaceComponent producerComponent
             = producingAttribute.getParent().getParentComponent();
-        
+
         try {
             buffer = Workspace.syncRest(producerComponent.getLocks().iterator(), new Callable<E>() {
                 public E call() throws Exception {
@@ -84,7 +86,7 @@ public final class Coupling<E> {
             // TODO exception service?
             e.printStackTrace();
         }
-        
+
         LOGGER.debug("buffer set: " + buffer);
     }
 
@@ -95,18 +97,22 @@ public final class Coupling<E> {
         if ((consumingAttribute != null) && (producingAttribute != null)) {
             final WorkspaceComponent consumerComponent
                 = consumingAttribute.getParent().getParentComponent();
-            
             try {
-                Workspace.syncRest(consumerComponent.getLocks().iterator(), new Callable<E>() {
-                    public E call() throws Exception {
-                        consumingAttribute.setValue(buffer);
-                        LOGGER.debug(consumingAttribute.getParent().getDescription()
-                            + " just consumed " + producingAttribute.getValue() + " from "
-                            + producingAttribute.getParent().getDescription());
-                        
-                        return null;
-                    }
-                });
+                Workspace.syncRest(consumerComponent.getLocks().iterator(),
+                        new Callable<E>() {
+                            public E call() throws Exception {
+                                consumingAttribute.setValue(buffer);
+                                LOGGER.debug(consumingAttribute.getParent()
+                                        .getDescription()
+                                        + " just consumed "
+                                        + producingAttribute.getValue()
+                                        + " from "
+                                        + producingAttribute.getParent()
+                                                .getDescription());
+
+                                return null;
+                            }
+                        });
             } catch (Exception e) {
                 // TODO exception service?
                 e.printStackTrace();
@@ -131,7 +137,7 @@ public final class Coupling<E> {
 
     /**
      * Returns the string representation of this coupling.
-     * 
+     *
      * @return The string representation of this coupling.
      */
     public String toString() {
@@ -167,7 +173,6 @@ public final class Coupling<E> {
             return false;
         }
     }
-    
     /**
      * {@inheritDoc}
      */

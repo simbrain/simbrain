@@ -143,15 +143,15 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
         SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(),
             workspaceComponent.getDescription());
-        
+
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
         }
-        
+
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
 //            workspaceComponent.open(theFile);
-            
+
             try {
                 Workspace workspace = workspaceComponent.getWorkspace();
 
@@ -160,11 +160,11 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                     .deserializeWorkspaceComponent(
                     workspaceComponent.getClass(), theFile.getName(),
                     new FileInputStream(theFile), SFileChooser.getExtension(theFile));
-                
+
                 workspace.addWorkspaceComponent(workspaceComponent);
-                
+
                 SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
-                
+
                 desktop.registerComponentInstance(workspaceComponent, this);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);

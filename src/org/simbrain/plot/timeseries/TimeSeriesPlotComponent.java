@@ -30,7 +30,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Represents time series data.
- * 
+ *
  * TODO:    Ability to add and remove TimeSeriesConsumers
  *          Custom component listener to reflect number of consumers
  *          Ability to reset the plot.
@@ -62,9 +62,20 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public TimeSeriesPlotComponent(final String name, final TimeSeriesModel model) {
         super(name);
         this.model = model;
+        initializeAttributes();
         addListener();
-        model.defaultInit();
     }
+
+   /**
+     * Initialize consuming attributes.
+     */
+    private void initializeAttributes() {
+        this.getConsumers().clear();
+        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+            addConsumer(new TimeSeriesConsumer(this, i));
+        }
+    }
+
 
     /**
      * Initializes a JFreeChart with specific number of data sources.
@@ -83,7 +94,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * Add chart listener to model.
      */
     private void addListener() {
-        
+
         model.addListener(new ChartListener() {
 
             /**
@@ -99,12 +110,12 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers().get(index);
+                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers()
+                        .get(index);
                 removeConsumer(toBeRemoved);
             }
-            
         });
-  }
+    }
 
     /**
      * @return the model.

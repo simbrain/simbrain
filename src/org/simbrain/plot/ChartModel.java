@@ -46,6 +46,9 @@ public class ChartModel {
      * @param listener listener to add.
      */
     public void addListener(ChartListener listener) {
+        if (listenerList == null) {
+            listenerList = new ArrayList<ChartListener>();
+        }
         listenerList.add(listener);
     }
 
@@ -55,6 +58,10 @@ public class ChartModel {
      * @param listener listener to add.
      */
     public void addChartSettingsListener(ChartSettingsListener listener) {
+        if (settingsListenerList == null) {
+            settingsListenerList = new ArrayList<ChartSettingsListener>();
+        }
+
         settingsListenerList.add(listener);
     }
 
@@ -74,6 +81,9 @@ public class ChartModel {
      * @param index index of added data source
      */
     public void fireDataSourceAdded(final int index) {
+        if (listenerList == null) {
+            listenerList = new ArrayList<ChartListener>();
+        }
         for (ChartListener listener : listenerList) {
             listener.dataSourceAdded(index);
         }

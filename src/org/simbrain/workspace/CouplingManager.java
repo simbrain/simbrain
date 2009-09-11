@@ -161,7 +161,7 @@ public class CouplingManager {
     
     /**
      * Adds a coupling to this instance.
-     * 
+     *
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
@@ -173,11 +173,11 @@ public class CouplingManager {
             System.out.println("removing old coupling: " + old);
 //            removeCoupling(old);
         }
-        
+
         consumingAttributes.put(coupling.getConsumingAttribute(), coupling);
-        
+
         all.add(coupling);
-        
+
         WorkspaceComponent source = coupling.getProducingAttribute()
             .getParent().getParentComponent();
         WorkspaceComponent target = coupling.getConsumingAttribute()
@@ -194,7 +194,7 @@ public class CouplingManager {
             targetCouplings.get(source), coupling));
         fireCouplingListUpdated();
     }
-    
+
     /**
      * Replaces any couplings where the old attribute is the source or
      * target with a new coupling with the new attribute in the source
@@ -209,17 +209,17 @@ public class CouplingManager {
             boolean replace = false;
             ProducingAttribute producer = coupling.getProducingAttribute();
             ConsumingAttribute consumer = coupling.getConsumingAttribute();
-            
+
             if (consumer == oldAttr) {
                 replace = true;
                 consumer = (ConsumingAttribute) newAttr;
             }
-            
+
             if (producer == oldAttr) {
                 replace = true;
                 producer = (ProducingAttribute) newAttr;
             }
-            
+
             if (replace) {
                 removeCoupling(coupling);
                 addCoupling(new Coupling(producer, consumer));

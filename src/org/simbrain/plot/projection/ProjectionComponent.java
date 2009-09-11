@@ -52,7 +52,8 @@ public class ProjectionComponent extends WorkspaceComponent {
     public ProjectionComponent(final String name) {
         super(name);
         projectionModel = new ProjectionModel();
-        init(DEFAULT_NUMBER_OF_SOURCES);
+        addListener();
+        projectionModel.init(DEFAULT_NUMBER_OF_SOURCES);
     }
 
     /**
@@ -64,7 +65,8 @@ public class ProjectionComponent extends WorkspaceComponent {
     public ProjectionComponent(final String name, final int numDataSources) {
         super(name);
         projectionModel = new ProjectionModel();
-        init(numDataSources);
+        addListener();
+        projectionModel.init(numDataSources);
     }
 
     /**
@@ -77,51 +79,53 @@ public class ProjectionComponent extends WorkspaceComponent {
     public ProjectionComponent(final ProjectionModel model, final String name) {
         super(name);
         projectionModel = model;
-        int numPoints = projectionModel.getProjector().getNumPoints();
-        getConsumers().clear();
-        init(numPoints);
 
         // Add the data to the chart.
+        int numPoints = projectionModel.getProjector().getNumPoints();
         for (int i = 0; i < numPoints; i++) {
             double[] point = projectionModel.getProjector().getDownstairs().getPoint(i);
             if (point != null) {
-            	projectionModel.addPoint(point[0], point[1]);
+                projectionModel.addPoint(point[0], point[1]);
             }
         }
+
+        // Initialize attributes
+        this.getConsumers().clear();
+        for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
+            addConsumer(new ProjectionConsumer(this, i));
+        }
+        addListener();
     }
 
-	/**
-	 * Initialize plot.
-	 *
-	 * @param numSources number of data sources
-	 */
-	private void init(final int numSources) {
-		projectionModel.addListener(new ChartListener() {
+    /**
+     * Add chart listener to model.
+     */
+    private void addListener() {
+        projectionModel.addListener(new ChartListener() {
 
-			/**
-			 * {@inheritDoc}
-			 */
-			public void dataSourceAdded(final int index) {
-				ProjectionConsumer newAttribute = new ProjectionConsumer(
-						ProjectionComponent.this, index);
-				addConsumer(newAttribute);
-			}
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int index) {
+                ProjectionConsumer newAttribute = new ProjectionConsumer(
+                        ProjectionComponent.this, index);
+                addConsumer(newAttribute);
+            }
 
-			/**
-			 * {@inheritDoc}
-			 */
-			public void dataSourceRemoved(final int index) {
-				ProjectionConsumer toBeRemoved = (ProjectionConsumer) getConsumers()
-						.get(index);
-				removeConsumer(toBeRemoved);
-			}
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                ProjectionConsumer toBeRemoved = (ProjectionConsumer) getConsumers()
+                        .get(index);
+                removeConsumer(toBeRemoved);
+            }
+        });
 
-		});
-		projectionModel.init(numSources);
-	}
+    }
 
     /**
-     * {@inheritDoc}
+     * Open component.
      */
     public static ProjectionComponent open(InputStream input,
             final String name, final String format) {

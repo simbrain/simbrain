@@ -40,7 +40,7 @@ public class OdorWorld {
 
     /** List of odor world entities. */
     private List<OdorWorldEntity> entityList = new ArrayList<OdorWorldEntity>();
-    
+
     /** Listeners on this odor world. */
     private List<WorldListener> listenerList = new ArrayList<WorldListener>();
 
@@ -49,10 +49,10 @@ public class OdorWorld {
 
     /** Point cache used in collision detection. */
     private Point pointCache = new Point();
-    
+
     /** Renderer for this world. */
     private OdorWorldRenderer renderer;
-    
+
     /** Whether or not sprites wrap around or are halted at the borders */
     //private boolean wrapAround = true;
 

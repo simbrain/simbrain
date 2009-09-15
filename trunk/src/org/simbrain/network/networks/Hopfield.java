@@ -85,17 +85,17 @@ public class Hopfield extends Network {
         for (int i = 0; i < this.getNeuronCount(); i++) {
             for (int j = 0; j < i; j++) {
                 ClampedSynapse w = new ClampedSynapse(this.getNeuron(i), this.getNeuron(j));
+                addSynapse(w);
                 w.setUpperBound(1);
                 w.setLowerBound(-1);
                 w.randomize();
                 w.setStrength(Math.round(w.getStrength()));
-                addSynapse(w);
 
                 ClampedSynapse w2 = new ClampedSynapse(this.getNeuron(j), this.getNeuron(i));
+                addSynapse(w2);
                 w2.setUpperBound(1);
                 w2.setLowerBound(-1);
                 w2.setStrength(w.getStrength());
-                addSynapse(w2);
             }
         }
     }

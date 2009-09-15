@@ -306,6 +306,7 @@ public class NetworkPanel extends PCanvas  {
         updateStatusLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight()
                 - UPDATE_LABEL_OFFSET);
         getCamera().addChild(updateStatusLabel);
+        //getCamera().setScale(.8); // Cheating to offset the toolbar
         updateStatusLabel.update();
 
         // register support for tool tips
@@ -1274,8 +1275,8 @@ public class NetworkPanel extends PCanvas  {
         // TODO: Add a check to see if network is running
         if (autoZoomMode && editMode.isSelection()) {
             PBounds filtered = getLayer().getFullBounds();
-            PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 20,
-                    filtered.getWidth() + 40, filtered.getHeight() + 40);
+            PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 60,
+                    filtered.getWidth() + 40, filtered.getHeight() + 120);
 
             camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
         }

@@ -717,7 +717,6 @@ public abstract class Network {
             s.setSource(newNeuron);
         }
         neuronList.remove(oldNeuron);
-        neuronList.add(oldNeuron);
         addNeuron(newNeuron);
         for (Neuron neuron : getNeuronList()) {
             neuron.setParentNetwork(this);

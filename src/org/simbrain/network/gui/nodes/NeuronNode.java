@@ -67,6 +67,7 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 
@@ -174,7 +175,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         activationText.setFont(NEURON_FONT);
         setActivationTextPosition();
         addChild(activationText);
-        addChild(labelText);
+        
+        // TODO: create a white background for the activation text
+        //PNode node = new PNode();
+        //node.setPaint(Color.white);
+        //node.setBounds(labelText.getBounds());
+        //node.addChild(labelText);
+        //addChild(node);
 
         resetColors();
         update();

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -39,6 +40,9 @@ public class TestObject {
     long theLong = 20L;
     short theShort = 20; // TODO: Figure out about shorts...
 
+    // Array test(s)
+    double[] doubleArray = new double[]{.1,.2,.3,4};
+
     // Enum / Combo Box test
     private TestEnum theEnum = TestEnum.FOUR;
     ComboBoxable boxable;
@@ -65,6 +69,7 @@ public class TestObject {
                 + "The Boolean Object: " + theBooleanObject + "\n"
                 + "The Boolean: " + theBool + "\n" + "The String: " + theString
                 + "\n" + "The Integer Object: " + theIntObject + "\n"
+                + "The Double Array: " + Arrays.toString(doubleArray) + "\n"
                 + "The Double Object: " + theDoubleObject + "\n"
                 + "The Float Object: " + theFloatObject + "\n"
                 + "The Long Object: " + theLongObject + "\n"
@@ -351,5 +356,19 @@ public class TestObject {
      */
     public void setTheShort(short theShort) {
         this.theShort = theShort;
+    }
+
+    /**
+     * @return the doubleArray
+     */
+    public double[] getDoubleArray() {
+        return doubleArray;
+    }
+
+    /**
+     * @param doubleArray the doubleArray to set
+     */
+    public void setDoubleArray(double[] doubleArray) {
+        this.doubleArray = doubleArray;
     }
 }

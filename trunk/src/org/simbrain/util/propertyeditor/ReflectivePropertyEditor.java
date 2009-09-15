@@ -5,12 +5,23 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import org.simbrain.util.LabelledItemPanel;
 
@@ -156,6 +167,31 @@ public class ReflectivePropertyEditor extends JPanel {
                                     theTextField);
                         }
 
+                        else if (method.getReturnType() == double[].class) {
+                            JTable table = new JTable();
+                            table.setGridColor(Color.gray);
+                            double[] value = (double[]) getGetterValue(method);
+                            DefaultTableModel model = new DefaultTableModel(value.length, 1);
+                            for(int i = 0; i < value.length; i++) {
+                                model.setValueAt(value[i], i, 0);
+                            }
+                            table.setModel(model);
+                            table.setBorder(BorderFactory.createLineBorder(Color.black));
+                            componentMap.put(propertyName, table);
+                            itemPanel.addItem(formattedPropertyName, table);
+//                            JList jList = new JList();
+//                            DefaultListModel model = new DefaultListModel();
+//                            double[] value = (double[]) getGetterValue(method);
+//                            model.setSize(value.length);
+//                            for(int i = 0; i < value.length; i++) {
+//                                model.set(i, value[i]);
+//                            }
+//                            jList.setModel(model);
+//                            jList.setBorder(BorderFactory.createLineBorder(Color.black));
+//                            componentMap.put(propertyName, jList);
+//                            itemPanel.addItem(formattedPropertyName, jList);
+                        }
+
                         // Booleans > Checkboxes
                         else if (method.getReturnType() == Boolean.class) {
                             JCheckBox checkBox = new JCheckBox();
@@ -261,6 +297,20 @@ public class ReflectivePropertyEditor extends JPanel {
                 setSetterValue(m, ComboBoxable.class, boxedObject);
             }
 
+            // Double array
+            else if (argumentType == double[].class) {
+                JTable table = (JTable) componentMap.get(propertyName);
+                double[] data = new double[table.getRowCount()];
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    if(table.getValueAt(i, 0).getClass() == String.class) {
+                        data[i] = Double.parseDouble((String)table.getValueAt(i, 0));                        
+                    } else {
+                        data[i] = (Double) table.getValueAt(i, 0);
+                    }
+                }
+                setSetterValue(m, argumentType, data);
+            }
+
             // Colors
             else if (argumentType == Color.class) {
                 // This one's easy because the colors are already stored in a
@@ -340,7 +390,7 @@ public class ReflectivePropertyEditor extends JPanel {
     /**
      * Return a property name from a Method object, which is here taken to be
      * the substring after "is", "get", or "set".
-     * 
+     *
      * @param method
      *            the method to retrieve the property name from.
      * @return the property name

@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.odorworld.effectors;
 
 import java.util.ArrayList;
@@ -14,37 +32,16 @@ public class RotationEffector implements Effector {
     private RotatingEntity parentObject;
 
     /** Translation. */
-    private double turnIncrement = 1;
+    private double turnAmount = 1;
 
     /** Makes the difference between Right and Left and how much. */
     private double scaleFactor = 0;
 
-    /** Obvious... */
-    private final static double DEGREES_IN_A_CIRCLE = 360;
-    
     /**
      * Constructor.
      */
     public RotationEffector(final RotatingEntity agent) {
         parentObject = agent;
-    }
-
-    /**
-     * Ensures that value lies between 0 and 360.
-     * 
-     * @param value the value to compute
-     * @return value's "absolute angle"
-     */
-    private double computeAngle(final double val) {
-        double retVal = val; 
-        while (val >= DEGREES_IN_A_CIRCLE) {
-            retVal -= DEGREES_IN_A_CIRCLE;
-        }
-        while (val < 0) {
-            retVal += DEGREES_IN_A_CIRCLE;
-        }
-
-        return retVal;
     }
 
     /**
@@ -54,9 +51,9 @@ public class RotationEffector implements Effector {
         if (scaleFactor == 0) {
             return;
         }
-        double offset =  turnIncrement * scaleFactor;
+//        double offset =  turnIncrement * scaleFactor;
         parentObject.setHeading(parentObject.getHeading()
-                + offset);
+                + turnAmount * scaleFactor);
     }
 
     public List<Class> getApplicableTypes() {
@@ -85,5 +82,19 @@ public class RotationEffector implements Effector {
      */
     public void setScaleFactor(final double scaleFactor) {
         this.scaleFactor = scaleFactor;
+    }
+
+    /**
+     * @return the turnAmount
+     */
+    public double getTurnAmount() {
+        return turnAmount;
+    }
+
+    /**
+     * @param turnAmount the turnAmount to set
+     */
+    public void setTurnAmount(double turnAmount) {
+        this.turnAmount = turnAmount;
     }
 }

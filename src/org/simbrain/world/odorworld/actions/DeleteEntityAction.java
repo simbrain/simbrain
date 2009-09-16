@@ -18,45 +18,46 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.world.odorworld.OdorWorldPanel;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
- * Action for opening an Odor World.
+ * Delete entity.
  */
-public final class OpenWorldAction
-    extends AbstractAction {
-
-    /** Plot GUI component. */
-    private final GuiComponent component;
+public final class DeleteEntityAction extends AbstractAction {
 
     /**
-     * Create a new add entity action.
-     *
-     * @param GuiComponent parent component
+     * Reference to Panel; the action refers to the panel because it needs
+     * information on mouse clicks, etc.
      */
-    public OpenWorldAction(final GuiComponent component) {
-        super("Open World...");
-        if (component == null) {
-            throw new IllegalArgumentException("Desktop component must not be null");
-        }
-        this.component = component;
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-        putValue(SHORT_DESCRIPTION, "Open odor world");
-    }
+    private final OdorWorldPanel worldPanel;
 
+    /** Entity to edit. */
+    private final OdorWorldEntity entity;
+
+    /**
+     * Create a delete entity action.
+     *
+     * @param worldPanel parent panel
+     * @param entity entity to delete
+     */
+    public DeleteEntityAction(final OdorWorldPanel worldPanel,
+            OdorWorldEntity entity) {
+
+        super("Delete entity");
+        this.worldPanel = worldPanel;
+        this.entity = entity;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Delete.png"));
+        putValue(SHORT_DESCRIPTION, "Delete entity");
+    }
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        component.showOpenFileDialog();
+        worldPanel.getWorld().deleteEntity(entity);
     }
 }

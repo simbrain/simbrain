@@ -37,9 +37,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.actions.AddAgentAction;
 import org.simbrain.world.odorworld.actions.AddEntityAction;
+import org.simbrain.world.odorworld.actions.DeleteEntityAction;
+import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
+import org.simbrain.world.odorworld.actions.ViewSmellSource;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -86,11 +90,12 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
     /** Whether world has been updated yet; used by thread. */
     private boolean updateCompleted;
-    
+
     /**
      * Default constructor.
      */
     public OdorWorldPanel() {
+        System.out.println("Here");
     }
 
     /**
@@ -224,11 +229,20 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             
             // Handle Double clicks
             else if (mouseEvent.getClickCount() == 2) { 
-                JDialog dialog = new JDialog();
-                dialog.setContentPane(new ReflectivePropertyEditor(selectedEntity, dialog));
-                dialog.setLocationRelativeTo(null);
-                dialog.pack();
-                dialog.setVisible(true);
+                if (selectedEntity.getSmellSource() != null) {
+                    //TODO: Code repeated 
+                    JDialog dialog = new JDialog(); 
+                    ReflectivePropertyEditor editor = new ReflectivePropertyEditor(selectedEntity.getSmellSource(), dialog);
+                    dialog.setContentPane(editor);
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(null);
+                    dialog.setVisible(true);
+//                    if (!dialog.hasUserCancelled()) {
+//                        editor.commit();
+//                    }
+
+
+                }
             }
 
         }
@@ -432,7 +446,6 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
         ret.add(menu.getCopyItem());
         ret.add(menu.getCutItem());
-        ret.add(menu.getDeleteItem());
 
         //        if (theEntity instanceof BasicEntity) {
         //            ret.addSeparator();
@@ -448,11 +461,13 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         //        }
         
 
+        ret.add(new JMenuItem(new DeleteEntityAction(this, theEntity)));
         ret.add(new JMenuItem(new AddEntityAction(this)));
         ret.add(new JMenuItem(new AddAgentAction(this)));
+        ret.add(new JMenuItem(new ViewSmellSource(this, theEntity)));
 
         ret.addSeparator();
-        ret.add(menu.getPropsItem());
+        ret.add(new JMenuItem(new ShowWorldPrefsAction(this)));
 
         return ret;
     }

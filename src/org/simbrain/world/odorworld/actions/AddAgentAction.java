@@ -26,20 +26,20 @@ import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * Open plot action.
+ * Add agent action.
  */
 public final class AddAgentAction extends AbstractAction {
 
-	/**
-	 * Reference to Panel; the action refers to the panel because it needs
-	 * information on mouse clicks, etc.
-	 */
+    /**
+     * Reference to Panel; the action refers to the panel because it needs
+     * information on mouse clicks, etc.
+     */
     private final OdorWorldPanel worldPanel;
 
     /**
-     * Create a new open plot action.
-     *
-     * @param component GUI component, must not be null.
+     * Create an add agent action.
+     * 
+     * @param worldPanel parent panel.
      */
     public AddAgentAction(final OdorWorldPanel worldPanel) {
         super("Add Agent");
@@ -51,8 +51,8 @@ public final class AddAgentAction extends AbstractAction {
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-    	RotatingEntity entity = new RotatingEntity();
+    	RotatingEntity entity = new RotatingEntity(worldPanel.getWorld());
     	entity.setLocation(worldPanel.getSelectedPoint().x, worldPanel.getSelectedPoint().y);
-    	worldPanel.getWorld().addEntity(entity);
+    	worldPanel.getWorld().addAgent(entity);
     }
 }

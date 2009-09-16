@@ -30,6 +30,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.world.odorworld.entities.BasicEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 
 /**
@@ -47,7 +48,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 
     /** The entity for which this dialog is called. */
-    private BasicEntity entityRef = null;
+    private OdorWorldEntity entityRef = null;
 
     /** The visual container for the sub panels. */
     private Box mainPanel = Box.createVerticalBox();
@@ -85,7 +86,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
      *
      * @param we reference to the world entity whose smell signature is being adjusted
      */
-    public DialogOdorWorldEntity(final BasicEntity we) {
+    public DialogOdorWorldEntity(final OdorWorldEntity we) {
         entityRef = we;
         init();
         this.pack();

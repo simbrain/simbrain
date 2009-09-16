@@ -301,8 +301,8 @@ public abstract class Network {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
         if ((rootNetwork != null)) {
-            rootNetwork.fireNeuronAdded(neuron);
             neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
+            rootNetwork.fireNeuronAdded(neuron);
         }
         neuron.init();
     }
@@ -334,8 +334,8 @@ public abstract class Network {
         synapse.initSpikeResponder();
         synapseList.add(synapse);
         if ((rootNetwork != null)) {
-            rootNetwork.fireSynapseAdded(synapse);
             synapse.setId(rootNetwork.getSynapseIdGenerator().getId());
+            rootNetwork.fireSynapseAdded(synapse);
         }
     }
 

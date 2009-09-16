@@ -23,40 +23,60 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.world.odorworld.DialogOdorWorldEntity;
+import org.simbrain.world.odorworld.OdorWorldPanel;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
- * Action for opening an Odor World.
+ * Action for showing an entity dialog.
  */
-public final class OpenWorldAction
+public final class ShowEntityDialog
     extends AbstractAction {
 
-    /** Plot GUI component. */
-    private final GuiComponent component;
+    /** Reference to parent. */
+    private final OdorWorldPanel component;
+
+    /** Entity to edit. */
+    private final OdorWorldEntity entity;
 
     /**
-     * Create a new add entity action.
+     * Construct a show entity action.
      *
-     * @param GuiComponent parent component
+     * @param component GUI component, must not be null.
      */
-    public OpenWorldAction(final GuiComponent component) {
-        super("Open World...");
+    public ShowEntityDialog(final OdorWorldPanel component, OdorWorldEntity entity) {
+        super("World Preferences...");
+        this.entity = entity;
         if (component == null) {
             throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-        putValue(SHORT_DESCRIPTION, "Open odor world");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SHORT_DESCRIPTION, "Odor world preferences...");
     }
 
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        component.showOpenFileDialog();
+        DialogOdorWorldEntity theDialog = new DialogOdorWorldEntity(entity);
+        theDialog.pack();
+        theDialog.setLocationRelativeTo(null);
+        theDialog.setVisible(true);
+
+        JDialog dialog = new JDialog();
+        dialog.setContentPane(new ReflectivePropertyEditor(entity, dialog));
+
+        if (!theDialog.hasUserCancelled()) {
+            theDialog.commitChanges();
+        }
+
+        component.repaint();
     }
 }

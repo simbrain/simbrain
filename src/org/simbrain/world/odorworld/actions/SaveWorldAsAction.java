@@ -18,18 +18,15 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Action for opening an Odor World.
+ * Action for saving an Odor World.
  */
 public final class SaveWorldAsAction
     extends AbstractAction {
@@ -38,7 +35,7 @@ public final class SaveWorldAsAction
     private final GuiComponent component;
 
     /**
-     * Create a new open plot action.
+     * Constructo for save world action.
      *
      * @param component GUI component, must not be null.
      */

@@ -1,6 +1,25 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.odorworld.attributes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.simbrain.workspace.AbstractAttribute;
@@ -48,7 +67,7 @@ public class SmellProducer implements Producer {
 
         /** Index of the component of the smell vector to sample. */
         int index;
-        
+
         /**
          * Construct a smell attribute.
          *
@@ -57,7 +76,7 @@ public class SmellProducer implements Producer {
         public SmellAttribute(final int i) {
             index = i;
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -69,6 +88,7 @@ public class SmellProducer implements Producer {
          * {@inheritDoc}
          */
         public Double getValue() {
+            //System.out.println("-->" + Arrays.toString(sensor.getCurrentValue()));
             return Double.valueOf(sensor.getCurrentValue()[index]);
         }
 
@@ -78,9 +98,9 @@ public class SmellProducer implements Producer {
         public String getKey() {
             return "Smell-" + (index + 1);
         }
-        
+
     }
-        
+
     /**
      * {@inheritDoc}
      */
@@ -92,7 +112,7 @@ public class SmellProducer implements Producer {
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "Smell sensor";
+        return sensor.getParent().getName() + "-" + sensor.getName();
     }
 
     /**
@@ -101,5 +121,5 @@ public class SmellProducer implements Producer {
     public WorkspaceComponent getParentComponent() {
         return parentComponent;
     }
-    
+
 }

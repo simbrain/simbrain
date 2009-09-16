@@ -24,16 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.RotationEffector;
+import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.entities.Animation;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Core model class of Odor World, which contains a list of entities in the world.
- * 
+ * Core model class of Odor World, which contains a list of entities in the
+ * world.
+ *
  * Some code from Developing Games in Java, by David Brackeen.
  */
 public class OdorWorld {
@@ -54,28 +59,28 @@ public class OdorWorld {
     private OdorWorldRenderer renderer;
 
     /** Whether or not sprites wrap around or are halted at the borders */
-    //private boolean wrapAround = true;
+    private boolean wrapAround = true;
 
     /**
      * Default constructor.
      */
     OdorWorld() {
         renderer = new OdorWorldRenderer();
-        map = new TileMap(8, 8);
-        
+        map = new TileMap(10, 15);
+
         //renderer.setBackground(ResourceManager.getImage("dirt.jpg"));
         //map.setTile(1, 2, ResourceManager.getImage("Tulip.gif"));
         //map.setTile(3, 3, ResourceManager.getImage("Tulip.gif"));
         //map.setTile(5, 5, ResourceManager.getImage("Tulip.gif"));
     }
-    
+
     /**
      * Update world.
      */
     public void update() {
         for (OdorWorldEntity object : entityList) {
             object.updateSensors();
-            object.applyEffectors();
+            //object.applyEffectors(); // TODO: 
             updateSprite(object, 1); // time defaults to 1 now
         }
         fireUpdateEvent();
@@ -89,17 +94,41 @@ public class OdorWorld {
     public void addEntity(final OdorWorldEntity entity) {
         // TODO: As usual, need a system for naming things..
         entity.setName(entity.getClass().getSimpleName() + "-" + (entityList.size()+1));
-        
-        entity.setParentWorld(this);
-        
+
         //centerSprite(sprite, tileX,tileY);
 
         // Add entity to the map
         map.addSprite(entity);
         entityList.add(entity);
-        
+
         // Fire entity added event
         fireEntityAdded(entity);
+    }
+
+    /*
+     * Adds an agent and by default adds several sensors and effectors to it.
+     */
+    public void addAgent(final OdorWorldEntity entity) {
+        if (entity instanceof RotatingEntity) {
+            entity.addEffector(new RotationEffector((RotatingEntity) entity));
+            entity.addEffector(new StraightMovementEffector((RotatingEntity) entity));
+            entity.addSensor(new SmellSensor(entity, "Left", Math.PI/8, 50));
+            entity.addSensor(new SmellSensor(entity, "Center", 0, 0));
+            entity.addSensor(new SmellSensor(entity, "Right",-Math.PI/8, 50));
+        }
+        addEntity(entity);
+    }
+
+
+    /**
+     * Delete entity.
+     *
+     * @param entity the entity to delete
+     */
+    public void deleteEntity(OdorWorldEntity entity) {
+        map.removeSprite(entity);
+        entityList.remove(entity);
+        fireEntityRemoved(entity);
     }
 
 //    /**
@@ -155,6 +184,7 @@ public class OdorWorld {
         XStream xstream = new XStream(new DomDriver());
         xstream.omitField(OdorWorld.class, "listenerList");
         xstream.omitField(Animation.class, "frames");
+        xstream.omitField(Animation.class, "currFrameIndex");
         return xstream;
     }
     
@@ -229,28 +259,28 @@ public class OdorWorld {
             //sprite.setY(newY);
         }
 
-        //        if (wrapAround) {
-        //            if (creature.getX() >= worldWidth) {
-        //                creature.setX(creature.getX() - worldWidth);
-        //            }
-        //            if (creature.getX() < 0) {
-        //                creature.setX(creature.getX() + worldWidth);
-        //            }
-        //            if (creature.getY() >= worldHeight) {
-        //                creature.setY(creature.getY() - worldHeight);
-        //            }
-        //            if (creature.getY() < 0) {
-        //                creature.setY(creature.getY() + worldHeight);
-        //            }
-        //        }
+        if (wrapAround == true) {
+
+            if (sprite.getX() >= getWidth()) {
+                sprite.setX(sprite.getX() - getWidth());
+            }
+            if (sprite.getX() < 0) {
+                sprite.setX(sprite.getX() + getWidth());
+            }
+            if (sprite.getY() >= getHeight()) {
+                sprite.setY(sprite.getY() - getHeight());
+            }
+            if (sprite.getY() < 0) {
+                sprite.setY(sprite.getY() + getHeight());
+            }
+        }
 
         // Update creature
         sprite.update(elapsedTime);
-        
+
         //System.out.println("x: " + creature.getX() + " y:" + creature.getY());
 }
-    
-    
+
     /**
      * Handle collisions in x directions.
      * 
@@ -378,7 +408,7 @@ public class OdorWorld {
     public int getWidth() {
         return OdorWorldRenderer.tilesToPixels(map.getWidth());
     }
-    
+
     /**
      * Returns height of world in pixels.
      *
@@ -398,7 +428,7 @@ public class OdorWorld {
             listener.entityAdded(entity);
         }
     }
-    
+
     /**
      * Fire entity removed event.
      *
@@ -409,7 +439,7 @@ public class OdorWorld {
             listener.entityRemoved(entity);
         }
     }
-    
+
     /***
      * Fire sensor added event.
      *
@@ -462,5 +492,19 @@ public class OdorWorld {
             listener.updated();
         }
     }
-    
+
+    /**
+     * @return the wrapAround
+     */
+    public boolean getWrapAround() {
+        return wrapAround;
+    }
+
+    /**
+     * @param wrapAround the wrapAround to set
+     */
+    public void setWrapAround(boolean wrapAround) {
+        this.wrapAround = wrapAround;
+    }
+
 }

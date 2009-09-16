@@ -21,12 +21,18 @@ package org.simbrain.world.odorworld;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.simbrain.network.attributes.NeuronWrapper;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.attributes.EntityWrapper;
-import org.simbrain.world.odorworld.attributes.RotationConsumer;
+import org.simbrain.world.odorworld.attributes.LeftTurn;
+import org.simbrain.world.odorworld.attributes.RightTurn;
 import org.simbrain.world.odorworld.attributes.SmellProducer;
+import org.simbrain.world.odorworld.attributes.Straight;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
+import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -49,7 +55,12 @@ public class OdorWorldComponent extends WorkspaceComponent {
         addListener();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Constructor used in deserializing.
+     *
+     * @param name name of world
+     * @param world model world
+     */
     private OdorWorldComponent(final String name, final OdorWorld world) {
         super(name);
         this.world = world;
@@ -62,6 +73,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
      */
     private void initializeAttributes() {
         getConsumers().clear();
+        getProducers().clear();
         for (OdorWorldEntity entity : world.getObjectList()) {
             addEntityAttributes(entity);
             for (Sensor sensor : entity.getSensors()) {
@@ -92,8 +104,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
      */
     private void addEffectorAttributes(final Effector effector) {
         if (effector instanceof RotationEffector) {
-            addConsumer(new RotationConsumer(OdorWorldComponent.this,
+            addConsumer(new LeftTurn(OdorWorldComponent.this,
                     (RotationEffector) effector));
+            addConsumer(new RightTurn(OdorWorldComponent.this,
+                    (RotationEffector) effector));
+        } else if (effector instanceof StraightMovementEffector) {
+            addConsumer(new Straight(OdorWorldComponent.this,
+                    (StraightMovementEffector) effector));
         }
     }
 
@@ -103,8 +120,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * @param entity the entity
      */
     private void addEntityAttributes(final OdorWorldEntity entity) {
-        addConsumer(new EntityWrapper(this, entity));
-        addProducer(new EntityWrapper(this, entity));
+//        addConsumer(new EntityWrapper(this, entity));
+//        addProducer(new EntityWrapper(this, entity));
     }
 
     /**
@@ -121,7 +138,24 @@ public class OdorWorldComponent extends WorkspaceComponent {
             }
 
             public void effectorRemoved(final Effector effector) {
-                // TODO Auto-generated method stub
+                
+                //TODO: Below from NetworkComponent.  There must be an easier way!
+                
+//                for (Consumer consumer : getConsumers()) {
+//                    if (consumer instanceof NeuronWrapper) {
+//                        if (((NeuronWrapper)consumer).getNeuron() == e.getObject()) {
+//                            removeConsumer(consumer);
+//                            break;
+//                        }
+//                    }
+//                }
+//                for (Producer producer : getProducers()) {
+//                    if (producer instanceof NeuronWrapper) {
+//                        if (((NeuronWrapper)producer).getNeuron() == e.getObject()) {
+//                            removeProducer(producer);
+//                        }
+//                    }
+//                }
             }
 
             public void entityAdded(final OdorWorldEntity entity) {
@@ -167,28 +201,28 @@ public class OdorWorldComponent extends WorkspaceComponent {
     public void save(final OutputStream output, final String format) {
         OdorWorld.getXStream().toXML(world, output);
     }
-    
+
     @Override
     public void closing() {
         // TODO Auto-generated method stub
     }
-    
+
     @Override
     public void update() {
         world.update();
     }
-    
+
     @Override
     public void setCurrentDirectory(final String currentDirectory) { 
         super.setCurrentDirectory(currentDirectory);
         OdorWorldPreferences.setCurrentDirectory(currentDirectory);
     }
-    
+
     @Override
     public String getCurrentDirectory() {
        return OdorWorldPreferences.getCurrentDirectory();
     }
-    
+
     /**
      * Returns a reference to the odor world.
      *

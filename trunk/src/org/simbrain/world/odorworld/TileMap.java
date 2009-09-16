@@ -6,13 +6,11 @@ import java.util.Iterator;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-
 /**
-    The TileMap class contains the data for a tile-based
-    map, including Sprites. Each tile is a reference to an
-    Image. Of course, Images are used multiple times in the tile
-    map.
-*/
+ * The TileMap class contains the data for a tile-based map, including Sprites.
+ * Each tile is a reference to an Image. Of course, Images are used multiple
+ * times in the tile map.
+ */
 public class TileMap {
 
     private Image[][] tiles;

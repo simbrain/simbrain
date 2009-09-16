@@ -46,7 +46,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         super(frame, component);
         setLayout(new BorderLayout());
         worldPanel = new OdorWorldPanel(component.getWorld());
-        worldPanel.setPreferredSize(new Dimension(256,256));
+        worldPanel.setPreferredSize(new Dimension(400, 500));
         add("Center", worldPanel);
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
@@ -84,10 +84,9 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     
     @Override
     public void postAddInit() {
-        // Commented this out since it has no obvious effect
-//        OdorWorld world = this.getWorkspaceComponent().getWorld();
-//        worldPanel.setWorld(world);
-//        worldPanel.repaint();
+        menu = new OdorWorldFrameMenu(this);
+        menu.setUpMenus();
+        getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this class?
     }
 
     /**

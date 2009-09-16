@@ -11,6 +11,7 @@ import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * Adapted and extended from From Developing Games in Java, by David Brackeen.
@@ -21,8 +22,8 @@ public abstract class OdorWorldEntity {
      * Animation used to depict this object. If the animation has one frame this
      * is equivalent to just using a single image to represent it.
      */
-    private Animation animation;
-    
+    private Animation animation;  
+
     /** X Position. */
     protected float x;
 
@@ -78,8 +79,9 @@ public abstract class OdorWorldEntity {
      *
      * @param animation animation to use.
      */
-    public OdorWorldEntity(final Animation anim) {
+    public OdorWorldEntity(final Animation anim, OdorWorld world) {
         this.animation = anim;
+        this.parentWorld = world;
         anim.start();
     }
 
@@ -88,8 +90,9 @@ public abstract class OdorWorldEntity {
      *
      * @param imageLocation the image location 
      */
-    public OdorWorldEntity(final String imageLocation) {
+    public OdorWorldEntity(final String imageLocation, OdorWorld world) {
         this.animation = new Animation(imageLocation);
+        this.parentWorld = world;
         animation.start();
     }
 
@@ -193,7 +196,7 @@ public abstract class OdorWorldEntity {
     public Image getImage() {
         return animation.getImage();
     }
-    
+
     /**
      * Get bounds, based on current image.
      *
@@ -202,14 +205,13 @@ public abstract class OdorWorldEntity {
     public Rectangle getBounds() {
         return new Rectangle((int) x, (int) y, getWidth(), getHeight());
     }
-    
+
     /**
      * Add an effector.
      *
-     * @param effector effetor to add
+     * @param effector effector to add
      */
     public void addEffector(final Effector effector) {
-        effectors.add(effector);
         parentWorld.fireEffectorAdded(effector);
     }
 
@@ -263,13 +265,6 @@ public abstract class OdorWorldEntity {
         return parentWorld;
     }
 
-    /**
-	 * @param parentWorld the parentWorld to set
-	 */
-	public void setParentWorld(OdorWorld parentWorld) {
-		this.parentWorld = parentWorld;
-	}
-
 	/**
      * Returns the location of the entity as a double array.
      *
@@ -308,7 +303,7 @@ public abstract class OdorWorldEntity {
      * Initialize the animation from stored image location(s). 
      */
     public void postSerializationInit() {
-        getAnimation().initializeImages();
+        getAnimation().initializeImages(); //TODO
     }
 
     /**

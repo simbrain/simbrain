@@ -31,13 +31,12 @@ import org.simbrain.plot.projection.*;
         desktop.getDesktopComponent(odorWorld).getParentFrame().setBounds(470, 38, worldWidth, worldHeight);
         
 	// Add agent to environment
-	RotatingEntity mouse = new RotatingEntity();
+	RotatingEntity mouse = new RotatingEntity(world);
     	mouse.setLocation(162,200);
-	world.addEntity(mouse);
-	mouse.addSensor(new SmellSensor(mouse));
+	world.addAgent(mouse);
 	
 	// Add objects
-	BasicEntity object1 = new BasicEntity("Swiss.gif");
+	BasicEntity object1 = new BasicEntity("Swiss.gif", world);
 	object1.setLocation(36,107);
 	object1.setSmellSource(
                 new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.3,0.0,0.0,0.0,0.0,0.0,0.0}
@@ -46,7 +45,7 @@ import org.simbrain.plot.projection.*;
                 object1.getLocation()));
 	world.addEntity(object1);	
 
-	BasicEntity object2 = new BasicEntity("Gouda.gif");
+	BasicEntity object2 = new BasicEntity("Gouda.gif", world);
 	object2.setLocation(169,32);
 	object2.setSmellSource(
                 new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.0,0.3,0.0,0.0,0.0,0.0,0.0}
@@ -55,7 +54,7 @@ import org.simbrain.plot.projection.*;
                 object1.getLocation()));
 	world.addEntity(object2);	
 
-	BasicEntity object3 = new BasicEntity("Bluecheese.gif");
+	BasicEntity object3 = new BasicEntity("Bluecheese.gif", world);
 	object3.setLocation(304,87);
 	object3.setSmellSource(
                 new SmellSource(SimbrainMath.multVector(new double[]{0.7,0.0,0.0,0.0,0.3,0.0,0.0,0.0}
@@ -64,7 +63,7 @@ import org.simbrain.plot.projection.*;
                 object1.getLocation()));
 	world.addEntity(object3);
 
-	BasicEntity object4 = new BasicEntity("Tulip.gif");
+	BasicEntity object4 = new BasicEntity("Tulip.gif", world);
 	object4.setLocation(80,351);
 	object4.setSmellSource(
                 new SmellSource(SimbrainMath.multVector(new double[]{0.0,0.3,0.0,0.7,0.0,0.0,0.0,0.0}
@@ -73,7 +72,7 @@ import org.simbrain.plot.projection.*;
                 object1.getLocation()));
 	world.addEntity(object4);
 	
-	BasicEntity object5 = new BasicEntity("Pansy.gif");
+	BasicEntity object5 = new BasicEntity("Pansy.gif", world);
 	object5.setLocation(251,370);
 	object5.setSmellSource(
                 new SmellSource(SimbrainMath.multVector(new double[]{0.0,0.0,0.3,0.7,0.0,0.0,0.0,0.0}
@@ -81,7 +80,7 @@ import org.simbrain.plot.projection.*;
                 SmellSource.DecayFunction.GAUSSIAN, 
                 object1.getLocation()));
 	world.addEntity(object5);	
-	
+		
 	
 	// Add Recurrent network
 	source("../simbrain/scripts/scriptmenu/sparseNetwork3.bsh");
@@ -110,11 +109,11 @@ import org.simbrain.plot.projection.*;
     	sparseConnect.connectNeurons();
 	
 	// Couple odor world to network
-	ProducingAttribute smell1 = odorWorld.getProducingAttribute("Smell sensor","Smell-1");
-        ProducingAttribute smell2 = odorWorld.getProducingAttribute("Smell sensor","Smell-2");
-        ProducingAttribute smell3 = odorWorld.getProducingAttribute("Smell sensor","Smell-3");
-        ProducingAttribute smell4 = odorWorld.getProducingAttribute("Smell sensor","Smell-4");
-        ProducingAttribute smell5 = odorWorld.getProducingAttribute("Smell sensor","Smell-5");
+	ProducingAttribute smell1 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-1");
+        ProducingAttribute smell2 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-2");
+        ProducingAttribute smell3 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-3");
+        ProducingAttribute smell4 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-4");
+        ProducingAttribute smell5 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-5");
         ConsumingAttribute inputNeuron1 = networkComponent.getConsumingAttribute("Neuron_26", "Activation"); 
         ConsumingAttribute inputNeuron2 = networkComponent.getConsumingAttribute("Neuron_27", "Activation"); 
         ConsumingAttribute inputNeuron3 = networkComponent.getConsumingAttribute("Neuron_28", "Activation"); 

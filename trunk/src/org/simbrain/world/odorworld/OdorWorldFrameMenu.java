@@ -103,7 +103,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
             Utils.showQuickRef("World.html");
         }
     };
-    
+
     /**
      * Sets up menus.
      */

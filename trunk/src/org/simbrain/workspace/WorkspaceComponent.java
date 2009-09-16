@@ -431,14 +431,44 @@ public abstract class WorkspaceComponent {
     }
 
     /**
+     * Returns true if the component contains the consumer, false otherwise.
+     *
+     * @param consumer the consumer to check
+     * @return true if the component contains the consumer
+     */
+    public boolean containsConsumer(final Consumer consumer) {
+        if (this.getConsumer(consumer.getDescription()) != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if the component contains the producer, false otherwise.
+     *
+     * @param producer the producer to check
+     * @return true if the component contains the producer
+     */
+    public boolean containsProducer(final Producer producer) {
+        if (this.getProducer(producer.getDescription()) != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Adds the specified consumer.
      *
      * @param consumer consumer to add.
      */
     public void addConsumer(final Consumer consumer) {
-        consumers.add(consumer);
-        for (AttributeHolderListener listener : attributeListeners) {
-            listener.consumerAdded(consumer);
+        if (!containsConsumer(consumer)) {
+            consumers.add(consumer);
+            for (AttributeHolderListener listener : attributeListeners) {
+                listener.consumerAdded(consumer);
+            }
         }
     }
 
@@ -448,9 +478,11 @@ public abstract class WorkspaceComponent {
      * @param producer producer to add.
      */
     public void addProducer(final Producer producer) {
-        producers.add(producer);
-        for (AttributeHolderListener listener : attributeListeners) {
-            listener.producerAdded(producer);
+        if (!containsProducer(producer)) {
+            producers.add(producer);
+            for (AttributeHolderListener listener : attributeListeners) {
+                listener.producerAdded(producer);
+            }
         }
     }
 
@@ -542,7 +574,7 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-    * Finds a consumer by name and returns it, or none if it is not found.
+    * Finds a consumer by name and returns it, or null if it is not found.
     *
     * @param consumerId the name of the consumer (attribute holder)
     * @return the the consumer

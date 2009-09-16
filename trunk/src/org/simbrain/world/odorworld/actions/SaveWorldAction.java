@@ -29,7 +29,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Action for opening an Odor World.
+ * Action for saving an Odor World.
  */
 public final class SaveWorldAction
     extends AbstractAction {
@@ -38,7 +38,7 @@ public final class SaveWorldAction
     private final GuiComponent component;
 
     /**
-     * Create a new open plot action.
+     * Construct a save world action.
      *
      * @param component GUI component, must not be null.
      */

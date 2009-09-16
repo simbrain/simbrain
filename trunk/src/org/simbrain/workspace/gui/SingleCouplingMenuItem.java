@@ -19,7 +19,7 @@ public class SingleCouplingMenuItem extends JCheckBoxMenuItem {
 
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
-    
+
     /** Reference to producing attribute. */
     private final ProducingAttribute<?> source;
 
@@ -28,13 +28,13 @@ public class SingleCouplingMenuItem extends JCheckBoxMenuItem {
 
     /** The workspace this object belongs to. */
     private final Workspace workspace;
-    
+
     /** The current coupling if there is one. */
     private final Coupling<?> coupling;
-    
+
     /**
      * Creates a new instance.
-     * 
+     *
      * @param workspace The parent workspace.
      * @param description The description of the menu item.
      * @param source The producingAttribute for the coupling.

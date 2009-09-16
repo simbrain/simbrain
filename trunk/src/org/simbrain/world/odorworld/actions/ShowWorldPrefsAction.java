@@ -23,14 +23,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.world.odorworld.DialogOdorWorld;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
 /**
- * Action for opening an Odor World.
+ * Action for showing world preferences.
  */
 public final class ShowWorldPrefsAction
     extends AbstractAction {
@@ -39,9 +40,9 @@ public final class ShowWorldPrefsAction
     private final OdorWorldPanel component;
 
     /**
-     * Create a new open plot action.
+     * Construct a show prefs action
      *
-     * @param component GUI component, must not be null.
+     * @param component parent component 
      */
     public ShowWorldPrefsAction(final OdorWorldPanel component) {
         super("World Preferences...");
@@ -58,15 +59,12 @@ public final class ShowWorldPrefsAction
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        DialogOdorWorld theDialog = new DialogOdorWorld(component);
-        theDialog.pack();
-        theDialog.setLocationRelativeTo(null);
-        theDialog.setVisible(true);
+        JDialog dialog = new JDialog();
+        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(component.getWorld(), dialog);
+        dialog.setContentPane(editor);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
 
-        if (!theDialog.hasUserCancelled()) {
-            theDialog.setValues();
-        }
-
-        component.repaint();
     }
 }

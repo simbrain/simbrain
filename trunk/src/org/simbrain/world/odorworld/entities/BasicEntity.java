@@ -34,16 +34,16 @@ public class BasicEntity extends OdorWorldEntity {
      *
      * @param animation animation associated with this entity.
      */
-    public BasicEntity(final Animation anim) {
-        super(anim);
+    public BasicEntity(final Animation anim, final OdorWorld world) {
+        super(anim, world);
         //behavior = new StationaryBehavior();
     }
 
     /**
      * Construct a default entity.
      */
-    public BasicEntity() {
-        super(DEFAULT_IMAGE);
+    public BasicEntity(final OdorWorld world) {
+        super(DEFAULT_IMAGE, world);
     }
 
     /**
@@ -51,8 +51,8 @@ public class BasicEntity extends OdorWorldEntity {
      *
      * @param imageLocation image location
      */
-    public BasicEntity(final String imageLocation) {
-        super(imageLocation);
+    public BasicEntity(final String imageLocation, final OdorWorld world) {
+        super(imageLocation, world);
     }
 
     /**

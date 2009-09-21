@@ -18,6 +18,12 @@
  */
 package org.simbrain.world.odorworld.entities;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.simbrain.util.propertyeditor.ComboBoxable;
 import org.simbrain.world.odorworld.OdorWorld;
 
 
@@ -29,8 +35,14 @@ public class BasicEntity extends OdorWorldEntity {
     /** Default image. */
     private static final String DEFAULT_IMAGE = "Swiss.gif";
 
+    /** List of available objects (for property editor).*/
+    private List<String> images = new ArrayList<String>();
+
+    /** Current image name (for property editor).*/
+    private String currentImage = DEFAULT_IMAGE;
+
     /**
-     * Construct a basic entity witha specified animation.
+     * Construct a basic entity with a specified animation.
      *
      * @param animation animation associated with this entity.
      */
@@ -56,11 +68,50 @@ public class BasicEntity extends OdorWorldEntity {
     }
 
     /**
-     * Updates this OdorWorldEntity's Animation and its position based on the velocity.
+     * Updates this OdorWorldEntity's Animation and its position based on the
+     * velocity.
      */
     public void update(final long elapsedTime) {
         behavior.apply(elapsedTime);
         getAnimation().update(elapsedTime);
+    }
+
+    /**
+     * Initialize the image name list.
+     */
+    private void initImageList() {
+        String baseDir = System.getProperty("user.dir");
+        final String FS = System.getProperty("file.separator");
+        File dir = new File(baseDir + FS + "src" + FS + "org" + FS + "simbrain"
+                + FS + "world" + FS + "odorworld" + FS + "images" + FS
+                + "static");
+        //TODO: Create file filter for jpg, etc.
+        //TODO: Use File separator
+        images.addAll(Arrays.asList(dir.list()));
+    }
+
+    /**
+     * @return the imageBox
+     */
+    public ComboBoxable getImages() {
+        initImageList();
+        return new ComboBoxable() {
+            public Object getCurrentObject() {
+                return currentImage;
+            }
+
+            public Object[] getObjects() {
+                return images.toArray();
+            }
+        };
+    }
+
+    /**
+     * @param imageBox the imageBox to set
+     */
+    public void setImages(ComboBoxable imageBox) {
+        currentImage = (String) imageBox.getCurrentObject();
+        this.setAnimation(new Animation(currentImage));
     }
 
 }

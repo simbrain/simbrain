@@ -29,7 +29,9 @@ import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -301,6 +303,30 @@ public final class NetworkComponent extends WorkspaceComponent {
             // Remove the synapse listener
             rootNetwork.removeSynapseListener(synapseListener);
         }
+    }
+
+    public ConsumingAttribute findConsumingActivationAttribute(Neuron neuron) {
+        for (Consumer consumer : getConsumers()) {
+            if (consumer instanceof NeuronWrapper) {
+                if (((NeuronWrapper)consumer).getNeuron() == neuron) {
+                    return consumer.getConsumingAttributes().get(0);
+                }
+            }
+        }
+        return null;
+    }
+
+    //TODO: Use this below in listener.  Apply template to odor world listenres?
+    
+    public ProducingAttribute findProducingActivationAttribute(Neuron neuron) {
+        for (Producer producers : getProducers()) {
+            if (producers instanceof NeuronWrapper) {
+                if (((NeuronWrapper)producers).getNeuron() == neuron) {
+                    return producers.getProducingAttributes().get(0);
+                }
+            }
+        }
+        return null;
     }
 
     /**

@@ -47,7 +47,6 @@ public class LeftTurn extends SingleAttributeConsumer<Double> {
     public void setValue(Double value) {
         effector.setScaleFactor(1);
         effector.setTurnAmount(value);
-        effector.activate();
     }
 
     public String getKey() {

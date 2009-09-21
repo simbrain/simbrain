@@ -20,10 +20,17 @@ package org.simbrain.world.odorworld.sensors;
 
 import java.util.List;
 
+/**
+ * Interface for 2d world sensors.
+ */
 public interface Sensor {
 
+    /** Upate the sensor state. */
     public void update();
 
+    /**
+     * Return a list of entity types which can use this type of sensor.
+     */
     public List<Class> getApplicableTypes();
 
 }

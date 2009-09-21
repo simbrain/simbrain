@@ -20,6 +20,8 @@ package org.simbrain.util.environment;
 
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor.ComboBoxable;
+import org.simbrain.world.odorworld.entities.Animation;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
@@ -414,11 +416,33 @@ public class SmellSource {
 
     /**
      * Set the location of this smell source.
-     * 
+     *
      * @param location
      */
     public void setLocation(final double[] location) {
         this.location = location;
+    }
+
+    /**
+     * @return the imageBox
+     */
+    public ComboBoxable getTheDecayFunction() {
+        return new ComboBoxable() {
+            public Object getCurrentObject() {
+                return getDecayFunction();
+            }
+
+            public Object[] getObjects() {
+                return DecayFunction.values();
+            }
+        };
+    }
+
+    /**
+     * @param imageBox the imageBox to set
+     */
+    public void setTheDecayFunction(ComboBoxable decayFunctionBox) {
+        setDecayFunction((DecayFunction) decayFunctionBox.getCurrentObject());
     }
 
 }

@@ -20,7 +20,6 @@ package org.simbrain.world.odorworld.attributes;
 
 import org.simbrain.workspace.SingleAttributeConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 
 public class Straight extends SingleAttributeConsumer<Double> {
@@ -32,8 +31,7 @@ public class Straight extends SingleAttributeConsumer<Double> {
 
     /** Parent component for this attribute holder. */
     WorkspaceComponent parent;
-    
-    
+
     public Straight(WorkspaceComponent component, StraightMovementEffector effector) {
         this.effector = effector;
         this.parent = component;
@@ -47,7 +45,7 @@ public class Straight extends SingleAttributeConsumer<Double> {
     }
 
     public void setValue(Double value) {
-        effector.moveStraight(value);
+        effector.setCurrentValue(value);
     }
 
     public String getKey() {

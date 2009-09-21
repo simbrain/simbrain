@@ -49,12 +49,13 @@ public class SmellSensor implements Sensor {
 
     /** Current value of this sensor, as an array of doubles. */
     private double[] currentValue = new double[5];
-    
+
+    /** The name of this smell sensor.. */
     private String name;
 
     /**
      * Construct a sensor.
-     * 
+     *
      * @param parent reference
      * @param sensorName name
      * @param dim stimulus dimension
@@ -81,7 +82,7 @@ public class SmellSensor implements Sensor {
     }
 
     /**
-     * Update the current value of this sensor.
+     * {@inheritDoc}
      */
     public void update() {
         double[] temp = SimbrainMath.zeroVector(currentValue.length);
@@ -98,6 +99,9 @@ public class SmellSensor implements Sensor {
         currentValue = temp;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<Class> getApplicableTypes() {
         return null;
     }

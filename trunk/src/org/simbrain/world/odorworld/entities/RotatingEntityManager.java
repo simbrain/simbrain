@@ -21,8 +21,8 @@ package org.simbrain.world.odorworld.entities;
 import java.util.TreeMap;
 
 /**
- * Manages the creation of treempas for rotating entities.
- * 
+ * Manages the creation of treemaps for rotating entities.
+ *
  * @author jyoshimi
  */
 public class RotatingEntityManager {

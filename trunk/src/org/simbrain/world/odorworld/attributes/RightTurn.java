@@ -31,7 +31,7 @@ public class RightTurn extends SingleAttributeConsumer<Double> {
 
     /** Parent component for this attribute holder. */
     WorkspaceComponent parent;
-    
+
     public RightTurn(WorkspaceComponent component, RotationEffector effector) {
         this.effector = effector;
         this.parent = component;
@@ -47,7 +47,6 @@ public class RightTurn extends SingleAttributeConsumer<Double> {
     public void setValue(Double value) {
         effector.setScaleFactor(-1);
         effector.setTurnAmount(value);
-        effector.activate();
     }
 
     public String getKey() {

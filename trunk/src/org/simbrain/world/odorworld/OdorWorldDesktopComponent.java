@@ -20,6 +20,8 @@ package org.simbrain.world.odorworld;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -54,22 +56,22 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
 
         this.getParentFrame().pack();
 
-        //        this.addComponentListener(new ComponentListener() {
-        //
-        //            public void componentHidden(ComponentEvent arg0) {
-        //            }
-        //
-        //            public void componentMoved(ComponentEvent arg0) {
-        //            }
-        //
-        //            public void componentResized(ComponentEvent arg0) {
-        //                 worldPanel.getWorld().setWorldWidth(worldPanel.getWidth());
-        //                 worldPanel.getWorld().setWorldHeight(worldPanel.getHeight());
-        //            }
-        //
-        //            public void componentShown(ComponentEvent arg0) {
-        //            }
-        //        });
+        this.addComponentListener(new ComponentListener() {
+
+            public void componentHidden(ComponentEvent arg0) {
+            }
+
+            public void componentMoved(ComponentEvent arg0) {
+            }
+
+            public void componentResized(ComponentEvent arg0) {
+                worldPanel.getWorld().setWidth(worldPanel.getWidth());
+                worldPanel.getWorld().setHeight(worldPanel.getHeight());
+            }
+
+            public void componentShown(ComponentEvent arg0) {
+            }
+        });
 
     }
 

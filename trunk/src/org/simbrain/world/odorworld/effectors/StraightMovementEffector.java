@@ -18,12 +18,15 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
- * Move agent in a straight line scaled by value.
+ * Move the agent in a straight line relative to its current heading. Movement
+ * amount is value * movementAmont * scaleFactor is the amount the agent moves
+ * forward.
  */
 public class StraightMovementEffector implements Effector {
 
@@ -36,6 +39,9 @@ public class StraightMovementEffector implements Effector {
     /** Reference to parent object. */
     private RotatingEntity parentObject;
 
+    /** Value of straight movement which can vary in real time. */
+    private double currentValue;
+
     /**
      * Construct the straight movement effector.
      *
@@ -45,7 +51,26 @@ public class StraightMovementEffector implements Effector {
         this.parentObject = parentObject;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void activate() {
+
+        if (currentValue == 0) {
+            return;
+        }
+        if(parentObject.getParentWorld().isObjectsBlockMovement()) {
+            if (parentObject.hasCollided()) {
+                return;
+            }
+        }
+
+        double offset = (currentValue * movementAmount) * scaleFactor;
+        double heading = parentObject.getHeadingRadians();
+        parentObject.setX(parentObject.getX()
+                + (float) (offset * Math.cos(heading)));
+        parentObject.setY(parentObject.getY()
+                - (float) (offset * Math.sin(heading)));
     }
 
     /**
@@ -56,29 +81,22 @@ public class StraightMovementEffector implements Effector {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     public List<Class> getApplicableTypes() {
-        // TODO Auto-generated method stub
-        return null;
+        ArrayList<Class> list = new ArrayList<Class>();
+        list.add(RotatingEntity.class);
+        return list;
     }
 
-
     /**
-     * Move the agent in a straight line relative to its current heading.
-     *
-     * @param value
-     *            value * movementAmont * scaleFactor is the amount the agent
-     *            moves forward.
+     * @param currentValue the currentValue to set
      */
-    public void moveStraight(Double value) {
-        if (value == 0) {
-            return;
-        }
-        double offset = (value * movementAmount) * scaleFactor;
-        double heading = parentObject.getHeadingRadians();
-        parentObject.setX(parentObject.getX()
-                + (float) (offset * Math.cos(heading)));
-        parentObject.setY(parentObject.getY()
-                - (float) (offset * Math.sin(heading)));
-	}
+    public void setCurrentValue(double currentValue) {
+        this.currentValue = currentValue;
+    }
+    
+    
 
 }

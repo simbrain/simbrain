@@ -70,7 +70,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
     /** Reference to desktop. */
     private SimbrainDesktop desktop;
-    
+
     /** Reference of parent frame. */
     private final GenericFrame frame;
 
@@ -127,7 +127,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         this.add("South", bottomPanel);
 
         frame.getRootPane().setDefaultButton(okButton);
-        
+
     }
 
 
@@ -154,7 +154,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
             }
         }
     }
-    
+
     /**
      * Add couplings using the selected method.
      */

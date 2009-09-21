@@ -11,7 +11,7 @@ import org.simbrain.resource.ResourceManager;
 /**
  * The Animation class manages a series of images (frames) and the amount of
  * time to display each frame.
- * 
+ *
  * TODO: Provide a way of loading images from arbitrary locations.
  */
 public class Animation {
@@ -21,20 +21,20 @@ public class Animation {
 
     /** Names of images; used for persistence. */
     private String[] imageNames;
-    
+
     /** Current frame index. */
     private int currFrameIndex;
-    
+
     /** Length of animation. */
     private long animTime;
-    
+
     /** Total duration of animation. */
     private long totalDuration;
 
     /**
      * Creates an animation from a list of images, specified in terms of their
      * file locations.
-     * 
+     *
      * @param imageLocations array of image locations.
      * @param totalDuration total duration of animation.
      */
@@ -46,7 +46,7 @@ public class Animation {
 
     /**
      * An animation with a single image; equivalent to a static image.
-     * 
+     *
      * @param imageLocation file name of image
      */
     public Animation(final String imageLocation) {
@@ -156,8 +156,7 @@ public class Animation {
     public String[] getImageLocations() {
         return imageNames;
     }
-    
-    
+
     /**
      * @return the totalDuration
      */

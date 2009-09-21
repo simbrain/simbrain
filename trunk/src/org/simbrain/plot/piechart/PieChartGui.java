@@ -144,9 +144,9 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         if (e.getActionCommand().equalsIgnoreCase("Add")) {
             this.getWorkspaceComponent().getModel().addDataSource();
         } else if (e.getActionCommand().equalsIgnoreCase("dialog")) {
-            JDialog dialog = new JDialog();
-            dialog.setContentPane(new ReflectivePropertyEditor(getWorkspaceComponent()
-                    .getModel(), dialog));
+            ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(
+                    getWorkspaceComponent().getModel()));
+            JDialog dialog = editor.getDialog();
             dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);

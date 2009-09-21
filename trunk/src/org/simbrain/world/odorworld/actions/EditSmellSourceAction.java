@@ -18,65 +18,56 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
-import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.world.odorworld.DialogOdorWorldEntity;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
- * Action for showing an entity dialog.
+ * Action for showing a dialog to edit a smell source.
  */
-public final class ShowEntityDialog
+public final class EditSmellSourceAction
     extends AbstractAction {
 
-    /** Reference to parent. */
+    /** Plot GUI component. */
     private final OdorWorldPanel component;
 
     /** Entity to edit. */
     private final OdorWorldEntity entity;
 
     /**
-     * Construct a show entity action.
+     * Create a new open plot action.
      *
      * @param component GUI component, must not be null.
      */
-    public ShowEntityDialog(final OdorWorldPanel component, OdorWorldEntity entity) {
-        super("World Preferences...");
+    public EditSmellSourceAction(final OdorWorldPanel component, OdorWorldEntity entity) {
+        super("View / Edit smell stimulus...");
         this.entity = entity;
         if (component == null) {
             throw new IllegalArgumentException("Desktop component must not be null");
         }
         this.component = component;
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-        putValue(SHORT_DESCRIPTION, "Odor world preferences...");
+        //this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
+        //        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        //putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SHORT_DESCRIPTION, "View / Edit smell stimulus...");
     }
 
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        DialogOdorWorldEntity theDialog = new DialogOdorWorldEntity(entity);
-        theDialog.pack();
-        theDialog.setLocationRelativeTo(null);
-        theDialog.setVisible(true);
 
-        JDialog dialog = new JDialog();
-        dialog.setContentPane(new ReflectivePropertyEditor(entity, dialog));
-
-        if (!theDialog.hasUserCancelled()) {
-            theDialog.commitChanges();
-        }
-
-        component.repaint();
+        ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(entity
+                .getSmellSource()));
+        JDialog dialog = editor.getDialog();
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
+
 }

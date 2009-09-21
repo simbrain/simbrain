@@ -89,7 +89,7 @@ public class ProducingAttributeMenu extends JMenu implements WorkspaceListener {
                         for (ProducingAttribute<?> source : producer.getProducingAttributes()) {
                             SingleCouplingMenuItem item = 
                                 new SingleCouplingMenuItem(
-                                    workspace,source.getAttributeDescription(), source, targetConsumingAttribute);
+                                    workspace,source.getKey(), source, targetConsumingAttribute);
                             producerItem.add(item);
                             componentMenu.add(producerItem);
                         }

@@ -176,9 +176,9 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
     /** @see ActionListener */
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            JDialog dialog = new JDialog();
-            dialog.setContentPane(new ReflectivePropertyEditor(
-                    getWorkspaceComponent().getModel(), dialog));
+            ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(
+                    getWorkspaceComponent().getModel()));
+            JDialog dialog = editor.getDialog();
             dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
@@ -188,9 +188,5 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         } else if (arg0.getActionCommand().equalsIgnoreCase("Add")) {
             this.getWorkspaceComponent().getModel().addColumn();
         }
-        
     }
-    
-    
-   
 }

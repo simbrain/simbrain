@@ -8,9 +8,9 @@ import java.util.Iterator;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
- * The OdorWorldRenderer class draws a TileMap on the screen. It draws all tiles,
- * sprites, and an optional background image centered around the position of the
- * player.
+ * The OdorWorldRenderer class draws a TileMap on the screen. It draws all
+ * tiles, sprites, and an optional background image centered around the position
+ * of the player.
  * 
  * <p>
  * If the width of background image is smaller the width of the tile map, the
@@ -28,7 +28,8 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  * 
  * Adapted from Developing Games in Java, by David Brackeen.
  * 
- * TODO: Possibly move sprite list out of tile-map, and just give this thing a reference
+ * TODO: Possibly move sprite list out of tile-map, and just give this thing a
+ * reference
  */
 public class OdorWorldRenderer {
 
@@ -88,7 +89,7 @@ public class OdorWorldRenderer {
      * 
      * TODO: to be refactored
      */
-    public void draw(Graphics2D g, TileMap map, int screenWidth, int screenHeight)
+    public void draw(Graphics2D g, OdorWorld world, int screenWidth, int screenHeight)
     {
 
         // Draw white background, if needed
@@ -109,20 +110,20 @@ public class OdorWorldRenderer {
         //g.drawRect(0, 0, mapWidth, mapHeight);
 
         // Draw all tiles   
-        for (int y = 0; y < map.getHeight(); y++) {
-            for (int x = 0; x <= map.getWidth(); x++) {
-                Image image = map.getTile(x, y);
-                if (image != null) {
-                    g.drawImage(image,
-                        tilesToPixels(x),
-                        tilesToPixels(y),
-                        null);
-                }
-            }
-        }
+//        for (int y = 0; y < map.getHeight(); y++) {
+//            for (int x = 0; x <= map.getWidth(); x++) {
+//                Image image = map.getTile(x, y);
+//                if (image != null) {
+//                    g.drawImage(image,
+//                        tilesToPixels(x),
+//                        tilesToPixels(y),
+//                        null);
+//                }
+//            }
+//        }
 
-        // Draw sprites
-        Iterator<OdorWorldEntity> i = map.getSprites();
+        // Draw entities
+        Iterator<OdorWorldEntity> i = world.getObjectList().iterator();
         while (i.hasNext()) {
             OdorWorldEntity sprite = i.next();
             int x = Math.round(sprite.getX());

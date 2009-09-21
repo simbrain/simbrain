@@ -31,11 +31,11 @@ public class RotationEffector implements Effector {
     /** Reference to parent object. */
     private RotatingEntity parentObject;
 
-    /** Translation. */
-    private double turnAmount = 1;
+    /** Amount to turn on next update. */
+    private double turnAmount;
 
     /** Makes the difference between Right and Left and how much. */
-    private double scaleFactor = 0;
+    private double scaleFactor = 1;
 
     /**
      * Constructor.
@@ -48,16 +48,20 @@ public class RotationEffector implements Effector {
      * {@inheritDoc}
      */
     public void activate() {
-        if (scaleFactor == 0) {
+        if (turnAmount == 0) {
             return;
         }
-//        double offset =  turnIncrement * scaleFactor;
+        // double offset =  turnIncrement * scaleFactor;
         parentObject.setHeading(parentObject.getHeading()
-                + turnAmount * scaleFactor);
+                + turnAmount);
+        turnAmount = 0;
+        scaleFactor = 1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<Class> getApplicableTypes() {
-        //TODO: Why can't I use Collections.singleton here?
         ArrayList<Class> list = new ArrayList<Class>();
         list.add(RotatingEntity.class);
         return list;
@@ -85,16 +89,12 @@ public class RotationEffector implements Effector {
     }
 
     /**
-     * @return the turnAmount
-     */
-    public double getTurnAmount() {
-        return turnAmount;
-    }
-
-    /**
+     * Update the turn amount. Note that this additive, since multiple
+     * attributes can use the same effector. Not sure about this design. (TODO).
+     *
      * @param turnAmount the turnAmount to set
      */
-    public void setTurnAmount(double turnAmount) {
-        this.turnAmount = turnAmount;
+    public void setTurnAmount(double value) {
+        turnAmount += value * scaleFactor;
     }
 }

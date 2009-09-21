@@ -34,24 +34,27 @@ import javax.swing.filechooser.FileFilter;
  * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic
  * adding of file extensions, memory of file-locations, and checks to prevent
  * file-overwrites.
- * 
+ *
  * 2008-10-09 Matt Watson - modified to support new serialization approach more
  * easily.
  */
 public class SFileChooser {
-    
+
     /** Default serial version id */
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * The map of extension and their descriptions in the order
      * of their addition.
      */
     private final LinkedHashMap<String, String> exts = new LinkedHashMap<String, String>();
 
-    /** The description for the entire set of formats */
+    /**
+     * The description of the file formats that are acceptable (shown in the
+     * "File Format field of the file chooser).  For example, "image files (.jpg, .gif, .png)".
+     */
     private String description;
-    
+
     /** A memory of the last directory this FileChooser was in. */
     private String currentDirectory;
 
@@ -89,15 +92,15 @@ public class SFileChooser {
     }
     
     /**
-     * adds an extension with the provided description.
-     * 
+     * Adds an extension with the provided description.
+     *
      * @param extension the extension
      * @param description the description
      */
     public void addExtension(final String description, final String extension) {
         exts.put(extension, description);
     }
-    
+
     /**
      * Adds an extension with the default description.
      * 
@@ -106,10 +109,10 @@ public class SFileChooser {
     public void addExtension(final String extension) {
         addExtension("*." + extension, extension);
     }
-    
+
     /**
      * Adds the filters for the extensions to the provided chooser
-     * 
+     *
      * @param chooser the file chooser to add filters to
      */
     private Map<String, ExtensionFileFilter> addExtensions(JFileChooser chooser) {
@@ -120,13 +123,12 @@ public class SFileChooser {
             filters.put(entry.getKey(), filter);
             chooser.addChoosableFileFilter(filter);
         }
-        
         return filters;
     }
-    
+
     /**
      * Shows dialog for opening files.
-     * 
+     *
      * @return File if selected
      */
     public File showOpenDialog() {
@@ -137,7 +139,7 @@ public class SFileChooser {
         if (exts.size() > 1) {
             chooser.addChoosableFileFilter(new ExtensionSetFileFilter(exts.keySet(), description));
         }
-        
+
         if (useViewer) {
             ImagePreviewPanel preview = new ImagePreviewPanel();
             chooser.setAccessory(preview);
@@ -181,13 +183,13 @@ public class SFileChooser {
         setCurrentDirectory(chooser);
         chooser.setAcceptAllFileFilterUsed(false);
         Map<String, ExtensionFileFilter> filters = addExtensions(chooser);
-        
+
         if (file != null) {
             chooser.setSelectedFile(file);
             String extension = getExtension(file);
             
-            System.out.println("extension: " + extension);
-            
+            //System.out.println("extension: " + extension);
+
             if (extension != null) chooser.setFileFilter(filters.get(extension));
         }
         
@@ -273,18 +275,18 @@ public class SFileChooser {
 
     /**
      * Filter for a set of extensions.
-     * 
+     *
      * @author Matt Watson
      */
     private class ExtensionSetFileFilter extends FileFilter {
         private final Collection<String> extensions;
         private final String description;
-        
+
         ExtensionSetFileFilter(Collection<String> extensions, String description) {
             this.extensions = extensions;
             this.description = description;
         }
-        
+
         /**
          * Determines if the file has the correct extension type.
          * 
@@ -333,17 +335,17 @@ public class SFileChooser {
     public static String getExtension(final File theFile) {
         String fileName = theFile.getName();
         int position = fileName.lastIndexOf('.');
-        
+
         if (position > 0 && position < fileName.length()) {
             return fileName.substring(position + 1);
         } else {
             return null;
         }
     }
-    
+
     /**
      * Check to see if the file has the extension, and if not, add it.
-     * 
+     *
      * @param theFile File to add extension to
      * @param extension Extension to add to file
      * @return The file name with the correct extension

@@ -50,7 +50,7 @@ public class OdorWorld {
     private List<WorldListener> listenerList = new ArrayList<WorldListener>();
 
     /** Tile map. */
-    private TileMap map;
+    //private TileMap map;
 
     /** Point cache used in collision detection. */
     private Point pointCache = new Point();
@@ -62,11 +62,23 @@ public class OdorWorld {
     private boolean wrapAround = true;
 
     /**
+     * If true, then objects block movements; otherwise agents can walk through
+     * objects.
+     */
+    private boolean objectsBlockMovement = true;
+
+    /** Height of world. */
+    private int height;
+
+    /** Width of world. */
+    private int width;
+
+    /**
      * Default constructor.
      */
     OdorWorld() {
         renderer = new OdorWorldRenderer();
-        map = new TileMap(10, 15);
+        //map = new TileMap(10, 15);
 
         //renderer.setBackground(ResourceManager.getImage("dirt.jpg"));
         //map.setTile(1, 2, ResourceManager.getImage("Tulip.gif"));
@@ -80,7 +92,7 @@ public class OdorWorld {
     public void update() {
         for (OdorWorldEntity object : entityList) {
             object.updateSensors();
-            //object.applyEffectors(); // TODO: 
+            object.applyEffectors(); 
             updateSprite(object, 1); // time defaults to 1 now
         }
         fireUpdateEvent();
@@ -98,7 +110,7 @@ public class OdorWorld {
         //centerSprite(sprite, tileX,tileY);
 
         // Add entity to the map
-        map.addSprite(entity);
+        //map.addSprite(entity);
         entityList.add(entity);
 
         // Fire entity added event
@@ -126,7 +138,7 @@ public class OdorWorld {
      * @param entity the entity to delete
      */
     public void deleteEntity(OdorWorldEntity entity) {
-        map.removeSprite(entity);
+        //map.removeSprite(entity);
         entityList.remove(entity);
         fireEntityRemoved(entity);
     }
@@ -187,13 +199,13 @@ public class OdorWorld {
         xstream.omitField(Animation.class, "currFrameIndex");
         return xstream;
     }
-    
+
     /**
      * Standard method call made to objects after they are deserialized.
      * See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
@@ -206,10 +218,11 @@ public class OdorWorld {
 
     /**
      * Updates the creature.
-     * 
+     *
      * TODO: to be rewritten
      */
-    private void updateSprite(final OdorWorldEntity sprite, final long elapsedTime) {
+    private void updateSprite(final OdorWorldEntity sprite,
+            final long elapsedTime) {
 
         // Collision detection
         float dx = sprite.getVelocityX();
@@ -220,46 +233,58 @@ public class OdorWorld {
         float newY = oldY + dy * elapsedTime;
 
         // Handle tile collisions
-        //        Point tile = getTileCollision(creature, newX, creature.getY());
-        //        if (tile != null) {
-        //            // Line up with the tile boundary
-        //            if (dx > 0) {
-        //                creature.setX(
-        //                    OdorWorldRenderer.tilesToPixels(tile.x) -
-        //                    creature.getWidth());
-        //            }
-        //            else if (dx < 0) {
-        //                creature.setX(
-        //                    OdorWorldRenderer.tilesToPixels(tile.x + 1));
-        //            }
+        // Point tile = getTileCollision(creature, newX, creature.getY());
+        // if (tile != null) {
+        // // Line up with the tile boundary
+        // if (dx > 0) {
+        // creature.setX(
+        // OdorWorldRenderer.tilesToPixels(tile.x) -
+        // creature.getWidth());
+        // }
+        // else if (dx < 0) {
+        // creature.setX(
+        // OdorWorldRenderer.tilesToPixels(tile.x + 1));
+        // }
+        // }
+        // tile = getTileCollision(creature, creature.getX(), newY);
+        // if (tile != null) {
+        // // Line up with the tile boundary
+        // if (dx > 0) {
+        // creature.setY(
+        // OdorWorldRenderer.tilesToPixels(tile.y) -
+        // creature.getHeight());
+        // }
+        // else if (dx < 0) {
+        // creature.setY(
+        // OdorWorldRenderer.tilesToPixels(tile.y + 1));
+        // }
+        // }
+
+        // Handle sprite collisions
+        sprite.setHasCollided(false);
+        for (OdorWorldEntity entity : entityList) {
+            if (entity == sprite) {
+                continue;
+            }
+            if (entity.getBounds().intersects(sprite.getBounds())) {
+                entity.setHasCollided(true);
+            }
+        }
+
+        // TODO: Refactor below!  Needed for behaviors...
+        // Handle sprite collisions
+        //        if (xCollission(sprite, newX)) {
+        //            sprite.collideHorizontal();
+        //        } else {
+        //            // sprite.setX(newX);
         //        }
-        //        tile = getTileCollision(creature, creature.getX(), newY);
-        //        if (tile != null) {
-        //            // Line up with the tile boundary
-        //            if (dx > 0) {
-        //                creature.setY(
-        //                    OdorWorldRenderer.tilesToPixels(tile.y) -
-        //                    creature.getHeight());
-        //            }
-        //            else if (dx < 0) {
-        //                creature.setY(
-        //                    OdorWorldRenderer.tilesToPixels(tile.y + 1));
-        //            }
+        //        if (yCollission(sprite, newY)) {
+        //            sprite.collideVertical();
+        //        } else {
+        //            // sprite.setY(newY);
         //        }
 
-        // Handle sprite collisions 
-        if (xCollission(sprite, newX)) {
-            sprite.collideHorizontal();
-        } else {
-            //sprite.setX(newX);
-        }
-        if (yCollission(sprite, newY)) {
-            sprite.collideVertical();
-        } else {
-            //sprite.setY(newY);
-        }
-
-        if (wrapAround == true) {
+        if (wrapAround) {
 
             if (sprite.getX() >= getWidth()) {
                 sprite.setX(sprite.getX() - getWidth());
@@ -278,32 +303,31 @@ public class OdorWorld {
         // Update creature
         sprite.update(elapsedTime);
 
-        //System.out.println("x: " + creature.getX() + " y:" + creature.getY());
-}
+        // System.out.println("x: " + creature.getX() + " y:" +
+        // creature.getY());
+    }
 
     /**
      * Handle collisions in x directions.
-     * 
+     *
      * @param entityToCheck
      * @param xCheck position to check
      * @return whether or not a collision occurred.
      */
     private boolean xCollission(OdorWorldEntity entityToCheck, float xCheck) {
-        
+
         // Hit a wall
-        if ((entityToCheck.getX() < 0) || (entityToCheck.getX() > getWidth())) {
-            return true;
-        }
-        
+        //        if ((entityToCheck.getX() < 0) || (entityToCheck.getX() > getWidth())) {
+        //            return true;
+        //        }
+
         // Check for collisions with sprites
-        for (OdorWorldEntity sprite : entityList) {
-            
-            if (sprite == entityToCheck) {
+        for (OdorWorldEntity entity : entityList) {
+            if (entity == entityToCheck) {
                 continue;
             }
-            
-            if ((entityToCheck.getX() > sprite.getX()) &&
-                    (entityToCheck.getX() < (sprite.getX() + sprite.getWidth()))) {
+            if ((entityToCheck.getX() > entity.getX()) &&
+                    (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
                 return true;
             }
         }
@@ -312,23 +336,24 @@ public class OdorWorld {
 
     /**
      * Handle collisions in y directions.
-     * 
+     *
      * @param entityToCheck
      * @param yCheck position to check
      * @return whether or not a collision occurred.
      */
     private boolean yCollission(OdorWorldEntity entityToCheck, float yCheck) {
         // Hit a wall
-        if ((entityToCheck.getY() < 0) || (entityToCheck.getY() > getHeight())) {
-            return true;
-        }
+        //        if ((entityToCheck.getY() < 0) || (entityToCheck.getY() > getHeight())) {
+        //            return true;
+        //        }
+
         // Check for collisions with sprites
         for (OdorWorldEntity sprite : entityList) {
-            
+
             if (sprite == entityToCheck) {
                 continue;
             }
-            
+
             if ((entityToCheck.getY() > sprite.getY()) &&
                     (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
                 return true;
@@ -337,7 +362,6 @@ public class OdorWorld {
         return false;
     }
 
-    
     /**
      * Gets the tile that a Sprites collides with. Only the OdorWorldEntity's X or Y
      * should be changed, not both. Returns null if no collision is detected.
@@ -357,15 +381,15 @@ public class OdorWorld {
                 - 1);
 
         // Check each tile for a collision
-        for (int x = fromTileX; x <= toTileX; x++) {
-            for (int y = fromTileY; y <= toTileY; y++) {
-                if (x < 0 || x >= map.getWidth() || map.getTile(x, y) != null) {
-                    // collision found, return the tile
-                    pointCache.setLocation(x, y);
-                    return pointCache;
-                }
-            }
-        }
+//        for (int x = fromTileX; x <= toTileX; x++) {
+//            for (int y = fromTileY; y <= toTileY; y++) {
+//                if (x < 0 || x >= map.getWidth() || map.getTile(x, y) != null) {
+//                    // collision found, return the tile
+//                    pointCache.setLocation(x, y);
+//                    return pointCache;
+//                }
+//            }
+//        }
 
         // No collision found
         return null;
@@ -379,7 +403,7 @@ public class OdorWorld {
      * @param screenHeight height of screen
      */
     public void draw(Graphics2D g, int screenWidth, int screenHeight) {
-        renderer.draw(g, map, screenWidth, screenHeight);
+        renderer.draw(g, this, screenWidth, screenHeight);
     }
 
     /**
@@ -398,24 +422,6 @@ public class OdorWorld {
      */
     public List<OdorWorldEntity> getObjectList() {
         return entityList;
-    }
-
-    /**
-     * Returns width of world in pixels.
-     *
-     * @return width in pixels.
-     */
-    public int getWidth() {
-        return OdorWorldRenderer.tilesToPixels(map.getWidth());
-    }
-
-    /**
-     * Returns height of world in pixels.
-     *
-     * @return height of world
-     */
-    public int getHeight() {
-        return OdorWorldRenderer.tilesToPixels(map.getHeight());
     }
 
     /**
@@ -505,6 +511,52 @@ public class OdorWorld {
      */
     public void setWrapAround(boolean wrapAround) {
         this.wrapAround = wrapAround;
+    }
+
+    /**
+     * @param height the height to set
+     */
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    /**
+     * @param width the width to set
+     */
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    /**
+     * Returns width of world in pixels.
+     *
+     * @return width in pixels.
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * Returns height of world in pixels.
+     *
+     * @return height of world
+     */
+    public int getHeight() {
+        return height;
+    }
+
+    /**
+     * @return the objectsBlockMovement
+     */
+    public boolean isObjectsBlockMovement() {
+        return objectsBlockMovement;
+    }
+
+    /**
+     * @param objectsBlockMovement the objectsBlockMovement to set
+     */
+    public void setObjectsBlockMovement(boolean objectsBlockMovement) {
+        this.objectsBlockMovement = objectsBlockMovement;
     }
 
 }

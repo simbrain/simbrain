@@ -41,9 +41,11 @@ import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
  * <b>OdorWorldFrameMenu</b>.
  */
 public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
-    
+
     private static final long serialVersionUID = 1L;
     
+    //TODO: Replace all this with actions.
+
     /** Parent frame. */
     private OdorWorldDesktopComponent parentFrame;
     /** File menu. */
@@ -91,13 +93,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         }
     };
     
-    private final ActionListener prefsListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            parentFrame.getWorldPanel().showGeneralDialog();
-            parentFrame.getWorkspaceComponent().setChangedSinceLastSave(true);
-        }
-    };
-    
     private final ActionListener helpItemListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             Utils.showQuickRef("World.html");
@@ -132,8 +127,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getFileMenu().addMenuListener(this);
 
 //        getClose().addActionListener(closeListener);
-        getClose().setAccelerator(KeyStroke.getKeyStroke(
-                                                KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        getClose().setAccelerator(
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
+                        .getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
     /**

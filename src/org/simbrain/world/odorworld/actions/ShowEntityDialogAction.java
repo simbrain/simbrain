@@ -18,63 +18,47 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
-import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
- * Action for showing a dialog to edit a smell source.
+ * Action for showing an entity dialog.
  */
-public final class ViewSmellSource
+public final class ShowEntityDialogAction
     extends AbstractAction {
-
-    /** Plot GUI component. */
-    private final OdorWorldPanel component;
 
     /** Entity to edit. */
     private final OdorWorldEntity entity;
 
     /**
-     * Create a new open plot action.
+     * Construct a show entity action.
      *
      * @param component GUI component, must not be null.
      */
-    public ViewSmellSource(final OdorWorldPanel component, OdorWorldEntity entity) {
-        super("View / Edit smell stimulus...");
+    public ShowEntityDialogAction(OdorWorldEntity entity) {
+        super("Edit entity...");
         this.entity = entity;
-        if (component == null) {
-            throw new IllegalArgumentException("Desktop component must not be null");
-        }
-        this.component = component;
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+//        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
+//                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-        putValue(SHORT_DESCRIPTION, "View / Edit smell stimulus...");
+        putValue(SHORT_DESCRIPTION, "Edit entity...");
     }
 
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-
-        JDialog dialog = new JDialog();
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(entity
-                .getSmellSource(), dialog);
-        dialog.setContentPane(editor);
+        ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+        editor.setExcludeList(new String[] {"velocityX", "velocityY"});
+        editor.setObject(entity);
+        JDialog dialog = editor.getDialog();
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-
-        component.repaint();
     }
-
 }

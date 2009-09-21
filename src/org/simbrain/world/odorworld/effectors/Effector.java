@@ -20,12 +20,19 @@ package org.simbrain.world.odorworld.effectors;
 
 import java.util.List;
 
+/**
+ * Interface for Odor World effectors.
+ */
 public interface Effector {
 
+    /**
+     * Move the agent in a manner appropriate to the effector type.
+     */
     public void activate();
-    
-    // TODO: Possibly to be used to determine which effectors can be added to which objects
-    //      But  another option is to have object types take specific effector types
+
+    /**
+     * Return a list of entity types which can use this type of effector.
+     */
     public List<Class> getApplicableTypes();
-    
+
 }

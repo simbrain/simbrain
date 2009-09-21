@@ -117,9 +117,9 @@ public class TestObject {
     public static void main(String[] args) {
 
         // Test ReflectivePropertyEditor as a panel with ok / cancel
-        JDialog dialog = new JDialog();
         TestObject testObject = new TestObject();
-        dialog.setContentPane(new ReflectivePropertyEditor(testObject, dialog));
+        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(testObject);
+        JDialog dialog = editor.getDialog();
         dialog.pack();
         dialog.setVisible(true);
 

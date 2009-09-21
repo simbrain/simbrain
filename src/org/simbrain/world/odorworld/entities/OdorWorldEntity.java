@@ -24,6 +24,9 @@ public abstract class OdorWorldEntity {
      */
     private Animation animation;  
 
+    /** Name of this entity. */
+    private String name;
+
     /** X Position. */
     protected float x;
 
@@ -39,9 +42,6 @@ public abstract class OdorWorldEntity {
     /** Back reference to parent parentWorld. */
     private OdorWorld parentWorld;
 
-    /** Name of this entity. */
-    private String name;
-
     /** Sensors. */
     private List<Sensor> sensors= new ArrayList<Sensor>();
 
@@ -52,7 +52,16 @@ public abstract class OdorWorldEntity {
     protected Behavior behavior = new StationaryBehavior();
 
     /** Smell Source (if any). */
-    private SmellSource smellSource = null;
+    private SmellSource smellSource;
+
+    /** True if a collision occurred in the last time step. */
+    private boolean collision;
+
+    /** Enable sensors. If not the agent is "blind." */
+    private boolean sensorsEnabled = true;
+
+    /** Enable effectors.  If not the agent is "paralyzed. */
+    private boolean effectorsEnabled = true;
 
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the
@@ -65,6 +74,7 @@ public abstract class OdorWorldEntity {
      */
     public void collideHorizontal() {
         behavior.collisionX();
+        collision = true;
     }
 
     /**
@@ -72,10 +82,11 @@ public abstract class OdorWorldEntity {
      */
     public void collideVertical() {
         behavior.collissionY();
+        collision = true;
     }
 
     /**
-     * Construct an entity from an animoation.
+     * Construct an entity from an animation.
      *
      * @param animation animation to use.
      */
@@ -86,9 +97,9 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * Construct an odor worl dentity from a single image location.
+     * Construct an odor world entity from a single image location.
      *
-     * @param imageLocation the image location 
+     * @param imageLocation the image location
      */
     public OdorWorldEntity(final String imageLocation, OdorWorld world) {
         this.animation = new Animation(imageLocation);
@@ -171,7 +182,7 @@ public abstract class OdorWorldEntity {
     public void setVelocityY(final float dy) {
         this.dy = dy;
     }
-    
+
     /**
      * Get the entity's name.
      *
@@ -229,8 +240,10 @@ public abstract class OdorWorldEntity {
      * Apply impact of all effectors.
      */
     public void applyEffectors() {
-        for (Effector effector : effectors) {
-            effector.activate();
+        if (effectorsEnabled) {
+            for (Effector effector : effectors) {
+                effector.activate();
+            }
         }
     }
 
@@ -238,8 +251,10 @@ public abstract class OdorWorldEntity {
      * Update all sensors.
      */
     public void updateSensors() {
-        for (Sensor sensor : sensors) {
-            sensor.update();
+        if (sensorsEnabled) {
+            for (Sensor sensor : sensors) {
+                sensor.update();
+            }
         }
     }
 
@@ -284,7 +299,7 @@ public abstract class OdorWorldEntity {
         this.x = x;
         this.y = y;
     }
-    
+
     /**
      * @return the animation associated with this entity
      */
@@ -300,7 +315,7 @@ public abstract class OdorWorldEntity {
     }
 
     /**
-     * Initialize the animation from stored image location(s). 
+     * Initialize the animation from stored image location(s).
      */
     public void postSerializationInit() {
         getAnimation().initializeImages(); //TODO
@@ -332,5 +347,47 @@ public abstract class OdorWorldEntity {
      */
     public void setEffectors(List<Effector> effectors) {
         this.effectors = effectors;
+    }
+
+    /**
+     * @return true if a collision occurred
+     */
+    public boolean hasCollided() {
+        return collision;
+    }
+
+    /**
+     * @param collission the collision to set
+     */
+    public void setHasCollided(boolean collission) {
+        this.collision = collission;
+    }
+
+    /**
+     * @return the sensorsEnabled
+     */
+    public boolean isSensorsEnabled() {
+        return sensorsEnabled;
+    }
+
+    /**
+     * @param sensorsEnabled the sensorsEnabled to set
+     */
+    public void setSensorsEnabled(boolean sensorsEnabled) {
+        this.sensorsEnabled = sensorsEnabled;
+    }
+
+    /**
+     * @return the effectorsEnabled
+     */
+    public boolean isEffectorsEnabled() {
+        return effectorsEnabled;
+    }
+
+    /**
+     * @param effectorsEnabled the effectorsEnabled to set
+     */
+    public void setEffectorsEnabled(boolean effectorsEnabled) {
+        this.effectorsEnabled = effectorsEnabled;
     }
 }

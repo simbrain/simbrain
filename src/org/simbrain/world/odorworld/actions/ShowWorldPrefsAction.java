@@ -59,9 +59,8 @@ public final class ShowWorldPrefsAction
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        JDialog dialog = new JDialog();
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(component.getWorld(), dialog);
-        dialog.setContentPane(editor);
+        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(component.getWorld());
+        JDialog dialog = editor.getDialog();
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

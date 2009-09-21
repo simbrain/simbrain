@@ -66,6 +66,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -116,8 +117,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Number text inside neuron. */
     private PText activationText;
 
-    /** Number text inside neuron. */
+    /** Text corresponding to neuron label. */
     private PText labelText = new PText("...");
+
+    /** Background for label text, so that background objects don't show up. */
+    PNode labelBackground;
 
     /** Whether the node is currently moving or not. */
     private boolean isMoving = false;
@@ -177,11 +181,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         addChild(activationText);
         
         // TODO: create a white background for the activation text
-        //PNode node = new PNode();
-        //node.setPaint(Color.white);
-        //node.setBounds(labelText.getBounds());
-        //node.addChild(labelText);
-        //addChild(node);
+        labelBackground = new PNode();
+        labelBackground.setPaint(this.getNetworkPanel().getBackground());
+        labelBackground.setBounds(labelText.getBounds());
+        labelBackground.addChild(labelText);
+        addChild(labelBackground);
 
         resetColors();
         update();
@@ -726,7 +730,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             labelText.setFont(NEURON_FONT);
             labelText.setText("" + neuron.getLabel());
             labelText.setOffset(getX() - labelText.getWidth() / 2 + DIAMETER/2,
-                    getY() - DIAMETER/2);
+                    getY() - DIAMETER/2 - 1);
+            labelBackground.setBounds(labelText.getFullBounds());
+            // TODO: Make background bigger than label text
         }
 
         // 0 (or close to it) is a special case--a black font
@@ -992,6 +998,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** @see ScreenElement */
     public void resetColors() {
         circle.setStrokePaint(NetworkGuiSettings.getLineColor());
+        labelBackground.setPaint(NetworkGuiSettings.getBackgroundColor());
 //        inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
 //        outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
         updateColor();

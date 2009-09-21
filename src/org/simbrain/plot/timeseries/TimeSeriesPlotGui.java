@@ -179,9 +179,9 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
     /** @see ActionListener */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            JDialog dialog = new JDialog();
-            dialog.setContentPane(new ReflectivePropertyEditor(getWorkspaceComponent()
-                    .getModel(), dialog));
+            ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(
+                    getWorkspaceComponent().getModel()));
+            JDialog dialog = editor.getDialog();
             dialog.setModal(true);
             dialog.pack();
             dialog.setLocationRelativeTo(null);

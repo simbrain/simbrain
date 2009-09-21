@@ -93,7 +93,7 @@ public class ConsumingAttributeMenu extends JMenu implements WorkspaceListener {
                             SingleCouplingMenuItem item = 
                                 new SingleCouplingMenuItem(
                                     workspace,
-                            		target.getAttributeDescription(),
+                            		target.getKey(),
                             		sourceProducingAttribute, 
                             		target);
                             consumerItem.add(item);

@@ -27,8 +27,14 @@ import org.simbrain.util.LabelledItemPanel;
 
 /**
  * ReflectivePropertyEditor.
- * 
+ *
  * @author Jeff Yoshimi
+ *
+ * TODO:
+ *  - Generalize array stuff
+ *  - Put arrays in scrollers
+ *  - Better documenation / readme
+ *  - Custom naming, ordering for fields?
  */
 public class ReflectivePropertyEditor extends JPanel {
 
@@ -45,10 +51,16 @@ public class ReflectivePropertyEditor extends JPanel {
     private LabelledItemPanel itemPanel = new LabelledItemPanel();
 
     /** List of methods that can be edited. Used when committing changes. */
-    List<Method> editableMethods = new ArrayList<Method>();
+    private List<Method> editableMethods = new ArrayList<Method>();
 
     /** Map from property names for Color objects to selected selectedColor. */
-    HashMap<String, Color> selectedColor = new HashMap<String, Color>();
+    private HashMap<String, Color> selectedColor = new HashMap<String, Color>();
+
+    /** List of methods to exclude from the dialog, listed by name. */
+    private String[] excludeList = new String[]{};
+
+    /** If true, use superclass methods. */
+    private boolean useSuperclass = true;
 
     /**
      * Associate property names with JComponents that are used to set those
@@ -59,32 +71,46 @@ public class ReflectivePropertyEditor extends JPanel {
     /**
      * Construct a property editor panel only. It's up to the user to embed it
      * in a dialog or other GUI element
-     * 
+     *
      * @param toEdit
      *            the object to edit
      */
     public ReflectivePropertyEditor(final Object toEdit) {
         this.toEdit = toEdit;
-        initPanel();
         this.add(itemPanel);
+        initPanel();
     }
 
     /**
-     * Construct a property editor dialog. For use in a dialog box. Formatted
-     * with an OK and Cancel button.
-     * 
-     * @param toEdit
-     *            the object to edit.
-     * @param parentDialog
-     *            the parent dialog.
+     * Use this constructor to make an editor, adjust its settings, and then
+     * initialize it with an object.
      */
-    public ReflectivePropertyEditor(final Object toEdit,
-            final JDialog parentDialog) {
-        this.toEdit = toEdit;
-        this.setLayout(new BorderLayout());
-        this.add("Center", itemPanel);
+    public ReflectivePropertyEditor() {
+    }
 
-        initPanel();
+    /**
+     * Set object to edit. For use with no argument constructor.
+     *
+     * @param edit the object to edit
+     */
+    public void setObject(final Object edit) {
+        if (this.toEdit == null) {
+            this.toEdit = edit;
+            this.add(itemPanel);
+            initPanel();
+        } // else throw exception?
+    }
+
+    /**
+     * Returns an ok / cancel dialog for this dialog.
+     *
+     * @return parentDialog parent dialog
+     */
+    public JDialog getDialog() {
+
+        final JDialog ret = new JDialog();
+        ret.setLayout(new BorderLayout());
+        ret.add("Center", itemPanel);
 
         // Bottom Panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -92,19 +118,20 @@ public class ReflectivePropertyEditor extends JPanel {
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 commit();
-                parentDialog.dispose();
+                ret.dispose();
             }
         });
         bottomPanel.add(okButton);
-        parentDialog.getRootPane().setDefaultButton(okButton);
+        ret.getRootPane().setDefaultButton(okButton);
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                parentDialog.dispose();
+                ret.dispose();
             }
         });
         bottomPanel.add(cancelButton);
-        this.add("South", bottomPanel);
+        ret.add("South", bottomPanel);
+        return ret;
     }
 
     /**
@@ -112,9 +139,13 @@ public class ReflectivePropertyEditor extends JPanel {
      */
     private void initPanel() {
         for (final Method method : toEdit.getClass().getMethods()) {
-            boolean inBaseClass = (method.getDeclaringClass() == toEdit
-                    .getClass());
-            if (inBaseClass) {
+
+            boolean inSuperClass = (method.getDeclaringClass() != toEdit.getClass());
+            // If useSuperClass is false, then if the method is in the base class,
+            //  this flag should be false.
+            boolean skipMethod = !useSuperclass & inSuperClass;
+
+            if (!skipMethod && !inExcludeList(method)) {
                 boolean isGetter = (method.getName().startsWith("get") || method
                         .getName().startsWith("is"));
                 if (isGetter) {
@@ -271,6 +302,21 @@ public class ReflectivePropertyEditor extends JPanel {
                 }
             }
         }
+    }
+
+    /**
+     * Check to see if the method is in the exclude list.
+     *
+     * @param method the method to check
+     * @return true if the method is to be excluded, false otherwse
+     */
+    private boolean inExcludeList(Method method) {
+        for (String name : excludeList) {
+            if (getPropertyName(method).equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -495,6 +541,27 @@ public class ReflectivePropertyEditor extends JPanel {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @return the useSuperclass
+     */
+    public boolean isUseSuperclass() {
+        return useSuperclass;
+    }
+
+    /**
+     * @param useSuperclass the useSuperclass to set
+     */
+    public void setUseSuperclass(boolean useSuperclass) {
+        this.useSuperclass = useSuperclass;
+    }
+
+    /**
+     * @param strings the excludeList to set
+     */
+    public void setExcludeList(String[] strings) {
+        this.excludeList = strings;
     }
 
 }

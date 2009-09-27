@@ -423,9 +423,9 @@ public final class NetworkActionManager {
                 newStandardNetworkAction, newWTANetworkAction });
     }
 
-    public List<JToggleButton> getClampBarActions() {
-        return Arrays.asList(new JToggleButton[] {getClampNeuronsBarItem(), getClampWeightsBarItem()});
-    }
+//    public List<JToggleButton> getClampBarActions() {
+//        return Arrays.asList(new JToggleButton[] {getClampNeuronsBarItem(), getClampWeightsBarItem()});
+//    }
 
     /**
      * Return the new neuron action.
@@ -597,33 +597,21 @@ public final class NetworkActionManager {
     }
 
     /**
-     * Return the clamp weight check box menu item.
+     * Return the clamp weight action.
      *
-     * @return the clamp weight check box menu item
+     * @return the clamp weight action
      */
-    public JCheckBoxMenuItem getClampWeightsMenuItem() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampWeightsAction);
-        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampWeights());
-        return actionWrapper;
+    public Action getClampWeightsAction() {
+        return clampWeightsAction;
     }
-
-    /**
-     * Return the clamp weight toggle button tool bar item.
-     *
-     * @return the clamp weight toggle button tool bar item
-     */
-    public JToggleButton getClampWeightsBarItem() {
-        JToggleButton actionWrapper = new JToggleButton(clampWeightsAction);
-        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampWeights());
-        return actionWrapper;
-    }
-
+    
     /**
      * Return the show IO information check box menu item.
      *
      * @return the show IO information check box menu item
      */
     public JCheckBoxMenuItem getShowIOInfoMenuItem() {
+        // TODO: Creating the wrapper in the getter is problematic.  Remove where it occurs. 
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showIOInfoAction);
         actionWrapper.setSelected(networkPanel.getInOutMode());
         return actionWrapper;
@@ -749,25 +737,12 @@ public final class NetworkActionManager {
         }
 
     /**
-     * Return the clamp neurons check box menu item.
+     * Return the clamp neurons action.
      *
-     * @return the clamp neurons check box menu item
+     * @return the clamp neurons action
      */
-    public JCheckBoxMenuItem getClampNeuronsMenuItem() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampNeuronsAction);
-        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampNeurons());
-        return actionWrapper;
-    }
-
-    /**
-     * Return the clamp neurons check box menu item.
-     *
-     * @return the clamp neurons check box menu item
-     */
-    public JToggleButton getClampNeuronsBarItem() {
-        JToggleButton actionWrapper = new JToggleButton(clampNeuronsAction);
-        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampNeurons());
-        return actionWrapper;
+    public Action getClampNeuronsAction() {
+        return clampNeuronsAction;
     }
 
     /**

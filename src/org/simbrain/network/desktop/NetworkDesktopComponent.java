@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.attributes.NeuronWrapper;
@@ -51,20 +50,27 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     /** Menu bar. */
     private JMenuBar menuBar;
 
+    /** Default height. */
+    private static final int DEFAULT_HEIGHT = 450;
+
+    /** Default width. */
+    private static final int DEFAULT_WIDTH = 480;
+
     /**
      * Create a new network frame.
      */
     public NetworkDesktopComponent(final GenericFrame frame, final NetworkComponent component) {
         super(frame, component);
-        this.setPreferredSize(new Dimension(450,400));
+        this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         networkPanel = new NetworkPanelDesktop(this, component.getRootNetwork());
 
-         //TODO: Wire up preferences
+        // TODO: Wire up preferences
         // component.setCurrentDirectory(currentDirectory);
         // component.setCurrentFile(currentFile);
 
-        // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
+        // Place networkPanel in a buffer so that toolbars don't get in the way
+        // of canvas elements
         setLayout(new BorderLayout());
 
         // Put it all together
@@ -91,46 +97,55 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
     /**
      * Create attribute menu.
-     *
+     * 
      * @return the attribute menu
      */
     private JMenu createAttributeMenu() {
         JMenu fileMenu = new JMenu("Attributes");
 
-        //TODO: None of below will work with multiple gui views.  Need listeners.
-        
-        final JCheckBoxMenuItem upperBoundItem = new JCheckBoxMenuItem("Use upper bound attributes");
+        // TODO: None of below will work with multiple gui views. Need
+        // listeners.
+
+        final JCheckBoxMenuItem upperBoundItem = new JCheckBoxMenuItem(
+                "Use upper bound attributes");
         upperBoundItem.setSelected(NeuronWrapper.isUseUpperBoundAttribute());
         upperBoundItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setUpperBoundAttributes(upperBoundItem.isSelected());
+                getWorkspaceComponent().setUpperBoundAttributes(
+                        upperBoundItem.isSelected());
             }
         });
         fileMenu.add(upperBoundItem);
 
-        final JCheckBoxMenuItem lowerBoundItem = new JCheckBoxMenuItem("Use lower bound attributes");
+        final JCheckBoxMenuItem lowerBoundItem = new JCheckBoxMenuItem(
+                "Use lower bound attributes");
         lowerBoundItem.setSelected(NeuronWrapper.isUseLowerBoundAttribute());
         lowerBoundItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setLowerBoundAttributes(lowerBoundItem.isSelected());
+                getWorkspaceComponent().setLowerBoundAttributes(
+                        lowerBoundItem.isSelected());
             }
         });
         fileMenu.add(lowerBoundItem);
 
-        final JCheckBoxMenuItem targetValueItem = new JCheckBoxMenuItem("Use target value attributes");
+        final JCheckBoxMenuItem targetValueItem = new JCheckBoxMenuItem(
+                "Use target value attributes");
         targetValueItem.setSelected(NeuronWrapper.isUseTargetValueAttribute());
         targetValueItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setTargetValueAttributes(targetValueItem.isSelected());
+                getWorkspaceComponent().setTargetValueAttributes(
+                        targetValueItem.isSelected());
             }
         });
         fileMenu.add(targetValueItem);
 
-        final JCheckBoxMenuItem synapseItem = new JCheckBoxMenuItem("Use synapse attributes");
-        synapseItem.setSelected(SynapseWrapper.isUsingSynapseAttributes()); 
+        final JCheckBoxMenuItem synapseItem = new JCheckBoxMenuItem(
+                "Use synapse attributes");
+        synapseItem.setSelected(SynapseWrapper.isUsingSynapseAttributes());
         synapseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setUsingSynapseWrappers(synapseItem.isSelected());
+                getWorkspaceComponent().setUsingSynapseWrappers(
+                        synapseItem.isSelected());
             }
         });
         fileMenu.add(synapseItem);
@@ -140,7 +155,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
     /**
      * Create and return a new File menu for this rootNetwork panel.
-     *
+     * 
      * @return a new File menu for this rootNetwork panel
      */
     JMenu createFileMenu() {
@@ -165,10 +180,12 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
             createAndAttachMenus();
         }
 
-        //TODO: Below only needs to happen when opening; but currently it happens
-        //      also when creating a new network
+        // TODO: Below only needs to happen when opening; but currently it
+        // happens
+        // also when creating a new network
         networkPanel.clearPanel();
-        if (networkPanel.getRootNetwork() != this.getWorkspaceComponent().getRootNetwork()) {
+        if (networkPanel.getRootNetwork() != this.getWorkspaceComponent()
+                .getRootNetwork()) {
             networkPanel.setRootNetwork(this.getWorkspaceComponent()
                     .getRootNetwork().getRootNetwork());
         }
@@ -178,7 +195,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
     /**
      * Return the network panel for this network frame.
-     *
+     * 
      * @return the network panel for this network frame
      */
     public NetworkPanel getNetworkPanel() {

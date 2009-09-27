@@ -27,7 +27,7 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
  * A sensor which is updated based on the presence of SmellSources near it.
- * 
+ *
  * @see org.simbrain.util.environment.SmellSource
  */
 public class SmellSensor implements Sensor {
@@ -74,9 +74,9 @@ public class SmellSensor implements Sensor {
         //TODO: Formnalize rule that this sensor applies to rotating entity only,
         //      or relax the code so that it will work for non-rotating entities
         RotatingEntity parent = (RotatingEntity) this.getParent();
-        double x = parent.getX()
+        double x = parent.getCenterLocation()[0]
                 + (radius * Math.cos(parent.getHeadingRadians() + theta));
-        double y = parent.getY()
+        double y = parent.getCenterLocation()[1]
                 - (radius * Math.sin(parent.getHeadingRadians() + theta));
         return new double[] { x, y };
     }

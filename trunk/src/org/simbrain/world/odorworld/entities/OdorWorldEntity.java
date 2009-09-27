@@ -279,6 +279,16 @@ public abstract class OdorWorldEntity {
     public OdorWorld getParentWorld() {
         return parentWorld;
     }
+    
+    /**
+     * Returns the location of the center of this entity as a double array.
+     *
+     * @return center location of the entity.
+     */
+    public double[] getCenterLocation() {
+        return new double[] { x + getWidth()/2, y + getHeight()/2 };
+    }
+
 
 	/**
      * Returns the location of the entity as a double array.
@@ -288,7 +298,7 @@ public abstract class OdorWorldEntity {
     public double[] getLocation() {
         return new double[] { x, y };
     }
-    
+
     /**
      * Set the location of this entity.
      *

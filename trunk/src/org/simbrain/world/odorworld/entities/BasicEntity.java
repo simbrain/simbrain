@@ -80,11 +80,12 @@ public class BasicEntity extends OdorWorldEntity {
      * Initialize the image name list.
      */
     private void initImageList() {
+
+        //TODO: Not sure about locating resources at the root level, but I need something
+           //   that works for now.  This needs a consistent policy though.
         String baseDir = System.getProperty("user.dir");
         final String FS = System.getProperty("file.separator");
-        File dir = new File(baseDir + FS + "src" + FS + "org" + FS + "simbrain"
-                + FS + "world" + FS + "odorworld" + FS + "images" + FS
-                + "static");
+        File dir = new File(baseDir + FS + "images" + FS + "static");
         //TODO: Create file filter for jpg, etc.
         //TODO: Use File separator
         images.addAll(Arrays.asList(dir.list()));

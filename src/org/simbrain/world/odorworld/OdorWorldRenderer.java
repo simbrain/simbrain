@@ -6,6 +6,8 @@ import java.awt.Image;
 import java.util.Iterator;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * The OdorWorldRenderer class draws a TileMap on the screen. It draws all
@@ -129,6 +131,14 @@ public class OdorWorldRenderer {
             int x = Math.round(sprite.getX());
             int y = Math.round(sprite.getY());
             g.drawImage(sprite.getImage(), x, y, null);
+            g.setColor(Color.red);
+            //g.drawRect((int) sprite.getX(), (int) sprite.getY(), sprite.getWidth(), sprite.getHeight());             
+            for(Sensor sensor : sprite.getSensors()) {
+                if (sensor instanceof SmellSensor) {
+                    double[] location = ((SmellSensor)sensor).getLocation();
+                    g.drawOval((int) location[0] - 3, (int) location[1] - 3, 6, 6);
+                }
+            }
         }
     }
 

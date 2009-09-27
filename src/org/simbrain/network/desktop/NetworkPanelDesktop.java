@@ -20,7 +20,6 @@ package org.simbrain.network.desktop;
 
 import java.awt.Color;
 
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
@@ -130,27 +129,11 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     /**
-     * Create clamp JMenu.
-     *
-     * @return the clamp JMenu
-     */
-     JMenu createClampMenu() {
-        JMenu clampMenu = new JMenu("Clamp");
-        JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();
-        checkBoxes.add(cbW);
-        clampMenu.add(cbW);
-        JCheckBoxMenuItem cbN = actionManager.getClampNeuronsMenuItem();
-        checkBoxes.add(cbN);
-        clampMenu.add(cbN);
-        return clampMenu;
-    }
-
-    /**
      * Create a selection JMenu.
      *
      * @return the selection menu.
      */
-     JMenu createSelectionMenu() {
+     public JMenu createSelectionMenu() {
         JMenu selectionMenu = new JMenu("Select");
         selectionMenu.add(actionManager.getSelectAllAction());
         selectionMenu.add(actionManager.getSelectAllWeightsAction());
@@ -170,7 +153,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         helpMenu.add(actionManager.getShowHelpAction());
         return helpMenu;
     }
-    
+
     /*
      * This version of network dialog allows user to set User Preferences.
      *

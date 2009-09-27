@@ -32,16 +32,16 @@ public interface NetworkListener {
      */
     void networkChanged();
 
-    // TODO: Add clamp events here?
     // TODO: Add some kind of setting event here, for centering camera, etc?
 
-    //  /**
-    //  * Notify listeners that all neurons have been clamped.
-    //  */
-    // void neuronsClamped();
-    //  /**
-    //  * Invoked when all synapse are clamped.
-    //  */
-    // void synapsesClamped();
+    /**
+     * Notify listeners that all neurons have been clamped or un-clamped.
+     */
+    void neuronClampToggled();
+
+    /**
+     *  Notify listeners that all synapses have been clamped or un-clamped.
+     */
+    void synapseClampToggled();
 
 }

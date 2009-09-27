@@ -464,6 +464,26 @@ public class RootNetwork extends Network {
     }
 
     /**
+     * Fire a neuron clamp toggle event to all registered model listeners.
+     */
+    public void fireNeuronClampToggle() {
+
+        for (NetworkListener listener : networkListeners) {
+            listener.neuronClampToggled();
+        }
+    }
+
+    /**
+     * Fire a neuron synapse toggle event to all registered model listeners.
+     */
+    public void fireSynapseClampToggle() {
+
+        for (NetworkListener listener : networkListeners) {
+            listener.synapseClampToggled();
+        }
+    }
+
+    /**
      * Fire a network changed event to all registered model listeners.
      * @param moved Neuron that has been moved
      */
@@ -472,21 +492,6 @@ public class RootNetwork extends Network {
             listener.neuronMoved(new NetworkEvent<Neuron>(this, moved));
         }
     }
-
-    /**
-     * Fire a clamp changed event to all registered model listeners.
-     */
-    public void fireClampChanged() {
-        // TODO: NeuronsClamped, SynapsesClamped
-//        for (NetworkListener listener : component.getListeners()) {
-//            listener.clampMenuChanged();
-//            listener.clampBarChanged();
-//        }
-//        if (getParent() != null) {
-//            getParent().setChangedSinceLastSave(true);
-//        }
-    }
-
 
     /**
      * Fire a neuron added event to all registered model listeners.
@@ -669,7 +674,7 @@ public class RootNetwork extends Network {
      */
     public void setClampWeights(final boolean clampWeights) {
         this.clampWeights = clampWeights;
-        fireClampChanged();
+        this.fireSynapseClampToggle();
     }
 
     /**
@@ -685,7 +690,7 @@ public class RootNetwork extends Network {
      */
     public void setClampNeurons(final boolean clampNeurons) {
         this.clampNeurons = clampNeurons;
-        fireClampChanged();
+        this.fireNeuronClampToggle();
     }
 
     @Override

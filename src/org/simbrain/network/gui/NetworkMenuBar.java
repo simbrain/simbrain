@@ -102,14 +102,7 @@ public class NetworkMenuBar {
         editMenu.add(networkPanel.createAlignMenu());
         editMenu.add(networkPanel.createSpacingMenu());
         editMenu.addSeparator();
-        JMenu clampMenu = new JMenu("Clamp");
-        JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();
-        checkBoxes.add(cbW);
-        clampMenu.add(cbW);
-        JCheckBoxMenuItem cbN = actionManager.getClampNeuronsMenuItem();
-        checkBoxes.add(cbN);
-        clampMenu.add(cbN);
-        editMenu.add(clampMenu);
+        editMenu.add(networkPanel.createClampMenu());
         editMenu.addSeparator();
         editMenu.add(actionManager.getShowIOInfoMenuItem());
         editMenu.add(actionManager.getSetAutoZoomMenuItem());

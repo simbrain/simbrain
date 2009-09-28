@@ -68,10 +68,8 @@ public class WorkspaceComponentDeserializer {
             final String name, final InputStream input, final String format) {
         try {
             Method method = clazz.getMethod("open", InputStream.class, String.class, String.class);
-                
-            WorkspaceComponent wc = (WorkspaceComponent)
-                method.invoke(null, input, name, format);
-
+            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(null, input, name, format);
+            wc.setChangedSinceLastSave(false);
             return wc;
         } catch (RuntimeException e) {
             throw e;

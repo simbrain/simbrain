@@ -47,7 +47,9 @@ public interface GenericFrame {
     public void setBounds(int x, int y, int width, int height);
 
     public Rectangle getBounds();
-    
+
     public void setVisible(boolean isVisible);
-    
+
+    public void setBounds(Rectangle bounds);
+
 }

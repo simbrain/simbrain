@@ -29,7 +29,7 @@ public class NeuronNodeDesktop extends NeuronNode {
         super(netPanel, neuron);
         this.component = component;
     }
-    
+
     /**
      * Add coupling menu to neuron node.
      */
@@ -38,6 +38,7 @@ public class NeuronNodeDesktop extends NeuronNode {
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
+            contextMenu.addSeparator();
             JMenu producerMenu = new ProducingAttributeMenu(
                     "Receive coupling from", workspace, component
                             .getWorkspaceComponent().findConsumingActivationAttribute(neuron));

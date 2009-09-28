@@ -50,7 +50,7 @@ public final class NewNeuronAction
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
-        putValue(SHORT_DESCRIPTION, "Add new node(p)");
+        putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke('p'), this);
         networkPanel.getActionMap().put(this, this);

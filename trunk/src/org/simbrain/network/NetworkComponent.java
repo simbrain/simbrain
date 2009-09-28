@@ -56,7 +56,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     public NetworkComponent(final String name, final RootNetwork network) {
         super(name);
         this.rootNetwork = network;
-        setChangedSinceLastSave(false);
         init();
     }
 

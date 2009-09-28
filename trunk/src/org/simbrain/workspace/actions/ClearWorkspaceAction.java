@@ -22,7 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Clear the current workspace.
@@ -31,16 +31,20 @@ public final class ClearWorkspaceAction extends WorkspaceAction {
     
     private static final long serialVersionUID = 1L;
 
+    //TODO
+    private SimbrainDesktop desktop;
+
     /**
      * Create a clear workspace action with the specified
      * workspace.
      */
-    public ClearWorkspaceAction(Workspace workspace) {
-        super("Clear Workspace", workspace);
+    public ClearWorkspaceAction(SimbrainDesktop desktop) {
+        super("Clear Workspace", desktop.getWorkspace());
+        this.desktop = desktop;
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.clearWorkspace();
+        desktop.clearDesktop();
     }
 }

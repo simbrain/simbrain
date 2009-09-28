@@ -19,18 +19,20 @@
 package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.NetworkSelectionEvent;
-import org.simbrain.network.gui.NetworkSelectionListener;
+import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.resource.ResourceManager;
 
 /**
- * Clear selection action.
+ * Clear selected neurons action.
  */
-public final class ClearSelectionAction
+public final class ZeroSelectedObjectsAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -38,44 +40,37 @@ public final class ClearSelectionAction
 
 
     /**
-     * Create a new clear selection action with the
+     * Create a new clear selected neurons action with the
      * specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
-    public ClearSelectionAction(final NetworkPanel networkPanel) {
-        super("Clear selection");
+    public ZeroSelectedObjectsAction(final NetworkPanel networkPanel) {
+        super("Set selected objects to zero");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+        putValue(SHORT_DESCRIPTION, "Set selected neurons and synapses to zero (c)");
 
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('u'), this);
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('c'), this);
         networkPanel.getActionMap().put(this, this);
-
-        // conditional, only enabled if something is selected
-        setEnabled(!networkPanel.isSelectionEmpty());
-
-        // add a selection listener to update state based on selection
-        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent event) {
-
-                    if (networkPanel.isSelectionEmpty()) {
-                        setEnabled(false);
-                    } else {
-                        setEnabled(true);
-                    }
-                }
-            });
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.clearSelection();
+        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext(); ) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.getNeuron().clear();
+        }
+        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext(); ) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.getSynapse().setStrength(0);
+        }
+        networkPanel.getRootNetwork().fireNetworkChanged();
     }
 }

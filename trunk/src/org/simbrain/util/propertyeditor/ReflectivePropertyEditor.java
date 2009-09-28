@@ -35,6 +35,7 @@ import org.simbrain.util.LabelledItemPanel;
  *  - Put arrays in scrollers
  *  - Better documenation / readme
  *  - Custom naming, ordering for fields?
+ *  - Deal with redundant get and is case (then two fields are added).
  */
 public class ReflectivePropertyEditor extends JPanel {
 

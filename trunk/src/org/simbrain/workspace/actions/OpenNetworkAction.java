@@ -20,17 +20,14 @@ package org.simbrain.workspace.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.*;
-import org.simbrain.network.desktop.NetworkDesktopComponent;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.desktop.NetworkGuiPreferences;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponentDeserializer;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Open a network within current workspace.
@@ -47,24 +44,19 @@ public final class OpenNetworkAction extends WorkspaceAction {
      */
     public OpenNetworkAction(Workspace workspace) {
         super("Open Network", workspace);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.gif"));
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        SFileChooser chooser = new SFileChooser("", "xml", "xml");
+        SFileChooser chooser = new SFileChooser(NetworkGuiPreferences
+                .getCurrentDirectory(), "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            try {
-                NetworkComponent networkComponent = (NetworkComponent) WorkspaceComponentDeserializer
-                        .deserializeWorkspaceComponent(NetworkComponent.class,
-                                theFile.getName(),
-                                new FileInputStream(theFile), SFileChooser
-                                        .getExtension(theFile));
-                workspace.addWorkspaceComponent(networkComponent);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            NetworkComponent networkComponent = (NetworkComponent) workspace
+                    .open(NetworkComponent.class, theFile);
+            workspace.addWorkspaceComponent(networkComponent);
         }
     }
 }

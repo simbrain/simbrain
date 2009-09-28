@@ -21,7 +21,6 @@ package org.simbrain.workspace;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,8 +32,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}
@@ -67,7 +64,7 @@ public abstract class WorkspaceComponent {
     private final Collection<AttributeHolderListener> attributeListeners;
 
     /** Whether this component has changed since last save. */
-    private boolean changedSinceLastSave = true;
+    private boolean changedSinceLastSave = false;
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
@@ -86,9 +83,10 @@ public abstract class WorkspaceComponent {
             + System.getProperty("file.separator");
 
     /**
-     * Current directory. So when re-opening this type of component the app remembers
-     * where to look.
-     * <p>Subclasses can provide a default value using User Preferences.
+     * Current directory. So when re-opening this type of component the app
+     * remembers where to look.
+     *
+     * <p> Subclasses can provide a default value using User Preferences.
      */
     private String currentDirectory = DEFAULT_CURRENT_DIRECTORY;
 
@@ -123,10 +121,8 @@ public abstract class WorkspaceComponent {
      * Used when saving a workspace. All changed workspace components are saved
      * using this method.
      *
-     * @param output
-     *            the stream of data to write the data to.
-     * @param format
-     *            a key used to define the requested format.
+     * @param output the stream of data to write the data to.
+     * @param format a key used to define the requested format.
      */
     public abstract void save(OutputStream output, String format);
 
@@ -181,7 +177,7 @@ public abstract class WorkspaceComponent {
      * Returns the locks for the update parts. There should be one lock per
      * part. These locks need to be the same ones used to lock the update of
      * each part.
-     * 
+     *
      * @return The locks for the update parts.
      */
     public Collection<? extends Object> getLocks() {
@@ -203,7 +199,7 @@ public abstract class WorkspaceComponent {
             listener.componentUpdated();
         }
     }
-    
+
     /**
      * Notify all workspaceComponentListeners that the gui has been turned on or off.
      */
@@ -222,14 +218,13 @@ public abstract class WorkspaceComponent {
         }
     }
 
-    
     /**
      * Called after a global update ends.
      */
     final void doStopped() {
         stopped();
     }
-    
+
     /**
      * Returns the WorkspaceComponentListeners on this component.
      * 
@@ -378,38 +373,12 @@ public abstract class WorkspaceComponent {
 //    }
 
     /**
-     * Open a workspace component from a file.  Currently assumes xml.
-     *
-     * @param openFile file representing saved component.
-     */
-    public final void open(final File openFile) {
-        setCurrentFile(openFile);
-        FileReader reader;
-        try {
-            reader = new FileReader(openFile);
-            deserializeFromReader(reader);
-            setChangedSinceLastSave(false);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Override for use with open service.
      *
      * @return xml string representing stored file.
      */
     public String getXML() {
         return null;
-    }
-
-    /**
-     * Override for use with save service.
-     *
-     * @param reader the reader to deserialize from.
-     */
-    public final void deserializeFromReader(final FileReader reader) {
-        // no implementation
     }
 
     /**

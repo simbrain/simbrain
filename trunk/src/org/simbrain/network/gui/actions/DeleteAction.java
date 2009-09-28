@@ -52,7 +52,7 @@ public final class DeleteAction
         this.networkPanel = networkPanel;
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteNeuron.png"));
-        putValue(SHORT_DESCRIPTION, "Delete selected node(\"Backspace\")");
+        putValue(SHORT_DESCRIPTION, "Delete selected node(s) (\"Backspace\")");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
         networkPanel.getActionMap().put(this, this);

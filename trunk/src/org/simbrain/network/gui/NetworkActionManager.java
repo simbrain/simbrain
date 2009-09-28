@@ -23,14 +23,12 @@ import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JToggleButton;
 
 import org.simbrain.network.gui.actions.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.AlignVerticalAction;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
-import org.simbrain.network.gui.actions.ClearNeuronsAction;
-import org.simbrain.network.gui.actions.ClearSelectionAction;
+import org.simbrain.network.gui.actions.ZeroSelectedObjectsAction;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
@@ -109,7 +107,7 @@ public final class NetworkActionManager {
     private final Action newNeuronAction;
 
     /** Clear neurons action. */
-    private final Action clearNeuronsAction;
+    private final Action zeroSelectedObjectsAction;
 
     /** Randomize objects action. */
     private final Action randomizeObjectsAction;
@@ -117,11 +115,8 @@ public final class NetworkActionManager {
     /** Select all action. */
     private final Action selectAllAction;
 
-    /** Clear selection action. */
-    private final Action clearSelectionAction;
-
     /** Clear action. */
-    private final Action clearAction;
+    private final Action deleteAction;
 
     /** Copy action. */
     private final Action copyAction;
@@ -279,13 +274,12 @@ public final class NetworkActionManager {
         textEditModeAction = new TextEditModeAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
-        clearNeuronsAction = new ClearNeuronsAction(networkPanel);
+        zeroSelectedObjectsAction = new ZeroSelectedObjectsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
         selectAllAction = new SelectAllAction(networkPanel);
-        clearSelectionAction = new ClearSelectionAction(networkPanel);
 
-        clearAction = new DeleteAction(networkPanel);
+        deleteAction = new DeleteAction(networkPanel);
         copyAction = new CopyAction(networkPanel);
         cutAction = new CutAction(networkPanel);
         pasteAction = new PasteAction(networkPanel);
@@ -409,7 +403,7 @@ public final class NetworkActionManager {
      * @return a list of network editing actions
      */
     public List<Action> getNetworkEditingActions() {
-        return Arrays.asList(new Action[] {newNeuronAction, clearAction });
+        return Arrays.asList(new Action[] {newNeuronAction, deleteAction });
     }
 
     /**
@@ -441,8 +435,8 @@ public final class NetworkActionManager {
      *
      * @return the clear neurons action
      */
-    public Action getClearNeuronsAction() {
-        return clearNeuronsAction;
+    public Action getZeroSelectedObjectsAction() {
+        return zeroSelectedObjectsAction;
     }
 
     /**
@@ -461,15 +455,6 @@ public final class NetworkActionManager {
      */
     public Action getSelectAllAction() {
         return selectAllAction;
-    }
-
-    /**
-     * Return the clear selection action.
-     *
-     * @return the clear selection action
-     */
-    public Action getClearSelectionAction() {
-        return clearSelectionAction;
     }
 
     /**
@@ -529,8 +514,8 @@ public final class NetworkActionManager {
      *
      * @return the clear action
      */
-    public Action getClearAction() {
-        return clearAction;
+    public Action getDeleteAction() {
+        return deleteAction;
     }
 
     /**

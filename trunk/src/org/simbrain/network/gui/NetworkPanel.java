@@ -622,7 +622,7 @@ public class NetworkPanel extends PCanvas  {
         mainTools.add(actionManager.getIterateNetworkAction());
         mainTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
         mainTools.addSeparator();
-        mainTools.add(actionManager.getClearNeuronsAction());
+        mainTools.add(actionManager.getZeroSelectedObjectsAction());
         mainTools.add(actionManager.getRandomizeObjectsAction());
         mainTools.addSeparator();
 

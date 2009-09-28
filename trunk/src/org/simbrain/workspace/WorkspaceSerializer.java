@@ -164,20 +164,17 @@ public class WorkspaceSerializer {
                 WorkspaceComponent wc = componentDeserializer.deserializeWorkspaceComponent(
                     component, new ByteArrayInputStream(entries.get(component.uri)));
 
-                if (component.desktopComponent != null) {
-                    workspace.toggleEvents(false);
-                }
-
+                // This will cause a desktop component (GuiComponent) to be created
                 workspace.addWorkspaceComponent(wc);
 
                 if (component.desktopComponent != null) {
-                    GuiComponent dc = componentDeserializer.deserializeDesktopComponent(
+                    // Use deserialized desktop component to set the bounds on the
+                    //  newly created desktop component
+                    GuiComponent dc_deserialized = componentDeserializer.deserializeDesktopComponent(
                         component.desktopComponent.className, wc, new ByteArrayInputStream(
                         entries.get(component.desktopComponent.uri)), component.name);
-                    
-                    desktop.addComponent(wc, dc);
-                    dc.postAddInit();
-                    workspace.toggleEvents(true);
+                    GuiComponent dc = desktop.getDesktopComponent(wc);
+                    dc.getParentFrame().setBounds(dc_deserialized.getBounds());
                 }
             }
         }

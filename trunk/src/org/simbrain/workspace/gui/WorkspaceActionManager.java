@@ -182,13 +182,13 @@ public class WorkspaceActionManager {
 
     /**
      * Create a new workspace action manager for the specified workspace.
-     * 
+     *
      * @param desktop
      *            workspace, must not be null
      */
     public WorkspaceActionManager(final SimbrainDesktop desktop) {
         Workspace workspace = desktop.getWorkspace();
-        clearWorkspaceAction = new ClearWorkspaceAction(workspace);
+        clearWorkspaceAction = new ClearWorkspaceAction(desktop);
 
         openDataWorldAction = new OpenDataWorldAction();
         openNetworkAction = new OpenNetworkAction(workspace);

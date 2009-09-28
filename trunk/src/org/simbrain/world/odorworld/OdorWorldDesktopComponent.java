@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -53,6 +54,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this class?
+        component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
 
         this.getParentFrame().pack();
 

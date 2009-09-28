@@ -70,12 +70,12 @@ public final class SetSynapsePropertiesAction
 
         if (numSynapses > 0) {
             String text = new String(
-                    ("Set " + numSynapses + ((numSynapses > 1) ? " Selected Synapses"
+                    ("Edit " + numSynapses + ((numSynapses > 1) ? " Selected Synapses"
                             : " Selected Synapse")));
             putValue(NAME, text);
             setEnabled(true);
         } else {
-            putValue(NAME, "Set Selected Synapse(s)");
+            putValue(NAME, "Edit Selected Synapse(s)");
             setEnabled(false);
         }
     }

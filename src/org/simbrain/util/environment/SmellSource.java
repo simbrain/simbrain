@@ -222,15 +222,6 @@ public class SmellSource {
     }
 
     /**
-     * Return the add noise.
-     *
-     * @return the add noise
-     */
-    public boolean getAddNoise() {
-        return addNoise;
-    }
-
-    /**
      * Sets the noise level.
      *
      * @param d Noise level

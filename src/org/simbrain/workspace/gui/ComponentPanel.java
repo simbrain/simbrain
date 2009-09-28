@@ -232,6 +232,5 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
        }
 
     }
-
     
 }

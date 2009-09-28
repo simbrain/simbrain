@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -37,7 +36,6 @@ import java.awt.event.WindowListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -104,13 +102,14 @@ import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
 import bsh.Interpreter;
+import bsh.This;
 import bsh.util.JConsole;
 
 /**
  * Creates a Swing-based environment for working with a workspace.
- * 
+ *
  * Also provides wrappers for GUI elements called from a terminal.
- * 
+ *
  * @author Matt Watson
  * @author Jeff Yoshimi
  */
@@ -121,7 +120,7 @@ public class SimbrainDesktop {
 
     /** The y offset for popup menus. */
     private static final int MENU_Y_OFFSET = 53;
-    
+
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
 
@@ -137,7 +136,7 @@ public class SimbrainDesktop {
     /** TODO: Create Javadoc comment. */
     private static final Map<Workspace, SimbrainDesktop> INSTANCES =
          new HashMap<Workspace, SimbrainDesktop>();
-    
+
     /** Desktop pane. */
     private JDesktopPane desktop;
 
@@ -152,49 +151,41 @@ public class SimbrainDesktop {
 
     /** the frame that will hold the workspace. */
     private JFrame frame;
-    
-    /** Used to track whether the gui has been modified since the last save. */
-    private boolean guiChanged = false;
-    
+
     /** The bottom dock. */
     private JTabbedPane bottomDock;
 
     /** Pane splitter for bottom dock. */
     private JSplitPane horizontalSplitter;
-    
+
     /** The workspace this desktop wraps. */
     private final Workspace workspace;
 
     /** Boundary of workspace. */
     private Rectangle workspaceBounds;
-    
+
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
-    
+
     /** Interpreter for terminal. */
     Interpreter interpreter;
 
-    /** All the guiComponents in the workspace. */
+    /** Associates workspace components with their corresponding gui components. */
     private Map<WorkspaceComponent, GuiComponent<?>> guiComponents
         = new LinkedHashMap<WorkspaceComponent, GuiComponent<?>>();
-    
+
     /** Listener on the workspace. */
     private final WorkspaceListener listener = new WorkspaceListener() {
-        public boolean clearWorkspace() {
-            save();
-            return true;
-        }
-        
+
+        /**
+         * Clear the Simbrain desktop.
+         */
 		public void workspaceCleared() {
-			if (changesExist()) {
-				save();
-			}
-			desktop.removeAll();
-			desktop.repaint();
-			frame.setTitle("Simbrain");
-			return;
+            desktop.removeAll();
+            desktop.repaint();
+            frame.setTitle("Simbrain");
 		}
-        
+
         /**
          * Add a new <c>SimbrainComponent</c>.
          *
@@ -202,7 +193,7 @@ public class SimbrainDesktop {
          */
         @SuppressWarnings("unchecked")
         public void componentAdded(final WorkspaceComponent workspaceComponent) {
-            addComponent(workspaceComponent, null);
+            addDesktopComponent(workspaceComponent);
         }
 
         @SuppressWarnings("unchecked")
@@ -211,16 +202,17 @@ public class SimbrainDesktop {
             guiComponents.remove(component);
             component.getParentFrame().dispose();
         }
+
     };
-    
+
     // TODO this should be addressed at a higher level
     public static SimbrainDesktop getDesktop(final Workspace workspace) {
         return INSTANCES.get(workspace);
     }
-    
+
     /**
      * Default constructor.
-     * 
+     *
      * @param workspace
      *            The workspace for this desktop.
      */
@@ -275,7 +267,7 @@ public class SimbrainDesktop {
         frame.pack();
         frame.addWindowListener(windowListener);
         frame.addKeyListener(new WorkspaceKeyAdapter(workspace));
-        
+
         // Start terminal
         new Thread(interpreter).start();
 
@@ -283,7 +275,7 @@ public class SimbrainDesktop {
         // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 
     }
-    
+
     /**
      * Create mappings from guiComponents to their GUI wrappers.
      */
@@ -320,10 +312,10 @@ public class SimbrainDesktop {
         console.setPreferredSize(new Dimension(400,300));
         return console;
     }
-    
+
     /**
      * Print text to terminal.
-     * 
+     *
      * @param toPrint text to print
      */
     public void printToTerminal(final String toPrint) {
@@ -331,32 +323,22 @@ public class SimbrainDesktop {
     }
     /**
      * Returns the workspace.
-     * 
+     *
      * @return the workspace.
      */
     public Workspace getWorkspace() {
         return workspace;
     }
-    
+
     /**
      * Returns the main frame for the desktop.
-     * 
+     *
      * @return the main frame for the desktop.
      */
     public JFrame getFrame() {
         return frame;
     }
-    
-    /**
-     * Whether any changes have been made to the gui or
-     * the underlying workspace.
-     * 
-     * @return whether any changes were made.
-     */
-    public boolean changesExist() {
-        return guiChanged || workspace.changesExist();
-    }
-        
+
     /**
      * Creates the workspace tool bar.
      *
@@ -511,7 +493,6 @@ public class SimbrainDesktop {
     private JMenu createCoupleMenu() {
         JMenu coupleMenu = new JMenu("Couplings");
         coupleMenu.add(actionManager.getOpenCouplingManagerAction());
-        coupleMenu.add(actionManager.getGlobalUpdateAction());
         coupleMenu.add(actionManager.getOpenCouplingListAction());
         coupleMenu.add(actionManager.getOpenWorkspaceComponentListAction());
         return coupleMenu;
@@ -548,7 +529,7 @@ public class SimbrainDesktop {
         contextMenu.add(actionManager.getNewConsoleAction());
 
     }
-    
+
     /**
      * This nasty declaration creates a map of the workspace guiComponents to their associated
      * wrapper class.
@@ -557,10 +538,10 @@ public class SimbrainDesktop {
             Class<? extends GuiComponent<?>>> wrappers =
                 new HashMap<Class<? extends WorkspaceComponent>,
         Class<? extends GuiComponent<?>>>();
-    
+
     /**
      * Registers a gui wrapper class association with a component class.
-     * 
+     *
      * @param component The component class.
      * @param gui The gui class.
      */
@@ -568,10 +549,10 @@ public class SimbrainDesktop {
             final Class<? extends GuiComponent<?>> gui) {
         wrappers.put(component, gui);
     }
-    
+
     /**
      * Returns the desktop component corresponding to a workspace component.
-     * 
+     *
      * @param component component to check with
      * @return component guicomponent
      */
@@ -582,7 +563,7 @@ public class SimbrainDesktop {
     /**
      * Returns the desktop component corresponding to a named workspace
      * component.
-     * 
+     *
      * @param component
      *            name of desktop component to return
      * @return component desktop component, or null if none found
@@ -639,16 +620,16 @@ public class SimbrainDesktop {
             setClosable(true);
             addInternalFrameListener(new WindowFrameListener());
         }
-        
+
         /**
          * Set the Gui Component.
-         * 
+         *
          * @param guiComponent the component to set.
          */
         public void setGuiComponent(final GuiComponent guiComponent) {
             this.guiComponent = guiComponent;
         }
-        
+
         /**
          * Manage cleanup when a component is closed.
          */
@@ -658,12 +639,11 @@ public class SimbrainDesktop {
                 if (workspaceComponent.hasChangedSinceLastSave()) {
                     guiComponent.showHasChangedDialog();
                 }
-                
                 guiComponent.close();
             }
         }
     } // End DesktopInternalFrame
-    
+
     /**
      * Add internal frame.
      *
@@ -683,83 +663,102 @@ public class SimbrainDesktop {
             final GuiComponent guiComponent) {
         guiComponents.put(workspaceComponent, guiComponent);
     }
-    
 
     /**
      * Add a new <c>SimbrainComponent</c>.
-     * Handles creation of new guiComponents and deserialization of guiComponents
      *
      * @param workspaceComponent Workspace Component
-     * @param guiComp GUI component
      */
     @SuppressWarnings("unchecked")
-    public void addComponent(final WorkspaceComponent workspaceComponent,
-            final GuiComponent guiComp) {
-        GuiComponent guiComponent = guiComp;
-
+    public void addDesktopComponent(final WorkspaceComponent workspaceComponent) {
         LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
-        // How the component is created depends on whether it is being deserialized or not
-        boolean isDeserialized = true;
-        if (guiComponent == null) {
-            isDeserialized = false;
-        }
-        
-        final DesktopInternalFrame  componentFrame;
-        if (isDeserialized) {
-            componentFrame = new DesktopInternalFrame(guiComponent);
+        GuiComponent guiComponent;
+        final DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
+
+        // The gui component already exists (when opening a component)
+        if (getDesktopComponent(workspaceComponent) != null) {
+            guiComponent = getDesktopComponent(workspaceComponent);
+            componentFrame.setBounds(guiComponent.getParentFrame().getBounds());
+            componentFrame.setContentPane(guiComponent);
+            componentFrame.setTitle(workspaceComponent.getName());
+            componentFrame.setVisible(true);
             guiComponent.setParentFrame(componentFrame);
-        } else {
-            componentFrame = new DesktopInternalFrame(workspaceComponent);
-            guiComponent = createDesktopComponent(componentFrame, workspaceComponent);
-            componentFrame.setGuiComponent(guiComponent);
+            registerComponentInstance(workspaceComponent, guiComponent);
+            desktop.add(componentFrame);
+            guiComponent.postAddInit();
+            return;
         }
-        
-        // Set Title
-        componentFrame.setTitle(workspaceComponent.getName());
 
-        // Handle GuiComponent Bounds
-        if (isDeserialized) {
-           componentFrame.setBounds(guiComponent.getBounds());
+        guiComponent = createDesktopComponent(componentFrame,
+                workspaceComponent);
+
+        // Either add the window at a default location, or relative to the last
+        // added window.
+        if (guiComponents.size() == 0) {
+            componentFrame.setBounds(DEFAULT_WINDOW_OFFSET,
+                    DEFAULT_WINDOW_OFFSET, (int) guiComponent
+                            .getPreferredSize().getWidth(), (int) guiComponent
+                            .getPreferredSize().getHeight());
         } else {
-            if (guiComponents.size() == 0) {
-                componentFrame.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
-                    (int) guiComponent.getPreferredSize().getWidth(),
-                    (int) guiComponent.getPreferredSize().getHeight());
-                guiChanged = true;
-            } else {
-                int highestComponentNumber = workspace.getComponentList().size();
+            int highestComponentNumber = workspace.getComponentList().size();
+            componentFrame
+                    .setBounds(
+                            (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET) % (desktop
+                                    .getWidth() - guiComponent
+                                    .getPreferredSize().getWidth())),
+                            (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET) % (desktop
+                                    .getHeight() - guiComponent
+                                    .getPreferredSize().getHeight())),
+                            (int) guiComponent.getPreferredSize().getWidth(),
+                            (int) guiComponent.getPreferredSize().getHeight());
+        }
 
-                componentFrame.setBounds(
-                    (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
-                            % (desktop.getWidth() - guiComponent.getPreferredSize().getWidth())),
-                    (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET)
-                            % (desktop.getHeight() - guiComponent.getPreferredSize().getHeight())),
-                    (int) guiComponent.getPreferredSize().getWidth(),
-                    (int) guiComponent.getPreferredSize().getHeight());
-                guiChanged = true;
+
+        // Add a movement and resize listener
+        componentFrame.addComponentListener(new ComponentAdapter() {
+
+            /**
+             * Responds to component moved events.
+             *
+             * @param arg0 SimbrainComponent event
+             */
+            public void componentMoved(final ComponentEvent arg0) {
+                // System.out.println("Component moved");
+                workspace.setWorkspaceChanged(true);
             }
-        }
 
-        // Finish adding component
-        guiComponent.addComponentListener(componentListener);
-        registerComponentInstance(workspaceComponent, guiComponent);
+            /**
+             * Responds to component resized events.
+             *
+             * @param arg0 SimbrainComponent event
+             */
+            public void componentResized(final ComponentEvent arg0) {
+                // System.out.println("Component resized");
+                workspace.setWorkspaceChanged(true);
+            }
+        });
+
+        // Final steps
         componentFrame.setContentPane(guiComponent);
         componentFrame.setVisible(true);
+        registerComponentInstance(workspaceComponent, guiComponent);
         desktop.add(componentFrame);
         guiComponent.postAddInit();
-   
+        componentFrame.setTitle(workspaceComponent.getName());
+
         // Forces last component of the desktop to the front
         try {
             ((JInternalFrame) componentFrame).setSelected(true);
         } catch (PropertyVetoException e) {
             e.printStackTrace();
         }
+
     }
-    
+
     /**
      * Creates an instance of the proper wrapper class around the provided instance.
-     * 
+     *
      * @param component The component to wrap.
      * @param parentFrame The frame of this component
      * @return A new desktop component wrapping the provided component.
@@ -770,16 +769,16 @@ public class SimbrainDesktop {
         Class<? extends WorkspaceComponent> componentClass =
             (Class<? extends WorkspaceComponent>) component.getClass();
         Class<? extends GuiComponent<?>> guiClass = wrappers.get(componentClass);
-        
+
         if (guiClass == null) {
             throw new IllegalArgumentException(
                 "no desktop component registered for " + component.getClass());
         }
-        
+
         try {
             GenericFrame genericFrame = parentFrame != null ? parentFrame
                 : new DesktopInternalFrame(component);
-            
+
             Constructor<? extends GuiComponent<?>> constructor
                 = guiClass.getConstructor(GenericFrame.class, componentClass);
             return constructor.newInstance(genericFrame, component);
@@ -789,8 +788,7 @@ public class SimbrainDesktop {
             throw new RuntimeException(e);
         }
     }
-    
-    
+
     /**
      * Shows the dialog for opening a workspace file.
      */
@@ -800,9 +798,10 @@ public class SimbrainDesktop {
         File simFile = simulationChooser.showOpenDialog();
         if (simFile != null) {
             openWorkspace(simFile);
+            workspace.setCurrentDirectory(simulationChooser.getCurrentLocation());
         }
     }
-    
+
     /**
      * Open a workspace from a file.
      *
@@ -813,10 +812,10 @@ public class SimbrainDesktop {
         try {
             workspace.clearWorkspace();
             serializer.deserialize(new FileInputStream(file));
+            //System.out.println("Open -->" + file);
             workspace.setCurrentFile(file);
             frame.setTitle(file.getName());
             workspace.setWorkspaceChanged(false);
-            guiChanged = false;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -828,7 +827,7 @@ public class SimbrainDesktop {
      * @param component component to view
      */
     public static void showJFrame(final WorkspaceComponent component) {
-        
+
         SimbrainDesktop.registerComponents();
         GenericJFrame theFrame = new GenericJFrame();
         GuiComponent<?> desktopComponent = createDesktopComponent(theFrame, component);
@@ -838,53 +837,82 @@ public class SimbrainDesktop {
         theFrame.setContentPane(desktopComponent);
         desktopComponent.postAddInit();
     }
-    
+
     /**
-     * If changes exist, show a change dialog, otherwise just save the current file.
+     * Show a save-as dialog.
+     */
+    public void saveAs() {
+
+        // Create the file chooser
+        SFileChooser chooser = new SFileChooser(
+            workspace.getCurrentDirectory(), "Zip Archive", "zip");
+
+        // Set the file
+        File theFile;
+        if (workspace.getCurrentFile() != null) {
+             theFile = chooser.showSaveDialog(workspace.getCurrentFile());
+        } else {
+            // Default workspace
+            theFile = chooser.showSaveDialog("workspace");
+        }
+
+        // Save the file by setting the current file
+        if (theFile != null) {
+            workspace.setCurrentFile(theFile);
+            workspace.setCurrentDirectory(chooser.getCurrentLocation());
+            save(theFile);
+        }
+    }
+
+    /**
+     * If changes exist, show a change dialog, otherwise just save the current
+     * file.
      */
     public void save() {
 
         // Ignore the save command if there are no changes
-        if (changesExist()) {
-            if (workspace.getCurrentFile() != null) {
-                try {
-                    FileOutputStream ostream = new FileOutputStream(workspace.getCurrentFile());
-                    try {
-                        WorkspaceSerializer serializer =
-                            new WorkspaceSerializer(this.getWorkspace());
-                        serializer.serialize(ostream);
-                        frame.setTitle(workspace.getCurrentFile().getName());
-                        workspace.setWorkspaceChanged(false);
-                        guiChanged = false;
-                    } finally {
-                        ostream.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        if (workspace.changesExist()) {
+            if (workspace.getCurrentFile() != null)  {
+                save(workspace.getCurrentFile());
+            } else {
+                saveAs(); // Show save-as is there is no current file.
             }
         }
     }
-    
-    /**
-     * Show a save dialog.
-     */
-    public void saveAs() {
-        SFileChooser chooser = new SFileChooser(
-            workspace.getCurrentDirectory(), "Zip Archive", "zip");
-        
-        File theFile;
 
-        if (workspace.getCurrentFile() != null) {
-             theFile = chooser.showSaveDialog(workspace.getCurrentFile());
-        } else {
-             theFile = chooser.showSaveDialog("workspace");
+    /**
+     * Save a specified file.
+     *
+     * @param file file to save.
+     */
+    private void save(File file) {
+        if (file != null) {
+            frame.setTitle(file.getName());
+            workspace.save(file);
         }
-        
-        if (theFile != null) {
-            workspace.setCurrentFile(theFile);
-            workspace.setCurrentDirectory(chooser.getCurrentLocation());
-            save();
+    }
+
+
+    /**
+     * Clear desktop of all components. Show a save-as dialog if there have been
+     * changes.
+     */
+    public void clearDesktop() {
+
+        // If there have been changes, show a save-as dialog
+        if (workspace.changesExist()) {
+            int s = showHasChangedDialog();
+            if (s == JOptionPane.OK_OPTION) {
+                save();
+                workspace.clearWorkspace();
+            } else if (s == JOptionPane.NO_OPTION) {
+                workspace.clearWorkspace();
+            } else if (s == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        } else {
+            // If there have been no changes, just clear away!
+            workspace.clearWorkspace();
         }
     }
 
@@ -902,10 +930,9 @@ public class SimbrainDesktop {
 
         /** Open a default workspace */
         //openWorkspace(workspace.getCurrentFile());
-        
+
         /* Display the window. */
         frame.setVisible(true);
-        
 
     }
 
@@ -917,11 +944,11 @@ public class SimbrainDesktop {
     public static void main(final String[] args) {
         final Workspace workspace = new Workspace();
         InterceptingEventQueue eventQueue = new InterceptingEventQueue(workspace);
-        
+
         workspace.setTaskSynchronizationManager(eventQueue);
-        
+
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
-        
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new SimbrainDesktop(workspace).createAndShowGUI();
@@ -931,33 +958,35 @@ public class SimbrainDesktop {
 
     /**
      * Checks to see if anything has changed and then offers to save if true.
+     *
+     * @return the JOptionPane pane result
      */
-    private void showHasChangedDialog() {
+    private int showHasChangedDialog() {
         Object[] options = {"Save", "Don't Save", "Cancel" };
-        int s = JOptionPane.showOptionDialog(frame,
+       return JOptionPane.showOptionDialog(frame,
                  "The workspace has changed since last save,"
                  + "\nWould you like to save these changes?",
                  "Workspace Has Changed", JOptionPane.YES_NO_OPTION,
                  JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-
-        if (s == JOptionPane.OK_OPTION) {
-            this.save();
-            quit(true);
-        } else if (s == JOptionPane.NO_OPTION) {
-            quit(true);
-        } else if (s == JOptionPane.CANCEL_OPTION) {
-            return;
-        }
     }
-    
+
     /**
      * Quit application.
+     *
      * @param forceQuit should quit be forced.
      */
     public void quit(final boolean forceQuit) {
-                
-        if (changesExist() && (!forceQuit)) {
-            showHasChangedDialog();
+
+        if (workspace.changesExist() && (!forceQuit)) {
+            int s = showHasChangedDialog();
+            if (s == JOptionPane.OK_OPTION) {
+                this.save();
+                quit(true);
+            } else if (s == JOptionPane.NO_OPTION) {
+                quit(true);
+            } else if (s == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
         } else {
             workspace.removeAllComponents();
             System.exit(0);
@@ -980,7 +1009,7 @@ public class SimbrainDesktop {
             }
         }
     };
-    
+
     /** listener for window closing events. */
     private final WindowListener windowListener = new WindowAdapter() {
         /**
@@ -991,26 +1020,8 @@ public class SimbrainDesktop {
             quit(false);
         }
     };
-    
-    /** Listener for swing component changes. */
-    private final ComponentListener componentListener = new ComponentAdapter() {
-        /**
-         * Responds to component moved events.
-         * @param arg0 SimbrainComponent event
-         */
-        public void componentMoved(final ComponentEvent arg0) {
-            guiChanged = true;
-        }
 
-        /**
-         * Responds to component resized events.
-         * @param arg0 SimbrainComponent event
-         */
-        public void componentResized(final ComponentEvent arg0) {
-            guiChanged = true;
-        }
-    };
-    
+
     /** listens to menu events for setting save enabled. */
     private final MenuListener menuListener = new MenuListener() {
         /**
@@ -1018,7 +1029,7 @@ public class SimbrainDesktop {
          * @param arg0 Menu event
          */
         public void menuSelected(final MenuEvent arg0) {
-            if (changesExist()) {
+            if (workspace.changesExist()) { 
                 actionManager.getSaveWorkspaceAction().setEnabled(true);
             } else {
                 actionManager.getSaveWorkspaceAction().setEnabled(false);

@@ -76,8 +76,10 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getCopyAction());
         editMenu.add(actionManager.getPasteAction());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getClearAction());
+        editMenu.add(actionManager.getDeleteAction());
         editMenu.add(createSelectionMenu());
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getZeroSelectedObjectsAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getGroupAction());
         editMenu.add(actionManager.getUngroupAction());
@@ -87,7 +89,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.addSeparator();
         editMenu.add(createClampMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getShowIOInfoMenuItem());
+        //editMenu.add(actionManager.getShowIOInfoMenuItem());
         editMenu.add(actionManager.getSetAutoZoomMenuItem());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
@@ -119,9 +121,12 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
 
-        viewMenu.add(actionManager.getShowEditToolBarMenuItem());
-        viewMenu.add(actionManager.getShowMainToolBarMenuItem());
-        viewMenu.add(actionManager.getShowClampToolBarMenuItem());
+        JMenu toolbarMenu = new JMenu("Toolbars");
+        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowClampToolBarMenuItem());
+        viewMenu.add(toolbarMenu);
+        viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());
         viewMenu.add(actionManager.getShowNodesAction());
 

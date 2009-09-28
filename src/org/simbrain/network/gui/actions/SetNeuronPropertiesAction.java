@@ -71,12 +71,12 @@ public final class SetNeuronPropertiesAction
 
         if (numNeurons > 0) {
             String text = new String(
-                    ("Set " + numNeurons + ((numNeurons > 1) ? " Selected Neurons"
+                    ("Edit " + numNeurons + ((numNeurons > 1) ? " Selected Neurons"
                             : " Selected Neuron")));
             putValue(NAME, text);
             setEnabled(true);
         } else {
-            putValue(NAME, "Set Selected Neuron(s)");
+            putValue(NAME, "Edit Selected Neuron(s)");
             setEnabled(false);
         }
     }

@@ -24,15 +24,17 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-//TODO: Add file menu, fix help menu
 /**
- * Menu bar that appears inside of jpanel; for use in Applets
+ * Menu bar that appears inside of JPanel; for use in Applets.
+ *
+ * TODO: Add file menu; fix help menu.
+ * TODO: Reduce duplicated code between this and NetworkPanelDesktop.
+ * TODO: Rename so that the fact that this is only used in applets is clear.
  */
 public class NetworkMenuBar {
 
-    
     public static JMenuBar getAppletMenuBar(final NetworkPanel networkPanel) {
-        
+
         ArrayList<JCheckBoxMenuItem> checkBoxes = new ArrayList<JCheckBoxMenuItem>();
         NetworkActionManager actionManager = networkPanel.getActionManager();
 
@@ -81,13 +83,13 @@ public class NetworkMenuBar {
 //        });
 //        fileMenu.add(saveItem);
 //        returnMenu.add(fileMenu);
-        
+
         JMenu editMenu = new JMenu("Edit");
         editMenu.add(actionManager.getCutAction());
         editMenu.add(actionManager.getCopyAction());
         editMenu.add(actionManager.getPasteAction());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getClearAction());
+        editMenu.add(actionManager.getDeleteAction());
         JMenu selectionMenu = new JMenu("Select");
         selectionMenu.add(actionManager.getSelectAllAction());
         selectionMenu.add(actionManager.getSelectAllWeightsAction());
@@ -95,6 +97,9 @@ public class NetworkMenuBar {
         selectionMenu.add(actionManager.getSelectIncomingWeightsAction());
         selectionMenu.add(actionManager.getSelectOutgoingWeightsAction());
         editMenu.add(selectionMenu);
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getZeroSelectedObjectsAction());
+        editMenu.addSeparator();
         editMenu.addSeparator();
         editMenu.add(actionManager.getGroupAction());
         editMenu.add(actionManager.getUngroupAction());
@@ -104,7 +109,7 @@ public class NetworkMenuBar {
         editMenu.addSeparator();
         editMenu.add(networkPanel.createClampMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getShowIOInfoMenuItem());
+        //editMenu.add(actionManager.getShowIOInfoMenuItem());
         editMenu.add(actionManager.getSetAutoZoomMenuItem());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
@@ -117,9 +122,12 @@ public class NetworkMenuBar {
         returnMenu.add(insertMenu);
 
         JMenu viewMenu = new JMenu("View");
-        viewMenu.add(actionManager.getShowEditToolBarMenuItem());
-        viewMenu.add(actionManager.getShowMainToolBarMenuItem());
-        viewMenu.add(actionManager.getShowClampToolBarMenuItem());
+        JMenu toolbarMenu = new JMenu("Toolbars");
+        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowClampToolBarMenuItem());
+        viewMenu.add(toolbarMenu);
+        viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());
         viewMenu.add(actionManager.getShowNodesAction());
         returnMenu.add(viewMenu);
@@ -127,7 +135,7 @@ public class NetworkMenuBar {
         JMenu helpMenu = new JMenu("Help");
         helpMenu.add(actionManager.getShowHelpAction());
         returnMenu.add(helpMenu);
-        
+
         return returnMenu;
     }
 

@@ -65,8 +65,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
         networkPanel = new NetworkPanelDesktop(this, component.getRootNetwork());
 
-        // TODO: Wire up preferences
-        // component.setCurrentDirectory(currentDirectory);
+        component.setCurrentDirectory(NetworkGuiPreferences.getCurrentDirectory());
         // component.setCurrentFile(currentFile);
 
         // Place networkPanel in a buffer so that toolbars don't get in the way
@@ -88,7 +87,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         menuBar.add(networkPanel.createEditMenu());
         menuBar.add(networkPanel.createInsertMenu());
         menuBar.add(networkPanel.createViewMenu());
-        menuBar.add(createAttributeMenu());
+        //menuBar.add(createAttributeMenu());
         menuBar.add(new ComponentMenu("Couple", this.getWorkspaceComponent()
                 .getWorkspace(), this.getWorkspaceComponent()));
         menuBar.add(networkPanel.createHelpMenu());
@@ -97,7 +96,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
     /**
      * Create attribute menu.
-     * 
+     *
      * @return the attribute menu
      */
     private JMenu createAttributeMenu() {

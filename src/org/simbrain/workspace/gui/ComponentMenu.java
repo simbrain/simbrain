@@ -13,7 +13,6 @@ import org.simbrain.workspace.WorkspaceListener;
 /**
  * For coupling a specific source component to a selected target component,
  * using one of the built in coupling methods (one to one, all to all, etc.).
- * 
  */
 public class ComponentMenu extends JMenu implements WorkspaceListener {
 

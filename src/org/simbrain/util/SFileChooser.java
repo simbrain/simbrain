@@ -218,38 +218,38 @@ public class SFileChooser {
     public boolean confirmOverwrite(final File file) {
         String message = "The file \"" + file.getName() + "\" already exists. Overwrite?";
         Object[] options = { "OK", "Cancel" };
-        
+
         return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null, message, 
             "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
             null, options, options[0]);
     }
-    
+
     /**
      * Shows the save dialog for the given string name.
-     * 
+     *
      * @param file the name of the file
      * @return the file name to save to
      */
     public File showSaveDialog(final String file) {
         return showSaveDialog(new File(file));
     }
-    
+
     /**
-     * Shows the save dialog
-     * 
+     * Shows the save dialog.
+     *
      * @return the selected file
      */
     public File showSaveDialog() {
         return showSaveDialog((File) null);
     }
-    
+
     /**
      * File-filter.
      */
     private class ExtensionFileFilter extends FileFilter {
         private final String extension;
         private final String description;
-        
+
         ExtensionFileFilter(final String extension, final String description) {
             this.extension = extension;
             this.description = description;

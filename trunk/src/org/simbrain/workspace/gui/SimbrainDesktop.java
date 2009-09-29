@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -102,7 +103,6 @@ import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
 import bsh.Interpreter;
-import bsh.This;
 import bsh.util.JConsole;
 
 /**
@@ -298,6 +298,29 @@ public class SimbrainDesktop {
         registerComponent(GameComponent.class, GameDesktopComponent.class);
     }
 
+    /** Listener for swing component changes. */
+    private final ComponentListener componentListener = new ComponentAdapter() {
+        /**
+         * Responds to component moved events.
+         *
+         * @param arg0 SimbrainComponent event
+         */
+        public void componentMoved(final ComponentEvent arg0) {
+            // System.out.println("Component moved");
+            workspace.setWorkspaceChanged(true);
+        }
+
+        /**
+         * Responds to component resized events.
+         *
+         * @param arg0 SimbrainComponent event
+         */
+        public void componentResized(final ComponentEvent arg0) {
+            // System.out.println("Component resized");
+            workspace.setWorkspaceChanged(true);
+        }
+    };
+
     /**
      * @return Terminal panel.
      */
@@ -424,7 +447,7 @@ public class SimbrainDesktop {
         }
         return scriptMenu;
     }
-    
+
     /**
      * Create the workspace file menu.
      *
@@ -583,16 +606,16 @@ public class SimbrainDesktop {
      * JInternalFrame for Desktop.
      */
     private static class DesktopInternalFrame extends GenericJInternalFrame {
-        
+
         /** Reference to workspace component. */
         private WorkspaceComponent workspaceComponent;
-        
+
         /** Gui Component. */
         private GuiComponent guiComponent;
 
         /**
          * Construct an internal frame.
-         * 
+         *
          * @param workspaceComponent workspace component.
          */
         public DesktopInternalFrame(final WorkspaceComponent workspaceComponent) {
@@ -600,16 +623,6 @@ public class SimbrainDesktop {
             this.workspaceComponent = workspaceComponent;
         }
 
-        /**
-         * Internal desktop frame.
-         * @param guiComponent component for gui rendering
-         */
-        public DesktopInternalFrame(final GuiComponent guiComponent) {
-            init();
-            this.guiComponent = guiComponent;
-            this.workspaceComponent = guiComponent.getWorkspaceComponent();
-        }
-           
         /**
          * Initialize the frame.
          */
@@ -673,28 +686,15 @@ public class SimbrainDesktop {
     public void addDesktopComponent(final WorkspaceComponent workspaceComponent) {
         LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
-        GuiComponent guiComponent;
-        final DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
-
-        // The gui component already exists (when opening a component)
-        if (getDesktopComponent(workspaceComponent) != null) {
-            guiComponent = getDesktopComponent(workspaceComponent);
-            componentFrame.setBounds(guiComponent.getParentFrame().getBounds());
-            componentFrame.setContentPane(guiComponent);
-            componentFrame.setTitle(workspaceComponent.getName());
-            componentFrame.setVisible(true);
-            guiComponent.setParentFrame(componentFrame);
-            registerComponentInstance(workspaceComponent, guiComponent);
-            desktop.add(componentFrame);
-            guiComponent.postAddInit();
-            return;
-        }
-
-        guiComponent = createDesktopComponent(componentFrame,
+        final DesktopInternalFrame componentFrame = new DesktopInternalFrame(
                 workspaceComponent);
+        GuiComponent guiComponent = createDesktopComponent(componentFrame,
+                workspaceComponent);
+        componentFrame.setGuiComponent(guiComponent);
 
         // Either add the window at a default location, or relative to the last
-        // added window.
+        // added window. Note that this is overridden when individual
+        // components are opened
         if (guiComponents.size() == 0) {
             componentFrame.setBounds(DEFAULT_WINDOW_OFFSET,
                     DEFAULT_WINDOW_OFFSET, (int) guiComponent
@@ -715,37 +715,14 @@ public class SimbrainDesktop {
         }
 
 
-        // Add a movement and resize listener
-        componentFrame.addComponentListener(new ComponentAdapter() {
-
-            /**
-             * Responds to component moved events.
-             *
-             * @param arg0 SimbrainComponent event
-             */
-            public void componentMoved(final ComponentEvent arg0) {
-                // System.out.println("Component moved");
-                workspace.setWorkspaceChanged(true);
-            }
-
-            /**
-             * Responds to component resized events.
-             *
-             * @param arg0 SimbrainComponent event
-             */
-            public void componentResized(final ComponentEvent arg0) {
-                // System.out.println("Component resized");
-                workspace.setWorkspaceChanged(true);
-            }
-        });
-
-        // Final steps
+        // Other initialization
+        componentFrame.addComponentListener(componentListener);
         componentFrame.setContentPane(guiComponent);
         componentFrame.setVisible(true);
         registerComponentInstance(workspaceComponent, guiComponent);
+        componentFrame.setTitle(workspaceComponent.getName());
         desktop.add(componentFrame);
         guiComponent.postAddInit();
-        componentFrame.setTitle(workspaceComponent.getName());
 
         // Forces last component of the desktop to the front
         try {

@@ -180,8 +180,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         }
 
         // TODO: Below only needs to happen when opening; but currently it
-        // happens
-        // also when creating a new network
+        // happens also when creating a new network
         networkPanel.clearPanel();
         if (networkPanel.getRootNetwork() != this.getWorkspaceComponent()
                 .getRootNetwork()) {
@@ -194,7 +193,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
     /**
      * Return the network panel for this network frame.
-     * 
+     *
      * @return the network panel for this network frame
      */
     public NetworkPanel getNetworkPanel() {

@@ -162,16 +162,6 @@ public class Workspace {
      * @param component The component to add.
      */
     public void addWorkspaceComponent(final WorkspaceComponent component) {
-        addWorkspaceComponent(component, false);
-    }
-
-    /**
-     * Adds a workspace component to the workspace.
-     *
-     * @param component The component to add.
-     * @param isComponentDeserialized  whether a component is being deserialized or not
-     */
-    public void addWorkspaceComponent(final WorkspaceComponent component, boolean isComponentDeserialized) {
         LOGGER.debug("adding component: " + component);
         componentList.add(component);
         component.setWorkspace(this);

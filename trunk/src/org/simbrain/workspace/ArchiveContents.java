@@ -248,7 +248,7 @@ class ArchiveContents {
 
     /**
      * Writes this instance to XML.
-     * 
+     *
      * @param stream
      *            The stream to write to.
      */

@@ -1,5 +1,6 @@
 package org.simbrain.workspace;
 
+import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,6 +16,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Serializes and deserializes workspaces.
@@ -133,7 +137,6 @@ public class WorkspaceSerializer {
         }
 
         ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bytes.toByteArray()));
-
         ArchiveContents contents = null;
         WorkspaceComponentDeserializer componentDeserializer = new WorkspaceComponentDeserializer();
 
@@ -168,13 +171,10 @@ public class WorkspaceSerializer {
                 workspace.addWorkspaceComponent(wc);
 
                 if (component.desktopComponent != null) {
-                    // Use deserialized desktop component to set the bounds on the
-                    //  newly created desktop component
-                    GuiComponent dc_deserialized = componentDeserializer.deserializeDesktopComponent(
-                        component.desktopComponent.className, wc, new ByteArrayInputStream(
-                        entries.get(component.desktopComponent.uri)), component.name);
-                    GuiComponent dc = desktop.getDesktopComponent(wc);
-                    dc.getParentFrame().setBounds(dc_deserialized.getBounds());
+                    Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(new ByteArrayInputStream(
+                            entries.get(component.desktopComponent.uri)));
+                    GuiComponent desktopComponent = desktop.getDesktopComponent(wc);
+                    desktopComponent.getParentFrame().setBounds(bounds);
                 }
             }
         }

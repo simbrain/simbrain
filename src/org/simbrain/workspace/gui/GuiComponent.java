@@ -152,26 +152,27 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
             try {
+                Rectangle  bounds = this.getParentFrame().getBounds();
                 Workspace workspace = workspaceComponent.getWorkspace();
-
                 workspace.removeWorkspaceComponent(workspaceComponent);
                 workspaceComponent = (E) WorkspaceComponentDeserializer
                     .deserializeWorkspaceComponent(
                     workspaceComponent.getClass(), theFile.getName(),
                     new FileInputStream(theFile), SFileChooser.getExtension(theFile));
-
-                SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
-                desktop.registerComponentInstance(workspaceComponent, this);
-                workspace.addWorkspaceComponent(workspaceComponent, true);
+                workspace.addWorkspaceComponent(workspaceComponent);
                 workspaceComponent.setCurrentFile(theFile);
+                workspaceComponent.setCurrentDirectory(theFile.getParentFile().getAbsolutePath());
+                SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
+                GuiComponent desktopComponent = desktop.getDesktopComponent(workspaceComponent);
+                desktop.registerComponentInstance(workspaceComponent, desktopComponent);
+                desktopComponent.getParentFrame().setBounds(bounds);
+                workspaceComponent.setName(theFile.getName());
+                getParentFrame().setTitle(workspaceComponent.getName());
+                postAddInit();
 
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-
-            workspaceComponent.setName(theFile.getName());
-            getParentFrame().setTitle(workspaceComponent.getName());
-            postAddInit();
         }
     }
 
@@ -233,7 +234,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Creates a new desktop component from the provided stream.
-     * 
+     *
      * @param component the component to create the desktop component for.
      * @param istream the inputstream containing the serialized data.
      * @param name the name of the desktop component.
@@ -241,17 +242,17 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      */
     public static GuiComponent<?> open(final WorkspaceComponent component,
             final InputStream istream, final String name) {
-        
+
 //        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
         GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);
         Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
-        
+
         dc.setTitle(name);
         dc.setBounds(bounds);
-        
+
         return dc;
     }
-    
+
     /**
      * Checks to see if anything has changed and then offers to save if true.
      */
@@ -330,4 +331,5 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     public GenericFrame getParentFrame() {
         return this.parentFrame;
     }
+
 }

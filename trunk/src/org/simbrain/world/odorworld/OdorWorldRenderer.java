@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.Iterator;
 
+import org.simbrain.util.SimbrainMath;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -13,25 +14,23 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
  * The OdorWorldRenderer class draws a TileMap on the screen. It draws all
  * tiles, sprites, and an optional background image centered around the position
  * of the player.
- * 
+ *
  * <p>
  * If the width of background image is smaller the width of the tile map, the
  * background image will appear to move slowly, creating a parallax background
  * effect.
- * 
+ *
  * <p>
  * Also, three static methods are provided to convert pixels to tile positions,
  * and vice-versa.
- * 
+ *
  * <p>
  * This TileMapRender uses a tile size of 64.
- * 
+ *
  * See: http://www.cs.miami.edu/~visser/home_page/CSC_329_files/2DPlatform.pdf
- * 
+ *
  * Adapted from Developing Games in Java, by David Brackeen.
- * 
- * TODO: Possibly move sprite list out of tile-map, and just give this thing a
- * reference
+ *
  */
 public class OdorWorldRenderer {
 
@@ -42,6 +41,12 @@ public class OdorWorldRenderer {
 
     /** Background image.*/
     private Image background;
+
+    /** Sensor color. */
+    private static float sensorColor = Color.RGBtoHSB(255, 0, 0, null)[0];
+
+    /** Sensor diameter. */
+    private final static int SENSOR_DIAMATER = 6;
 
     /**
      * Converts a pixel position to a tile position.
@@ -88,7 +93,7 @@ public class OdorWorldRenderer {
 
     /**
      * Draws the specified TileMap.
-     * 
+     *
      * TODO: to be refactored
      */
     public void draw(Graphics2D g, OdorWorld world, int screenWidth, int screenHeight)
@@ -131,15 +136,52 @@ public class OdorWorldRenderer {
             int x = Math.round(sprite.getX());
             int y = Math.round(sprite.getY());
             g.drawImage(sprite.getImage(), x, y, null);
-            g.setColor(Color.red);
-            //g.drawRect((int) sprite.getX(), (int) sprite.getY(), sprite.getWidth(), sprite.getHeight());             
-            for(Sensor sensor : sprite.getSensors()) {
-                if (sensor instanceof SmellSensor) {
-                    double[] location = ((SmellSensor)sensor).getLocation();
-                    g.drawOval((int) location[0] - 3, (int) location[1] - 3, 6, 6);
+            if (sprite.isShowSensors()) {
+                // g.drawRect((int) sprite.getX(), (int) sprite.getY(),
+                // sprite.getWidth(), sprite.getHeight());
+                for (Sensor sensor : sprite.getSensors()) {
+                    if (sensor instanceof SmellSensor) {
+                        double val = SimbrainMath
+                                .getVectorNorm(((SmellSensor) sensor)
+                                        .getCurrentValue());
+                        float saturation = checkValid((float) Math.abs(val
+                                / (1 * world.getTotalSmellVectorLength())));
+                        g.setPaint(Color.getHSBColor(sensorColor, saturation,
+                                (float) 1));
+                        // System.out.println(val + "--" + world.getTotalSmellVectorLength());
+                        double[] location = ((SmellSensor) sensor)
+                                .getLocation();
+                        g.fillOval((int) location[0] - SENSOR_DIAMATER / 2,
+                                (int) location[1] - SENSOR_DIAMATER / 2,
+                                SENSOR_DIAMATER, SENSOR_DIAMATER);
+                        g.setColor(Color.black);
+                        g.drawOval((int) location[0] - SENSOR_DIAMATER / 2,
+                                (int) location[1] - SENSOR_DIAMATER / 2,
+                                SENSOR_DIAMATER, SENSOR_DIAMATER);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Check whether the specified saturation is valid or not.
+     *
+     * @param val the saturation value to check.
+     * @return whether it is valid or not.
+     */
+    private float checkValid(final float val) {
+        float tempval = val;
+
+        if (val > 1) {
+            tempval = 1;
+        }
+
+        if (val < 0) {
+            tempval = 0;
+        }
+
+        return tempval;
     }
 
 }

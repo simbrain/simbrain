@@ -23,6 +23,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.util.SimbrainMath;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
@@ -57,6 +58,9 @@ public class OdorWorld {
 
     /** Renderer for this world. */
     private OdorWorldRenderer renderer;
+
+    /** Sum of lenths of smell vectors for all smelly objects in the world. */
+    private double totalSmellVectorLength;
 
     /** Whether or not sprites wrap around or are halted at the borders */
     private boolean wrapAround = true;
@@ -109,6 +113,8 @@ public class OdorWorld {
 
         //centerSprite(sprite, tileX,tileY);
 
+        recomputeMaxStimulusLength();
+        
         // Add entity to the map
         //map.addSprite(entity);
         entityList.add(entity);
@@ -140,7 +146,22 @@ public class OdorWorld {
     public void deleteEntity(OdorWorldEntity entity) {
         //map.removeSprite(entity);
         entityList.remove(entity);
+        recomputeMaxStimulusLength();
         fireEntityRemoved(entity);
+    }
+
+    /**
+     * Computes maximum stimulus length. This is used for scaling the color in
+     * the graphical display of the agent sensors.
+     */
+    private void recomputeMaxStimulusLength() {
+        totalSmellVectorLength = 0;
+        for (OdorWorldEntity entity : entityList) {
+            if (entity.getSmellSource() != null) {
+                totalSmellVectorLength += SimbrainMath.getVectorNorm(entity
+                        .getSmellSource().getStimulus());
+            }
+        }
     }
 
 //    /**
@@ -187,7 +208,7 @@ public class OdorWorld {
 //        addEntity(entity, (int) p[0], (int) p[1]);
 //        fireUpdateEvent();
 //    }
-    
+
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
@@ -197,6 +218,7 @@ public class OdorWorld {
         xstream.omitField(OdorWorld.class, "listenerList");
         xstream.omitField(Animation.class, "frames");
         xstream.omitField(Animation.class, "currFrameIndex");
+        xstream.omitField(OdorWorldEntity.class, "images");
         return xstream;
     }
 
@@ -213,6 +235,7 @@ public class OdorWorld {
         for (OdorWorldEntity entity : entityList) {
             entity.postSerializationInit();
         }
+        recomputeMaxStimulusLength();
         return this;
     }
 
@@ -267,7 +290,7 @@ public class OdorWorld {
                 continue;
             }
             if (entity.getBounds().intersects(sprite.getBounds())) {
-                entity.setHasCollided(true);
+                sprite.setHasCollided(true);
             }
         }
 
@@ -557,6 +580,13 @@ public class OdorWorld {
      */
     public void setObjectsBlockMovement(boolean objectsBlockMovement) {
         this.objectsBlockMovement = objectsBlockMovement;
+    }
+
+    /**
+     * @return the maxSmellVectorLength
+     */
+    public double getTotalSmellVectorLength() {
+        return totalSmellVectorLength;
     }
 
 }

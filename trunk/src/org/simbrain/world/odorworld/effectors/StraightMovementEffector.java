@@ -59,18 +59,14 @@ public class StraightMovementEffector implements Effector {
         if (currentValue == 0) {
             return;
         }
-        if(parentObject.getParentWorld().isObjectsBlockMovement()) {
-            if (parentObject.hasCollided()) {
-                return;
-            }
+        if (!parentObject.isBlocked()) {
+            double offset = (currentValue * movementAmount) * scaleFactor;
+            double heading = parentObject.getHeadingRadians();
+            parentObject.setX(parentObject.getX()
+                    + (float) (offset * Math.cos(heading)));
+            parentObject.setY(parentObject.getY()
+                    - (float) (offset * Math.sin(heading)));
         }
-
-        double offset = (currentValue * movementAmount) * scaleFactor;
-        double heading = parentObject.getHeadingRadians();
-        parentObject.setX(parentObject.getX()
-                + (float) (offset * Math.cos(heading)));
-        parentObject.setY(parentObject.getY()
-                - (float) (offset * Math.sin(heading)));
     }
 
     /**

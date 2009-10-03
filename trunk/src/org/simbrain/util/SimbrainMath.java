@@ -41,7 +41,7 @@ public class SimbrainMath {
 
         return (int) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
-    
+
     /**
      * Calculates the Euclidean distance between two points.  Used in World.
      *
@@ -298,10 +298,10 @@ public class SimbrainMath {
         }
         return returnVector;
     }
-   
+
     /**
      * Returns a vector of random values between min and max.
-     * 
+     *
      * @param length number of components in the vector
      * @param min minimum value for random values
      * @param max maximum value for random values
@@ -314,12 +314,12 @@ public class SimbrainMath {
         }
         return returnVector;
     }
-    
+
     /**
      * Round a double value to a specified number of places.
-     * 
+     *
      * (From user dforbu on the Sun Java Programming forum).
-     * 
+     *
      * @param d double value to round
      * @param places placed to round do
      * @return rounded value
@@ -327,5 +327,19 @@ public class SimbrainMath {
     public static final double roundDouble(double d, int places) {
         return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10,
             (double) places);
+    }
+
+    /**
+     * Returns the Euclidean norm of the supplied vector.
+     *
+     * @param vector vector to check
+     * @return the norm
+     */
+    public static double getVectorNorm(double[] vector) {
+        double ret = 0;
+        for (int i = 0; i < vector.length; i++) {
+            ret += Math.pow(vector[i], 2);
+        }
+        return Math.sqrt(ret);
     }
 }

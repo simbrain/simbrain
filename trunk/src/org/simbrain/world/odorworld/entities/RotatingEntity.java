@@ -106,26 +106,27 @@ public class RotatingEntity extends OdorWorldEntity {
     }
 
     /**
-     * Updates this OdorWorldEntity's Animation and its position based on the velocity.
+     * Updates this OdorWorldEntity's Animation and its position based on the
+     * velocity.
      */
     public void update(final long elapsedTime) {
 
         behavior.apply(elapsedTime);
 
-        //System.out.println("heading:" + heading);
+        if  (!isBlocked()) {
+            heading =  computeAngle(heading);
+            //System.out.println("heading:" + heading);
 
-        heading =  computeAngle(heading);
-
-        //TODO: only do this if heading has changed
-        for (Entry<Double, Animation> entry : imageMap.entrySet()) {
-            //System.out.println("" + heading + "-" + entry.getKey());
-            if (heading < entry.getKey()) {
-                setAnimation(entry.getValue());
-                break;
+            //TODO: only do this if heading has changed
+            for (Entry<Double, Animation> entry : imageMap.entrySet()) {
+                //System.out.println("" + heading + "-" + entry.getKey());
+                if (heading < entry.getKey()) {
+                    setAnimation(entry.getValue());
+                    break;
+                }
             }
+            getAnimation().update(elapsedTime);
         }
-
-        getAnimation().update(elapsedTime);
     }
 
     /**
@@ -158,6 +159,5 @@ public class RotatingEntity extends OdorWorldEntity {
     public void setImageMap(TreeMap<Double, Animation> imageMap) {
         this.imageMap = imageMap;
     }
-
 
 }

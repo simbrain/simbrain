@@ -51,11 +51,13 @@ public class RotationEffector implements Effector {
         if (turnAmount == 0) {
             return;
         }
-        // double offset =  turnIncrement * scaleFactor;
-        parentObject.setHeading(parentObject.getHeading()
-                + turnAmount);
-        turnAmount = 0;
-        scaleFactor = 1;
+        if (!parentObject.isBlocked()) {
+            // double offset =  turnIncrement * scaleFactor;
+            parentObject.setHeading(parentObject.getHeading()
+                    + turnAmount);
+            turnAmount = 0;
+            scaleFactor = 1;
+        }
     }
 
     /**
@@ -95,6 +97,8 @@ public class RotationEffector implements Effector {
      * @param turnAmount the turnAmount to set
      */
     public void setTurnAmount(double value) {
-        turnAmount += value * scaleFactor;
+        if (!parentObject.isBlocked()) {
+            turnAmount += value * scaleFactor;
+        }
     }
 }

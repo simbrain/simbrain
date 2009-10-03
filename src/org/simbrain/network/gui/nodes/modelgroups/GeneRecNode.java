@@ -35,16 +35,16 @@ public class GeneRecNode extends ModelGroupNode {
         this.setConextMenu(getContextMenu());
     }
 
-    /**
-     * Adds actions specific to GeneRec groups.
-     */
-    protected JPopupMenu getContextMenu() {
-
-        JPopupMenu ret = super.getContextMenu();
-        ret.addSeparator();
-        ret.add(randomizeAction);
-
-        return ret;
-    }
+//    /**
+//     * Adds actions specific to GeneRec groups.
+//     */
+//    protected JPopupMenu getContextMenu() {
+//
+//        JPopupMenu ret = super.getContextMenu();
+//        ret.addSeparator();
+//        ret.add(randomizeAction);
+//
+//        return ret;
+//    }
 
 }

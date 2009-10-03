@@ -72,6 +72,7 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
         this.group = group;
         setStroke(DASHED);
         setStrokePaint(Color.yellow);
+        this.setConextMenu(getContextMenu());
     }
 
 
@@ -109,7 +110,7 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
     }
 
     /**
-     * Remopve a reference node.
+     * Remove a reference node.
      *
      * @param node node to remove.
      */

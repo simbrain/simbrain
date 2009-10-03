@@ -203,7 +203,7 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
         private float BOX_HEIGHT = 10;
 
         /** Distance from upper left corner of group. */
-        private float OFFSET_X = BOX_WIDTH + 3;
+        private float OFFSET_X = 0;
 
         /** Distance from upper left corner of group. */
         private float OFFSET_Y = BOX_HEIGHT + 3;
@@ -228,9 +228,8 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
             box.setStrokePaint(java.awt.Color.GRAY);
             setBounds(box.getBounds());
             addChild(box);
-
         }
-        
+
         /**
          * @param textLabel the textLabel to set
          */

@@ -44,6 +44,8 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.GeneRec;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
@@ -347,16 +349,14 @@ public class NetworkPanel extends PCanvas  {
              * {@inheritDoc}
              */
             public void neuronClampToggled() {
-                neuronClampButton.setSelected(rootNetwork.getClampNeurons());
-                neuronClampMenuItem.setSelected(rootNetwork.getClampNeurons());
+                syncNeuronClampState();
             }
 
             /**
              * {@inheritDoc}
              */
             public void synapseClampToggled() {
-                synapseClampButton.setSelected(rootNetwork.getClampWeights());
-                synapseClampMenuItem.setSelected(rootNetwork.getClampWeights());
+                syncSynapseClampState();
             }
         });
 
@@ -1464,6 +1464,10 @@ public class NetworkPanel extends PCanvas  {
 
         if (group instanceof GeneRec) {
             ret = new GeneRecNode(this, (GeneRec) group);
+        } else if (group instanceof NeuronGroup) {
+            ret = new ModelGroupNode(this, group);
+        } else if (group instanceof SynapseGroup) {
+            ret = new ModelGroupNode(this, group);
         }
         return ret;
     }
@@ -1487,7 +1491,26 @@ public class NetworkPanel extends PCanvas  {
         for (Synapse synapse : rootNetwork.getSynapseList()) {
             addSynapse(synapse);
         }
+        syncSynapseClampState();
+        syncNeuronClampState();
     }
+
+    /**
+     * Sync gui to network neuron clamp state.
+     */
+    private void syncNeuronClampState() {
+        neuronClampButton.setSelected(rootNetwork.getClampNeurons());
+        neuronClampMenuItem.setSelected(rootNetwork.getClampNeurons());
+    }
+
+    /**
+     * Sync gui to network synapse clamp state.
+     */
+    private void syncSynapseClampState() {
+        synapseClampButton.setSelected(rootNetwork.getClampWeights());
+        synapseClampMenuItem.setSelected(rootNetwork.getClampWeights());
+    }
+
 
     /**
      * Find the upper left corner of the subnet nodes.

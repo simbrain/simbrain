@@ -22,16 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <b>Group</b> a group of neurons, synapses, and networks which are separately contained in the
- * main network hierarchy but to which additinal rules should be applied.  Group elements are references
- * Extending this class and overriding the update function gives it functoinality.
+ * <b>Group</b> a group of neurons, synapses, and networks which are separately
+ * contained in the main network hierarchy but to which additional rules should
+ * be applied. 
  *
- * This extends Network not because these should behave like networks but mainly to take advantage of utility
- * methods associated with the Network class.
  */
 public abstract class Group {
 
-    /** Network delegate which serves here as a utilty class to keep track of references to network objects. */
+    /**
+     * Network delegate which serves here as a utility class to keep track of
+     * references to network objects. Mainly here to take advantage of utility
+     * methods associated with the Network class.
+     */
     protected RootNetwork referenceNetwork;
 
     /** Reference to the network this group is a part of. */
@@ -81,7 +83,8 @@ public abstract class Group {
 
     /**
      * True if this group has no neurons, weights, or networks.
-     * @return
+     *
+     * @return whether the group is empty or not.
      */
     public boolean isEmpty() {
         boolean neuronsGone = referenceNetwork.getNeuronList().isEmpty();
@@ -89,6 +92,17 @@ public abstract class Group {
         boolean networksGone = referenceNetwork.getNetworkList().isEmpty();
         return (neuronsGone && weightsGone && networksGone);
     }
+
+    /**
+     * Returns the number of neurons and synapses in this group.
+     *
+     * @return the number of neurons and synapses in this group.
+     */
+    public int getElementCount() {
+        return referenceNetwork.getNeuronCount()
+                + referenceNetwork.getSynapseCount();
+    }
+
     /**
      * @see Object
      */
@@ -164,7 +178,7 @@ public abstract class Group {
      */
     public void deleteWeight(Synapse toDelete) {
         // Just remove the reference; don't do all the other bookkeeping
-        //  The main network will handle that        
+        //  The main network will handle that
         referenceNetwork.getSynapseList().remove(toDelete);
         parent.fireGroupChanged(this, this);
     }

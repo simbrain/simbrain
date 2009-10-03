@@ -29,22 +29,28 @@ public class HebbianCPCA extends Synapse {
 
     /** Default Learning rate. */
     public static final double DEFAULT_LEARNING_RATE = .005;
+
     /**
      * Default Maximum weight value (see equation 4.19 in O'Reilly and
      * Munakata).
      */
     public static final double DEFAULT_M = .5 / .15;
-    /** default Weight offset. */
+
+    /** Default Weight offset. */
     public static final double DEFAULT_THETA = 1;
-    /** default Sigmoidal function. */
+
+    /** Default Sigmoidal function. */
     public static final double DEFAULT_LAMBDA = 1;
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
+
     /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
     private double m = DEFAULT_M;
+
     /** Weight offset. */
     private double theta = DEFAULT_THETA;
+
     /** Sigmoidal function. */
     private double lambda = DEFAULT_LAMBDA;
 
@@ -57,8 +63,6 @@ public class HebbianCPCA extends Synapse {
      * @param theId Id of the synapse
      */
     public HebbianCPCA(final Neuron src, final Neuron tar, final double val, final String theId) {
-//    	  setSource(src);
-//        setTarget(tar);
         super(src, tar);
         this.setStrength(val);
         id = theId;
@@ -68,7 +72,7 @@ public class HebbianCPCA extends Synapse {
      * This constructor is used when creating a neuron of one type from another
      * neuron of another type Only values common to different types of neuron
      * are copied.
-     * 
+     *
      * @param s Synapse to make of the type
      */
     public HebbianCPCA(final Synapse s) {
@@ -178,7 +182,7 @@ public class HebbianCPCA extends Synapse {
      */
     public void setTheta(final double theta) {
         this.theta = theta;
-        }
+    }
 
     /**
      * @param lambda is The sigmoidal to set.

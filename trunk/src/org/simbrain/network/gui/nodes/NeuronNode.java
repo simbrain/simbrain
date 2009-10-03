@@ -50,12 +50,11 @@ import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.SetSourceNeuronsAction;
-import org.simbrain.network.gui.actions.connection.ConnectNeuronsAction;
 import org.simbrain.network.gui.actions.connection.ConnectNeuronsSimpleAction;
 import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
-import org.simbrain.network.gui.actions.modelgroups.NewGeneRecGroupAction;
+import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
+import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
-import org.simbrain.network.gui.dialogs.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuron;
@@ -63,10 +62,7 @@ import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -284,8 +280,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
         contextMenu.addSeparator();
 
-        //Model Group Action; TODO Make this a submenu with group types
-        contextMenu.add(new NewGeneRecGroupAction(getNetworkPanel()));
+        //Model Group Action
+        JMenu groupMenu = new JMenu("Groups");
+        groupMenu.add(new NewNeuronGroupAction(getNetworkPanel()));
+        groupMenu.add(new NewSynapseGroupAction(getNetworkPanel()));
+        contextMenu.add(groupMenu);
         contextMenu.addSeparator();
 
         // Add Connect Actions

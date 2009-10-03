@@ -23,13 +23,13 @@ import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.groups.GeneRec;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
- * New GeneRec group action.
+ * Create a new neuron group.
  */
-public final class NewGeneRecGroupAction
+public final class NewNeuronGroupAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -42,9 +42,9 @@ public final class NewGeneRecGroupAction
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public NewGeneRecGroupAction(final NetworkPanel networkPanel) {
+    public NewNeuronGroupAction(final NetworkPanel networkPanel) {
 
-        super("GeneRec Group");
+        super("New neuron group");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("NetworkPanel must not be null");
@@ -58,8 +58,11 @@ public final class NewGeneRecGroupAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        GeneRec gr = new GeneRec(networkPanel.getRootNetwork(), (ArrayList) networkPanel.getSelectedModelElements());
+        NeuronGroup group = new NeuronGroup(networkPanel.getRootNetwork(),
+                (ArrayList) networkPanel.getSelectedModelElements());
 
-        networkPanel.getRootNetwork().addGroup(gr);
+        if (group.getElementCount() > 0) {
+            networkPanel.getRootNetwork().addGroup(group);
+        }
     }
 }

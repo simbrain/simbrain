@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 
@@ -37,7 +38,8 @@ public final class NewVisionWorldAction extends WorkspaceAction {
      * workspace.
      */
     public NewVisionWorldAction(Workspace workspace) {
-        super("VisionWorld", workspace);
+        super("Vision World", workspace);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Glasses.png"));
     }
 
 

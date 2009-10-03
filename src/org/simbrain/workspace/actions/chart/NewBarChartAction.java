@@ -39,7 +39,7 @@ public final class NewBarChartAction extends WorkspaceAction {
      */
     public NewBarChartAction(final Workspace workspace) {
         super("Bar Chart", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("chart009.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("BarChart.png"));
         putValue(SHORT_DESCRIPTION, "New Bar Chart");
     }
 

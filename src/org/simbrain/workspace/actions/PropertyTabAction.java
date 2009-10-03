@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -39,6 +40,7 @@ public final class PropertyTabAction extends AbstractAction {
      */
     public PropertyTabAction(SimbrainDesktop desktop) {
         super("Property Tabs");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Properties.png"));
         this.desktop = desktop;
     }
 

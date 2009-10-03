@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.dataworld.DataWorldComponent;
 
@@ -37,7 +38,8 @@ public final class NewDataWorldAction extends WorkspaceAction {
      * workspace.
      */
     public NewDataWorldAction(Workspace workspace) {
-        super("DataWorld", workspace);
+        super("Data World", workspace);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
     }
 
     /** @see AbstractAction */

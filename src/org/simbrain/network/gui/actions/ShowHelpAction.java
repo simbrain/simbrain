@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.SwingUtilities;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
@@ -40,7 +41,7 @@ public final class ShowHelpAction
      */
     public ShowHelpAction() {
         super("Help");
-
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
     }
 
 

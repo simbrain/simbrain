@@ -22,6 +22,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
+
 /**
  * Open data world in current workspace.
  */
@@ -35,6 +37,7 @@ public final class OpenDataWorldAction extends AbstractAction {
      */
     public OpenDataWorldAction() {
         super("Data World");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
     }
 
 

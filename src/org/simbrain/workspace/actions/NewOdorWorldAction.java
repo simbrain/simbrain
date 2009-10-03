@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.Workspace;
@@ -42,7 +43,8 @@ public final class NewOdorWorldAction extends WorkspaceAction {
      * workspace.
      */
     public NewOdorWorldAction(Workspace workspace) {
-        super("2D World", workspace);
+        super("Odor World", workspace);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("SwissIcon.png"));
     }
 
     /** @see AbstractAction */

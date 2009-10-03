@@ -11,7 +11,6 @@ import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * Adapted and extended from From Developing Games in Java, by David Brackeen.
@@ -62,6 +61,9 @@ public abstract class OdorWorldEntity {
 
     /** Enable effectors.  If not the agent is "paralyzed. */
     private boolean effectorsEnabled = true;
+
+    /** If true, show sensors. */
+    private boolean showSensors = true;
 
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the
@@ -400,4 +402,33 @@ public abstract class OdorWorldEntity {
     public void setEffectorsEnabled(boolean effectorsEnabled) {
         this.effectorsEnabled = effectorsEnabled;
     }
+
+    /**
+     * @return the showSensors
+     */
+    public boolean isShowSensors() {
+        return showSensors;
+    }
+
+    /**
+     * @param showSensors the showSensors to set
+     */
+    public void setShowSensors(boolean showSensors) {
+        this.showSensors = showSensors;
+    }
+
+    /**
+     * Returns true if the entity is blocked from moving.
+     *
+     * @return true if blocked, false otherwise.
+     */
+    public boolean isBlocked() {
+        if (getParentWorld().isObjectsBlockMovement()) {
+            if (hasCollided()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

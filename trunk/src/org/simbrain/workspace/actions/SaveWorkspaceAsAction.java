@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -38,6 +39,7 @@ public final class SaveWorkspaceAsAction extends DesktopAction {
      */
     public SaveWorkspaceAsAction(SimbrainDesktop desktop) {
         super("Save Workspace As", desktop);
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
     }
 
 

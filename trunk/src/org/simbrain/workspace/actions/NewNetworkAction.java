@@ -44,7 +44,7 @@ public final class NewNetworkAction extends WorkspaceAction {
     public NewNetworkAction(Workspace workspace) {
         super("New Network", workspace);
         putValue(SHORT_DESCRIPTION, "New network");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

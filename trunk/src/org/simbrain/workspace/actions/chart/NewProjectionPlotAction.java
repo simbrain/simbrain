@@ -39,7 +39,7 @@ public final class NewProjectionPlotAction extends WorkspaceAction {
      */
     public NewProjectionPlotAction(final Workspace workspace) {
         super("Projection Plot", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("chart145.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("ProjectionIcon.png"));
         putValue(SHORT_DESCRIPTION, "New Projection Plot");
     }
 

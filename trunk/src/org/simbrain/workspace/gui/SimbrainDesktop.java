@@ -241,9 +241,6 @@ public class SimbrainDesktop {
 
         // Create the Tabbed Pane for bottom of the desktop
         bottomDock = new JTabbedPane();
-        bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
-        bottomDock.addTab("Updator", null, new ThreadViewerPanel(this
-                .getWorkspace()), "Simbrain thread viewer");
         bottomDock.addTab("Components", null, new ComponentPanel(
                 this), "Show workspace components");
         // List of current couplings for populating couplings panel.
@@ -251,6 +248,9 @@ public class SimbrainDesktop {
                 .getCouplingManager().getCouplings());
         bottomDock.addTab("Couplings", null, new CouplingListPanel(this,
                 couplings), "Show current couplings");
+        bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
+        bottomDock.addTab("Updator", null, new ThreadViewerPanel(this
+                .getWorkspace()), "Simbrain thread viewer");
         // Set up the main panel
         horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         horizontalSplitter.setDividerLocation((int) (3 * (workspaceBounds
@@ -400,7 +400,7 @@ public class SimbrainDesktop {
 
         /* Chart menu button. */
         button = new JButton();
-        button.setIcon(ResourceManager.getImageIcon("Gauge.png"));
+        button.setIcon(ResourceManager.getImageIcon("BarChart.png"));
         final JPopupMenu gaugeMenu = new JPopupMenu();
         for (Action action : actionManager.getPlotActions()) {
             gaugeMenu.add(action);
@@ -517,7 +517,6 @@ public class SimbrainDesktop {
         JMenu coupleMenu = new JMenu("Couplings");
         coupleMenu.add(actionManager.getOpenCouplingManagerAction());
         coupleMenu.add(actionManager.getOpenCouplingListAction());
-        coupleMenu.add(actionManager.getOpenWorkspaceComponentListAction());
         return coupleMenu;
     }
 

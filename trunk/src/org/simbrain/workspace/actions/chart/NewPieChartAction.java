@@ -39,7 +39,7 @@ public final class NewPieChartAction extends WorkspaceAction {
      */
     public NewPieChartAction(final Workspace workspace) {
         super("Pie Chart", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("chart169.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("PieChart.png"));
         putValue(SHORT_DESCRIPTION, "New Pie Chart");
     }
 

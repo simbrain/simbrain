@@ -19,7 +19,6 @@
 package org.simbrain.workspace.actions;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
@@ -27,11 +26,8 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.AttributePanel;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -44,7 +40,6 @@ public final class OpenCouplingListAction extends AbstractAction {
 
     /** Reference to Simbrain desktop. */
     private SimbrainDesktop desktop;
-    
 
     /**
      * Create a coupling list with the specified
@@ -55,7 +50,7 @@ public final class OpenCouplingListAction extends AbstractAction {
     public OpenCouplingListAction(final SimbrainDesktop desktop) {
         super("Open coupling list");
         this.desktop = desktop;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("BothWays.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("CouplingList.png"));
         putValue(SHORT_DESCRIPTION, "Open coupling list");
     }
 

@@ -39,7 +39,7 @@ public final class NewScatterPlotAction extends WorkspaceAction {
      */
     public NewScatterPlotAction(final Workspace workspace) {
         super("Scatter Plot", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("chart145.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("ScatterIcon.png"));
         putValue(SHORT_DESCRIPTION, "New Scatter Plot");
     }
 

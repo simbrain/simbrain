@@ -44,7 +44,7 @@ public final class OpenNetworkAction extends WorkspaceAction {
      */
     public OpenNetworkAction(Workspace workspace) {
         super("Open Network", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
     }
 
     /** @see AbstractAction */

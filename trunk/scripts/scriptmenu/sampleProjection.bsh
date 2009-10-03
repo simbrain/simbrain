@@ -23,7 +23,7 @@ import org.simbrain.workspace.Workspace;
         // Make Network
         NetworkComponent networkComponent = new NetworkComponent("Projection of Attractor Network");
         workspace.addWorkspaceComponent(networkComponent);
-        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
+        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 500);
         RootNetwork network = networkComponent.getRootNetwork();
         GridLayout layout = new GridLayout(50.0, 50.0, 5);
         int numNeurons = 25;

@@ -25,8 +25,8 @@ import java.io.IOException;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import bsh.EvalError;
@@ -50,6 +50,7 @@ public final class RunScriptAction extends WorkspaceAction {
      */
     public RunScriptAction(SimbrainDesktop desktop) {
         super("Run Script...", desktop.getWorkspace());
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Script.png"));
         this.desktop = desktop;
     }
 

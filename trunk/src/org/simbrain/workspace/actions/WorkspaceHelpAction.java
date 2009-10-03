@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
@@ -31,13 +32,13 @@ public final class WorkspaceHelpAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
      * Create a workspace help action with the specified
      * workspace.
      */
     public WorkspaceHelpAction() {
         super("Help");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
     }
 
 

@@ -18,35 +18,59 @@
  */
 package org.simbrain.util.projection;
 
+import org.simbrain.util.propertyeditor.ComboBoxable;
+
+
 /**
- * <b>Settings</b> stores gauge parameters which must persist when the projection algorithm is changed, but which
- * should not be static (which must be different when different instances of the Projector class are created).  Examples
- * include settings particular to a specific projection  algorithm.
+ * <b>Settings</b> stores gauge parameters which must persist when the
+ * projection algorithm is changed, but which should not be static (which must
+ * be different when different instances of the Projector class are created).
+ * Examples include settings particular to a specific projection algorithm.
  */
 public class Settings {
-    /** Method for adding new datapoints. */
-    public static final String REFRESH = "Refresh";
-    /** Method for adding new datapoints. */
-    public static final String TRIANGULATE = "Triangulate";
-    /** Method for adding new datapoints. */
-    public static final String NN_SUBSPACE = "Nearest Neighbor Subspace";
-
-    /** List of available add methods. */
-    private static String[] addMethods = {Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE };
 
     /**
-     *  General projection settings.
+     * Method for calculating decay of stimulus as a function of distance from
+     * object.
      */
-    /** Distance within which added points are considered old and are thus not added. */
+    public enum SammonAddMethod {
+
+        REFRESH("Refresh"), NN_SUBSPACE("Nearest Neighbor Subspace"), TRIANGULATE(
+                "Triangulate");
+
+        /** Name of decay function. */
+        private String name;
+
+        /**
+         * Constructor.
+         *
+         * @param name name.
+         */
+        SammonAddMethod(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    };
+
+
+    /**
+     * Distance within which added points are considered old and are thus not
+     * added.
+     */
     protected double tolerance = GaugePreferences.getTolerance();
+
     /** Amount by which to perturb overlapping points. */
     protected double perturbationAmount = GaugePreferences.getPerturbationAmount();
+
     /** Method to add new datapoints. */
-    protected String addMethod = GaugePreferences.getAddMethod();
+    protected SammonAddMethod sammonAddMethod = SammonAddMethod.REFRESH;
 
     /**
-     * Sammon Map Settings.
-     * epsilon or "magic factor"
+     * Sammon Map Settings. epsilon or "magic factor".
      */
     private double epsilon = GaugePreferences.getEpsilon();
 
@@ -55,6 +79,7 @@ public class Settings {
 
     /** Coordinate Projection Settings. */
     private int hiD2 = GaugePreferences.getHiDim2();
+
     /** Automatically use most variant dimensions. */
     private boolean autoFind = GaugePreferences.getAutoFind();
 
@@ -143,23 +168,40 @@ public class Settings {
     }
 
     /**
-     * @return what method is being used to add new points
+     * @return the sammonAddMethod
      */
-    public String getAddMethod() {
-        return addMethod;
+    public SammonAddMethod getSammonAddMethod() {
+        return sammonAddMethod;
     }
 
     /**
-     * @param i method to use to add new points
+     * @param sammonAddMethod the sammonAddMethod to set
      */
-    public void setAddMethod(final String i) {
-        addMethod = i;
+    public void setSammonAddMethod(SammonAddMethod sammonAddMethod) {
+        this.sammonAddMethod = sammonAddMethod;
     }
 
-    /**
-     * @return addMethods string.
-     */
-    public static String[] getAddMethods() {
-        return addMethods;
-    }
+//    /**
+//     * @return the imageBox
+//     */
+//    public ComboBoxable getSammonAddPointMethod() {
+//        return new ComboBoxable() {
+//            public Object getCurrentObject() {
+//                return getSammonAddMethod();
+//            }
+//
+//            public Object[] getObjects() {
+//                return SammonAddMethod.values();
+//            }
+//        };
+//    }
+//
+//    /**
+//     * @param imageBox the imageBox to set
+//     */
+//    public void setSammonAddPointMethod(ComboBoxable decayFunctionBox) {
+//        setSammonAddMethod((SammonAddMethod) decayFunctionBox.getCurrentObject());
+//    }
+
+
 }

@@ -31,6 +31,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -48,6 +49,7 @@ import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -265,6 +267,7 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 
     /**
      * Creates the menu bar.
+     *
      * @return menu bar
      */
     private void createAttachMenuBar() {
@@ -278,8 +281,18 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements 
 
         final JMenu editMenu = new JMenu("Edit");
         final JMenuItem preferences = new JMenuItem("Preferences...");
-        preferences.addActionListener(this);
-        preferences.setActionCommand("dialog");
+        preferences.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
+                        getWorkspaceComponent().getProjectionModel()
+                                .getProjector().getSettings());
+                JDialog dialog = editor.getDialog();
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+
+        });
         editMenu.add(preferences);
         bar.add(fileMenu);
         bar.add(editMenu);

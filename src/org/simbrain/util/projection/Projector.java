@@ -282,5 +282,10 @@ public class Projector {
         }
     }
 
-    
+    /**
+     * @return the projectorSettings
+     */
+    public Settings getSettings() {
+        return projectorSettings;
+    }
 }

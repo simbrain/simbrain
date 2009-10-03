@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import org.apache.log4j.Logger;
+import org.simbrain.util.projection.Settings.SammonAddMethod;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -57,11 +58,6 @@ public abstract class ProjectionMethod {
     protected Settings theSettings;
 
     /**
-     * Current selected add methods.
-     */
-    protected String addMethod;
-
-    /**
      * Initialize the projector with high and low-d data.
      *
      * @param up Reference to high dimensional dataset
@@ -76,8 +72,6 @@ public abstract class ProjectionMethod {
 
         upstairs = up;
         downstairs = down;
-
-        addMethod = theSettings.getAddMethod();
 
         // For cases where the low-dimensional data has not been provided,
         // create a coordinate projection
@@ -173,11 +167,13 @@ public abstract class ProjectionMethod {
     }
 
     /**
-     * Chcek the integrity of the two datasets by checking:     (1) That the low-d set is at least 2 dimensions     (2)
-     * That the low d space is lower dimensional than the hi d space     (3) That both datasets have the same number
-     * of points.
+     * Check the integrity of the two datasets by checking: (1) That the low-d
+     * set is at least 2 dimensions (2) That the low d space is lower
+     * dimensional than the hi d space (3) That both datasets have the same
+     * number of points.
      *
-     * @return true if low dimensions are lower than hi dimensions and low dimension is less than one
+     * @return true if low dimensions are lower than hi dimensions and low
+     *         dimension is less than one
      */
     public boolean compareDatasets() {
         if (downstairs.getDimensions() < 1) {
@@ -225,7 +221,8 @@ public abstract class ProjectionMethod {
     public abstract boolean isIterable();
 
     /**
-     * @return true if this projection algorithm accepts new new points, false otherwise
+     * @return true if this projection algorithm accepts new new points, false
+     *         otherwise
      */
     public abstract boolean isExtendable();
 
@@ -249,8 +246,8 @@ public abstract class ProjectionMethod {
     }
 
     /**
-     * Add a datapoint to the upstairs dataset, and a corresponding point to the downstairs dataset.  Add the new point
-     * using the currently selected method
+     * Add a datapoint to the upstairs dataset, and a corresponding point to the
+     * downstairs dataset. Add the new point using the currently selected method
      *
      * @param point point to be added
      * @return true if the point was added, false otherwise.
@@ -268,24 +265,36 @@ public abstract class ProjectionMethod {
                 return true;
             }
 
-            // Add the downstairs point differently depending on the add method
-            //   The first case is the default case: add the points and run the projection
-            //	 The other cases are custom add methods
-            if (theSettings.getAddMethod().equals(Settings.REFRESH)) {
-                newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
-                downstairs.addPoint(newPoint);
-                this.project();
-            } else if (theSettings.getAddMethod().equals(Settings.TRIANGULATE)) {
-                newPoint = AddData.triangulate(upstairs, downstairs, point);
-                downstairs.addPoint(newPoint);
-            } else if (theSettings.getAddMethod().equals(Settings.NN_SUBSPACE)) {
-                newPoint = AddData.nnSubspace(upstairs, downstairs, point);
-                downstairs.addPoint(newPoint);
-            }
+            //TODO: To be refactored.
+            newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings
+                    .getHiD2(), point);
+            downstairs.addPoint(newPoint);
+            this.project();
             return true;
         }
         return false;
     }
+
+//  if (this instanceof ProjectSammon) {
+//  // Add the downstairs point differently depending on the add method
+//  //   The first case is the default case: add the points and run the projection
+//  //   The other cases are custom add methods
+//  if (theSettings.getSammonAddMethod().equals(SammonAddMethod.REFRESH)) {
+//      newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
+//      downstairs.addPoint(newPoint);
+//      this.project();
+//  } else if (theSettings.getSammonAddMethod().equals(SammonAddMethod.TRIANGULATE)) {
+//      newPoint = AddData.triangulate(upstairs, downstairs, point);
+//      downstairs.addPoint(newPoint);
+//  } else if (theSettings.getSammonAddMethod().equals(SammonAddMethod.NN_SUBSPACE)) {
+//      newPoint = AddData.nnSubspace(upstairs, downstairs, point);
+//      downstairs.addPoint(newPoint);
+//  } 
+//} else {
+//  newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
+//  downstairs.addPoint(newPoint);
+//  this.project();
+//}
 
     /**
      * @return distance within which points are considered unique
@@ -328,37 +337,6 @@ public abstract class ProjectionMethod {
      */
     public void setTheSettings(final Settings settings) {
         theSettings = settings;
-    }
-
-    /**
-     * @return name of the add method currently selected
-     */
-    public String getAddMethod() {
-        return theSettings.getAddMethod();
-    }
-
-    /**
-     * Indices sed in populating combo box in general dialog.
-     *
-     * @return index of the add method currently selected
-     */
-    public int getAddMethodIndex() {
-        if (getAddMethod().equals(Settings.REFRESH)) {
-            return 0;
-        } else if (getAddMethod().equals(Settings.NN_SUBSPACE)) {
-            return 1;
-        } else if (getAddMethod().equals(Settings.TRIANGULATE)) {
-            return 2;
-        }
-
-        return 0;
-    }
-
-    /**
-     * @param string Method to be added.
-     */
-    public void setAddMethod(final String string) {
-        theSettings.setAddMethod(string);
     }
 
     /**

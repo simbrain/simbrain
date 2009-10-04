@@ -448,7 +448,7 @@ public final class VisionWorld extends PCanvas {
      * @return a list of view menu actions for this vision world
      */
     public List<Action> getViewMenuActions() {
-        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new IsometricViewAction(this), new PaintViewAction(this)});
+        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new PaintViewAction(this)});
     }
 
     /**

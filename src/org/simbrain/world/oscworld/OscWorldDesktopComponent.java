@@ -42,13 +42,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import org.dishevelled.layout.LabelFieldPanel;
+import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.ProducingAttributeMenu;
-
-import ca.odell.glazedlists.swing.EventListModel;
 
 /**
  * OSC world desktop component.
@@ -168,19 +166,17 @@ public final class OscWorldDesktopComponent
         menuBar.add(file);
         getParentFrame().setJMenuBar(menuBar);
 
-        LabelFieldPanel inPanel = new LabelFieldPanel();
-        inPanel.addField("OSC in host:", new JLabel(oscWorldComponent.getOscInHost()));
-        inPanel.addField("OSC in port:", new JLabel(String.valueOf(oscWorldComponent.getOscInPort())));
-        inPanel.addSpacing(11);
-        inPanel.addLabel("OSC in messages:");
-        inPanel.addFinalField(new JScrollPane(producers));
+        LabelledItemPanel inPanel = new LabelledItemPanel();
+        inPanel.addItem("OSC in host:", new JLabel(oscWorldComponent.getOscInHost()));
+        inPanel.addItem("OSC in port:", new JLabel(String.valueOf(oscWorldComponent.getOscInPort())));
+        //inPanel.addSpacing(11);
+        inPanel.addItem("OSC in messages:", new JScrollPane(producers));
 
-        LabelFieldPanel outPanel = new LabelFieldPanel();
-        outPanel.addField("OSC out host:", new JLabel(oscWorldComponent.getOscOutHost()));
-        outPanel.addField("OSC out port:", new JLabel(String.valueOf(oscWorldComponent.getOscOutPort())));
-        outPanel.addSpacing(11);
-        outPanel.addLabel("OSC out messages:");
-        outPanel.addFinalField(new JScrollPane(consumers));
+        LabelledItemPanel outPanel = new LabelledItemPanel();
+        outPanel.addItem("OSC out host:", new JLabel(oscWorldComponent.getOscOutHost()));
+        outPanel.addItem("OSC out port:", new JLabel(String.valueOf(oscWorldComponent.getOscOutPort())));
+        //outPanel.addSpacing(11);
+        outPanel.addItem("OSC out messages:", new JScrollPane(consumers));
 
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(new EmptyBorder(12, 12, 12, 12));

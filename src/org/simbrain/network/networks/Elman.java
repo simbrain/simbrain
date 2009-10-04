@@ -24,8 +24,6 @@ import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.ConnectNets;
 
-import edu.wlu.cs.levy.SNARLI.BPLayer;
-
 
 /**
  * <b>Elman</b> networks are simple recurrent networks based on the work of Jeff Elman.
@@ -33,7 +31,7 @@ import edu.wlu.cs.levy.SNARLI.BPLayer;
 public class Elman extends Backprop {
 
     /** Copy of hidden units. */
-    private BPLayer copy;
+    private StandardNetwork copy;
 
     /** Number of input neurons. */
     private int nInput = 3;

@@ -18,18 +18,22 @@
  */
 package org.simbrain.network.gui.actions;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
+import javax.swing.JOptionPane;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.neurons.LinearNeuron;
 
 /**
- * New neuron action.
+ * Creates a group of neurons.
  */
-public final class NewNeuronAction
+public final class AddNeuronsAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -41,25 +45,35 @@ public final class NewNeuronAction
      *
      * @param networkPanel network panel, must not be null
      */
-    public NewNeuronAction(final NetworkPanel networkPanel) {
-        super("Add Neuron");
+    public AddNeuronsAction(final NetworkPanel networkPanel) {
+        super("Add Neurons...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
-        putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
-
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('p'), this);
-        networkPanel.getActionMap().put(this, this);
+        //putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
+        //putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
+        //networkPanel.getInputMap().put(KeyStroke.getKeyStroke('p'), this);
+        //networkPanel.getActionMap().put(this, this);
 
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.addNeuron();
+        int numNeurons = Integer.parseInt(JOptionPane
+                .showInputDialog("Number of neurons to add"));
+        GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numNeurons));
+        ArrayList<Neuron> list = new ArrayList<Neuron>();
+        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        for (int i = 0; i < numNeurons; i++) {
+            LinearNeuron neuron = new LinearNeuron();
+            list.add(neuron);
+            networkPanel.getRootNetwork().addNeuron(neuron);
+        }
+        layout.layoutNeurons(list);
+        networkPanel.repaint();
     }
 }

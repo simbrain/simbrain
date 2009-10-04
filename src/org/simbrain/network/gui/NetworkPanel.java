@@ -46,6 +46,7 @@ import javax.swing.ToolTipManager;
 import org.simbrain.network.groups.GeneRec;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
@@ -529,7 +530,7 @@ public class NetworkPanel extends PCanvas  {
      * @return the new rootNetwork menu
      */
     protected JMenu createNewNetworkMenu() {
-        JMenu newNetMenu = new JMenu("New Network");
+        JMenu newNetMenu = new JMenu("Add Network");
         newNetMenu.add(actionManager.getNewActorCriticNetworkAction());
         newNetMenu.add(actionManager.getNewBackpropNetworkAction());
         newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
@@ -551,22 +552,28 @@ public class NetworkPanel extends PCanvas  {
 
         contextMenu = new JPopupMenu();
 
+        // Insert actions
         contextMenu.add(actionManager.getNewNeuronAction());
+        contextMenu.add(new AddNeuronsAction(this));
         contextMenu.add(createNewNetworkMenu());
 
+        // Clipboard actions
         contextMenu.addSeparator();
         for (Action action : actionManager.getClipboardActions()) {
             contextMenu.add(action);
         }
         contextMenu.addSeparator();
 
+        // Connection actions
         contextMenu.add(actionManager.getSetSourceNeuronsAction());
         contextMenu.add(actionManager.getShowConnectDialogAction());
         contextMenu.addSeparator();
 
+        // Layout actions
         contextMenu.add(getLayoutMenu());
         contextMenu.addSeparator();
 
+        // Preferences
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
     }
 

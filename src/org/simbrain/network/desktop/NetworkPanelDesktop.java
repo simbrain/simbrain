@@ -24,6 +24,7 @@ import javax.swing.JMenu;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
@@ -61,8 +62,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         NetworkGuiSettings.setNudgeAmount(NetworkGuiPreferences.getNudgeAmount());
         resetColors();
     }
-    
-    
+
     /**
      * Create and return a new Edit menu for this rootNetwork panel.
      *
@@ -107,9 +107,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         JMenu insertMenu = new JMenu("Insert");
 
-        insertMenu.add(createNewNetworkMenu());
         insertMenu.add(actionManager.getNewNeuronAction());
-
+        insertMenu.add(new AddNeuronsAction(this));
+        insertMenu.add(createNewNetworkMenu());
         return insertMenu;
     }
 

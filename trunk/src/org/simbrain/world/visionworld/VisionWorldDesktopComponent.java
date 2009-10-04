@@ -26,9 +26,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
 
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.world.visionworld.filter.PixelAccumulator;
+import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
+import org.simbrain.world.visionworld.sensormatrix.DenseSensorMatrix;
 
 /**
  * Vision world frame.
@@ -37,8 +39,6 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
 
     /** Default serial version UID. */
     private static final long serialVersionUID = 1L;
-    
-
 
     /**
      * Create a new vision world frame with the specified workspace.
@@ -66,10 +66,10 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
         JMenu edit = new JMenu("Edit");
         for (Action action : component.getVisionWorld().getEditMenuActions()) {
             edit.add(action);
-            toolBar.add(action);
+            //toolBar.add(action);
         }
 
-        toolBar.addSeparator();
+        //toolBar.addSeparator();
 
         JMenu view = new JMenu("View");
         for (Action action : component.getVisionWorld().getViewMenuActions()) {
@@ -87,10 +87,22 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
         add("Center", component.getVisionWorld());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void postAddInit() {
-        setSize(450, 400);
+
+        // Open with a default pixel matrix
+        PixelMatrix pixelMatrix = new BufferedImagePixelMatrix(100, 100);
+        getWorkspaceComponent().getVisionWorld().getModel().setPixelMatrix(
+                pixelMatrix);
+        Filter defaultFilter = new PixelAccumulator();
+        SensorMatrix sensorMatrix = new DenseSensorMatrix(10, 10, 10, 10,
+                defaultFilter);
+        getWorkspaceComponent().getVisionWorld().getModel().setSensorMatrix(
+                sensorMatrix);
         setVisible(true);
-    } 
+    }
 
     @Override
     public void closing() {

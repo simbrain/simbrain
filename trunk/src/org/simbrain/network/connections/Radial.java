@@ -14,6 +14,7 @@ import org.simbrain.network.synapses.ClampedSynapse;
  * 
  * TODO: More complex connection making functions
  *       Custom randomization?
+ *       Ability to connect in a range (e.g, between 109 and 209 units away)
  *
  * @author jyoshimi
  *
@@ -33,13 +34,13 @@ public class Radial extends ConnectNeurons {
     private static double excitatoryProbability = .8;
     
     /** Radius within which to connect excitatory neurons. */
-    private static double excitatoryRadius = 75;
+    private static double excitatoryRadius = 100;
 
     /** Template synapse for inhibitory synapses. */
     private static Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
     
     /** Radius within which to connect inhibitory neurons. */
-    private static double inhibitoryRadius = 40;
+    private static double inhibitoryRadius = 80;
     
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
     private static double inhibitoryProbability = .8;
@@ -84,6 +85,9 @@ public class Radial extends ConnectNeurons {
      */
     private void makeInhibitory(final Neuron source) {
         for (Neuron target : network.getNeuronsInRadius(source, inhibitoryRadius)) {
+            if (!sourceNeurons.contains(target)) {
+                continue;
+            }
             if (!allowSelfConnections) {
                 if (source == target) {
                     continue;
@@ -107,6 +111,9 @@ public class Radial extends ConnectNeurons {
      */
     private void makeExcitatory(final Neuron source) {
         for (Neuron target : network.getNeuronsInRadius(source, excitatoryRadius)) {
+            if (!sourceNeurons.contains(target)) {
+                continue;
+            }
             if (!allowSelfConnections) {
                 if (source == target) {
                     continue;

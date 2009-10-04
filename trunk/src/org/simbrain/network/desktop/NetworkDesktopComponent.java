@@ -154,7 +154,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
     /**
      * Create and return a new File menu for this rootNetwork panel.
-     * 
+     *
      * @return a new File menu for this rootNetwork panel
      */
     JMenu createFileMenu() {

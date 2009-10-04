@@ -15,16 +15,23 @@ public abstract class ConnectNeurons {
 
     /** The network whose neurons are to be connected. */
     protected Network network;
-    /** The source group of neurons, generally from which connections will be made. */
-    protected List<? extends Neuron> sourceNeurons;
-    /** The target group of neurons, generally to which connections will be made. */
-    protected List<? extends Neuron> targetNeurons;
     /**
-     * Holds "current" connection object.  Used in Gui so that users can set a current type
-     * (see parameter-free constructor below)then simply apply it.
+     * The source group of neurons, generally from which connections will be
+     * made.
+     */
+    protected List<? extends Neuron> sourceNeurons;
+    
+    /**
+     * The target group of neurons, generally to which connections will be made.
+     */
+    protected List<? extends Neuron> targetNeurons;
+    
+    /**
+     * Holds "current" connection object. Used in Gui so that users can set a
+     * current type (see parameter-free constructor below)then simply apply it.
      */
     public static ConnectNeurons connectionType = new AllToAll();
-    
+
     /**
      * Default constructor.
      *
@@ -49,7 +56,7 @@ public abstract class ConnectNeurons {
 
     /**
      * Apply connection using specified parameters.
-     * 
+     *
      * @param network reference to parent network
      * @param neurons source neurons
      * @param neurons2 target neurons
@@ -65,5 +72,5 @@ public abstract class ConnectNeurons {
      * Connect the source to the target neurons using some method.
      */
     public abstract void connectNeurons();
-    
+
 }

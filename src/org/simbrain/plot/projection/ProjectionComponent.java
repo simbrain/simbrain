@@ -189,6 +189,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     public void clearData() {
         projectionModel.getProjector().reset();
+        resetChartDataset();
         fireUpdateEvent();
     }
     

@@ -18,8 +18,9 @@
  */
 package org.simbrain.network.interfaces;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.util.Utils;
@@ -544,8 +545,6 @@ public abstract class Neuron  {
     public int getNumberOfActiveInputs(final int threshold) {
         int numActiveLines = 0;
         // Determine number of active (greater than 0) input lines
-        
-        
         for (Synapse incoming : fanIn) {
             if (incoming.getSource().getActivation() > threshold) {
                 numActiveLines++;
@@ -626,7 +625,7 @@ public abstract class Neuron  {
     public double getY() {
         return y;
     }
-    
+
     /**
      * @param x The x coordinate to set.
      */
@@ -756,16 +755,16 @@ public abstract class Neuron  {
 
     /**
      * Toggles whether this neuron is clamped.
-     * 
+     *
      * @param clamped Whether this neuron is to be clamped.
      */
     public void setClamped(final boolean clamped) {
         this.clamped = clamped;
     }
-    
+
     /**
      * Returns the id of the neuron.
-     * 
+     *
      * @return the id of the neuron.
      */
     public String getDescription() {
@@ -784,6 +783,25 @@ public abstract class Neuron  {
      */
     public void setLabel(final String label) {
         this.label = label;
+    }
+
+    /**
+     * Returns position as a 2-d point.
+     *
+     * @return point representation of neuron position.
+     */
+    public Point2D getPosition() {
+        return new Point((int) this.getX(), (int) this.getY());
+    }
+
+    /**
+     * Set position of neuron using a point object.
+     *
+     * @param position point location of neuron
+     */
+    public void setPosition(Point2D position) {
+        this.setX(position.getX());
+        this.setY(position.getY());
     }
 
 }

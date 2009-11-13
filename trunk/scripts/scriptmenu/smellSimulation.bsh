@@ -83,7 +83,7 @@ import org.simbrain.plot.projection.*;
 		
 	
 	// Add Recurrent network
-	source("../simbrain/scripts/scriptmenu/sparseNetwork3.bsh");
+	source("./scripts/scriptmenu/sparseNetwork3.bsh");
 	NetworkComponent networkComponent = workspace.getComponent("Recurrent Network");
 	RootNetwork network = networkComponent.getRootNetwork();
 	List targetNeurons = network.getFlatNeuronList();

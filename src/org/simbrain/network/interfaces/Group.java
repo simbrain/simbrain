@@ -187,7 +187,7 @@ public abstract class Group {
      * @return
      * @see org.simbrain.network.interfaces.Network#getFlatNetworkList()
      */
-    public ArrayList getFlatNetworkList() {
+    public List getFlatNetworkList() {
         return referenceNetwork.getFlatNetworkList();
     }
 
@@ -195,7 +195,7 @@ public abstract class Group {
      * @return
      * @see org.simbrain.network.interfaces.Network#getFlatNeuronList()
      */
-    public ArrayList<Neuron> getFlatNeuronList() {
+    public List<Neuron> getFlatNeuronList() {
         return referenceNetwork.getFlatNeuronList();
     }
 
@@ -203,7 +203,7 @@ public abstract class Group {
      * @return
      * @see org.simbrain.network.interfaces.Network#getFlatSynapseList()
      */
-    public ArrayList<Synapse> getFlatSynapseList() {
+    public List<Synapse> getFlatSynapseList() {
         return referenceNetwork.getFlatSynapseList();
     }
 

@@ -18,7 +18,10 @@
  */
 package org.simbrain.network.util;
 
+import java.util.List;
+
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.ClampedSynapse;
 
@@ -138,6 +141,33 @@ public final class ConnectNets {
             }
         }
 
+        return ret;
+    }
+
+    /**
+     * Returns weights connecting two lists of neurons as a matrix of doubles.
+     *
+     * @param srcLayer source layer
+     * @param targetLayer target layer
+     * @return weight matrix
+     */
+    public static double[][] getWeights(List<Neuron> srcLayer,
+            List<Neuron> targetLayer) {
+        double[][] ret = new double[srcLayer.size()][targetLayer.size()];
+
+        for (int i = 0; i < srcLayer.size(); i++) {
+            for (int j = 0; j < targetLayer.size(); j++) {
+                Synapse s = Network.getSynapse(srcLayer.get(i), targetLayer
+                        .get(j));
+
+                if (s != null) {
+                    ret[j][i] = s.getStrength();
+                } else {
+                    ret[j][i] = 0;
+                }
+                // System.out.println("[" + i + "][" + j + "]" + ret[i][j]);
+            }
+        }
         return ret;
     }
 }

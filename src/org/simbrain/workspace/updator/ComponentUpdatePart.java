@@ -69,16 +69,16 @@ public class ComponentUpdatePart {
     
     /**
      * Returns the description for this part.
-     * 
+     *
      * @return the description for this part.
      */
     public String getDescription() {
         return description;
     }
-    
+
     /**
      * Get's a runnable that counts down the latch after completion.
-     * 
+     *
      * @param signal the latch to count down on.
      * @return The runnable to execute.
      */
@@ -87,15 +87,14 @@ public class ComponentUpdatePart {
             public void run() {
                 synchronized (lock) {
                     UpdateThread thread = (UpdateThread) Thread.currentThread();
-                    
+
                     thread.setCurrentTask(ComponentUpdatePart.this);
-                    
+
                     WorkspaceUpdator.LOGGER.trace("updating component part: " + getDescription());
-                    
+
                     runnable.run();
-                    
+
                     thread.clearCurrentTask(ComponentUpdatePart.this);
-                    
                     signal.done();
                 }
             }

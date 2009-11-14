@@ -19,6 +19,7 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -45,10 +46,13 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -87,6 +91,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.workspace.updator.InterceptingEventQueue;
+import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.game.GameComponent;
@@ -170,12 +175,18 @@ public class SimbrainDesktop {
     /** Interpreter for terminal. */
     Interpreter interpreter;
 
+    /** Time indicator. */
+    private JLabel timeLabel = new JLabel();
+
+    /** "Throbber" to indicate a simulation is running. */
+    private JLabel runningLabel = new JLabel();
+
     /** Associates workspace components with their corresponding gui components. */
     private Map<WorkspaceComponent, GuiComponent<?>> guiComponents
         = new LinkedHashMap<WorkspaceComponent, GuiComponent<?>>();
 
     /** Listener on the workspace. */
-    private final WorkspaceListener listener = new WorkspaceListener() {
+    private final WorkspaceListener workspaceListener = new WorkspaceListener() {
 
         /**
          * Clear the Simbrain desktop.
@@ -184,6 +195,7 @@ public class SimbrainDesktop {
             desktop.removeAll();
             desktop.repaint();
             frame.setTitle("Simbrain");
+            updateTimeLabel();
 		}
 
         /**
@@ -203,6 +215,49 @@ public class SimbrainDesktop {
             component.getParentFrame().dispose();
         }
 
+    };
+
+    /** Listens for workspace updator events. */
+    private final WorkspaceUpdatorListener updatorListener = new WorkspaceUpdatorListener() {
+
+        /**
+         * {@inheritDoc}
+         */
+        public void changeNumThreads() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void changedUpdateController() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void finishedComponentUpdate(WorkspaceComponent component,
+                int update, int thread) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void startingComponentUpdate(WorkspaceComponent component,
+                int update, int thread) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void updatedCouplings(int update) {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void updatedWorkspace() {
+            updateTimeLabel();
+        }
     };
 
     // TODO this should be addressed at a higher level
@@ -225,7 +280,8 @@ public class SimbrainDesktop {
         createAndAttachMenus();
         wsToolBar = createToolBar();
         createContextMenu();
-        workspace.addListener(listener);
+        workspace.addListener(workspaceListener);
+        workspace.getWorkspaceUpdator().addListener(updatorListener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET,
@@ -273,7 +329,6 @@ public class SimbrainDesktop {
 
         // Make dragging a little faster but perhaps uglier.
         // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
-
     }
 
     /**
@@ -415,6 +470,14 @@ public class SimbrainDesktop {
         bar.add(button);
 
         bar.add(actionManager.getNewConsoleAction());
+
+        // Initialize time label
+        timeLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        runningLabel.setIcon(ResourceManager.getImageIcon("Throbber.gif"));
+        runningLabel.setVisible(false);
+        updateTimeLabel();
+        bar.add(timeLabel);
+        bar.add(runningLabel);
 
         return bar;
     }
@@ -1041,5 +1104,19 @@ public class SimbrainDesktop {
             horizontalSplitter.getBottomComponent().setVisible(true);
         }
 
+    }
+
+    /**
+     * Update time label.
+     */
+    public void updateTimeLabel() {
+        timeLabel.setText("Time:" + workspace.getTime());
+        if (workspace.getWorkspaceUpdator().isRunning()) {
+            runningLabel.setVisible(true);
+            // SimbrainDesktop.this.desktop.setBackground(Color.red);
+        } else {
+            runningLabel.setVisible(false);
+            // SimbrainDesktop.this.desktop.setBackground(Color.blue);
+        }
     }
 }

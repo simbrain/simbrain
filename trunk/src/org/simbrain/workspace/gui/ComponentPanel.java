@@ -34,7 +34,7 @@ import org.simbrain.workspace.WorkspaceListener;
 
 /**
  * Displays a list of all currently open workspace components.
- * 
+ *
  * TODO: Will need to make each row of the list be an object wrapping the
  * component. This is so the rows can listen for workspacecomponent changes, and
  * also so users can right click on the rows and use them as a to set parameters
@@ -45,10 +45,10 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
 
     /** Table representing workspace components. */
     private JTable componentTable;
-    
+
     /** Table model. */
     private ComponentTableModel model;
-    
+
     /**
      * Workspace component list panel constructor.
      * @param desktop reference.
@@ -66,18 +66,17 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
         componentTable.setRowSelectionAllowed(false);
         componentTable.setGridColor(Color.LIGHT_GRAY);
         componentTable.setFocusable(false);
-        
+
         JScrollPane scrollPane = new JScrollPane(componentTable);
         add(scrollPane);
     }
-    
 
     /**
      * Update the panel.
      */
     private void update() {
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -107,15 +106,15 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
         update();
         return true;
     }
-    
+
     /**
      * Table model which represents workspace components.
      */
     class ComponentTableModel extends AbstractTableModel {
-        
+
         /** Column names. */
         String[] columnNames = {"Component", "Type", "Gui On", "Update On"};
-        
+
         /** Internal list of components. */
         private ArrayList<WorkspaceComponent> data = new ArrayList<WorkspaceComponent>();      
 
@@ -144,15 +143,19 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
          * {@inheritDoc}
          */
         public Object getValueAt(int row, int col) {
-            switch(col) {
-                case 0 : return data.get(row).getName();
-                case 1 : return data.get(row).getSimpleName();
-                case 2 : return data.get(row).getGuiOn();
-                case 3 : return data.get(row).getUpdateOn();
-                default : return null;
+            switch (col) {
+            case 0:
+                return data.get(row).getName();
+            case 1:
+                return data.get(row).getSimpleName();
+            case 2:
+                return data.get(row).getGuiOn();
+            case 3:
+                return data.get(row).getUpdateOn();
+            default:
+                return null;
             }
         }
-        
 
         /**
          * {@inheritDoc}
@@ -172,7 +175,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
             }
             this.fireTableDataChanged();
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -191,15 +194,14 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
             }
         }
 
-        
         /**
          * Add a new component to the list.
          */
         public void addRow(WorkspaceComponent component) {
-            data.add(component);       
+            data.add(component);
             fireTableStructureChanged();
         }
-        
+
         /**
          * Clear the component list.
          */
@@ -207,7 +209,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
             data.clear();
             fireTableStructureChanged();
         }
-        
+
         /**
          * Remove a component from the list.
          *
@@ -217,20 +219,25 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
             data.remove(component);
             fireTableStructureChanged();
         }
-        
+
         /**
          * {@inheritDoc}
          */
-       public Class getColumnClass(int col) {
-           switch(col) {
-               case 0 : return String.class;
-               case 1 : return String.class;
-               case 2 : return Boolean.class;
-               case 3 : return Boolean.class;
-               default : return null;
-           }
-       }
+        public Class getColumnClass(int col) {
+            switch (col) {
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return Boolean.class;
+            case 3:
+                return Boolean.class;
+            default:
+                return null;
+            }
+        }
 
     }
-    
+
 }

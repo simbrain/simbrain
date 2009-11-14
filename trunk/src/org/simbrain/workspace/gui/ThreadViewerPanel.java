@@ -157,10 +157,16 @@ public class ThreadViewerPanel extends JPanel {
 						updateList();
 					}
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    public void updatedWorkspace() {
+                        // TODO Auto-generated method stub
+                    }
+
                 });
     }
-    
-    
+
     /**
      * Update thread viewer list. 
      */

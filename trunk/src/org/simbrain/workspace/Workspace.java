@@ -277,6 +277,7 @@ public class Workspace {
      */
     public void clearWorkspace() {
         removeAllComponents();
+        resetTime();
         this.setWorkspaceChanged(false);
         currentFile = null;
         for (WorkspaceListener listener : listeners) {
@@ -598,6 +599,13 @@ public class Workspace {
      */
     public Number getTime() {
         return updator.getTime();
+    }
+
+    /**
+     * Reset time.
+     */
+    public void resetTime() {
+        updator.resetTime();
     }
 
     /**

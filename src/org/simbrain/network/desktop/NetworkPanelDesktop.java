@@ -21,6 +21,7 @@ package org.simbrain.network.desktop;
 import java.awt.Color;
 
 import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
@@ -168,7 +169,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public NetworkDialog getNetworkDialog(final NetworkPanel networkPanel) {
         return new DesktopNetworkDialog(networkPanel);
     }
-    
+
     /**
      * This version of a NeuronNode has a coupling context menu.
      *
@@ -179,5 +180,19 @@ public class NetworkPanelDesktop extends NetworkPanel {
     public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
         return new NeuronNodeDesktop(component, net, neuron);
     }
+
+    /**
+     * This version adds the script menu.
+     */
+    public JPopupMenu createContextMenu() {
+        JPopupMenu contextMenu = super.createContextMenu();
+
+        // Add script menus
+        contextMenu.addSeparator();
+        contextMenu.add(NetworkScriptMenu.getNetworkScriptMenu(this));
+
+        return contextMenu;
+    }
+
 
 }

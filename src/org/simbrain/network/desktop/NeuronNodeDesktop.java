@@ -35,6 +35,7 @@ public class NeuronNodeDesktop extends NeuronNode {
      */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = super.getContextMenu();
+
         // Add coupling menus
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {

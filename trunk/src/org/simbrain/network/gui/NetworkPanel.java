@@ -548,7 +548,7 @@ public class NetworkPanel extends PCanvas  {
     /**
      * Create a new context menu for this rootNetwork panel.
      */
-    public void createContextMenu() {
+    public JPopupMenu createContextMenu() {
 
         contextMenu = new JPopupMenu();
 
@@ -575,6 +575,8 @@ public class NetworkPanel extends PCanvas  {
 
         // Preferences
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
+
+        return contextMenu;
     }
 
     /**

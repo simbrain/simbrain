@@ -87,6 +87,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         menuBar.add(networkPanel.createEditMenu());
         menuBar.add(networkPanel.createInsertMenu());
         menuBar.add(networkPanel.createViewMenu());
+        menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
         //menuBar.add(createAttributeMenu());
         menuBar.add(new ComponentMenu("Couple", this.getWorkspaceComponent()
                 .getWorkspace(), this.getWorkspaceComponent()));

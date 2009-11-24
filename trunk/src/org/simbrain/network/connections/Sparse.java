@@ -1,6 +1,22 @@
+/*
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,6 +30,8 @@ import org.simbrain.network.synapses.ClampedSynapse;
  *
  * @author jyoshimi
  *
+ * TODO:    - Rename this class; it does not necessarily produce "sparse" connectivity.
+ *          - Set weights strengths.
  */
 public class Sparse extends ConnectNeurons {
 
@@ -22,21 +40,19 @@ public class Sparse extends ConnectNeurons {
 
     /** Probability connection will be an inhibitory weight. */
     public static double inhibitoryProbability = .1;
-    
+
     /** Base excitatory synapse. */
     private static Synapse baseExcitatorySynapse = new ClampedSynapse(null, null);
 
     /** Base inhibitory synapse. */
     private static Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
-    
+
+    // Initialize base synapses
     {
         baseExcitatorySynapse.setStrength(10);
         baseInhibitorySynapse.setStrength(-10);
     }
 
-
-    //TODO: set weights strengths or synapses
-    
     /**
      * See super class description.
      *
@@ -49,6 +65,7 @@ public class Sparse extends ConnectNeurons {
     }
     
     /** {@inheritDoc} */
+    
     public Sparse() {}
 
     @Override
@@ -56,18 +73,25 @@ public class Sparse extends ConnectNeurons {
         return "Sparse";
     }
 
-
     /** @inheritDoc */
     public void connectNeurons() {
         for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
             Neuron source = (Neuron) i.next();
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
                 Neuron target = (Neuron) j.next();
+
+                // Don't add a connection if there is already one present
+                //  TODO: Add option to turn this off?
+                if (Network.getSynapse(source, target) != null) {
+                    continue;
+                }
+
                 if (Math.random() < excitatoryProbability) {
                     Synapse synapse = baseExcitatorySynapse.duplicate();
                     synapse.setSource(source);
                     synapse.setTarget(target);
                     network.addSynapse(synapse);
+                    continue;
                 }
                 if (Math.random() < inhibitoryProbability) {
                     Synapse synapse = baseInhibitorySynapse.duplicate();

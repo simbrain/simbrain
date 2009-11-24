@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -281,6 +282,7 @@ public class NetworkPanel extends PCanvas  {
         addInputEventListener(new PanEventHandler());
         addInputEventListener(new ZoomEventHandler());
         addInputEventListener(new SelectionEventHandler());
+        addInputEventListener(new WandEventHandler());
         addInputEventListener(textHandle);
         addInputEventListener(new ContextMenuEventHandler());
 
@@ -484,7 +486,7 @@ public class NetworkPanel extends PCanvas  {
                 // best way to do that
                 ModelGroupNode groupNode = findModelGroupNode(e.getObject());
                 groupNode.getOutlinedObjects().clear();
-                
+
                 // Make a list of neuron and synapse nodes
                 ArrayList<PNode> nodes = new ArrayList<PNode>();
                 for (Network network : e.getObject().getNetworkList()) {
@@ -627,9 +629,11 @@ public class NetworkPanel extends PCanvas  {
         for (Action action : actionManager.getNetworkModeActions()) {
             mainTools.add(action);
         }
+
         mainTools.addSeparator();
         mainTools.add(actionManager.getIterateNetworkAction());
-        mainTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
+        mainTools
+                .add(new ToggleButton(actionManager.getNetworkControlActions()));
         mainTools.addSeparator();
         mainTools.add(actionManager.getZeroSelectedObjectsAction());
         mainTools.add(actionManager.getRandomizeObjectsAction());
@@ -744,16 +748,16 @@ public class NetworkPanel extends PCanvas  {
      *
      * <p>This is a bound property.</p>
      *
-     * @param editMode edit mode for this rootNetwork panel, must not be null
+     * @param newEditMode edit mode for this rootNetwork panel, must not be null
      */
-    public void setEditMode(final EditMode editMode) {
+    public void setEditMode(final EditMode newEditMode) {
 
-        if (editMode == null) {
+        if (newEditMode == null) {
             throw new IllegalArgumentException("editMode must not be null");
         }
 
         EditMode oldEditMode = this.editMode;
-        this.editMode = editMode;
+        this.editMode = newEditMode;
         firePropertyChange("editMode", oldEditMode, this.editMode);
         setCursor(this.editMode.getCursor());
     }
@@ -1673,7 +1677,7 @@ public class NetworkPanel extends PCanvas  {
 
     /**
      * Return height bottom toolbar is taking up.
-     * 
+     *
      * @return height bottom toolbar is taking up
      */
     private double getToolbarOffset() {

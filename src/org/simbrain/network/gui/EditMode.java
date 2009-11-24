@@ -18,14 +18,14 @@
  */
 package org.simbrain.network.gui;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.awt.image.BufferedImage;
 
 import org.simbrain.resource.ResourceManager;
 
@@ -34,15 +34,35 @@ import org.simbrain.resource.ResourceManager;
  */
 public final class EditMode {
 
-    /** Name of this edit mode. */
-    private final String name;
-
     /** Cursor center point. */
     private static final Point CENTER_POINT = new Point(9, 9);
 
     /** Cursor for this edit mode. */
     private final Cursor cursor;
 
+    /** Selection edit mode. */
+    public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
+
+    /** Pan edit mode. */
+    public static final EditMode PAN = new EditMode("pan", "Pan.png");
+
+    /** Zoom in edit mode. */
+    public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomIn.png");
+
+    /** Zoom out edit mode. */
+    public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.png");
+
+    /** Text edit mode. */
+    public static final EditMode TEXT = new EditMode("text", "Text.png");
+
+    /** Default wand radius. */
+    private static final int DEFAULT_WAND_RADIUS = 15;
+
+    /** Wand mode mode. */
+    public static final EditMode WAND = new EditMode("wand", DEFAULT_WAND_RADIUS);
+
+   /** Radius of wand in wand mode. */
+    private int wandRadius = DEFAULT_WAND_RADIUS;
 
     /**
      * Create a new edit mode with the specified name.
@@ -52,17 +72,39 @@ public final class EditMode {
      */
     private EditMode(final String name, final String cursorName) {
 
-        this.name = name;
-
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = ResourceManager.getImage(cursorName);
         if (name.equals("selection")) {
-           this.cursor = Cursor.getDefaultCursor();
+            this.cursor = Cursor.getDefaultCursor();
         } else {
-            this.cursor = toolkit.createCustomCursor(image, CENTER_POINT, name);            
+            this.cursor = toolkit.createCustomCursor(image, CENTER_POINT, name);
         }
     }
 
+    /**
+     * Construct a "wand" edit mode.
+     *
+     * TODO: Is this the right place for this?
+     *
+     * @param name name of edit mode
+     * @param radius radius of wand
+     */
+    private EditMode(String name, int radius) {
+        this.wandRadius = radius;
+        BufferedImage image = new BufferedImage(radius+1, radius+1,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = (Graphics2D) image.getGraphics();
+        g2.setBackground(new Color(0, 0, 0, 0));
+        //g2.setStroke(new BasicStroke(2));
+        g2.setColor(Color.YELLOW);
+        g2.drawOval(0, 0, radius, radius);
+        float alpha = .1f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        g2.fillOval(0, 0, radius, radius);
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Cursor newCursor = tk.createCustomCursor(image, CENTER_POINT, "wand");
+        this.cursor = newCursor;
+    }
 
     /**
      * Return the cursor for this edit mode.
@@ -129,25 +171,27 @@ public final class EditMode {
         return (this == TEXT);
     }
 
+    /**
+     * Return true if this edit mode is <code>WAND</code>.
+     *
+     * @return true if this edit mode is <code>WAND</code>
+     */
+    public boolean isWand() {
+        return (this == WAND);
+    }
 
-    /** Selection edit mode. */
-    public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
+    /**
+     * @return the current wand radius
+     */
+    public int getWandRadius() {
+        return wandRadius;
+    }
 
-    /** Pan edit mode. */
-    public static final EditMode PAN = new EditMode("pan", "Pan.png");
+    /**
+     * @param wandRadius the wandRadius to set
+     */
+    public void setWandRadius(int wandRadius) {
+        this.wandRadius = wandRadius;
+    }
 
-    /** Zoom in edit mode. */
-    public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomIn.png");
-
-    /** Zoom out edit mode. */
-    public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.png");
-
-    /** Text edit mode. */
-    public static final EditMode TEXT = new EditMode("text", "Text.png");
-
-    /** Private array of edit mode values. */
-    private static final EditMode[] VALUES_LIST = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT, TEXT};
-
-    /** Collection of edit mode values. */
-    public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_LIST));
 }

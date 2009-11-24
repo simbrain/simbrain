@@ -28,6 +28,7 @@ import org.simbrain.network.gui.actions.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.AlignVerticalAction;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
+import org.simbrain.network.gui.actions.WandEditModeAction;
 import org.simbrain.network.gui.actions.ZeroSelectedObjectsAction;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
@@ -375,7 +376,8 @@ public final class NetworkActionManager {
         return Arrays.asList(new Action[] {zoomInEditModeAction,
                                            panEditModeAction,
                                            selectionEditModeAction,
-                                           textEditModeAction });
+                                           textEditModeAction,
+                                           new WandEditModeAction(networkPanel)});
     }
 
     /**

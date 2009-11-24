@@ -580,17 +580,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private void updateColor() {
         double activation = neuron.getActivation();
 
-        //Force to blank if 0
+        // Force to blank if 0
         if ((activation > -.1) && (activation < .1)) {
             circle.setPaint(Color.white);
         } else if (activation > 0) {
-            float saturation = checkValid((float) Math.abs(activation / neuron.getUpperBound()));
-            circle.setPaint(Color.getHSBColor(NetworkGuiSettings.getHotColor(),
-                    saturation, (float) 1));
+
+            float saturation = checkValid((float) Math.abs(activation
+                    / neuron.getUpperBound()));
+            float hotColor = NetworkGuiSettings.getHotColor();
+            circle.setPaint(Color.getHSBColor(hotColor, saturation, (float) 1));
         } else if (activation < 0) {
-            float saturation = checkValid((float) Math.abs(activation / neuron.getLowerBound()));
-            circle.setPaint(Color.getHSBColor(NetworkGuiSettings.getCoolColor(),
-                    saturation, (float) 1));
+
+            float saturation = checkValid((float) Math.abs(activation
+                    / neuron.getLowerBound()));
+            float coolColor = NetworkGuiSettings.getCoolColor();
+            circle.setPaint(Color.getHSBColor(coolColor, saturation,
+                            (float) 1));
         }
 
         if (neuron instanceof SpikingNeuron) {
@@ -1025,7 +1030,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             synapseNode.setGrouped(isGrouped);
         }
     }
-
 }
 
 /**

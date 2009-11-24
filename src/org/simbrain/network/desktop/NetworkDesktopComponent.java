@@ -54,7 +54,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     private static final int DEFAULT_HEIGHT = 450;
 
     /** Default width. */
-    private static final int DEFAULT_WIDTH = 480;
+    private static final int DEFAULT_WIDTH = 500;
 
     /**
      * Create a new network frame.

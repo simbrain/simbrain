@@ -26,6 +26,7 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
+import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
@@ -93,6 +94,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         //editMenu.add(actionManager.getShowIOInfoMenuItem());
         editMenu.add(actionManager.getSetAutoZoomMenuItem());
         editMenu.addSeparator();
+        editMenu.add(new ShowEditModeDialogAction(this));
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
 

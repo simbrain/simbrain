@@ -78,7 +78,7 @@ public class NeuronDialog extends StandardDialog {
     static {
         Association association;
         
-        association = new Association("Additive", AdditiveNeuron.class,
+        association = new Association("Additive (Continuous Hopfield)", AdditiveNeuron.class,
                 AdditiveNeuronPanel.class, true);
         ASSOCIATIONS.put(association.clazz, association);
 

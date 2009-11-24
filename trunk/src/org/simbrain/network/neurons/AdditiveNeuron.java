@@ -127,7 +127,7 @@ public class AdditiveNeuron extends Neuron {
      * @return Name of neuron type.
      */
     public static String getName() {
-        return "Additive";
+        return "Additive (Continuous Hopfield)";
     }
 
     /**

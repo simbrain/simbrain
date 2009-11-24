@@ -27,10 +27,10 @@ import java.util.prefs.Preferences;
  * color for the network panel, using the java Preferences API.
  */
 public class NetworkGuiPreferences {
-    
+
     /** System specific file separator. */
     private static final String FS = System.getProperty("file.separator");
-    
+
     /**The main user preference object. */
     private static final Preferences NETWORK_PREFERENCES = 
         Preferences.userRoot().node("/org/simbrain/network");

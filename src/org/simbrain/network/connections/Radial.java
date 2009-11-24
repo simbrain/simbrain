@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
@@ -23,7 +40,7 @@ public class Radial extends ConnectNeurons {
 
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
     private static double percentExcitatory = .6;
-    
+
     /** Whether to allow self-connections. */
     private static boolean allowSelfConnections = false;
 
@@ -32,13 +49,13 @@ public class Radial extends ConnectNeurons {
 
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
     private static double excitatoryProbability = .8;
-    
+
     /** Radius within which to connect excitatory neurons. */
     private static double excitatoryRadius = 100;
 
     /** Template synapse for inhibitory synapses. */
     private static Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
-    
+
     /** Radius within which to connect inhibitory neurons. */
     private static double inhibitoryRadius = 80;
     
@@ -59,12 +76,12 @@ public class Radial extends ConnectNeurons {
     /** {@inheritDoc} */
     public Radial() {
     }
-    
+
     @Override
     public String toString() {
         return "Radial";
     }
-    
+
     /** @inheritDoc */
     public void connectNeurons() {
         for (Neuron source : sourceNeurons) {
@@ -88,6 +105,10 @@ public class Radial extends ConnectNeurons {
             if (!sourceNeurons.contains(target)) {
                 continue;
             }
+            // Don't add a connection if there is already one present
+            if (Network.getSynapse(source, target) != null) {
+                continue;
+            }
             if (!allowSelfConnections) {
                 if (source == target) {
                     continue;
@@ -104,14 +125,18 @@ public class Radial extends ConnectNeurons {
     }
 
     /**
-     * Make an excitatory neuron, in the sense of connecting this neuron with surrounding neurons via
-     * excitatory connections.
+     * Make an excitatory neuron, in the sense of connecting this neuron with
+     * surrounding neurons via excitatory connections.
      *
      * @param source source neuron
      */
     private void makeExcitatory(final Neuron source) {
         for (Neuron target : network.getNeuronsInRadius(source, excitatoryRadius)) {
             if (!sourceNeurons.contains(target)) {
+                continue;
+            }
+            // Don't add a connection if there is already one present
+            if (Network.getSynapse(source, target) != null) {
                 continue;
             }
             if (!allowSelfConnections) {

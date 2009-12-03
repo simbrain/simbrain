@@ -48,7 +48,8 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
     private static final float[] DASH = {10.0f};
 
     /** Dash style. */
-    private static final BasicStroke DASHED = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, DASH, 0.0f);
+    private static final BasicStroke DASHED = new BasicStroke(1.0f,
+            BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, DASH, 0.0f);
 
     /** The model group. */
     private final Group group;
@@ -62,8 +63,10 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
     /**
      * Create a new abstract subnetwork node from the specified parameters.
      *
-     * @param networkPanel networkPanel for this subnetwork node, must not be null.
-     * @param subnetwork subnetwork for this subnetwork node, must not be null.
+     * @param networkPanel
+     *            networkPanel for this subnetwork node, must not be null.
+     * @param subnetwork
+     *            subnetwork for this subnetwork node, must not be null.
      */
     public ModelGroupNode(final NetworkPanel networkPanel, final Group group) {
         super(networkPanel);
@@ -73,6 +76,7 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
         setStroke(DASHED);
         setStrokePaint(Color.yellow);
         this.setConextMenu(getContextMenu());
+        this.setTextLabel(group.getName());
     }
 
 

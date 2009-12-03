@@ -15,9 +15,12 @@ import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
- * A custom outline that can be drawn around a collection of nodes.
- * Be sure, after initializing, to specifiy whether an interaction box will be used, and 
+ * A custom outline that can be drawn around a collection of nodes. Be sure,
+ * after initializing, to specifiy whether an interaction box will be used, and
  * whether positioning will be non-standard (i.e. not in a subnetworknode).
+ *
+ * TODO: Serious refactoring needed in this class. Interaction box needs to be
+ * more general, and needs to resize as text is changed.
  */
 public class CustomOutline extends PPath implements PropertyChangeListener {
 

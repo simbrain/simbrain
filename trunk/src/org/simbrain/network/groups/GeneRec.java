@@ -28,7 +28,7 @@ public class GeneRec extends Group {
     public GeneRec(final RootNetwork net, final ArrayList<Object> items) {
         super(net);
         this.addObjectReferences(items);
-        referenceNetwork.setUpdateMethod(getParent().getUpdateMethod());
+        //referenceNetwork.setUpdateMethod(getParent().getUpdateMethod());
     }
 
     /**
@@ -36,12 +36,12 @@ public class GeneRec extends Group {
      * Does not use subnet randomization functions.
      */
     public void randomize() {
-        for (Neuron neuron : getFlatNeuronList()) {
+        for (Neuron neuron : getNeuronList()) {
             if (neuron instanceof BiasedNeuron) {
                 ((BiasedNeuron) neuron).setBias(neuron.getRandomValue());
             }
         }
-        for (Synapse synapse : getFlatSynapseList()) {
+        for (Synapse synapse : getSynapseList()) {
             synapse.randomizeSymmetric();
         }
     }
@@ -57,32 +57,32 @@ public class GeneRec extends Group {
         }
 
         //Compute minus phase
-        for (Neuron neuron : getFlatNeuronList()) {
+        for (Neuron neuron : getNeuronList()) {
             if (neuron.isInput()) {
                 neuron.setActivation(neuron.getInputValue());
                 neuron.setClamped(true);
             }
         }
         for (int i = 0; i < numUpdates; i++) {
-            referenceNetwork.update();
+            //referenceNetwork.update();
         }
 
         // Store minus phase activations
-        for (Neuron neuron : this.getFlatNeuronList()) {
+        for (Neuron neuron : this.getNeuronList()) {
             plusToMinusMapping.put(neuron, neuron.getActivation());
         }
 
         // Compute plus phase
-        for (Neuron neuron : getFlatNeuronList()) {
+        for (Neuron neuron : getNeuronList()) {
             neuron.setActivation(neuron.getTargetValue());
             neuron.setClamped(true);
         }
         for (int i = 0; i < numUpdates; i++) {
-            referenceNetwork.update();
+            //referenceNetwork.update();
         }
 
         // Update synapses
-        for (Synapse synapse : this.getFlatSynapseList()) {
+        for (Synapse synapse : this.getSynapseList()) {
             double plusPhaseSource = synapse.getSource().getActivation();
             double plusPhaseTarget = synapse.getTarget().getActivation();
             double minusPhaseSource = (plusToMinusMapping.get(synapse.getSource()));
@@ -94,7 +94,7 @@ public class GeneRec extends Group {
         }
 
         // Update biases
-        for (Neuron neuron : this.getFlatNeuronList()) {
+        for (Neuron neuron : this.getNeuronList()) {
             double plusPhase = neuron.getActivation();
             double minusPhase = plusToMinusMapping.get(neuron);
             double delta = epsilon * (minusPhase - plusPhase);
@@ -105,7 +105,7 @@ public class GeneRec extends Group {
         }
 
         // Reset neuron activations to minusphase
-        for (Neuron neuron : getFlatNeuronList()) {
+        for (Neuron neuron : getNeuronList()) {
             neuron.setClamped(false);
             neuron.setActivation(plusToMinusMapping.get(neuron));
         }

@@ -17,7 +17,7 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
@@ -31,12 +31,10 @@ public class NeuronGroup extends Group {
 
 
     /** @see Group */
-    public NeuronGroup(final RootNetwork net, final ArrayList<Object> items) {
+    public NeuronGroup(final RootNetwork net, final List<Neuron> neurons) {
         super(net);
-        for (Object object : items) {
-            if (object instanceof Neuron) {
-                this.addObjectReferences(items);
-            }
+        for (Neuron neuron : neurons) {
+            this.addNeuron(neuron);
         }
     }
 

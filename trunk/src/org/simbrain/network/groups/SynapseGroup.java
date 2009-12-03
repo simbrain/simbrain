@@ -17,7 +17,7 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
@@ -31,12 +31,10 @@ public class SynapseGroup extends Group {
 
 
     /** @see Group */
-    public SynapseGroup(final RootNetwork net, final ArrayList<Object> items) {
+    public SynapseGroup(final RootNetwork net, final List<Synapse> synapseList) {
         super(net);
-        for (Object object : items) {
-            if (object instanceof Synapse) {
-                this.addObjectReferences(items);
-            }
+        for (Synapse synapse : synapseList) {
+            addSynapse(synapse);
         }
     }
 

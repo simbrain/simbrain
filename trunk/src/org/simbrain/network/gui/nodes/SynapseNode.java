@@ -58,6 +58,14 @@ public final class SynapseNode
     /** Line connecting nodes. */
     private PPath line;
 
+    /**
+     * Line2D representation of the PPath, currently used by selection event
+     * listener so that synapses can be selected by lassoing the line.
+     *
+     * TODO: I have a feeling there is a way to avoid this redundancy.
+     */
+    private Line2D.Double publicLine = new Line2D.Double();
+
     /** Reference to source neuron. */
     private NeuronNode source;
 
@@ -68,7 +76,7 @@ public final class SynapseNode
     private static final double ZERO_PROXY = .001;
 
     /**
-     * Default constructor; used by Castor.
+     * Default constructor.
      */
     public SynapseNode() {
     }
@@ -129,7 +137,8 @@ public final class SynapseNode
 
         // Create the circle
         if (circle == null) {
-            circle = PPath.createEllipse((float) 0, (float) 0, (float) offset * 2, (float) offset * 2);
+            circle = PPath.createEllipse((float) 0, (float) 0,
+                    (float) offset * 2, (float) offset * 2);
             ((PPath) circle).setStrokePaint(null);
             setBounds(circle.getFullBounds());
         }
@@ -142,7 +151,10 @@ public final class SynapseNode
         // Update the line (unless it's a self connection)
         if (!isSelfConnection()) {
             line.reset();
-            line.append(new Line2D.Double(globalToLocal(source.getCenter()), synapseCenter), false);
+            line.append(new Line2D.Double(globalToLocal(source.getCenter()),
+                    synapseCenter), false);
+            publicLine.setLine(source.getCenter(),
+                    localToGlobal(synapseCenter));
         }
     }
 
@@ -402,7 +414,15 @@ public final class SynapseNode
         updateColor();
         updateDiameter();
     }
-    
+
+    /**
+     * @return the publicLine
+     */
+    public Line2D.Double getLine() {
+        return publicLine;
+    }
+
+
 //    public void paint(PPaintContext aPaintContext) {
 //        double s = aPaintContext.getScale();
 //        //TODO: Make this settable

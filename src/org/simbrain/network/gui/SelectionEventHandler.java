@@ -19,6 +19,7 @@
 package org.simbrain.network.gui;
 
 import java.awt.event.InputEvent;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
+import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.SimbrainUtils;
 
@@ -38,6 +40,7 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventFilter;
+import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
@@ -283,7 +286,15 @@ final class SelectionEventHandler
         /** @see PNodeFilter */
         public boolean accept(final PNode node) {
             boolean isPickable = node.getPickable();
-            boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
+            boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);            
+            // Allow selection of a synapes via the line associated with it
+            if (node instanceof SynapseNode) {
+                Line2D.Double line = ((SynapseNode)node).getLine();
+                if (bounds.intersectsLine(line)) {
+                    boundsIntersects = true;
+                }
+
+            }
             boolean isLayer = (node instanceof PLayer);
             boolean isCamera = (node instanceof PCamera);
             boolean isMarquee = (marquee == node);

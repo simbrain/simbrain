@@ -457,7 +457,7 @@ public abstract class Network {
 
         Group group = getRootNetwork().containedInGroup(toDelete);
         if (group != null) {
-            group.deleteWeight(toDelete);
+            group.deleteSynapse(toDelete);
             if (group.isEmpty()) {
                 this.getRootNetwork().deleteGroup(group);
             }
@@ -538,7 +538,21 @@ public abstract class Network {
         for (Synapse s : synapseList) {
             s.randomize();
         }
-        // TODO Make this symmetrical
+    }
+
+    /**
+     * Randomize all biased neurons.
+     *
+     * @param lower lower bound for randomization.
+     * @param upper upper bound for randomization.
+     */
+    public void randomizeBiases(double lower, double upper) {
+        for (Neuron neuron : neuronList) {
+            if (neuron instanceof BiasedNeuron) {
+                ((BiasedNeuron) neuron).setBias((upper - lower) * Math.random()
+                        + lower);
+            }
+        }
     }
 
     /**

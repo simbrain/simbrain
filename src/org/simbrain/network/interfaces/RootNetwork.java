@@ -305,15 +305,15 @@ public class RootNetwork extends Network {
     public Group containedInGroup(final Object object) {
         for (Group group : groupList) {
             if (object instanceof Neuron) {
-                if (group.getFlatNeuronList().contains(object)) {
+                if (group.getNeuronList().contains(object)) {
                     return group;
                 }
             } else if (object instanceof Synapse) {
-                if (group.getFlatSynapseList().contains(object)) {
+                if (group.getSynapseList().contains(object)) {
                     return group;
                 }
             } else if (object instanceof Network) {
-                if (group.getFlatNetworkList().contains(object)) {
+                if (group.getNetworkList().contains(object)) {
                     return group;
                 }
             }
@@ -887,6 +887,16 @@ public class RootNetwork extends Network {
      */
     public void addGroupListener(final GroupListener listener) {
         groupListeners.add(listener);
+    }
+
+
+    /**
+     * TODO: Move this to network with other lists?
+     *
+     * @return the groupList
+     */
+    public ArrayList<Group> getGroupList() {
+        return groupList;
     }
 
 }

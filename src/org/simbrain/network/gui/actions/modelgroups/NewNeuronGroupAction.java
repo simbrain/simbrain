@@ -19,12 +19,13 @@
 package org.simbrain.network.gui.actions.modelgroups;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.interfaces.Neuron;
 
 /**
  * Create a new neuron group.
@@ -59,7 +60,7 @@ public final class NewNeuronGroupAction
     public void actionPerformed(final ActionEvent event) {
 
         NeuronGroup group = new NeuronGroup(networkPanel.getRootNetwork(),
-                (ArrayList) networkPanel.getSelectedModelElements());
+                (List<Neuron>) networkPanel.getSelectedModelNeurons());
 
         if (group.getElementCount() > 0) {
             networkPanel.getRootNetwork().addGroup(group);

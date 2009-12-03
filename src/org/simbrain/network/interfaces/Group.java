@@ -19,28 +19,39 @@
 package org.simbrain.network.interfaces;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <b>Group</b> a group of neurons, synapses, and networks which are separately
  * contained in the main network hierarchy but to which additional rules should
- * be applied. 
+ * be applied.
  *
+ *  TODO:
+ * - Make complete sets of methods (add, delete, contains, etc)
+ * - Rethink object refs, add all, use of networks at all!
+ * - Work on gui representation (text box, etc.)
  */
 public abstract class Group {
 
-    /**
-     * Network delegate which serves here as a utility class to keep track of
-     * references to network objects. Mainly here to take advantage of utility
-     * methods associated with the Network class.
-     */
-    protected RootNetwork referenceNetwork;
+    /** Set of neurons. */
+    private Set<Neuron> neuronList = new HashSet<Neuron>();
+
+    /** Set of synapses. */
+    private Set<Synapse> synapseList = new HashSet<Synapse>();
+
+    /** Set of networks. */
+    private Set<Network> networkList = new HashSet<Network>();
 
     /** Reference to the network this group is a part of. */
     private RootNetwork parent;
 
     /** Whether this Group should be active or not. */
     private boolean isOn = true;
+
+    /** Name of this group. */
+    private String name;
 
     /**
      * Construct a model group with a reference to its root network.
@@ -49,7 +60,6 @@ public abstract class Group {
      */
     public Group(final RootNetwork net) {
         parent = net;
-        referenceNetwork = new RootNetwork();
     }
 
     /**
@@ -59,7 +69,7 @@ public abstract class Group {
      * @return true if the group contains this neuron, false otherwise
      */
     public boolean containsNeuron(final Neuron n) {
-        return this.getFlatNeuronList().contains(n);
+        return neuronList.contains(n);
     }
 
     /**
@@ -82,15 +92,15 @@ public abstract class Group {
     }
 
     /**
-     * True if this group has no neurons, weights, or networks.
+     * True if this group has no neurons, synapses, or networks.
      *
      * @return whether the group is empty or not.
      */
     public boolean isEmpty() {
-        boolean neuronsGone = referenceNetwork.getNeuronList().isEmpty();
-        boolean weightsGone = referenceNetwork.getSynapseList().isEmpty();
-        boolean networksGone = referenceNetwork.getNetworkList().isEmpty();
-        return (neuronsGone && weightsGone && networksGone);
+        boolean neuronsGone = neuronList.isEmpty();
+        boolean synapsesGone = synapseList.isEmpty();
+        boolean networksGone = networkList.isEmpty();
+        return (neuronsGone && synapsesGone && networksGone);
     }
 
     /**
@@ -99,27 +109,43 @@ public abstract class Group {
      * @return the number of neurons and synapses in this group.
      */
     public int getElementCount() {
-        return referenceNetwork.getNeuronCount()
-                + referenceNetwork.getSynapseCount();
+        return neuronList.size() + synapseList.size();
     }
 
-    /**
-     * @see Object
-     */
+    @Override
     public String toString() {
         String ret =  new String();
         ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
-        ret += (" " + this.getWeightList().size() + " synapse(s),");
+        ret += (" " + this.getSynapseList().size() + " synapse(s),");
         ret += ("and " + this.getNetworkList().size() + " network(s).");
         return ret;
     }
 
     /**
-     * Adds a list of network elements to this network.
+     * Add neuron.
+     *
+     * @param neuron neuron to add
+     */
+    public void addNeuron(Neuron neuron) {
+        neuronList.add(neuron);
+    }
+
+    /**
+     * Add synapse.
+     *
+     * @param synapse synapse to add
+     */
+    public void addSynapse(Synapse synapse) {
+        synapseList.add(synapse);
+    }
+
+    /**
+     * Adds a list of neural network elements (synapses, neurons, subnetworks)
+     * to this network.
      *
      * @param toAdd list of objects to add.
      */
-    public void addObjectReferences(final ArrayList<Object> toAdd) {
+    public void addObjectReferences(final List<Object> toAdd) {
 
         // To avoid adding networks as well as their children
         //  No doubt there is a better way to do this!
@@ -129,7 +155,7 @@ public abstract class Group {
         for (final Object object : toAdd) {
             if (object instanceof Network) {
                 final Network net = (Network) object;
-                referenceNetwork.getNetworkList().add(net);
+                networkList.add(net);
                 possibleOverlaps.addAll(net.getFlatNeuronList());
                 possibleOverlaps.addAll(net.getFlatSynapseList());
             }
@@ -140,123 +166,102 @@ public abstract class Group {
             if (object instanceof Neuron) {
                 if (!possibleOverlaps.contains(object)) {
                     final Neuron neuron = (Neuron) object;
-                    referenceNetwork.addNeuron(neuron);
+                    neuronList.add(neuron);
                 }
             } else if (object instanceof Synapse) {
                 if (!possibleOverlaps.contains(object)) {
                     final Synapse synapse = (Synapse) object;
-                    referenceNetwork.getSynapseList().add(synapse);
+                    synapseList.add(synapse);
                 }
             }
         }
     }
     /**
-     * @param toDelete
-     * @see org.simbrain.network.interfaces.Network#deleteNetwork(org.simbrain.network.interfaces.Network)
+     * Delete a network.
+     *
+     * @param toDelete network to delete
      */
     public void deleteNetwork(Network toDelete) {
-        // Just remove the reference; don't do all the other bookkeeping
-        //  The main network will handle that
-        referenceNetwork.getNetworkList().remove(toDelete);
+        networkList.remove(toDelete);
         parent.fireGroupChanged(this, this);
     }
 
     /**
-     * @param toDelete
-     * @see org.simbrain.network.interfaces.Network#deleteNeuron(org.simbrain.network.interfaces.Neuron)
+     * Delete a neuron.
+     *
+     * @param toDelete neuron to delete
      */
     public void deleteNeuron(Neuron toDelete) {
-        // Just remove the reference; don't do all the other bookkeeping
-        //  The main network will handle that
-        referenceNetwork.getNeuronList().remove(toDelete);
+        neuronList.remove(toDelete);
         parent.fireGroupChanged(this, this);
     }
 
     /**
-     * @param toDelete
-     * @see org.simbrain.network.interfaces.Network#deleteSynapse(org.simbrain.network.interfaces.Synapse)
+     * Delete a synapse.
+     *
+     * @param toDelete synapse to delete
      */
-    public void deleteWeight(Synapse toDelete) {
-        // Just remove the reference; don't do all the other bookkeeping
-        //  The main network will handle that
-        referenceNetwork.getSynapseList().remove(toDelete);
+    public void deleteSynapse(Synapse toDelete) {
+        synapseList.remove(toDelete);
         parent.fireGroupChanged(this, this);
     }
 
-    /**
-     * @return
-     * @see org.simbrain.network.interfaces.Network#getFlatNetworkList()
-     */
-    public List getFlatNetworkList() {
-        return referenceNetwork.getFlatNetworkList();
-    }
-
-    /**
-     * @return
-     * @see org.simbrain.network.interfaces.Network#getFlatNeuronList()
-     */
-    public List<Neuron> getFlatNeuronList() {
-        return referenceNetwork.getFlatNeuronList();
-    }
-
-    /**
-     * @return
-     * @see org.simbrain.network.interfaces.Network#getFlatSynapseList()
-     */
-    public List<Synapse> getFlatSynapseList() {
-        return referenceNetwork.getFlatSynapseList();
-    }
 
     /**
      * @return a list of networks
-     * @see org.simbrain.network.interfaces.Network#getNetworkList()
      */
-    public ArrayList<Network> getNetworkList() {
-        return referenceNetwork.getNetworkList();
+    public List<Network> getNetworkList() {
+        return new ArrayList<Network>(networkList);
     }
 
     /**
      * @return a list of neurons
-     * @see org.simbrain.network.interfaces.Network#getNeuronList()
      */
-    public List<? extends Neuron> getNeuronList() {
-        return referenceNetwork.getNeuronList();
+    public List<Neuron> getNeuronList() {
+        return new ArrayList<Neuron>(neuronList);
     }
 
     /**
      * @return a list of weights
-     * @see org.simbrain.network.interfaces.Network#getSynapseList()
      */
-    public ArrayList<Synapse> getWeightList() {
-        return referenceNetwork.getSynapseList();
+    public List<Synapse> getSynapseList() {
+        return new ArrayList<Synapse>(synapseList);
     }
 
     /**
-     * @see org.simbrain.network.interfaces.RootNetwork#update()
+     * Update group.  Override for special updating.
      */
     public void update() {
-        referenceNetwork.update();
+        updateAllNetworks();
+        updateAllNeurons();
+        updateAllSynapses();
     }
 
     /**
-     * @see org.simbrain.network.interfaces.Network#updateAllNetworks()
+     * Update all networks.
      */
     public void updateAllNetworks() {
-        referenceNetwork.updateAllNetworks();
+        for (Network network : networkList) {
+            network.update();
+        }
     }
 
     /**
-     * @see org.simbrain.network.interfaces.Network#updateAllNeurons()
+     * Update all neurons.
      */
     public void updateAllNeurons() {
-        referenceNetwork.updateAllNeurons();
+        for (Neuron neuron : neuronList) {
+            neuron.update();
+        }
     }
 
     /**
-     * @see org.simbrain.network.interfaces.Network#updateAllSynapses()
+     * Update all synapses.
      */
-    public void updateAllWeights() {
-        referenceNetwork.updateAllSynapses();
+    public void updateAllSynapses() {
+        for (Synapse synapse : synapseList) {
+            synapse.update();
+        }
     }
 
     /**
@@ -264,5 +269,19 @@ public abstract class Group {
      */
     public RootNetwork getParent() {
         return parent;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

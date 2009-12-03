@@ -460,7 +460,7 @@ public class NetworkPanel extends PCanvas  {
                         nodes.add(node);
                     }
                 }
-                for (Synapse synapse : e.getObject().getWeightList()) {
+                for (Synapse synapse : e.getObject().getSynapseList()) {
                     SynapseNode node = findSynapseNode(synapse);
                     if (node != null) {
                         nodes.add(node);
@@ -501,7 +501,7 @@ public class NetworkPanel extends PCanvas  {
                         nodes.add(node);
                     }
                 }
-                for (Synapse synapse : e.getObject().getWeightList()) {
+                for (Synapse synapse : e.getObject().getSynapseList()) {
                     SynapseNode node = findSynapseNode(synapse);
                     if (node != null) {
                         nodes.add(node);
@@ -1430,6 +1430,36 @@ public class NetworkPanel extends PCanvas  {
     }
 
     /**
+     * Add a model group node to the piccolo canvas.
+     *
+     * @param group the group to add
+     */
+    private void addGroup(Group group) {
+
+        ModelGroupNode modelGroup = this.findModelGroupNode(group);
+        if (modelGroup != null) {
+            return;
+        }
+
+        modelGroup = new ModelGroupNode(this, group);
+
+        for (Neuron neuron : group.getNeuronList()) {
+            NeuronNode neuronNode = findNeuronNode(neuron);
+            if (neuronNode != null) {
+                modelGroup.addReference(neuronNode);
+            }
+        }
+        for (Synapse synapse : group.getSynapseList()) {
+            SynapseNode synapseNode = findSynapseNode(synapse);
+            if (synapseNode != null) {
+                modelGroup.addReference(synapseNode);
+            }
+        }
+        // TODO: Take care of subnetworks
+        getLayer().addChild(modelGroup);
+    }
+
+    /**
      * Convert a subnetwork into a subnetwork node.
      *
      * TODO: Cheesy design!
@@ -1503,6 +1533,9 @@ public class NetworkPanel extends PCanvas  {
         }
         for (Synapse synapse : rootNetwork.getSynapseList()) {
             addSynapse(synapse);
+        }
+        for (Group group: rootNetwork.getGroupList()) {
+            addGroup(group);
         }
         syncSynapseClampState();
         syncNeuronClampState();

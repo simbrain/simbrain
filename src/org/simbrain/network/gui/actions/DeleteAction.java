@@ -21,6 +21,7 @@ package org.simbrain.network.gui.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
@@ -54,9 +55,10 @@ public final class DeleteAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteNeuron.png"));
         putValue(SHORT_DESCRIPTION,
                 "Delete selected node(s) (\"Backspace\" or \"Delete\")");
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"),
-                this);
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke("DELETE"), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke("BACK_SPACE"), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke("DELETE"), this);
         networkPanel.getActionMap().put(this, this);
     }
 

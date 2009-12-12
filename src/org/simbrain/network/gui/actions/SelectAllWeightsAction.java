@@ -21,6 +21,7 @@ package org.simbrain.network.gui.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
@@ -49,7 +50,8 @@ public final class SelectAllWeightsAction
         }
 
         this.networkPanel = networkPanel;
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('w'), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('w'), this);
         networkPanel.getActionMap().put(this, this);
     }
 

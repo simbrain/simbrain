@@ -21,6 +21,7 @@ package org.simbrain.network.gui.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
@@ -49,7 +50,8 @@ public final class SelectAllNeuronsAction
         }
 
         this.networkPanel = networkPanel;
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('n'), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('n'), this);
         networkPanel.getActionMap().put(this, this);
     }
 

@@ -21,6 +21,7 @@ package org.simbrain.network.gui.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.apache.log4j.Logger;
@@ -54,7 +55,8 @@ public final class IterateNetworkAction extends AbstractAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
         putValue(SHORT_DESCRIPTION, "Step network update algorithm (\"spacebar\")");
 
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke(' '), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke(' '), this);
         networkPanel.getActionMap().put(this, this);
     }
 

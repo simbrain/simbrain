@@ -27,6 +27,11 @@ import java.util.TreeMap;
  */
 public class RotatingEntityManager {
 
+    /**
+     * Tree map for mouse.
+     *
+     * @return mouse tree map
+     */
     public static TreeMap<Double, Animation> getMouse() {
         TreeMap<Double, Animation> mouseMap = new TreeMap<Double, Animation>();
         mouseMap.put(7.5, new Animation("Mouse_0.gif"));
@@ -56,98 +61,73 @@ public class RotatingEntityManager {
         return mouseMap;
     }
 
+    /**
+     * Tree map for horse.
+     * 
+     * Courtesy of Reiner Prokein,
+     * http://reinerstileset.4players.de/englisch.html
+     * 
+     * @return horse tree map
+     */
     public static TreeMap<Double, Animation> getHorse() {
         TreeMap<Double, Animation> horseMap = new TreeMap<Double, Animation>();
-        horseMap.put(0.0, new Animation(new String[] { "./walking/w0000.png",
+
+        double angle = 7.5;
+        int duration = 25;
+        horseMap.put(angle, new Animation(new String[] { "walking/e0001.png",
+                "walking/e0002.png", "walking/e0003.png",
+                "walking/e0004.png", "walking/e0005.png",
+                "walking/e0006.png", "walking/e0007.png", }, duration));
+
+        angle += 45.0;
+        horseMap.put(angle, new Animation(new String[] { "./walking/ne0000.png",
+                "./walking/ne0001.png", "./walking/ne0002.png",
+                "./walking/ne0003.png", "./walking/ne0004.png",
+                "./walking/ne0005.png", "./walking/ne0006.png",
+                "./walking/ne0007.png", }, duration));
+
+        angle += 45.0;
+        horseMap.put(angle, new Animation(new String[] { "./walking/n0000.png",
+                "./walking/n0001.png", "./walking/n0002.png",
+                "./walking/n0003.png", "./walking/n0004.png",
+                "./walking/n0005.png", "./walking/n0006.png",
+                "./walking/n0007.png", }, duration));
+
+        angle += 45.0;
+        horseMap.put(angle, new Animation(new String[] { "./walking/nw0000.png",
+                "./walking/nw0001.png", "./walking/nw0002.png",
+                "./walking/nw0003.png", "./walking/nw0004.png",
+                "./walking/nw0005.png", "./walking/nw0006.png",
+                "./walking/nw0007.png", }, duration));
+
+        angle += 45.0;
+        horseMap.put(angle, new Animation(new String[] { "./walking/w0000.png",
                 "./walking/w0001.png", "./walking/w0002.png",
                 "./walking/w0003.png", "./walking/w0004.png",
                 "./walking/w0005.png", "./walking/w0006.png",
-                "./walking/w0007.png", }, 1));
+                "./walking/w0007.png" }, duration));
 
-        horseMap.put(100.0, new Animation(new String[] { "./walking/e0000.bmp",
-        // "walking/walking nw0001.bmp",
-                // "walking/walking nw0002.bmp",
-                // "walking/walking nw0003.bmp",
-                // "walking/walking nw0004.bmp",
-                // "walking/walking nw0005.bmp",
-                // "walking/walking nw0006.bmp",
-                // "walking/walking nw0007.bmp",
-                }, 10));
+        angle += 45.0;
+        horseMap.put(angle, new Animation(new String[] { "./walking/sw0000.png",
+                "./walking/sw0001.png", "./walking/sw0002.png",
+                "./walking/sw0003.png", "./walking/sw0004.png",
+                "./walking/sw0005.png", "./walking/sw0006.png",
+                "./walking/sw0007.png", }, duration));
 
-        horseMap.put(100.0, new Animation(
-                new String[] { "./walking/e0000.png" }, 10));
+        angle += 45.0;
+        horseMap.put(angle, new Animation(new String[] { "./walking/s0000.png",
+                "./walking/s0001.png", "./walking/s0002.png",
+                "./walking/s0003.png", "./walking/s0004.png",
+                "./walking/s0005.png", "./walking/s0006.png",
+                "./walking/s0007.png", }, duration));
 
-        horseMap.put(100.0, new Animation(
-                new String[] { "./walking/e0000.png" }, 10));
+        angle += 45.0;
+        horseMap.put(angle, new Animation(new String[] { "./walking/se0000.png",
+                "./walking/se0001.png", "./walking/se0002.png",
+                "./walking/se0003.png", "./walking/se0004.png",
+                "./walking/se0005.png", "./walking/se0006.png",
+                "./walking/se0007.png", }, duration));
 
-        horseMap.put(120.0, new Animation(
-                new String[] { "./walking/e0000.png" }, 10));
-
-        horseMap.put(200.0, new Animation(
-                new String[] { "./walking/e0000.png" }, 10));
-        horseMap.put(300.0, new Animation(
-                new String[] { "./walking/e0000.png" }, 10));
-
-        // horseMap.put(80.0, new Animation(new String[] {
-        // "walking/walking n0000.bmp",
-        // "walking/walking n0001.bmp",
-        // "walking/walking n0002.bmp",
-        // "walking/walking n0003.bmp",
-        // "walking/walking n0004.bmp",
-        // "walking/walking n0005.bmp",
-        // "walking/walking n0006.bmp",
-        // "walking/walking n0007.bmp",
-        // },
-        // 10));
-        //
-        // horseMap.put(120.0, new Animation(new String[] {
-        // "walking/walking ne0000.bmp",
-        // "walking/walking ne0001.bmp",
-        // "walking/walking ne0002.bmp",
-        // "walking/walking ne0003.bmp",
-        // "walking/walking ne0004.bmp",
-        // "walking/walking ne0005.bmp",
-        // "walking/walking ne0006.bmp",
-        // "walking/walking ne0007.bmp",
-        // },
-        // 10));
-        //
-        // horseMap.put(210.0, new Animation(new String[] {
-        // "walking/walking e0000.bmp",
-        // "walking/walking e0001.bmp",
-        // "walking/walking e0002.bmp",
-        // "walking/walking e0003.bmp",
-        // "walking/walking e0004.bmp",
-        // "walking/walking e0005.bmp",
-        // "walking/walking e0006.bmp",
-        // "walking/walking e0007.bmp",
-        // },
-        // 10));
-        //
-        // horseMap.put(2500.0, new Animation(new String[] {
-        // "walking/walking se0000.bmp",
-        // "walking/walking se0001.bmp",
-        // "walking/walking se0002.bmp",
-        // "walking/walking se0003.bmp",
-        // "walking/walking se0004.bmp",
-        // "walking/walking se0005.bmp",
-        // "walking/walking se0006.bmp",
-        // "walking/walking se0007.bmp",
-        // },
-        // 10));
-        //        
-        // horseMap.put(300.0, new Animation(new String[] {
-        // "walking/walking sw0000.bmp",
-        // "walking/walking sw0001.bmp",
-        // "walking/walking sw0002.bmp",
-        // "walking/walking sw0003.bmp",
-        // "walking/walking sw0004.bmp",
-        // "walking/walking sw0005.bmp",
-        // "walking/walking sw0006.bmp",
-        // "walking/walking sw0007.bmp",
-        // },
-        // 10));
-        //        
         return horseMap;
     }
 

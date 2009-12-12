@@ -28,6 +28,7 @@ import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.entities.Animation;
+import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -212,13 +213,17 @@ public class OdorWorld {
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
+     * 
+     * TODO: There is more to remove!
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
         xstream.omitField(OdorWorld.class, "listenerList");
         xstream.omitField(Animation.class, "frames");
         xstream.omitField(Animation.class, "currFrameIndex");
+        xstream.omitField(BasicEntity.class, "images");
         xstream.omitField(OdorWorldEntity.class, "images");
+        xstream.omitField(RotatingEntity.class, "imageMap");
         return xstream;
     }
 

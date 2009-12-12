@@ -110,6 +110,15 @@ public abstract class OdorWorldEntity {
     }
 
     /**
+     * Construct an entity.
+     *
+     * @param world parent world of entity
+     */
+    public OdorWorldEntity(OdorWorld world) {
+        this.parentWorld = world;
+    }
+
+    /**
      * Gets this OdorWorldEntity's current x position.
      */
     public float getX() {
@@ -225,6 +234,7 @@ public abstract class OdorWorldEntity {
      * @param effector effector to add
      */
     public void addEffector(final Effector effector) {
+        effectors.add(effector);
         parentWorld.fireEffectorAdded(effector);
     }
 

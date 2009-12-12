@@ -1,11 +1,27 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.odorworld.entities;
 
 import java.util.Iterator;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
@@ -16,8 +32,8 @@ import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 public class RotatingEntity extends OdorWorldEntity {
 
     /** Images for various angles. */
-    private TreeMap<Double, Animation>  imageMap = DEFAULT_MAP;
-    
+    private TreeMap<Double, Animation>  imageMap;
+
     /** Current heading / orientation. */
     private double heading = DEFAULT_HEADING;
 
@@ -33,8 +49,11 @@ public class RotatingEntity extends OdorWorldEntity {
     /** Amount to manually rotate. */
     private final double manualStraightMovementIncrement = 4;
 
-    /** Default tree map; of a mouse. */
-    private static final TreeMap<Double, Animation>  DEFAULT_MAP = RotatingEntityManager.getMouse();
+    /** Default type. */
+    private static final String DEFAULT_TYPE = "Mouse";
+
+    /** Type; used to load images. */
+    private String type = DEFAULT_TYPE;
 
     /** Obvious... */
     private final static double DEGREES_IN_A_CIRCLE = 360;
@@ -45,17 +64,24 @@ public class RotatingEntity extends OdorWorldEntity {
       * @param world parent world
       */
     public RotatingEntity(final OdorWorld world) {
-        super(DEFAULT_MAP.get(DEFAULT_MAP.firstKey()), world);
+        super(world);
+        initTreeMap();
+        this.setAnimation(imageMap.get(imageMap.firstKey()));
     }
 
     /**
-     * Create a rotating entity using specified map.
-     *
-     * @param map the map to use
+     * Initialize the tree map, which associates angles with images /
+     * animations.
      */
-    public RotatingEntity(final TreeMap<Double, Animation>  map, final OdorWorld world) {
-        super(map.get(map.firstKey()), world);  // Default to animation for 0 degrees
-        this.imageMap = map;
+    private void initTreeMap() {
+        if (type == null) {
+            type = "mouse";
+        }
+        if (type.equalsIgnoreCase("mouse")) {
+            imageMap = RotatingEntityManager.getMouse();
+        } else if (type.equalsIgnoreCase("horse")) {
+            imageMap = RotatingEntityManager.getHorse();
+        }
     }
 
     /**
@@ -95,7 +121,7 @@ public class RotatingEntity extends OdorWorldEntity {
     private double computeAngle(final double val) {
 
         //TODO: This will not work for vals greater or less than 360
-        double retVal = val; 
+        double retVal = val;
         if (val >= DEGREES_IN_A_CIRCLE) {
             retVal -= DEGREES_IN_A_CIRCLE;
         }
@@ -134,6 +160,7 @@ public class RotatingEntity extends OdorWorldEntity {
      */
     public void postSerializationInit() {
         super.postSerializationInit();
+        initTreeMap();
         Iterator<Double> i = imageMap.keySet().iterator();
         while (i.hasNext()) {
             Double key = i.next();
@@ -158,6 +185,21 @@ public class RotatingEntity extends OdorWorldEntity {
      */
     public void setImageMap(TreeMap<Double, Animation> imageMap) {
         this.imageMap = imageMap;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+        initTreeMap();
     }
 
 }

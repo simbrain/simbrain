@@ -40,6 +40,7 @@ public class Animation {
      */
     public Animation(final String[] imageLocations, final long totalDuration) {
         this.imageNames = imageLocations;
+        this.totalDuration = totalDuration;
         initializeImages();
         start();
     }
@@ -139,7 +140,7 @@ public class Animation {
 
         /**
          * Initialize the frame.
-         * 
+         *
          * @param image image
          * @param endTime end time
          */

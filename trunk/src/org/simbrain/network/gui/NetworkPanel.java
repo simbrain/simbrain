@@ -24,6 +24,8 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,15 +35,15 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.JToolTip;
+import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.GeneRec;
@@ -172,8 +174,8 @@ public class NetworkPanel extends PCanvas  {
     /** Label which displays current update script. */
     private UpdateStatusLabel updateStatusLabel;
 
-    /** Reference to bottom JToolBar. */
-    private JToolBar southBar;
+    /** Reference to bottom NetworkPanelToolBar. */
+    private CustomToolBar southBar;
 
     /** Show input labels. */
     private boolean inOutMode = true;
@@ -188,13 +190,13 @@ public class NetworkPanel extends PCanvas  {
     private boolean showTime = true;
 
     /** Main tool bar. */
-    private JToolBar mainToolBar;
+    private CustomToolBar mainToolBar;
 
     /** Edit tool bar. */
-    private JToolBar editToolBar;
+    private CustomToolBar editToolBar;
 
     /** Clamp tool bar. */
-    private JToolBar clampToolBar;
+    private CustomToolBar clampToolBar;
 
     /** Source neurons. */
     private Collection<NeuronNode> sourceNeurons = new ArrayList<NeuronNode>();
@@ -310,10 +312,13 @@ public class NetworkPanel extends PCanvas  {
         //getCamera().setScale(.8); // Cheating to offset the toolbar
         updateStatusLabel.update();
 
-        // register support for tool tips
-        // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
+        // Register support for tool tips
+        // TODO: might be a memory leak, if not unregistered when the parent
+        // frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
 
+        // Register key support
+        KeyBindings.addBindings(this);
         addKeyListener(new NetworkKeyAdapter(this));
 
     }
@@ -622,9 +627,9 @@ public class NetworkPanel extends PCanvas  {
      *
      * @return the toolbar.
      */
-    protected JToolBar createMainToolBar() {
+    protected CustomToolBar createMainToolBar() {
 
-        JToolBar mainTools = new JToolBar();
+        CustomToolBar mainTools = new CustomToolBar();
 
         for (Action action : actionManager.getNetworkModeActions()) {
             mainTools.add(action);
@@ -647,9 +652,9 @@ public class NetworkPanel extends PCanvas  {
      *
      * @return the toolbar.
      */
-    protected JToolBar createEditToolBar() {
+    protected CustomToolBar createEditToolBar() {
 
-        JToolBar editTools = new JToolBar();
+        CustomToolBar editTools = new CustomToolBar();
 
         for (Action action : actionManager.getNetworkEditingActions()) {
             editTools.add(action);
@@ -663,8 +668,10 @@ public class NetworkPanel extends PCanvas  {
      *
      * @return the tool bar
      */
-    protected JToolBar createClampToolBar() {
-        JToolBar clampTools = new JToolBar();
+    protected CustomToolBar createClampToolBar() {
+        CustomToolBar clampTools = new CustomToolBar();
+        clampTools.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke("pressed UP"), "none");
         neuronClampButton.setAction(actionManager.getClampNeuronsAction());
         neuronClampButton.setText("");
         clampTools.add(neuronClampButton);
@@ -1907,7 +1914,7 @@ public class NetworkPanel extends PCanvas  {
     /**
      * @return Returns the edit tool bar.
      */
-    public JToolBar getEditToolBar() {
+    public CustomToolBar getEditToolBar() {
         return editToolBar;
     }
 
@@ -1915,14 +1922,14 @@ public class NetworkPanel extends PCanvas  {
     /**
      * @return Returns the main tool bar.
      */
-    public JToolBar getMainToolBar() {
+    public CustomToolBar getMainToolBar() {
         return mainToolBar;
     }
 
     /**
      * @return the clamp tool bar.
      */
-    public JToolBar getClampToolBar() {
+    public CustomToolBar getClampToolBar() {
         return clampToolBar;
     }
 

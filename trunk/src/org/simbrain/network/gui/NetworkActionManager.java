@@ -80,15 +80,22 @@ import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 
 /**
  * Network action manager.
- *
- * <p>This class contains references to all the actions for
- * a NetworkPanel.  In some cases, related actions are grouped
- * together, see e.g. <code>getNetworkModeActions()</code>.</p>
- *
- * <p>These references are contained here instead of in NetworkPanel
- * simply to reduce the amount of code in NetworkPanel.  Most but not
- * all actions hold a reference to the NetworkPanel, passed in via
- * their constructor.</p>
+ * 
+ * <p>
+ * This class contains references to all the actions for a NetworkPanel. In some
+ * cases, related actions are grouped together, see e.g.
+ * <code>getNetworkModeActions()</code>.
+ * </p>
+ * 
+ * <p>
+ * These references are contained here instead of in NetworkPanel simply to
+ * reduce the amount of code in NetworkPanel. Most but not all actions hold a
+ * reference to the NetworkPanel, passed in via their constructor.
+ * </p>
+ * 
+ * Wait, no, not just for that? Also so there is just one instance that can be
+ * shared? That way changes to the action are reflected everywhere... right?
+ * 
  */
 public final class NetworkActionManager {
 
@@ -797,6 +804,8 @@ public final class NetworkActionManager {
 
     /**
      * Return the show GUI action.
+     *
+     * TODO: This is not an action.
      *
      * @return show GUI action
      */

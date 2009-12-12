@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
@@ -56,7 +57,8 @@ public final class ZeroSelectedObjectsAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
         putValue(SHORT_DESCRIPTION, "Set selected neurons and synapses to zero (c)");
 
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('c'), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('c'), this);
         networkPanel.getActionMap().put(this, this);
     }
 

@@ -21,6 +21,7 @@ package org.simbrain.network.gui.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
@@ -52,7 +53,8 @@ public final class NewNeuronAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
         putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
 
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('p'), this);
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke('p'), this);
         networkPanel.getActionMap().put(this, this);
 
     }

@@ -344,6 +344,12 @@ public class WorkspaceUpdator {
 
         LOGGER.trace("starting: " + time);
 
+        try {
+            Thread.sleep(workspace.getUpdateDelay());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         controller.doUpdate(controls);
 
         snychManager.runTasks();

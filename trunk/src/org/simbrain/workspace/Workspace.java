@@ -89,11 +89,17 @@ public class Workspace {
      * For naming.
      */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
-    
+
     /**
      * The updator used to manage component updates.
      */
     private Object updatorLock = new Object();
+
+    /**
+     * Delay in milliseconds between update cycles. Used to artificially slow down
+     * simulation (sometimes useful in teaching).
+     */
+    private int updateDelay = 0;
 
     /**
      * The updator used to manage component updates.
@@ -643,6 +649,20 @@ public class Workspace {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @return the updateDelay
+     */
+    public int getUpdateDelay() {
+        return updateDelay;
+    }
+
+    /**
+     * @param updateDelay the updateDelay to set
+     */
+    public void setUpdateDelay(int updateDelay) {
+        this.updateDelay = updateDelay;
     }
 
 }

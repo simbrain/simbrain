@@ -26,16 +26,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
-import org.simbrain.workspace.actions.NewGameWorldAction;
 import org.simbrain.workspace.actions.GlobalRunAction;
 import org.simbrain.workspace.actions.GlobalStopAction;
 import org.simbrain.workspace.actions.GlobalUpdateAction;
 import org.simbrain.workspace.actions.NewConsoleAction;
 import org.simbrain.workspace.actions.NewDataWorldAction;
+import org.simbrain.workspace.actions.NewGameWorldAction;
 import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
@@ -55,6 +56,7 @@ import org.simbrain.workspace.actions.QuitWorkspaceAction;
 import org.simbrain.workspace.actions.RunScriptAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
+import org.simbrain.workspace.actions.ShowPropertyDialogAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
 import org.simbrain.workspace.actions.WorkspaceHelpAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
@@ -68,11 +70,11 @@ import bsh.Interpreter;
 
 /**
  * Workspace action manager.
- * 
+ *
  * <p>
  * This class contains references to all the actions for a Workspace.
  * </p>
- * 
+ *
  * <p>
  * These references are contained here instead of in Workspace simply to reduce
  * the amount of code in Workspace. Most but not all actions hold a reference to
@@ -89,7 +91,7 @@ public class WorkspaceActionManager {
 
     /** New odor world action. */
     private final Action newThreeDeeWorldAction;
-    
+
     /** New odor world action. */
     private final Action newGameWorldAction;
 
@@ -156,6 +158,9 @@ public class WorkspaceActionManager {
     /** Global workspace update action. */
     private final Action globalUpdateAction;
 
+    /** Show workspace dialog. */
+    private final Action showPropertyDialogAction;
+
     /** Opens the coupling manager. */
     private final Action openCouplingManagerAction;
 
@@ -193,6 +198,8 @@ public class WorkspaceActionManager {
         openDataWorldAction = new OpenDataWorldAction();
         openNetworkAction = new OpenNetworkAction(workspace);
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
+
+        showPropertyDialogAction = new ShowPropertyDialogAction(workspace);
 
         openWorkspaceAction = new OpenWorkspaceAction(desktop);
         saveWorkspaceAction = new SaveWorkspaceAction(desktop);
@@ -235,7 +242,7 @@ public class WorkspaceActionManager {
 
     /**
      * Return a list of network control actions.
-     * 
+     *
      * @return a list of network control actions
      */
     public List<Action> getGlobalControlActions() {
@@ -536,5 +543,12 @@ public class WorkspaceActionManager {
      */
     public Action getPropertyTabAction() {
         return propertyTabAction;
+    }
+
+    /**
+     * @return the showPropertyDialogAction
+     */
+    public Action getShowPropertyDialogAction() {
+        return showPropertyDialogAction;
     }
 }

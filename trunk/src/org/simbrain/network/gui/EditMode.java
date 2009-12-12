@@ -19,6 +19,7 @@
 package org.simbrain.network.gui;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
@@ -95,7 +96,7 @@ public final class EditMode {
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) image.getGraphics();
         g2.setBackground(new Color(0, 0, 0, 0));
-        //g2.setStroke(new BasicStroke(2));
+        g2.setStroke(new BasicStroke(2));
         g2.setColor(Color.YELLOW);
         g2.drawOval(0, 0, radius, radius);
         float alpha = .1f; // 0.0f is 100% transparent and 1.0f is 100% opaque.

@@ -216,7 +216,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
                 setWallPoint2(mouseEvent.getPoint());
                 draggingPoint = null;
             }
-        }
+        }       
     };
 
     private final MouseMotionListener mouseDraggedListener = new MouseMotionAdapter() {

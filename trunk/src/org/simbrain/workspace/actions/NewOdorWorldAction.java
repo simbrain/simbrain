@@ -37,6 +37,9 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 public final class NewOdorWorldAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
+    
+    /** File separator. */
+    private static final String FS = System.getProperty("file.separator");
 
     /**
      * Create a new odor world action with the specified
@@ -67,35 +70,35 @@ public final class NewOdorWorldAction extends WorkspaceAction {
         // some such...
 
         // Add objects
-        BasicEntity object1 = new BasicEntity("Swiss.gif", world);
+        BasicEntity object1 = new BasicEntity("static" + FS + "Swiss.gif", world);
         object1.setLocation(36, 107);
         object1.setSmellSource(new SmellSource(SimbrainMath.multVector(
                 new double[] { 0.7, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, 100),
                 SmellSource.DecayFunction.GAUSSIAN, object1.getLocation()));
         world.addEntity(object1);
 
-        BasicEntity object2 = new BasicEntity("Gouda.gif", world);
+        BasicEntity object2 = new BasicEntity("static" + FS + "Gouda.gif", world);
         object2.setLocation(169, 32);
         object2.setSmellSource(new SmellSource(SimbrainMath.multVector(
                 new double[] { 0.7, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0 }, 100),
                 SmellSource.DecayFunction.GAUSSIAN, object1.getLocation()));
         world.addEntity(object2);
 
-        BasicEntity object3 = new BasicEntity("Bluecheese.gif", world);
+        BasicEntity object3 = new BasicEntity("static" + FS + "Bluecheese.gif", world);
         object3.setLocation(304, 87);
         object3.setSmellSource(new SmellSource(SimbrainMath.multVector(
                 new double[] { 0.7, 0.0, 0.0, 0.0, 0.3, 0.0, 0.0, 0.0 }, 100),
                 SmellSource.DecayFunction.GAUSSIAN, object1.getLocation()));
         world.addEntity(object3);
 
-        BasicEntity object4 = new BasicEntity("Tulip.gif", world);
+        BasicEntity object4 = new BasicEntity("static" + FS + "Tulip.gif", world);
         object4.setLocation(80, 351);
         object4.setSmellSource(new SmellSource(SimbrainMath.multVector(
                 new double[] { 0.0, 0.3, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0 }, 100),
                 SmellSource.DecayFunction.GAUSSIAN, object1.getLocation()));
         world.addEntity(object4);
 
-        BasicEntity object5 = new BasicEntity("Pansy.gif", world);
+        BasicEntity object5 = new BasicEntity("static" + FS + "Pansy.gif", world);
         object5.setLocation(251, 370);
         object5.setSmellSource(new SmellSource(SimbrainMath.multVector(
                 new double[] { 0.0, 0.0, 0.3, 0.7, 0.0, 0.0, 0.0, 0.0 }, 100),

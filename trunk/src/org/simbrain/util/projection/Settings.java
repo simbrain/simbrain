@@ -18,7 +18,7 @@
  */
 package org.simbrain.util.projection;
 
-import org.simbrain.util.propertyeditor.ComboBoxable;
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 
 /**

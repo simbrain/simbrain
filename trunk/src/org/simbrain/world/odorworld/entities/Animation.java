@@ -6,7 +6,7 @@ package org.simbrain.world.odorworld.entities;
 import java.awt.Image;
 import java.util.ArrayList;
 
-import org.simbrain.resource.ResourceManager;
+import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
 
 /**
  * The Animation class manages a series of images (frames) and the amount of
@@ -178,7 +178,7 @@ public class Animation {
             if ((imageNames.length > 0) && (totalDuration > 0)) {
                 duration = totalDuration / imageNames.length;
             }
-            this.addFrame(ResourceManager.getImage(imageNames[i]), duration);
+            this.addFrame(OdorWorldResourceManager.getImage(imageNames[i]), duration);
         }
     }
 }

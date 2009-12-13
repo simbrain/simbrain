@@ -54,7 +54,7 @@ public final class ShowEntityDialogAction
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
         ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-        editor.setExcludeList(new String[] {"velocityX", "velocityY"});
+        editor.setExcludeList(new String[] {"velocityX", "velocityY", "entityType"});
         editor.setObject(entity);
         JDialog dialog = editor.getDialog();
         dialog.pack();

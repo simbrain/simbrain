@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
@@ -53,7 +54,7 @@ public class RotatingEntity extends OdorWorldEntity {
     private static final String DEFAULT_TYPE = "Mouse";
 
     /** Type; used to load images. */
-    private String type = DEFAULT_TYPE;
+    private String entityType = DEFAULT_TYPE;
 
     /** Obvious... */
     private final static double DEGREES_IN_A_CIRCLE = 360;
@@ -74,14 +75,15 @@ public class RotatingEntity extends OdorWorldEntity {
      * animations.
      */
     private void initTreeMap() {
-        if (type == null) {
-            type = "mouse";
+        if (entityType == null) {
+            entityType = "Mouse";
         }
-        if (type.equalsIgnoreCase("mouse")) {
+        if (entityType.equalsIgnoreCase("Mouse")) {
             imageMap = RotatingEntityManager.getMouse();
-        } else if (type.equalsIgnoreCase("horse")) {
-            imageMap = RotatingEntityManager.getHorse();
+        } else if (entityType.equalsIgnoreCase("Cow")) {
+            imageMap = RotatingEntityManager.getCow();
         }
+        update(0);
     }
 
     /**
@@ -190,16 +192,43 @@ public class RotatingEntity extends OdorWorldEntity {
     /**
      * @return the type
      */
-    public String getType() {
-        return type;
+    public String getEntityType() {
+        return entityType;
     }
 
     /**
      * @param type the type to set
      */
-    public void setType(String type) {
-        this.type = type;
+    public void setEntityType(String type) {
+        this.entityType = type;
         initTreeMap();
+    }
+
+    /**
+     * Getter which returns data that can be used in a combo box (the property
+     * editor dialog).
+     *
+     * @return the image data
+     */
+    public ComboBoxWrapper getType() {
+        return new ComboBoxWrapper() {
+            public Object getCurrentObject() {
+                return getEntityType();
+            }
+
+            public Object[] getObjects() {
+                return new Object[] { "Cow", "Mouse" };
+            }
+        };
+    }
+
+    /**
+     * Setter which takes the data from a combo box as an argument.
+     *
+     * @param imageData the data from the combo box
+     */
+    public void setType(ComboBoxWrapper imageData) {
+        setEntityType((String) imageData.getCurrentObject());
     }
 
 }

@@ -1,17 +1,19 @@
 <?xml  version="1.0" encoding="UTF-8"?>
 <project name="Simbrain" default="jar" basedir=".">
 
+        <property name="version" location="Simbrain3_alpha_6" />
+
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="lib" location="lib" />
 	<property name="dist" location="dist" /> 	<!-- Put final products here -->	
 	<property name="build" location="build" /> 	<!-- Staging area -->
-	<property name="build.main" location="${build}/main" />
-    <property name="build.jars" location="${build}/jars" />
+	<property name="build.main" location="${build}/main" /> 
+        <property name="build.jars" location="${build}/jars" />
 	<property name="docs" location="docs" />
 	<property name="scripts" location="scripts" />
 	<property name="resource" value="org/simbrain/resource" />
-	<property name="images" value="images" />
+	<property name="odorworldresource" value="org/simbrain/world/odorworld/resources" />
 	<property name="commands" value="org/simbrain/console" />
 	<property name="workspace" value="org/simbrain/workspace" />
 	<property name="network" value="org/simbrain/network" />
@@ -41,6 +43,10 @@
 		<copy todir="${bin}/${resource}">
 			<fileset dir="${src}/${resource}">
 				<exclude name="**/*.class" />
+			</fileset>
+		</copy>
+		<copy todir="${bin}/${odorworldresource}">
+			<fileset dir="${src}/${odorworldresource}">
 			</fileset>
 		</copy>
 		<copy todir="${bin}/${commands}">
@@ -82,15 +88,11 @@
 			<fileset dir="scripts">
 			</fileset>
 		</copy>
-		<copy todir="${build.main}/images">
-			<fileset dir="images">
-			</fileset>
-		</copy>
 		<copy todir="${build.main}" file="${etc}/Readme.txt" />
 		<copy todir="${build.main}" file="${etc}/License.txt" />
-		<zip destfile="Simbrain_3_alpha_2.zip" basedir="${build.main}" />
+		<zip destfile="${version}.zip" basedir="${build.main}" />
 		<mkdir dir="${dist}"/>
-		<move todir="${dist}" file="Simbrain_3_alpha_2.zip" />
+		<move todir="${dist}" file="${version}.zip" />
 	</target>
 
 	<!-- Clean things up. -->

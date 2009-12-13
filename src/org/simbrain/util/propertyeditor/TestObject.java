@@ -45,7 +45,7 @@ public class TestObject {
 
     // Enum / Combo Box test
     private TestEnum theEnum = TestEnum.FOUR;
-    ComboBoxable boxable;
+    ComboBoxWrapper boxable;
 
     public enum TestEnum {
         ONE("One"), TWO("Two"), THREE("Three"), FOUR("Four"), FIVE("Five");
@@ -84,8 +84,8 @@ public class TestObject {
      * 
      * @return the boxable
      */
-    public ComboBoxable getEnumeration() {
-        return new ComboBoxable() {
+    public ComboBoxWrapper getEnumeration() {
+        return new ComboBoxWrapper() {
 
             public Object getCurrentObject() {
                 return theEnum;
@@ -104,7 +104,7 @@ public class TestObject {
      * @param boxable
      *            the boxable to set
      */
-    public void setEnumeration(ComboBoxable object) {
+    public void setEnumeration(ComboBoxWrapper object) {
         theEnum = (TestEnum) object.getCurrentObject();
     }
 

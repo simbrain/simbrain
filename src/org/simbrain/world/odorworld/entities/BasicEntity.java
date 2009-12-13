@@ -18,28 +18,20 @@
  */
 package org.simbrain.world.odorworld.entities;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.simbrain.util.propertyeditor.ComboBoxable;
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.world.odorworld.OdorWorld;
-
 
 /**
  * <b>BasicEntity</b> represents a basic entity in the Odor World environment.
  */
 public class BasicEntity extends OdorWorldEntity {
 
+
+    /** File separator. */
+    private static final String FS = System.getProperty("file.separator");
+
     /** Default image. */
-    private static final String DEFAULT_IMAGE = "Swiss.gif";
-
-    /** List of available objects (for property editor).*/
-    private List<String> images = new ArrayList<String>();
-
-    /** Current image name (for property editor).*/
-    private String currentImage = DEFAULT_IMAGE;
+    private static final String DEFAULT_IMAGE = "static" + FS + "Swiss.gif";
 
     /**
      * Construct a basic entity with a specified animation.
@@ -77,42 +69,36 @@ public class BasicEntity extends OdorWorldEntity {
     }
 
     /**
-     * Initialize the image name list.
+     * Getter which returns data that can be used in a combo box (the property
+     * editor dialog).
+     *
+     * @return the image data
      */
-    private void initImageList() {
-
-        //TODO: Not sure about locating resources at the root level, but I need something
-           //   that works for now.  This needs a consistent policy though.
-        String baseDir = System.getProperty("user.dir");
-        final String FS = System.getProperty("file.separator");
-        File dir = new File(baseDir + FS + "images" + FS + "static");
-        //TODO: Create file filter for jpg, etc.
-        //TODO: Use File separator
-        images.addAll(Arrays.asList(dir.list()));
-    }
-
-    /**
-     * @return the imageBox
-     */
-    public ComboBoxable getImages() {
-        initImageList();
-        return new ComboBoxable() {
+    public ComboBoxWrapper getType() {
+        return new ComboBoxWrapper() {
             public Object getCurrentObject() {
-                return currentImage;
+                String imageName = getAnimation().getImageLocations()[0];
+                String[] truncatedName = imageName.split("/");
+                return truncatedName[truncatedName.length - 1];
             }
 
             public Object[] getObjects() {
-                return images.toArray();
+                return new Object[] { "Bell.gif", "Fish.gif", "Gouda.gif",
+                        "Poison.gif", "Bluecheese.gif", "Flax.gif",
+                        "Pansy.gif", "Swiss.gif", "Candle.png", "Flower.gif",
+                        "PinkFlower.gif", "Tulip.gif" };
             }
         };
     }
 
     /**
-     * @param imageBox the imageBox to set
+     * Setter which takes the data from a combo box as an argument.
+     *
+     * @param imageData the data from the combo box
      */
-    public void setImages(ComboBoxable imageBox) {
-        currentImage = (String) imageBox.getCurrentObject();
-        this.setAnimation(new Animation(currentImage));
+    public void setType(ComboBoxWrapper imageData) {
+        String currentImage = (String) imageData.getCurrentObject();
+        this.setAnimation(new Animation("static" + FS + currentImage));
     }
 
 }

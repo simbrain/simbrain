@@ -156,8 +156,8 @@ public class ReflectivePropertyEditor extends JPanel {
                         final String formattedPropertyName = formatString(propertyName);
 
                         // Combo Boxes must be wrapped in a ComboBoxable
-                        if (method.getReturnType() == ComboBoxable.class) {
-                            ComboBoxable boxable = (ComboBoxable) getGetterValue(method);
+                        if (method.getReturnType() == ComboBoxWrapper.class) {
+                            ComboBoxWrapper boxable = (ComboBoxWrapper) getGetterValue(method);
                             JComboBox comboBox = new JComboBox(boxable
                                     .getObjects());
                             componentMap.put(propertyName, comboBox);
@@ -329,10 +329,10 @@ public class ReflectivePropertyEditor extends JPanel {
             Class<?> argumentType = m.getParameterTypes()[0];
 
             // Combo Box
-            if (argumentType == ComboBoxable.class) {
+            if (argumentType == ComboBoxWrapper.class) {
                 final Object selectedObject = ((JComboBox) componentMap
                         .get(propertyName)).getSelectedItem();
-                ComboBoxable boxedObject = new ComboBoxable() {
+                ComboBoxWrapper boxedObject = new ComboBoxWrapper() {
                     public Object getCurrentObject() {
                         return selectedObject;
                     }
@@ -341,7 +341,7 @@ public class ReflectivePropertyEditor extends JPanel {
                         return null;
                     }
                 };
-                setSetterValue(m, ComboBoxable.class, boxedObject);
+                setSetterValue(m, ComboBoxWrapper.class, boxedObject);
             }
 
             // Double array

@@ -20,7 +20,7 @@ package org.simbrain.util.environment;
 
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.ComboBoxable;
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.world.odorworld.entities.Animation;
 
 /**
@@ -417,8 +417,8 @@ public class SmellSource {
     /**
      * @return the imageBox
      */
-    public ComboBoxable getTheDecayFunction() {
-        return new ComboBoxable() {
+    public ComboBoxWrapper getTheDecayFunction() {
+        return new ComboBoxWrapper() {
             public Object getCurrentObject() {
                 return getDecayFunction();
             }
@@ -432,7 +432,7 @@ public class SmellSource {
     /**
      * @param imageBox the imageBox to set
      */
-    public void setTheDecayFunction(ComboBoxable decayFunctionBox) {
+    public void setTheDecayFunction(ComboBoxWrapper decayFunctionBox) {
         setDecayFunction((DecayFunction) decayFunctionBox.getCurrentObject());
     }
 

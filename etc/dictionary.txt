@@ -6,3 +6,5 @@ datapoint
 datasets
 refactored
 clipboard
+piccolo
+combo

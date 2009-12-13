@@ -46,6 +46,10 @@ public class NetworkPanelDesktop extends NetworkPanel {
         super(rootNetwork);
         this.component = component;
 
+        // By default the network's run toolbar is not shown in the context of a
+        // workspace,because it is confusingly similar to the workspace run / stop buttons
+        this.getRunToolBar().setVisible(false);
+
         // TODO: Finish this and clean it up
         NetworkGuiSettings.setLineColor(new Color(NetworkGuiPreferences.getLineColor()));
         NetworkGuiSettings.setBackgroundColor(new Color(NetworkGuiPreferences.
@@ -125,8 +129,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
         JMenu viewMenu = new JMenu("View");
 
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowRunToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowClampToolBarMenuItem());
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();

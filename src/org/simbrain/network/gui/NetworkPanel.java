@@ -192,6 +192,9 @@ public class NetworkPanel extends PCanvas  {
     /** Main tool bar. */
     private CustomToolBar mainToolBar;
 
+    /** Run tool bar. */
+    private CustomToolBar runToolBar;
+
     /** Edit tool bar. */
     private CustomToolBar editToolBar;
 
@@ -266,6 +269,7 @@ public class NetworkPanel extends PCanvas  {
         //initialize toolbars
         toolbars = new JPanel(new BorderLayout());
         mainToolBar = this.createMainToolBar();
+        runToolBar = this.createRunToolBar();
         editToolBar = this.createEditToolBar();
         clampToolBar = this.createClampToolBar();
         // Construct toolbar pane
@@ -274,6 +278,7 @@ public class NetworkPanel extends PCanvas  {
         flow.setVgap(0);
         JPanel internalToolbar = new JPanel(flow);
         internalToolbar.add(getMainToolBar());
+        internalToolbar.add(getRunToolBar());
         internalToolbar.add(getEditToolBar());
         internalToolbar.add(getClampToolBar());
         toolbars.add("Center", internalToolbar);
@@ -623,6 +628,21 @@ public class NetworkPanel extends PCanvas  {
     }
 
     /**
+     * Create the iteration tool bar.
+     *
+     * @return the toolbar.
+     */
+    protected CustomToolBar createRunToolBar() {
+
+        CustomToolBar runTools = new CustomToolBar();
+
+        runTools.add(actionManager.getIterateNetworkAction());
+        runTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
+
+        return runTools;
+    }
+
+    /**
      * Create the main tool bar.
      *
      * @return the toolbar.
@@ -634,15 +654,6 @@ public class NetworkPanel extends PCanvas  {
         for (Action action : actionManager.getNetworkModeActions()) {
             mainTools.add(action);
         }
-
-        mainTools.addSeparator();
-        mainTools.add(actionManager.getIterateNetworkAction());
-        mainTools
-                .add(new ToggleButton(actionManager.getNetworkControlActions()));
-        mainTools.addSeparator();
-        mainTools.add(actionManager.getZeroSelectedObjectsAction());
-        mainTools.add(actionManager.getRandomizeObjectsAction());
-        mainTools.addSeparator();
 
         return mainTools;
     }
@@ -659,6 +670,8 @@ public class NetworkPanel extends PCanvas  {
         for (Action action : actionManager.getNetworkEditingActions()) {
             editTools.add(action);
         }
+        editTools.add(actionManager.getZeroSelectedObjectsAction());
+        editTools.add(actionManager.getRandomizeObjectsAction());
 
         return editTools;
     }
@@ -1916,6 +1929,13 @@ public class NetworkPanel extends PCanvas  {
      */
     public CustomToolBar getEditToolBar() {
         return editToolBar;
+    }
+
+    /**
+     * @return Returns run tool bar.
+     */
+    public CustomToolBar getRunToolBar() {
+        return runToolBar;
     }
 
 

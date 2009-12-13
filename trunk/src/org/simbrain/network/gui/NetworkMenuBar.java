@@ -123,8 +123,9 @@ public class NetworkMenuBar {
 
         JMenu viewMenu = new JMenu("View");
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowRunToolBarMenuItem());
+        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
         toolbarMenu.add(actionManager.getShowClampToolBarMenuItem());
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();

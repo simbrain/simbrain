@@ -28,6 +28,7 @@ import org.simbrain.network.gui.actions.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.AlignVerticalAction;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
+import org.simbrain.network.gui.actions.ShowRunToolBarAction;
 import org.simbrain.network.gui.actions.WandEditModeAction;
 import org.simbrain.network.gui.actions.ZeroSelectedObjectsAction;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -80,22 +81,12 @@ import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 
 /**
  * Network action manager.
- * 
+ *
  * <p>
  * This class contains references to all the actions for a NetworkPanel. In some
  * cases, related actions are grouped together, see e.g.
  * <code>getNetworkModeActions()</code>.
  * </p>
- * 
- * <p>
- * These references are contained here instead of in NetworkPanel simply to
- * reduce the amount of code in NetworkPanel. Most but not all actions hold a
- * reference to the NetworkPanel, passed in via their constructor.
- * </p>
- * 
- * Wait, no, not just for that? Also so there is just one instance that can be
- * shared? That way changes to the action are reflected everywhere... right?
- * 
  */
 public final class NetworkActionManager {
 
@@ -225,6 +216,9 @@ public final class NetworkActionManager {
     /** Determines if edit tool bar is to be shown. */
     private final Action showEditToolBarAction;
 
+    /** Determines if run tool bar is to be shown. */
+    private final Action showRunToolBarAction;
+
     /** Determines if clamp tool bar is to be shown. */
     private final Action showClampToolBarAction;
 
@@ -312,6 +306,8 @@ public final class NetworkActionManager {
         showMainToolBarAction = new ShowMainToolBarAction(networkPanel);
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
         showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
+        showRunToolBarAction = new ShowRunToolBarAction(networkPanel);
+        
         ShowGUIAction theShowGUIAction = new ShowGUIAction(networkPanel);
         showGUIAction = new JCheckBoxMenuItem(theShowGUIAction);
         ShowWeightsAction theShowNodesAction = new ShowWeightsAction(networkPanel);
@@ -786,10 +782,20 @@ public final class NetworkActionManager {
      */
     public JCheckBoxMenuItem getShowClampToolBarMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showClampToolBarAction);
-        actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
+        actionWrapper.setSelected(networkPanel.getClampToolBar().isVisible());
         return actionWrapper;
     }
 
+    /**
+     * Return the run clamp tool bar menu item.
+     *
+     * @return the run clamp tool bar menu item
+     */
+    public JCheckBoxMenuItem getShowRunToolBarMenuItem() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showRunToolBarAction);
+        actionWrapper.setSelected(networkPanel.getRunToolBar().isVisible());
+        return actionWrapper;
+    }
 
     /**
      * Return the set source neurons action.
@@ -856,12 +862,12 @@ public final class NetworkActionManager {
     }
 
 
-	/**
-	 * @return the ungroupAction
-	 */
-	public Action getUngroupAction() {
-		return ungroupAction;
-	}
+    /**
+     * @return the ungroupAction
+     */
+    public Action getUngroupAction() {
+        return ungroupAction;
+    }
 
 
 	/**
@@ -870,4 +876,5 @@ public final class NetworkActionManager {
 	public Action getGroupAction() {
 		return groupAction;
 	}
+
 }

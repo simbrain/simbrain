@@ -250,7 +250,7 @@ public final class Sensor extends SingleAttributeProducer<Double> {
     }
 
     public String getKey() {
-        return "sample";
+        return filter.getDescription() + " (" + receptiveField.getCenterX() + ")(" + receptiveField.getCenterY() + ")";
     }
 
     /**

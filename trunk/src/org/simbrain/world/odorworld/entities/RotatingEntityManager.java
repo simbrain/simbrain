@@ -89,103 +89,104 @@ public class RotatingEntityManager {
     }
 
     /**
-     * Tree map for cow.
-     * 
-     * Courtesy of Reiner Prokein,
-     * http://reinerstileset.4players.de/englisch.html
-     * 
+     * Tree map for a rotating image from Reiner Prokein's collection.
+     *
+     * Courtesy of http://reinerstileset.4players.de/englisch.html
+     *
+     * @param tileBaseName
+     *            base name used to access the relevant set of image, which are
+     *            named in a standard way
      * @return horse tree map
      */
-    public static TreeMap<Double, Animation> getCow() {
+    public static TreeMap<Double, Animation> getRotatingTileset(String tileBaseName, int duration) {
         TreeMap<Double, Animation> cowMap = new TreeMap<Double, Animation>();
 
         double angle = 7.5;
-        int duration = 25;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "e0001.png",
-                "rotating" + FS + "cow" + FS + "e0002.png",
-                "rotating" + FS + "cow" + FS + "e0003.png",
-                "rotating" + FS + "cow" + FS + "e0004.png",
-                "rotating" + FS + "cow" + FS + "e0005.png",
-                "rotating" + FS + "cow" + FS + "e0006.png",
-                "rotating" + FS + "cow" + FS + "e0007.png", }, duration));
+                "rotating" + FS + tileBaseName + FS + "e0001.png",
+                "rotating" + FS + tileBaseName + FS + "e0002.png",
+                "rotating" + FS + tileBaseName + FS + "e0003.png",
+                "rotating" + FS + tileBaseName + FS + "e0004.png",
+                "rotating" + FS + tileBaseName + FS + "e0005.png",
+                "rotating" + FS + tileBaseName + FS + "e0006.png",
+                "rotating" + FS + tileBaseName + FS + "e0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "ne0000.png",
-                "rotating" + FS + "cow" + FS + "ne0001.png",
-                "rotating" + FS + "cow" + FS + "ne0002.png",
-                "rotating" + FS + "cow" + FS + "ne0003.png",
-                "rotating" + FS + "cow" + FS + "ne0004.png",
-                "rotating" + FS + "cow" + FS + "ne0005.png",
-                "rotating" + FS + "cow" + FS + "ne0006.png",
-                "rotating" + FS + "cow" + FS + "ne0007.png", }, duration));
+                "rotating" + FS + tileBaseName + FS + "ne0000.png",
+                "rotating" + FS + tileBaseName + FS + "ne0001.png",
+                "rotating" + FS + tileBaseName + FS + "ne0002.png",
+                "rotating" + FS + tileBaseName + FS + "ne0003.png",
+                "rotating" + FS + tileBaseName + FS + "ne0004.png",
+                "rotating" + FS + tileBaseName + FS + "ne0005.png",
+                "rotating" + FS + tileBaseName + FS + "ne0006.png",
+                "rotating" + FS + tileBaseName + FS + "ne0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "n0000.png",
-                "rotating" + FS + "cow" + FS + "n0001.png",
-                "rotating" + FS + "cow" + FS + "n0002.png",
-                "rotating" + FS + "cow" + FS + "n0003.png",
-                "rotating" + FS + "cow" + FS + "n0004.png",
-                "rotating" + FS + "cow" + FS + "n0005.png",
-                "rotating" + FS + "cow" + FS + "n0006.png",
-                "rotating" + FS + "cow" + FS + "n0007.png", }, duration));
+                "rotating" + FS + tileBaseName + FS + "n0000.png",
+                "rotating" + FS + tileBaseName + FS + "n0001.png",
+                "rotating" + FS + tileBaseName + FS + "n0002.png",
+                "rotating" + FS + tileBaseName + FS + "n0003.png",
+                "rotating" + FS + tileBaseName + FS + "n0004.png",
+                "rotating" + FS + tileBaseName + FS + "n0005.png",
+                "rotating" + FS + tileBaseName + FS + "n0006.png",
+                "rotating" + FS + tileBaseName + FS + "n0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "nw0000.png",
-                "rotating" + FS + "cow" + FS + "nw0001.png",
-                "rotating" + FS + "cow" + FS + "nw0002.png",
-                "rotating" + FS + "cow" + FS + "nw0003.png",
-                "rotating" + FS + "cow" + FS + "nw0004.png",
-                "rotating" + FS + "cow" + FS + "nw0005.png",
-                "rotating" + FS + "cow" + FS + "nw0006.png",
-                "rotating" + FS + "cow" + FS + "nw0007.png", }, duration));
+                "rotating" + FS + tileBaseName + FS + "nw0000.png",
+                "rotating" + FS + tileBaseName + FS + "nw0001.png",
+                "rotating" + FS + tileBaseName + FS + "nw0002.png",
+                "rotating" + FS + tileBaseName + FS + "nw0003.png",
+                "rotating" + FS + tileBaseName + FS + "nw0004.png",
+                "rotating" + FS + tileBaseName + FS + "nw0005.png",
+                "rotating" + FS + tileBaseName + FS + "nw0006.png",
+                "rotating" + FS + tileBaseName + FS + "nw0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "w0000.png",
-                "rotating" + FS + "cow" + FS + "w0001.png",
-                "rotating" + FS + "cow" + FS + "w0002.png",
-                "rotating" + FS + "cow" + FS + "w0003.png",
-                "rotating" + FS + "cow" + FS + "w0004.png",
-                "rotating" + FS + "cow" + FS + "w0005.png",
-                "rotating" + FS + "cow" + FS + "w0006.png",
-                "rotating" + FS + "cow" + FS + "w0007.png" }, duration));
+                "rotating" + FS + tileBaseName + FS + "w0000.png",
+                "rotating" + FS + tileBaseName + FS + "w0001.png",
+                "rotating" + FS + tileBaseName + FS + "w0002.png",
+                "rotating" + FS + tileBaseName + FS + "w0003.png",
+                "rotating" + FS + tileBaseName + FS + "w0004.png",
+                "rotating" + FS + tileBaseName + FS + "w0005.png",
+                "rotating" + FS + tileBaseName + FS + "w0006.png",
+                "rotating" + FS + tileBaseName + FS + "w0007.png" }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "sw0000.png",
-                "rotating" + FS + "cow" + FS + "sw0001.png",
-                "rotating" + FS + "cow" + FS + "sw0002.png",
-                "rotating" + FS + "cow" + FS + "sw0003.png",
-                "rotating" + FS + "cow" + FS + "sw0004.png",
-                "rotating" + FS + "cow" + FS + "sw0005.png",
-                "rotating" + FS + "cow" + FS + "sw0006.png",
-                "rotating" + FS + "cow" + FS + "sw0007.png", }, duration));
+                "rotating" + FS + tileBaseName + FS + "sw0000.png",
+                "rotating" + FS + tileBaseName + FS + "sw0001.png",
+                "rotating" + FS + tileBaseName + FS + "sw0002.png",
+                "rotating" + FS + tileBaseName + FS + "sw0003.png",
+                "rotating" + FS + tileBaseName + FS + "sw0004.png",
+                "rotating" + FS + tileBaseName + FS + "sw0005.png",
+                "rotating" + FS + tileBaseName + FS + "sw0006.png",
+                "rotating" + FS + tileBaseName + FS + "sw0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "s0000.png",
-                "rotating" + FS + "cow" + FS + "s0001.png",
-                "rotating" + FS + "cow" + FS + "s0002.png",
-                "rotating" + FS + "cow" + FS + "s0003.png",
-                "rotating" + FS + "cow" + FS + "s0004.png",
-                "rotating" + FS + "cow" + FS + "s0005.png",
-                "rotating" + FS + "cow" + FS + "s0006.png",
-                "rotating" + FS + "cow" + FS + "s0007.png", }, duration));
+                "rotating" + FS + tileBaseName + FS + "s0000.png",
+                "rotating" + FS + tileBaseName + FS + "s0001.png",
+                "rotating" + FS + tileBaseName + FS + "s0002.png",
+                "rotating" + FS + tileBaseName + FS + "s0003.png",
+                "rotating" + FS + tileBaseName + FS + "s0004.png",
+                "rotating" + FS + tileBaseName + FS + "s0005.png",
+                "rotating" + FS + tileBaseName + FS + "s0006.png",
+                "rotating" + FS + tileBaseName + FS + "s0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + "cow" + FS + "se0000.png",
-                "rotating" + FS + "cow" + FS + "se0001.png",
-                "rotating" + FS + "cow" + FS + "se0002.png",
-                "rotating" + FS + "cow" + FS + "se0003.png",
-                "rotating" + FS + "cow" + FS + "se0004.png",
-                "rotating" + FS + "cow" + FS + "se0005.png",
-                "rotating" + FS + "cow" + FS + "se0006.png",
-                "rotating" + FS + "cow" + FS + "se0007.png", }, duration));
+                "rotating" + FS + tileBaseName + FS + "se0000.png",
+                "rotating" + FS + tileBaseName + FS + "se0001.png",
+                "rotating" + FS + tileBaseName + FS + "se0002.png",
+                "rotating" + FS + tileBaseName + FS + "se0003.png",
+                "rotating" + FS + tileBaseName + FS + "se0004.png",
+                "rotating" + FS + tileBaseName + FS + "se0005.png",
+                "rotating" + FS + tileBaseName + FS + "se0006.png",
+                "rotating" + FS + tileBaseName + FS + "se0007.png", }, duration));
 
         return cowMap;
     }

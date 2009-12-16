@@ -485,6 +485,25 @@ public abstract class Network {
     }
 
     /**
+     * Sets neuron activations using values in an array of doubles. Currently
+     * these activations are applied to the network in whatever order the
+     * neurons were added.
+     * 
+     * @param activationArray
+     *            array of values to apply to network
+     */
+    public void setActivations(final double[] activationArray) {
+        // TODO: Sort by id
+        int i = 0;
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            if (activationArray.length == i) {
+                return;
+            }
+            neuron.setActivation(activationArray[i++]);
+        }
+    }
+
+    /**
      * Sets all weights to a specified value.
      *
      * @param value value to set

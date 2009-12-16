@@ -22,17 +22,19 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
- * Action for showing a dialog to edit a smell source.
+ * Add a new smell source to this entity.
  */
-public final class EditSmellSourceAction
-    extends AbstractAction {
+public final class AddSmellSourceAction extends AbstractAction {
 
     /** Plot GUI component. */
     private final OdorWorldPanel component;
@@ -43,31 +45,32 @@ public final class EditSmellSourceAction
     /**
      * Create a new open plot action.
      *
-     * @param component GUI component, must not be null.
+     * @param component
+     *            GUI component, must not be null.
      */
-    public EditSmellSourceAction(final OdorWorldPanel component, OdorWorldEntity entity) {
-        super("Edit smell source...");
+    public AddSmellSourceAction(final OdorWorldPanel component,
+            OdorWorldEntity entity) {
+        super("Add / Change smell source...");
         this.entity = entity;
         if (component == null) {
-            throw new IllegalArgumentException("Desktop component must not be null");
+            throw new IllegalArgumentException(
+                    "Desktop component must not be null");
         }
         this.component = component;
-        //this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
-        //        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-        putValue(SHORT_DESCRIPTION, "View / Edit smell stimulus...");
+        // this.putValue(this.ACCELERATOR_KEY,
+        // KeyStroke.getKeyStroke(KeyEvent.VK_P,
+        // Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        // putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SHORT_DESCRIPTION, "Add a smell source to this object...");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-
-        ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(entity
-                .getSmellSource()));
-        JDialog dialog = editor.getDialog();
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        int dimensions = Integer
+                .parseInt(JOptionPane
+                        .showInputDialog("How many dimensions will the smell vector have?"));
+        entity.setSmellSource(new SmellSource(SimbrainMath
+                .zeroVector(dimensions)));
     }
 
 }

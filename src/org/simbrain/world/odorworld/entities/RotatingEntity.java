@@ -81,7 +81,13 @@ public class RotatingEntity extends OdorWorldEntity {
         if (entityType.equalsIgnoreCase("Mouse")) {
             imageMap = RotatingEntityManager.getMouse();
         } else if (entityType.equalsIgnoreCase("Cow")) {
-            imageMap = RotatingEntityManager.getCow();
+            imageMap = RotatingEntityManager.getRotatingTileset("cow", 15);
+        } else if (entityType.equalsIgnoreCase("Arnold")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("arno", 55);
+        } else if (entityType.equalsIgnoreCase("Susi")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("susi", 55);
+        } else if (entityType.equalsIgnoreCase("Amy")) {
+            imageMap = RotatingEntityManager.getRotatingTileset("amy", 55);
         }
         update(0);
     }
@@ -217,7 +223,7 @@ public class RotatingEntity extends OdorWorldEntity {
             }
 
             public Object[] getObjects() {
-                return new Object[] { "Cow", "Mouse" };
+                return new Object[] { "Amy", "Arnold", "Cow", "Mouse", "Susi" };
             }
         };
     }

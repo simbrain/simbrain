@@ -38,6 +38,7 @@ import javax.swing.JPopupMenu;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.actions.AddAgentAction;
 import org.simbrain.world.odorworld.actions.AddEntityAction;
+import org.simbrain.world.odorworld.actions.AddSmellSourceAction;
 import org.simbrain.world.odorworld.actions.DeleteEntityAction;
 import org.simbrain.world.odorworld.actions.ShowEntityDialogAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
@@ -378,15 +379,18 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         //            ret.addSeparator();
         //        }
 
-        ret.add(new JMenuItem(new DeleteEntityAction(this, theEntity)));
-        ret.addSeparator();
         ret.add(new JMenuItem(new ShowEntityDialogAction(theEntity)));
 
-        // Add smell source item if the entity has one.
+        // TODO: Fix this up; maybe add and delete and edit separate
+        ret.addSeparator();
+        ret.add(new JMenuItem(new AddSmellSourceAction(this, theEntity)));
         if (theEntity.getSmellSource() != null) {
-            ret.addSeparator();
             ret.add(new JMenuItem(new EditSmellSourceAction(this, theEntity)));
         }
+
+        ret.addSeparator();
+        ret.add(new JMenuItem(new DeleteEntityAction(this, theEntity)));
+
 
         return ret;
     }

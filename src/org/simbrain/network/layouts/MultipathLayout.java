@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
@@ -9,6 +27,8 @@ import org.simbrain.network.interfaces.Neuron;
 
 /**
  * MultipathLayout arranges the layers of the network in multiple paths.
+ *
+ * TODO: Clarify the way this layout works and perhaps generalize it.
  */
 public class MultipathLayout implements Layout {
 
@@ -23,7 +43,7 @@ public class MultipathLayout implements Layout {
 
     /** Initial y position of line of neurons. */
     private double initialY;
-    
+
     /** Number of paths. */
     private int numberOfPaths = 1;
 
@@ -39,9 +59,9 @@ public class MultipathLayout implements Layout {
     /**
      * Lay out a complex network into layers.
      *
-     * @param hspacing
-     * @param vspacing
-     * @param layout
+     * @param hspacing horizontal spacing
+     * @param vspacing vertical spacing
+     * @param layout vertical vs. horizontal
      */
     public MultipathLayout(final double hspacing, final double vspacing, final int numberOfPaths, final int layout) {
         this.vSpacing = vspacing;

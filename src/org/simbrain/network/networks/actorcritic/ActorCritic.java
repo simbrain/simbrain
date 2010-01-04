@@ -19,22 +19,15 @@
 
 package org.simbrain.network.networks.actorcritic;
 
-import java.util.HashSet;
-import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.networks.StandardNetwork;
-import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.synapses.SimpleSynapse;
-import org.simbrain.network.util.SimpleId;
 
 /**
  * <b>ActorCritic</b>. Implements Temporal Difference learning. This network
@@ -75,7 +68,7 @@ public class ActorCritic extends Network {
     private double[] lastCritic = null;
 
     /** Actor learning rate. */
-    private double actorLearningRate = 1;
+    private double actorLearningRate = .01;
 
     /** Critic learning rate. */
     private double criticLearningRate = 1;
@@ -136,23 +129,11 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     * 
-     * @return Initialized object.
-     */
-    private Object readResolve() {
-        initVariables();
-        return this;
-    }
-
-    /**
      *  Create neurons.
      */
 
     private void createNeurons() {
+        
         stateNetwork = new StandardNetwork(this.getRootNetwork());
         actionsNetwork = new StandardNetwork(this.getRootNetwork());
         criticLayer = new StandardNetwork(this.getRootNetwork());
@@ -166,9 +147,18 @@ public class ActorCritic extends Network {
         for (int i = 0; i < this.actorUnits; i++) {
             this.actionsNetwork.addNeuron(new LinearNeuron());
         }
-        for (int i = 0; i < 2; i++) {
-            this.criticLayer.addNeuron(new LinearNeuron());
-        }
+
+        // Expected value neuron
+        LinearNeuron expectedValueNeuron = new LinearNeuron();
+        expectedValueNeuron.setLabel("Exp.");
+        this.criticLayer.addNeuron(expectedValueNeuron);
+
+        // Reward neuron
+        LinearNeuron rewardNeuron = new LinearNeuron();
+        rewardNeuron.setLabel("Reward");
+        this.criticLayer.addNeuron(rewardNeuron);
+
+        // Add the network
         addNetwork(stateNetwork);
         addNetwork(actionsNetwork);
         addNetwork(criticLayer);
@@ -231,6 +221,7 @@ public class ActorCritic extends Network {
             stateNetwork.getNeuron(i).update();
             stateNetwork.getNeuron(i).setActivation(stateNetwork.getNeuron(i).getBuffer());
         }
+
         // Now find the action
         double[] a = new double[actionsNetwork.getNeuronCount()];
         for (int i = 0; i < actionsNetwork.getNeuronCount(); i++) {
@@ -238,14 +229,17 @@ public class ActorCritic extends Network {
             actionsNetwork.getNeuron(i).update();
             a[i] = actionsNetwork.getNeuron(i).getBuffer();
         }
+
         // Update Action network
         for (int i = 0; i < actionsNetwork.getNeuronCount(); i++) {
             actionsNetwork.getNeuron(i).setActivation(a[i]);
         }
+
         // Adaptive Critic
         this.lastCritic[0] = criticLayer.getNeuron(0).getActivation();
         criticLayer.getNeuron(0).update();
         criticLayer.getNeuron(0).setActivation(criticLayer.getNeuron(0).getBuffer());
+
         // Reward Neuron 
         this.lastCritic[1] = criticLayer.getNeuron(1).getActivation();
         criticLayer.getNeuron(1).update();
@@ -263,15 +257,14 @@ public class ActorCritic extends Network {
     private void updateWeights() {
         double delta = (this.gamma * this.criticLayer.getNeuron(0).getActivation()
                 + this.lastCritic[1]) - this.lastCritic[0];
-
-        if (delta < 0) {
-            System.out.print("negative delta");
-        }
+//        if (delta < 0) {
+//            System.out.print("negative delta");
+//        }
         int i;
         // Update critic weights
         for (i = 0; i < this.stateUnits; i++) {
-            this.getSynapse(this.stateNetwork.getNeuron(i), this.criticLayer.getNeuron(0)).setStrength(
-                    this.getSynapse(this.stateNetwork.getNeuron(i), this.criticLayer.getNeuron(0)).getStrength()
+            Synapse toUpdate =  this.getSynapse(this.stateNetwork.getNeuron(i), this.criticLayer.getNeuron(0));
+            toUpdate.setStrength(toUpdate.getStrength()
                     + this.criticLearningRate * this.lastState[i] * delta);
             this.getSynapse(i).checkBounds();
         }
@@ -514,4 +507,17 @@ public class ActorCritic extends Network {
         this.stateNetwork = state;
     }
 
+
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     *
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        initVariables();
+        return this;
+    }
 }

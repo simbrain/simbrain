@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
+import org.simbrain.workspace.updator.ComponentUpdateListener;
 import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 
 /**
@@ -578,20 +579,19 @@ public class Workspace {
      * @param newUpdator the new updator
      */
     private void swapUpdators(final WorkspaceUpdator newUpdator) {
-    	
-        List<WorkspaceUpdatorListener> updatorListenerList =  updator.getListeners();
+
         updator = newUpdator;
-        for(WorkspaceUpdatorListener listener : updatorListenerList) {
-            updator.addListener(listener);
+        for(WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
+            updator.addUpdatorListener(listener);
         }
-        for(WorkspaceUpdatorListener listener : updatorListenerList) {
+        for(WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
             listener.changedUpdateController();
         }
     }
-        
+
     /**
      * Sets a custom controller with the default number of threads.
-     * 
+     *
      * @param controller The number of threads to use.
      */
     public void resetUpdateController() {

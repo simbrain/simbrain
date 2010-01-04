@@ -35,13 +35,14 @@ import javax.swing.JToolBar;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.updator.ComponentUpdateListener;
 import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 
 /**
  * Display updator and thread information.
- * 
+ *
  * @author jyoshimi
- * 
+ *
  */
 public class ThreadViewerPanel extends JPanel {
 
@@ -53,19 +54,19 @@ public class ThreadViewerPanel extends JPanel {
 
     /** List. */
     private JList list = new JList();
-    
+
     /** List model. */
     private ThreadListModel<ListItem> listModel = new ThreadListModel<ListItem>();
-    
+
     /** Label for update method name. */
     private JLabel updateName = new JLabel();
-    
+
     /** Thread viewer scroll pane. */
     JScrollPane scrollPane = null;
     
     /** Reference to parent workspace. */
     private Workspace workspace;
-    
+
     /** Number of update threads. */
     private JTextField updatorNumThreads = new JTextField();
 
@@ -89,26 +90,28 @@ public class ThreadViewerPanel extends JPanel {
         topStatsPanel.addSeparator(new Dimension(50,10));
         topStatsPanel.add(new JLabel("Number of Threads: "));
         updatorNumThreads.setMaximumSize(new Dimension(100,100));
-        topStatsPanel.add(updatorNumThreads);        
+        topStatsPanel.add(updatorNumThreads);
         JButton setThreadsButton = new JButton("Set");
         setThreadsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				workspace.getWorkspaceUpdator().setNumThreads(Integer.parseInt(updatorNumThreads.getText()));
+                workspace.getWorkspaceUpdator().setNumThreads(
+                        Integer.parseInt(updatorNumThreads.getText()));
 			}
-        	
+
         });
         topStatsPanel.add(setThreadsButton);
         topStatsPanel.addSeparator(new Dimension(50,10));
-        topStatsPanel.add(new JLabel("Number of Processors: " + Runtime.getRuntime().availableProcessors()));
+        topStatsPanel.add(new JLabel("Number of Processors: "
+                + Runtime.getRuntime().availableProcessors()));
         updateStats();
 
         // Add main components to panel
         this.add("North", topStatsPanel);
         this.add("Center", threadViewer);
 
-        // Add workspace updator listener
-        workspace.getWorkspaceUpdator().addListener(
-                new WorkspaceUpdatorListener() {
+        // Add updator component listener
+        workspace.getWorkspaceUpdator().addComponentListener(
+                new ComponentUpdateListener() {
 
                 	/**
                 	 * {@inheritDoc}
@@ -133,34 +136,45 @@ public class ThreadViewerPanel extends JPanel {
                                         + component.getName());
                         threadViewer.repaint();
                     }
+                });
 
-                	/**
-                	 * {@inheritDoc}
-                	 */
+        // Add updator listener
+        workspace.getWorkspaceUpdator().addUpdatorListener(
+                new WorkspaceUpdatorListener() {
+
+                    /**
+                     * {@inheritDoc}
+                     */
                     public void updatedCouplings(int update) {
                         listModel.getElementAt(update - 1).setText(
                                 "Thread " + update + ": updating couplings");
                         threadViewer.repaint();
                     }
 
-                	/**
-                	 * {@inheritDoc}
-                	 */
-					public void changedUpdateController() {
-						updateStats();
-					}
-
-                	/**
-                	 * {@inheritDoc}
-                	 */
-					public void changeNumThreads() {
-						updateList();
-					}
+                    /**
+                     * {@inheritDoc}
+                     */
+                    public void changedUpdateController() {
+                        updateStats();
+                    }
 
                     /**
                      * {@inheritDoc}
                      */
-                    public void updatedWorkspace() {
+                    public void changeNumThreads() {
+                        updateList();
+                    }
+
+                    // TODO: Should be some useful graphic thing to do when update begins and ends...
+                    public void updatingStarted() {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void updatingFinished() {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void workspaceUpdated() {
                         // TODO Auto-generated method stub
                     }
 
@@ -179,7 +193,7 @@ public class ThreadViewerPanel extends JPanel {
         list.setModel(listModel);
         updatorNumThreads.setText("" + workspace.getWorkspaceUpdator().getNumThreads());
     }
-    
+
 	/**
 	 * Update the labels on the thread viewer panel, of which there is currently
 	 * just one.

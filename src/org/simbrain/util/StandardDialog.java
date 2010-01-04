@@ -34,17 +34,21 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-
 /**
- * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and "Cancel" buttons. Subclasses can
- * override the isDataValid(), okButtonPressed(), and cancelButtonPressed() methods to perform implementation specific
- * processing.
+ * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and
+ * "Cancel" buttons. Special functionality associated with Simbrain has also
+ * been added.
+ * 
+ * Subclasses can override the isDataValid(), okButtonPressed(), and
+ * cancelButtonPressed() methods to perform implementation specific processing.
  *
  * <P>
- * By default, the dialog is modal, and has a JPanel with a BorderLayout for its content pane.
+ * By default, the dialog is modal, and has a JPanel with a BorderLayout for its
+ * content pane.
  * </p>
  *
  * @author David Fraser
@@ -52,6 +56,17 @@ import javax.swing.KeyStroke;
  */
 public class StandardDialog extends JDialog {
 
+    /**
+     * When this flag is set to true, then whenever a StandardDialog is used, a
+     * warning will be displayed first, notifying the user that an external
+     * simulation is running.
+     */
+    private static boolean isRunning;
+
+    /**
+     * Use this flag to disable the use of run warnings (see isRunning)
+     */
+    private static final boolean USE_RUN_WARNINGS = true;
 
     /** Custom button panel. */
     private JPanel customButtonPanel = new JPanel();
@@ -66,15 +81,11 @@ public class StandardDialog extends JDialog {
     /** The spacing between components in pixels. */
     private static final int COMPONENT_SPACING = 10;
 
-    // Attributes
-
     /** Flag indicating if the "Cancel" button was pressed to close dialog. */
     private boolean myIsDialogCancelled = true;
 
     /** The content pane for holding user components. */
     private Container myUserContentPane;
-
-    // Methods
 
     /**
      * This method is the default constructor.
@@ -84,7 +95,8 @@ public class StandardDialog extends JDialog {
     }
 
     /**
-     * This method creates a StandardDialog with the given parent frame and title.
+     * This method creates a StandardDialog with the given parent frame and
+     * title.
      *
      * @param parent The parent frame for the dialog.
      * @param title The title to display in the dialog.
@@ -129,6 +141,14 @@ public class StandardDialog extends JDialog {
      * This method sets up the default attributes of the dialog and the content pane.
      */
     private void init() {
+
+        if (isRunning && USE_RUN_WARNINGS) {
+            JOptionPane.showMessageDialog( null,
+                            "WARNING: You are modifying system parameters while a simulation is running. \n "
+                                    + "Some functions may not behave as they are supposed to.",
+                            "Warning!", JOptionPane.WARNING_MESSAGE);
+        }
+
         setModal(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -173,7 +193,7 @@ public class StandardDialog extends JDialog {
 
         internalContentPane.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Initialise the user content pane with a JPanel
+        // Initialize the user content pane with a JPanel
         setContentPane(new JPanel(new BorderLayout()));
 
         super.setContentPane(internalContentPane);
@@ -214,8 +234,9 @@ public class StandardDialog extends JDialog {
     }
 
     /**
-     * This method gets the content pane for adding components. Components should not be added directly to the dialog.
-     *
+     * This method gets the content pane for adding components. Components
+     * should not be added directly to the dialog.
+     * 
      * @return the content pane for the dialog.
      */
     public Container getContentPane() {
@@ -223,9 +244,11 @@ public class StandardDialog extends JDialog {
     }
 
     /**
-     * This method sets the content pane for adding components. Components should not be added directly to the dialog.
+     * This method sets the content pane for adding components. Components
+     * should not be added directly to the dialog.
      *
-     * @param contentPane The content pane for the dialog.
+     * @param contentPane
+     *            The content pane for the dialog.
      */
     public void setContentPane(final Container contentPane) {
         myUserContentPane = contentPane;
@@ -234,21 +257,25 @@ public class StandardDialog extends JDialog {
     }
 
     /**
-     * This method returns <code>true</code> if the User cancelled the dialog otherwise <code>false</code>. The dialog
-     * is cancelled if the "Cancel" button is pressed or the "Close" window button is pressed, or the "Escape" key is
-     * pressed. In other words, if the User has caused the dialog to close by any method other than by pressing the
-     * "Ok" button, this method will return <code>true</code>.
+     * This method returns <code>true</code> if the User cancelled the dialog
+     * otherwise <code>false</code>. The dialog is cancelled if the "Cancel"
+     * button is pressed or the "Close" window button is pressed, or the
+     * "Escape" key is pressed. In other words, if the User has caused the
+     * dialog to close by any method other than by pressing the "Ok" button,
+     * this method will return <code>true</code>.
      */
     public boolean hasUserCancelled() {
         return myIsDialogCancelled;
     }
 
     /**
-     * This method is used to validate the current dialog box. This method provides a default response of
-     * <code>true</code>. This method should be implemented by each dialog that extends this class.
+     * This method is used to validate the current dialog box. This method
+     * provides a default response of <code>true</code>. This method should be
+     * implemented by each dialog that extends this class.
      *
-     * @return a boolean indicating if the data is valid. <code>true</code> indicates that all of the fields were
-     *         validated correctly and <code>false</code> indicates the validation failed
+     * @return a boolean indicating if the data is valid. <code>true</code>
+     *         indicates that all of the fields were validated correctly and
+     *         <code>false</code> indicates the validation failed
      */
     protected boolean isValidData() {
         return true;
@@ -261,5 +288,12 @@ public class StandardDialog extends JDialog {
      */
     public void addButton(final JButton theButton) {
         customButtonPanel.add(theButton);
+    }
+
+    /**
+     * @param isRunning the isRunning to set
+     */
+    public static void setSimulationRunning(boolean isRunning) {
+        StandardDialog.isRunning = isRunning;
     }
 }

@@ -441,4 +441,18 @@ public abstract class OdorWorldEntity {
         return false;
     }
 
+    /**
+     * @return the behavior
+     */
+    public Behavior getBehavior() {
+        return behavior;
+    }
+
+    /**
+     * @param behavior the behavior to set
+     */
+    public void setBehavior(Behavior behavior) {
+        this.behavior = behavior;
+    }
+
 }

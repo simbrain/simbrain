@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace.updator;
 
 import java.util.ArrayList;
@@ -9,13 +27,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.log4j.Logger;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.CouplingManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * This class manages the workspace updates, possibly using multiple threads.
- * 
+ *
  * The main part of the default update can be found in the DEFAULT_CONTROLLER
  * instance. Each component update call is fed to an executor service which uses
  * as many threads as it's configured to use (it defaults to the number of
@@ -23,56 +42,60 @@ import org.simbrain.workspace.WorkspaceComponent;
  * on a countdown latch. Each component update decrements the latch so that
  * after the last update is complete, the thread waiting on the latch wakes up
  * and updates all the couplings.
- * 
+ *
  * There's a second executor service that's only there to execute event updates.
  * This is to support the need for a view on threads.
- * 
+ *
  * The thread factory is used to create a custom thread class that will be
  * generated inside the executor. This allows for a clean way to capture the
  * events using the thread instances themselves which 'know' their thread
  * number.
- * 
+ *
  * @author Matt Watson
  */
 public class WorkspaceUpdator {
 
     /** The static logger for the class. */
     static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
-    
+
     /** The parent workspace. */
     private final Workspace workspace;
-    
+
     /** The coupling manager for the workspace. */
     private final CouplingManager manager;
-    
+
     /** The Update Controller.  */
     private final UpdateController controller;
-    
+
     /** The executor service for managing updates. */
     private final ExecutorService updates;
-    
+
     /** The executor service for doing updates. */
     private ExecutorService service;
-    
+
     /** The executor service for notifying listeners. */
     private final ExecutorService events;
 
-    /** The listeners on this object. */
-    private final List<WorkspaceUpdatorListener> listeners
+    /** Component listeners. */
+    private final List<ComponentUpdateListener> componentListeners
+        = new CopyOnWriteArrayList<ComponentUpdateListener>();
+
+    /** Updator listeners. */
+    private final List<WorkspaceUpdatorListener> updatorListeners
         = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
-    
+
     /** creates a default synch-manager that does nothing. */
     private volatile TaskSynchronizationManager snychManager = NO_ACTION_SYNCH_MANAGER;
-    
+
     /** Whether updates should continue to run. */
     private volatile boolean run = false;
 
     /** The number of times the update has run. */
     private volatile int time = 0;
-    
+
     /** Number of threads used in the update service.*/
     private int numThreads;
-    
+
     /** A synch-manager where the methods do nothing. */
     private static final TaskSynchronizationManager NO_ACTION_SYNCH_MANAGER
             = new TaskSynchronizationManager() {
@@ -88,10 +111,10 @@ public class WorkspaceUpdator {
             /* no implementation */
         }
     };
-    
+
     /** The default controller. */
     public static final UpdateController DEFAULT_CONTROLLER = new UpdateController() {
-        
+
         /**
          * Default update.
          */
@@ -298,6 +321,8 @@ public class WorkspaceUpdator {
 
         updates.submit(new Runnable() {
             public void run() {
+                notifyWorkspaceUpdateStarted();
+
                 snychManager.queueTasks();
 
                 while (run) {
@@ -311,8 +336,12 @@ public class WorkspaceUpdator {
 
                 snychManager.releaseTasks();
                 snychManager.runTasks();
+
+                notifyWorkspaceUpdateCompleted();
             }
         });
+
+
     }
 
     /**
@@ -360,30 +389,57 @@ public class WorkspaceUpdator {
     }
 
     /**
-     * Adds a listener to this instance.
+     * Adds a component listener to this instance.
      *
-     * @param listener The listener to add.
+     * @param listener The component listener to add.
      */
-    public void addListener(final WorkspaceUpdatorListener listener) {
-        listeners.add(listener);
+    public void addComponentListener(final ComponentUpdateListener listener) {
+        componentListeners.add(listener);
     }
 
     /**
-     * Return list of listeners.
+     * Return list of component listeners.
      *
-     * @return list of listeners;
+     * @return list of component listeners;
      */
-    public List<WorkspaceUpdatorListener> getListeners() {
-        return listeners;
+    public List<ComponentUpdateListener> getComponentListeners() {
+        return componentListeners;
     }
 
     /**
-     * Removes a listener from this instance.
+     * Removes a component listener from this instance.
      *
      * @param listener The listener to add.
      */
-    public void removeListener(final WorkspaceUpdatorListener listener) {
-        listeners.remove(listener);
+    public void removeComponentListener(final ComponentUpdateListener listener) {
+        componentListeners.remove(listener);
+    }
+
+    /**
+     * Adds an updator listener to this instance.
+     *
+     * @param listener updator component listener to add.
+     */
+    public void addUpdatorListener(final WorkspaceUpdatorListener listener) {
+        updatorListeners.add(listener);
+    }
+
+    /**
+     * Return list of updator listeners.
+     *
+     * @return list of updator listeners;
+     */
+    public List<WorkspaceUpdatorListener> getUpdatorListeners() {
+        return updatorListeners;
+    }
+
+    /**
+     * Removes an updator listener from this instance.
+     *
+     * @param listener The updator listener to add.
+     */
+    public void removeUpdatorListener(final WorkspaceUpdatorListener listener) {
+        updatorListeners.remove(listener);
     }
 
     /**
@@ -392,12 +448,12 @@ public class WorkspaceUpdator {
      * @param component The component to update.
      * @param thread The number of the thread doing the update.
      */
-    void notifyUpdateStarted(final WorkspaceComponent component, final int thread) {
+    void notifyComponentUpdateStarted(final WorkspaceComponent component, final int thread) {
         final int time = this.time;
 
         events.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : listeners) {
+                for (ComponentUpdateListener listener : componentListeners) {
                     listener.startingComponentUpdate(component, time, thread);
                 }
             }
@@ -410,12 +466,12 @@ public class WorkspaceUpdator {
      * @param component The component to update.
      * @param thread The number of the thread doing the update.
      */
-    void notifyUpdateFinished(final WorkspaceComponent component, final int thread) {
+    void notifyComponentUpdateFinished(final WorkspaceComponent component, final int thread) {
         final int time = this.time;
 
         events.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : listeners) {
+                for (ComponentUpdateListener listener : componentListeners) {
                     listener.finishedComponentUpdate(component, time, thread);
                 }
             }
@@ -430,7 +486,7 @@ public class WorkspaceUpdator {
 
         events.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : listeners) {
+                for (WorkspaceUpdatorListener listener : updatorListeners) {
                     listener.updatedCouplings(time);
                 }
             }
@@ -438,14 +494,42 @@ public class WorkspaceUpdator {
     }
 
     /**
-     * Called when the workspace is updated.
+     * Called when the workspace update begins.
+     */
+    private void notifyWorkspaceUpdateStarted() {
+
+        events.submit(new Runnable() {
+            public void run() {
+                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                    listener.updatingStarted();
+                }
+            }
+        });
+    }
+
+    /**
+     * Called when workspace update finishes.
+     */
+    private void notifyWorkspaceUpdateCompleted() {
+
+        events.submit(new Runnable() {
+            public void run() {
+                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                    listener.updatingFinished();
+                }
+            }
+        });
+    }
+
+    /**
+     * Called after every workspace update .
      */
     private void notifyWorkspaceUpdated() {
 
         events.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : listeners) {
-                    listener.updatedWorkspace();
+                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                    listener.workspaceUpdated();
                 }
             }
         });
@@ -469,7 +553,7 @@ public class WorkspaceUpdator {
 		}
 		this.numThreads = numThreads;
         this.service = Executors.newFixedThreadPool(numThreads, new UpdatorThreadFactory());
-        for(WorkspaceUpdatorListener listener : listeners) {
+        for(WorkspaceUpdatorListener listener : updatorListeners) {
             listener.changeNumThreads();
         }
 

@@ -19,7 +19,6 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -47,7 +46,6 @@ import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -84,6 +82,7 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Workspace;
@@ -235,27 +234,27 @@ public class SimbrainDesktop {
         /**
          * {@inheritDoc}
          */
-        public void finishedComponentUpdate(WorkspaceComponent component,
-                int update, int thread) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void startingComponentUpdate(WorkspaceComponent component,
-                int update, int thread) {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
         public void updatedCouplings(int update) {
         }
 
         /**
          * {@inheritDoc}
          */
-        public void updatedWorkspace() {
+        public void updatingStarted() {
+            StandardDialog.setSimulationRunning(true);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void updatingFinished() {
+            StandardDialog.setSimulationRunning(false);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void workspaceUpdated() {
             updateTimeLabel();
         }
     };
@@ -281,7 +280,7 @@ public class SimbrainDesktop {
         wsToolBar = createToolBar();
         createContextMenu();
         workspace.addListener(workspaceListener);
-        workspace.getWorkspaceUpdator().addListener(updatorListener);
+        workspace.getWorkspaceUpdator().addUpdatorListener(updatorListener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET,

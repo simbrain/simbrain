@@ -227,10 +227,11 @@ public class Workspace {
     }
 
     /**
-     * Convenience method forwarded to singleUpdate; recognizable name so useful in API.
+     * Convenience method (with an easily-recognized name) forwarded to
+     * singleUpdate.
      */
     public void iterate() {
-    	singleUpdate();
+        singleUpdate();
     }
 
     /**
@@ -239,9 +240,7 @@ public class Workspace {
      * @param numIterations
      */
     public void iterate(final int numIterations) {
-    	for (int i = 0; i < numIterations; i++) {
-    		iterate();
-    	}
+        updator.iterate(numIterations);
     }
 
     /**

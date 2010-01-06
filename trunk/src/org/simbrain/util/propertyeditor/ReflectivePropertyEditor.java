@@ -1,8 +1,6 @@
 package org.simbrain.util.propertyeditor;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -17,13 +15,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * ReflectivePropertyEditor.
@@ -103,37 +101,29 @@ public class ReflectivePropertyEditor extends JPanel {
     }
 
     /**
-     * Returns an ok / cancel dialog for this dialog.
+     * Returns an dialog containing this property editor.
      *
      * @return parentDialog parent dialog
      */
-    public JDialog getDialog() {
+    public EditorDialog getDialog() {
 
-        final JDialog ret = new JDialog();
-        ret.setLayout(new BorderLayout());
-        ret.add("Center", itemPanel);
-
-        // Bottom Panel
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton okButton = new JButton("OK");
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                commit();
-                ret.dispose();
-            }
-        });
-        bottomPanel.add(okButton);
-        ret.getRootPane().setDefaultButton(okButton);
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                ret.dispose();
-            }
-        });
-        bottomPanel.add(cancelButton);
-        ret.add("South", bottomPanel);
+        final EditorDialog ret = new EditorDialog();
+        ret.setContentPane(itemPanel);
         return ret;
     }
+
+    /**
+     * Extension of Standard Dialog for Editor Panel
+     */
+    private class EditorDialog extends StandardDialog {
+
+        @Override
+        protected void closeDialogOk() {
+            ReflectivePropertyEditor.this.commit();
+            dispose();
+        }
+    }
+
 
     /**
      * Set up the main panel.

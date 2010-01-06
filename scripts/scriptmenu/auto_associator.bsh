@@ -16,6 +16,7 @@ import org.simbrain.network.neurons.*;
 import org.simbrain.network.synapses.*;
 import org.simbrain.network.gui.*;
 import org.simbrain.workspace.*;
+import org.simbrain.util.*;
 
 
 {
@@ -67,7 +68,7 @@ import org.simbrain.workspace.*;
         JPanel panel = new JPanel();
 
         // Reset simulation
-        JButton clearButton = new JButton("Reset simulation");
+        SimbrainButton clearButton = new SimbrainButton("Reset simulation", workspace);
 	clearButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 	        networkPanel.setSynapseNodesOn(true);
@@ -79,7 +80,7 @@ import org.simbrain.workspace.*;
         panel.add(clearButton);
 
         // + Pattern
-        JButton plusPattern = new JButton("+ Pattern");
+        SimbrainButton plusPattern = new SimbrainButton("+ Pattern", workspace);
         plusPattern.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 	        networkPanel.setSynapseNodesOn(true);
@@ -95,7 +96,7 @@ import org.simbrain.workspace.*;
         panel.add(plusPattern);
 
         // O Pattern
-        JButton oPattern = new JButton("O Pattern");
+        SimbrainButton oPattern = new SimbrainButton("O Pattern", workspace);
         oPattern.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 	        networkPanel.setSynapseNodesOn(true);
@@ -111,7 +112,7 @@ import org.simbrain.workspace.*;
         panel.add(oPattern);
 
         // X Pattern 
-        JButton xPattern = new JButton("X Pattern");
+        SimbrainButton xPattern = new SimbrainButton("X Pattern", workspace);
         xPattern.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 	        networkPanel.setSynapseNodesOn(true);
@@ -127,7 +128,7 @@ import org.simbrain.workspace.*;
         panel.add(xPattern);
 
         // Train Button
-        JButton trainButton = new JButton("Train network");
+        SimbrainButton trainButton = new SimbrainButton("Train network", workspace);
         trainButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 	        networkPanel.setSynapseNodesOn(true);
@@ -139,7 +140,7 @@ import org.simbrain.workspace.*;
         panel.add(trainButton);
 
         // Randomize and test
-        JButton testPattern = new JButton("Test random pattern");
+        SimbrainButton testPattern = new SimbrainButton("Test random pattern", workspace);
         testPattern.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 	        networkPanel.setSynapseNodesOn(false);
@@ -152,7 +153,7 @@ import org.simbrain.workspace.*;
         panel.add(testPattern);
 
         // Test mode
-        JButton testingMode = new JButton("Testing mode");
+        SimbrainButton testingMode = new SimbrainButton("Testing mode", workspace);
         testingMode.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
 	        networkPanel.setSynapseNodesOn(false);

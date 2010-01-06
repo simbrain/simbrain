@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -30,19 +31,17 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.actions.AddAgentAction;
 import org.simbrain.world.odorworld.actions.AddEntityAction;
 import org.simbrain.world.odorworld.actions.AddSmellSourceAction;
 import org.simbrain.world.odorworld.actions.DeleteEntityAction;
+import org.simbrain.world.odorworld.actions.EditSmellSourceAction;
 import org.simbrain.world.odorworld.actions.ShowEntityDialogAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
-import org.simbrain.world.odorworld.actions.EditSmellSourceAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -217,7 +216,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
                 setWallPoint2(mouseEvent.getPoint());
                 draggingPoint = null;
             }
-        }       
+        }
     };
 
     private final MouseMotionListener mouseDraggedListener = new MouseMotionAdapter() {
@@ -227,16 +226,24 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
          */
         public void mouseDragged(final MouseEvent e) {
 
-        	if (drawingWalls) {
+            if (drawingWalls) {
                 draggingPoint = e.getPoint();
                 repaint();
             }
 
-            final Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
-            if ((selectedEntity != null) && getBounds().intersects((selectedEntity.getBounds()))) {
-                selectedEntity.setX((int) test.x);
-                selectedEntity.setY((int) test.y);
-                repaint();
+            // Drag selected entity
+            if (selectedEntity != null){
+                // Possible place to drag object, and bounds at that location
+                final Point test = new Point(e.getPoint().x + distanceX, e
+                        .getPoint().y + distanceY);
+                final Rectangle testRect = new Rectangle((int) test.getX(),
+                        (int) test.getY(), selectedEntity.getWidth(),
+                        selectedEntity.getHeight());
+                if (getBounds().contains((testRect.getBounds()))) {
+                    selectedEntity.setX((int) test.x);
+                    selectedEntity.setY((int) test.y);
+                    repaint();
+                }
             }
         }
     };

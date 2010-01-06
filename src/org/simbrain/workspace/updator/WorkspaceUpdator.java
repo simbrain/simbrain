@@ -568,4 +568,30 @@ public class WorkspaceUpdator {
         return controller.getName();
     }
 
+    /**
+     * Iterate the updator for a specified number of iterations.
+     *
+     * @param numIterations number of times to iterate updator.
+     */
+    public void iterate(final int numIterations) {
+        updates.submit(new Runnable() {
+            public void run() {
+                notifyWorkspaceUpdateStarted();
+                for (int i = 0; i < numIterations; i++) {
+                    snychManager.queueTasks();
+
+                    try {
+                        doUpdate();
+                    } catch (Exception e) {
+                        // TODO exception handler
+                        e.printStackTrace();
+                    }
+                    snychManager.releaseTasks();
+                    snychManager.runTasks();
+                }
+                notifyWorkspaceUpdateCompleted();
+            }
+        });
+    }
+
 }

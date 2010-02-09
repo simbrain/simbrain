@@ -41,9 +41,9 @@ public final class OpenWorkspaceAction extends DesktopAction {
      * workspace.
      */
     public OpenWorkspaceAction(SimbrainDesktop desktop) {
-        super("Open Workspace", desktop);
+        super("Open Workspace File (.zip) ...", desktop);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-        putValue(SHORT_DESCRIPTION, "Open workspace");
+        putValue(SHORT_DESCRIPTION, "Open workspace (.zip)");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_O, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

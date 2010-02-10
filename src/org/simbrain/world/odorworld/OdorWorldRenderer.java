@@ -135,6 +135,10 @@ public class OdorWorldRenderer {
             OdorWorldEntity sprite = i.next();
             int x = Math.round(sprite.getX());
             int y = Math.round(sprite.getY());
+            //  Below: Was thinking about some sort of indication that entities collided.
+            //if (sprite.hasCollided()) {
+            //    g.drawRect((int) sprite.getX(), (int) sprite.getY(),sprite.getWidth(), sprite.getHeight());
+            //}
             g.drawImage(sprite.getImage(), x, y, null);
             if (sprite.isShowSensors()) {
                 // g.drawRect((int) sprite.getX(), (int) sprite.getY(),

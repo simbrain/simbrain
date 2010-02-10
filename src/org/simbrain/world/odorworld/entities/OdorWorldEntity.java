@@ -229,6 +229,20 @@ public abstract class OdorWorldEntity {
     }
 
     /**
+     * Reduced bounds used for some entities, to improve the look of collisions
+     * and blocking.
+     *
+     * TODO: This may not work well when shapes (not pixel images) are used.
+     *
+     * @return reduced bounds.
+     */
+    public Rectangle getReducedBounds() {
+        Rectangle ret = getBounds();
+        ret.grow(-getHeight() / 5, -getWidth() / 5);
+        return ret;
+    }
+
+    /**
      * Add an effector.
      *
      * @param effector effector to add

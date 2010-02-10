@@ -219,6 +219,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         }
     };
 
+    /**
+     * Handle mouse drags in the odor world panel.
+     */
     private final MouseMotionListener mouseDraggedListener = new MouseMotionAdapter() {
         /**
          * Task to perform when mouse button is held and mouse moved.
@@ -232,13 +235,20 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             }
 
             // Drag selected entity
-            if (selectedEntity != null){
-                // Possible place to drag object, and bounds at that location
+            if (selectedEntity != null) {
+
+                // Build a rectangle that corresponds to the bounds where the
+                // agent will be in the next moment. Then shrink it a bit to control the way
+                // agents "bump" into
+                // the edge of the world when dragged.
                 final Point test = new Point(e.getPoint().x + distanceX, e
                         .getPoint().y + distanceY);
                 final Rectangle testRect = new Rectangle((int) test.getX(),
                         (int) test.getY(), selectedEntity.getWidth(),
                         selectedEntity.getHeight());
+                testRect.grow(-5, -5); // TODO: Do this shrinking in a more principled way
+
+                // Only draw change the entity location if it's in the world bounds.
                 if (getBounds().contains((testRect.getBounds()))) {
                     selectedEntity.setX((int) test.x);
                     selectedEntity.setY((int) test.y);

@@ -61,7 +61,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * @param name name of world
      * @param world model world
      */
-    private OdorWorldComponent(final String name, final OdorWorld world) {
+    public OdorWorldComponent(final String name, final OdorWorld world) {
         super(name);
         this.world = world;
         initializeAttributes();

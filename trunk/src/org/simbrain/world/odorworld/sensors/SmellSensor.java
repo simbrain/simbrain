@@ -92,7 +92,9 @@ public class SmellSensor implements Sensor {
             if (entity != parent) {
                 SmellSource smell = entity.getSmellSource();
                 if (smell != null) {
-                    temp = SimbrainMath.addVector(temp, smell.getStimulus(SimbrainMath.distance(getLocation(), entity.getLocation())));
+                    temp = SimbrainMath.addVector(temp, smell
+                            .getStimulus(SimbrainMath.distance(getLocation(),
+                                    entity.getCenterLocation())));
                 }
             }
         }

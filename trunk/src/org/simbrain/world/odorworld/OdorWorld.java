@@ -294,7 +294,7 @@ public class OdorWorld {
             if (entity == sprite) {
                 continue;
             }
-            if (entity.getBounds().intersects(sprite.getBounds())) {
+            if (entity.getReducedBounds().intersects(sprite.getReducedBounds())) {
                 sprite.setHasCollided(true);
             }
         }

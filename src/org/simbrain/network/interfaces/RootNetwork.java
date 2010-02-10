@@ -899,4 +899,26 @@ public class RootNetwork extends Network {
         return groupList;
     }
 
+    /**
+     * Search for a neuron by label. If there are more than one with the same
+     * label only the first one found is returned.
+     *
+     * @param inputString
+     *            label of neuron to search for
+     * @return list of matched neurons, or null if none are found
+     */
+    public List<Neuron> getNeuronByLabel(String inputString) {
+        ArrayList<Neuron> foundNeurons = new ArrayList<Neuron>();
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            if (neuron.getLabel().equalsIgnoreCase(inputString)) {
+                foundNeurons.add(neuron);
+            }
+        }
+        if (foundNeurons.size() == 0) {
+            return null;
+        } else {
+            return foundNeurons;
+        }
+    }
+
 }

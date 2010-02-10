@@ -57,7 +57,7 @@ public final class EditMode {
     public static final EditMode TEXT = new EditMode("text", "Text.png");
 
     /** Default wand radius. */
-    private static final int DEFAULT_WAND_RADIUS = 15;
+    private static final int DEFAULT_WAND_RADIUS = 40;
 
     /** Wand mode mode. */
     public static final EditMode WAND = new EditMode("wand", DEFAULT_WAND_RADIUS);
@@ -95,13 +95,22 @@ public final class EditMode {
         BufferedImage image = new BufferedImage(radius+1, radius+1,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) image.getGraphics();
-        g2.setBackground(new Color(0, 0, 0, 0));
-        g2.setStroke(new BasicStroke(2));
-        g2.setColor(Color.YELLOW);
+
+        // Draw stroke around wand
+        int stroke = 1;
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(stroke));
         g2.drawOval(0, 0, radius, radius);
-        float alpha = .1f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+
+        // Draw wand itself
+        g2.setColor(Color.YELLOW);
+        g2.setStroke(new BasicStroke(1));
+        float alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         g2.fillOval(0, 0, radius, radius);
+        //g2.fillRect(0, 0, radius, radius);
+
+        // Add cursor
         Toolkit tk = Toolkit.getDefaultToolkit();
         Cursor newCursor = tk.createCustomCursor(image, CENTER_POINT, "wand");
         this.cursor = newCursor;

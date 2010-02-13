@@ -27,10 +27,13 @@ import org.simbrain.network.synapses.spikeresponders.Step;
  * <b>SpikeResponder</b>.
  */
 public abstract class SpikeResponder {
+
     /** Value. */
     protected double value = 0;
+
     /** Parent. */
     protected Synapse parent;
+
     /** Used for combo box. */
     private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), RiseAndDecay.getName() };
 

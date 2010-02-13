@@ -26,42 +26,44 @@ import org.simbrain.network.util.RandomSource;
 /**
  * <b>IntegrateAndFireNeuron</b>.
  */
-public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
-    /** Has the neuron spiked. */
-    private boolean hasSpiked = false;
+public class IntegrateAndFireNeuron extends SpikingNeuron {
+
     /** Resistance. */
     private double resistance = 1;
+
     /** Time constant. */
     private double timeConstant = 1;
+
     /** Threshold. */
     private double threshold = .8;
+
     /** Reset potential. */
     private double resetPotential = .1;
+
     /** Resting potential. */
     private double restingPotential = .5;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Add noise to neuron. */
     private boolean addNoise = false;
+
     /** Clipping. */
     private boolean clipping = false;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
+     * Default constructor needed for external calls which create neurons then
+     * set their parameters.
      */
     public IntegrateAndFireNeuron() {
     }
 
     /**
-     * @return Time type.
-     */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
-    }
-
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type Only values common to different types of neuron
+     * are copied.
+     *
      * @param n Neuron to be made type integrate and fire
      */
     public IntegrateAndFireNeuron(final Neuron n) {
@@ -101,10 +103,10 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
                      + (resistance * inputs)));
 
         if (val > threshold) {
-            hasSpiked = true;
+            setHasSpiked(true);
             val = resetPotential;
         } else {
-            hasSpiked = false;
+            setHasSpiked(false);
         }
 
         if (clipping) {
@@ -238,12 +240,5 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
      */
     public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
-    }
-
-    /**
-     * @return Returns the hasSpiked.
-     */
-    public boolean hasSpiked() {
-        return hasSpiked;
     }
 }

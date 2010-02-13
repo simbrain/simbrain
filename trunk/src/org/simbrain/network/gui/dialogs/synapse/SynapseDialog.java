@@ -21,9 +21,7 @@ package org.simbrain.network.gui.dialogs.synapse;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -46,6 +44,7 @@ import org.simbrain.network.synapses.HebbianCPCA;
 import org.simbrain.network.synapses.HebbianThresholdSynapse;
 import org.simbrain.network.synapses.OjaSynapse;
 import org.simbrain.network.synapses.RandomSynapse;
+import org.simbrain.network.synapses.STDPSynapse;
 import org.simbrain.network.synapses.ShortTermPlasticitySynapse;
 import org.simbrain.network.synapses.SignalSynapse;
 import org.simbrain.network.synapses.SimpleSynapse;
@@ -59,6 +58,8 @@ import org.simbrain.util.StandardDialog;
  * The <b>SynapseDialog</b> is initialized with a list of synapses. When
  * the dialog is closed the synapses are changed based on the state of the
  * dialog.
+ *
+ * TODO: Rewrite using method (or a form of the method) in NeuronDialog.java
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
 
@@ -115,11 +116,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
     /** Show Help Action. */
     private ShowHelpAction helpAction = new ShowHelpAction();
-    
+
     /** Associates synapse creator utilities with synapses by name. */
     private Map<String, Creator> creatorsByName = new TreeMap<String, Creator>(
             String.CASE_INSENSITIVE_ORDER);
-    
+
     /** Associates synapse creator utilities with synapses by class. */
     private Map<Class, Creator> creatorsByClass = new HashMap<Class, Creator>();
 
@@ -571,9 +572,26 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                 return new TraceSynapsePanel();
             }
         };
-        
+
         creatorsByName.put(TraceSynapse.getName(), creator);
         creatorsByClass.put(TraceSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return STDPSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new STDPSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new STDPSynapsePanel();
+            }
+        };
+
+        creatorsByName.put(STDPSynapse.getName(), creator);
+        creatorsByClass.put(STDPSynapse.class, creator);
 
         creator = new Creator() {
             public String getName() {

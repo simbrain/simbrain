@@ -24,46 +24,43 @@ import org.simbrain.network.util.RandomSource;
 
 
 /**
- * <b>IzhikevichNeuron</b>.
+ * <b>IzhikevichNeuron</b>. Default values correspond to "tonic spiking".
  */
-public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
-    
-    /** Has spiked. */
-    private boolean hasSpiked = false;
+public class IzhikevichNeuron extends SpikingNeuron {
+
     /** Recovery. */
     private double recovery = 0;
-    
-    // Default values correspond to "tonic spiking"
-    
+
     /** A. */
     private double a = .02;
+
     /** B. */
     private double b = .2;
+
     /** C. */
     private double c = -65;
+
     /** D. */
     private double d = 6;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Add noise to the neuron. */
     private boolean addNoise = false;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
+     * Default constructor needed for external calls which create neurons then
+     * set their parameters.
      */
     public IzhikevichNeuron() {
     }
 
     /**
-     * @return Time type.
-     */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
-    }
-
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type Only values common to different types of neuron
+     * are copied.
+     *
      * @param n Neuron to make of the type
      */
     public IzhikevichNeuron(final Neuron n) {
@@ -107,19 +104,12 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         if (val > 30) {
             val = c;
             recovery += d;
-            hasSpiked = true;
+            setHasSpiked(true);
         } else {
-            hasSpiked = false;
+            setHasSpiked(false);
         }
 
         setBuffer(val);
-    }
-
-    /**
-     * @return Has the neuron spiked.
-     */
-    public boolean hasSpiked() {
-        return hasSpiked;
     }
 
     /**

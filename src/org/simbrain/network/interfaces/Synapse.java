@@ -27,6 +27,7 @@ import org.simbrain.network.synapses.HebbianCPCA;
 import org.simbrain.network.synapses.HebbianThresholdSynapse;
 import org.simbrain.network.synapses.OjaSynapse;
 import org.simbrain.network.synapses.RandomSynapse;
+import org.simbrain.network.synapses.STDPSynapse;
 import org.simbrain.network.synapses.ShortTermPlasticitySynapse;
 import org.simbrain.network.synapses.SignalSynapse;
 import org.simbrain.network.synapses.SimpleSynapse;
@@ -36,10 +37,10 @@ import org.simbrain.network.synapses.TraceSynapse;
 import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
 import org.simbrain.util.Utils;
 
-
 /**
- * <b>Synapse</b> objects represent "connections" between neurons, which learn (grow or  weaken) based on various
- * factors, including the activation level of connected neurons.
+ * <b>Synapse</b> objects represent "connections" between neurons, which learn
+ * (grow or weaken) based on various factors, including the activation level of
+ * connected neurons.
  */
 public abstract class Synapse {
 
@@ -100,8 +101,7 @@ public abstract class Synapse {
             HebbianThresholdSynapse.getName(), OjaSynapse.getName(),
             RandomSynapse.getName(), ShortTermPlasticitySynapse.getName(),
             SignalSynapse.getName(), SimpleSynapse.getName(), SubtractiveNormalizationSynapse.getName(),
-            TDSynapse.getName(), TraceSynapse.getName()
-
+            STDPSynapse.getName(), TDSynapse.getName(), TraceSynapse.getName()
     };
     
     public Synapse(Neuron source, Neuron target) {
@@ -599,5 +599,14 @@ public abstract class Synapse {
      */
     public void setSendWeightedInput(boolean sendWeightedInput) {
         this.sendWeightedInput = sendWeightedInput;
+    }
+
+    /**
+     * Convenience method for getting a reference to the parent root network.
+     *
+     * @return reference to root network.
+     */
+    public RootNetwork getRootNetwork() {
+        return this.getSource().getParentNetwork().getRootNetwork();
     }
 }

@@ -71,7 +71,6 @@ public class Hebbian extends Synapse {
     public Synapse duplicate() {
         Hebbian h = new Hebbian(this.getSource(), this.getTarget());
         h.setLearningRate(getLearningRate());
-
         return super.duplicate(h);
     }
 

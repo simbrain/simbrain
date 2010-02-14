@@ -19,36 +19,42 @@
 package org.simbrain.workspace.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.world.dataworld.DataWorldComponent;
 
 /**
  * Open data world in current workspace.
  */
-public final class OpenDataWorldAction extends AbstractAction {
+public final class OpenDataWorldAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create an open data world with the specified
-     * workspace.
+     * Open a data world.
+     *
+     * @param workspace reference to workspace
      */
-    public OpenDataWorldAction() {
-        super("Data World");
+    public OpenDataWorldAction(Workspace workspace) {
+        super("Data World", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-//        workspace.addDataWorld(false);
-//        if (!workspace.getLastDataWorld().openWorld()) {
-//            workspace.getLastDataWorld().dispose();
-//            workspace.getDataWorldList().remove(workspace.getLastDataWorld());
-//        } else {
-//            workspace.getLastDataWorld().setVisible(true);
-//        }
+        SFileChooser chooser = new SFileChooser(NetworkGuiPreferences
+                .getCurrentDirectory(), "xml file", "xml");
+        File theFile = chooser.showOpenDialog();
+        if (theFile != null) {
+            DataWorldComponent tableComponent = (DataWorldComponent) Workspace
+                    .open(DataWorldComponent.class, theFile);
+            workspace.addWorkspaceComponent(tableComponent);
+        }
     }
 }

@@ -195,7 +195,7 @@ public class WorkspaceActionManager {
         Workspace workspace = desktop.getWorkspace();
         clearWorkspaceAction = new ClearWorkspaceAction(desktop);
 
-        openDataWorldAction = new OpenDataWorldAction();
+        openDataWorldAction = new OpenDataWorldAction(workspace);
         openNetworkAction = new OpenNetworkAction(workspace);
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
 

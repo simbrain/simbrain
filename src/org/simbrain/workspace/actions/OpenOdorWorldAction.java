@@ -19,12 +19,14 @@
 package org.simbrain.workspace.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
 /**
@@ -45,7 +47,13 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        // TODO implement
-//        SimbrainDesktop.getInstance().openWorkspaceComponent(OdorWorldComponent.class);
+        SFileChooser chooser = new SFileChooser(NetworkGuiPreferences
+                .getCurrentDirectory(), "xml file", "xml");
+        File theFile = chooser.showOpenDialog();
+        if (theFile != null) {
+            OdorWorldComponent worldComponent = (OdorWorldComponent) Workspace
+                    .open(OdorWorldComponent.class, theFile);
+            workspace.addWorkspaceComponent(worldComponent);
+        }
     }
 }

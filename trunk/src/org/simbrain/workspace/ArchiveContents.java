@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace;
 
 import java.io.OutputStream;
@@ -13,26 +31,37 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Instances of this class are used for building and reading the TOC of an
  * archive.
- * 
+ *
+ * This is the class that XStream serializes.
+ *
  * @author Matt Watson
  */
 class ArchiveContents {
+
     /** A map of all the components to their uris. */
     private transient Map<WorkspaceComponent, String> componentUris
         = new HashMap<WorkspaceComponent, String>();
+
     /** All of the components in the archive. */
     private List<Component> components = new ArrayList<Component>();
+
     /** All of the couplings in the archive. */
     private List<Coupling> couplings = new ArrayList<Coupling>();
+
     /** The serializer for this archive. */
     private final WorkspaceComponentSerializer serializer;
+
+    /** Reference to workspace used to serialize parameters in workspace. */
+    private final Workspace workspaceParameters;
+
 
     /**
      * The component serializer for this archive.
      *
      * @param serializer The component serializer for this archive.
      */
-    ArchiveContents(final WorkspaceComponentSerializer serializer) {
+    ArchiveContents(final Workspace workspace, final WorkspaceComponentSerializer serializer) {
+        this.workspaceParameters = workspace;
         this.serializer = serializer;
     }
 
@@ -235,14 +264,10 @@ class ArchiveContents {
                     final org.simbrain.workspace.Attribute attribute) {
 
                 WorkspaceComponent comp = attribute.getParent().getParentComponent();
-
                 this.uri = parent.componentUris.get(comp);
                 this.attributeID = attribute.getKey();
                 this.attributeHolderID = attribute.getParent().getDescription();
-
             }
-            
-
         }
     }
 
@@ -270,6 +295,17 @@ class ArchiveContents {
         xstream.omitField(Coupling.class, "serializer");
         xstream.omitField(Component.class, "data");
         xstream.omitField(Component.DesktopComponent.class, "data");
+        xstream.omitField(Workspace.class, "LOGGER");
+        xstream.omitField(Workspace.class, "manager");
+        xstream.omitField(Workspace.class, "componentList");
+        xstream.omitField(Workspace.class, "workspaceChanged");
+        xstream.omitField(Workspace.class, "currentDirectory");
+        xstream.omitField(Workspace.class, "currentFile");
+        xstream.omitField(Workspace.class, "updator");
+        xstream.omitField(Workspace.class, "listeners");
+        xstream.omitField(Workspace.class, "componentNameIndices");
+        xstream.omitField(Workspace.class, "updatorLock");
+        xstream.omitField(Workspace.class, "componentLock");
 
         xstream.alias("Workspace", ArchiveContents.class);
         xstream.alias("Component", Component.class);
@@ -281,5 +317,12 @@ class ArchiveContents {
         xstream.addImplicitCollection(Component.class, "desktopComponents");
 
         return xstream;
+    }
+
+    /**
+     * @return the workspaceParameters
+     */
+    public Workspace getWorkspaceParameters() {
+        return workspaceParameters;
     }
 }

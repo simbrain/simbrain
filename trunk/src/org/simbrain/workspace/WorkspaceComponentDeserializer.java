@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace;
 
 import java.io.InputStream;
@@ -9,10 +27,11 @@ import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * Class used to assist with deserializing workspace components.
- * 
+ *
  * @author Matt Watson
  */
 public class WorkspaceComponentDeserializer {
+
     /** A map of keys to their components. */
     private final Map<String, WorkspaceComponent> componentKeys
         = new HashMap<String, WorkspaceComponent>();
@@ -43,10 +62,10 @@ public class WorkspaceComponentDeserializer {
         try {
             Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>)
               Class.forName(component.className);
-            
+
             WorkspaceComponent wc = deserializeWorkspaceComponent(
                clazz, component.name, input, null);
-            
+
             componentKeys.put(component.uri, wc);
             wc.setChangedSinceLastSave(false);
             return wc;
@@ -95,7 +114,7 @@ public class WorkspaceComponentDeserializer {
                 = (Class<WorkspaceComponent>) Class.forName(className);
             Method method = clazz.getMethod("open", WorkspaceComponent.class,
                 InputStream.class, String.class);
-            
+
             return (GuiComponent<?>) method.invoke(null, component, input, name);
         } catch (RuntimeException e) {
             throw e;

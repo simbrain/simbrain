@@ -6,24 +6,33 @@ import java.util.Map;
 
 /**
  * Class used to assist with serializing components.
- * 
+ *
  * @author Matt Watson
  */
 public class WorkspaceComponentSerializer {
+
     /** The last component id. */
     private int lastComponent = 0;
+
     /** Map of components to their ids. */
     private final Map<WorkspaceComponent, Integer> componentIds
         = new IdentityHashMap<WorkspaceComponent, Integer>();
+
+    /** Output stream. */
     private final OutputStream stream;
-    
+
+    /**
+     * Construct serializer.
+     *
+     * @param stream output stream
+     */
     WorkspaceComponentSerializer(final OutputStream stream) {
         this.stream = stream;
     }
-    
+
     /**
      * Returns the id associated with a component.
-     * 
+     *
      * @param component The component to return an id for.
      * @return The component's id.
      */
@@ -38,7 +47,7 @@ public class WorkspaceComponentSerializer {
 
     /**
      * Serializes a component and returns the id for that component.
-     * 
+     *
      * @param component The component to serialize.
      * @param stream The stream to write to.
      * @return The id for the component that was serialized.

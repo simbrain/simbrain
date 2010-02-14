@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
-import org.simbrain.workspace.updator.ComponentUpdateListener;
 import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 
 /**

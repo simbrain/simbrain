@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace;
 
 import java.awt.Rectangle;
@@ -55,7 +73,7 @@ public class WorkspaceSerializer {
     public void serialize(final OutputStream output) throws IOException {
         ZipOutputStream zipStream = new ZipOutputStream(output);
         WorkspaceComponentSerializer serializer = new WorkspaceComponentSerializer(zipStream);
-        ArchiveContents archive = new ArchiveContents(serializer);
+        ArchiveContents archive = new ArchiveContents(workspace, serializer);
 
         serializeComponents(serializer, archive, zipStream);
 
@@ -157,6 +175,12 @@ public class WorkspaceSerializer {
         contents = (ArchiveContents) ArchiveContents.xstream().fromXML(
             new ByteArrayInputStream(entries.get("contents.xml")));
 
+        // Deserialize workspace parameters
+        if (contents.getWorkspaceParameters() != null) {
+            workspace.setUpdateDelay(contents.getWorkspaceParameters()
+                    .getUpdateDelay());
+        }
+
         // Add Components
         if (contents.getComponents() != null) {
             for (ArchiveContents.Component component : contents.getComponents()) {
@@ -214,19 +238,15 @@ public class WorkspaceSerializer {
     /**
      * Helper method that will read the InputStream repeatedly until the given
      * array is filled.
-     
      * @param istream the InputStream to read from.
      * @param bytes the array to write to
      * @throws IOException if there is an IO error
      */
     private static void read(final InputStream istream, final byte[] bytes) throws IOException {
         int pos = 0;
-        
-        while (pos < bytes.length) {
+       while (pos < bytes.length) {
             int read = istream.read(bytes, pos, bytes.length - pos);
-            
             if (read < 0) { throw new RuntimeException("premature EOF"); }
-            
             pos += read;
         }
     }

@@ -18,14 +18,18 @@
  */
 package org.simbrain.trainer;
 
+import java.io.File;
 import java.util.List;
 
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.util.Utils;
 
 /**
- * Train a neural network.
+ * Superclass for all forms of supervised training algorithms. A trainer
+ * combines input data, training data, and error information in a single
+ * package, which can be visualized in a special gui dialog.
  *
  * @author jyoshimi
  */
@@ -33,7 +37,6 @@ public abstract class Trainer {
 
     //TODO: Tools for batch training at this level?
     //TODO: Iteration number?
-    
     // getCurrentError?
     // train(min-error) / train to get past an error
 
@@ -84,6 +87,15 @@ public abstract class Trainer {
     }
 
     /**
+     *  Use a csv file to load input data.
+     *
+     * @param inputFile the inputData as a csv file
+     */
+    public void setInputData(final File inputFile) {
+        this.inputData = Utils.getDoubleMatrix(inputFile);
+    }
+
+    /**
      * @return the trainingData
      */
     public double[][] getTrainingData() {
@@ -91,6 +103,8 @@ public abstract class Trainer {
     }
 
     /**
+     *  Set training data.
+     *
      * @param trainingData the trainingData to set
      */
     public void setTrainingData(double[][] trainingData)  {
@@ -98,10 +112,19 @@ public abstract class Trainer {
         if (trainingData[0].length != outputLayer.size()) {
             return;
             // throw new
-            // Exception("Training data size must be the same as ouptut layer size");
+            // Exception("Training data size must be the same as output layer size");
         }
         // TODO: CHECK correct throw exception otherwise
         this.trainingData = trainingData;
+    }
+
+    /**
+     * Use a csv file to load training data.
+     *
+     * @param trainingDataFile the training data as a .csv file
+     */
+    public void setTrainingData(final File trainingDataFile) {
+        this.trainingData = Utils.getDoubleMatrix(trainingDataFile);
     }
 
     /**
@@ -119,7 +142,8 @@ public abstract class Trainer {
     }
 
     /**
-     * 
+     * Set the input layer to a whole network.
+     *
      * @param inputNetwork
      */
    public void setInputLayer(Network inputNetwork) {

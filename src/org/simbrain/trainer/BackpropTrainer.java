@@ -298,7 +298,7 @@ public class BackpropTrainer extends Trainer {
 
         // Build network
         RootNetwork network = new RootNetwork();
-       
+
         // Layout object
         LineLayout layout = new LineLayout(50, LineOrientation.HORIZONTAL);
         int initialYPosition = 400;
@@ -396,6 +396,20 @@ public class BackpropTrainer extends Trainer {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * @return the learningRate
+     */
+    public double getLearningRate() {
+        return learningRate;
+    }
+
+    /**
+     * @param learningRate the learningRate to set
+     */
+    public void setLearningRate(double learningRate) {
+        this.learningRate = learningRate;
     }
 
 }

@@ -1,36 +1,1 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<title>Simbrain Documentation</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../Styles.css" rel="stylesheet" type="text/css">
-</head>
-
-<body>
-<a href="../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div>
-</a>
-<div id="main_docs">
-  <div class="navi">
-  <p><a href="../SimbrainDocs.html">Simbrain</a> &gt; World</p>
-  </div>
-  <p><h1>Worlds</h1></p>
-  <p>World components represent the sensory-motor environment of a neural network. They produce inputs to and accept outputs from <a href="Network.html">network</a> components. They represent an environment and a set of sensory and / or motor transducers. Worlds convert a given type of sensory information, visual patterns, smells, and sounds, into a set of values that is sent to the input nodes of network. Once in the hands of the neural network, information sent from a world can be interpreted to the network's content. The network can, also, contribute to the World. Through <em>Output Commands</em>, in the form of output vectors, networks can interact with the world through motion, sounds, text, and more. The interaction between Worlds and Networks takes place because the instances have been <a href="Network/couplings.html">coupled</a>. The simplest worlds simply send data in a spreadsheet to a neural network. More complex worlds convert visual, auditory, olfactory, and linguistic stimuli to patterns of neural activity. </p>
-  <div class="intial">
-    <div class="section">
-	<a href="Worlds/OdorWorld/OdorWorld.html"><img src="../Images/Icons/odor_world.gif" width="131" height="150" class="floatright" /></a>
-	<h1><a href="Worlds/OdorWorld/OdorWorld.html">OdorWorld</a></h1>
-	<p>The Odor World simulates olfaction and motion of a creature in a two-dimensional world. The agent, or creature, senses objects and can react to them by turning and moving. Each object corresponds, essentially, to a vector of values that represents a pattern of activity over an agents receptors. This is to say, each object broadcasts a signal, and it is up to the agent to understand what those signals represent and to react to them. How the agent interprets the signals is determined by the network that controls the agent. </p>
-	</div>
-	<div class="section">
-	<a href="Worlds/DataWorld/DataWorld.html"><img src="../Images/Icons/data_world.gif" width="145" height="129" class="floatright" /></a>
-	<h1><a href="Worlds/DataWorld/DataWorld.html">DataWorld</a></h1>
-	<p>The Data World is a table of values which can be used to produce input to and receive output from a neural network. </p>
-	</div>
-  </div>
-  <p>&nbsp;</p>
-</div>
-</body>
-</html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd"><html><head><title>Simbrain Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><link href="../Styles.css" rel="stylesheet" type="text/css"></head><body><a href="../SimbrainDocs.html"><div class="logo">  <p><span></span></p></div></a><div id="main_docs">  <div class="navi">  <p><a href="../SimbrainDocs.html">Simbrain</a> &gt; World</p>  </div>  <p><h1>Worlds</h1></p>  <p>Worlds are environments which can be used to produce inputs to and accept outputs from other components, in particular networks.</p>  <p>NOTE: Much of the information in odorworld and dataworld is out of date for 3.0. </p>  <div class="intial">    <div class="section">	<a href="Worlds/OdorWorld/OdorWorld.html"><img src="../Images/Icons/odor_world.gif" width="131" height="150" class="floatright" /></a>	<h1><a href="Worlds/OdorWorld/OdorWorld.html">OdorWorld</a></h1>	<p>The Odor World simulates olfaction and motion of a creature in a two-dimensional world. The agent, or creature, senses objects and can react to them by turning and moving. Each object corresponds, essentially, to a vector of values that represents a pattern of activity over an agents receptors. This is to say, each object broadcasts a signal, and it is up to the agent to understand what those signals represent and to react to them. How the agent interprets the signals is determined by the network that controls the agent. </p>	</div>  <div class="section">	<a href="Worlds/DataWorld/DataWorld.html"><img src="../Images/Icons/data_world.gif" width="145" height="129" class="floatright" /></a>	<h1><a href="Worlds/DataWorld/DataWorld.html">DataWorld</a></h1>	<p>The Data World is a table of values which can be used to produce input to and receive output from a neural network. </p>	</div>  <div class="section">	<img src="../Images/visionWorld.png" width="145" height="104" class="floatright" />	<h1>Vision World </h1>	<p>Convert images to  numbers which can be fed to a neural network. Docs to be written. Note that this component is not yet fully functional. </p>	</div>  </div>  <p>&nbsp;</p></div></body></html>

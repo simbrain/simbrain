@@ -109,7 +109,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     /** Component. */
     private final DataWorldComponent component;
-    
+
     /**
      * Default constructor.
      *
@@ -119,9 +119,9 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
             final DataWorldComponent component) {
 
         super(frame, component);
-        
+
         this.component = component;
-        
+
         component.getDataModel().initValues(new Double(0));
 
         addMenuBar(worldPanel);
@@ -133,7 +133,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         add(scroller, BorderLayout.CENTER);
     }
 
-    
     /**
      * Creates the Menu Bar and adds it to the frame.
      *

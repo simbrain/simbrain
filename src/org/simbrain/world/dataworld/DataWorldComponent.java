@@ -36,7 +36,8 @@ import org.simbrain.workspace.WorkspaceComponent;
 import com.Ostermiller.util.CSVParser;
 
 /**
- * <b>DataWorldComponent</b> is a data table which other Simbrain components can use.
+ * <b>DataWorldComponent</b> is a data table which other Simbrain components can
+ * use.
  */
 public class DataWorldComponent extends WorkspaceComponent {
 
@@ -51,27 +52,27 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public DataWorldComponent(final String name) {
         super(name);
-        dataModel = new DataModel<Double>(this);
-        this.dataModel.setParent(this);
+        dataModel = new DataModel<Double>();
         init();
     }
 
     /**
-     * This method is the default constructor.
+     * Construct a dataworld with a specified name, columns, and rows.
+     *
+     * @param name name of network
+     * @param rows number of rows
+     * @param columns number of columns
      */
-    public DataWorldComponent(final String name, int columns, int rows) {
+    public DataWorldComponent(final String name, int rows, int columns) {
         super(name);
-        dataModel = new DataModel<Double>(this, columns, rows);
-        this.dataModel.setParent(this);
+        dataModel = new DataModel<Double>(rows, columns);
         init();
     }
 
-    
     @SuppressWarnings("unchecked")
     private DataWorldComponent(final String name, final DataModel<?> dataModel) {
         super(name);
-        this.dataModel = (DataModel<Double>) dataModel;
-        this.dataModel.setParent(this);
+        this.dataModel = new DataModel<Double>();
         init();
     }
 
@@ -80,8 +81,8 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     private void init() {
         for (int i = 0; i < dataModel.getColumnCount(); i++) {
-            addConsumer(new ConsumingColumn<Double>(dataModel, i));
-            addProducer(new ProducingColumn<Double>(dataModel, i));
+            addConsumer(new ConsumingColumn<Double>(this, i));
+            addProducer(new ProducingColumn<Double>(this, i));
         }
 
         dataModel.addListener(listener);
@@ -92,33 +93,40 @@ public class DataWorldComponent extends WorkspaceComponent {
 
         public void columnAdded(int column) {
             int index = dataModel.getColumnCount() - 1;
-            addConsumer(new ConsumingColumn<Double>(dataModel, index));
-            addProducer(new ProducingColumn<Double>(dataModel, index));
+            addConsumer(new ConsumingColumn<Double>(DataWorldComponent.this, index));
+            addProducer(new ProducingColumn<Double>(DataWorldComponent.this, index));
+            DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void columnRemoved(int column) {
-            int index = dataModel.getColumnCount();
-            getProducers().remove(index);
-            getProducers().remove(index);
+            // TODO: This stuff is broken but waiting to refactor attribute stuff anyway
+            // int index = dataModel.getColumnCount();
+            // getProducers().remove(index);
+            // getProducers().remove(index);
+            DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void dataChanged() {
+            DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void itemChanged(int row, int column) {
+            DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void rowAdded(int row) {
+            DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
         public void rowRemoved(int row) {
+            DataWorldComponent.this.setChangedSinceLastSave(true);
         }
-        
+
     };
-    
+
     /**
      * Recreates an instance of this class from a saved component.
-     * 
+     *
      * @param input input stream
      * @param name name of file
      * @param format format of file
@@ -143,7 +151,7 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     /**
      * Returns the data model for this component.
-     * 
+     *
      * @return The data model for this component.
      */
     public DataModel<Double> getDataModel() {
@@ -157,7 +165,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     public void save(final OutputStream output, final String format) {
         DataModel.getXStream().toXML(dataModel, output);
     }
-    
+
     @SuppressWarnings("unchecked")
     void wireCouplings(final Collection<? extends Producer> producers) {
         /* Handle Coupling wire-up */
@@ -183,16 +191,15 @@ public class DataWorldComponent extends WorkspaceComponent {
     @Override
     public void closing() {
     }
-    
+
     @Override
     public String getXML() {
         return DataModel.getXStream().toXML(dataModel);
     }
 
-
     /**
-     * Read in stored dataset file.
-     * 
+     * Read in stored dataset file as CVS File.
+     *
      * @param file Name of file to read in
      * @throws FileNotFoundException
      */
@@ -211,11 +218,8 @@ public class DataWorldComponent extends WorkspaceComponent {
                     }
                 }
             }
-            
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-    
 }

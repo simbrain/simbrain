@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.dataworld;
 
 import java.util.ArrayList;
@@ -9,7 +27,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Underlying data model.
- * 
+ *
  * @param <E>
  */
 public class DataModel<E> {
@@ -50,59 +68,38 @@ public class DataModel<E> {
     // TODO: Document this.
     boolean initialized = false;
 
-
-
-    /** The parent component of this model. */
-    private DataWorldComponent parent;
+    /**
+     * Construct a dataworld model of a specified number of rows and columns.
+     *
+     * @param numRows number of rows.
+     * @param numColumns number of columns.
+     */
+    DataModel(final int numRows, final int numColumns) {
+        this.numRows = numRows;
+        this.numColumns = numColumns;
+        init();
+    }
 
     /**
-     * Construct a dataworld model.
-     * 
-     * @param parent
-     *            parent WorkspaceComponent.
+     * Default constructor.
      */
-    DataModel(final DataWorldComponent parent) {
-        this.parent = parent;
+    public DataModel() {
+        init();
+    }
+
+    /**
+     * Initialize listeners.
+     */
+    private void init() {
         for (int i = 0; i < numRows; i++) {
             rowData.add((List<E>) newRow(null));
         }
-        init();
-    }
-
-    /**
-     * Construct a dataworld model of a specified number of rows and columns.
-     * 
-     * @param parent
-     *            parent WorkspaceComponent.
-     * @param numColumns
-     *            number of columns.
-     * @param height
-     *            number of rows.
-     */
-    DataModel(final DataWorldComponent parent, final int numRows,
-            final int numColumns) {
-        this.numRows = numRows;
-        this.numColumns = numColumns;
-        this.parent = parent;
-
-        for (int i = 0; i < numColumns; i++) {
-            rowData.add((List<E>) newRow(null));
-        }
-        init();
-    }
-
-    /**
-     * Initialize data model.
-     */
-    private void init() {
-
-
         listeners = new ArrayList<Listener>();
     }
 
     /**
      * Returns a properly initialized xstream object.
-     * 
+     *
      * @return the XStream object
      */
     static XStream getXStream() {
@@ -119,21 +116,13 @@ public class DataModel<E> {
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
         init();
         initialized = true;
         return this;
-    }
-
-    public DataWorldComponent getParent() {
-        return parent;
-    }
-
-    void setParent(DataWorldComponent parent) {
-        this.parent = parent;
     }
 
     public void addListener(Listener listener) {
@@ -180,7 +169,7 @@ public class DataModel<E> {
 
     /**
      * Sets the lower bound value.
-     * 
+     *
      * @param lowerBound
      *            Value to set
      */
@@ -242,7 +231,6 @@ public class DataModel<E> {
         for (Listener listener : listeners) {
             listener.rowAdded(numRows - 1);            
         }
-        parent.setChangedSinceLastSave(true);
     }
 
     public void insertNewRow(final int at, E value) {
@@ -250,7 +238,6 @@ public class DataModel<E> {
         rowData.add(at, newRow(value));
         for (Listener listener : listeners)
             listener.rowAdded(at);
-        parent.setChangedSinceLastSave(true);
     }
 
     public void addNewColumn(final E value) {
@@ -261,7 +248,6 @@ public class DataModel<E> {
         for (Listener listener : listeners) {
             listener.columnAdded(numColumns - 1);
         }
-        parent.setChangedSinceLastSave(true);
     }
 
     /**
@@ -312,30 +298,30 @@ public class DataModel<E> {
         for (Listener listener : listeners) {
             listener.columnAdded(at);
         }
-        parent.setChangedSinceLastSave(true);
     }
 
+    /**
+     * Remove last row.
+     */
     public void removeLastRow() {
         numRows--;
         rowData.remove(numRows);
         for (Listener listener : listeners) {
-            listener.rowRemoved(numRows);            
+            listener.rowRemoved(numRows);
         }
-        parent.setChangedSinceLastSave(true);
     }
 
     /**
      * Remove a specified row.
      *
-     * @param at index of row to remove.
+     * @param rowToRemoveIndex index of row to remove.
      */
-    public void removeRow(final int at) {
+    public void removeRow(final int rowToRemoveIndex) {
         numRows--;
-        rowData.remove(at);
+        rowData.remove(rowToRemoveIndex);
         for (Listener listener : listeners) {
-            listener.rowRemoved(at);
+            listener.rowRemoved(rowToRemoveIndex);
         }
-        parent.setChangedSinceLastSave(true);
     }
 
     /**
@@ -349,23 +335,21 @@ public class DataModel<E> {
         for (Listener listener : listeners) {
             listener.columnRemoved(numColumns);
         }
-        parent.setChangedSinceLastSave(true);
     }
 
     /**
      * Remove column at specified index.
-     * 
-     * @param at index
+     *
+     * @param columnToRemoveIndex index of column to remove
      */
-    public void removeColumn(final int at) {
+    public void removeColumn(final int columnToRemoveIndex) {
         numColumns--;
         for (List<E> row : rowData) {
-            row.remove(at);
+            row.remove(columnToRemoveIndex);
         }
         for (Listener listener : listeners) {
-            listener.columnRemoved(at);
+            listener.columnRemoved(columnToRemoveIndex);
         }
-        parent.setChangedSinceLastSave(true);
     }
 
     /**
@@ -378,7 +362,7 @@ public class DataModel<E> {
     }
 
     /**
-     * Retursn number of rows.
+     * Returns number of rows.
      *
      * @return number of rows.
      */
@@ -405,7 +389,6 @@ public class DataModel<E> {
         for (List<E> row : rowData) {
             Collections.fill(row, value);
         }
-        parent.setChangedSinceLastSave(true);
     }
 
     /**
@@ -420,9 +403,8 @@ public class DataModel<E> {
             }
         }
     }
-    
+
     public void fireModelChanged() {
-        
     }
 
     public interface Listener {

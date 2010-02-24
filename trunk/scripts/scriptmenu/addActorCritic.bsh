@@ -19,112 +19,111 @@ import org.simbrain.world.odorworld.behaviors.*;
 import org.simbrain.util.*;
 import org.simbrain.util.environment.SmellSource;
 
-
 {
 
-	private static final String FS = System.getProperty("file.separator");
+    private static final String FS = System.getProperty("file.separator");
 
-	// Variables
-	int worldHeight = 350;
-	int worldWidth = 350;
-	double dispersion = 300;
-	
-        // Make a 2-d environment
-        OdorWorldComponent odorWorld = new OdorWorldComponent("Odor World");
-	OdorWorld world = odorWorld.getWorld();
-        workspace.addWorkspaceComponent(odorWorld);
-        desktop.getDesktopComponent(odorWorld).getParentFrame().setBounds(470, 38, worldWidth, worldHeight);
-        
-	// Add agent to environment
-	RotatingEntity mouse = new RotatingEntity(world);
-    	mouse.setLocation(162,200);                                  
-	world.addAgent(mouse);
-	
-	// Add rewarding object
-	String string = "static" + FS + "Swiss.gif";
-	BasicEntity object1 = new BasicEntity(string , world);
-	object1.setBehavior(new NewtonianBouncer(object1));
-	object1.setVelocityX(1);
-	object1.setVelocityY(1);
-	object1.setLocation(36,107);
-	object1.setSmellSource(
-	new SmellSource(SimbrainMath.multVector(new double[]{.03,.07,.01}
-                , dispersion),
-                SmellSource.DecayFunction.GAUSSIAN, 
-                object1.getLocation()));                                                
-	world.addEntity(object1);	
-	
-	// Add bad object
-	String string = "static" + FS + "Poison.gif";
-	BasicEntity object2 = new BasicEntity(string , world);
-	object2.setBehavior(new NewtonianBouncer(object2));
-	object2.setVelocityX(-1);
-	object2.setVelocityY(-1);
-	object2.setLocation(136,107);
-	object2.setSmellSource(
-                new SmellSource(SimbrainMath.multVector(new double[]{.07,.04,-.01}
-                , dispersion),
-                SmellSource.DecayFunction.GAUSSIAN, 
-                object2.getLocation()));
-	world.addEntity(object2);	
+    // Variables
+    int worldHeight = 350;
+    int worldWidth = 350;
+    double dispersion = 300;
 
-		
-	// TODO: Label the neurons
-	
-        // Create Network
-        NetworkComponent network = new NetworkComponent("Adaptive Critic Network");
-        workspace.addWorkspaceComponent(network);
-        desktop.getDesktopComponent(network).getParentFrame().setBounds(28, 35, 450, 400);
-        MultipathLayout layout = new MultipathLayout(40, 80, 2, MultipathLayout.HORIZONTAL);
-        layout.setInitialLocation(new Point(10,10));
-        ActorCritic ac = new ActorCritic(network.getRootNetwork(), 4, 3, layout);
-        network.getRootNetwork().addNetwork(ac);
-        ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_5")).setAddNoise(true);
-        ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_6")).setAddNoise(true);
-        ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_7")).setAddNoise(true);
-        ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_5")).setLowerBound(-1);
-        ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_6")).setLowerBound(-1);
-        ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_7")).setLowerBound(-1);
-        ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_9")).setLowerBound(-1);
-        for (Neuron neuron : network.getRootNetwork().getFlatNeuronList()) {
-            neuron.setUpperBound(20);
-            neuron.getNoiseGenerator().setUpperBound(5);
-            //neuron.setLowerBound(-3);                
-        }
-            
-        //Couple Mouse Whiskers to adaptive critic neurons
-        ProducingAttribute leftWhisker1 = odorWorld.getProducingAttribute("RotatingEntity-1-Left","Smell-1");
-        ProducingAttribute rightWhisker1 = odorWorld.getProducingAttribute("RotatingEntity-1-Right","Smell-1");
-        ProducingAttribute leftWhisker2 = odorWorld.getProducingAttribute("RotatingEntity-1-Left","Smell-2");
-        ProducingAttribute rightWhisker2 = odorWorld.getProducingAttribute("RotatingEntity-1-Right","Smell-2");
-        ConsumingAttribute inputNeuron1 = network.getConsumingAttribute("Neuron_1", "Activation"); 
-        ConsumingAttribute inputNeuron2 = network.getConsumingAttribute("Neuron_2", "Activation"); 
-        ConsumingAttribute inputNeuron3 = network.getConsumingAttribute("Neuron_3", "Activation"); 
-        ConsumingAttribute inputNeuron4 = network.getConsumingAttribute("Neuron_4", "Activation"); 
-        workspace.getCouplingManager().addCoupling(new Coupling(leftWhisker1, inputNeuron1));
-        workspace. getCouplingManager().addCoupling(new Coupling(rightWhisker1, inputNeuron2));
-        workspace.getCouplingManager().addCoupling(new Coupling(leftWhisker2, inputNeuron3));
-        workspace. getCouplingManager().addCoupling(new Coupling(rightWhisker2, inputNeuron4));
-                                                                              
-        //Couple Output Neurons to motion
-        ProducingAttribute actor1 = network.getProducingAttribute("Neuron_5", "Activation"); 
-        ProducingAttribute actor2 = network.getProducingAttribute("Neuron_6", "Activation"); 
-        ProducingAttribute actor3 = network.getProducingAttribute("Neuron_7", "Activation"); 
-        ConsumingAttribute turnLeft = odorWorld.getSingleConsumingAttribute("RotatingEntity-1-Left"); 
-        ConsumingAttribute goStraight = odorWorld.getSingleConsumingAttribute("RotatingEntity-1-Straight"); 
-        ConsumingAttribute turnRight = odorWorld.getSingleConsumingAttribute("RotatingEntity-1-Right"); 
-        workspace. getCouplingManager().addCoupling(new Coupling(actor1, turnLeft));
-        workspace. getCouplingManager().addCoupling(new Coupling(actor2, goStraight));
-        workspace. getCouplingManager().addCoupling(new Coupling(actor3, turnRight));
-        
-        //Couple left and right Reward sensors to reward neurons in Actor-critic network
-        ProducingAttribute leftReward = odorWorld.getProducingAttribute("RotatingEntity-1-Left","Smell-3");
-        ProducingAttribute rightReward = odorWorld.getProducingAttribute("RotatingEntity-1-Right","Smell-3");
-        ConsumingAttribute rewardNeuron = network.getConsumingAttribute("Neuron_9", "Activation"); 
-        workspace.getCouplingManager().addCoupling(new Coupling(leftReward, rewardNeuron));
-        workspace.getCouplingManager().addCoupling(new Coupling(rightReward, rewardNeuron));
+    // Make a 2-d environment
+    OdorWorldComponent odorWorld = new OdorWorldComponent("Odor World");
+    OdorWorld world = odorWorld.getWorld();
+    workspace.addWorkspaceComponent(odorWorld);
+    desktop.getDesktopComponent(odorWorld).getParentFrame().setBounds(470, 38, worldWidth, worldHeight);
 
-        ac.setTrain(true);
-	desktop.getDesktopComponent(network).postAddInit();
+    // Add agent to environment
+    RotatingEntity mouse = new RotatingEntity(world);
+    mouse.setLocation(162,200);                                  
+    world.addAgent(mouse);
+
+    // Add rewarding object
+    String string = "static" + FS + "Swiss.gif";
+    BasicEntity object1 = new BasicEntity(string , world);
+    object1.setBehavior(new NewtonianBouncer(object1));
+    object1.setVelocityX(1);
+    object1.setVelocityY(1);
+    object1.setLocation(36,107);
+    object1.setSmellSource(
+            new SmellSource(SimbrainMath.multVector(new double[]{.03,.07,.01}
+            , dispersion),
+            SmellSource.DecayFunction.GAUSSIAN, 
+            object1.getLocation()));                                                
+    world.addEntity(object1);	
+
+    // Add bad object
+    String string = "static" + FS + "Poison.gif";
+    BasicEntity object2 = new BasicEntity(string , world);
+    object2.setBehavior(new NewtonianBouncer(object2));
+    object2.setVelocityX(-1);
+    object2.setVelocityY(-1);
+    object2.setLocation(136,107);
+    object2.setSmellSource(
+            new SmellSource(SimbrainMath.multVector(new double[]{.07,.04,-.01}
+            , dispersion),
+            SmellSource.DecayFunction.GAUSSIAN, 
+            object2.getLocation()));
+    world.addEntity(object2);	
+
+
+    // TODO: Label the neurons
+
+    // Create Network
+    NetworkComponent network = new NetworkComponent("Adaptive Critic Network");
+    workspace.addWorkspaceComponent(network);
+    desktop.getDesktopComponent(network).getParentFrame().setBounds(28, 35, 450, 400);
+    MultipathLayout layout = new MultipathLayout(40, 80, 2, MultipathLayout.HORIZONTAL);
+    layout.setInitialLocation(new Point(10,10));
+    ActorCritic ac = new ActorCritic(network.getRootNetwork(), 4, 3, layout);
+    network.getRootNetwork().addNetwork(ac);
+    ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_5")).setAddNoise(true);
+    ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_6")).setAddNoise(true);
+    ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_7")).setAddNoise(true);
+    ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_5")).setLowerBound(-1);
+    ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_6")).setLowerBound(-1);
+    ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_7")).setLowerBound(-1);
+    ((LinearNeuron)network.getRootNetwork().getNeuron("Neuron_9")).setLowerBound(-1);
+    for (Neuron neuron : network.getRootNetwork().getFlatNeuronList()) {
+        neuron.setUpperBound(20);
+        neuron.getNoiseGenerator().setUpperBound(5);
+        //neuron.setLowerBound(-3);                
+    }
+
+    //Couple Mouse Whiskers to adaptive critic neurons
+    ProducingAttribute leftWhisker1 = odorWorld.getProducingAttribute("RotatingEntity-1-Left","Smell-1");
+    ProducingAttribute rightWhisker1 = odorWorld.getProducingAttribute("RotatingEntity-1-Right","Smell-1");
+    ProducingAttribute leftWhisker2 = odorWorld.getProducingAttribute("RotatingEntity-1-Left","Smell-2");
+    ProducingAttribute rightWhisker2 = odorWorld.getProducingAttribute("RotatingEntity-1-Right","Smell-2");
+    ConsumingAttribute inputNeuron1 = network.getConsumingAttribute("Neuron_1", "Activation"); 
+    ConsumingAttribute inputNeuron2 = network.getConsumingAttribute("Neuron_2", "Activation"); 
+    ConsumingAttribute inputNeuron3 = network.getConsumingAttribute("Neuron_3", "Activation"); 
+    ConsumingAttribute inputNeuron4 = network.getConsumingAttribute("Neuron_4", "Activation"); 
+    workspace.getCouplingManager().addCoupling(new Coupling(leftWhisker1, inputNeuron1));
+    workspace. getCouplingManager().addCoupling(new Coupling(rightWhisker1, inputNeuron2));
+    workspace.getCouplingManager().addCoupling(new Coupling(leftWhisker2, inputNeuron3));
+    workspace. getCouplingManager().addCoupling(new Coupling(rightWhisker2, inputNeuron4));
+
+    //Couple Output Neurons to motion
+    ProducingAttribute actor1 = network.getProducingAttribute("Neuron_5", "Activation"); 
+    ProducingAttribute actor2 = network.getProducingAttribute("Neuron_6", "Activation"); 
+    ProducingAttribute actor3 = network.getProducingAttribute("Neuron_7", "Activation"); 
+    ConsumingAttribute turnLeft = odorWorld.getSingleConsumingAttribute("RotatingEntity-1-Left"); 
+    ConsumingAttribute goStraight = odorWorld.getSingleConsumingAttribute("RotatingEntity-1-Straight"); 
+    ConsumingAttribute turnRight = odorWorld.getSingleConsumingAttribute("RotatingEntity-1-Right"); 
+    workspace. getCouplingManager().addCoupling(new Coupling(actor1, turnLeft));
+    workspace. getCouplingManager().addCoupling(new Coupling(actor2, goStraight));
+    workspace. getCouplingManager().addCoupling(new Coupling(actor3, turnRight));
+
+    //Couple left and right Reward sensors to reward neurons in Actor-critic network
+    ProducingAttribute leftReward = odorWorld.getProducingAttribute("RotatingEntity-1-Left","Smell-3");
+    ProducingAttribute rightReward = odorWorld.getProducingAttribute("RotatingEntity-1-Right","Smell-3");
+    ConsumingAttribute rewardNeuron = network.getConsumingAttribute("Neuron_9", "Activation"); 
+    workspace.getCouplingManager().addCoupling(new Coupling(leftReward, rewardNeuron));
+    workspace.getCouplingManager().addCoupling(new Coupling(rightReward, rewardNeuron));
+
+    ac.setTrain(true);
+    desktop.getDesktopComponent(network).postAddInit();
 
 }

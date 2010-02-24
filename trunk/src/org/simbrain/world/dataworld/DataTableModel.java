@@ -27,10 +27,10 @@ import javax.swing.table.AbstractTableModel;
 public class DataTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
-    
+
     /** Underlying data. */
     private final DataModel<Double> model;
-    
+
     /** Listener. */
     private final DataModel.Listener listener = new DataModel.Listener() {
 
@@ -59,9 +59,9 @@ public class DataTableModel extends AbstractTableModel {
         public void rowRemoved(int row) {
             fireTableRowsDeleted(row, row);
         }
-        
+
     };
-    
+
     /**
      * Construct the table model.
      *
@@ -79,7 +79,7 @@ public class DataTableModel extends AbstractTableModel {
     public int getColumnCount() {
         return model.getColumnCount();
     }
-    
+
     public String getColumnName(int columnIndex) {
         return "" + (columnIndex + 1);
     }

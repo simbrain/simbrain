@@ -43,8 +43,9 @@ import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**
- * <b>DataWorldPanel</b> is a jpanel which contains a table object and a that table's model object.
- *
+ * <b>DataWorldPanel</b> is a jpanel which contains a table object and a that
+ * table's model object.
+ * 
  * @author jyoshimi
  */
 public class DataWorldPanel extends JPanel {
@@ -89,7 +90,7 @@ public class DataWorldPanel extends JPanel {
         table = new JXTable(tableModel);
         add(table, BorderLayout.CENTER);
         add(table.getTableHeader(), BorderLayout.NORTH);
-        
+
         table.addKeyListener(keyListener);
         table.addMouseListener(mouseListener);
         table.setColumnSelectionAllowed(true);
@@ -97,15 +98,15 @@ public class DataWorldPanel extends JPanel {
         table.setRowSelectionAllowed(true);
         table.setGridColor(gridColor);
         updateRowSelection();
-        
+
         addRow.addActionListener(addRowHereListener);
         addCol.addActionListener(addColHereListener);
-        
+
         remRow.addActionListener(remRowHereListener);
         remCol.addActionListener(remColHereListener);
-                
+
    }
-    
+
     private ActionListener addRowHereListener = new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
             if (getSelectedPoint().x < (table.getRowHeight() * table

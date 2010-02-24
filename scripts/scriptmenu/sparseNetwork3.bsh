@@ -36,4 +36,6 @@ import org.simbrain.workspace.*;
 	network.randomizeNeurons();
         workspace.addWorkspaceComponent(networkComponent);
         desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(25, 38, 400, 500);
+	desktop.getDesktopComponent(networkComponent).postAddInit();
+
 }

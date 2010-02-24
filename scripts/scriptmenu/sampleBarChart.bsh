@@ -2,7 +2,8 @@ import java.awt.Point;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.*;
 import org.simbrain.plot.barchart.*;
 import org.simbrain.workspace.ConsumingAttribute;
@@ -14,45 +15,43 @@ import java.awt.Color;
 
 {
 
-	// PARAMETERS
-        int numNeurons = 6;
+    // PARAMETERS
+    int numNeurons = 10;
 
-        // BUILD NETWORK
-        NetworkComponent networkComponent = new NetworkComponent("Simple Recurrent Network");
-        workspace.addWorkspaceComponent(networkComponent);
-        RootNetwork network = networkComponent.getRootNetwork();
-        for (int i = 0; i < numNeurons; i++) {
-            NakaRushtonNeuron neuron = new NakaRushtonNeuron();
-            network.addNeuron(neuron);
-        }
+    // BUILD NETWORK
+    NetworkComponent networkComponent = new NetworkComponent("Simple Recurrent Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    RootNetwork network = networkComponent.getRootNetwork();
+    for (int i = 0; i < numNeurons; i++) {
+        NakaRushtonNeuron neuron = new NakaRushtonNeuron();
+        network.addNeuron(neuron);
+    }
 
-	// LAYOUT NEURONS
-        GridLayout layout = new GridLayout(50.0, 50.0, 6);
-        layout.setInitialLocation(new Point(10, 10));
-        layout.layoutNeurons(network);
+    // LAYOUT NEURONS
+    LineLayout layout = new LineLayout(10,10, 70, LineOrientation.HORIZONTAL);
+    layout.layoutNeurons(network);
 
-	// CREATE SYNAPSES 
-        Sparse connection = new Sparse(network, network.getFlatNeuronList(),
-                network.getFlatNeuronList());
-        connection.setExcitatoryProbability(.2);
-        connection.setInhibitoryProbability(.5);
-        connection.connectNeurons();    
-	network.randomizeNeurons();
-	networkComponent.update();
-        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
+    // CREATE SYNAPSES 
+    Sparse connection = new Sparse(network, network.getFlatNeuronList(),
+            network.getFlatNeuronList());
+    connection.setExcitatoryProbability(.2);
+    connection.setInhibitoryProbability(.5);
+    connection.connectNeurons();    
+    network.randomizeNeurons();
+    networkComponent.update();
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
 
-        //MAKE BARCHART
-        BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network");
-	barChart.getModel().setBarColor(Color.blue);
-        workspace.addWorkspaceComponent(barChart);
-        desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
-	
+    //MAKE BARCHART
+    BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network", numNeurons);
+    barChart.getModel().setBarColor(Color.blue);
+    workspace.addWorkspaceComponent(barChart);
+    desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
 
-	// COUPLING NETWORK TO BARCHART
-        for (int i = 0; i < numNeurons; i++) {
-            ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + (i+1), "Activation"); 
-            ConsumingAttribute barChartAttribute = barChart.getSingleConsumingAttribute("BarChartData" + i);
-            workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, barChartAttribute));
-        }
+    // COUPLING NETWORK TO BARCHART
+    for (int i = 0; i < numNeurons; i++) {
+        ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + (i+1), "Activation"); 
+        ConsumingAttribute barChartAttribute = barChart.getSingleConsumingAttribute("BarChartData" + i);
+        workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, barChartAttribute));
+    }
 
 }

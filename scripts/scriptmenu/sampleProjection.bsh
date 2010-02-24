@@ -15,36 +15,37 @@ import org.simbrain.workspace.Workspace;
 
 {
 
-        //Make a scatter chart
-        ProjectionComponent chart = new ProjectionComponent("Attractor Network");
-        workspace.addWorkspaceComponent(chart);
-        desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
+    //Make a scatter chart
+    ProjectionComponent chart = new ProjectionComponent("Attractor Network");
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
 
-        // Make Network
-        NetworkComponent networkComponent = new NetworkComponent("Projection of Attractor Network");
-        workspace.addWorkspaceComponent(networkComponent);
-        desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 500);
-        RootNetwork network = networkComponent.getRootNetwork();
-        GridLayout layout = new GridLayout(50.0, 50.0, 5);
-        int numNeurons = 25;
-        layout.setInitialLocation(new Point(10, 10));
-        for (int i = 0; i < numNeurons; i++) {
-            NakaRushtonNeuron neuron = new NakaRushtonNeuron();
-            network.addNeuron(neuron);
-        }
-        layout.layoutNeurons(network);
-        Sparse connection = new Sparse(network, network.getFlatNeuronList(),
-                network.getFlatNeuronList());
-        connection.setExcitatoryProbability(.05);
-        connection.setInhibitoryProbability(.1);
-        connection.connectNeurons();    
-	network.randomizeNeurons();
+    // Make Network
+    NetworkComponent networkComponent = new NetworkComponent("Projection of Attractor Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 500);
+    RootNetwork network = networkComponent.getRootNetwork();
+    GridLayout layout = new GridLayout(50.0, 50.0, 5);
+    int numNeurons = 25;
+    layout.setInitialLocation(new Point(10, 10));
+    for (int i = 0; i < numNeurons; i++) {
+        NakaRushtonNeuron neuron = new NakaRushtonNeuron();
+        network.addNeuron(neuron);
+    }
+    layout.layoutNeurons(network);
+    Sparse connection = new Sparse(network, network.getFlatNeuronList(),
+            network.getFlatNeuronList());
+    connection.setExcitatoryProbability(.05);
+    connection.setInhibitoryProbability(.1);
+    connection.connectNeurons();    
+    network.randomizeNeurons();
+    desktop.getDesktopComponent(networkComponent).postAddInit();
 
-	// Make Couplings
-        for (int i = 1; i < numNeurons; i++) {
-            ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + i, "Activation"); 
-            ConsumingAttribute chartAttribute = chart.getSingleConsumingAttribute("Dimension" + i);
-            workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
-        }
+    // Make Couplings
+    for (int i = 1; i < numNeurons; i++) {
+        ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + i, "Activation"); 
+        ConsumingAttribute chartAttribute = chart.getSingleConsumingAttribute("Dimension" + i);
+        workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
+    }
 
 }

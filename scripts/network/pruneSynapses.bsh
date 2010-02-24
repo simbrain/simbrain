@@ -5,11 +5,11 @@ import org.simbrain.network.interfaces.*;
  * threshold.
  */
 {
-	double THRESHOLD = .5;
+    double THRESHOLD = .5;
 
-        for (Synapse synapse: networkPanel.getSelectedModelSynapses()) {
-            if (Math.abs(synapse.getStrength()) < THRESHOLD) {
-                network.deleteSynapse(synapse);
-            }
+    for (Synapse synapse: networkPanel.getSelectedModelSynapses()) {
+        if (Math.abs(synapse.getStrength()) < THRESHOLD) {
+            network.deleteSynapse(synapse);
         }
+    }
 }

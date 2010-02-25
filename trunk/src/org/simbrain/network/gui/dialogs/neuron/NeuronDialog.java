@@ -43,6 +43,7 @@ import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.CustomNeuron;
 import org.simbrain.network.neurons.DecayNeuron;
 import org.simbrain.network.neurons.ExponentialDecayNeuron;
+import org.simbrain.network.neurons.HodgkinHuxleyNeuron;
 import org.simbrain.network.neurons.IACNeuron;
 import org.simbrain.network.neurons.IntegrateAndFireNeuron;
 import org.simbrain.network.neurons.IzhikevichNeuron;
@@ -160,6 +161,9 @@ public class NeuronDialog extends StandardDialog {
         
         association = new Association("Trace", TraceNeuron.class, TraceNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
+        
+        association = new Association("Hodgkin Huxley Neuron", HodgkinHuxleyNeuron.class, HodgkinHuxleyNeuronPanel.class, false);
+       ASSOCIATIONS.put(association.clazz, association);
 
     }
     

@@ -74,11 +74,11 @@ public class NeuronDialog extends StandardDialog {
     /** The neuron types indexed by name. */
     private static final Map<Class<? extends Neuron>, Association> ASSOCIATIONS
         = new LinkedHashMap<Class<? extends Neuron>, Association>();
-    
+
     /* Temporary fill of associations.  To be replaced with load from file. */
     static {
         Association association;
-        
+
         association = new Association("Additive (Continuous Hopfield)", AdditiveNeuron.class,
                 AdditiveNeuronPanel.class, true);
         ASSOCIATIONS.put(association.clazz, association);
@@ -86,7 +86,7 @@ public class NeuronDialog extends StandardDialog {
         association = new Association("Binary", BinaryNeuron.class,
                 BinaryNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-       
+
         association = new Association("Clamped", ClampedNeuron.class,
                 ClampedNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
@@ -102,6 +102,9 @@ public class NeuronDialog extends StandardDialog {
                 ExponentialDecayNeuronPanel.class, true);
         ASSOCIATIONS.put(association.clazz, association);
 
+//      association = new Association("Hodgkin Huxley Neuron", HodgkinHuxleyNeuron.class, HodgkinHuxleyNeuronPanel.class, false);
+//      ASSOCIATIONS.put(association.clazz, association);
+
         association = new Association("IAC", IACNeuron.class,
                 IACNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
@@ -113,14 +116,14 @@ public class NeuronDialog extends StandardDialog {
         association = new Association("Izhikevich", IzhikevichNeuron.class,
                 IzhikevichNeuronPanel.class, true);
         ASSOCIATIONS.put(association.clazz, association);
- 
+
         association = new Association("Linear", LinearNeuron.class,
                 LinearNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
 
         association = new Association("LMS", LMSNeuron.class, LMSNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-      
+
         association = new Association("Logistic", LogisticNeuron.class,
                 LogisticNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
@@ -158,15 +161,13 @@ public class NeuronDialog extends StandardDialog {
         association = new Association("Three valued", ThreeValuedNeuron.class,
             ThreeValuedNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-        
+
         association = new Association("Trace", TraceNeuron.class, TraceNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-        
-        association = new Association("Hodgkin Huxley Neuron", HodgkinHuxleyNeuron.class, HodgkinHuxleyNeuronPanel.class, false);
-       ASSOCIATIONS.put(association.clazz, association);
+
 
     }
-    
+
     /** Null string. */
     public static final String NULL_STRING = "...";
 

@@ -5,9 +5,9 @@
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="lib" location="lib" />
-	<property name="dist" location="dist" />
-	<property name="build" location="build" /> 	<!-- Put final products here -->
-	<property name="build.main" location="${build}/main" /> <!-- Staging area -->
+	<property name="dist" location="dist" /> <!-- Put final products here -->
+	<property name="build" location="build" /> 	<!-- Staging area -->
+	<property name="build.main" location="${build}/main" /> 
 	<property name="build.jars" location="${build}/jars" />
 	<property name="docs" location="docs" />
 	<property name="scripts" location="scripts" />

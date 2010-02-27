@@ -45,7 +45,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private DataModel<Double> dataModel;
+    private DataModel<Double> dataModel; //TODO: Generalize to arbitrary data type?
 
     /**
      * This method is the default constructor.
@@ -72,7 +72,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     @SuppressWarnings("unchecked")
     private DataWorldComponent(final String name, final DataModel<?> dataModel) {
         super(name);
-        this.dataModel = new DataModel<Double>();
+        this.dataModel = (DataModel<Double>) dataModel;
         init();
     }
 

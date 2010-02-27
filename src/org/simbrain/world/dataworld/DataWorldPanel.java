@@ -72,11 +72,10 @@ public class DataWorldPanel extends JPanel {
 
     /** Removes a column. */
     private JMenuItem remCol = new JMenuItem("Delete column");
-    
+
     /** Grid Color. */
     private Color gridColor =  Color.LIGHT_GRAY;
-        
-    
+
     /**
      * Creates a new instance of the data world.
      * @param dataModel 

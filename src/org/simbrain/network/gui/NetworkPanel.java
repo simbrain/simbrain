@@ -544,12 +544,12 @@ public class NetworkPanel extends PCanvas  {
     protected JMenu createNewNetworkMenu() {
         JMenu newNetMenu = new JMenu("Add Network");
         newNetMenu.add(actionManager.getNewActorCriticNetworkAction());
-        newNetMenu.add(actionManager.getNewBackpropNetworkAction());
+//        newNetMenu.add(actionManager.getNewBackpropNetworkAction());
         newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
 //        newNetMenu.add(actionManager.getNewElmanNetworkAction());
         newNetMenu.add(actionManager.getNewHopfieldNetworkAction());
         newNetMenu.add(actionManager.getNewKwtaNetworkAction());
-        newNetMenu.add(actionManager.getNewLMSNetworkAction());
+//        newNetMenu.add(actionManager.getNewLMSNetworkAction());
         newNetMenu.add(actionManager.getNewSOMNetworkAction());
         newNetMenu.add(actionManager.getNewStandardNetworkAction());
         newNetMenu.add(actionManager.getNewWTANetworkAction());

@@ -16,7 +16,7 @@ import java.awt.Color;
 {
 
     // PARAMETERS
-    int numNeurons = 10;
+    int numNeurons = 8;
 
     // BUILD NETWORK
     NetworkComponent networkComponent = new NetworkComponent("Simple Recurrent Network");

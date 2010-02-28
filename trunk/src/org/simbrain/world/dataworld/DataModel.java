@@ -318,6 +318,9 @@ public class DataModel<E> {
      */
     public void removeRow(final int rowToRemoveIndex) {
         numRows--;
+        if (currentRow >= numRows) {
+            currentRow = numRows - 1;
+        }
         rowData.remove(rowToRemoveIndex);
         for (Listener listener : listeners) {
             listener.rowRemoved(rowToRemoveIndex);

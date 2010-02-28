@@ -21,8 +21,6 @@ import org.simbrain.util.environment.SmellSource;
 
 {
 
-    private static final String FS = System.getProperty("file.separator");
-
     // Variables
     int worldHeight = 350;
     int worldWidth = 350;
@@ -40,7 +38,7 @@ import org.simbrain.util.environment.SmellSource;
     world.addAgent(mouse);
 
     // Add rewarding object
-    String string = "static" + FS + "Swiss.gif";
+    String string = "Swiss.gif";
     BasicEntity object1 = new BasicEntity(string , world);
     object1.setBehavior(new NewtonianBouncer(object1));
     object1.setVelocityX(1);
@@ -54,7 +52,7 @@ import org.simbrain.util.environment.SmellSource;
     world.addEntity(object1);	
 
     // Add bad object
-    String string = "static" + FS + "Poison.gif";
+    String string = "Poison.gif";
     BasicEntity object2 = new BasicEntity(string , world);
     object2.setBehavior(new NewtonianBouncer(object2));
     object2.setVelocityX(-1);

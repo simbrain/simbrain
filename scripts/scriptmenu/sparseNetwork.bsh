@@ -9,7 +9,7 @@ import org.simbrain.workspace.*;
 {
 
 	// Parameters 
-	int NUM_NEURONS = 200;
+	int NUM_NEURONS = 100;
 	double GRID_SPACE = 50;
 	double INHIBITORY_PROB = .2;
 	double INHIBITORY_RADIUS = 100;

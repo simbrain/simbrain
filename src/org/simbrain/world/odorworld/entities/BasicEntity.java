@@ -26,12 +26,11 @@ import org.simbrain.world.odorworld.OdorWorld;
  */
 public class BasicEntity extends OdorWorldEntity {
 
-
-    /** File separator. */
-    private static final String FS = System.getProperty("file.separator");
+    /** Static image location. */
+    private static final String STATIC_IMAGE_DIR = "static/";
 
     /** Default image. */
-    private static final String DEFAULT_IMAGE = "static" + FS + "Swiss.gif";
+    private static final String DEFAULT_IMAGE = STATIC_IMAGE_DIR  + "Swiss.gif";
 
     /**
      * Construct a basic entity with a specified animation.
@@ -56,7 +55,7 @@ public class BasicEntity extends OdorWorldEntity {
      * @param imageLocation image location
      */
     public BasicEntity(final String imageLocation, final OdorWorld world) {
-        super(imageLocation, world);
+        super(STATIC_IMAGE_DIR + imageLocation, world);
     }
 
     /**
@@ -98,7 +97,7 @@ public class BasicEntity extends OdorWorldEntity {
      */
     public void setType(ComboBoxWrapper imageData) {
         String currentImage = (String) imageData.getCurrentObject();
-        this.setAnimation(new Animation("static" + FS + currentImage));
+        this.setAnimation(new Animation(STATIC_IMAGE_DIR + currentImage));
     }
 
 }

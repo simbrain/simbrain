@@ -22,13 +22,13 @@ import java.util.TreeMap;
 
 /**
  * Manages the creation of treemaps for rotating entities.
- * 
+ *
  * @author jyoshimi
  */
 public class RotatingEntityManager {
 
-    /** File separator. */
-    private static String FS = System.getProperty("file.separator");
+    /** Rotating image base directory. */
+    private static final String ROTATING_IMAGE_DIR = "rotating/";
 
     /**
      * Tree map for mouse. Images by David Fleishman.
@@ -37,54 +37,30 @@ public class RotatingEntityManager {
      */
     public static TreeMap<Double, Animation> getMouse() {
         TreeMap<Double, Animation> mouseMap = new TreeMap<Double, Animation>();
-        mouseMap.put(7.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_0.gif"));
-        mouseMap.put(22.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_15.gif"));
-        mouseMap.put(37.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_30.gif"));
-        mouseMap.put(52.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_45.gif"));
-        mouseMap.put(67.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_60.gif"));
-        mouseMap.put(82.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_75.gif"));
-        mouseMap.put(97.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_90.gif"));
-        mouseMap.put(112.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_105.gif"));
-        mouseMap.put(127.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_120.gif"));
-        mouseMap.put(142.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_135.gif"));
-        mouseMap.put(157.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_150.gif"));
-        mouseMap.put(172.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_165.gif"));
-        mouseMap.put(187.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_180.gif"));
-        mouseMap.put(202.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_195.gif"));
-        mouseMap.put(217.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_210.gif"));
-        mouseMap.put(232.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_225.gif"));
-        mouseMap.put(247.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_240.gif"));
-        mouseMap.put(262.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_255.gif"));
-        mouseMap.put(277.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_270.gif"));
-        mouseMap.put(292.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_285.gif"));
-        mouseMap.put(307.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_300.gif"));
-        mouseMap.put(322.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_315.gif"));
-        mouseMap.put(337.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_330.gif"));
-        mouseMap.put(352.5, new Animation("rotating" + FS + "mouse" + FS
-                + "Mouse_345.gif"));
+        mouseMap.put(7.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_0.gif"));
+        mouseMap.put(22.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_15.gif"));
+        mouseMap.put(37.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_30.gif"));
+        mouseMap.put(52.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_45.gif"));
+        mouseMap.put(67.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_60.gif"));
+        mouseMap.put(82.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_75.gif"));
+        mouseMap.put(97.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_90.gif"));
+        mouseMap.put(112.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_105.gif"));
+        mouseMap.put(127.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_120.gif"));
+        mouseMap.put(142.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_135.gif"));
+        mouseMap.put(157.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_150.gif"));
+        mouseMap.put(172.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_165.gif"));
+        mouseMap.put(187.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_180.gif"));
+        mouseMap.put(202.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_195.gif"));
+        mouseMap.put(217.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_210.gif"));
+        mouseMap.put(232.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_225.gif"));
+        mouseMap.put(247.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_240.gif"));
+        mouseMap.put(262.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_255.gif"));
+        mouseMap.put(277.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_270.gif"));
+        mouseMap.put(292.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_285.gif"));
+        mouseMap.put(307.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_300.gif"));
+        mouseMap.put(322.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_315.gif"));
+        mouseMap.put(337.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_330.gif"));
+        mouseMap.put(352.5, new Animation(ROTATING_IMAGE_DIR + "mouse/Mouse_345.gif"));
         return mouseMap;
     }
 
@@ -103,90 +79,90 @@ public class RotatingEntityManager {
 
         double angle = 7.5;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "e0001.png",
-                "rotating" + FS + tileBaseName + FS + "e0002.png",
-                "rotating" + FS + tileBaseName + FS + "e0003.png",
-                "rotating" + FS + tileBaseName + FS + "e0004.png",
-                "rotating" + FS + tileBaseName + FS + "e0005.png",
-                "rotating" + FS + tileBaseName + FS + "e0006.png",
-                "rotating" + FS + tileBaseName + FS + "e0007.png", }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/e0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "ne0000.png",
-                "rotating" + FS + tileBaseName + FS + "ne0001.png",
-                "rotating" + FS + tileBaseName + FS + "ne0002.png",
-                "rotating" + FS + tileBaseName + FS + "ne0003.png",
-                "rotating" + FS + tileBaseName + FS + "ne0004.png",
-                "rotating" + FS + tileBaseName + FS + "ne0005.png",
-                "rotating" + FS + tileBaseName + FS + "ne0006.png",
-                "rotating" + FS + tileBaseName + FS + "ne0007.png", }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0000.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/ne0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "n0000.png",
-                "rotating" + FS + tileBaseName + FS + "n0001.png",
-                "rotating" + FS + tileBaseName + FS + "n0002.png",
-                "rotating" + FS + tileBaseName + FS + "n0003.png",
-                "rotating" + FS + tileBaseName + FS + "n0004.png",
-                "rotating" + FS + tileBaseName + FS + "n0005.png",
-                "rotating" + FS + tileBaseName + FS + "n0006.png",
-                "rotating" + FS + tileBaseName + FS + "n0007.png", }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0000.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/n0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "nw0000.png",
-                "rotating" + FS + tileBaseName + FS + "nw0001.png",
-                "rotating" + FS + tileBaseName + FS + "nw0002.png",
-                "rotating" + FS + tileBaseName + FS + "nw0003.png",
-                "rotating" + FS + tileBaseName + FS + "nw0004.png",
-                "rotating" + FS + tileBaseName + FS + "nw0005.png",
-                "rotating" + FS + tileBaseName + FS + "nw0006.png",
-                "rotating" + FS + tileBaseName + FS + "nw0007.png", }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0000.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/nw0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "w0000.png",
-                "rotating" + FS + tileBaseName + FS + "w0001.png",
-                "rotating" + FS + tileBaseName + FS + "w0002.png",
-                "rotating" + FS + tileBaseName + FS + "w0003.png",
-                "rotating" + FS + tileBaseName + FS + "w0004.png",
-                "rotating" + FS + tileBaseName + FS + "w0005.png",
-                "rotating" + FS + tileBaseName + FS + "w0006.png",
-                "rotating" + FS + tileBaseName + FS + "w0007.png" }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0000.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/w0007.png" }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "sw0000.png",
-                "rotating" + FS + tileBaseName + FS + "sw0001.png",
-                "rotating" + FS + tileBaseName + FS + "sw0002.png",
-                "rotating" + FS + tileBaseName + FS + "sw0003.png",
-                "rotating" + FS + tileBaseName + FS + "sw0004.png",
-                "rotating" + FS + tileBaseName + FS + "sw0005.png",
-                "rotating" + FS + tileBaseName + FS + "sw0006.png",
-                "rotating" + FS + tileBaseName + FS + "sw0007.png", }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0000.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/sw0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "s0000.png",
-                "rotating" + FS + tileBaseName + FS + "s0001.png",
-                "rotating" + FS + tileBaseName + FS + "s0002.png",
-                "rotating" + FS + tileBaseName + FS + "s0003.png",
-                "rotating" + FS + tileBaseName + FS + "s0004.png",
-                "rotating" + FS + tileBaseName + FS + "s0005.png",
-                "rotating" + FS + tileBaseName + FS + "s0006.png",
-                "rotating" + FS + tileBaseName + FS + "s0007.png", }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0000.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/s0007.png", }, duration));
 
         angle += 45.0;
         cowMap.put(angle, new Animation(new String[] {
-                "rotating" + FS + tileBaseName + FS + "se0000.png",
-                "rotating" + FS + tileBaseName + FS + "se0001.png",
-                "rotating" + FS + tileBaseName + FS + "se0002.png",
-                "rotating" + FS + tileBaseName + FS + "se0003.png",
-                "rotating" + FS + tileBaseName + FS + "se0004.png",
-                "rotating" + FS + tileBaseName + FS + "se0005.png",
-                "rotating" + FS + tileBaseName + FS + "se0006.png",
-                "rotating" + FS + tileBaseName + FS + "se0007.png", }, duration));
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0000.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0001.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0002.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0003.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0004.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0005.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0006.png",
+                ROTATING_IMAGE_DIR + tileBaseName + "/se0007.png", }, duration));
 
         return cowMap;
     }

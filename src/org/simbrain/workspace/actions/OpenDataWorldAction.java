@@ -27,6 +27,7 @@ import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 
 /**
@@ -52,7 +53,7 @@ public final class OpenDataWorldAction extends WorkspaceAction {
                 .getCurrentDirectory(), "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            DataWorldComponent tableComponent = (DataWorldComponent) Workspace
+            DataWorldComponent tableComponent = (DataWorldComponent) WorkspaceSerializer
                     .open(DataWorldComponent.class, theFile);
             workspace.addWorkspaceComponent(tableComponent);
         }

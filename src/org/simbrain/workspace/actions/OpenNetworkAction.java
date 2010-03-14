@@ -28,6 +28,7 @@ import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceSerializer;
 
 /**
  * Open a network within current workspace.
@@ -54,7 +55,7 @@ public final class OpenNetworkAction extends WorkspaceAction {
                 .getCurrentDirectory(), "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            NetworkComponent networkComponent = (NetworkComponent) workspace
+            NetworkComponent networkComponent = (NetworkComponent) WorkspaceSerializer
                     .open(NetworkComponent.class, theFile);
             workspace.addWorkspaceComponent(networkComponent);
         }

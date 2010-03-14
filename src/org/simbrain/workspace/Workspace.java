@@ -19,11 +19,8 @@
 package org.simbrain.workspace;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -329,30 +326,6 @@ public class Workspace {
     }
 
     /**
-     * Save a specified file.
-     *
-     * @param file file to save.
-     */
-    public void save(File file) {
-        if (file != null) {
-            //System.out.println("Workspace Save -->" + file);
-            try {
-                FileOutputStream ostream = new FileOutputStream(file);
-                try {
-                    WorkspaceSerializer serializer = new WorkspaceSerializer(
-                            this);
-                    serializer.serialize(ostream);
-                    setWorkspaceChanged(false);
-                } finally {
-                    ostream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
      * Sets whether the workspace has been changed.
      *
      * @param workspaceChanged Has workspace been changed value
@@ -621,34 +594,6 @@ public class Workspace {
      */
     public WorkspaceUpdator getWorkspaceUpdator() {
         return updator;
-    }
-
-    /**
-     * Helper method to open a workspace component from a file.
-     *
-     * A call might look like this
-     *  <code>NetworkComponent networkComponent =
-     *      (NetworkComponent) Workspace.open(NetworkComponent.class, new File("Net.xml"));</code>
-     * 
-     * @param fileClass the type of Workpsace component to open; a subclass of WorkspaceComponent.
-     * @param file the File to open
-     * @return the workspace component
-     */
-    public static WorkspaceComponent open (final Class<?> fileClass, final File file) {
-        String extension = file.getName().substring(file.getName().indexOf("."));
-        try {
-            Method method = fileClass.getMethod("open", InputStream.class,
-                    String.class, String.class);
-            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(
-                    null, new FileInputStream(file), file.getName(), extension);
-            wc.setCurrentFile(file);
-            wc.setChangedSinceLastSave(false);
-            return wc;
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

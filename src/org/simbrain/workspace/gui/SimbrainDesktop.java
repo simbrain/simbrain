@@ -928,7 +928,7 @@ public class SimbrainDesktop {
     private void save(File file) {
         if (file != null) {
             frame.setTitle(file.getName());
-            workspace.save(file);
+            WorkspaceSerializer.save(file, workspace);
         }
     }
 

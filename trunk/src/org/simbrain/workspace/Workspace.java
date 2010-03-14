@@ -550,7 +550,8 @@ public class Workspace {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
             }
-            WorkspaceUpdator updator = new WorkspaceUpdator(this, manager, controller, threads);
+            WorkspaceUpdator updator = new WorkspaceUpdator(this, manager,
+                    controller, threads);
             swapUpdators(updator);
         }
     }
@@ -578,10 +579,11 @@ public class Workspace {
      */
     private void swapUpdators(final WorkspaceUpdator newUpdator) {
 
-        updator = newUpdator;
+        // Move old listeners over to new updator
         for(WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
-            updator.addUpdatorListener(listener);
+            newUpdator.addUpdatorListener(listener);
         }
+        updator = newUpdator;
         for(WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
             listener.changedUpdateController();
         }

@@ -11,7 +11,7 @@ import org.simbrain.workspace.Workspace;
 /**
  * Class used to wrap InvocationEvents such that they are synchronized when
  * executed.
- * 
+ *
  * @author Matt Watson
  */
 class SynchronizingInvocationEvent extends InvocationEvent {
@@ -19,12 +19,12 @@ class SynchronizingInvocationEvent extends InvocationEvent {
     private static final long serialVersionUID = 1L;
     /** the event to synchronize. */
     private final InvocationEvent event;
-    
+
     /**
      * Creates an invocation event for the provided event using the
      * workspace for synchronization and calling signal.done() when
      * finished.
-     * 
+     *
      * @param event The 'real' invocation event.
      * @param workspace The workspace used for synchronization.
      * @param signal The signal to call when done.

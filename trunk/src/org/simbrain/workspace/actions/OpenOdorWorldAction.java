@@ -27,6 +27,7 @@ import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
 /**
@@ -51,7 +52,7 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
                 .getCurrentDirectory(), "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            OdorWorldComponent worldComponent = (OdorWorldComponent) Workspace
+            OdorWorldComponent worldComponent = (OdorWorldComponent) WorkspaceSerializer
                     .open(OdorWorldComponent.class, theFile);
             workspace.addWorkspaceComponent(worldComponent);
         }

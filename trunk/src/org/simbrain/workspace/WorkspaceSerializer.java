@@ -21,9 +21,13 @@ package org.simbrain.workspace;
 import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -250,4 +254,60 @@ public class WorkspaceSerializer {
             pos += read;
         }
     }
+    
+    /**
+     * Helper method for openings workspace components from a file.
+     *
+     * A call might look like this 
+     *      <code>NetworkComponent networkComponent =
+     *      (NetworkComponent) WorkspaceFileOpener(NetworkComponent.class, new File("Net.xml"));</code>
+     *
+     * @param fileClass the type of Workpsace component to open; a subclass of WorkspaceComponent.
+     * @param file the File to open
+     * @return the workspace component
+     */
+    public static WorkspaceComponent open(final Class<?> fileClass,
+            final File file) {
+        String extension = file.getName()
+                .substring(file.getName().indexOf("."));
+        try {
+            Method method = fileClass.getMethod("open", InputStream.class,
+                    String.class, String.class);
+            WorkspaceComponent wc = (WorkspaceComponent) method.invoke(null,
+                    new FileInputStream(file), file.getName(), extension);
+            wc.setCurrentFile(file);
+            wc.setChangedSinceLastSave(false);
+            return wc;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Helper method to save a specified file.
+     *
+     * @param file file to save.
+     * @param workspace reference to workspace
+     */
+    public static void save(File file, Workspace workspace) {
+        if (file != null) {
+            //System.out.println("Workspace Save -->" + file);
+            try {
+                FileOutputStream ostream = new FileOutputStream(file);
+                try {
+                    WorkspaceSerializer serializer = new WorkspaceSerializer(
+                            workspace);
+                    serializer.serialize(ostream);
+                    workspace.setWorkspaceChanged(false);
+                } finally {
+                    ostream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

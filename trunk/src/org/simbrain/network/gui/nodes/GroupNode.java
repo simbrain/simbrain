@@ -26,6 +26,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
@@ -36,7 +37,7 @@ import edu.umd.cs.piccolo.PNode;
 /**
  * Represents a group of neurons and weights that are part of other networks.
  */
-public class ModelGroupNode extends CustomOutline implements PropertyChangeListener {
+public class GroupNode extends CustomOutline implements PropertyChangeListener {
 
     /** Outline inset or border height. */
     public static final double OUTLINE_INSET_HEIGHT = 4d;
@@ -54,12 +55,6 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
     /** The model group. */
     private final Group group;
 
-    /** Turn this group on or off. */
-    private Action groupOnOff;
-
-    /** Action which removes this group. */
-    private Action removeGroup;
-
     /**
      * Create a new abstract subnetwork node from the specified parameters.
      *
@@ -68,7 +63,7 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
      * @param subnetwork
      *            subnetwork for this subnetwork node, must not be null.
      */
-    public ModelGroupNode(final NetworkPanel networkPanel, final Group group) {
+    public GroupNode(final NetworkPanel networkPanel, final Group group) {
         super(networkPanel);
         this.setHasInteractionBox(true);
         this.setNodePositioning(CustomOutline.NodePositioning.GLOBAL);
@@ -76,29 +71,37 @@ public class ModelGroupNode extends CustomOutline implements PropertyChangeListe
         setStroke(DASHED);
         setStrokePaint(Color.yellow);
         this.setConextMenu(getContextMenu());
-        this.setTextLabel(group.getName());
+        this.setTextLabel(group.getLabel());
     }
 
 
     /**
      * Creates default actions for all model group nodes.
+     *
      * @return context menu populated with default actions.
      */
     protected JPopupMenu getContextMenu() {
         JPopupMenu ret = new JPopupMenu();
-        groupOnOff = new AbstractAction("Group is active") {
+        Action groupOnOff = new AbstractAction("Group is active") {
             public void actionPerformed(final ActionEvent event) {
                 group.toggleOnOff();
             }
         };
-        removeGroup = new AbstractAction("Remove group") {
+        Action removeGroup = new AbstractAction("Remove group") {
             public void actionPerformed(final ActionEvent event) {
                 getNetworkPanel().getRootNetwork().deleteGroup(group);
+            }
+        };
+        Action editGroupName = new AbstractAction("Edit group name...") {
+            public void actionPerformed(final ActionEvent event) {
+                String newName = JOptionPane.showInputDialog("Name:");
+                GroupNode.this.setTextLabel(newName);
             }
         };
         JCheckBoxMenuItem groupOnOffItem = new JCheckBoxMenuItem(groupOnOff);
         ret.add(groupOnOffItem);
         ret.add(removeGroup);
+        ret.add(editGroupName);
         return ret;
     }
 

@@ -31,13 +31,14 @@ import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
- * 
+ * Train using least mean squares.
+ *
  * @author jyoshimi
  */
 public class LMSTrainer extends Trainer {
 
     // TODO
-    // 
+    //
     //  Flag for bias update
     //  Make a script that create a viewable network
     //  Validate sum squared error
@@ -50,7 +51,7 @@ public class LMSTrainer extends Trainer {
     private double learningRate = .01; // TODO: Make settable
 
     public LMSTrainer(Network network) {
-        this.setNetwork(network);
+        super(network);
     }
 
     @Override

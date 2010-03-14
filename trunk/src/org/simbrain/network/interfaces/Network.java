@@ -20,7 +20,6 @@ package org.simbrain.network.interfaces;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -54,6 +53,9 @@ public abstract class Network {
 
     /** Array list of sub-networks. */
     private ArrayList<Network> networkList = new ArrayList<Network>();
+
+    /** Since groups span all levels of the hierarchy they are stored here. */
+    private List<Group> groupList = new ArrayList<Group>();
 
     /** Time step. */
     private double timeStep = DEFAULT_TIME_STEP;
@@ -260,7 +262,7 @@ public abstract class Network {
         }
         return null;
     }
-    
+
     /**
      * Find neurons with a given label.
      *
@@ -275,6 +277,48 @@ public abstract class Network {
             }
         }
         return returnList;
+    }
+
+    /**
+     * Find a group with a given string id.
+     *
+     * @param id id to search for.
+     * @return group with that id, null otherwise
+     */
+    public Group getGroup(final String id) {
+        for (Group group : getGroupList()) {
+            if (group.getId().equalsIgnoreCase(id)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find groups with a given label.
+     *
+     * @param label label to search for.
+     * @return list of groups with that label found, null otherwise
+     */
+    public List<Group> getGroupsByLabel(final String label) {
+        List<Group> returnList = new ArrayList<Group>();
+        for (Group group : getGroupList()) {
+            if (group.getLabel().equalsIgnoreCase(label)) {
+                returnList.add(group);
+            }
+        }
+        return returnList;
+    }
+
+    /**
+     * Returns the group list.
+     *
+     * TODO: getFlatGroupList? (not currently adding groups to subnets)
+     *
+     * @return the groupList
+     */
+    public List<? extends Group> getGroupList() {
+        return groupList;
     }
 
     /**
@@ -392,7 +436,7 @@ public abstract class Network {
     }
 
     /**
-     * Round activations of to intergers; for testing.
+     * Round activations off to integers; for testing.
      */
     public void roundAll() {
         for (Neuron n : neuronList) {
@@ -488,7 +532,7 @@ public abstract class Network {
      * Sets neuron activations using values in an array of doubles. Currently
      * these activations are applied to the network in whatever order the
      * neurons were added.
-     * 
+     *
      * @param activationArray
      *            array of values to apply to network
      */
@@ -591,11 +635,11 @@ public abstract class Network {
      */
     public String toString() {
         String ret = new String();
-        
+
         for (Neuron n : neuronList) {
             ret += (getIndents() + n + "\n");
         }
-        
+
         if (synapseList.size() > 0) {
             for (int i = 0; i < synapseList.size(); i++) {
                 Synapse tempRef = (Synapse) synapseList.get(i);
@@ -897,6 +941,30 @@ public abstract class Network {
         rootNetwork.fireSubnetDeleted(toDelete);
     }
 
+    /**
+     * Add a new group of network elements.
+     *
+     * @param group group of network elements
+     */
+    public void addGroup(final Group group) {
+        group.setParent(rootNetwork);
+        if ((rootNetwork != null)) {
+            group.setId(getRootNetwork().getGroupIdGenerator().getId());
+            groupList.add(group);
+            rootNetwork.fireGroupAdded(group);
+        }
+    }
+
+    /**
+     * Remove the specified group.
+     *
+     * @param toDelete the group to delete.
+     */
+    public void deleteGroup(final Group toDelete) {
+        rootNetwork.fireGroupDeleted(toDelete);
+        groupList.remove(toDelete);
+    }
+
 
     /**
      * Returns true if all objects are gone from this network.
@@ -941,7 +1009,8 @@ public abstract class Network {
     }
 
     /**
-     * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons.
+     * Create "flat" list of neurons, which includes the top-level neurons plus
+     * all subnet neurons.
      *
      * @return the flat list
      */
@@ -960,10 +1029,10 @@ public abstract class Network {
 
         return ret;
     }
-    
+
     /**
-     * Create "flat" list of synapses, which includes the top-level synapses plus
-     * all subnet synapses.
+     * Create "flat" list of synapses, which includes the top-level synapses
+     * plus all subnet synapses.
      *
      * @return the flat list
      */
@@ -985,7 +1054,7 @@ public abstract class Network {
 
     /**
      * Returns a list containing all neurons, synapses and networks.
-     * 
+     *
      * @return A list containing all neurons, synapses and networks.
      */
     public ArrayList<Object> getObjectList() {
@@ -1018,40 +1087,6 @@ public abstract class Network {
     }
 
     /**
-     * Returns all Input Neurons.
-     *
-     * @return list of input neurons;
-     */
-    public Collection<Neuron> getInputNeurons() {
-        ArrayList<Neuron> inputs = new ArrayList<Neuron>();
-        
-        for (Neuron neuron : getFlatNeuronList()) {
-            if (neuron.isInput()) {
-                inputs.add(neuron);
-            }
-        }
-        
-        return inputs;
-    }
-
-    /**
-     * Returns all Output Neurons.
-     *
-     * @return list of output neurons;
-     */
-    public Collection<Neuron> getOutputNeurons() {
-        ArrayList<Neuron> outputs = new ArrayList<Neuron>();
-        
-        for (Neuron neuron : getFlatNeuronList()) {
-            if (neuron.isOutput()) {
-                outputs.add(neuron);
-            }
-        }
-        
-        return outputs;
-    }
-
-    /**
      * @return Returns the rootNetwork.
      */
     public RootNetwork getRootNetwork() {
@@ -1060,7 +1095,7 @@ public abstract class Network {
 
     /**
      * Sets the root network.
-     * 
+     *
      * @param rootNetwork The rootNetwork to set.
      */
     public void setRootNetwork(final RootNetwork rootNetwork) {
@@ -1078,12 +1113,11 @@ public abstract class Network {
     /**
      * @param updatePriority to set.
      */
-   public void setUpdatePriority(final int updatePriority) {
-       this.updatePriority = updatePriority;
+    public void setUpdatePriority(final int updatePriority) {
+        this.updatePriority = updatePriority;
         if (this.updatePriority != 0 && this.getRootNetwork() != null) {
             // notify the rootNetwork
             this.getRootNetwork().setPriorityUpdate(updatePriority);
         }
-   }
-   
+    }
 }

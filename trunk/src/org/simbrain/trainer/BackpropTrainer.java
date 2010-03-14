@@ -43,28 +43,24 @@ import org.simbrain.network.synapses.ClampedSynapse;
 /**
  * Backprop trainer.
  *
- *  TODO:   Add neuron groups is an option.
- *          Generalize derivative
- *          Clean up methods; remove redundant code
- *          Add different errors (at superclass?)
- *          Layered layout 
- *          Add update code to groups (?)
- *          Deal with recurrent network 
- *              - For each neuron: 
- *                     - IsContained (then recurrent)
- *                     - Is check > MAX
- *                 - InvalidNeuron = IsContained || MaxCheck
- *               - If each neuron is invalid, stop.
- *
  * @author jyoshimi
  */
 public class BackpropTrainer extends Trainer {
 
+    // TODOS:
+    // Clean up methods; remove redundant code
+    // Generalize derivative to other activation functions
+    // Add different errors (at superclass?)
+    // Deal with recurrent networks (see notes)
+
     /** Current error. */
     private double rmsError;
 
+    /** Default learning rate. */
+    private static final double DEFAULT_LEARNING_RATE = .1;
+
     /** Learning rate. */
-    private double learningRate = .1;
+    private double learningRate = DEFAULT_LEARNING_RATE;
 
     /** For storing errors. */
     private HashMap<Neuron, Double> errorMap = new HashMap<Neuron, Double>();
@@ -84,7 +80,7 @@ public class BackpropTrainer extends Trainer {
      * @param network
      */
     public BackpropTrainer(Network network) {
-        this.setNetwork(network);
+        super(network);
     }
 
     /**
@@ -95,7 +91,10 @@ public class BackpropTrainer extends Trainer {
     }
 
     /**
-     * Recursively build up a representation of the network, beginning with output layer.
+     * Recursively build up a representation of the network, beginning with
+     * output layer.
+     *
+     * TODO: May be useful elsewhere; possibly refactor to a separate class.
      */
     private void buildNetworkRepresentation() {
         System.out.println("Building network representation...");
@@ -103,18 +102,17 @@ public class BackpropTrainer extends Trainer {
 
         NeuronGroup outputLayer = new NeuronGroup(this.getNetwork()
                 .getRootNetwork(), this.getOutputLayer());
-        outputLayer.setName("Output Layer");
         layers.add(outputLayer);
-        //TODO:  A way to make this part of method below?
-        this.getNetwork().getRootNetwork().addGroup(outputLayer);
-        //layers.add(new HashSet<Neuron>(this.getOutputLayer()));
-        addLayer(outputLayer);
+        addPreviousLayer(outputLayer);
     }
 
+
     /**
-     * Add the "next layer down" from the given layer.
+     * Add the "next layer down" in the hierarchy.
+     *
+     * @param neuronGroup the layer whose previous layer will be added.
      */
-    private void addLayer(NeuronGroup neuronGroup) {
+    private void addPreviousLayer(NeuronGroup neuronGroup) {
         NeuronGroup newGroup = new NeuronGroup(this.getNetwork()
                 .getRootNetwork(), Collections.EMPTY_LIST);
         int furtherConnectionCount = 0;
@@ -125,14 +123,12 @@ public class BackpropTrainer extends Trainer {
             }
         }
         System.out.println("Adding layer " + layers.size());
-        newGroup.setName("Layer" + layers.size());
-        //group.setName("Layer" )
-        this.getNetwork().getRootNetwork().addGroup(newGroup);
+        newGroup.setLabel("Layer" + layers.size());
         layers.add(newGroup);
 
         // Recursive step
         if (furtherConnectionCount > 0) {
-            addLayer(newGroup);
+            addPreviousLayer(newGroup);
         } else {
             //System.out.println("First layer: " + newGroup.getName());
             // Sanity check. Does last layer == input layer?
@@ -141,7 +137,9 @@ public class BackpropTrainer extends Trainer {
 
 
     /**
-     * Update internally constructed network. TODO: Confusing code. Improve.
+     * Update internally constructed network.
+     *
+     * TODO: Confusing code. Improve.
      */
     public void updateNetwork() {
         // Update beginning with the first hidden layer.
@@ -239,8 +237,7 @@ public class BackpropTrainer extends Trainer {
                         sumFanOutErrors += (errorMap.get(outputNeuron)
                                 * synapse.getStrength());
                     }
-
-                    propagateError(neuron,sumFanOutErrors);
+                    propagateError(neuron, sumFanOutErrors);
                 }
             }
         }

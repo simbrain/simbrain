@@ -64,6 +64,13 @@ public abstract class Trainer {
     private double[][] trainingData;
 
     /**
+     * @param network parent network
+     */
+    public Trainer(Network network) {
+        this.network = network;
+    }
+
+    /**
      * Train the network for specified iterations. Return error. Overrode by
      * subclasses with specific algorithms;
      *

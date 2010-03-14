@@ -49,9 +49,6 @@ public class RootNetwork extends Network {
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(RootNetwork.class);
 
-    /** Since groups span all levels of the hierarchy they are stored here. */
-    private ArrayList<Group> groupList = new ArrayList<Group>();
-
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
 
@@ -86,11 +83,11 @@ public class RootNetwork extends Network {
      * Enumeration for the update methods.
      *
      * BUFFER: default update method; based on buffering
-      
+     *
      * PRIORITYBASED: user sets the priority for each neuron, sub-neuron and
      * synapse. Default priority value is 0. Elements with smaller priority
      * value are updated first.
-     * 
+     *
      * TODO: Remove this?
      */
     public enum UpdateMethod { PRIORITYBASED, BUFFERED }
@@ -112,6 +109,9 @@ public class RootNetwork extends Network {
 
     /** Synapse Id generator. */
     private SimpleId synapseIdGenerator = new SimpleId("Synapse", 1);
+
+    /** Group Id generator. */
+    private SimpleId groupIdGenerator = new SimpleId("Group", 1);
 
     /** List of objects registered to observe general network events. */
     private List<NetworkListener> networkListeners = new ArrayList<NetworkListener>();
@@ -226,8 +226,8 @@ public class RootNetwork extends Network {
             updateAllSynapses();
             updateAllNetworks();
         }
-        if (groupList != null) {
-            for (Group n : groupList) {
+        if (getGroupList() != null) {
+            for (Group n : getGroupList()) {
                 n.update();
             }
         }
@@ -278,32 +278,13 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Add a new group of network elements.
-     * @param group group of network elements
-     */
-    public void addGroup(final Group group) {
-        groupList.add(group);
-        fireGroupAdded(group);
-    }
-
-    /**
-     * Remove the specified group.
-     *
-     * @param toDelete the group to delete.
-     */
-    public void deleteGroup(final Group toDelete) {
-        fireGroupDeleted(toDelete);
-        groupList.remove(toDelete);
-    }
-
-    /**
      * Returns the group, if any, a specified object is contained in.
      *
      * @param object the object to check
      * @return the group, if any, containing that object
      */
     public Group containedInGroup(final Object object) {
-        for (Group group : groupList) {
+        for (Group group : getGroupList()) {
             if (object instanceof Neuron) {
                 if (group.getNeuronList().contains(object)) {
                     return group;
@@ -650,7 +631,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a group changed event to all registered model listeners.
-     * 
+     *
      * @param old Old group
      * @param changed New changed group
      */
@@ -747,15 +728,15 @@ public class RootNetwork extends Network {
      * @see Object
      */
     public String toString() {
-        
+
         String ret = "Root Network \n================= \n";
         ret += "Update method: " + this.getUpdateMethod() + "\t Iterations:"
                 + this.getTime() + "\n";
-        
+
         for (Neuron n : this.getNeuronList()) {
             ret += (getIndents() + n + "\n");
         }
-        
+
         if (this.getSynapseList().size() > 0) {
             for (int i = 0; i < getSynapseList().size(); i++) {
                 Synapse tempRef = (Synapse) getSynapseList().get(i);
@@ -769,8 +750,9 @@ public class RootNetwork extends Network {
             ret += (getIndents() + "--------------------------------\n");
             ret += net.toString();
         }
-        for (int i = 0; i < groupList.size(); i++) {
-            Group group = (Group) groupList.get(i);
+
+        for (int i = 0; i < getGroupList().size(); i++) {
+            Group group = (Group) getGroupList().get(i);
             ret += ("\n" + getIndents() + "Group " + (i + 1));
             ret += (getIndents() + "--------------------------------\n");
             ret += group.toString();
@@ -786,7 +768,7 @@ public class RootNetwork extends Network {
     public SimpleId getNeuronIdGenerator() {
         return neuronIdGenerator;
     }
-    
+
 //    public Attribute getAttribute(String id) {
 //        System.out.println("id: " + id);
 //        
@@ -816,7 +798,7 @@ public class RootNetwork extends Network {
 //        
 //        return null;
 //    }
-    
+
     /**
      * Return the generator for network ids.
      *
@@ -889,16 +871,6 @@ public class RootNetwork extends Network {
         groupListeners.add(listener);
     }
 
-
-    /**
-     * TODO: Move this to network with other lists?
-     *
-     * @return the groupList
-     */
-    public ArrayList<Group> getGroupList() {
-        return groupList;
-    }
-
     /**
      * Search for a neuron by label. If there are more than one with the same
      * label only the first one found is returned.
@@ -919,6 +891,13 @@ public class RootNetwork extends Network {
         } else {
             return foundNeurons;
         }
+    }
+
+    /**
+     * @return the groupIdGenerator
+     */
+    public SimpleId getGroupIdGenerator() {
+        return groupIdGenerator;
     }
 
 }

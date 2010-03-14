@@ -57,7 +57,7 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.gui.dialogs.text.TextDialog;
 import org.simbrain.network.gui.filters.Filters;
-import org.simbrain.network.gui.nodes.ModelGroupNode;
+import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionHandle;
@@ -478,7 +478,7 @@ public class NetworkPanel extends PCanvas  {
                 }
 
                 // Populate group node and add it
-                ModelGroupNode neuronGroup = getModelGroupNodeFromGroup(e
+                GroupNode neuronGroup = getModelGroupNodeFromGroup(e
                         .getObject());
                 for (PNode node : nodes) {
                     neuronGroup.addReference(node);
@@ -494,7 +494,7 @@ public class NetworkPanel extends PCanvas  {
                 // I suppose the proper way is to compare the group before and
                 // after and just change what changed but I'm not sure of the
                 // best way to do that
-                ModelGroupNode groupNode = findModelGroupNode(e.getObject());
+                GroupNode groupNode = findModelGroupNode(e.getObject());
                 groupNode.getOutlinedObjects().clear();
 
                 // Make a list of neuron and synapse nodes
@@ -527,7 +527,7 @@ public class NetworkPanel extends PCanvas  {
 
             /** @see NetworkListener */
             public void groupRemoved(final NetworkEvent<Group> event) {
-                ModelGroupNode node = findModelGroupNode(event.getObject());
+                GroupNode node = findModelGroupNode(event.getObject());
                 node.removeFromParent();
             }
 
@@ -1168,7 +1168,7 @@ public class NetworkPanel extends PCanvas  {
      *
      * @return a collection of all neuron nodes
      */
-    public Collection<ModelGroupNode> getModelGroupNodes() {
+    public Collection<GroupNode> getModelGroupNodes() {
         return getLayer().getAllNodes(Filters.getModelGroupNodeFilter(), null);
     }
 
@@ -1456,12 +1456,12 @@ public class NetworkPanel extends PCanvas  {
      */
     private void addGroup(Group group) {
 
-        ModelGroupNode modelGroup = this.findModelGroupNode(group);
+        GroupNode modelGroup = this.findModelGroupNode(group);
         if (modelGroup != null) {
             return;
         }
 
-        modelGroup = new ModelGroupNode(this, group);
+        modelGroup = new GroupNode(this, group);
 
         for (Neuron neuron : group.getNeuronList()) {
             NeuronNode neuronNode = findNeuronNode(neuron);
@@ -1522,15 +1522,15 @@ public class NetworkPanel extends PCanvas  {
      * @param group the model group
      * @return the ModelGroupNode
      */
-    private ModelGroupNode getModelGroupNodeFromGroup(final Group group) {
-        ModelGroupNode ret = null;
+    private GroupNode getModelGroupNodeFromGroup(final Group group) {
+        GroupNode ret = null;
 
         if (group instanceof GeneRec) {
             ret = new GeneRecNode(this, (GeneRec) group);
         } else if (group instanceof NeuronGroup) {
-            ret = new ModelGroupNode(this, group);
+            ret = new GroupNode(this, group);
         } else if (group instanceof SynapseGroup) {
-            ret = new ModelGroupNode(this, group);
+            ret = new GroupNode(this, group);
         }
         return ret;
     }
@@ -1606,8 +1606,8 @@ public class NetworkPanel extends PCanvas  {
      * @param group the group to look for
      * @return the corresponding model group
      */
-    public ModelGroupNode findModelGroupNode(final Group group) {
-        for (ModelGroupNode modelGroup : this.getModelGroupNodes()) {
+    public GroupNode findModelGroupNode(final Group group) {
+        for (GroupNode modelGroup : this.getModelGroupNodes()) {
             if (modelGroup.getGroup() == group) {
                 return modelGroup;
             }

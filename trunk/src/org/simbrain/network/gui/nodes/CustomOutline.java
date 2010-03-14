@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.gui.nodes;
 
 import java.beans.PropertyChangeEvent;
@@ -16,11 +34,13 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * A custom outline that can be drawn around a collection of nodes. Be sure,
- * after initializing, to specifiy whether an interaction box will be used, and
+ * after initializing, to specify whether an interaction box will be used, and
  * whether positioning will be non-standard (i.e. not in a subnetworknode).
  *
  * TODO: Serious refactoring needed in this class. Interaction box needs to be
  * more general, and needs to resize as text is changed.
+ *
+ * TODO: Rename to outline or tabbed outline?
  */
 public class CustomOutline extends PPath implements PropertyChangeListener {
 
@@ -29,7 +49,7 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
 
     /**
      * Which coordinate system to place the outlined nodes in.
-     * Set to GLOBAL if the outline is directy on a canvas.
+     * Set to GLOBAL if the outline is directly on a canvas.
      * Set to LOCAL if the outline is contained in a subnetwork node.
      */
     public enum NodePositioning { GLOBAL, PARENT }
@@ -138,7 +158,9 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
      */
     private void updateInteractionBox() {
         if (hasInteractionBox) {
-            interactionBox.setOffset(this.getBounds().getX() - interactionBox.getOFFSET_X(), this.getBounds().getY() - interactionBox.getOFFSET_Y());
+            interactionBox.setOffset(this.getBounds().getX()
+                    - interactionBox.getOFFSET_X(), this.getBounds().getY()
+                    - interactionBox.getOFFSET_Y());
         }
     }
 
@@ -194,6 +216,7 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
     public void setTextLabel(final String text) {
         interactionBox.setText(text);
     }
+
     /**
      * Interaction Box: graphical element for interacting with a group.
      */
@@ -234,11 +257,26 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
         }
 
         /**
+         * Set text for interaction box.
+         *
          * @param textLabel the textLabel to set
          */
         public void setText(String text) {
-            this.textLabel = new PText(text);
-            this.addChild(textLabel);
+            if (text == null) {
+                return;
+            }
+            if (this.textLabel == null) {
+                this.textLabel = new PText(text);
+                this.addChild(textLabel);
+                textLabel.scaleAboutPoint(.8, box.getBounds().getCenter2D()
+                        .getX(), box.getBounds().getCenter2D().getY());
+            } else {
+                textLabel.setText(text);
+                textLabel.resetBounds();
+            }
+
+            // Reset box bounds
+            box.setBounds(textLabel.getBounds()); 
         }
 
         /** @see ScreenElement */
@@ -248,60 +286,52 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
 
         @Override
         protected JDialog getPropertyDialog() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         protected String getToolTipText() {
-            return "Test";
+            return "";
         }
 
         @Override
         protected boolean hasContextMenu() {
-            // TODO Auto-generated method stub
             return true;
         }
 
         @Override
         protected boolean hasPropertyDialog() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         protected boolean hasToolTipText() {
-            // TODO Auto-generated method stub
-            return true;
+            return false;
         }
 
         @Override
         public boolean isDraggable() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public boolean isSelectable() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public void resetColors() {
             // TODO Auto-generated method stub
-            
         }
 
         @Override
         public boolean showSelectionHandle() {
-            // TODO Auto-generated method stub
             return false;
         }
 
 
         /**
-         * @return the oFFSET_X
+         * @return the x offset
          */
         public float getOFFSET_X() {
             return OFFSET_X;
@@ -309,7 +339,7 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
 
 
         /**
-         * @param offset_x the oFFSET_X to set
+         * @param offset_x the offset to set
          */
         public void setOFFSET_X(float offset_x) {
             OFFSET_X = offset_x;

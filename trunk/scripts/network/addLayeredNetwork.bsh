@@ -2,83 +2,24 @@ import java.util.*;
 import java.awt.geom.Point2D;
 import java.awt.Point;
 
-import org.simbrain.trainer.*;
-import org.simbrain.workspace.*;
-import org.simbrain.util.*;
-
 import org.simbrain.network.*;
-import org.simbrain.network.connections.*;
-import org.simbrain.network.interfaces.*;
-import org.simbrain.network.layouts.*;
-import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.networks.*;
-import org.simbrain.network.neurons.*;
-import org.simbrain.network.synapses.*;
+import org.simbrain.network.builders.*;
 
 /**
  * Make Layered Network (as in a standard backprop network)
  */
 {
 
-    //TODO: implement centering, 
-    //	base neuron, synapse, bounds
-    //	option: create labelled neuron groups for layers
-    //	layout options: up, down, side, etc.
-    //	option: within layer recurrence
-
     // Parameters
-    int[] sizes = {2,4,4,2}; // Number of neurons in each layer / number of layers
-    int layerInterval = 100;  // Space between intervals
-
+    int[] topology = {5,3,3,5}; // Number of neurons in each layer / number of layers
+    
     // Get last clicked position in the panel
     Point2D lastClicked = networkPanel.getLastClickedPosition();
+    
+    LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
+    builder.setInitialPosition(lastClicked);
+    builder.setNodesPerLayer(topology);
+    builder.buildNetwork(networkPanel.getRootNetwork());
+    
 
-    // Layout
-    LineLayout layout = new LineLayout(50, LineOrientation.HORIZONTAL);
-
-    // Set up input layer
-    List inputLayer = new ArrayList();
-    for (int i = 0; i < sizes[0]; i++) {
-        ClampedNeuron neuron = new ClampedNeuron();
-        neuron.setIncrement(1); // For easier testing
-        neuron.setLowerBound(0);
-        network.addNeuron(neuron);
-        inputLayer.add(neuron);
-    }
-    layout.setInitialLocation(new Point((int) lastClicked.getX(), (int) lastClicked.getY()));
-    layout.layoutNeurons(inputLayer);
-
-    // Prepare base synapse for connecting layers
-    ClampedSynapse synapse = new ClampedSynapse(null, null);
-    synapse.setLowerBound(-10);
-    synapse.setUpperBound(10);
-
-    // Memory of last layer created
-    List lastLayer = inputLayer;
-
-    // Make hidden layers
-    for (int i = 1; i < sizes.length; i++) {
-        List hiddenLayer = new ArrayList();
-        for (int j = 0; j < sizes[i]; j++) {
-            LinearNeuron neuron = new LinearNeuron();
-            neuron.setLowerBound(0);
-            network.addNeuron(neuron);
-            hiddenLayer.add(neuron);
-        }
-        layout.setInitialLocation(new Point((int) lastClicked.getX(), (int) lastClicked.getY() - (layerInterval * (i + 1) )));
-        layout.layoutNeurons(hiddenLayer);
-
-        // Connect input layer to hidden layer
-        AllToAll.setBaseSynapse(synapse);
-        AllToAll connection = new AllToAll(network, lastLayer, hiddenLayer);
-        connection.connectNeurons();
-
-        //  Reset last layer
-        lastLayer = hiddenLayer;
-    }
-
-
-    // Randomize weights and biases
-    network.randomizeWeights();
-    //network.randomizeBiases(-1, 1);
 }

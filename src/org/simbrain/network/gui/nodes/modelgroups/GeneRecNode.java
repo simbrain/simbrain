@@ -8,13 +8,13 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.groups.GeneRec;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.ModelGroupNode;
+import org.simbrain.network.gui.nodes.GroupNode;
 
 
 /**
  * A PNode representing a GeneRec group.
  */
-public class GeneRecNode extends ModelGroupNode {
+public class GeneRecNode extends GroupNode {
 
     /** Randomize action. */
     private Action randomizeAction;

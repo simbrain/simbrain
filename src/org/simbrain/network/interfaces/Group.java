@@ -51,7 +51,10 @@ public abstract class Group {
     private boolean isOn = true;
 
     /** Name of this group. */
-    private String name;
+    private String id;
+
+    /** Name of this group. */
+    private String label;
 
     /**
      * Construct a model group with a reference to its root network.
@@ -272,16 +275,38 @@ public abstract class Group {
     }
 
     /**
-     * @return the name
+     * @return the id
      */
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     /**
-     * @param name the name to set
+     * @param id the id to set
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label the label to set
+     */
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    /**
+     * @param parent the parent to set
+     */
+    public void setParent(RootNetwork parent) {
+        this.parent = parent;
+    }
+
 }

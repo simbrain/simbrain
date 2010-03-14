@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.filters;
 
-import org.simbrain.network.gui.nodes.ModelGroupNode;
+import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
@@ -53,7 +53,7 @@ public final class Filters {
     private static final AbstractFilter MODEL_GROUP_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return (node instanceof ModelGroupNode);
+            return (node instanceof GroupNode);
         }
     };
 
@@ -110,7 +110,7 @@ public final class Filters {
     private static final AbstractFilter PARENT_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return ((node instanceof SubnetworkNode) || (node instanceof ModelGroupNode));
+            return ((node instanceof SubnetworkNode) || (node instanceof GroupNode));
         }
     };
 

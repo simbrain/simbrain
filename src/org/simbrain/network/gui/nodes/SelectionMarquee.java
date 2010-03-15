@@ -26,7 +26,6 @@ import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
 
 import org.simbrain.util.SimbrainUtils;
-import org.simbrain.util.StrokeUtils;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -85,7 +84,7 @@ public final class SelectionMarquee
 
         if (stroke != null && strokePaint != null) {
             g2.setPaint(strokePaint);
-            g2.setStroke(StrokeUtils.prepareStroke(stroke, paintContext));
+            g2.setStroke(new PFixedWidthStroke(1.5f));
             g2.draw(path);
         }
     }

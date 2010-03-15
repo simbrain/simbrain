@@ -26,7 +26,6 @@ import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 
 import org.simbrain.util.SimbrainUtils;
-import org.simbrain.util.StrokeUtils;
 import org.simbrain.world.visionworld.PixelMatrix;
 
 import edu.umd.cs.piccolo.PNode;
@@ -99,7 +98,7 @@ abstract class AbstractPixelMatrixNode
     public final void setOutlinePaint(final Paint outlinePaint) {
         Paint oldOutlinePaint = this.outlinePaint;
         this.outlinePaint = outlinePaint;
-        firePropertyChange("outlinePaint", oldOutlinePaint, this.outlinePaint);
+        firePropertyChange(-1,"outlinePaint", oldOutlinePaint, this.outlinePaint);
     }
 
     /**
@@ -123,7 +122,7 @@ abstract class AbstractPixelMatrixNode
         }
         Stroke oldOutlineStroke = this.outlineStroke;
         this.outlineStroke = outlineStroke;
-        firePropertyChange("outlineStroke", oldOutlineStroke, this.outlineStroke);
+        firePropertyChange(-1,"outlineStroke", oldOutlineStroke, this.outlineStroke);
     }
 
     /** {@inheritDoc} */
@@ -134,7 +133,7 @@ abstract class AbstractPixelMatrixNode
 
         if (outlinePaint != null) {
             g.setPaint(outlinePaint);
-            g.setStroke(StrokeUtils.prepareStroke(outlineStroke, paintContext));
+            g.setStroke(new PFixedWidthStroke());
             g.draw(rect);
         }
     }

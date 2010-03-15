@@ -866,7 +866,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         Neuron oldNeuron = this.neuron;
         this.neuron = neuron;
-        firePropertyChange("neuron", oldNeuron, neuron);
+        firePropertyChange(-1,"neuron", oldNeuron, neuron);
     }
 
     /** @see ScreenElement */

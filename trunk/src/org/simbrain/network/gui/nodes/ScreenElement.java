@@ -259,7 +259,7 @@ public abstract class ScreenElement
 
         NetworkPanel oldNetworkPanel = this.networkPanel;
         this.networkPanel = networkPanel;
-        firePropertyChange("networkPanel", oldNetworkPanel, this.networkPanel);
+        firePropertyChange(-1,"networkPanel", oldNetworkPanel, this.networkPanel);
     }
 
 

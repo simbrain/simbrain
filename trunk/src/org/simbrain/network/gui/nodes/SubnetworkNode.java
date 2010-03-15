@@ -253,7 +253,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
                outline.setStroke(null);
            }
        }
-      firePropertyChange("showOutline", Boolean.valueOf(oldShowOutline), Boolean.valueOf(showOutline));
+      firePropertyChange(-1, "showOutline", Boolean.valueOf(oldShowOutline), Boolean.valueOf(showOutline));
    }
 
     /** @see ScreenElement */
@@ -297,7 +297,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         String oldLabel = this.label;
         this.label = label;
         tab.setLabel(this.label);
-        firePropertyChange("label", oldLabel, this.label);
+        firePropertyChange(-1,"label", oldLabel, this.label);
     }
 
     /**
@@ -331,7 +331,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         Paint oldTabPaint = this.tabPaint;
         this.tabPaint = tabPaint;
         tab.setTabPaint(tabPaint);
-        firePropertyChange("tabPaint", oldTabPaint, this.tabPaint);
+        firePropertyChange(-1,"tabPaint", oldTabPaint, this.tabPaint);
     }
 
     /**
@@ -355,7 +355,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         Stroke oldTabStroke = this.tabStroke;
         this.tabStroke = tabStroke;
         tab.setTabStroke(tabStroke);
-        firePropertyChange("tabStroke", oldTabStroke, this.tabStroke);
+        firePropertyChange(-1,"tabStroke", oldTabStroke, this.tabStroke);
     }
 
     /**
@@ -379,7 +379,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         Paint oldTabStrokePaint = this.tabStrokePaint;
         this.tabStrokePaint = tabStrokePaint;
         tab.setTabStrokePaint(tabStrokePaint);
-        firePropertyChange("tabStrokePaint", oldTabStrokePaint, this.tabStrokePaint);
+        firePropertyChange(-1,"tabStrokePaint", oldTabStrokePaint, this.tabStrokePaint);
     }
 
     /**
@@ -403,7 +403,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         Stroke oldOutlineStroke = this.outlineStroke;
         this.outlineStroke = outlineStroke;
         outline.setStroke(outlineStroke);
-        firePropertyChange("outlineStroke", oldOutlineStroke, this.outlineStroke);
+        firePropertyChange(-1,"outlineStroke", oldOutlineStroke, this.outlineStroke);
     }
 
     /**
@@ -427,7 +427,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         Paint oldOutlineStrokePaint = this.outlineStrokePaint;
         this.outlineStrokePaint = outlineStrokePaint;
         outline.setStrokePaint(outlineStrokePaint);
-        firePropertyChange("outlineStrokePaint", oldOutlineStrokePaint, this.outlineStrokePaint);
+        firePropertyChange(-1,"outlineStrokePaint", oldOutlineStrokePaint, this.outlineStrokePaint);
     }
 
     /** @see PNode */

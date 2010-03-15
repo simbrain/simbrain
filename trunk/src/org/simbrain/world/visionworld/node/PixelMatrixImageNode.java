@@ -95,7 +95,7 @@ public final class PixelMatrixImageNode
         }
         Color oldPenForeground = this.penForeground;
         this.penForeground = penForeground;
-        firePropertyChange("penForeground", oldPenForeground, this.penForeground);
+        firePropertyChange(-1,"penForeground", oldPenForeground, this.penForeground);
     }
 
     /**
@@ -120,7 +120,7 @@ public final class PixelMatrixImageNode
         }
         Color oldPenBackground = this.penBackground;
         this.penBackground = penBackground;
-        firePropertyChange("penBackground", oldPenBackground, this.penBackground);
+        firePropertyChange(-1,"penBackground", oldPenBackground, this.penBackground);
     }
 
     /**
@@ -147,7 +147,7 @@ public final class PixelMatrixImageNode
             } else {
                 removeInputEventListener(pen);
             }
-            firePropertyChange("hasFocus", oldHasFocus, this.hasFocus);
+            firePropertyChange(-1, "hasFocus", oldHasFocus, this.hasFocus);
         }
     }
 

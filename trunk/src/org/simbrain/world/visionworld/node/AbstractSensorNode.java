@@ -31,7 +31,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.util.SimbrainUtils;
-import org.simbrain.util.StrokeUtils;
 import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.dialog.EditSensorDialog;
@@ -223,7 +222,7 @@ abstract class AbstractSensorNode
     public final void setMouseoverPaint(final Paint mouseoverPaint) {
         Paint oldMouseoverPaint = this.mouseoverPaint;
         this.mouseoverPaint = mouseoverPaint;
-        firePropertyChange("mouseoverPaint", oldMouseoverPaint, this.mouseoverPaint);
+        firePropertyChange(-1,"mouseoverPaint", oldMouseoverPaint, this.mouseoverPaint);
     }
 
     /**
@@ -243,7 +242,7 @@ abstract class AbstractSensorNode
     public final void setOutlinePaint(final Paint outlinePaint) {
         Paint oldOutlinePaint = this.outlinePaint;
         this.outlinePaint = outlinePaint;
-        firePropertyChange("outlinePaint", oldOutlinePaint, this.outlinePaint);
+        firePropertyChange(-1,"outlinePaint", oldOutlinePaint, this.outlinePaint);
     }
 
     /**
@@ -267,7 +266,7 @@ abstract class AbstractSensorNode
         }
         Stroke oldOutlineStroke = this.outlineStroke;
         this.outlineStroke = outlineStroke;
-        firePropertyChange("outlineStroke", oldOutlineStroke, this.outlineStroke);
+        firePropertyChange(-1,"outlineStroke", oldOutlineStroke, this.outlineStroke);
     }
 
     /**
@@ -287,7 +286,7 @@ abstract class AbstractSensorNode
     public final void setSelectedPaint(final Paint selectedPaint) {
         Paint oldSelectedPaint = this.selectedPaint;
         this.selectedPaint = selectedPaint;
-        firePropertyChange("selectedPaint", oldSelectedPaint, this.selectedPaint);
+        firePropertyChange(-1,"selectedPaint", oldSelectedPaint, this.selectedPaint);
     }
 
     /** {@inheritDoc} */
@@ -308,7 +307,7 @@ abstract class AbstractSensorNode
 
         if (outlinePaint != null) {
             g.setPaint(outlinePaint);
-            g.setStroke(StrokeUtils.prepareStroke(outlineStroke, paintContext));
+            g.setStroke(new PFixedWidthStroke());
             g.draw(rect);
         }
     }

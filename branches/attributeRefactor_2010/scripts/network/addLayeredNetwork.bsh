@@ -1,0 +1,25 @@
+import java.util.*;
+import java.awt.geom.Point2D;
+import java.awt.Point;
+
+import org.simbrain.network.*;
+import org.simbrain.network.builders.*;
+
+/**
+ * Make Layered Network (as in a standard backprop network)
+ */
+{
+
+    // Parameters
+    int[] topology = {5,3,3,5}; // Number of neurons in each layer / number of layers
+    
+    // Get last clicked position in the panel
+    Point2D lastClicked = networkPanel.getLastClickedPosition();
+    
+    LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
+    builder.setInitialPosition(lastClicked);
+    builder.setNodesPerLayer(topology);
+    builder.buildNetwork(networkPanel.getRootNetwork());
+    
+
+}

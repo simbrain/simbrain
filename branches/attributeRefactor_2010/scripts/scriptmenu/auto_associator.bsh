@@ -1,0 +1,186 @@
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+
+import org.simbrain.network.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.synapses.*;
+import org.simbrain.network.gui.*;
+import org.simbrain.workspace.*;
+import org.simbrain.util.*;
+
+
+{
+
+    // Parameters.  Change these values to customize the lesson.
+    int NUM_NEURONS = 25;	// Number of neurons in hopfield network
+    double GRID_SPACE = 50; // Space between neurons horizontally and vertically
+    int TRAINING_ITERATIONS = 25; // Number of iterations to use in training patterns
+
+    // Create network component 
+
+    NetworkComponent networkComponent = new NetworkComponent(
+    "Auto-Associative Network");
+    final RootNetwork network = networkComponent.getRootNetwork();
+    workspace.addWorkspaceComponent(networkComponent);
+
+    // Get a reference to the network panel
+    NetworkPanel networkPanel = ((NetworkDesktopComponent) desktop
+            .getDesktopComponent("Auto-Associative Network"))
+            .getNetworkPanel();
+
+
+    // Create Hopfield network
+    GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, 5);
+    layout.setInitialLocation(new Point(10, 10));
+    List sourceNeurons = new ArrayList();
+    for (int i = 0; i < NUM_NEURONS; i++) {
+        AdditiveNeuron neuron = new AdditiveNeuron();
+        neuron.setLowerBound(-10); // This is for nicer graphics
+        neuron.setActivation(-1);
+        network.addNeuron(neuron);
+        sourceNeurons.add(neuron);
+    }
+    network.setTimeStep(.1);
+    layout.layoutNeurons(network);
+
+    // Connect neurons
+    //AllToAll connection = new AllToAll(network, network.getFlatNeuronList(), network.getFlatNeuronList());
+    Sparse connection = new Sparse(network, network.getFlatNeuronList(), network.getFlatNeuronList());
+    Hebbian synapse = new Hebbian(null, null);
+    synapse.setStrength(0);
+    synapse.setLearningRate(.01);
+    connection.setBaseExcitatorySynapse(synapse);
+    connection.connectNeurons();
+
+    // Make sure it's all formatted correctly
+    desktop.getDesktopComponent(networkComponent).postAddInit();
+
+    // Create a control panel with buttons 
+    JInternalFrame internalFrame = new JInternalFrame("Controls",
+            true, true);
+    JPanel panel = new JPanel();
+
+    // Reset simulation
+    SimbrainButton clearButton = new SimbrainButton("Reset simulation", workspace);
+    clearButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            networkPanel.setSynapseNodesOn(true);
+            network.setActivations(-1);
+            network.setWeights(0);
+            network.fireNetworkChanged();
+        }
+    });
+    panel.add(clearButton);
+
+    // + Pattern
+    SimbrainButton plusPattern = new SimbrainButton("+ Pattern", workspace);
+    plusPattern.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            networkPanel.setSynapseNodesOn(true);
+            network.setActivations(new double[] 
+                                              {-1,-1,1,-1,-1,
+                    -1,-1,1,-1,-1,
+                    1,1,1,1,1,
+                    -1,-1,1,-1,-1,
+                    -1,-1,1,-1,-1});
+            network.fireNetworkChanged();
+        }
+    });
+    panel.add(plusPattern);
+
+    // O Pattern
+    SimbrainButton oPattern = new SimbrainButton("O Pattern", workspace);
+    oPattern.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            networkPanel.setSynapseNodesOn(true);
+            network.setActivations(new double[] 
+                                              {-1,1,1,1,-1,
+                    1,-1,-1,-1,1,
+                    1,-1,-1,-1,1,
+                    1,-1,-1,-1,1,
+                    -1,1,1,1,-1});
+            network.fireNetworkChanged();
+        }
+    });
+    panel.add(oPattern);
+
+    // X Pattern 
+    SimbrainButton xPattern = new SimbrainButton("X Pattern", workspace);
+    xPattern.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            networkPanel.setSynapseNodesOn(true);
+            network.setActivations(new double[] 
+                                              {1,-1,-1,-1,1,
+                    -1,1,-1,1,-1,
+                    -1,-1,1,-1,-1,
+                    -1,1,-1,1,-1,
+                    1,-1,-1,-1,1});
+            network.fireNetworkChanged();
+        }
+    });
+    panel.add(xPattern);
+
+    // Train Button
+    SimbrainButton trainButton = new SimbrainButton("Train current pattern", workspace);
+    trainButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            networkPanel.setSynapseNodesOn(true);
+            network.setClampNeurons(true);
+            network.setClampWeights(false);
+            workspace.iterate(TRAINING_ITERATIONS);
+        }
+    });
+    panel.add(trainButton);
+
+    // Randomize and test
+    SimbrainButton testPattern = new SimbrainButton("Test using random pattern", workspace);
+    testPattern.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            networkPanel.setSynapseNodesOn(false);
+            network.setClampNeurons(false);
+            network.setClampWeights(true);
+            network.randomizeNeurons();
+            workspace.iterate(50);
+        }
+    });
+    panel.add(testPattern);
+
+    // Test mode
+    SimbrainButton testingMode = new SimbrainButton("Test retrieval manually", workspace);
+    testingMode.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) {
+            networkPanel.setSynapseNodesOn(false);
+            network.setClampNeurons(false);
+            network.setClampWeights(true);
+            network.setActivations(0);
+            network.fireNetworkChanged();
+        }
+    });
+    panel.add(testingMode);                            
+
+    // Add and display button panel
+    internalFrame.getContentPane().add(panel);
+    internalFrame.setVisible(true);
+    internalFrame.pack();
+    desktop.addInternalFrame(internalFrame);
+
+    // Locate network in relation to button panel
+    int net_width = 450;
+    int net_height = 450;
+    int panel_width = internalFrame.getBounds().getWidth();
+    int panel_height = internalFrame.getBounds().getHeight();
+    int x = internalFrame.getBounds().getX() + (panel_width/2) - (net_width/2);
+    int y = internalFrame.getBounds().getY() + (panel_height) + 5;
+    desktop.getDesktopComponent(networkComponent).getParentFrame()
+    .setBounds(x, y, net_width, net_height);
+}

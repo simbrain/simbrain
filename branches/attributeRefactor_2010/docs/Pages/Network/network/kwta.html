@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Winner-Take-All</p>
+  </div>
+  <p><h1>K-Winner-Take-All Network</h1>
+  <p>The <em>k</em> units active in a kWTA function are the units receiving the most excitatory input.  First the units must be sorted according to their.</p>
+
+  <p>Then the inhibitory conductance is computed so that the top k units will have membrane potentials that are above the desired threshold, while the rest remain below the threshold.</p>
+
+  <p>In order to implement the kWTA network we need to compute the amount of inhibitory current required to put a unit at the threshold give its current level of excitatory input; where theta is the threshold membrane potential value.</p>
+
+  <p>For the kWTA algorithm the inhibitory conductance is computed as a value intermediate between the excitatory input values for the k and k + 1<em>th</em> units, after they have been sorted by level of excitatory conductance.  This ensures that the k+ 1th unit remains below the desired threshold value, while the k<em>th</em> unit is above it.</p>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,62 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.synapses.*;
+import org.simbrain.workspace.*;
+
+import org.simbrain.plot.timeseries.*;
+{
+
+    // Build Network
+    NetworkComponent networkComponent = new NetworkComponent("Spiking neurons");
+    workspace.addWorkspaceComponent(networkComponent);
+    RootNetwork network = networkComponent.getRootNetwork();
+    network.setTimeStep(.2);
+
+    // Input neuron
+    ClampedNeuron inputNeuron = new ClampedNeuron();
+    inputNeuron.setLocation(10,10);
+    inputNeuron.setActivation(15);
+    inputNeuron.setUpperBound(50);
+    inputNeuron.setLowerBound(-50);
+    inputNeuron.setIncrement(1);
+    inputNeuron.setLabel("Input");
+    network.addNeuron(inputNeuron);
+
+    // Spiking neuron
+    IzhikevichNeuron spiker = new IzhikevichNeuron();
+    spiker.setLocation(150,10);
+    spiker.setLabel("Spiking neuron");
+    spiker.setA(.02);
+    spiker.setB(.2);
+    spiker.setC(-50);
+    spiker.setD(2);
+
+    network.addNeuron(spiker);
+
+    // Connect neurons
+    network.addSynapse(new ClampedSynapse(inputNeuron, spiker));
+
+    // Initialize network
+    networkComponent.update();  // TODO: Replace with better method
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(10, 20, 400,300);
+    desktop.getDesktopComponent(networkComponent).postAddInit();
+
+    // Make time series chart
+    TimeSeriesPlotComponent chart = new TimeSeriesPlotComponent("Sub-threshold dynamics of a spiking neuron", 1);
+    chart.getModel().setAutoRange(false);
+    chart.getModel().setUpperRangeBoundary(50);
+    chart.getModel().setLowerRangeBoundary(-100);
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500,300);
+
+
+    // Couple network to chart
+    ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_2", "Activation"); 
+    ConsumingAttribute timeSeriesAttribute = chart.getSingleConsumingAttribute("TimeSeries-0");
+    workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, timeSeriesAttribute));
+
+}

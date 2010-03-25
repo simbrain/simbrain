@@ -1,0 +1,238 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<project name="Simbrain" default="jar" basedir=".">
+
+	<property name="version" location="Simbrain3_alpha_1" />
+	<property name="src" location="src" />
+	<property name="bin" location="bin" />
+	<property name="lib" location="lib" />
+	<property name="dist" location="dist" /> <!-- Put final products here -->
+	<property name="build" location="build" /> 	<!-- Staging area -->
+	<property name="build.main" location="${build}/main" /> 
+	<property name="build.jars" location="${build}/jars" />
+	<property name="docs" location="docs" />
+	<property name="scripts" location="scripts" />
+	<property name="resource" value="org/simbrain/resource" />
+	<property name="odorworldresource" value="org/simbrain/world/odorworld/resources" />
+	<property name="commands" value="org/simbrain/console" />
+	<property name="workspace" value="org/simbrain/workspace" />
+	<property name="network" value="org/simbrain/network" />
+	<property name="util" value="org/simbrain/util" />
+	<property name="temp" location="temp" />
+	<property name="removelogger" location="${temp}/removelogger" />
+	<property name="etc" location="etc" />
+	<property name="jarfile" location="${build.main}/${ant.project.name}.jar" />
+	<property name="compile.debug" value="true" />
+
+	<fileset id="lib.jars" dir="${lib}">
+		<include name="**/*.jar" />
+	</fileset>
+
+	<path id="lib.path">
+		<fileset refid="lib.jars" />
+	</path>
+
+	<!-- =================== MAIN BUILD TASKS ============================= -->
+
+	<!-- Compile the source, and copy needed files. -->
+	<target name="compile" description="Compile code">
+		<mkdir dir="${bin}" />
+		<mkdir dir="${lib}" />
+		<javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no" classpathref="lib.path" debug="${compile.debug}">
+		</javac>
+		<copy todir="${bin}/${resource}">
+			<fileset dir="${src}/${resource}">
+				<exclude name="**/*.class" />
+			</fileset>
+		</copy>
+		<copy todir="${bin}/${odorworldresource}">
+			<fileset dir="${src}/${odorworldresource}">
+			</fileset>
+		</copy>
+		<copy todir="${bin}/${commands}">
+			<fileset dir="${src}/${commands}">
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- Create simbrain jar for main distribution. -->
+	<target name="jar" depends="compile" description="Build jar">
+		<mkdir dir="${build.main}" />
+		<jar jarfile="${jarfile}" basedir="${bin}">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Main-Class" value="org.simbrain.workspace.gui.Splasher" />
+			</manifest>
+			<!-- Merge library jars into final jar file -->
+			<zipgroupfileset refid="lib.jars" />
+		</jar>
+	</target>
+
+	<!-- Run simbrain. -->
+	<target name="run" depends="jar" description="Run jar file">
+		<java jar="${jarfile}" fork="yes" failonerror="true">
+		</java>
+	</target>
+
+	<!-- Build main distribution. -->
+	<target name="build" depends="clean, jar" description="Create the end-user distribution">
+		<copy todir="${build.main}/docs">
+			<fileset dir="${docs}">
+			</fileset>
+		</copy>
+		<copy todir="${build.main}/simulations">
+			<fileset dir="simulations">
+			</fileset>
+		</copy>
+		<copy todir="${build.main}/scripts">
+			<fileset dir="scripts">
+			</fileset>
+		</copy>
+		<copy todir="${build.main}" file="${etc}/Readme.txt" />
+		<copy todir="${build.main}" file="${etc}/License.txt" />
+		<zip destfile="${version}.zip" basedir="${build.main}" />
+		<mkdir dir="${dist}"/>
+		<move todir="${dist}" file="${version}.zip" />
+	</target>
+
+	<!-- Clean things up. -->
+	<target name="clean" description="Remove build and bin directories">
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+		<delete dir="${temp}" />
+	</target>
+
+	<!-- =================== OTHER TASKS ============================= -->
+
+	<!--  Javadocs. -->
+	<target name="javadocs" description="Create API documentation">
+		<javadoc encoding="ISO-8859-1" packagenames="org.*" sourcepath="${src}" classpathref="lib.path" destdir="${build}/apidocs/" author="true" version="true" use="true" source="1.5" package="true" overview="${src}/overview.html" windowtitle="Simbrain API" doctitle="Simbrain API">
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/" offline="false" />
+			<link href="http://www.cs.umd.edu/hcil/piccolo/learn/piccolo/doc-1.1/api/" offline="false" />
+		</javadoc>
+	</target>
+
+	<!--  Checkstyle. -->
+	<taskdef resource="checkstyletask.properties" classpath="${etc}/checkstyle-all-5.0.jar" />
+	<target name="checkstyle" description="Generates a report of code convention violations">
+		<checkstyle config="${etc}/checkstyle.xml">
+			<formatter type="xml" tofile="checkstyle_report.xml" />
+			<fileset dir="${src}" includes="**/*.java" />
+		</checkstyle>
+	</target>
+
+	<target name="console" depends="compile">
+		<java classname="org.simbrain.console.SimbrainConsole" fork="yes">
+			<classpath>
+				<fileset dir="${lib}" includes="**/*.jar" />
+				<pathelement location="${bin}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="commandline" depends="compile">
+		<java classname="org.simbrain.console.SimbrainInterpreter">
+			<classpath>
+				<fileset dir="${lib}" includes="**/*.jar" />
+				<pathelement location="${bin}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="test3d" description="Run 3d test">
+		<java classname="org.simbrain.world.threedee.Test">
+			<classpath>
+				<fileset dir="${lib}" includes="**/*.jar" />
+				<pathelement location="${bin}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="profile" depends="jar" description="Run using profiler">
+		<java jar="${jarfile}" fork="yes">
+			<jvmarg value="-Xprof " />
+		</java>
+	</target>
+
+	<target name="profile2" depends="jar" description="Run using profiler">
+		<java jar="${jarfile}" fork="yes">
+			<jvmarg value="-agentlib:hprof=heap=all" />
+		</java>
+	</target>
+
+	<!-- =================== FOR BUILDING SEPARATE JARS ============================= -->
+	<!-- TODO: Use build.jar and dist as indicated in comments above -->
+
+	<!-- Replace references to "log4j" with references to internal Logger 
+	proxy.  Removes dependency on log4j jar file for lightweight distributions. -->
+	<target name="removelog4j" description="Remove log4j references from source files.">
+		<mkdir dir="${removelogger}" />
+		<copy todir="${removelogger}">
+			<fileset dir="${src}">
+				<include name="**/*.java" />
+			</fileset>
+		</copy>
+		<replace dir="${removelogger}" token="import org.apache.log4j.Logger" value="import org.simbrain.util.Logger" />
+	</target>
+
+	<!-- Build util package, currently used in all specialized distributions. -->
+	<target name="util" depends="removelog4j" description="Compile utils">
+		<mkdir dir="${build}" />
+		<filter token="import org.apache.log4j.Logger" value="import org.simbrain.util.Logger" />
+		<javac srcdir="${removelogger}/org/simbrain/util" destdir="${build}" includeAntRuntime="no" classpathref="lib.path" debug="${comple.debug}">
+			<exclude name="environment/**" />
+			<exclude name="projection/**" />
+		</javac>
+	</target>
+
+	<!-- Compile workspace code -->
+	<target name="workspace" depends="util, removelog4j" description="Compile workspace module">
+
+		<mkdir dir="${build}" />
+		<javac srcdir="${removelogger}/org/simbrain/workspace/" destdir="${build}" includeAntRuntime="no" classpathref="lib.path" debug="${comple.debug}">
+			<exclude name="gui/**" />
+			<exclude name="actions/**" />
+			<exclude name="WorkspaceSerializer.java" />
+			<exclude name="ArchiveContents.java" />
+			<exclude name="WorkspaceComponentDeserializer.java" />
+		</javac>
+	</target>
+
+	<!-- Used for creating a minimal network (no gui, no workspace) distribution -->
+	<target name="network" depends="util, removelog4j" description="Compile minimal network">
+		<mkdir dir="${build}" />
+		<javac srcdir="${removelogger}/org/simbrain/network/" destdir="${build}" includeAntRuntime="no" classpathref="lib.path" debug="${comple.debug}">
+			<exclude name="gui/**" />
+			<exclude name="desktop/**" />
+			<exclude name="attributes/**" />
+			<exclude name="NetworkComponent.java" />
+		</javac>
+	</target>
+
+	<!-- Create a minimal network jar. -->
+	<target name="networkjar" depends="clean, network " description="Create the bare network jar">
+		<mkdir dir="${dist}" />
+		<mkdir dir="${build}" />
+		<jar destfile="${dist}/Network.jar" basedir="${build}" />
+	</target>
+
+	<!-- Network with GUI -->
+	<target name="networkgui" depends="workspace, removelog4j" description="Compile network">
+		<mkdir dir="${build}" />
+		<javac srcdir="${removelogger}/${resource}/" destdir="${build}" />
+		<copy todir="${build}/${resource}">
+			<fileset dir="${src}/${resource}">
+				<exclude name="**/*.class" />
+			</fileset>
+		</copy>
+		<javac srcdir="${removelogger}/org/simbrain/network/" destdir="${build}" classpathref="lib.path" includeAntRuntime="no" debug="${compile.debug}">
+			<exclude name="desktop/**" />
+		</javac>
+	</target>
+
+	<!-- Create network (with GUI) jar.  Can be used in applets. -->
+	<target name="networkguijar" depends="clean, networkgui" description="Create the network jar">
+		<mkdir dir="${dist}" />
+		<jar destfile="${dist}/NetworkGui.jar" basedir="${build}" />
+	</target>
+
+</project>

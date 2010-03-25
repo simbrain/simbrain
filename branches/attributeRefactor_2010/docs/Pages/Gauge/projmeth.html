@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Projection Methods</p>
+  </div>
+  <p><h1>Projection Methods</h1>
+  <p>There are numerous ways to project high dimensional data to lower dimensions. The projection menu in the gauge allows one to switch projections and thereby compare the way neural network data look under different projections. </p>
+  <p class="heading"><a name="Coordinate"></a>Coordinate Projection</p>
+  <blockquote>
+    <p>This is perhaps the simplest possible projection technique. If one has a list of datapoints with 40 components each, coordinate projection to two-dimensions simply ignores all but two of these components, which are then used to display the data in two-space.</p>
+  </blockquote>
+  <p class="heading"> Principal Component Analysis (PCA)</p>
+  <blockquote>
+    <p>PCA builds on coordinate projection by making use of the "principal axes" of the dataset. The principal axes of an object are the directions in space about which the object is most balanced or evenly spaced. PCA selects the two principal axes along which the dataset is the most spread out and projects the data onto these two axes.</p>
+  </blockquote>
+  <p><a name="Sammon"></a><span class="heading">Sammon map</span>
+  <blockquote>
+    <p>The Sammon map is an iterative technique for making interpoint distances in the low-dimensional projection as close as possible to the interpoint distances in the high-dimensional object. Two points close together in the high-dimensional space should appear close together in the projection, while two points far apart in the high dimensional space should appear far apart in the projection. By minimizing an error function between the high and low dimensional sets of interpoint distances, the Sammon map does its best to preserve these distances in the projection. This iterative procedure can  be watched in the gauge by loading a dataset and pressing the "play" button on the interface. <br>
+      <span class="heading2">Note</span>: Before Sammon Mapping is used, it is useful to <em>Randomize</em>, <img src="../../Images/Rand.gif">, the data points, as overlapping points cause the algorithm to blow up. One would run the Sammon Mapping process <strong>after</strong> data points have been developed by PCA or Coordinate Projection.
+    </p>
+  </blockquote>
+</div>
+</body>
+</html>

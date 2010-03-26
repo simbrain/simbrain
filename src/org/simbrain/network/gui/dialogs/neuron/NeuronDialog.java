@@ -52,6 +52,7 @@ import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.LogisticNeuron;
 import org.simbrain.network.neurons.NakaRushtonNeuron;
 import org.simbrain.network.neurons.PointNeuron;
+import org.simbrain.network.neurons.ProbabilisticSpikingNeuron;
 import org.simbrain.network.neurons.RandomNeuron;
 import org.simbrain.network.neurons.RunningAverageNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
@@ -133,6 +134,9 @@ public class NeuronDialog extends StandardDialog {
         ASSOCIATIONS.put(association.clazz, association);
 
         association = new Association("Point", PointNeuron.class, PointNeuronPanel.class, true);
+        ASSOCIATIONS.put(association.clazz, association);
+        
+        association = new Association("Probabilistic Spiking", ProbabilisticSpikingNeuron.class, ProbabilisticSpikingNeuronPanel.class, true);
         ASSOCIATIONS.put(association.clazz, association);
 
         association = new Association("Random", RandomNeuron.class, RandomNeuronPanel.class, false);

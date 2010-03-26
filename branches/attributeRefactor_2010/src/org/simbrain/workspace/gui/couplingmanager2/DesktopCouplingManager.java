@@ -24,25 +24,17 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.AttributeID;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.AttributePanel;
 import org.simbrain.workspace.gui.CouplingListPanel;
@@ -160,8 +152,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      */
     private void addCouplings() {
 
-    	ArrayList<ProducingAttribute<?>> producingAttributeList = (ArrayList<ProducingAttribute<?>>) producingAttributes.getSelectedAttributes();
-        ArrayList<ConsumingAttribute<?>> consumingAttributeList = (ArrayList<ConsumingAttribute<?>>) consumingAttributes.getSelectedAttributes();
+        List<AttributeID> producingAttributeList = (ArrayList<AttributeID>) producingAttributes.getSelectedAttributes();
+        List<AttributeID> consumingAttributeList = (ArrayList<AttributeID>) consumingAttributes.getSelectedAttributes();
         
         if ((producingAttributeList.size() == 0) || (consumingAttributeList.size() == 0)) {
           JOptionPane.showMessageDialog(null,
@@ -173,7 +165,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to one")) {
             desktop.getWorkspace().coupleOneToOne(producingAttributeList, consumingAttributeList);
         } else if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to many")) {
-            desktop.getWorkspace().coupleOneToMany(producingAttributeList, consumingAttributeList);
+            //desktop.getWorkspace().coupleOneToMany(producingAttributeList, consumingAttributeList);
         }
     }
 

@@ -43,10 +43,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**
  * OSC world desktop component.
@@ -107,11 +105,11 @@ public final class OscWorldDesktopComponent
                 private void showContextMenu(final MouseEvent event) {
                     if (consumers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
-                        OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
-                        ProducingAttributeMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", oscWorldComponent.getWorkspace(),
-                                                                           consumer.getConsumingAttributes().get(0));
-                        producerMenu.setText("Set input source");
-                        contextMenu.add(producerMenu);
+//                        OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
+//                        ProducingAttributeMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", oscWorldComponent.getWorkspace(),
+//                                                                           consumer.getConsumingAttributes().get(0));
+//                        producerMenu.setText("Set input source");
+//                        contextMenu.add(producerMenu);
                         contextMenu.show(consumers, event.getX(), event.getY());
                     }
                 }
@@ -142,11 +140,11 @@ public final class OscWorldDesktopComponent
                 private void showContextMenu(final MouseEvent event) {
                     if (producers.getSelectedIndex() > -1) {
                         JPopupMenu contextMenu = new JPopupMenu();
-                        OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
-                        ConsumingAttributeMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", oscWorldComponent.getWorkspace(),
-                                                                           producer.getProducingAttributes().get(0));
-                        consumerMenu.setText("Set output target");
-                        contextMenu.add(consumerMenu);
+//                        OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
+//                        ConsumingAttributeMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", oscWorldComponent.getWorkspace(),
+//                                                                           producer.getProducingAttributes().get(0));
+//                        consumerMenu.setText("Set output target");
+//                        contextMenu.add(consumerMenu);
                         contextMenu.show(producers, event.getX(), event.getY());
                     }
                 }

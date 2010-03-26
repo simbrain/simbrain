@@ -24,8 +24,6 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -106,7 +104,6 @@ import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -2186,14 +2183,6 @@ public class NetworkPanel extends PCanvas  {
      * {@inheritDoc}
      */
     public void setTitle(String name) {
-        /* no implementation */
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
         /* no implementation */
     }
 

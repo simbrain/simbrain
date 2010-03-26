@@ -51,18 +51,6 @@ public abstract class WorkspaceComponent {
     /** The set of all WorkspaceComponentListeners on this component. */
     private final Collection<WorkspaceComponentListener> workspaceComponentListeners;
 
-    /** Consumer list. */
-    private final List<Consumer> consumers;
-
-    /** Producer list. */
-    private final List<Producer> producers;
-
-    /** Available attribute types. */
-    protected final List<String> attributeTypes;
-
-    /** List of attribute listeners. */
-    private final Collection<AttributeHolderListener> attributeListeners;
-
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
 
@@ -100,11 +88,11 @@ public abstract class WorkspaceComponent {
      * Initializer
      */
     {
-        consumers = new CopyOnWriteArrayList<Consumer>();
-        producers = new CopyOnWriteArrayList<Producer>();
-        attributeTypes = new ArrayList<String>();
+//        consumers = new CopyOnWriteArrayList<Consumer>();
+//        producers = new CopyOnWriteArrayList<Producer>();
+//        attributeTypes = new ArrayList<String>();
         workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
-        attributeListeners = new HashSet<AttributeHolderListener>();
+//        attributeListeners = new HashSet<AttributeHolderListener>();
     }
 
     /**
@@ -156,6 +144,20 @@ public abstract class WorkspaceComponent {
      */
     public void update() {
         /* no default implementation */
+    }
+
+    //TODO: Change to abstract once I get this working
+    public List<AttributeID> getPotentialConsumers() {
+        return null;
+     }
+    public List<AttributeID> getPotentialProducers() {
+        return null;
+     }
+    public Consumer createConsumer(AttributeID id) {
+        return null;
+    }
+    public Producer createProducer(AttributeID id) {
+        return null;
     }
 
     /**
@@ -252,32 +254,7 @@ public abstract class WorkspaceComponent {
         workspaceComponentListeners.remove(listener);
     }
     
-    /**
-     * Returns the Attribute Listeners on this component.
-     * 
-     * @return The Attribute Listeners on this component.
-     */
-    public Collection<AttributeHolderListener> getAttributeListeners() {
-        return Collections.unmodifiableCollection(attributeListeners);
-    }
 
-    /**
-     * Adds a AttributeHolderListener to this component.
-     *
-     * @param listener the AttributeHolderListener to add.
-     */
-    public void addAttributeListener(final AttributeHolderListener listener) {
-        attributeListeners.add(listener);
-    }
-
-    /**
-     * Adds a AttributeHolderListener to this component.
-     *
-     * @param listener the AttributeHolderListener to add.
-     */
-    public void removeAttributeListener(final AttributeHolderListener listener) {
-        attributeListeners.remove(listener);
-    }
 
     /**
      * Returns the name of this component.
@@ -322,55 +299,7 @@ public abstract class WorkspaceComponent {
         return simpleName;
     }
 
-    /**
-     * Return producing attributes in a particular order, for use in creating
-     * couplings.
-     *
-     * Can be overridden if the attributes should be displayed in some special
-     * order.
-     *
-     * @return custom list of producing attributes.
-     */
-    public ArrayList<ProducingAttribute<?>> getProducingAttributes() {
 
-        ArrayList<ProducingAttribute<?>> list = new ArrayList<ProducingAttribute<?>>();
-
-        for (Producer producer : this.getProducers()) {
-            for (ProducingAttribute<?> attribute : producer
-                    .getProducingAttributes()) {
-                list.add(attribute);
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Return consuming attributes in a specified order.
-     *
-     * Can be overridden if the attributes should be displayed in some special
-     * order.
-     *
-     * @return custom list of producing attributes.
-     */
-    public ArrayList<ConsumingAttribute<?>> getConsumingAttributes() {
-
-        ArrayList<ConsumingAttribute<?>> list = new ArrayList<ConsumingAttribute<?>>();
-        for (Consumer consumer : this.getConsumers()) {
-            for (ConsumingAttribute<?> attribute : consumer
-                    .getConsumingAttributes()) {
-                list.add(attribute);
-            }
-        }
-        return list;
-    }
-    
-//    public void addAttribute(Class<?> producerType, Attribute attribute) {
-//        for (Producer producer : producers) {
-//            if (producer.getClass() == producerType) {
-//                // producer.addAttribute(attribute);
-//            }
-//        }
-//    }
 
     /**
      * Override for use with open service.
@@ -381,282 +310,7 @@ public abstract class WorkspaceComponent {
         return null;
     }
 
-    /**
-     * Returns the producers associated with this component.
-     *
-     * @return The producers associated with this component.
-     */
-    public List<Producer> getProducers() {
-        return producers;
-    }
-    
-    /**
-     * Returns the consumers associated with this component.
-     * 
-     * @return The consumers associated with this component.
-     */
-    public List<Consumer> getConsumers() {
-        return consumers;
-    }
 
-    /**
-     * Returns true if the component contains the consumer, false otherwise.
-     *
-     * @param consumer the consumer to check
-     * @return true if the component contains the consumer
-     */
-    public boolean containsConsumer(final Consumer consumer) {
-        if (this.getConsumer(consumer.getDescription()) != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Returns true if the component contains the producer, false otherwise.
-     *
-     * @param producer the producer to check
-     * @return true if the component contains the producer
-     */
-    public boolean containsProducer(final Producer producer) {
-        if (this.getProducer(producer.getDescription()) != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the specified consumer.
-     *
-     * @param consumer consumer to add.
-     */
-    public void addConsumer(final Consumer consumer) {
-        if (!containsConsumer(consumer)) {
-            consumers.add(consumer);
-            for (AttributeHolderListener listener : attributeListeners) {
-                listener.consumerAdded(consumer);
-            }
-        }
-    }
-
-    /**
-     * Adds the specified producer.
-     *
-     * @param producer producer to add.
-     */
-    public void addProducer(final Producer producer) {
-        if (!containsProducer(producer)) {
-            producers.add(producer);
-            for (AttributeHolderListener listener : attributeListeners) {
-                listener.producerAdded(producer);
-            }
-        }
-    }
-
-    /**
-     * Removes specified consumer.
-     *
-     * @param consumer consumer to remove
-     */
-    public void removeConsumer(final Consumer consumer) {
-        workspace.getCouplingManager().removeAttachedCouplings(consumer);
-        consumers.remove(consumer);
-        for (AttributeHolderListener listener : attributeListeners) {
-            listener.consumerRemoved(consumer);
-        }
-    }
-
-    /**
-     * Removes specified producer.
-     *
-     * @param producer producer to remove
-     */
-    public void removeProducer(final Producer producer) {
-        workspace.getCouplingManager().removeAttachedCouplings(producer);
-        producers.remove(producer);
-        for (AttributeHolderListener listener : attributeListeners) {
-            listener.producerRemoved(producer);
-        }
-    }
-
-    /**
-     * Remove all producers of the specified type.
-     *
-     * @param producerType the type of producer to be removed
-     */
-    public void removeProducers(final Class<?> producerType) {
-        for (Producer producer : producers) {
-            if (producer.getClass() == producerType) {
-                removeProducer(producer);
-            }
-        }
-    }
-
-    /**
-     * Remove all consumers of the specified type.
-     *
-     * @param consumerType the type of consumer to be removed
-     */
-    public void removeConsumers(final Class<?> consumerType) {
-        for (Consumer consumer : consumers) {
-            if (consumer.getClass() == consumerType) {
-                removeConsumer(consumer);
-            }
-        }
-    }
-
-    /**
-     * Get a SingleConsumingAttribute by name.
-     *
-     * @param consumerId id of single consuming attribute
-     * @return the attribute
-     */
-    public ConsumingAttribute<?> getSingleConsumingAttribute(final String consumerId) {
-        for (Consumer consumer : getConsumers()) {
-            if (consumer instanceof SingleAttributeConsumer) {
-                if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
-                    return ((SingleAttributeConsumer<?>)consumer).getAttribute();
-                }
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * Get a SingleProducingAttribute by id.
-     *
-     * @param producerId id of single producing attribute
-     * @return the attribute
-     */
-    public ProducingAttribute<?> getSingleProducingAttribute(final String producerId) {
-        for (Producer producer : getProducers()) {
-            if (producer instanceof SingleAttributeProducer) {
-                if (producer.getDescription().equalsIgnoreCase(producerId)) {
-                    return ((SingleAttributeProducer<?>)producer).getAttribute();
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-    * Finds a consumer by name and returns it, or null if it is not found.
-    *
-    * @param consumerId the name of the consumer (attribute holder)
-    * @return the the consumer
-    */
-    public Consumer getConsumer(final String consumerId) {
-        for (Consumer consumer : getConsumers()) {
-            //System.out.println(consumerId + "==" + consumer.getDescription() + "?");
-            if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
-                //System.out.println(consumer.getDescription() + "==" + consumerId + "?");
-                return consumer;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get a consuming attribute, using the id of the attribute holder and the attribute itself.
-     *
-     * @param consumerId the name of the consumer (attribute holder)
-     * @param attributeId the name of the attribute
-     * @return the consuming attribute
-     */
-    public ConsumingAttribute<?> getConsumingAttribute(final String consumerId,
-            final String attributeId) {
-        Consumer consumer = getConsumer(consumerId);
-        if (consumer != null) {
-            for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
-                //System.out.println(attribute.getKey() + "==" + attributeId + "?");
-                if (attribute.getKey().equals(attributeId)) {
-                    return attribute;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Finds a producer by name and returns it, or none if it is not found.
-     *
-     * @param producerId the name of the producer (attribute holder)
-     * @return the producer
-     */
-    public Producer getProducer(final String producerId) {
-        for (Producer producer : getProducers()) {
-            // System.out.println(producerId + "==" + producer.getDescription()
-            // + "?");
-            if (producer.getDescription().equalsIgnoreCase(producerId)) {
-                return producer;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get a producing attribute, using the id of the attribute holder and the attribute itself.
-     *
-     * @param producerId the name of the producing (attribute holder)
-     * @param attributeId the name of the attribute
-     * @return the producing attribute
-     */
-    public ProducingAttribute<?> getProducingAttribute(final String producerId,
-            final String attributeId) {
-        Producer producer = getProducer(producerId);
-        if (producer != null) {
-            for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
-                if (attribute.getKey().equals(attributeId)) {
-                    return attribute;
-                }
-            }
-        }
-        return null;
-    }
-    
-    public ProducingAttribute<Double> createDoubleProducingAttribute(final Producer producer,
-            final String getterName, final String key, final String description) {
-        if (producer == null) {
-            return null;
-        } else {
-            return new ProducingAttribute<Double>() {
-                public Producer getParent() {
-                    return producer;
-                }
-                public Double getValue() {
-                    Method theMethod = null;
-                    Double theVal = new Double(0);
-                    try {
-                        theMethod = producer.getClass().getMethod(getterName,(Class[]) null);
-                    } catch (SecurityException e1) {
-                        e1.printStackTrace();
-                    } catch (NoSuchMethodException e1) {
-                        e1.printStackTrace();
-                    }
-
-                    try {
-                        if (theMethod != null) {
-                            theVal = (Double) theMethod.invoke(producer, null);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return theVal;
-                }
-
-                public String getAttributeDescription() {
-                    return description;
-                }
-
-                public String getKey() {
-                    return key;
-                }
-            };
-        }
-    }
 
 
     /**
@@ -802,13 +456,6 @@ public abstract class WorkspaceComponent {
     public void setUpdateOn(Boolean updateOn) {
         this.updateOn = updateOn;
         this.fireComponentToggleEvent();
-    }
-
-    /**
-     * @return the attributeTypes
-     */
-    public List<String> getAttributeTypes() {
-        return attributeTypes;
     }
 
 }

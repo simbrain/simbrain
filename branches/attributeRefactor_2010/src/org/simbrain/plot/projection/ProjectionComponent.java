@@ -90,10 +90,11 @@ public class ProjectionComponent extends WorkspaceComponent {
         }
 
         // Initialize attributes
-        this.getConsumers().clear();
-        for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
-            addConsumer(new ProjectionConsumer(this, i));
-        }
+        //TODO: REDO
+//        this.getConsumers().clear();
+//        for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
+//            addConsumer(new ProjectionConsumer(this, i));
+//        }
         addListener();
     }
 
@@ -101,26 +102,28 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Add chart listener to model.
      */
     private void addListener() {
-        projectionModel.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceAdded(final int index) {
-                ProjectionConsumer newAttribute = new ProjectionConsumer(
-                        ProjectionComponent.this, index);
-                addConsumer(newAttribute);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceRemoved(final int index) {
-                ProjectionConsumer toBeRemoved = (ProjectionConsumer) getConsumers()
-                        .get(index);
-                removeConsumer(toBeRemoved);
-            }
-        });
+        
+        //TODO: REDO
+//        projectionModel.addListener(new ChartListener() {
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceAdded(final int index) {
+//                ProjectionConsumer newAttribute = new ProjectionConsumer(
+//                        ProjectionComponent.this, index);
+//                addConsumer(newAttribute);
+//            }
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceRemoved(final int index) {
+//                ProjectionConsumer toBeRemoved = (ProjectionConsumer) getConsumers()
+//                        .get(index);
+//                removeConsumer(toBeRemoved);
+//            }
+//        });
 
     }
 
@@ -159,20 +162,22 @@ public class ProjectionComponent extends WorkspaceComponent {
      */
     @Override
     public void update() {
+        
+        //TODO: REDO
 
-    	// Create a new double array to be sent as a new "point" to the projection dataset
-        double[] temp = new double[getConsumers().size()];
-        int i = 0;
-        for (Consumer consumer : getConsumers()) {
-            // TODO: Class cast exception below?
-            temp[i] = ((ProjectionConsumer)consumer).getValue();
-            i++;
-        }
-        boolean newDatapointWasAdded = projectionModel.getProjector().addDatapoint(temp);
-        if (newDatapointWasAdded) {
-        	projectionModel.setCurrentItemIndex(projectionModel.getDataset().getItemCount(0));
-            resetChartDataset(); 
-        }
+//    	// Create a new double array to be sent as a new "point" to the projection dataset
+//        double[] temp = new double[getConsumers().size()];
+//        int i = 0;
+//        for (Consumer consumer : getConsumers()) {
+//            // TODO: Class cast exception below?
+//            temp[i] = ((ProjectionConsumer)consumer).getValue();
+//            i++;
+//        }
+//        boolean newDatapointWasAdded = projectionModel.getProjector().addDatapoint(temp);
+//        if (newDatapointWasAdded) {
+//        	projectionModel.setCurrentItemIndex(projectionModel.getDataset().getItemCount(0));
+//            resetChartDataset(); 
+//        }
     }
     
     /**

@@ -70,10 +70,11 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        this.getConsumers().clear();
-        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-            addConsumer(new TimeSeriesConsumer(this, i));
-        }
+        //TODO: REDO
+//        this.getConsumers().clear();
+//        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+//            addConsumer(new TimeSeriesConsumer(this, i));
+//        }
     }
 
 
@@ -95,26 +96,27 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      */
     private void addListener() {
 
-        model.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceAdded(final int index) {
-                TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(
-                        TimeSeriesPlotComponent.this, index);
-                addConsumer(newAttribute);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceRemoved(final int index) {
-                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers()
-                        .get(index);
-                removeConsumer(toBeRemoved);
-            }
-        });
+        //TODO: REDO
+//        model.addListener(new ChartListener() {
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceAdded(final int index) {
+//                TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(
+//                        TimeSeriesPlotComponent.this, index);
+//                addConsumer(newAttribute);
+//            }
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceRemoved(final int index) {
+//                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers()
+//                        .get(index);
+//                removeConsumer(toBeRemoved);
+//            }
+//        });
     }
 
     /**
@@ -170,30 +172,32 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     
     @Override
     public void update() {
-
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                // Add the data
-                
-                // Trim appropriately if fixed width
-                if (model.isFixedWidth()) {
-                    // System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
-                    for (Iterator iterator = model.getDataset().getSeries()
-                            .iterator(); iterator.hasNext();) {
-                        XYSeries series = (XYSeries) iterator.next();
-                        if (series.getItemCount() > model.getMaxSize()) {
-                            series.remove(0);
-                        }
-                    }
-                }
         
-                for (Consumer consumer : getConsumers()) {
-                    TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
-                    model.getDataset().getSeries(t_consumer.getIndex()).add(
-                            getWorkspace().getTime(), t_consumer.getValue());
-                }
-            }
-        });
+        //TODO: REDO
+
+//        EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                // Add the data
+//                
+//                // Trim appropriately if fixed width
+//                if (model.isFixedWidth()) {
+//                    // System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
+//                    for (Iterator iterator = model.getDataset().getSeries()
+//                            .iterator(); iterator.hasNext();) {
+//                        XYSeries series = (XYSeries) iterator.next();
+//                        if (series.getItemCount() > model.getMaxSize()) {
+//                            series.remove(0);
+//                        }
+//                    }
+//                }
+//        
+//                for (Consumer consumer : getConsumers()) {
+//                    TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
+//                    model.getDataset().getSeries(t_consumer.getIndex()).add(
+//                            getWorkspace().getTime(), t_consumer.getValue());
+//                }
+//            }
+//        });
     }
  
     @Override

@@ -20,16 +20,11 @@ package org.simbrain.network.desktop;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.attributes.NeuronWrapper;
-import org.simbrain.network.attributes.SynapseWrapper;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
 import org.simbrain.workspace.gui.ComponentMenu;
@@ -105,50 +100,52 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
         // TODO: None of below will work with multiple gui views. Need
         // listeners.
+        
+        //TODO: Redo
 
-        final JCheckBoxMenuItem upperBoundItem = new JCheckBoxMenuItem(
-                "Use upper bound attributes");
-        upperBoundItem.setSelected(NeuronWrapper.isUseUpperBoundAttribute());
-        upperBoundItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setUpperBoundAttributes(
-                        upperBoundItem.isSelected());
-            }
-        });
-        fileMenu.add(upperBoundItem);
-
-        final JCheckBoxMenuItem lowerBoundItem = new JCheckBoxMenuItem(
-                "Use lower bound attributes");
-        lowerBoundItem.setSelected(NeuronWrapper.isUseLowerBoundAttribute());
-        lowerBoundItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setLowerBoundAttributes(
-                        lowerBoundItem.isSelected());
-            }
-        });
-        fileMenu.add(lowerBoundItem);
-
-        final JCheckBoxMenuItem targetValueItem = new JCheckBoxMenuItem(
-                "Use target value attributes");
-        targetValueItem.setSelected(NeuronWrapper.isUseTargetValueAttribute());
-        targetValueItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setTargetValueAttributes(
-                        targetValueItem.isSelected());
-            }
-        });
-        fileMenu.add(targetValueItem);
-
-        final JCheckBoxMenuItem synapseItem = new JCheckBoxMenuItem(
-                "Use synapse attributes");
-        synapseItem.setSelected(SynapseWrapper.isUsingSynapseAttributes());
-        synapseItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                getWorkspaceComponent().setUsingSynapseWrappers(
-                        synapseItem.isSelected());
-            }
-        });
-        fileMenu.add(synapseItem);
+//        final JCheckBoxMenuItem upperBoundItem = new JCheckBoxMenuItem(
+//                "Use upper bound attributes");
+//        upperBoundItem.setSelected(NeuronWrapper.isUseUpperBoundAttribute());
+//        upperBoundItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent arg0) {
+//                getWorkspaceComponent().setUpperBoundAttributes(
+//                        upperBoundItem.isSelected());
+//            }
+//        });
+//        fileMenu.add(upperBoundItem);
+//
+//        final JCheckBoxMenuItem lowerBoundItem = new JCheckBoxMenuItem(
+//                "Use lower bound attributes");
+//        lowerBoundItem.setSelected(NeuronWrapper.isUseLowerBoundAttribute());
+//        lowerBoundItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent arg0) {
+//                getWorkspaceComponent().setLowerBoundAttributes(
+//                        lowerBoundItem.isSelected());
+//            }
+//        });
+//        fileMenu.add(lowerBoundItem);
+//
+//        final JCheckBoxMenuItem targetValueItem = new JCheckBoxMenuItem(
+//                "Use target value attributes");
+//        targetValueItem.setSelected(NeuronWrapper.isUseTargetValueAttribute());
+//        targetValueItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent arg0) {
+//                getWorkspaceComponent().setTargetValueAttributes(
+//                        targetValueItem.isSelected());
+//            }
+//        });
+//        fileMenu.add(targetValueItem);
+//
+//        final JCheckBoxMenuItem synapseItem = new JCheckBoxMenuItem(
+//                "Use synapse attributes");
+//        synapseItem.setSelected(SynapseWrapper.isUsingSynapseAttributes());
+//        synapseItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent arg0) {
+//                getWorkspaceComponent().setUsingSynapseWrappers(
+//                        synapseItem.isSelected());
+//            }
+//        });
+//        fileMenu.add(synapseItem);
 
         return fileMenu;
     }

@@ -1,19 +1,16 @@
 package org.simbrain.workspace;
 
-import java.util.List;
 
 /**
- * A producer is an object that contains two or more producing attributes. If it
- * has just one producing attribute use SingleAttributeProducer.
+ * TODO.
  */
-public interface Producer extends AttributeHolder {
+public interface Producer<E> extends Attribute {
 
     /**
-     * Return an unmodifiable list of producing attributes for this producer.
-     * The list may be empty but may not be null.
+     * Return the value for this producer.
      *
-     * @return an unmodifiable list of producing attributes for this producer
+     * @return the value for this producer
      */
-    List<? extends ProducingAttribute<?>> getProducingAttributes();
+    E getValue();
 
 }

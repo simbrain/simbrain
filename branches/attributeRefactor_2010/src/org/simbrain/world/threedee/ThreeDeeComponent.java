@@ -2,19 +2,10 @@ package org.simbrain.world.threedee;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Timer;
 
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.world.threedee.environment.Environment;
 import org.simbrain.world.threedee.environment.Terrain;
 
@@ -63,7 +54,7 @@ public class ThreeDeeComponent extends WorkspaceComponent {
         xstream.omitField(Environment.class, "random");
         xstream.omitField(Agent.class, "logger");
         xstream.omitField(Moveable.class, "inputs");
-        xstream.omitField(Bindings.class, "component");
+        //xstream.omitField(Bindings.class, "component");
         xstream.omitField(MultipleViewElement.class, "spatials");
         
         return xstream;
@@ -82,9 +73,9 @@ public class ThreeDeeComponent extends WorkspaceComponent {
         ThreeDeeComponent component = new ThreeDeeComponent(
             name, (ThreeDeeModel) getXStream().fromXML(input));
         
-        for (Bindings bindings : component.model.bindings) {
-            bindings.setComponent(component);
-        }
+//        for (Bindings bindings : component.model.bindings) {
+//            bindings.setComponent(component);
+//        }
         
         return component;
     }
@@ -122,7 +113,7 @@ public class ThreeDeeComponent extends WorkspaceComponent {
     public Agent createAgent() {
         Agent agent = new Agent("" + (model.agents.size() + 1), this);
         model.agents.add(agent);
-        model.bindings.add(agent.getBindings());//new Bindings(agent, this));
+        //model.bindings.add(agent.getBindings());//new Bindings(agent, this));
         model.environment.add(agent);
         
         return agent;
@@ -141,10 +132,10 @@ public class ThreeDeeComponent extends WorkspaceComponent {
      */
     @Override
     public void update() {
-        for (Bindings bind : model.bindings) {
-            bind.setOn(true);
-            bind.updateExternal();
-        }
+//        for (Bindings bind : model.bindings) {
+//            bind.setOn(true);
+//            bind.updateExternal();
+//        }
     }
     
     /**
@@ -152,22 +143,23 @@ public class ThreeDeeComponent extends WorkspaceComponent {
      */
     @Override
     protected void stopped() {
-        for (Bindings bind : model.bindings) {
-            bind.setOn(false);
-        }
+//        for (Bindings bind : model.bindings) {
+//            bind.setOn(false);
+//        }
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    protected void couplingRemoved(final Coupling<?> coupling) {
-        ConsumingAttribute<Double> consumingAttribute
-            = (ConsumingAttribute<Double>) coupling.getConsumingAttribute();
-        
-        if (model.bindings.contains(consumingAttribute.getParent())) {
-            consumingAttribute.setValue(0d);
-        }
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @SuppressWarnings("unchecked")
+//    @Override
+//    protected void couplingRemoved(final Coupling<?> coupling) {
+//        ConsumingAttribute<Double> consumingAttribute
+//            = (ConsumingAttribute<Double>) coupling.getConsumingAttribute();
+//        
+//        if (model.bindings.contains(consumingAttribute.getParent())) {
+//            consumingAttribute.setValue(0d);
+//        }
+//    }
+    
 }

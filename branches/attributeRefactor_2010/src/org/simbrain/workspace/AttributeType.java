@@ -18,24 +18,40 @@
  */
 package org.simbrain.workspace;
 
-/**
- * Consuming attribute.
- *
- * @param <E> attribute value type
- */
-public interface ConsumingAttribute<E> extends Attribute {
+public class AttributeType {
+
+    //TODO: Needed?
+    private String typeName;
+
+    /** Whether this type of attribute is currently visible. */
+    private boolean visible;
 
     /**
-     * Return a reference to the parent of this attribute.
-     *
-     * @return the parent reference
+     * @return the typeName
      */
-    Consumer getParent();
+    public String getTypeName() {
+        return typeName;
+    }
 
     /**
-     * Set the value for this consuming attribute to <code>value</code>.
-     *
-     * @param value value for this consuming attribute
+     * @param typeName the typeName to set
      */
-    void setValue(E value);
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    /**
+     * @return the visible
+     */
+    public boolean isVisible() {
+        return visible;
+    }
+
+    /**
+     * @param visible the visible to set
+     */
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
 }

@@ -31,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -39,8 +38,6 @@ import javax.swing.JTextField;
 
 import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.workspace.gui.ConsumingAttributeMenu;
-import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**
  * <b>DataWorldPanel</b> is a jpanel which contains a table object and a that

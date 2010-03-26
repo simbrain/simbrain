@@ -75,9 +75,11 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
                     .getName());
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    workspace.coupleOneToOne(sourceComponent
-                            .getProducingAttributes(), targetComponent
-                            .getConsumingAttributes());
+                    
+                    //TODO: redo
+//                    workspace.coupleOneToOne(sourceComponent
+//                            .getProducingAttributes(), targetComponent
+//                            .getConsumingAttributes());
                 }
             });
             this.add(componentMenuItem);

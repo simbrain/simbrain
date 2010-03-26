@@ -232,11 +232,9 @@ class ArchiveContents {
          * @param coupling The coupling this instance represents.
          */
         Coupling(final ArchiveContents parent, final org.simbrain.workspace.Coupling<?> coupling) {
-            ProducingAttribute<?> producing = coupling.getProducingAttribute();
-            ConsumingAttribute<?> consuming = coupling.getConsumingAttribute();
 
-            this.source = new AttributeID(parent, producing);
-            this.target = new AttributeID(parent, consuming);
+            this.source = new AttributeID(parent, coupling.getProducer());
+            this.target = new AttributeID(parent, coupling.getConsumer());
         }
 
         /**
@@ -263,10 +261,10 @@ class ArchiveContents {
             AttributeID(final ArchiveContents parent,
                     final org.simbrain.workspace.Attribute attribute) {
 
-                WorkspaceComponent comp = attribute.getParent().getParentComponent();
+                WorkspaceComponent comp = attribute.getParentComponent();
                 this.uri = parent.componentUris.get(comp);
-                this.attributeID = attribute.getKey();
-                this.attributeHolderID = attribute.getParent().getDescription();
+                this.attributeID = attribute.getDescription(); //REDO
+                this.attributeHolderID = attribute.getDescription();
             }
         }
     }

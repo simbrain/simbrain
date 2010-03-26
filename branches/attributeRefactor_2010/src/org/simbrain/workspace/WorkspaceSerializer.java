@@ -219,21 +219,24 @@ public class WorkspaceSerializer {
                     = componentDeserializer.getComponent(coupling.source.uri);
                 WorkspaceComponent targetComponent
                     = componentDeserializer.getComponent(coupling.target.uri);
-
-                ProducingAttribute<?> producingAttribute = (ProducingAttribute<?>) sourceComponent
-                        .getProducingAttribute(
-                                coupling.source.attributeHolderID,
-                                coupling.source.attributeID);
-                //System.out.println("producing: " + producingAttribute);
-
-                ConsumingAttribute<?> consumingAttribute = (ConsumingAttribute<?>) targetComponent
-                        .getConsumingAttribute(
-                                coupling.target.attributeHolderID,
-                                coupling.target.attributeID);
-                //System.out.println("consuming: " + consumingAttribute);
-
-                workspace.addCoupling(new Coupling(producingAttribute,
-                        consumingAttribute));
+                
+                //TODO: Redo
+                
+//
+//                ProducingAttribute<?> producingAttribute = (ProducingAttribute<?>) sourceComponent
+//                        .getProducingAttribute(
+//                                coupling.source.attributeHolderID,
+//                                coupling.source.attributeID);
+//                //System.out.println("producing: " + producingAttribute);
+//
+//                ConsumingAttribute<?> consumingAttribute = (ConsumingAttribute<?>) targetComponent
+//                        .getConsumingAttribute(
+//                                coupling.target.attributeHolderID,
+//                                coupling.target.attributeID);
+//                //System.out.println("consuming: " + consumingAttribute);
+//
+//                workspace.addCoupling(new Coupling(producingAttribute,
+//                        consumingAttribute));
 
             }
         }

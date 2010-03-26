@@ -21,21 +21,10 @@ package org.simbrain.world.odorworld;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.simbrain.network.attributes.NeuronWrapper;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.odorworld.attributes.EntityWrapper;
-import org.simbrain.world.odorworld.attributes.LeftTurn;
-import org.simbrain.world.odorworld.attributes.RightTurn;
-import org.simbrain.world.odorworld.attributes.SmellProducer;
-import org.simbrain.world.odorworld.attributes.Straight;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.RotationEffector;
-import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -72,8 +61,9 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * Initialize odor world attributes.
      */
     private void initializeAttributes() {
-        getConsumers().clear();
-        getProducers().clear();
+        //REDO
+//        getConsumers().clear();
+//        getProducers().clear();
         for (OdorWorldEntity entity : world.getObjectList()) {
             addEntityAttributes(entity);
             for (Sensor sensor : entity.getSensors()) {
@@ -91,10 +81,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * @param sensor the sensor
      */
     private void addSensorAttributes(final Sensor sensor) {
-        if (sensor instanceof SmellSensor) {
-            addProducer(new SmellProducer(OdorWorldComponent.this,
-                    (SmellSensor) sensor));
-        }
+        
+        //REDO
+        
+//        if (sensor instanceof SmellSensor) {
+//            addProducer(new SmellProducer(OdorWorldComponent.this,
+//                    (SmellSensor) sensor));
+//        }
     }
 
     /**
@@ -103,15 +96,18 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * @param effector the effector
      */
     private void addEffectorAttributes(final Effector effector) {
-        if (effector instanceof RotationEffector) {
-            addConsumer(new LeftTurn(OdorWorldComponent.this,
-                    (RotationEffector) effector));
-            addConsumer(new RightTurn(OdorWorldComponent.this,
-                    (RotationEffector) effector));
-        } else if (effector instanceof StraightMovementEffector) {
-            addConsumer(new Straight(OdorWorldComponent.this,
-                    (StraightMovementEffector) effector));
-        }
+        
+        //REDO
+        
+//        if (effector instanceof RotationEffector) {
+//            addConsumer(new LeftTurn(OdorWorldComponent.this,
+//                    (RotationEffector) effector));
+//            addConsumer(new RightTurn(OdorWorldComponent.this,
+//                    (RotationEffector) effector));
+//        } else if (effector instanceof StraightMovementEffector) {
+//            addConsumer(new Straight(OdorWorldComponent.this,
+//                    (StraightMovementEffector) effector));
+//        }
     }
 
     /**

@@ -27,18 +27,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
 
+import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.SingleAttributeProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Sensor.
  */
-public final class Sensor extends SingleAttributeProducer<Double> {
+public final class Sensor implements Producer {
 
     /** Filter for this sensor. */
     private Filter filter;
@@ -54,7 +50,7 @@ public final class Sensor extends SingleAttributeProducer<Double> {
 
     /** Producer description. */
     private String producerDescription;
-    
+
     /** Reference to parent workspace component. */
     private WorkspaceComponent parentComponent;
 
@@ -239,19 +235,9 @@ public final class Sensor extends SingleAttributeProducer<Double> {
         return parentComponent;
     }
 
-    /** {@inheritDoc} */
-    public void setDefaultProducingAttribute(final ProducingAttribute<?> producingAttribute) {        
-        // empty
-    }
-
-    /** {@inheritDoc} */
-    public Producer getParent() {
-        return this;
-    }
-
-    public String getKey() {
-        return filter.getDescription() + " (" + receptiveField.getCenterX() + ")(" + receptiveField.getCenterY() + ")";
-    }
+//    public String getKey() {
+//        return filter.getDescription() + " (" + receptiveField.getCenterX() + ")(" + receptiveField.getCenterY() + ")";
+//    }
 
     /**
      * Update producer description.
@@ -280,5 +266,22 @@ public final class Sensor extends SingleAttributeProducer<Double> {
     /** {@inheritDoc} */
     public void setParentComponent(final WorkspaceComponent parentComponent) {
         this.parentComponent = parentComponent;
+    }
+    
+    //TODO
+
+    public String getAttributeDescription() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public AttributeType getAttributeType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public String getKey() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

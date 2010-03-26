@@ -80,10 +80,13 @@ public class DataWorldComponent extends WorkspaceComponent {
      * Initialize consumers and producers.
      */
     private void init() {
-        for (int i = 0; i < dataModel.getColumnCount(); i++) {
-            addConsumer(new ConsumingColumn<Double>(this, i));
-            addProducer(new ProducingColumn<Double>(this, i));
-        }
+        
+        //TODO: REDO
+        
+//        for (int i = 0; i < dataModel.getColumnCount(); i++) {
+//            addConsumer(new ConsumingColumn<Double>(this, i));
+//            addProducer(new ProducingColumn<Double>(this, i));
+//        }
 
         dataModel.addListener(listener);
     }
@@ -93,8 +96,8 @@ public class DataWorldComponent extends WorkspaceComponent {
 
         public void columnAdded(int column) {
             int index = dataModel.getColumnCount() - 1;
-            addConsumer(new ConsumingColumn<Double>(DataWorldComponent.this, index));
-            addProducer(new ProducingColumn<Double>(DataWorldComponent.this, index));
+//            addConsumer(new ConsumingColumn<Double>(DataWorldComponent.this, index)); //REDO
+//            addProducer(new ProducingColumn<Double>(DataWorldComponent.this, index));
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
@@ -168,18 +171,20 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     @SuppressWarnings("unchecked")
     void wireCouplings(final Collection<? extends Producer> producers) {
-        /* Handle Coupling wire-up */
-        LOGGER.debug("wiring " + getProducers().size() + " producers");
-
-       Iterator<? extends Producer> producerIterator = getProducers().iterator();
-
-        for (Consumer consumer : getConsumers()) {
-            if (producerIterator.hasNext()) {
-                Coupling<?> coupling = new Coupling(producerIterator.next()
-                    .getProducingAttributes().get(0), consumer.getConsumingAttributes().get(0));
-                getWorkspace().addCoupling(coupling);
-            }
-        }
+        
+        //REDO
+//        /* Handle Coupling wire-up */
+//        LOGGER.debug("wiring " + getProducers().size() + " producers");
+//
+//       Iterator<? extends Producer> producerIterator = getProducers().iterator();
+//
+//        for (Consumer consumer : getConsumers()) {
+//            if (producerIterator.hasNext()) {
+//                Coupling<?> coupling = new Coupling(producerIterator.next()
+//                    .getProducingAttributes().get(0), consumer.getConsumingAttributes().get(0));
+//                getWorkspace().addCoupling(coupling);
+//            }
+//        }
     }
 
     @Override

@@ -73,8 +73,8 @@ public final class MidiWorldComponent
      */
     void addController(final int number, final int value) {
         Controller controller = new Controller(number, value);
-        MidiControllerConsumer consumer = new MidiControllerConsumer(controller, this);
-        getConsumers().add(consumer);
+//        MidiControllerConsumer consumer = new MidiControllerConsumer(controller, this);
+//        getConsumers().add(consumer);
         // fire event?
     }
 
@@ -88,8 +88,8 @@ public final class MidiWorldComponent
      */
     void addNote(final int pitch, final int velocity, final int length) {
         Note note = new Note(pitch, velocity, length);
-        MidiNoteConsumer consumer = new MidiNoteConsumer(note, this);
-        getConsumers().add(consumer);
+//        MidiNoteConsumer consumer = new MidiNoteConsumer(note, this);
+//        getConsumers().add(consumer);
         // fire event?
     }
 
@@ -101,8 +101,8 @@ public final class MidiWorldComponent
      */
     void addProgramChange(final int number) {
         ProgramChange programChange = new ProgramChange(number);
-        MidiProgramChangeConsumer consumer = new MidiProgramChangeConsumer(programChange, this);
-        getConsumers().add(consumer);
+//        MidiProgramChangeConsumer consumer = new MidiProgramChangeConsumer(programChange, this);
+//        getConsumers().add(consumer);
         // fire event?
     }
 }

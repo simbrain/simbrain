@@ -1,44 +1,44 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace;
 
-import java.lang.reflect.Type;
 
 /**
- * Defines the base API for consuming and producing attributes.
- * 
+ * Defines the base API for consumers and producers.
+ *
  * @author Matt Watson
  */
 public interface Attribute {
 
     /**
      * Returns the descriptive name of this attribute.
-     * 
+     *
      * @return the name of this attribute.
      */
-    String getAttributeDescription();
+    String getDescription();  //TODO: Change to getDescription
 
     /**
-     * Returns the key for this attribute. This key serves two purposes.
-     * 
-     * First, it is used for serialization, as a String id for a given Attribute.
-     * Because of this, NOTE, the key must be unique relative to other
-     * Attributes in an AttributeHolder.
-     * 
-     * Second, this is used as a String description of the attribute, which is
-     * used at various places in the GUI. So, the key value should be
-     * human-readable.
-     * 
-     * Also note that the key of an attribute must be exactly the same after
-     * deserialization as it was before serialization, even if the description
-     * of the attribute was not serialized.
-     * 
-     * @return the key for this attribute.
-     */
-    String getKey();
-    
-    /**
-     * Returns a reference the AttributeHolder which holds this Attribute.
-
+     * Returns a reference to the parent component
+     *
      * @return parent AttributeHolder
      */
-    AttributeHolder getParent();
+    WorkspaceComponent getParentComponent();
+
+    //TODO: GetLocation
 }

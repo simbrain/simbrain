@@ -2,8 +2,8 @@ package org.simbrain.workspace.gui;
 
 import javax.swing.JMenuItem;
 
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -15,10 +15,10 @@ public class CouplingMenuItem extends JMenuItem {
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
-    private ProducingAttribute<?> producingAttribute = null;
+    private Producer<?> producer = null;
 
     /** Reference to consuming attribute. */
-    private ConsumingAttribute<?> consumingAttribute = null;
+    private Consumer<?> consumer = null;
 
     /** Reference to a coupling container. */
     private WorkspaceComponent component = null;
@@ -39,7 +39,7 @@ public class CouplingMenuItem extends JMenuItem {
 
     /**
      * Creates a new instance.
-     * 
+     *
      * @param component The component that this menuItem belongs to.
      * @param type The type of event this menuItem should fire.
      */
@@ -47,34 +47,6 @@ public class CouplingMenuItem extends JMenuItem {
         this.component = component;
         this.eventType = type;
         setSelected(true);
-    }
-
-    /**
-     * @return the consumingAttribute
-     */
-    public ConsumingAttribute<?> getConsumingAttribute() {
-        return consumingAttribute;
-    }
-
-    /**
-     * @param consumingAttribute the consumingAttribute to set
-     */
-    public void setConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
-        this.consumingAttribute = consumingAttribute;
-    }
-
-    /**
-     * @return the producingAttribute
-     */
-    public ProducingAttribute<?> getProducingAttribute() {
-        return producingAttribute;
-    }
-
-    /**
-     * @param producingAttribute the producingAttribute to set
-     */
-    public void setProducingAttribute(final ProducingAttribute<?> producingAttribute) {
-        this.producingAttribute = producingAttribute;
     }
 
     /**
@@ -89,5 +61,33 @@ public class CouplingMenuItem extends JMenuItem {
      */
     public EventType getEventType() {
         return eventType;
+    }
+
+    /**
+     * @return the producer
+     */
+    public Producer<?> getProducer() {
+        return producer;
+    }
+
+    /**
+     * @param producer the producer to set
+     */
+    public void setProducer(Producer<?> producer) {
+        this.producer = producer;
+    }
+
+    /**
+     * @return the consumer
+     */
+    public Consumer<?> getConsumer() {
+        return consumer;
+    }
+
+    /**
+     * @param consumer the consumer to set
+     */
+    public void setConsumer(Consumer<?> consumer) {
+        this.consumer = consumer;
     }
 }

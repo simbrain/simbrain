@@ -62,10 +62,11 @@ public class BarChartComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        this.getConsumers().clear();
-        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
-            addConsumer(new BarChartConsumer(this, i));
-        }
+        //TODO: Redo
+//        this.getConsumers().clear();
+//        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
+//            addConsumer(new BarChartConsumer(this, i));
+//        }
     }
 
     /**
@@ -86,26 +87,28 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void addListener() {
 
-        model.addListener(new ChartListener() {
+        //TODO: Redo
 
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceAdded(final int index) {
-                BarChartConsumer newAttribute = new BarChartConsumer(
-                        BarChartComponent.this, index);
-                addConsumer(newAttribute);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceRemoved(final int index) {
-                BarChartConsumer toBeRemoved = (BarChartConsumer) getConsumers()
-                        .get(index);
-                removeConsumer(toBeRemoved);
-            }
-        });
+//        model.addListener(new ChartListener() {
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceAdded(final int index) {
+//                BarChartConsumer newAttribute = new BarChartConsumer(
+//                        BarChartComponent.this, index);
+//                addConsumer(newAttribute);
+//            }
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceRemoved(final int index) {
+//                BarChartConsumer toBeRemoved = (BarChartConsumer) getConsumers()
+//                        .get(index);
+//                removeConsumer(toBeRemoved);
+//            }
+//        });
   }
     /**
      * Returns model.

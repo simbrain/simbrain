@@ -121,39 +121,44 @@ public class Workspace {
         listeners.remove(listener);
     }
 
+    //TODO: Redo
+    
+//    /**
+//     * Couple each source attribute to all target attributes.
+//     *
+//     * @param sourceAttributes source producing attributes
+//     * @param targetAttributes target consuming attributes
+//     */
+//    @SuppressWarnings("unchecked")
+//    public void coupleOneToMany(
+//            final ArrayList<Producer<?>> sourceAttributes,
+//            final ArrayList<ConsumingAttribute<?>> targetAttributes) {
+//        for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
+//            for (ConsumingAttribute<?> consumingAttribute : targetAttributes) {
+//                Coupling<?> coupling = new Coupling(producingAttribute, consumingAttribute);
+//                getCouplingManager().addCoupling(coupling);
+//            }
+//        }
+//    }
+
     /**
-     * Couple each source attribute to all target attributes.
+     * Couple each source attribute to one target attribute, as long as there are target attributes
+     * to couple to.
      *
      * @param sourceAttributes source producing attributes
      * @param targetAttributes target consuming attributes
      */
     @SuppressWarnings("unchecked")
-    public void coupleOneToMany(
-            final ArrayList<ProducingAttribute<?>> sourceAttributes,
-            final ArrayList<ConsumingAttribute<?>> targetAttributes) {
-        for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
-            for (ConsumingAttribute<?> consumingAttribute : targetAttributes) {
-                Coupling<?> coupling = new Coupling(producingAttribute, consumingAttribute);
-                getCouplingManager().addCoupling(coupling);
-            }
-        }
-    }
-    
-    /**
-     * Couple each source attribute to one target attribute, as long as there are target attributes
-     * to couple to.
-     * 
-     * @param sourceAttributes source producing attributes
-     * @param targetAttributes target producing attributes
-     */
-    @SuppressWarnings("unchecked")
-    public void coupleOneToOne(
-            final ArrayList<ProducingAttribute<?>> sourceAttributes,
-            final ArrayList<ConsumingAttribute<?>> targetAttributes) {
-        Iterator<ConsumingAttribute<?>> consumingAttributes = targetAttributes.iterator();
-        for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
-            if (consumingAttributes.hasNext()) {
-                Coupling<?> coupling = new Coupling(producingAttribute, consumingAttributes.next());
+    public void coupleOneToOne(final List<AttributeID> producers, final List<AttributeID> consumers) {
+        
+        Iterator<AttributeID> consumerIterator = consumers.iterator();
+
+        for (AttributeID producerID : producers) {
+            if (consumerIterator.hasNext()) {
+                AttributeID consumerID = consumerIterator.next();
+                Producer producer = producerID.getParent().createProducer(producerID);
+                Consumer consumer = consumerID.getParent().createConsumer(consumerID);
+                Coupling<?> coupling = new Coupling(producer, consumer);
                 getCouplingManager().addCoupling(coupling);
             }
         }

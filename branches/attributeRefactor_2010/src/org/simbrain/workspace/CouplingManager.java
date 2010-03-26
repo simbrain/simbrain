@@ -37,20 +37,28 @@ public class CouplingManager {
 
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
+
     /** All couplings for the workspace. */
     private List<Coupling<?>> all = new CopyOnWriteArrayList<Coupling<?>>();
+
     /** The couplings indexed by the source and target combination. */
     private Map<SourceTarget, List<Coupling<?>>> sourceTargetCouplings = newMap();
+
     /** The couplings indexed by source. */
     private Map<WorkspaceComponent, List<Coupling<?>>> sourceCouplings = newMap();
+
     /** The couplings indexed by target. */
     private Map<WorkspaceComponent, List<Coupling<?>>> targetCouplings = newMap();
+
     /** The couplings indexed by consuming attribute, which is unique. */
-    private Map<ConsumingAttribute<?>, Coupling<?>> consumingAttributes = newMap();
+//    private Map<ConsumingAttribute<?>, Coupling<?>> consumingAttributes = newMap(); //TODO: What was this for?
+
     /** Default priority. */
     private static final int DEFAULT_PRIORITY = 0;
+
     /** Priority of this component; used in priorty based workspace update. */
     private int priority = DEFAULT_PRIORITY;
+
     /** List of listeners to fire updates when couplings are changed. */
     private ArrayList<CouplingComponentListener> couplingManagerListeners
       = new ArrayList<CouplingComponentListener>();
@@ -132,17 +140,17 @@ public class CouplingManager {
     /**
      * Removes all couplings associated with a producer or consumer.
      *
-     * @param holder consumer or producer.
+     * @param attribute consumer or producer.
      */
-    public void removeAttachedCouplings(final AttributeHolder holder) {
+    public void removeAttachedCouplings(final Attribute attribute) {
         for (Coupling<?> coupling : getCouplings()) {
-            if (holder instanceof Consumer) {
-                if (coupling.getConsumingAttribute().getParent() == holder) {
+            if (attribute instanceof Consumer) {
+                if (coupling.getConsumer() == attribute) {
                     removeCoupling(coupling);
                 }
             }
-            if (holder instanceof Producer) {
-                if (coupling.getProducingAttribute().getParent() == holder) {
+            if (attribute instanceof Producer) {
+                if (coupling.getProducer() == attribute) {
                     removeCoupling(coupling);
                 }
             }
@@ -165,23 +173,21 @@ public class CouplingManager {
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
-        Coupling<?> old = consumingAttributes.get(coupling.getConsumingAttribute());
-        
-        // TODO warning that old was deleted
-        
-        if (old != null) {
-            System.out.println("removing old coupling: " + old);
-//            removeCoupling(old);
-        }
-
-        consumingAttributes.put(coupling.getConsumingAttribute(), coupling);
+//        Coupling<?> old = consumingAttributes.get(coupling.getConsumingAttribute());
+//        
+//        // TODO warning that old was deleted
+//        
+//        if (old != null) {
+//            System.out.println("removing old coupling: " + old);
+////            removeCoupling(old);
+//        }
+//
+//        consumingAttributes.put(coupling.getConsumingAttribute(), coupling);
 
         all.add(coupling);
 
-        WorkspaceComponent source = coupling.getProducingAttribute()
-            .getParent().getParentComponent();
-        WorkspaceComponent target = coupling.getConsumingAttribute()
-            .getParent().getParentComponent();
+        WorkspaceComponent source = coupling.getProducer().getParentComponent();
+        WorkspaceComponent target = coupling.getConsumer().getParentComponent();
 
         SourceTarget sourceTarget = new SourceTarget(source, target);
 
@@ -199,32 +205,35 @@ public class CouplingManager {
      * Replaces any couplings where the old attribute is the source or
      * target with a new coupling with the new attribute in the source
      * and/or target.
-     * 
+     *
      * @param oldAttr the attribute to be replaced.
      * @param newAttr the attribute to replace it with.
      */
     @SuppressWarnings("unchecked")
     public void replaceCouplings(final Attribute oldAttr, final Attribute newAttr) {
-        for (Coupling<?> coupling : new ArrayList<Coupling<?>>(all)) {
-            boolean replace = false;
-            ProducingAttribute producer = coupling.getProducingAttribute();
-            ConsumingAttribute consumer = coupling.getConsumingAttribute();
-
-            if (consumer == oldAttr) {
-                replace = true;
-                consumer = (ConsumingAttribute) newAttr;
-            }
-
-            if (producer == oldAttr) {
-                replace = true;
-                producer = (ProducingAttribute) newAttr;
-            }
-
-            if (replace) {
-                removeCoupling(coupling);
-                addCoupling(new Coupling(producer, consumer));
-            }
-        }
+        
+        //TODO: Think
+        
+//        for (Coupling<?> coupling : new ArrayList<Coupling<?>>(all)) {
+//            boolean replace = false;
+//            ProducingAttribute producer = coupling.getProducingAttribute();
+//            ConsumingAttribute consumer = coupling.getConsumingAttribute();
+//
+//            if (consumer == oldAttr) {
+//                replace = true;
+//                consumer = (ConsumingAttribute) newAttr;
+//            }
+//
+//            if (producer == oldAttr) {
+//                replace = true;
+//                producer = (ProducingAttribute) newAttr;
+//            }
+//
+//            if (replace) {
+//                removeCoupling(coupling);
+//                addCoupling(new Coupling(producer, consumer));
+//            }
+//        }
     }
     
     /**
@@ -247,7 +256,7 @@ public class CouplingManager {
         
         return local;
     }
-    
+
     /**
      * Remove all couplings associated with a WorkspaceComponent.
      *
@@ -256,16 +265,16 @@ public class CouplingManager {
     public void removeCouplings(final WorkspaceComponent component) {
         ArrayList<Coupling<?>> toRemove = new ArrayList<Coupling<?>>();
         for (Coupling<?> coupling : getCouplings()) {
-            if (coupling.getConsumingAttribute().getParent().getParentComponent() == component) {
+            if (coupling.getConsumer().getParentComponent() == component) {
                 toRemove.add(coupling);
             }
-            if (coupling.getProducingAttribute().getParent().getParentComponent() == component) {
+            if (coupling.getProducer().getParentComponent() == component) {
                 toRemove.add(coupling);
             }
         }
         removeCouplings(toRemove);
     }
-    
+
     /**
      * Remove a specified list of couplings.
      *
@@ -276,37 +285,35 @@ public class CouplingManager {
             removeCoupling(coupling);
         }
     }
-    
+
     /**
      * Removes a coupling from the manager.
      * 
      * @param coupling The coupling to remove.
      */
     public void removeCoupling(final Coupling<?> coupling) {
-        WorkspaceComponent source = coupling.getProducingAttribute()
-            .getParent().getParentComponent();
-        WorkspaceComponent target = coupling.getConsumingAttribute()
-            .getParent().getParentComponent();
-        
+        WorkspaceComponent source = coupling.getProducer().getParentComponent();
+        WorkspaceComponent target = coupling.getConsumer().getParentComponent();
+
         SourceTarget sourceTarget = new SourceTarget(source, target);
-        
-        consumingAttributes.remove(coupling.getConsumingAttribute());
-        
+
+        //consumingAttributes.remove(coupling.getConsumingAttribute());
+
         all.remove(coupling);
-        
+
         removeCouplingFromList(sourceTargetCouplings.get(sourceTarget), coupling);
         removeCouplingFromList(sourceCouplings.get(source), coupling);
         removeCouplingFromList(targetCouplings.get(target), coupling);
-        
+
         source.couplingRemoved(coupling);
-        
+
         if (target != source) { target.couplingRemoved(coupling); }
         fireCouplingListUpdated();
     }
-    
+
     /**
      * Removes a coupling from the provided list.  If the list is null nothing is done.
-     * 
+     *
      * @param list The list to remove from.
      * @param coupling The coupling to remove.
      */

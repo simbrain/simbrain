@@ -509,8 +509,17 @@ public abstract class Neuron  {
      */
     public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
-        // this.targetValue = inputValue; //TODO: This is temporary!
     }
+
+    /**
+     * TODO: Is the DOUBLE version really needed?  I put it in to make generics happy.
+     *
+     * @param inputValue The inputValue to set.
+     */
+    public void setInputValue(final Double inputValue) {
+        this.inputValue = inputValue;
+    }
+
 
     /**
      * @return the name of the class of this network.

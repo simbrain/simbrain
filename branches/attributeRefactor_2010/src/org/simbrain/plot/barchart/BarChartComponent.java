@@ -18,10 +18,18 @@
  */
 package org.simbrain.plot.barchart;
 
+import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -68,6 +76,15 @@ public class BarChartComponent extends WorkspaceComponent {
 //            addConsumer(new BarChartConsumer(this, i));
 //        }
     }
+
+    @Override
+    public List<AttributeType> getAttributeTypes() {
+
+        List<AttributeType> returnList = new ArrayList<AttributeType>();
+        returnList.add(new AttributeType("Dimension", null, true, Double.class));
+        return returnList;
+    }
+
 
     /**
      * Initializes a jfreechart with specific number of data sources.
@@ -149,5 +166,21 @@ public class BarChartComponent extends WorkspaceComponent {
     @Override
     public String getXML() {
         return BarChartModel.getXStream().toXML(model);
+    }
+
+    @Override
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
+            // TODO: Add check for visibility
+            PotentialConsumer consumerID = new PotentialConsumer(
+                    new AttributeType("Dimension", null, true, Double.class),
+                    this,
+                    getModel().getDataset(),
+                    "getValue");
+
+            returnList.add(consumerID);
+        }
+        return returnList;
     }
 }

@@ -24,18 +24,24 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeID;
+import org.simbrain.workspace.PotentialAttributeListener;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -44,7 +50,7 @@ import org.simbrain.workspace.WorkspaceListener;
  * Displays a panel with a JComboBox, which the user uses to select a component,
  * and a JList of attributes for that component.
  */
-public class AttributePanel extends JPanel implements ActionListener,
+public class PotentialAttributePanel extends JPanel implements ActionListener,
         MouseListener {
 
     /** Parent frame. */
@@ -59,12 +65,19 @@ public class AttributePanel extends JPanel implements ActionListener,
     /** List model. */
     private DefaultListModel model;
 
-    // TODO: Replace with generic parameter if possible.
-    public enum AttributeType {
+    // TODO: Get rid of this...
+    public enum ProducerOrConsumer {
         Producing, Consuming
     };
 
-    private AttributeType attributeType;
+    private ProducerOrConsumer producerOrConsumer;
+
+    /** Panel for setting visibility of attribute types. */
+    private AttributeTypePanel attributeTypePanel;
+
+
+    /** List of network couplings. */
+    private JList attributeTypes = new JList();
 
     /**
      * Creates a new attribute list panel.
@@ -72,9 +85,9 @@ public class AttributePanel extends JPanel implements ActionListener,
      * @param workspace
      *            reference to workspace
      */
-    public AttributePanel(final Workspace workspace, AttributeType attributeType) {
+    public PotentialAttributePanel(final Workspace workspace, ProducerOrConsumer attributeType) {
         super(new BorderLayout());
-        this.attributeType = attributeType;
+        this.producerOrConsumer = attributeType;
 
         // Set up attribute lists
         model = new DefaultListModel();
@@ -98,7 +111,19 @@ public class AttributePanel extends JPanel implements ActionListener,
 
         // Bottom panel
         JPanel bottomPanel = new JPanel();
-        JButton button = new JButton("Set attribute visibility"); //TODO
+        JButton button = new JButton("Set attribute visibility"); 
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+
+                if (attributeTypePanel != null) {
+                    JDialog dialog = new JDialog(parentFrame);
+                    dialog.setContentPane(attributeTypePanel);
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(null);
+                    dialog.setVisible(true);
+                }
+            }
+        });
         bottomPanel.add(button);
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -111,34 +136,22 @@ public class AttributePanel extends JPanel implements ActionListener,
         parentFrame.pack();
     }
 
+    public void setCurrentWorkspaceComponent(WorkspaceComponent component) {
+           attributeTypes.setListData(new Vector(component.getAttributeTypes()));
+    }
+
     /**
      * Add a listener to the specified workspace component.
      *
      * @param component component to listen to
      */
     private void addAttributeListener(final WorkspaceComponent component) {
-        
-        //TODO: Redo
-        
-//        component.addAttributeListener(new AttributeHolderListener() {
-//
-//            public void consumerAdded(Consumer consumer) {
-//                refresh(consumer.getParentComponent());
-//            }
-//
-//            public void consumerRemoved(Consumer consumer) {
-//                refresh(consumer.getParentComponent());
-//            }
-//
-//            public void producerAdded(Producer producer) {
-//                refresh(producer.getParentComponent());
-//            }
-//
-//            public void producerRemoved(Producer producer) {
-//                refresh(producer.getParentComponent());
-//            }
-//
-//        });
+
+        component.addAttributeListener(new PotentialAttributeListener() {
+            public void update(WorkspaceComponent component) {
+                refresh(component);
+            }
+        });
 
     }
 
@@ -160,15 +173,18 @@ public class AttributePanel extends JPanel implements ActionListener,
      */
     private void refresh(final WorkspaceComponent component) {
 
+       // attributeTypes.setListData(new Vector(component.getAttributeTypes()));
+        attributeTypePanel = new AttributeTypePanel(component);
+
         // Set Attribute list
         if (component != null) {
             model.clear();
-            if (attributeType == AttributeType.Producing) {
-                for (AttributeID producerID : component.getPotentialProducers()) {
+            if (producerOrConsumer == ProducerOrConsumer.Producing) {
+                for (PotentialProducer producerID : component.getPotentialProducers()) {
                     model.addElement(producerID);
                 }
-            } else if (attributeType == AttributeType.Consuming) {
-                for (AttributeID consumerID : component.getPotentialConsumers()) {
+            } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
+                for (PotentialConsumer consumerID : component.getPotentialConsumers()) {
                     model.addElement(consumerID);
                 }
             }
@@ -188,18 +204,18 @@ public class AttributePanel extends JPanel implements ActionListener,
      * @return list of selected attributes.
      */
     public ArrayList<?> getSelectedAttributes() {
-        
+
         //TODO: Redo
-        if (attributeType == AttributeType.Producing) {
-            ArrayList<AttributeID> ret = new ArrayList<AttributeID>();
+        if (producerOrConsumer == ProducerOrConsumer.Producing) {
+            ArrayList<PotentialAttribute> ret = new ArrayList<PotentialAttribute>();
             for (Object object : attributeList.getSelectedValues()) {
-                ret.add((AttributeID) object);
+                ret.add((PotentialAttribute) object);
             }
             return ret;
-        } else if (attributeType == AttributeType.Consuming) {
-            ArrayList<AttributeID> ret = new ArrayList<AttributeID>();
+        } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
+            ArrayList<PotentialAttribute> ret = new ArrayList<PotentialAttribute>();
             for (Object object : attributeList.getSelectedValues()) {
-                ret.add((AttributeID) object);
+                ret.add((PotentialAttribute) object);
             }
             return ret;
         }
@@ -235,7 +251,7 @@ public class AttributePanel extends JPanel implements ActionListener,
             DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
                     .getListCellRendererComponent(list, object, index,
                             isSelected, cellHasFocus);
-            AttributeID id = (AttributeID) object;
+            PotentialAttribute id = (PotentialAttribute) object;
 
             renderer.setText(id.getDescription());
             return renderer;
@@ -263,7 +279,7 @@ public class AttributePanel extends JPanel implements ActionListener,
             }
             if (this.getModel().getSize() > 0) {
                 this.setSelectedIndex(0);
-                AttributePanel.this.refresh((WorkspaceComponent) this.getItemAt(0));
+                PotentialAttributePanel.this.refresh((WorkspaceComponent) this.getItemAt(0));
             }
             workspace.addListener(this);
         }
@@ -289,7 +305,7 @@ public class AttributePanel extends JPanel implements ActionListener,
         public void componentRemoved(final WorkspaceComponent component) {
             this.removeItem(component);
             if (this.getItemCount() == 0) {
-                AttributePanel.this.clearList();
+                PotentialAttributePanel.this.clearList();
             }
         }
 
@@ -298,7 +314,7 @@ public class AttributePanel extends JPanel implements ActionListener,
          */
         public void workspaceCleared() {
             this.removeAllItems();
-            AttributePanel.this.clearList();
+            PotentialAttributePanel.this.clearList();
         }
     }
 

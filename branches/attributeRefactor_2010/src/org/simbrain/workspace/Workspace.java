@@ -149,15 +149,14 @@ public class Workspace {
      * @param targetAttributes target consuming attributes
      */
     @SuppressWarnings("unchecked")
-    public void coupleOneToOne(final List<AttributeID> producers, final List<AttributeID> consumers) {
+    public void coupleOneToOne(final List<PotentialProducer> producers, final List<PotentialConsumer> consumers) {
         
-        Iterator<AttributeID> consumerIterator = consumers.iterator();
+        Iterator<PotentialConsumer> consumerIterator = consumers.iterator();
 
-        for (AttributeID producerID : producers) {
+        for (PotentialProducer potentialProducer : producers) {
             if (consumerIterator.hasNext()) {
-                AttributeID consumerID = consumerIterator.next();
-                Producer producer = producerID.getParent().createProducer(producerID);
-                Consumer consumer = consumerID.getParent().createConsumer(consumerID);
+                Consumer consumer = consumerIterator.next().actualize();
+                Producer producer = potentialProducer.actualize();
                 Coupling<?> coupling = new Coupling(producer, consumer);
                 getCouplingManager().addCoupling(coupling);
             }

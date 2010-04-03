@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.gui.couplingmanager2;
+package org.simbrain.workspace.gui.couplingmanager;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -24,7 +24,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -34,14 +35,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import org.simbrain.workspace.AttributeID;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.AttributePanel;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
+import org.simbrain.workspace.gui.PotentialAttributePanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.AttributePanel.AttributeType;
+import org.simbrain.workspace.gui.PotentialAttributePanel.ProducerOrConsumer;
 
 /**
  * GUI dialog for creating couplings.
@@ -49,10 +51,10 @@ import org.simbrain.workspace.gui.AttributePanel.AttributeType;
 public class DesktopCouplingManager extends JPanel implements ActionListener {
 
     /** List of producing attributes. */
-    private AttributePanel producingAttributes;
+    private PotentialAttributePanel producingAttributes;
 
     /** List of consuming attributes. */
-    private AttributePanel consumingAttributes;
+    private PotentialAttributePanel consumingAttributes;
 
     /** Methods for making couplings. */
     private String[] tempStrings = {"One to one", "One to many" };
@@ -79,14 +81,14 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         // Left Panel
         Border leftBorder = BorderFactory.createTitledBorder("Source Producing Attributes");
-        producingAttributes = new AttributePanel(desktop.getWorkspace(), AttributeType.Producing);
+        producingAttributes = new PotentialAttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Producing);
         producingAttributes.setBorder(leftBorder);
 
         // Right Panel
         Border rightBorder = BorderFactory.createTitledBorder("Target Consuming Attributes");
-        consumingAttributes = new AttributePanel(desktop.getWorkspace(),  AttributeType.Consuming);
+        consumingAttributes = new PotentialAttributePanel(desktop.getWorkspace(),  ProducerOrConsumer.Consuming);
         consumingAttributes.setBorder(rightBorder);
-        
+
         // Bottom Panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.add(couplingMethodComboBox);
@@ -152,8 +154,9 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      */
     private void addCouplings() {
 
-        List<AttributeID> producingAttributeList = (ArrayList<AttributeID>) producingAttributes.getSelectedAttributes();
-        List<AttributeID> consumingAttributeList = (ArrayList<AttributeID>) consumingAttributes.getSelectedAttributes();
+        //todo make names shorter
+        List<PotentialProducer> producingAttributeList = (List<PotentialProducer>) producingAttributes.getSelectedAttributes();
+        List<PotentialConsumer> consumingAttributeList = (List<PotentialConsumer>) consumingAttributes.getSelectedAttributes();
         
         if ((producingAttributeList.size() == 0) || (consumingAttributeList.size() == 0)) {
           JOptionPane.showMessageDialog(null,

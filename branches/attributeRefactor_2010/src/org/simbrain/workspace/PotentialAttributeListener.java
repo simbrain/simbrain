@@ -18,29 +18,13 @@
  */
 package org.simbrain.workspace;
 
-
 /**
- * Defines the base API for consumers and producers.
+ * Listener for consumer and producer events.
  *
- * @author Matt Watson
+ * @author jyoshimi
  */
-public interface Attribute {
-    
-    //TODO: Add type here?  The visibility modifier can be ignored.
+public interface PotentialAttributeListener {
 
-    /**
-     * Returns the descriptive name of this attribute.
-     *
-     * @return the name of this attribute.
-     */
-    String getDescription();
-    
-    /**
-     * Returns a reference to the parent component
-     *
-     * @return parent parent component
-     */
-    WorkspaceComponent getParentComponent();
-
-    //TODO: GetLocation
+   void update(WorkspaceComponent component);
+   
 }

@@ -22,10 +22,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.interfaces.*;
-import org.simbrain.workspace.AttributeID;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
+import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.listeners.NeuronListener;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -41,6 +44,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     public NetworkComponent(final String name) {
         super(name);
+        init();
     }
 
     /**
@@ -49,6 +53,43 @@ public final class NetworkComponent extends WorkspaceComponent {
     public NetworkComponent(final String name, final RootNetwork network) {
         super(name);
         this.rootNetwork = network;
+        init();
+    }
+
+    /**
+     * By default, neuronwrappers are all that is added.
+     */
+    private void init() {
+        rootNetwork.addNeuronListener(new NeuronListener() {
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronAdded(NetworkEvent<Neuron> e) {
+                NetworkComponent.this.firePotentialAttributeUpdateEvent(NetworkComponent.this);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronTypeChanged(NetworkEvent<Neuron> e) {
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronMoved(NetworkEvent<Neuron> e) {
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronRemoved(NetworkEvent<Neuron> e) {
+                NetworkComponent.this.firePotentialAttributeUpdateEvent(NetworkComponent.this);
+            }
+
+            public void neuronChanged(NetworkEvent<Neuron> e) {
+            }
+        });
     }
 
     /**
@@ -90,87 +131,65 @@ public final class NetworkComponent extends WorkspaceComponent {
 
 
     @Override
-    public List<AttributeID> getPotentialConsumers() {
+    public List<PotentialConsumer> getPotentialConsumers() {
 
-        List<AttributeID> returnList = new ArrayList<AttributeID>();
-        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-            //TODO: Add check for visibility
-            AttributeID consumerID = new AttributeID(this, neuron.getId());
-            consumerID.setSubtype("activation");
-            returnList.add(consumerID);
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+
+        for (AttributeType type : this.getAttributeTypes()) {
+            if (type.isVisible() == true) {
+                if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+                    if (type.getSubtype().equalsIgnoreCase("activation")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialConsumer potentialConsumer = new PotentialConsumer(
+                                   type, this, neuron, "setInputValue");
+                            returnList.add(potentialConsumer);
+                        }
+                    } else if (type.getSubtype().equalsIgnoreCase("text")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialConsumer potentialConsumer = new PotentialConsumer(
+                                   type, this, neuron, "setLabel");
+                            returnList.add(potentialConsumer);
+                        }
+                    }
+                }
+
+            }
+
         }
 
         return returnList;
     }
 
     @Override
-    public List<AttributeID> getPotentialProducers() {
+    public List<PotentialProducer> getPotentialProducers() {
 
-        List<AttributeID> returnList = new ArrayList<AttributeID>();
-        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-            //TODO: Add check for visibility
-            AttributeID producerID = new AttributeID(this, neuron.getId());
-            producerID.setSubtype("activation");
-            returnList.add(producerID);
+        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+        for (AttributeType type : this.getAttributeTypes()) {
+            if (type.isVisible() == true) {
+                if(type.getTypeID().equalsIgnoreCase("Neuron")) {
+                    if(type.getSubtype().equalsIgnoreCase("activation")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialProducer potentialProducer = new PotentialProducer(
+                                   type, this, neuron, "getActivation");
+                            returnList.add(potentialProducer);
+                        }
+                    }
+                }
+            }
+
         }
-
         return returnList;
     }
 
     @Override
-    public Consumer createConsumer(final AttributeID id) {
+    public List<AttributeType> getAttributeTypes() {
 
-        final Neuron neuron = rootNetwork.getNeuron(id.getID());
-
-        if (neuron != null) {
-            if (id.getSubtype().equalsIgnoreCase("activation")) {
-                return new Consumer() {
-
-                    public void setValue(Object value) {
-                        neuron.setInputValue(((Double) value).doubleValue());
-                    }
-
-                    public String getDescription() {
-                        return id.getDescription();
-                    }
-
-                    public WorkspaceComponent getParentComponent() {
-                        return NetworkComponent.this;
-                    }
-
-                };
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public Producer createProducer(final AttributeID id) {
-
-        final Neuron neuron = rootNetwork.getNeuron(id.getID());
-
-        if (neuron != null) {
-            if (id.getSubtype().equalsIgnoreCase("activation")) {
-                return new Producer() {
-
-                    public String getDescription() {
-                        return id.getDescription();
-                    }
-
-                    public WorkspaceComponent getParentComponent() {
-                        return NetworkComponent.this;
-                    }
-
-                    public Object getValue() {
-                        return neuron.getActivation();
-                    }
-
-                };
-            }
-        }
-
-        return null;
+        List<AttributeType> returnList = new ArrayList<AttributeType>();
+        returnList.add(new AttributeType("Neuron", "activation", true, Double.class));
+        returnList.add(new AttributeType("Neuron", "upperBound", false, Double.class));
+        returnList.add(new AttributeType("Neuron", "lowerBound", false, Double.class));
+        returnList.add(new AttributeType("Neuron", "label", true, String.class));
+        return returnList;
     }
 
     // TODO: Link to NetworkSettings.

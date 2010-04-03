@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 
 /**
  * Manages all the couplings for a Workspace instance.
- * 
+ *
  * @author Matt Watson
  */
 public class CouplingManager {
@@ -62,11 +62,10 @@ public class CouplingManager {
     /** List of listeners to fire updates when couplings are changed. */
     private ArrayList<CouplingComponentListener> couplingManagerListeners
       = new ArrayList<CouplingComponentListener>();
-    
+
     /**
-     * 
      * Helper method to cleanup nasty generics declarations.
-     * 
+     *
      * @param <K> The key type.
      * @param <V> The value type.
      * @return A new HashMap.
@@ -74,16 +73,16 @@ public class CouplingManager {
     private static <K, V> Map<K, V> newMap() {
         return new HashMap<K, V>();
     }
-    
+
     /**
      * Returns an unmodifiable list of all the couplings.
-     * 
+     *
      * @return An unmodifiable list of all the couplings.
      */
     public Collection<? extends Coupling<?>> getCouplings() {
         return Collections.unmodifiableList(all);
     }
-    
+
     /**
      * Clear all couplings.
      */
@@ -93,7 +92,7 @@ public class CouplingManager {
 
     /**
      * Returns all couplings from the given source to the given target.
-     * 
+     *
      * @param source The source to use in the search.
      * @param target The target to use in the search.
      * @return A list of the couplings between the provided source and target.
@@ -102,14 +101,14 @@ public class CouplingManager {
             final WorkspaceComponent source, final WorkspaceComponent target) {
         Collection<Coupling<?>> couplings = sourceTargetCouplings.get(
                 new SourceTarget(source, target));
-        
+
         if (couplings == null) {
             return Collections.emptySet();
         } else {
             return Collections.unmodifiableCollection(couplings);
         }
     }
-    
+
     /**
      * Updates all couplings in the workspace.
      */
@@ -127,7 +126,7 @@ public class CouplingManager {
 
     /**
      * Finds a coupling for the provided ids.
-     * 
+     *
      * @param sourceId The source ID.
      * @param targetId The target ID.
      * @return The coupling associated with the ids.
@@ -136,7 +135,7 @@ public class CouplingManager {
     public Coupling<?> findCoupling(final String sourceId, final String targetId) {
         return null;
     }
-    
+
     /**
      * Removes all couplings associated with a producer or consumer.
      *
@@ -158,15 +157,15 @@ public class CouplingManager {
     }
 
     /**
-     * returns whether the coupling is referenced by this manager.
-     * 
+     * Returns whether the coupling is referenced by this manager.
+     *
      * @param coupling The coupling to search for.
      * @return whether the coupling is referenced by this manager.
      */
     public boolean containsCoupling(final Coupling<?> coupling) {
        return all.contains(coupling);
     }
-    
+
     /**
      * Adds a coupling to this instance.
      *
@@ -235,11 +234,11 @@ public class CouplingManager {
 //            }
 //        }
     }
-    
+
     /**
      * Adds a coupling to the provided list.  If the list is null, a new list
      * is created.  The list that the coupling is added to is returned.
-     * 
+     *
      * @param list The list to add to.
      * @param coupling The coupling to add.
      * @return The passed in list or a new list if null was provided.
@@ -247,13 +246,13 @@ public class CouplingManager {
     private List<Coupling<?>> addCouplingToList(final List<Coupling<?>> list,
             final Coupling<?> coupling) {
         List<Coupling<?>> local = list;
-        
+
         if (local == null) {
             local = new ArrayList<Coupling<?>>();
         }
-        
+
         local.add(coupling);
-        
+
         return local;
     }
 
@@ -288,7 +287,7 @@ public class CouplingManager {
 
     /**
      * Removes a coupling from the manager.
-     * 
+     *
      * @param coupling The coupling to remove.
      */
     public void removeCoupling(final Coupling<?> coupling) {

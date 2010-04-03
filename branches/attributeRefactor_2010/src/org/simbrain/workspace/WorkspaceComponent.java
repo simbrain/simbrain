@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace;
 
+import java.awt.Container;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
 
 /**
@@ -50,6 +52,9 @@ public abstract class WorkspaceComponent {
 
     /** The set of all WorkspaceComponentListeners on this component. */
     private final Collection<WorkspaceComponentListener> workspaceComponentListeners;
+
+    /** List of attribute listeners. */
+    private final Collection<PotentialAttributeListener> potentialAttributeListeners;
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
@@ -92,7 +97,7 @@ public abstract class WorkspaceComponent {
 //        producers = new CopyOnWriteArrayList<Producer>();
 //        attributeTypes = new ArrayList<String>();
         workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
-//        attributeListeners = new HashSet<AttributeHolderListener>();
+        potentialAttributeListeners = new HashSet<PotentialAttributeListener>();
     }
 
     /**
@@ -146,18 +151,26 @@ public abstract class WorkspaceComponent {
         /* no default implementation */
     }
 
-    //TODO: Change to abstract once I get this working
-    public List<AttributeID> getPotentialConsumers() {
-        return null;
-     }
-    public List<AttributeID> getPotentialProducers() {
-        return null;
-     }
-    public Consumer createConsumer(AttributeID id) {
+    // TODO: Change to abstract once I get this working
+    public List<PotentialConsumer> getPotentialConsumers() {
         return null;
     }
-    public Producer createProducer(AttributeID id) {
+
+    public List<PotentialProducer> getPotentialProducers() {
         return null;
+    }
+    
+    public List<AttributeType> getAttributeTypes() {
+        return null;
+    }
+
+    /**
+     * Adds a AttributeListener to this component.
+     *
+     * @param listener the AttributeListener to add.
+     */
+    public void addAttributeListener(final PotentialAttributeListener listener) {
+        potentialAttributeListeners.add(listener);
     }
 
     /**
@@ -175,6 +188,12 @@ public abstract class WorkspaceComponent {
         return Collections.singleton(new ComponentUpdatePart(this, callable, toString(), this));
     }
 
+    public void firePotentialAttributeUpdateEvent(WorkspaceComponent component) {
+        for (PotentialAttributeListener listener: potentialAttributeListeners) {
+            listener.update(component);
+        }
+    }
+    
     /**
      * Returns the locks for the update parts. There should be one lock per
      * part. These locks need to be the same ones used to lock the update of

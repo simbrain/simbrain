@@ -23,6 +23,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -180,12 +183,12 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
         if (component != null) {
             model.clear();
             if (producerOrConsumer == ProducerOrConsumer.Producing) {
-                for (PotentialProducer producerID : component.getPotentialProducers()) {
-                    model.addElement(producerID);
+                for (PotentialProducer<?> potentialProducer : component.getPotentialProducers()) {
+                    model.addElement(potentialProducer);
                 }
             } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
-                for (PotentialConsumer consumerID : component.getPotentialConsumers()) {
-                    model.addElement(consumerID);
+                for (PotentialConsumer<?> potentialConsumer : component.getPotentialConsumers()) {
+                    model.addElement(potentialConsumer);
                 }
             }
         }

@@ -512,16 +512,6 @@ public abstract class Neuron  {
     }
 
     /**
-     * TODO: Is the DOUBLE version really needed?  I put it in to make generics happy.
-     *
-     * @param inputValue The inputValue to set.
-     */
-    public void setInputValue(final Double inputValue) {
-        this.inputValue = inputValue;
-    }
-
-
-    /**
      * @return the name of the class of this network.
      */
     public String getType() {

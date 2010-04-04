@@ -18,7 +18,6 @@
  */
 package org.simbrain.workspace;
 
-
 /**
  * Encapsulates type information about a particular attribute or potential attribute.
  *
@@ -35,6 +34,10 @@ public class AttributeType {
     /** Class of this attribute. */
     private Class dataType;
 
+    /** Whether this type of attribute is currently visible. */
+    private boolean visible;
+
+
     /**
      * Return a description of the attribute.
      *
@@ -44,6 +47,15 @@ public class AttributeType {
         return getSimpleDescription() + typeClass();
     }
 
+    @Override
+    public String toString() {
+        return getDescription();
+    }
+
+    /**
+     * 
+     * @return
+     */
     public String getSimpleDescription() {
         if (subtype != null) {
             return typeID + ":" + subtype;
@@ -71,9 +83,6 @@ public class AttributeType {
         this.dataType = dataType;
     }
 
-    /** Whether this type of attribute is currently visible. */
-    private boolean visible;
-
     /**
      * @return the visible
      */
@@ -88,24 +97,20 @@ public class AttributeType {
         this.visible = visible;
     }
 
-    public String toString() {
-        return getDescription();
-    }
-    
     /**
      * @return the typeID
      */
     public String getTypeID() {
         return typeID;
     }
-    
+
     /**
      * @param typeID the typeID to set
      */
     public void setTypeID(String typeID) {
         this.typeID = typeID;
     }
-    
+
     /**
      * @return the subtype
      */
@@ -126,6 +131,7 @@ public class AttributeType {
     public Class getDataType() {
         return dataType;
     }
+
     /**
      * @param dataType the dataType to set
      */

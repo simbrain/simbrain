@@ -25,7 +25,7 @@ package org.simbrain.workspace;
  * @author Matt Watson
  */
 public interface Attribute {
-    
+
     //TODO: Add type here?  The visibility modifier can be ignored.
 
     /**
@@ -34,7 +34,7 @@ public interface Attribute {
      * @return the name of this attribute.
      */
     String getDescription();
-    
+
     /**
      * Returns a reference to the parent component
      *

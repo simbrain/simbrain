@@ -59,6 +59,9 @@ public abstract class WorkspaceComponent {
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
 
+    /** Attribute Type List for this component. */
+    private List<AttributeType> attributeTypeList = new ArrayList<AttributeType>();
+
     /**
      * Whether to display the GUI for this component (obviously only relevant
      * when Simbrain is run as a GUI).
@@ -152,16 +155,16 @@ public abstract class WorkspaceComponent {
     }
 
     // TODO: Change to abstract once I get this working
-    public List<PotentialConsumer> getPotentialConsumers() {
-        return null;
+    public List<PotentialConsumer<?>> getPotentialConsumers() {
+        return Collections.EMPTY_LIST;
     }
 
-    public List<PotentialProducer> getPotentialProducers() {
-        return null;
+    public List<PotentialProducer<?>> getPotentialProducers() {
+        return Collections.EMPTY_LIST;
     }
-    
+
     public List<AttributeType> getAttributeTypes() {
-        return null;
+        return attributeTypeList;
     }
 
     /**

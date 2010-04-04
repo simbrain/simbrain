@@ -149,9 +149,9 @@ public class Workspace {
      * @param targetAttributes target consuming attributes
      */
     @SuppressWarnings("unchecked")
-    public void coupleOneToOne(final List<PotentialProducer> producers, final List<PotentialConsumer> consumers) {
+    public void coupleOneToOne(final List<PotentialProducer<?>> producers, final List<PotentialConsumer<?>> consumers) {
         
-        Iterator<PotentialConsumer> consumerIterator = consumers.iterator();
+        Iterator<PotentialConsumer<?>> consumerIterator = consumers.iterator();
 
         for (PotentialProducer potentialProducer : producers) {
             if (consumerIterator.hasNext()) {

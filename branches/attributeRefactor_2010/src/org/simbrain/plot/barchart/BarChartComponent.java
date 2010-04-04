@@ -18,17 +18,13 @@
  */
 package org.simbrain.plot.barchart;
 
-import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -49,6 +45,7 @@ public class BarChartComponent extends WorkspaceComponent {
         super(name);
         model = new BarChartModel();
         addListener();
+        initializeAttributes();
         model.defaultInit();
     }
 
@@ -70,21 +67,8 @@ public class BarChartComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        //TODO: Redo
-//        this.getConsumers().clear();
-//        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
-//            addConsumer(new BarChartConsumer(this, i));
-//        }
+        getAttributeTypes().add(new AttributeType("Dimension", null, true, double.class));
     }
-
-    @Override
-    public List<AttributeType> getAttributeTypes() {
-
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        returnList.add(new AttributeType("Dimension", null, true, Double.class));
-        return returnList;
-    }
-
 
     /**
      * Initializes a jfreechart with specific number of data sources.
@@ -104,29 +88,24 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void addListener() {
 
-        //TODO: Redo
+        model.addListener(new ChartListener() {
 
-//        model.addListener(new ChartListener() {
-//
-//            /**
-//             * {@inheritDoc}
-//             */
-//            public void dataSourceAdded(final int index) {
-//                BarChartConsumer newAttribute = new BarChartConsumer(
-//                        BarChartComponent.this, index);
-//                addConsumer(newAttribute);
-//            }
-//
-//            /**
-//             * {@inheritDoc}
-//             */
-//            public void dataSourceRemoved(final int index) {
-//                BarChartConsumer toBeRemoved = (BarChartConsumer) getConsumers()
-//                        .get(index);
-//                removeConsumer(toBeRemoved);
-//            }
-//        });
-  }
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int index) {
+                firePotentialAttributeUpdateEvent(BarChartComponent.this);
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                firePotentialAttributeUpdateEvent(BarChartComponent.this);
+            }
+        });
+    }
+
     /**
      * Returns model.
      *
@@ -169,18 +148,41 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+    public List<PotentialConsumer<?>> getPotentialConsumers() {
+        List<PotentialConsumer<?>> returnList = new ArrayList<PotentialConsumer<?>>();
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
-            // TODO: Add check for visibility
-            PotentialConsumer consumerID = new PotentialConsumer(
+            PotentialConsumer<Double> consumerID = new PotentialConsumer<Double>(
                     new AttributeType("Dimension", null, true, Double.class),
                     this,
-                    getModel().getDataset(),
-                    "getValue");
-
+                    new BarChartConsumer(i),
+                    "setValue");
             returnList.add(consumerID);
         }
         return returnList;
     }
+
+
+    /**
+     * Represents a bar in a bar chart.
+     */
+    public class BarChartConsumer {
+
+        /** Index. */
+        private int index;
+
+        /**
+         * Construct  BarChartConsumer.
+         *
+         * @param plot the parent component
+         * @param name the name of this consumer (displayed in the plot)
+         */
+        public BarChartConsumer(final int index) {
+            this.index = index;
+        }
+
+        public void setValue(final Double val) {
+            model.setValue(val, index);
+        }
+    }
+
 }

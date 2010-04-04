@@ -155,8 +155,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     private void addCouplings() {
 
         //todo make names shorter
-        List<PotentialProducer> producingAttributeList = (List<PotentialProducer>) producingAttributes.getSelectedAttributes();
-        List<PotentialConsumer> consumingAttributeList = (List<PotentialConsumer>) consumingAttributes.getSelectedAttributes();
+        List<PotentialProducer<?>> producingAttributeList = (List<PotentialProducer<?>>) producingAttributes.getSelectedAttributes();
+        List<PotentialConsumer<?>> consumingAttributeList = (List<PotentialConsumer<?>>) consumingAttributes.getSelectedAttributes();
         
         if ((producingAttributeList.size() == 0) || (consumingAttributeList.size() == 0)) {
           JOptionPane.showMessageDialog(null,

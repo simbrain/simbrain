@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.workspace.AttributeType;
@@ -60,6 +61,13 @@ public final class NetworkComponent extends WorkspaceComponent {
      * By default, neuronwrappers are all that is added.
      */
     private void init() {
+
+        getAttributeTypes().add(new AttributeType("Neuron", "activation", true, double.class));
+        getAttributeTypes().add(new AttributeType("Neuron", "upperBound", false, double.class));
+        getAttributeTypes().add(new AttributeType("Neuron", "lowerBound", false, double.class));
+        getAttributeTypes().add(new AttributeType("Neuron", "label", false, String.class));
+        getAttributeTypes().add(new AttributeType("Synapse", "strength", false, double.class));
+
         rootNetwork.addNeuronListener(new NeuronListener() {
             /**
              * {@inheritDoc}
@@ -131,46 +139,88 @@ public final class NetworkComponent extends WorkspaceComponent {
 
 
     @Override
-    public List<PotentialConsumer> getPotentialConsumers() {
+    public List<PotentialConsumer<?>> getPotentialConsumers() {
 
-        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        List<PotentialConsumer<?>> returnList = new ArrayList<PotentialConsumer<?>>();
 
         for (AttributeType type : this.getAttributeTypes()) {
-            if (type.isVisible() == true) {
+            if (type.isVisible()) {
                 if (type.getTypeID().equalsIgnoreCase("Neuron")) {
                     if (type.getSubtype().equalsIgnoreCase("activation")) {
                         for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                            PotentialConsumer potentialConsumer = new PotentialConsumer(
-                                   type, this, neuron, "setInputValue");
+                            PotentialConsumer<Double> potentialConsumer = new PotentialConsumer<Double>(
+                                    type, this, neuron, "setInputValue");
                             returnList.add(potentialConsumer);
                         }
-                    } else if (type.getSubtype().equalsIgnoreCase("text")) {
+                    } else if (type.getSubtype().equalsIgnoreCase("upperBound")) {
                         for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                            PotentialConsumer potentialConsumer = new PotentialConsumer(
-                                   type, this, neuron, "setLabel");
+                            PotentialConsumer<Double> potentialConsumer = new PotentialConsumer<Double>(
+                                    type, this, neuron, "setUpperBound");
+                            returnList.add(potentialConsumer);
+                        }
+                    } else if (type.getSubtype().equalsIgnoreCase("lowerBound")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialConsumer<Double> potentialConsumer = new PotentialConsumer<Double>(
+                                    type, this, neuron, "setLowerBound");
+                            returnList.add(potentialConsumer);
+                        }
+                    } else if (type.getSubtype().equalsIgnoreCase("label")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialConsumer<String> potentialConsumer = new PotentialConsumer<String>(
+                                    type, this, neuron, "setLabel");
                             returnList.add(potentialConsumer);
                         }
                     }
+                } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+                    if (type.getSubtype().equalsIgnoreCase("strength")) {
+                        for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                            PotentialConsumer<Double> potentialConsumer = new PotentialConsumer<Double>(
+                                    type, this, synapse, "setStrength");
+                            returnList.add(potentialConsumer);
+                        }
+
+                    }
+
                 }
 
             }
-
         }
 
         return returnList;
     }
 
     @Override
-    public List<PotentialProducer> getPotentialProducers() {
+    public List<PotentialProducer<?>> getPotentialProducers() {
 
-        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+        List<PotentialProducer<?>> returnList = new ArrayList<PotentialProducer<?>>();
         for (AttributeType type : this.getAttributeTypes()) {
             if (type.isVisible() == true) {
                 if(type.getTypeID().equalsIgnoreCase("Neuron")) {
                     if(type.getSubtype().equalsIgnoreCase("activation")) {
                         for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                            PotentialProducer potentialProducer = new PotentialProducer(
+                            PotentialProducer<Double> potentialProducer = new PotentialProducer<Double>(
                                    type, this, neuron, "getActivation");
+                            returnList.add(potentialProducer);
+                        }
+                    }
+                    if(type.getSubtype().equalsIgnoreCase("upperBound")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialProducer<Double> potentialProducer = new PotentialProducer<Double>(
+                                   type, this, neuron, "getUpperBound");
+                            returnList.add(potentialProducer);
+                        }
+                    }
+                    if(type.getSubtype().equalsIgnoreCase("lowerBound")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialProducer<Double> potentialProducer = new PotentialProducer<Double>(
+                                   type, this, neuron, "getLowerBound");
+                            returnList.add(potentialProducer);
+                        }
+                    }
+                    if(type.getSubtype().equalsIgnoreCase("label")) {
+                        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                            PotentialProducer<String> potentialProducer = new PotentialProducer<String>(
+                                   type, this, neuron, "getLabel");
                             returnList.add(potentialProducer);
                         }
                     }
@@ -178,17 +228,6 @@ public final class NetworkComponent extends WorkspaceComponent {
             }
 
         }
-        return returnList;
-    }
-
-    @Override
-    public List<AttributeType> getAttributeTypes() {
-
-        List<AttributeType> returnList = new ArrayList<AttributeType>();
-        returnList.add(new AttributeType("Neuron", "activation", true, Double.class));
-        returnList.add(new AttributeType("Neuron", "upperBound", false, Double.class));
-        returnList.add(new AttributeType("Neuron", "lowerBound", false, Double.class));
-        returnList.add(new AttributeType("Neuron", "label", true, String.class));
         return returnList;
     }
 

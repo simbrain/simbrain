@@ -88,7 +88,6 @@ public class RootNetwork extends Network {
      * synapse. Default priority value is 0. Elements with smaller priority
      * value are updated first.
      *
-     * TODO: Remove this?
      */
     public enum UpdateMethod { PRIORITYBASED, BUFFERED }
 
@@ -100,7 +99,7 @@ public class RootNetwork extends Network {
      *  is stored in this set.
      */
     private SortedSet<Integer> updatePriorities = null;
-
+    
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
 
@@ -250,8 +249,10 @@ public class RootNetwork extends Network {
         if (this.getUpdatePriorities() == null) {
             return;
         }
+                
+        // TODO: Re-implement update using a <Priority,Neuron> treemap
         for (Integer i : this.getUpdatePriorities()) {
-            //System.out.print(i.intValue() + "\n");
+            // System.out.print(i.intValue() + "\n");
             // update neurons with priority level i
             if (!this.getClampNeurons()) {
                 // First update the activation buffers
@@ -268,12 +269,14 @@ public class RootNetwork extends Network {
                     }
                 }
             }
-            // update sub-networks with priority level i
-            for (Network n : this.getNetworkList()) {
-                if (n.getUpdatePriority() == i.intValue()) {
-                    n.update();
-                }
-            }
+            
+            // For now just neuron based priorities
+//            // update sub-networks with priority level i
+//            for (Network n : this.getNetworkList()) {
+//                if (n.getUpdatePriority() == i.intValue()) {
+//                    n.update();
+//                }
+//            }
         }
     }
 
@@ -438,11 +441,22 @@ public class RootNetwork extends Network {
      * Fire a network changed event to all registered model listeners.
      */
     public void fireNetworkChanged() {
-
         for (NetworkListener listener : networkListeners) {
             listener.networkChanged();
         }
     }
+    
+    /**
+     * Fire a network update method changed event to all registered model
+     * listeners.
+     */
+    private void fireNetworkUpdateMethodChanged() {
+        for (NetworkListener listener : networkListeners) {
+            listener.networkUpdateMethodChanged();
+        }
+    }
+
+
 
     /**
      * Fire a neuron clamp toggle event to all registered model listeners.
@@ -722,6 +736,7 @@ public class RootNetwork extends Network {
      */
     public void setUpdateMethod(final UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
+        this.fireNetworkUpdateMethodChanged();
     }
 
     /**

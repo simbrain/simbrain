@@ -113,8 +113,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Number text inside neuron. */
     private PText activationText;
 
-    /** Text corresponding to neuron label. */
+    /** Text corresponding to neuron's (optional) label. */
     private PText labelText = new PText("...");
+
+    /** Text corresponding to neuron's update priority. */
+    private PText priorityText = new PText("...");
 
     /** Background for label text, so that background objects don't show up. */
     PNode labelBackground;
@@ -124,6 +127,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
+
+    /** Priority Font. */
+    public static final Font PRIORITY_FONT = new Font("Courier", Font.PLAIN, 9);
 
     //TODO: These should be replaced with actual scaling of the text object.
 
@@ -175,6 +181,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         activationText.setFont(NEURON_FONT);
         setActivationTextPosition();
         addChild(activationText);
+
+        //Neuron update priority text
+        priorityText = new PText("" + neuron.getUpdatePriority());
+        priorityText.setFont(PRIORITY_FONT);
+        setPriorityTextPosition();
+        // TODO: Re-activate this once its visibility can be controlled (some
+        // refactoring in networkpanel needed first)
+        //addChild(priorityText);
+
         
         // TODO: create a white background for the activation text
         labelBackground = new PNode();
@@ -193,6 +208,16 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // The main circle is what users select
         setBounds(circle.getBounds());
+    }
+
+    /**
+     * Set position of priority label.
+     */
+    private void setPriorityTextPosition() {
+        if (priorityText == null) {
+            return;
+        }
+        priorityText.setOffset(getX() + DIAMETER + 2, getY() + DIAMETER  - 4);
     }
 
     /** @see ScreenElement */
@@ -422,7 +447,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     private JMenu getQuickConnections() {
         
-        JMenu menu = new JMenu("Quick Connect");
+        JMenu menu = new JMenu("Self Connect");
 
         JMenuItem allMenuItem = new JMenuItem("All to All");
         allMenuItem.addActionListener(new ActionListener() {
@@ -727,6 +752,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         double act = neuron.getActivation();
         activationText.setScale(1);
         setActivationTextPosition();
+
+        priorityText.setScale(1);
+        setPriorityTextPosition();
+        priorityText.setText("" + neuron.getUpdatePriority()); // todo: respond to listener
 
         // Set label text
         if ((!neuron.getLabel().equalsIgnoreCase(""))

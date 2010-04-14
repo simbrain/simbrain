@@ -22,6 +22,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -32,9 +35,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.Workspace;
 
 /**
  * GUI for trainer component.
@@ -49,6 +62,13 @@ public class TrainerGUI extends JFrame {
 	private String[] network = {"Network 1", "Network 2"};
 	private String[] trainingAlgorithms = {"Backprop  ", "Other"};
 	private String[] errorSignal = {"SSE           ", "Other"};
+	
+	/** Reference to trainer object. */
+	private Trainer trainer;
+	
+	/** Reference to workspace object. */
+	private Workspace workspace; 
+	
 	
 	Object [][] data = {
 			{"1",null, null,null,null},
@@ -107,9 +127,36 @@ public class TrainerGUI extends JFrame {
 		topPanel.add("West", netSelect);
 		
 		//Graph
-		LabelledItemPanel trainerDisplay = new LabelledItemPanel();
-		trainerDisplay.setBorder(BorderFactory.createTitledBorder("Error"));
-		trainerDisplay.setPreferredSize(new Dimension(700, 220));
+		JPanel trainerDisplay = new JPanel();
+		trainerDisplay.setLayout(new BorderLayout());
+
+		// Set up Plot with (currently) test data
+		XYSeriesCollection series = new XYSeriesCollection();
+		XYSeries series1 = new XYSeries(1);
+		series.addSeries(series1);		
+		JFreeChart chart = ChartFactory.createXYLineChart(
+	            "Error", // Title
+	            "Iterations", // x-axis Label
+	            "Error", // y-axis Label
+	            series, // Dataset
+	            PlotOrientation.VERTICAL, // Plot Orientation
+	            false, // Show Legend
+	            true, // Use tooltips
+	            false // Configure chart to generate URLs?
+	        );
+
+		
+		
+		ChartPanel chartPanel = new ChartPanel(chart);
+		JPanel runButtons = new JPanel();
+        runButtons.add(new JButton("Run"));
+        runButtons.add(new JButton("Stop"));
+        runButtons.add(new JButton("Step"));
+        runButtons.add(new JButton("Clear"));
+        trainerDisplay.add("Center",chartPanel);
+        trainerDisplay.add("South",runButtons);
+        
+        
 		topPanel.add("East", trainerDisplay);
 				
 		// Split Pane (Main Center Panel)
@@ -125,6 +172,15 @@ public class TrainerGUI extends JFrame {
 		splitPane.setLeftComponent(leftPanel);
 		splitPane.setRightComponent(rightPanel);		
 		
+	      // Left Table
+        final JTable  leftTable = new JTable(data, columnNames);
+        leftTable.setGridColor(Color.LIGHT_GRAY);
+        TableColumn inColumn = null;
+        inColumn = leftTable.getColumnModel().getColumn(0);
+        inColumn.setPreferredWidth(18);
+        JScrollPane leftScroll = new JScrollPane(leftTable);
+        leftScroll.setPreferredSize(new Dimension(400, 200));
+        
 		// Left top panel
 		JPanel leftMenuPanel = new JPanel();
 		leftMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -137,17 +193,42 @@ public class TrainerGUI extends JFrame {
 		leftMenuPanel.add(leftSave);
 		JButton leftImport = new JButton("Import");
 		leftMenuPanel.add(leftImport);
-		// Left Table
-		JTable  leftTable = new JTable(data, columnNames);
-		leftTable.setGridColor(Color.LIGHT_GRAY);
-		TableColumn inColumn = null;
-		inColumn = leftTable.getColumnModel().getColumn(0);
-		inColumn.setPreferredWidth(18);
-		JScrollPane leftScroll = new JScrollPane(leftTable);
-		leftScroll.setPreferredSize(new Dimension(400, 200));
-		leftPanel.add("North", leftMenuPanel);
-		leftPanel.add("Center", leftScroll);
+		leftImport.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                SFileChooser chooser = new SFileChooser(".",
+                        "Comma Separated Values", "csv");
+                    File theFile = chooser.showOpenDialog();
+
+                    if (theFile == null) {
+                        return;
+                    }                    
+                    DefaultTableModel model  = new DefaultTableModel();
+                    double[][]  doubleVals = Utils.getDoubleMatrix(theFile);
+                    model.setNumRows(doubleVals.length);
+                    model.setColumnCount(doubleVals[0].length);                    
+                    for (int i = 0; i < doubleVals.length; i++) {
+                        for (int j = 0; j < doubleVals[i].length; j++) {                            
+                            model.setValueAt(doubleVals[i][j],i,j);
+                        }
+                    }
+                    leftTable.setModel(model);                
+            }
+		    
+		});
 		
+        leftPanel.add("North", leftMenuPanel);
+        leftPanel.add("Center", leftScroll);
+
+        
+        // Right Table
+        final JTable  rightTable = new JTable(data, columnNames);
+        rightTable.setGridColor(Color.LIGHT_GRAY);
+        TableColumn outColumn = null;
+        outColumn = rightTable.getColumnModel().getColumn(0);
+        outColumn.setPreferredWidth(18);
+        JScrollPane rightScroll = new JScrollPane(rightTable);
+        rightScroll.setPreferredSize(new Dimension(400, 200));
+  	
 		// Right top panel
 		JPanel rightMenuPanel = new JPanel();
 		rightMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -160,14 +241,30 @@ public class TrainerGUI extends JFrame {
 		rightMenuPanel.add(rightSave);		
 		JButton rightImport = new JButton("Import");
 		rightMenuPanel.add(rightImport);
-		// Right Table
-		JTable  rightTable = new JTable(data, columnNames);
-		rightTable.setGridColor(Color.LIGHT_GRAY);
-		TableColumn outColumn = null;
-		outColumn = rightTable.getColumnModel().getColumn(0);
-		outColumn.setPreferredWidth(18);
-		JScrollPane rightScroll = new JScrollPane(rightTable);
-		rightScroll.setPreferredSize(new Dimension(400, 200));
+		rightImport.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent arg0) {
+	                SFileChooser chooser = new SFileChooser(".",
+	                        "Comma Separated Values", "csv");
+	                    File theFile = chooser.showOpenDialog();
+
+	                    if (theFile == null) {
+	                        return;
+	                    }
+	                    DefaultTableModel model  = new DefaultTableModel();
+	                    double[][]  doubleVals = Utils.getDoubleMatrix(theFile);
+	                    model.setNumRows(doubleVals.length);
+	                    model.setColumnCount(doubleVals[0].length);
+	                    for (int i = 0; i < doubleVals.length; i++) {
+	                        for (int j = 0; j < doubleVals[i].length; j++) {
+	                            model.setValueAt(doubleVals[i][j],i,j);
+	                        }
+	                    }
+	                    rightTable.setModel(model);    
+	            }
+	            
+	        });
+		
+		
 		rightPanel.add("North", rightMenuPanel);
 		rightPanel.add("Center", rightScroll);
 		

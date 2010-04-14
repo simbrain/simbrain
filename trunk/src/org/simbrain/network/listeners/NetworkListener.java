@@ -31,8 +31,12 @@ public interface NetworkListener {
      * change, but activations, synapse strengths, etc. change.
      */
     void networkChanged();
-
-    // TODO: Add some kind of setting event here, for centering camera, etc?
+    
+    /**
+     * Invoked when the network update method is changed (e.g. from default
+     * update to priority based update)
+     */
+    void networkUpdateMethodChanged();
 
     /**
      * Notify listeners that all neurons have been clamped or un-clamped.

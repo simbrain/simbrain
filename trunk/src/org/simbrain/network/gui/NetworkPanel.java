@@ -371,6 +371,14 @@ public class NetworkPanel extends PCanvas  {
             public void synapseClampToggled() {
                 syncSynapseClampState();
             }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void networkUpdateMethodChanged() {
+                updateStatusLabel.update();
+            }
+
         });
 
         // Handle Neuron Events

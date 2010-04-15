@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 
 /**
  * Displays a list of all currently open workspace components.
@@ -42,13 +43,19 @@ import org.simbrain.workspace.WorkspaceListener;
  * of the represented component. Once it's fixed, the test of this will be
  * setting component properties via terminal and seeing the change reflected.
  */
-public class ComponentPanel extends JPanel implements WorkspaceListener  {
+public class ComponentPanel extends JPanel implements WorkspaceListener, WorkspaceUpdatorListener  {
 
     /** Table representing workspace components. */
     private JTable componentTable;
 
     /** Table model. */
     private ComponentTableModel model;
+    
+    /** Update method label. */
+    private JLabel updateLabel = new JLabel();
+    
+    /** Reference to Simbrain Desktop. */
+    private SimbrainDesktop desktop;
 
     /**
      * Workspace component list panel constructor.
@@ -57,6 +64,9 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
     public ComponentPanel(final SimbrainDesktop desktop) {
         super(new BorderLayout());
         desktop.getWorkspace().addListener(this);
+        desktop.getWorkspace().getWorkspaceUpdator().addUpdatorListener(this);
+        this.desktop = desktop;
+        
 
         // Set up table
         model = new ComponentTableModel();
@@ -73,8 +83,8 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add("Center", scrollPane);
         
-       JLabel update = new JLabel(desktop.getWorkspace().getWorkspaceUpdator().getCurrentUpdatorName());
-        panel.add("North", update);
+        changedUpdateController();
+        panel.add("North", updateLabel);
         
         add(panel);
     }
@@ -105,7 +115,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
     public void workspaceCleared() {
         model.clear();
     }
-
 
     /**
      * {@inheritDoc}
@@ -252,6 +261,35 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
             }
         }
 
+    }
+
+    public void changeNumThreads() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void changedUpdateController() {
+        updateLabel.setText("Current updater: " + desktop.getWorkspace().getWorkspaceUpdator().getCurrentUpdatorName());        
+    }
+
+    public void updatedCouplings(int update) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void updatingFinished() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void updatingStarted() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void workspaceUpdated() {
+        // TODO Auto-generated method stub
+        
     }
 
 }

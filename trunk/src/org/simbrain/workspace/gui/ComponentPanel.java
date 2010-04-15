@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -68,7 +69,14 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
         componentTable.setFocusable(false);
 
         JScrollPane scrollPane = new JScrollPane(componentTable);
-        add(scrollPane);
+        
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add("Center", scrollPane);
+        
+       JLabel update = new JLabel(desktop.getWorkspace().getWorkspaceUpdator().getCurrentUpdatorName());
+        panel.add("North", update);
+        
+        add(panel);
     }
 
     /**
@@ -113,7 +121,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
     class ComponentTableModel extends AbstractTableModel {
 
         /** Column names. */
-        String[] columnNames = {"Component", "Type", "Gui On", "Update On"};
+        String[] columnNames = {"Component", "Type", "Gui On", "Update On", "Update Priority"};
 
         /** Internal list of components. */
         private ArrayList<WorkspaceComponent> data = new ArrayList<WorkspaceComponent>();      
@@ -152,6 +160,8 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
                 return data.get(row).getGuiOn();
             case 3:
                 return data.get(row).getUpdateOn();
+            case 4:
+                return data.get(row).getUpdatePriority();
             default:
                 return null;
             }
@@ -188,6 +198,8 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
             case 2:
                 return true;
             case 3:
+                return true;
+            case 4:
                 return true;
             default:
                 return false;
@@ -233,6 +245,8 @@ public class ComponentPanel extends JPanel implements WorkspaceListener  {
                 return Boolean.class;
             case 3:
                 return Boolean.class;
+            case 4:
+                return Integer.class;
             default:
                 return null;
             }

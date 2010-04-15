@@ -65,6 +65,9 @@ public abstract class WorkspaceComponent {
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
+    
+    /** Update priority. */
+    private int updatePriority;
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
@@ -809,6 +812,20 @@ public abstract class WorkspaceComponent {
      */
     public List<String> getAttributeTypes() {
         return attributeTypes;
+    }
+
+    /**
+     * @return the updatePriority
+     */
+    public int getUpdatePriority() {
+        return updatePriority;
+    }
+
+    /**
+     * @param updatePriority the updatePriority to set
+     */
+    public void setUpdatePriority(int updatePriority) {
+        this.updatePriority = updatePriority;
     }
 
 }

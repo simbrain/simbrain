@@ -40,65 +40,65 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
     private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
 
     /** Time average constant for updating the net current field. (p. 43-44) */
-	private double netTimeConstant = 0.7;
+    private double netTimeConstant = 0.7;
 
     /**
      * Max excitatory conductance field. Conductance if all channels are open.
      * (p. 49)
      */
-	private double excitatoryMaxConductance = 0.4;
+    private double excitatoryMaxConductance = 0.4;
 
-	/** Excitatory conductance field. Proportion of channels open. */
-	private double excitatoryConductance;
+    /** Excitatory conductance field. Proportion of channels open. */
+    private double excitatoryConductance;
 
-	/** Current inhibitory conductance. */
+    /** Current inhibitory conductance. */
     private double inhibitoryConductance;
 
     /** Maximal inhibitory conductance. */
     private double inhibitoryMaxConductance = 1;
 
-	/** Default value for membrane potential. */
-	private static final double DEFAULT_MEMBRANE_POTENTIAL = .15;
+    /** Default value for membrane potential. */
+    private static final double DEFAULT_MEMBRANE_POTENTIAL = .15;
 
-	/** Membrane potential field. (p. 45)*/
-	private double membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
+    /** Membrane potential field. (p. 45)*/
+    private double membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
 
-	/** Excitatory reversal potential field. (p. 45)*/
-	private double excitatoryReversal = 1;
+    /** Excitatory reversal potential field. (p. 45)*/
+    private double excitatoryReversal = 1;
 
-	/** Leak reversal potential field. (p. 45)*/
-	private double leakReversal = 0.15;
+    /** Leak reversal potential field. (p. 45)*/
+    private double leakReversal = 0.15;
 
     /**
      * Max leak conductance field. Conductance if all channels are open. (p. 49)
      */
-	private double leakMaxConductance = 2.8;
+    private double leakMaxConductance = 2.8;
 
-	/** Leak Conductance field. Proportion of channels open. (p. 49)*/
-	private double leakConductance = 1;
+    /** Leak Conductance field. Proportion of channels open. (p. 49)*/
+    private double leakConductance = 1;
 
-	/** Net current field. Sum of all currents. */
-	private double netCurrent;
+    /** Net current field. Sum of all currents. */
+    private double netCurrent;
 
     /**
      * Time averaging constant for updating the membrane potential field. (p.
      * 37, Equation 2.7)
      */
-	private double potentialTimeConstant = 0.1;
+    private double potentialTimeConstant = 0.1;
 
-	/** Excitatory current field. */
-	private double excitatoryCurrent;
+    /** Excitatory current field. */
+    private double excitatoryCurrent;
 
-	/** Leak current field. */
-	private double leakCurrent;
+    /** Leak current field. */
+    private double leakCurrent;
 
-	/** Inhibitory current field. */
-	private double inhibitoryCurrent;
+    /** Inhibitory current field. */
+    private double inhibitoryCurrent;
 
-	/** Inhibitory reversal field. */
-	private double inhibitoryReversal = 0.15;
+    /** Inhibitory reversal field. */
+    private double inhibitoryReversal = 0.15;
 
-	/** Output functions. (p. 45-48) */
+    /** Output functions. (p. 45-48) */
     public enum OutputFunction {
         DISCRETE_SPIKING {
             public String toString() {
@@ -119,31 +119,36 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
             public String toString() {
                 return "Noisy Rate Code";
             }
+        }, 
+        NONE {
+            public String toString() {
+                return "None (activation = membrane potential)";
+            }
         }
     };
 
-	/** Current output function. */
+    /** Current output function. */
     private OutputFunction outputFunction = OutputFunction.DISCRETE_SPIKING;
 
-	/** Gain factor for output function. (p. 46)*/
-	private double gain = 600;
+    /** Gain factor for output function. (p. 46)*/
+    private double gain = 600;
 
-	/** Threshold of excitation field. (p. 45)*/
-	private double thresholdPotential = 0.25;
+    /** Threshold of excitation field. (p. 45)*/
+    private double thresholdPotential = 0.25;
 
     /**
      * Duration of spike for DISCRETE_SPIKING output function. Used to extend
      * spike across multiple cycles (p. 46).
      */
-	private int duration = 1; //TODO: Implement and verify against Emergent
+    private int duration = 1; //TODO: Implement and verify against Emergent
 
     /**
      * Membrane potential after spike for DISCRETE_SPIKING output function. (p.
      * 46)
      */
-	private double refractoryPotential;
+    private double refractoryPotential;
 
-	/** Bias term. */
+    /** Bias term. */
     private double bias;
 
     /**
@@ -233,67 +238,73 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
         netCurrent = 0;
     }
 
-	@Override
-	public void update() {
+    @Override
+    public void update() {
 
-		/**
-		 * Calculate the excitatory conductance using time averaging constant.
-		 * (p. 44 Eq. 2.16)
-		 */
-		excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance
-				+ netTimeConstant * (getExcitatoryInputs());
-		// TODO: Add scaling parameters and bias term (when adding update kwta)
+        /**
+         * Calculate the excitatory conductance using time averaging constant.
+         * (p. 44 Eq. 2.16)
+         */
+        excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance
+                + netTimeConstant * (getExcitatoryInputs());
+        // TODO: Add scaling parameters and bias term (when adding update kwta)
+        
+        // TODO: Add a method to update inhibitory conductance analogously to
+        // excitatory, using any inhibitory synapses.
+//        inhibitoryConductance = (1 - netTimeConstant) * inhibitoryConductance
+//            + netTimeConstant * (getInhibitoryInputs());
 
-		/**
-		 * Calculate the excitatory current given the time averaged excitatory
-		 * conductance. (p. 37 equation 2.5)
-		 */
-		excitatoryCurrent = excitatoryConductance * excitatoryMaxConductance
-				* (membranePotential - excitatoryReversal);
+        /**
+         * Calculate the excitatory current given the time averaged excitatory
+         * conductance. (p. 37 equation 2.5)
+         */
+        excitatoryCurrent = excitatoryConductance * excitatoryMaxConductance
+                * (membranePotential - excitatoryReversal);
 
-		// Calculate the inhibitory current.
+        // Calculate the inhibitory current.
         inhibitoryCurrent = inhibitoryConductance * inhibitoryMaxConductance
                 * (membranePotential - inhibitoryReversal);
 
-        // TODO: Add a method to update inhibitory conductance analogously to
-        // excitatory, using any inhibitory synapses.
 
-		/** Calculate the leak current.(p. 37 eq. 2.5) */
-		leakCurrent = leakConductance * leakMaxConductance
-				* (membranePotential - leakReversal);
 
-		/** Calculate the net current. (p. 37 eq. 2.6) */
-		netCurrent = leakCurrent + excitatoryCurrent + inhibitoryCurrent;
+        /** Calculate the leak current.(p. 37 eq. 2.5) */
+        leakCurrent = leakConductance * leakMaxConductance
+                * (membranePotential - leakReversal);
 
-		/**
-		 * Calculate the time averaged membrane potential given net current. (p.
-		 * 37 eq. 2.7)
-		 */
-		membranePotential += -potentialTimeConstant * netCurrent;
+        /** Calculate the net current. (p. 37 eq. 2.6) */
+        netCurrent = leakCurrent + excitatoryCurrent + inhibitoryCurrent;
 
-		/** Apply output function. (p. 45-48) */
-		if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
-			if (membranePotential > thresholdPotential) {
-				setBuffer(1);
-				membranePotential = refractoryPotential;
-			} else {
-				setBuffer(0);
-			}
-		} else if (outputFunction == OutputFunction.RATE_CODE) {
-			double val = 
-			        (gain * getPositiveComponent(membranePotential - thresholdPotential))
-					/ (gain	* getPositiveComponent(membranePotential - thresholdPotential) + 1);
-			setBuffer(clip(val));
+        /**
+         * Calculate the time averaged membrane potential given net current. (p.
+         * 37 eq. 2.7)
+         */
+        membranePotential += -potentialTimeConstant * netCurrent;
+
+        /** Apply output function. (p. 45-48) */
+        if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
+            if (membranePotential > thresholdPotential) {
+                setBuffer(1);
+                membranePotential = refractoryPotential;
+            } else {
+                setBuffer(0);
+            }
+        } else if (outputFunction == OutputFunction.RATE_CODE) {
+            double val = 
+                    (gain * getPositiveComponent(membranePotential - thresholdPotential))
+                    / (gain * getPositiveComponent(membranePotential - thresholdPotential) + 1);
+            setBuffer(clip(val));
         } else if (outputFunction == OutputFunction.LINEAR) {
             double val = gain * getPositiveComponent(membranePotential - thresholdPotential);
             setBuffer(clip(val));
         } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
-            setBuffer(1);
+            setBuffer(1); // TODO: Complete this implementation
+        } else if (outputFunction == OutputFunction.NONE) {
+            setBuffer(membranePotential);
         }
 
-		/** Display current values of variables for diagnostics. */
-		//printState();
-	}
+        /** Display current values of variables for diagnostics. */
+        //printState();
+    }
 
     /**
      * Returns the inhibitory conductance that would set this point neuron's
@@ -303,7 +314,7 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
      *
      * @return the value of that equation
      */
-	public double getInhibitoryThresholdConductance() {
+    public double getInhibitoryThresholdConductance() {
         double excitatoryTerm = excitatoryConductance
                 * excitatoryMaxConductance
                 * (excitatoryReversal - thresholdPotential);
@@ -312,44 +323,44 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
 
         return (excitatoryTerm + leakTerm)
                 / (thresholdPotential - inhibitoryReversal);
-	}
+    }
 
     /**
      * {@inheritDoc}
      */
-	public String getToolTipText() {
-		return "Activation: " + activation + "\nMembrane Potential: "
-				+ membranePotential + "\nNet Current: " + netCurrent
-				+ "\nExcitatory current:  " + excitatoryCurrent
-				+ "\nLeak current: " + leakCurrent;
-	}
+    public String getToolTipText() {
+        return "Activation: " + activation + "\nMembrane Potential: "
+                + membranePotential + "\nNet Current: " + netCurrent
+                + "\nExcitatory current:  " + excitatoryCurrent
+                + "\nLeak current: " + leakCurrent;
+    }
 
-	/**
-	 * Print debugging information.
-	 */
-	private void printState() {
-		//System.out.println("getExcitatoryInputs:" + getExcitatoryInputs());
-		//System.out.println("excitatoryConductance:" + excitatoryConductance);
+    /**
+     * Print debugging information.
+     */
+    private void printState() {
+        //System.out.println("getExcitatoryInputs:" + getExcitatoryInputs());
+        //System.out.println("excitatoryConductance:" + excitatoryConductance);
         // System.out.println("excitatoryMaxConductance:" +
         // excitatoryMaxConductance);
-		//System.out.println("excitatoryReversal:" + excitatoryReversal);
-		//System.out.println("leakConductance:" + leakConductance);
-		//System.out.println("leakMaxConductance:" + leakMaxConductance);
-		//System.out.println("leakReversal" + leakReversal);
+        //System.out.println("excitatoryReversal:" + excitatoryReversal);
+        //System.out.println("leakConductance:" + leakConductance);
+        //System.out.println("leakMaxConductance:" + leakMaxConductance);
+        //System.out.println("leakReversal" + leakReversal);
         //System.out.println("Number of excitatory inputs: "
         //        + excitatoryInputs.size());
         //System.out.println("Number of inhibitory inputs:"
         //        + inhibitoryInputs.size());
 
-	    //System.out.println("\nNeuron: " + this.getId());
+        //System.out.println("\nNeuron: " + this.getId());
         System.out.println("excitatoryCurrent:" + excitatoryCurrent);
         System.out.println("inhibitoryCurrent:" + inhibitoryCurrent);
         System.out.println("inhibitoryConductance:" + inhibitoryConductance);
         System.out.println("leakCurrent:" + leakCurrent);
         System.out.println("netCurrent:" + netCurrent);
-		System.out.println("membranePotential:" + membranePotential);
-		System.out.println("output:" + activation);
-	}
+        System.out.println("membranePotential:" + membranePotential);
+        System.out.println("output:" + activation);
+    }
 
     /**
      * Returns net input to this neuron (source activations times weights), from
@@ -357,263 +368,263 @@ public class PointNeuron extends Neuron implements SynapseListener, BiasedNeuron
      *
      * @return net input
      */
-	private double getExcitatoryInputs() {
+    private double getExcitatoryInputs() {
 
-		double retVal = 0;
-		if (excitatoryInputs.size() > 0) {
+        double retVal = 0;
+        if (excitatoryInputs.size() > 0) {
             for (Synapse synapse : excitatoryInputs) {
                 Neuron source = synapse.getSource();
-                retVal += source.getActivation() * synapse.getStrength();
+                retVal += source.getActivation() * synapse.getStrength(); // Will not work with spiking, or negative activations?
             }
-		}
-		return retVal;
-	}
+        }
+        return retVal;
+    }
 
-	/**
-	 * Returns the positive component of a number.
-	 *
-	 * @param val value to consider
-	 * @return positive component
-	 */
-	private double getPositiveComponent(double val) {
+    /**
+     * Returns the positive component of a number.
+     *
+     * @param val value to consider
+     * @return positive component
+     */
+    private double getPositiveComponent(double val) {
 
-		if (val > 0) {
-			return val;
-		} else {
-			return 0;
-		}
-	}
+        if (val > 0) {
+            return val;
+        } else {
+            return 0;
+        }
+    }
 
-	/**
-	 * @return the inhibitoryInputs
-	 */
-	public ArrayList<Synapse> getInhibitoryInputs() {
-		return inhibitoryInputs;
-	}
+    /**
+     * @return the inhibitoryInputs
+     */
+    public ArrayList<Synapse> getInhibitoryInputs() {
+        return inhibitoryInputs;
+    }
 
-	/**
-	 * @param inhibitoryInputs the inhibitoryInputs to set
-	 */
-	public void setInhibitoryInputs(ArrayList<Synapse> inhibitoryInputs) {
-		this.inhibitoryInputs = inhibitoryInputs;
-	}
+    /**
+     * @param inhibitoryInputs the inhibitoryInputs to set
+     */
+    public void setInhibitoryInputs(ArrayList<Synapse> inhibitoryInputs) {
+        this.inhibitoryInputs = inhibitoryInputs;
+    }
 
-	/**
-	 * @return the netTimeConstant
-	 */
-	public double getNetTimeConstant() {
-		return netTimeConstant;
-	}
+    /**
+     * @return the netTimeConstant
+     */
+    public double getNetTimeConstant() {
+        return netTimeConstant;
+    }
 
-	/**
-	 * @param netTimeConstant the netTimeConstant to set
-	 */
-	public void setNetTimeConstant(double netTimeConstant) {
-		this.netTimeConstant = netTimeConstant;
-	}
+    /**
+     * @param netTimeConstant the netTimeConstant to set
+     */
+    public void setNetTimeConstant(double netTimeConstant) {
+        this.netTimeConstant = netTimeConstant;
+    }
 
-	/**
-	 * @return the excitatoryMaxConductance
-	 */
-	public double getExcitatoryMaxConductance() {
-		return excitatoryMaxConductance;
-	}
+    /**
+     * @return the excitatoryMaxConductance
+     */
+    public double getExcitatoryMaxConductance() {
+        return excitatoryMaxConductance;
+    }
 
-	/**
-	 * @param excitatoryMaxConductance the excitatoryMaxConductance to set
-	 */
-	public void setExcitatoryMaxConductance(double excitatoryMaxConductance) {
-		this.excitatoryMaxConductance = excitatoryMaxConductance;
-	}
+    /**
+     * @param excitatoryMaxConductance the excitatoryMaxConductance to set
+     */
+    public void setExcitatoryMaxConductance(double excitatoryMaxConductance) {
+        this.excitatoryMaxConductance = excitatoryMaxConductance;
+    }
 
-	/**
-	 * @return the excitatoryConductance
-	 */
-	public double getExcitatoryConductance() {
-		return excitatoryConductance;
-	}
+    /**
+     * @return the excitatoryConductance
+     */
+    public double getExcitatoryConductance() {
+        return excitatoryConductance;
+    }
 
-	/**
-	 * @param excitatoryConductance the excitatoryConductance to set
-	 */
-	public void setExcitatoryConductance(double excitatoryConductance) {
-		this.excitatoryConductance = excitatoryConductance;
-	}
+    /**
+     * @param excitatoryConductance the excitatoryConductance to set
+     */
+    public void setExcitatoryConductance(double excitatoryConductance) {
+        this.excitatoryConductance = excitatoryConductance;
+    }
 
-	/**
-	 * @return the membranePotential
-	 */
-	public double getMembranePotential() {
-		return membranePotential;
-	}
+    /**
+     * @return the membranePotential
+     */
+    public double getMembranePotential() {
+        return membranePotential;
+    }
 
-	/**
-	 * @param membranePotential the membranePotential to set
-	 */
-	public void setMembranePotential(double membranePotential) {
-		this.membranePotential = membranePotential;
-	}
+    /**
+     * @param membranePotential the membranePotential to set
+     */
+    public void setMembranePotential(double membranePotential) {
+        this.membranePotential = membranePotential;
+    }
 
-	/**
-	 * @return the excitatoryReversal
-	 */
-	public double getExcitatoryReversal() {
-		return excitatoryReversal;
-	}
+    /**
+     * @return the excitatoryReversal
+     */
+    public double getExcitatoryReversal() {
+        return excitatoryReversal;
+    }
 
-	/**
-	 * @param excitatoryReversal the excitatoryReversal to set
-	 */
-	public void setExcitatoryReversal(double excitatoryReversal) {
-		this.excitatoryReversal = excitatoryReversal;
-	}
+    /**
+     * @param excitatoryReversal the excitatoryReversal to set
+     */
+    public void setExcitatoryReversal(double excitatoryReversal) {
+        this.excitatoryReversal = excitatoryReversal;
+    }
 
-	/**
-	 * @return the leakReversal
-	 */
-	public double getLeakReversal() {
-		return leakReversal;
-	}
+    /**
+     * @return the leakReversal
+     */
+    public double getLeakReversal() {
+        return leakReversal;
+    }
 
-	/**
-	 * @param leakReversal the leakReversal to set
-	 */
-	public void setLeakReversal(double leakReversal) {
-		this.leakReversal = leakReversal;
-	}
+    /**
+     * @param leakReversal the leakReversal to set
+     */
+    public void setLeakReversal(double leakReversal) {
+        this.leakReversal = leakReversal;
+    }
 
-	/**
-	 * @return the leakMaxConductance
-	 */
-	public double getLeakMaxConductance() {
-		return leakMaxConductance;
-	}
+    /**
+     * @return the leakMaxConductance
+     */
+    public double getLeakMaxConductance() {
+        return leakMaxConductance;
+    }
 
-	/**
-	 * @param leakMaxConductance the leakMaxConductance to set
-	 */
-	public void setLeakMaxConductance(double leakMaxConductance) {
-		this.leakMaxConductance = leakMaxConductance;
-	}
+    /**
+     * @param leakMaxConductance the leakMaxConductance to set
+     */
+    public void setLeakMaxConductance(double leakMaxConductance) {
+        this.leakMaxConductance = leakMaxConductance;
+    }
 
-	/**
-	 * @return the leakConductance
-	 */
-	public double getLeakConductance() {
-		return leakConductance;
-	}
+    /**
+     * @return the leakConductance
+     */
+    public double getLeakConductance() {
+        return leakConductance;
+    }
 
-	/**
-	 * @param leakConductance the leakConductance to set
-	 */
-	public void setLeakConductance(double leakConductance) {
-		this.leakConductance = leakConductance;
-	}
+    /**
+     * @param leakConductance the leakConductance to set
+     */
+    public void setLeakConductance(double leakConductance) {
+        this.leakConductance = leakConductance;
+    }
 
-	/**
-	 * @return the potentialTimeConstant
-	 */
-	public double getPotentialTimeConstant() {
-		return potentialTimeConstant;
-	}
+    /**
+     * @return the potentialTimeConstant
+     */
+    public double getPotentialTimeConstant() {
+        return potentialTimeConstant;
+    }
 
-	/**
-	 * @param potentialTimeConstant the potentialTimeConstant to set
-	 */
-	public void setPotentialTimeConstant(double potentialTimeConstant) {
-		this.potentialTimeConstant = potentialTimeConstant;
-	}
+    /**
+     * @param potentialTimeConstant the potentialTimeConstant to set
+     */
+    public void setPotentialTimeConstant(double potentialTimeConstant) {
+        this.potentialTimeConstant = potentialTimeConstant;
+    }
 
-	/**
-	 * @return the currentOutputFunction
-	 */
-	public OutputFunction getOutputFunction() {
-		return outputFunction;
-	}
+    /**
+     * @return the currentOutputFunction
+     */
+    public OutputFunction getOutputFunction() {
+        return outputFunction;
+    }
 
-	/**
-	 * @param currentOutputFunction the currentOutputFunction to set
-	 */
-	public void setOutputFunction(OutputFunction currentOutputFunction) {
-		this.outputFunction = currentOutputFunction;
-	}
+    /**
+     * @param currentOutputFunction the currentOutputFunction to set
+     */
+    public void setOutputFunction(OutputFunction currentOutputFunction) {
+        this.outputFunction = currentOutputFunction;
+    }
 
-	/**
-	 * @return the gain
-	 */
-	public double getGain() {
-		return gain;
-	}
+    /**
+     * @return the gain
+     */
+    public double getGain() {
+        return gain;
+    }
 
-	/**
-	 * @param gain the gain to set
-	 */
-	public void setGain(double gain) {
-		this.gain = gain;
-	}
+    /**
+     * @param gain the gain to set
+     */
+    public void setGain(double gain) {
+        this.gain = gain;
+    }
 
-	/**
-	 * @return the threshold
-	 */
-	public double getThresholdPotential() {
-		return thresholdPotential;
-	}
+    /**
+     * @return the threshold
+     */
+    public double getThresholdPotential() {
+        return thresholdPotential;
+    }
 
-	/**
-	 * @param threshold the threshold to set
-	 */
-	public void setThresholdPotential(double threshold) {
-		this.thresholdPotential = threshold;
-	}
+    /**
+     * @param threshold the threshold to set
+     */
+    public void setThresholdPotential(double threshold) {
+        this.thresholdPotential = threshold;
+    }
 
-	/**
-	 * @return the refractoryPotential
-	 */
-	public double getRefractoryPotential() {
-		return refractoryPotential;
-	}
+    /**
+     * @return the refractoryPotential
+     */
+    public double getRefractoryPotential() {
+        return refractoryPotential;
+    }
 
-	/**
-	 * @param refractoryPotential the refractoryPotential to set
-	 */
-	public void setRefractoryPotential(double refractoryPotential) {
-		this.refractoryPotential = refractoryPotential;
-	}
+    /**
+     * @param refractoryPotential the refractoryPotential to set
+     */
+    public void setRefractoryPotential(double refractoryPotential) {
+        this.refractoryPotential = refractoryPotential;
+    }
 
-	/**
-	 * @param excitatoryInputs the excitatoryInputs to set
-	 */
-	public void setExcitatoryInputs(ArrayList<Synapse> excitatoryInputs) {
-		this.excitatoryInputs = excitatoryInputs;
-	}
+    /**
+     * @param excitatoryInputs the excitatoryInputs to set
+     */
+    public void setExcitatoryInputs(ArrayList<Synapse> excitatoryInputs) {
+        this.excitatoryInputs = excitatoryInputs;
+    }
 
-	/**
-	 * @return the inhibitoryReversal
-	 */
-	public double getInhibitoryReversal() {
-		return inhibitoryReversal;
-	}
+    /**
+     * @return the inhibitoryReversal
+     */
+    public double getInhibitoryReversal() {
+        return inhibitoryReversal;
+    }
 
-	/**
-	 * @param inhibitoryReversal the inhibitoryReversal to set
-	 */
-	public void setInhibitoryReversal(double inhibitoryReversal) {
-		this.inhibitoryReversal = inhibitoryReversal;
-	}
+    /**
+     * @param inhibitoryReversal the inhibitoryReversal to set
+     */
+    public void setInhibitoryReversal(double inhibitoryReversal) {
+        this.inhibitoryReversal = inhibitoryReversal;
+    }
 
-	/**
-	 * @return the excitatoryCurrent
-	 */
-	public double getExcitatoryCurrent() {
-		return excitatoryCurrent;
-	}
+    /**
+     * @return the excitatoryCurrent
+     */
+    public double getExcitatoryCurrent() {
+        return excitatoryCurrent;
+    }
 
-	/**
-	 * @param excitatoryCurrent the excitatoryCurrent to set
-	 */
-	public void setExcitatoryCurrent(double excitatoryCurrent) {
-		this.excitatoryCurrent = excitatoryCurrent;
-	}
+    /**
+     * @param excitatoryCurrent the excitatoryCurrent to set
+     */
+    public void setExcitatoryCurrent(double excitatoryCurrent) {
+        this.excitatoryCurrent = excitatoryCurrent;
+    }
 
     /**
      * @return the duration

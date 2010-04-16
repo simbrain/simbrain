@@ -48,8 +48,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
     /** Output function. */
     private JComboBox cbOutputFunction = new JComboBox(new OutputFunction[] {
-            OutputFunction.DISCRETE_SPIKING, OutputFunction.LINEAR,
-            OutputFunction.RATE_CODE, OutputFunction.NOISY_RATE_CODE});
+            OutputFunction.DISCRETE_SPIKING, OutputFunction.LINEAR, OutputFunction.NOISY_RATE_CODE, 
+            OutputFunction.NONE, OutputFunction.RATE_CODE, });
 
     /** Threshold for output function. */
     private JTextField tfThreshold = new JTextField();

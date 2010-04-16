@@ -19,6 +19,7 @@
 package org.simbrain.network.interfaces;
 
 import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapses.spikeresponders.ProbabilisticResponder;
 import org.simbrain.network.synapses.spikeresponders.RiseAndDecay;
 import org.simbrain.network.synapses.spikeresponders.Step;
 
@@ -35,7 +36,7 @@ public abstract class SpikeResponder {
     protected Synapse parent;
 
     /** Used for combo box. */
-    private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), RiseAndDecay.getName() };
+    private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), ProbabilisticResponder.getName(), RiseAndDecay.getName() };
 
     /**
      * @return Spike responder to duplcate.

@@ -44,7 +44,6 @@ import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.CustomNeuron;
 import org.simbrain.network.neurons.DecayNeuron;
 import org.simbrain.network.neurons.ExponentialDecayNeuron;
-import org.simbrain.network.neurons.HodgkinHuxleyNeuron;
 import org.simbrain.network.neurons.IACNeuron;
 import org.simbrain.network.neurons.IntegrateAndFireNeuron;
 import org.simbrain.network.neurons.IzhikevichNeuron;
@@ -58,6 +57,7 @@ import org.simbrain.network.neurons.RandomNeuron;
 import org.simbrain.network.neurons.RunningAverageNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SinusoidalNeuron;
+import org.simbrain.network.neurons.SpikingThresholdNeuron;
 import org.simbrain.network.neurons.StochasticNeuron;
 import org.simbrain.network.neurons.TemporalDifferenceNeuron;
 import org.simbrain.network.neurons.ThreeValuedNeuron;
@@ -151,6 +151,10 @@ public class NeuronDialog extends StandardDialog {
                 SigmoidalNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
                 
+        association = new Association("Spiking Threshold", SpikingThresholdNeuron.class,
+                SpikingThresholdPanel.class, false);
+        ASSOCIATIONS.put(association.clazz, association);
+                
         association = new Association("Sinusoidal", SinusoidalNeuron.class,
                 SinusoidalNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
@@ -169,7 +173,6 @@ public class NeuronDialog extends StandardDialog {
 
         association = new Association("Trace", TraceNeuron.class, TraceNeuronPanel.class, false);
         ASSOCIATIONS.put(association.clazz, association);
-
 
     }
 

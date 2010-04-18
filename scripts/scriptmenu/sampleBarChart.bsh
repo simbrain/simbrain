@@ -44,6 +44,8 @@ import java.awt.Color;
     //MAKE BARCHART
     BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network", numNeurons);
     barChart.getModel().setBarColor(Color.blue);
+    barChart.getModel().setUpperBound(100);
+    barChart.getModel().setAutoRange(false);
     workspace.addWorkspaceComponent(barChart);
     desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
 

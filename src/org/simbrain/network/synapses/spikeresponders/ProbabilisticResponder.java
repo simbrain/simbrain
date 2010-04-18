@@ -50,7 +50,7 @@ public class ProbabilisticResponder extends SpikeResponder {
      */
     public void update() {
         if (((SpikingNeuron) parent.getSource()).hasSpiked()) {
-            if (Math.random() > activationProbability) {
+            if (Math.random() > (1 - activationProbability)) {
                 value = responseValue * parent.getStrength();
             } else {
                 value = 0;

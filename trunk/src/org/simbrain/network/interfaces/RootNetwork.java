@@ -894,7 +894,7 @@ public class RootNetwork extends Network {
      *            label of neuron to search for
      * @return list of matched neurons, or null if none are found
      */
-    public List<Neuron> getNeuronByLabel(String inputString) {
+    public List<Neuron> getNeuronsByLabel(String inputString) {
         ArrayList<Neuron> foundNeurons = new ArrayList<Neuron>();
         for (Neuron neuron : this.getFlatNeuronList()) {
             if (neuron.getLabel().equalsIgnoreCase(inputString)) {
@@ -905,6 +905,21 @@ public class RootNetwork extends Network {
             return null;
         } else {
             return foundNeurons;
+        }
+    }
+    
+    /**
+     * Returns the first neuron in the array returned by getNeuronsByLabel
+     *
+     * @param inputString label of neuron to search for
+     * @return matched Neuron, if any
+     */
+    public Neuron getNeuronByLabel(String inputString) {
+        List<Neuron> foundNeurons = getNeuronsByLabel(inputString);
+        if (foundNeurons == null) {
+            return null;
+        } else {
+            return foundNeurons.get(0);
         }
     }
 

@@ -38,9 +38,6 @@ import org.simbrain.network.synapses.ClampedSynapse;
  */
 public class Radial extends ConnectNeurons {
 
-    /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
-    private static double percentExcitatory = .6;
-
     /** Whether to allow self-connections. */
     private static boolean allowSelfConnections = false;
 
@@ -85,12 +82,8 @@ public class Radial extends ConnectNeurons {
     /** @inheritDoc */
     public void connectNeurons() {
         for (Neuron source : sourceNeurons) {
-            double rand = Math.random();
-            if (rand < percentExcitatory) {
-                makeExcitatory(source);
-            }  else {
-                makeInhibitory(source);
-            }
+            makeExcitatory(source);
+            makeInhibitory(source);
         }
     }
 
@@ -152,20 +145,6 @@ public class Radial extends ConnectNeurons {
                 network.addSynapse(synapse);
             }
         }
-    }
-
-    /**
-     * @return the excitatoryRatio
-     */
-    public static double getPercentExcitatory() {
-        return percentExcitatory;
-    }
-
-    /**
-     * @param percentExcitatory the excitatoryRatio to set
-     */
-    public static void setPercentExcitatory(final double percentExcitatory) {
-        Radial.percentExcitatory = percentExcitatory;
     }
 
     /**

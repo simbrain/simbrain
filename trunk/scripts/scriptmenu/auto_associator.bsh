@@ -16,6 +16,7 @@ import org.simbrain.network.neurons.*;
 import org.simbrain.network.synapses.*;
 import org.simbrain.network.gui.*;
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.*;
 import org.simbrain.util.*;
 
 

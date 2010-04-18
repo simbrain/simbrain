@@ -40,9 +40,6 @@ public class RadialPanel extends AbstractConnectionPanel {
     /** Excitatory Probability. */
     private JTextField tfExciteProbability = new JTextField();
 
-    /** Excitatory Ratio. */
-    private JTextField tfExciteRatio = new JTextField();
-
     /** Excitatory Radius. */
     private JTextField tfExciteRadius = new JTextField();
 
@@ -67,9 +64,8 @@ public class RadialPanel extends AbstractConnectionPanel {
      */
     public RadialPanel(final Radial connection) {
         super(connection);
-        this.addItem("Excitatory/Inhibitory Ratio", tfExciteRatio);
-        this.addItem("Excitatory Probability", tfExciteProbability);
         this.addItem("Excitatory Radius", tfExciteRadius);
+        this.addItem("Excitatory Probability", tfExciteProbability);
         
 
         JButton setExcitatorySynapseType = new JButton("Set...");
@@ -92,8 +88,8 @@ public class RadialPanel extends AbstractConnectionPanel {
         this.addItem("Base Excitatory Synapse Type:", baseExcitatorySynapseLabel);
         this.addItem("Set Base Excitatory Synapse Type:", setExcitatorySynapseType);
 
-        this.addItem("Inhibitory Probability", tfInhibitProbability);
         this.addItem("Inhibitory Radius", tfInhibitRadius);
+        this.addItem("Inhibitory Probability", tfInhibitProbability);
         
         JButton setInhibitorySynapseType = new JButton("Set...");
         setInhibitorySynapseType.addActionListener(new ActionListener() {
@@ -124,7 +120,6 @@ public class RadialPanel extends AbstractConnectionPanel {
     public void commitChanges() {
         Radial.setExcitatoryProbability(Double.parseDouble(tfExciteProbability.getText()));
         Radial.setExcitatoryRadius(Double.parseDouble(tfExciteRadius.getText()));
-        Radial.setPercentExcitatory(Double.parseDouble(tfExciteRatio.getText()));
         Radial.setInhibitoryProbability(Double.parseDouble(tfInhibitProbability.getText()));
         Radial.setInhibitoryRadius(Double.parseDouble(tfInhibitRadius.getText()));
         Radial.setAllowSelfConnections(allowSelfConnect.isSelected());
@@ -138,7 +133,6 @@ public class RadialPanel extends AbstractConnectionPanel {
         tfExciteProbability.setText(Double.toString(Radial.getExcitatoryProbability()));
         tfInhibitProbability.setText(Double.toString(Radial.getInhibitoryProbability()));
         tfExciteRadius.setText(Double.toString(Radial.getExcitatoryRadius()));
-        tfExciteRatio.setText(Double.toString(Radial.getPercentExcitatory()));
         tfInhibitProbability.setText(Double.toString(Radial.getInhibitoryProbability()));
         tfInhibitRadius.setText(Double.toString(Radial.getInhibitoryRadius()));
         allowSelfConnect.setSelected(Radial.isAllowSelfConnections());

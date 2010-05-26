@@ -170,7 +170,7 @@ public class CouplingManager {
         // TODO warning that old was deleted
         
         if (old != null) {
-            System.out.println("removing old coupling: " + old);
+            //System.out.println("removing old coupling: " + old);
 //            removeCoupling(old);
         }
 

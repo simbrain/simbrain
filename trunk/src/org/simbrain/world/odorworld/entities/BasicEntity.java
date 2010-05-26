@@ -22,7 +22,8 @@ import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.world.odorworld.OdorWorld;
 
 /**
- * <b>BasicEntity</b> represents a basic entity in the Odor World environment.
+ * <b>BasicEntity</b> represents a static entity in the Odor World environment, with a static
+ * image file.  (TODO: Improve doc)
  */
 public class BasicEntity extends OdorWorldEntity {
 
@@ -96,8 +97,16 @@ public class BasicEntity extends OdorWorldEntity {
      * @param imageData the data from the combo box
      */
     public void setType(ComboBoxWrapper imageData) {
-        String currentImage = (String) imageData.getCurrentObject();
-        this.setAnimation(new Animation(STATIC_IMAGE_DIR + currentImage));
+        setImage( (String) imageData.getCurrentObject());
+    }
+    
+    /**
+     * Set type of object.
+     * 
+     * @param fileName file name.  //TODO!  BEtter doc
+     */
+    public void setImage(String fileName) {
+        this.setAnimation(new Animation(STATIC_IMAGE_DIR + fileName));
     }
 
 }

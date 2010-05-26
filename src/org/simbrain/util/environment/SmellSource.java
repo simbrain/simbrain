@@ -80,7 +80,7 @@ public class SmellSource {
     private double noiseLevel = initNoise;
 
     /**
-     * Instance of stimulus initializing values to be set.
+     * Construct smell source from specified parameters.
      *
      * @param distalstim Distal stimulus
      * @param decay Decay rate
@@ -98,9 +98,28 @@ public class SmellSource {
     }
     
     /**
-     * Instance of stimulus initializing values to be set.
+     * Construct smell source from specified parameters.
      *
-     * @param distalstim Distal stimulus
+     * @param distalstim  stimulus vector
+     * @param decay decay function
+     * @param dispersion level of dispersion
+     * @param location location of smell source
+     */
+    public SmellSource(final double[] distalstim, final DecayFunction decay,
+            final double dispersion, final double[] location) {
+        this.stimulusVector = distalstim;
+        this.decayFunction = decay;
+        this.stimulusDispersion = dispersion;
+        this.location = location;
+    }
+    
+
+    /**
+     * Construct smell source from specified parameters.
+     *
+     * @param distalstim  stimulus vector
+     * @param decay decay function
+     * @param location location of smell source
      */
     public SmellSource(final double[] distalstim, final DecayFunction decay, final double[] location) {
         this.stimulusVector = distalstim;

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
@@ -608,6 +610,22 @@ public class Workspace {
      */
     public void setUpdateDelay(int updateDelay) {
         this.updateDelay = updateDelay;
+    }
+
+    /**
+     * Returns all components of the specified type, e.g. all WorkspaceComponents of type NetworkComponent.class.
+     *
+     * @param componentType the type of the component, in the sense of its class
+     * @return list of components
+     */
+    public Collection<? extends WorkspaceComponent> getComponentList(Class componentType) {
+        List<WorkspaceComponent> returnList = new ArrayList<WorkspaceComponent>();
+        for (WorkspaceComponent component : componentList) {
+            if (component.getClass() == componentType) {
+                returnList.add(component);
+            }
+        }
+        return returnList;
     }
 
 }

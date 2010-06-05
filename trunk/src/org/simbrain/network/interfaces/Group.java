@@ -115,13 +115,26 @@ public abstract class Group {
         return neuronList.size() + synapseList.size();
     }
 
-    @Override
-    public String toString() {
+    /**
+     * Returns a debug string.
+     *
+     * @return the debug string.
+     */
+    public String debugString() {
         String ret =  new String();
         ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
         ret += (" " + this.getSynapseList().size() + " synapse(s),");
         ret += ("and " + this.getNetworkList().size() + " network(s).");
         return ret;
+    }
+    
+    @Override
+    public String toString() {
+        if (label != null) {
+            return label;
+        } else {
+            return id;            
+        }
     }
 
     /**

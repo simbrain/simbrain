@@ -557,6 +557,7 @@ public class SimbrainDesktop {
     private JMenu createInsertMenu() {
         JMenu insertMenu = new JMenu("Insert");
         insertMenu.add(actionManager.getNewNetworkAction());
+        insertMenu.add(actionManager.getNewTrainerAction());
         JMenu newGaugeSubMenu = new JMenu("New Plot");
         for (Action action : actionManager.getPlotActions()) {
             newGaugeSubMenu.add(action);

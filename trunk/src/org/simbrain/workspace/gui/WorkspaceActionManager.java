@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenuItem;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
@@ -43,6 +44,7 @@ import org.simbrain.workspace.actions.NewOdorWorldAction;
 import org.simbrain.workspace.actions.NewOscWorldAction;
 import org.simbrain.workspace.actions.NewTextWorldAction;
 import org.simbrain.workspace.actions.NewThreeDeeWorldAction;
+import org.simbrain.workspace.actions.NewTrainerAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
 import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
@@ -182,6 +184,9 @@ public class WorkspaceActionManager {
     /** Show hide property tab. */
     private final Action propertyTabAction;
 
+    /** Add trainer action. */
+    private Action newTrainerAction;
+
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
@@ -222,6 +227,8 @@ public class WorkspaceActionManager {
         newGameWorldAction = new NewGameWorldAction(workspace);
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
+
+        newTrainerAction = new NewTrainerAction(desktop);
 
         workspaceHelpAction = new WorkspaceHelpAction();
 
@@ -550,5 +557,9 @@ public class WorkspaceActionManager {
      */
     public Action getShowPropertyDialogAction() {
         return showPropertyDialogAction;
+    }
+
+    public Action getNewTrainerAction() {
+        return newTrainerAction;
     }
 }

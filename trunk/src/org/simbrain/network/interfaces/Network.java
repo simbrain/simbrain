@@ -961,8 +961,8 @@ public abstract class Network {
      * @param toDelete the group to delete.
      */
     public void deleteGroup(final Group toDelete) {
-        rootNetwork.fireGroupDeleted(toDelete);
         groupList.remove(toDelete);
+        rootNetwork.fireGroupDeleted(toDelete);
     }
 
 

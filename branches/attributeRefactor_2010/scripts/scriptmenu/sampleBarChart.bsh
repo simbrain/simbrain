@@ -6,11 +6,8 @@ import org.simbrain.network.layouts.*;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.*;
 import org.simbrain.plot.barchart.*;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.plot.barchart.BarChartComponent.BarChartConsumer;
+import org.simbrain.workspace.*;
 import java.awt.Color;
 
 {
@@ -48,9 +45,9 @@ import java.awt.Color;
     desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500, 20, 300,300);
 
     // COUPLING NETWORK TO BARCHART
-    for (int i = 0; i < numNeurons; i++) {
-        ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + (i+1), "Activation"); 
-        ConsumingAttribute barChartAttribute = barChart.getSingleConsumingAttribute("BarChartData" + i);
+    for (int i = 1; i <= numNeurons; i++) {
+        Producer neuronAttribute = networkComponent.getProducer(network.getNeuron("Neuron_" + i), "Activation", double.class, "Neuron " + i); 
+        Consumer barChartAttribute = barChart.getConsumer(barChart.getSetter(i-1), "Value", double.class, "Bar " + (i-1));
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, barChartAttribute));
     }
 

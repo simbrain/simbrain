@@ -18,57 +18,91 @@
  */
 package org.simbrain.workspace;
 
-import java.lang.reflect.Method;
-
 /**
- * TODO...
+ * Objects of this class contain everything necessary to produce a particular
+ * consumer or producer, as well as information used in displaying the potential
+ * attribute (for GUI elements which manage coupling creation).
  *
  * @author jyoshimi
- *
  */
-public class PotentialAttribute<E> {
-
-    /** The ID. */
-    private AttributeType type;
+public class PotentialAttribute {
 
     /** Parent workspace component. */
     private WorkspaceComponent parent;
 
-    /** Parent object on which an attribute will be set or get. */
-    private Object parentObject;
+    /**
+     * A string which can be used to obtain a reference to the object. Also used
+     * by getDescription()
+     */
+    private String objectKey;
 
-    /** Key for finding parent object. */ 
-    private String objectKey; //TODO: Use this for description and serialization
+    /** Potential producing or consuming object. */
+    private Object baseObject;
 
-    /** Name of the method that sets or gets the attribute. */
-    private String methodName;
+    /** Base name of the method that sets or gets the attribute. */
+    private String methodBaseName;
 
-    /** The method that sets or gets the attribute. */
-    protected Method theMethod = null;
+    /** The data type (double, string, etc) of a consumer or producer. */
+    private Class dataType;
 
     /**
      * Construct a potential attribute.
      *
-     * @param type
-     * @param parent
-     * @param parentObject
-     * @param methodName
+     * @param parent parent workspace component
+     * @param objectKey string key or object
+     * @param methodBaseName method name
+     * @param dataType class of data
      */
-    public PotentialAttribute(AttributeType type, WorkspaceComponent parent,
-            Object parentObject, String methodName) {
-        this.type = type;
+    public PotentialAttribute(WorkspaceComponent parent, String objectKey, Object object,
+            String methodBaseName, Class dataType) {
         this.parent = parent;
-        this.parentObject = parentObject;
-        this.methodName = methodName;
+        this.objectKey = objectKey;
+        this.baseObject = object;
+        this.methodBaseName = methodBaseName;
+        this.dataType = dataType;
     }
 
     /**
-     * Returns a description for use in GUIs...
+     * @param parent
+     * @param objectKey
+     * @param dataType
+     */
+    public PotentialAttribute(WorkspaceComponent parent, String objectName, Object object, AttributeType type) {
+        this.parent = parent;
+        this.objectKey = objectName;
+        this.baseObject = object;
+        this.methodBaseName = type.getAttributeName();
+        this.dataType = type.getDataType();
+    }
+
+    /**
+     * Actualize this potential attribute into a producer.
      *
-     * @return description
+     * @return the producer corresponding to this potential attribute.
+     */
+    public Producer createProducer() {
+        return parent.getProducer(this);
+    }
+
+    /**
+     * Actualize this potential attribute into a consumer.
+     *
+     * @return the consumer corresponding to this potential attribute.
+     */
+    public Consumer createConsumer() {
+        return parent.getConsumer(this);
+    }
+
+    /**
+     * Returns a description of this potential attribute; used in GUI.
+     *
+     * @param objectKey
+     * @param type
+     * @return
      */
     public String getDescription() {
-        return type.getDescription();
+        return objectKey + ":" + methodBaseName + "<"
+                + dataType.getCanonicalName() + ">";
     }
 
     /**
@@ -78,35 +112,32 @@ public class PotentialAttribute<E> {
         return parent;
     }
 
-
     /**
-     * @return the type
+     * @return the objectKey
      */
-    public AttributeType getType() {
-        return type;
-    }
-
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(AttributeType type) {
-        this.type = type;
-    }
-
-    /**
-     * @return the parentObject
-     */
-    public Object getParentObject() {
-        return parentObject;
+    public String getObjectKey() {
+        return objectKey;
     }
 
     /**
      * @return the methodName
      */
-    public String getMethodName() {
-        return methodName;
+    public String getMethodBaseName() {
+        return methodBaseName;
     }
 
+    /**
+     * @return the attributeType
+     */
+    public Class<?> getDataType() {
+        return dataType;
+    }
+
+    /**
+     * @return the object
+     */
+    public Object getBaseObject() {
+        return baseObject;
+    }
 
 }

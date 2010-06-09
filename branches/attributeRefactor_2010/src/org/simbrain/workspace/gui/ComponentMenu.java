@@ -93,8 +93,8 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
                     .getName());
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    workspace.coupleOneToOne(sourceComponent
-                            .getPotentialProducers(), targetComponent.getPotentialConsumers());
+                    workspace.coupleOneToOne(
+                            sourceComponent.getPotentialProducers(), targetComponent.getPotentialConsumers());
                 }
             });
             this.add(componentMenuItem);

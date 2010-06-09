@@ -18,10 +18,10 @@ public final class Coupling<E> {
     private static final int ARBITRARY_PRIME = 59;
 
     /** Producing attribute for this coupling. */
-    private Producer<E> Producer; //TODO: Change to lowercase
+    private Producer<E> producer;
 
     /** Consuming attribute for this coupling. */
-    private Consumer<E> Consumer;
+    private Consumer<E> consumer;
 
     /** Value of buffer. */
     private E buffer;
@@ -35,7 +35,7 @@ public final class Coupling<E> {
      */
     public Coupling(final Consumer<E> Consumer) {
         super();
-        this.Consumer = Consumer;
+        this.consumer = Consumer;
     }
 
     /**
@@ -47,7 +47,7 @@ public final class Coupling<E> {
      */
     public Coupling(final Producer<E> Producer) {
         super();
-        this.Producer = Producer;
+        this.producer = Producer;
     }
 
 
@@ -64,8 +64,8 @@ public final class Coupling<E> {
 //        System.out.println("producing " + Producer.getAttributeDescription());
 //        System.out.println("consuming " + Consumer.getAttributeDescription());
 
-        this.Producer = Producer;
-        this.Consumer = Consumer;
+        this.producer = Producer;
+        this.consumer = Consumer;
     }
 
 
@@ -74,12 +74,12 @@ public final class Coupling<E> {
      */
     public void setBuffer() {
         final WorkspaceComponent producerComponent
-            = Producer.getParentComponent();
+            = producer.getParentComponent();
 
         try {
             buffer = Workspace.syncRest(producerComponent.getLocks().iterator(), new Callable<E>() {
                 public E call() throws Exception {
-                    return Producer.getValue();
+                    return producer.getValue();
                 }
             });
         } catch (Exception e) {
@@ -94,20 +94,20 @@ public final class Coupling<E> {
      * Update this coupling.
      */
     public void update() {
-        if ((Consumer != null) && (Producer != null)) {
+        if ((consumer != null) && (producer != null)) {
             final WorkspaceComponent consumerComponent
-                = Consumer.getParentComponent();
+                = consumer.getParentComponent();
             try {
                 Workspace.syncRest(consumerComponent.getLocks().iterator(),
                         new Callable<E>() {
                             public E call() throws Exception {
-                                Consumer.setValue(buffer);
-                                LOGGER.debug(Consumer.getParentComponent()
+                                consumer.setValue(buffer);
+                                LOGGER.debug(consumer.getParentComponent()
                                         .getDescription()
                                         + " just consumed "
-                                        + Producer.getValue()
+                                        + producer.getValue()
                                         + " from "
-                                        + Producer.getParentComponent()
+                                        + producer.getParentComponent()
                                                 .getDescription());
 
                                 return null;
@@ -125,14 +125,14 @@ public final class Coupling<E> {
      * @return the Producer
      */
     public Producer<E> getProducer() {
-        return Producer;
+        return producer;
     }
 
     /**
      * @return the Consumer
      */
     public Consumer<E> getConsumer() {
-        return Consumer;
+        return consumer;
     }
 
     /**
@@ -145,17 +145,17 @@ public final class Coupling<E> {
         String producerComponent = "";
         String consumerString;
         String consumerComponent = "";
-        if (Producer == null) {
+        if (producer == null) {
             producerString = "Null";
         } else {
-            producerComponent =  "[" + Producer.getParentComponent().toString() +"]";
-            producerString = Producer.getDescription();
+            producerComponent =  "[" + producer.getParentComponent().toString() +"]";
+            producerString = producer.getDescription();
         }
-        if (Consumer == null) {
+        if (consumer == null) {
             consumerString = "Null";
         } else {
-            consumerComponent = "[" + Consumer.getParentComponent().toString() +"]";
-            consumerString = Consumer.getDescription();
+            consumerComponent = "[" + consumer.getParentComponent().toString() +"]";
+            consumerString = consumer.getDescription();
         }
         return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
      }
@@ -167,8 +167,8 @@ public final class Coupling<E> {
         if (o instanceof Coupling) {
             Coupling<?> other = (Coupling<?>) o;
             
-            return other.Producer.equals(Producer)
-                && other.Consumer.equals(Consumer);
+            return other.producer.equals(producer)
+                && other.consumer.equals(consumer);
         } else {
             return false;
         }
@@ -177,6 +177,6 @@ public final class Coupling<E> {
      * {@inheritDoc}
      */
     public int hashCode() {
-        return Producer.hashCode() + (ARBITRARY_PRIME * Consumer.hashCode());
+        return producer.hashCode() + (ARBITRARY_PRIME * consumer.hashCode());
     }
 }

@@ -18,21 +18,17 @@
  */
 package org.simbrain.workspace;
 
-import java.awt.Container;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
 
 /**
@@ -154,17 +150,179 @@ public abstract class WorkspaceComponent {
         /* no default implementation */
     }
 
-    // TODO: Change to abstract once I get this working
-    public List<PotentialConsumer<?>> getPotentialConsumers() {
+    ////////////// NEW STUFF BEGIN ////////////////
+
+    public List<PotentialAttribute> getPotentialConsumers() {
         return Collections.EMPTY_LIST;
     }
 
-    public List<PotentialProducer<?>> getPotentialProducers() {
+    public List<PotentialAttribute> getPotentialProducers() {
         return Collections.EMPTY_LIST;
     }
 
     public List<AttributeType> getAttributeTypes() {
         return attributeTypeList;
+    }
+
+    // For serialization...
+    public Producer<?> getProducer(final String objectKey,
+            final String methodBaseName, final String className, final String description) {
+        Object parentObject = this.getObjectFromKey(objectKey);
+        Class dataType = null;
+        try {
+            dataType = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            System.err.println("The class name provided was wrong");
+            e.printStackTrace();
+        }
+        return getProducer(parentObject, methodBaseName, dataType, description);
+    }
+
+    public Producer<?> getProducer(final Object parentObject,
+            final String methodBaseName, final Class dataType) {
+        // TODO: Abstract formatting below which is repeated in
+        // PotentialAttribute
+        String description = parentObject.getClass().getSimpleName() + ":"
+                + methodBaseName + "<" + dataType.getSimpleName() + ">";
+        return getProducer(parentObject, methodBaseName, dataType, description);   
+    }
+
+    public Producer<?> getProducer(final PotentialAttribute potentialAttribute) {
+        return getProducer(potentialAttribute.getBaseObject(), potentialAttribute
+                .getMethodBaseName(), potentialAttribute.getDataType(),
+                potentialAttribute.getDescription());
+    }
+
+    /**
+     * Create a producer.
+     */
+    public Producer<?> getProducer(final Object parentObject,
+            final String methodBaseName, final Class dataType,
+            final String description) {
+
+        Producer<?> producer = new Producer() {
+
+            Method theMethod;
+
+            // Static initializer
+            {
+                try {
+                    theMethod = parentObject.getClass().getMethod(
+                            "get" + methodBaseName, null);
+                } catch (SecurityException e1) {
+                    e1.printStackTrace();
+                } catch (NoSuchMethodException e1) {
+                    System.err.println("Could not find method "
+                            + methodBaseName + " with return type of "
+                            + dataType.getCanonicalName());
+                    e1.printStackTrace();
+                }
+
+            }
+
+            public Object getValue() {
+                try {
+                    return theMethod.invoke(parentObject, null);
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            public WorkspaceComponent getParentComponent() {
+                return WorkspaceComponent.this;
+            }
+
+            public String getDescription() {
+                return description;
+            }
+        };
+        return producer;
+
+    }
+
+    public Consumer<?> getConsumer(final Object parentObject,
+            final String methodBaseName, final Class dataType) {
+        String description = parentObject.getClass().getSimpleName() + ":"
+                + methodBaseName + "<" + dataType.getSimpleName() + ">";
+        return getConsumer(parentObject, methodBaseName, dataType, description);   
+    }
+
+    public Consumer<?> getConsumer(final PotentialAttribute potentialAttribute) {
+        return getConsumer(potentialAttribute.getBaseObject(), potentialAttribute
+                .getMethodBaseName(), potentialAttribute.getDataType(),
+                potentialAttribute.getDescription());
+    }
+
+    public Consumer<?> getConsumer(final Object parentObject,
+            final String methodBaseName, final Class dataType,
+            final String description) {
+
+        Consumer<?> consumer = new Consumer() {
+
+            Method theMethod;
+
+            // Static initializer
+            {
+                try {
+                    theMethod = parentObject.getClass().getMethod(
+                            "set" + methodBaseName,
+                            new Class[] { dataType });
+                } catch (SecurityException e1) {
+                    e1.printStackTrace();
+                } catch (NoSuchMethodException e1) {
+                    System.err.println("Could not find method "
+                            + methodBaseName + " with argument of type of "
+                            + dataType.getCanonicalName());
+                    e1.printStackTrace();
+                }
+            }
+
+            public void setValue(Object value) {
+                try {
+                    theMethod.invoke(parentObject, new Object[] { value });
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            public WorkspaceComponent getParentComponent() {
+                return WorkspaceComponent.this;
+            }
+
+            public String getDescription() {
+                return description;
+            }
+
+        };
+        return consumer;
+
+    }
+
+
+    /**
+     * Classes which offer this should override it.
+     *
+     * @param objectKey
+     * @return
+     */
+    public Object getObjectFromKey(String objectKey) {
+        // TODO Should this be public?
+        return null;
     }
 
     /**
@@ -175,6 +333,14 @@ public abstract class WorkspaceComponent {
     public void addAttributeListener(final PotentialAttributeListener listener) {
         potentialAttributeListeners.add(listener);
     }
+
+    public void firePotentialAttributeUpdateEvent(WorkspaceComponent component) {
+        for (PotentialAttributeListener listener: potentialAttributeListeners) {
+            listener.update(component);
+        }
+    }
+
+    //////////// NEW STUFF END ////////////////
 
     /**
      * Returns the collection of update parts for this component.
@@ -191,12 +357,6 @@ public abstract class WorkspaceComponent {
         return Collections.singleton(new ComponentUpdatePart(this, callable, toString(), this));
     }
 
-    public void firePotentialAttributeUpdateEvent(WorkspaceComponent component) {
-        for (PotentialAttributeListener listener: potentialAttributeListeners) {
-            listener.update(component);
-        }
-    }
-    
     /**
      * Returns the locks for the update parts. There should be one lock per
      * part. These locks need to be the same ones used to lock the update of

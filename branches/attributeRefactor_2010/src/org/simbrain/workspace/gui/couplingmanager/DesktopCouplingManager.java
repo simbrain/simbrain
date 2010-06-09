@@ -35,8 +35,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.GenericFrame;
@@ -154,21 +153,22 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      */
     private void addCouplings() {
 
-        //todo make names shorter
-        List<PotentialProducer<?>> producingAttributeList = (List<PotentialProducer<?>>) producingAttributes.getSelectedAttributes();
-        List<PotentialConsumer<?>> consumingAttributeList = (List<PotentialConsumer<?>>) consumingAttributes.getSelectedAttributes();
-        
-        if ((producingAttributeList.size() == 0) || (consumingAttributeList.size() == 0)) {
+        List<PotentialAttribute> potentialProducers = (List<PotentialAttribute>) producingAttributes
+                .getSelectedAttributes();
+        List<PotentialAttribute> potentialConsumers = (List<PotentialAttribute>) consumingAttributes
+                .getSelectedAttributes();
+
+        if ((potentialProducers.size() == 0) || (potentialConsumers.size() == 0)) {
           JOptionPane.showMessageDialog(null,
                   "You must select at least one consuming and producing attribute \n in order to create couplings!",
                   "No Attributes Selected Warning", JOptionPane.WARNING_MESSAGE);
                   return;
         }
-        
+
         if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to one")) {
-            desktop.getWorkspace().coupleOneToOne(producingAttributeList, consumingAttributeList);
+            desktop.getWorkspace().coupleOneToOne(potentialProducers, potentialConsumers);
         } else if (((String)couplingMethodComboBox.getSelectedItem()).equalsIgnoreCase("One to many")) {
-            //desktop.getWorkspace().coupleOneToMany(producingAttributeList, consumingAttributeList);
+            desktop.getWorkspace().coupleOneToMany(potentialProducers, potentialConsumers);
         }
     }
 

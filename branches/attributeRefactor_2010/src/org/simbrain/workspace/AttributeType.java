@@ -19,7 +19,9 @@
 package org.simbrain.workspace;
 
 /**
- * Encapsulates type information about a particular attribute or potential attribute.
+ * Encapsulates type information about a particular attribute or potential
+ * attribute.  Used to determine which potential attributes are visible in 
+ * coupling creation GUI.
  *
  * @author jyoshimi
  */
@@ -28,15 +30,29 @@ public class AttributeType {
     /** ID for this type. */
     private String typeID;
 
-    /** ID for subtype. Null if there is none. */ 
-    private String subtype;
+    /** The root name of a getter or setter; i.e. "X" in "getX" or "setX".  */
+    private String methodBaseName;
 
     /** Class of this attribute. */
-    private Class dataType;
+    private Class<?> dataType;
 
     /** Whether this type of attribute is currently visible. */
     private boolean visible;
 
+    /**
+     * Construct an attribute type object.
+     *
+     * @param typeID String identification of type id
+     * @param methodName name of method 
+     * @param dataType data type (return type for producers; argument type for consumers)
+     * @param visible whether this attribute should be visible for a given component
+     */
+    public AttributeType(String typeID, String methodName, Class dataType, boolean visible) {
+        this.typeID = typeID;
+        this.methodBaseName = methodName;
+        this.dataType = dataType;
+        this.visible = visible;
+    }
 
     /**
      * Return a description of the attribute.
@@ -53,12 +69,13 @@ public class AttributeType {
     }
 
     /**
-     * 
-     * @return
+     * Returns a description of this potential attribute.
+     *
+     * @return the description
      */
     public String getSimpleDescription() {
-        if (subtype != null) {
-            return typeID + ":" + subtype;
+        if (methodBaseName != null) {
+            return typeID + ":" + methodBaseName;
         } else {
             return typeID;
         }
@@ -69,18 +86,6 @@ public class AttributeType {
      */
     private String typeClass() {
         return " <" + dataType.getSimpleName() + ">";
-    }
-
-    /**
-     * @param typeID
-     * @param subtype
-     * @param visible
-     */
-    public AttributeType(String typeID, String subtype, boolean visible, Class dataType) {
-        this.typeID = typeID;
-        this.subtype = subtype;
-        this.visible = visible;
-        this.dataType = dataType;
     }
 
     /**
@@ -114,15 +119,15 @@ public class AttributeType {
     /**
      * @return the subtype
      */
-    public String getSubtype() {
-        return subtype;
+    public String getAttributeName() {
+        return methodBaseName;
     }
 
     /**
      * @param subtype the subtype to set
      */
-    public void setSubtype(String subtype) {
-        this.subtype = subtype;
+    public void setAttributeName(String subtype) {
+        this.methodBaseName = subtype;
     }
 
     /**

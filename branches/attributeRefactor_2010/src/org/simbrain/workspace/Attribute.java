@@ -36,7 +36,7 @@ public interface Attribute {
     String getDescription();
 
     /**
-     * Returns a reference to the parent component
+     * Returns a reference to the parent component.
      *
      * @return parent parent component
      */

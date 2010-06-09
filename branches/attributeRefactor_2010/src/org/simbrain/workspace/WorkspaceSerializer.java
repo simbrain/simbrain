@@ -209,30 +209,30 @@ public class WorkspaceSerializer {
 
         // Add Couplings
         if (contents.getCouplings() != null) {
-            for (ArchiveContents.Coupling coupling : contents.getCouplings()) {
-                if (exclude.contains(coupling.source.uri)
-                || exclude.contains(coupling.target.uri)) {
+            for (ArchiveContents.CouplingReference couplingRef : contents.getCouplings()) {
+                if (exclude.contains(couplingRef.source.uri)
+                || exclude.contains(couplingRef.target.uri)) {
                     continue;
                 }
 
                 WorkspaceComponent sourceComponent
-                    = componentDeserializer.getComponent(coupling.source.uri);
+                    = componentDeserializer.getComponent(couplingRef.source.uri);
                 WorkspaceComponent targetComponent
-                    = componentDeserializer.getComponent(coupling.target.uri);
+                    = componentDeserializer.getComponent(couplingRef.target.uri);
                 
                 //TODO: Redo
                 
 //
 //                ProducingAttribute<?> producingAttribute = (ProducingAttribute<?>) sourceComponent
 //                        .getProducingAttribute(
-//                                coupling.source.attributeHolderID,
-//                                coupling.source.attributeID);
+//                               couplingRef.source.attributeHolderID,
+//                                couplingRef.source.attributeID);
 //                //System.out.println("producing: " + producingAttribute);
 //
 //                ConsumingAttribute<?> consumingAttribute = (ConsumingAttribute<?>) targetComponent
 //                        .getConsumingAttribute(
-//                                coupling.target.attributeHolderID,
-//                                coupling.target.attributeID);
+//                                couplingRef.target.attributeHolderID,
+//                               couplingRef.target.attributeID);
 //                //System.out.println("consuming: " + consumingAttribute);
 //
 //                workspace.addCoupling(new Coupling(producingAttribute,

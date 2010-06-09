@@ -23,9 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -39,12 +36,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.simbrain.workspace.PotentialAttributeListener;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.PotentialAttribute;
-import org.simbrain.workspace.PotentialConsumer;
-import org.simbrain.workspace.PotentialProducer;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.PotentialAttributeListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -183,11 +176,11 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
         if (component != null) {
             model.clear();
             if (producerOrConsumer == ProducerOrConsumer.Producing) {
-                for (PotentialProducer<?> potentialProducer : component.getPotentialProducers()) {
+                for (PotentialAttribute potentialProducer : component.getPotentialProducers()) {
                     model.addElement(potentialProducer);
                 }
             } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
-                for (PotentialConsumer<?> potentialConsumer : component.getPotentialConsumers()) {
+                for (PotentialAttribute potentialConsumer : component.getPotentialConsumers()) {
                     model.addElement(potentialConsumer);
                 }
             }

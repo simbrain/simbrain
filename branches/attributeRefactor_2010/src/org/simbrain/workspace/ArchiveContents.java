@@ -46,7 +46,7 @@ class ArchiveContents {
     private List<Component> components = new ArrayList<Component>();
 
     /** All of the couplings in the archive. */
-    private List<Coupling> couplings = new ArrayList<Coupling>();
+    private List<CouplingReference> couplings = new ArrayList<CouplingReference>();
 
     /** The serializer for this archive. */
     private final WorkspaceComponentSerializer serializer;
@@ -96,7 +96,7 @@ class ArchiveContents {
      *
      * @return An immutable list of the couplings in this archive.
      */
-    List<? extends Coupling> getCouplings() {
+    List<? extends CouplingReference> getCouplings() {
         if (couplings == null) couplings = Collections.emptyList();
         return Collections.unmodifiableList(couplings);
     }
@@ -123,8 +123,8 @@ class ArchiveContents {
      * @param coupling The coupling to add.
      * @return The coupling entry in the archive.
      */
-    Coupling addCoupling(final org.simbrain.workspace.Coupling<?> coupling) {
-        Coupling c = new Coupling(this, coupling);
+    CouplingReference addCoupling(final org.simbrain.workspace.Coupling<?> coupling) {
+        CouplingReference c = new CouplingReference(this, coupling);
         couplings.add(c);
         return c;
     }
@@ -214,12 +214,13 @@ class ArchiveContents {
         }
     }
 
+    //TODO: Change name to CouplingID or something...
     /**
      * Class used to represent a coupling in the archive.
      *
      * @author Matt Watson
      */
-    static final class Coupling {
+    static final class CouplingReference {
         /** The source attribute for the coupling. */
         final AttributeID source;
         /** The target attribute for the coupling. */
@@ -231,11 +232,13 @@ class ArchiveContents {
          * @param parent The parent archive.
          * @param coupling The coupling this instance represents.
          */
-        Coupling(final ArchiveContents parent, final org.simbrain.workspace.Coupling<?> coupling) {
+        CouplingReference(final ArchiveContents parent, final org.simbrain.workspace.Coupling<?> coupling) {
 
             this.source = new AttributeID(parent, coupling.getProducer());
             this.target = new AttributeID(parent, coupling.getConsumer());
         }
+        
+        //TODO: 2 levels down nested class confusing?
 
         /**
          * The class used to represent an attribute in the archive.
@@ -290,7 +293,7 @@ class ArchiveContents {
 
         xstream.omitField(ArchiveContents.class, "serializer");
         xstream.omitField(Component.class, "serializer");
-        xstream.omitField(Coupling.class, "serializer");
+        xstream.omitField(CouplingReference.class, "serializer");
         xstream.omitField(Component.class, "data");
         xstream.omitField(Component.DesktopComponent.class, "data");
         xstream.omitField(Workspace.class, "LOGGER");
@@ -307,11 +310,11 @@ class ArchiveContents {
 
         xstream.alias("Workspace", ArchiveContents.class);
         xstream.alias("Component", Component.class);
-        xstream.alias("Coupling", Coupling.class);
+        xstream.alias("Coupling", CouplingReference.class);
         xstream.alias("DesktopComponent", Component.DesktopComponent.class);
 
         xstream.addImplicitCollection(ArchiveContents.class, "components", Component.class);
-        xstream.addImplicitCollection(ArchiveContents.class, "couplings", Coupling.class);
+        xstream.addImplicitCollection(ArchiveContents.class, "couplings", CouplingReference.class);
         xstream.addImplicitCollection(Component.class, "desktopComponents");
 
         return xstream;

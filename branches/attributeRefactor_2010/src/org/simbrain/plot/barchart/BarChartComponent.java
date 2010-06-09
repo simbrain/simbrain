@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -37,6 +37,12 @@ public class BarChartComponent extends WorkspaceComponent {
     private BarChartModel model;
 
     /**
+     * Objects which can be used to set bar chart. Component level interface to
+     * plot.
+     */
+    private List<BarChartSetter> setterList = new ArrayList<BarChartSetter>();
+
+    /**
      * Create new BarChart Component.
      *
      * @param name chart name
@@ -45,8 +51,8 @@ public class BarChartComponent extends WorkspaceComponent {
         super(name);
         model = new BarChartModel();
         addListener();
-        initializeAttributes();
         model.defaultInit();
+        initializeAttributes();
     }
 
     /**
@@ -64,13 +70,6 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     /**
-     * Initialize consuming attributes.
-     */
-    private void initializeAttributes() {
-        getAttributeTypes().add(new AttributeType("Dimension", null, true, double.class));
-    }
-
-    /**
      * Initializes a jfreechart with specific number of data sources.
      *
      * @param name name of component
@@ -81,7 +80,22 @@ public class BarChartComponent extends WorkspaceComponent {
         model = new BarChartModel();
         addListener();
         model.addDataSources(numDataSources);
+        initializeAttributes();
     }
+
+    /**
+     * Initialize consuming attributes.
+     */
+    private void initializeAttributes() {
+
+        getAttributeTypes().add(new AttributeType("Dimension", null, double.class, true));
+
+        //TODO: Move this
+        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
+            setterList.add(new BarChartSetter(i));
+        }
+    }
+
 
     /**
      * Add chart listener to model.
@@ -148,14 +162,14 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<PotentialConsumer<?>> getPotentialConsumers() {
-        List<PotentialConsumer<?>> returnList = new ArrayList<PotentialConsumer<?>>();
+    public List<PotentialAttribute> getPotentialConsumers() {
+        List<PotentialAttribute> returnList = new ArrayList<PotentialAttribute>();
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
-            PotentialConsumer<Double> consumerID = new PotentialConsumer<Double>(
-                    new AttributeType("Dimension", null, true, Double.class),
+            PotentialAttribute consumerID = new PotentialAttribute(
                     this,
-                    new BarChartConsumer(i),
-                    "setValue");
+                    "Bar_" + i,
+                    new BarChartSetter(i),
+                    "Value", Double.class);
             returnList.add(consumerID);
         }
         return returnList;
@@ -163,24 +177,39 @@ public class BarChartComponent extends WorkspaceComponent {
 
 
     /**
-     * Represents a bar in a bar chart.
+     * Return the specified setter object. Used for making consumers.
+     *
+     * @param i index of setter
+     * @return the setter object
      */
-    public class BarChartConsumer {
+    public BarChartSetter getSetter(int i) {
+        return setterList.get(i);
+    }
+
+    /**
+     * Object which sets a value of one bar in a bar chart.
+     */
+    public class BarChartSetter {
 
         /** Index. */
         private int index;
 
         /**
-         * Construct  BarChartConsumer.
+         * Construct a setter object.
          *
          * @param plot the parent component
          * @param name the name of this consumer (displayed in the plot)
          */
-        public BarChartConsumer(final int index) {
+        public BarChartSetter(final int index) {
             this.index = index;
         }
 
-        public void setValue(final Double val) {
+        /**
+         * Set the value.
+         *
+         * @param val value for the bar
+         */
+        public void setValue(final double val) {
             model.setValue(val, index);
         }
     }

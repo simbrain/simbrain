@@ -83,10 +83,9 @@ public class BackpropTrainer extends Trainer {
         super(network);
     }
 
-    /**
-     * Initialize.
-     */
+    @Override
     public void init() {
+        layers.clear();
         buildNetworkRepresentation();
     }
 
@@ -203,7 +202,8 @@ public class BackpropTrainer extends Trainer {
 
         // Update RMS error
         rmsError = Math.sqrt(rmsError / (numRows * getOutputLayer().size()));
-
+        this.setCurrentError(rmsError);
+        this.setIteration(this.getIteration()+1);
     }
 
     /**

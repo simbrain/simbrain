@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -47,6 +48,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.builders.LayeredNetworkBuilder;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -72,12 +74,12 @@ public class TrainerGUI extends JPanel {
 	private String[] columnNames = {"#","N1","N2","N3","N4"};
 	private String[] trainingAlgorithms = {"Backprop  ", "Other"};
 	private String[] errorSignal = {"SSE           ", "Other"};
-	
+		
 	/** Network selection combo box. */
-	JComboBox cbNetworkChooser = new JComboBox();
+	private JComboBox cbNetworkChooser = new JComboBox();
 	
 	/** Input layer combo box. */
-	JComboBox cbInputLayer = new JComboBox();
+	private JComboBox cbInputLayer = new JComboBox();
 
 	/** Table displaying input data. */
 	private JTable inputDataTable;
@@ -97,6 +99,12 @@ public class TrainerGUI extends JPanel {
 	/** Current network. */
 	private RootNetwork currentNetwork;
 	
+	/** Data for the error graph. */
+    private XYSeries graphData;
+    
+    /** Text field for setting number of iterations to run. */
+    private JTextField tfIterations;
+
 	// Sample data to start with
 	Object [][] data = {
 			{"1",null, null,null,null},
@@ -116,7 +124,6 @@ public class TrainerGUI extends JPanel {
 			{"15",null, null,null,null},
 	};	
 	
-	
 	/**
 	 * Default constructor.
 	 */
@@ -125,7 +132,7 @@ public class TrainerGUI extends JPanel {
 	    // Initial setup
 		this.workspace = workspace;
 		workspace.addListener(workspaceListener);
-		
+				
 		// Initialize combo box action listeners
 		cbNetworkChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -178,8 +185,8 @@ public class TrainerGUI extends JPanel {
 		JPanel trainerDisplay = new JPanel();
 		trainerDisplay.setLayout(new BorderLayout());
 		XYSeriesCollection series = new XYSeriesCollection();
-		XYSeries series1 = new XYSeries(1);
-		series.addSeries(series1);		
+		graphData = new XYSeries(1);
+		series.addSeries(graphData);		
 		JFreeChart chart = ChartFactory.createXYLineChart(
 	            "Error", // Title
 	            "Iterations", // x-axis Label
@@ -191,10 +198,28 @@ public class TrainerGUI extends JPanel {
 	            false // Configure chart to generate URLs?
 	        );		
 		ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setPreferredSize(new Dimension(800,200));
 		JPanel runButtons = new JPanel();
-        runButtons.add(new JButton("Run"));
-        runButtons.add(new JButton("Stop"));
-        runButtons.add(new JButton("Step"));
+        JButton runButton = new JButton("Run");
+        runButtons.add(runButton);
+        runButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                if (trainer != null) {
+                    trainer.train(Integer.parseInt(tfIterations.getText()));
+                }
+            }
+        });
+        JButton initButton = new JButton("Init");
+        runButtons.add(initButton);
+        initButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                currentNetwork.randomizeBiases(-1, 1);
+                trainer.init();
+            }
+        });
+        
+        tfIterations = new JTextField("300");
+        runButtons.add(tfIterations);
         runButtons.add(new JButton("Clear"));
         trainerDisplay.add("Center",chartPanel);
         trainerDisplay.add("South",runButtons);
@@ -235,7 +260,6 @@ public class TrainerGUI extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 loadData(inputDataTable);
             }
-		    
 		});		
         leftPanel.add("North", leftMenuPanel);
         leftPanel.add("Center", leftScroll);
@@ -261,8 +285,7 @@ public class TrainerGUI extends JPanel {
 		rightImport.addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent arg0) {
 	                loadData(trainingDataTable);
-	            }
-	            
+	            }	            
 	        });
 		rightPanel.add("North", rightMenuPanel);
 		rightPanel.add("Center", rightScroll);
@@ -287,34 +310,45 @@ public class TrainerGUI extends JPanel {
 	 * @param table table to laod data in to
 	 */
 	private void loadData(JTable table) {
-        SFileChooser chooser = new SFileChooser(".",
-                "Comma Separated Values", "csv");
-            File theFile = chooser.showOpenDialog();
-            if (theFile == null) {
-                return;
+
+        SFileChooser chooser = new SFileChooser(".", "Comma Separated Values",
+                "csv");
+        File theFile = chooser.showOpenDialog();
+        if (theFile == null) {
+            return;
+        }
+
+        // Load data in to trainer
+        if (trainer != null) {
+            if (table == inputDataTable) {
+                trainer.setInputData(theFile);
+            } else if (table == trainingDataTable) {
+                trainer.setTrainingData(theFile);
             }
-            double[][]  doubleVals = Utils.getDoubleMatrix(theFile);
-            DefaultTableModel model  = (DefaultTableModel)table.getModel();
-            model.setNumRows(doubleVals.length);
-            model.setColumnCount(doubleVals[0].length+1);
-            for (int i = 0; i < doubleVals.length; i++) {
-                for (int j = 0; j < doubleVals[i].length+1; j++) {
-                    if (j == 0) {
-                        model.setValueAt(i+1,i,j); // Row number column 
-                    } else {
-                        model.setValueAt(doubleVals[i][j-1],i,j);                        
-                    }
+        }
+        
+        double[][] doubleVals = Utils.getDoubleMatrix(theFile);
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setNumRows(doubleVals.length);
+        model.setColumnCount(doubleVals[0].length + 1);
+        for (int i = 0; i < doubleVals.length; i++) {
+            for (int j = 0; j < doubleVals[i].length + 1; j++) {
+                if (j == 0) {
+                    model.setValueAt(i + 1, i, j); // Row number column
+                } else {
+                    model.setValueAt(doubleVals[i][j - 1], i, j);
                 }
             }
-    }   
+        }
+    }
 	
     /**
      * User has changed the current network in the network selection combo box.
      * Make appropriate changes.
      */
 	private void updateCurrentNetwork() {
+	    
 	    Object object = cbNetworkChooser.getSelectedItem(); 
-	    //previousNetwork = currentNetwork;
 	    if (object instanceof NetworkComponent) {
 	        currentNetwork = ((NetworkComponent)object).getRootNetwork();
 	    } else {
@@ -323,6 +357,20 @@ public class TrainerGUI extends JPanel {
 	    }
         updateInputTable();
         updateOutputTable();
+
+        // Initialize trainer
+        if (trainer == null) {
+            trainer = new BackpropTrainer(currentNetwork);          
+            trainer.listeners.add(new TrainerListener() {
+
+                public void errorUpdated(double error) {
+                    graphData.add(trainer.getIteration() , error);
+                }
+                
+            });
+        } else {
+            trainer.setNetwork(currentNetwork);
+        }
         
 	    //TODO: Remove old listener
 	    //previousNetwork.removeGroupListener(previousListener)
@@ -371,8 +419,11 @@ public class TrainerGUI extends JPanel {
      * Update input data table
      */
     private void updateInputTable() {
-        Group group = (Group) cbInputLayer.getSelectedItem();
+        NeuronGroup group = (NeuronGroup) cbInputLayer.getSelectedItem();
         if (group != null) {
+            if (trainer != null) {
+                trainer.setInputLayer(group);    
+            }
             updateTable(group, inputDataTable);
         }
     }
@@ -381,8 +432,11 @@ public class TrainerGUI extends JPanel {
      * Update training data table
      */
     private void updateOutputTable() {
-        Group group = (Group) cbOutputLayer.getSelectedItem();
+        NeuronGroup group = (NeuronGroup) cbOutputLayer.getSelectedItem();
         if (group != null) {
+            if (trainer != null) {
+                trainer.setOutputLayer(group);
+            }
             updateTable(group, trainingDataTable);
         }
     }
@@ -396,11 +450,15 @@ public class TrainerGUI extends JPanel {
 	    if (currentNetwork != null) {
 	        cbInputLayer.removeAllItems();
 	        for (Group group : currentNetwork.getGroupList()) {
-	            cbInputLayer.addItem(group);
+	            if (group instanceof NeuronGroup) {
+	                cbInputLayer.addItem(group);	                
+	            }
 	        }
 	        cbOutputLayer.removeAllItems();
 	        for (Group group : currentNetwork.getGroupList()) {
-	            cbOutputLayer.addItem(group);
+                if (group instanceof NeuronGroup) {
+                    cbOutputLayer.addItem(group);
+                }
 	        }  
 	        updateInputTable();
 	        updateOutputTable();
@@ -411,7 +469,6 @@ public class TrainerGUI extends JPanel {
 	 * Update table using the supplied neuron group.
 	 */
 	private void updateTable(Group group, JTable table) {
-
 	          
 	    int groupSize = group.getNeuronList().size();
 	    int tableSize = table.getColumnCount();

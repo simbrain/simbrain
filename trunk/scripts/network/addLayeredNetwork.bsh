@@ -11,7 +11,7 @@ import org.simbrain.network.builders.*;
 {
 
     // Parameters
-    int[] topology = {5,3,3,5}; // Number of neurons in each layer / number of layers
+    int[] topology = {2,3,3,1}; // Number of neurons in each layer / number of layers
     
     // Get last clicked position in the panel
     Point2D lastClicked = networkPanel.getLastClickedPosition();
@@ -20,6 +20,5 @@ import org.simbrain.network.builders.*;
     builder.setInitialPosition(lastClicked);
     builder.setNodesPerLayer(topology);
     builder.buildNetwork(networkPanel.getRootNetwork());
-    
 
 }

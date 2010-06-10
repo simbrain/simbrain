@@ -29,6 +29,7 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
@@ -92,7 +93,7 @@ public final class LayeredNetworkBuilder {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
-            LinearNeuron neuron = new LinearNeuron();
+            ClampedNeuron neuron = new ClampedNeuron();
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);

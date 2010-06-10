@@ -19,6 +19,7 @@
 package org.simbrain.trainer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.groups.NeuronGroup;
@@ -36,10 +37,8 @@ import org.simbrain.util.Utils;
 public abstract class Trainer {
 
     //TODO: Tools for batch training at this level?
-    //TODO: Iteration number?
-    // getCurrentError?
     // train(min-error) / train to get past an error
-
+    
     /**
      * Reference to the network being trained.
      */
@@ -50,6 +49,15 @@ public abstract class Trainer {
 
     /** Output layer. */
     private List<Neuron> outputLayer;
+
+    /** Current error. */
+    private double currentError;
+
+    /** Iteration number. */
+    private int iteration;
+
+    /** Listener list. */
+    public List<TrainerListener> listeners = new ArrayList<TrainerListener>();
 
     /**
      * Same number of columns as input network.
@@ -69,6 +77,11 @@ public abstract class Trainer {
     public Trainer(Network network) {
         this.network = network;
     }
+    
+    /**
+     * Initialize the trainer.
+     */
+    public abstract void init();
 
     /**
      * Train the network for specified iterations. Return error. Overrode by
@@ -204,6 +217,44 @@ public abstract class Trainer {
      */
     public void setNetwork(Network network) {
         this.network = network;
+    }
+    
+    /**
+     * Notify listeners that the error value has been updated.
+     */
+    public void fireErrorUpdated() {
+        for (TrainerListener listener : listeners) {
+            listener.errorUpdated(currentError); 
+        }
+    }
+
+    /**
+     * @return the currentError
+     */
+    public double getCurrentError() {
+        return currentError;
+    }
+
+    /**
+     * @param currentError the currentError to set
+     */
+    public void setCurrentError(double currentError) {
+        this.currentError = currentError;
+        fireErrorUpdated();
+    }
+
+    /**
+     * @return the iteration
+     */
+    public int getIteration() {
+        return iteration;
+    }
+
+    /**
+     * @param iteration the iteration to set
+     */
+    public void setIteration(int iteration) {
+        this.iteration = iteration;
     }
 
 }

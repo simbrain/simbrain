@@ -64,6 +64,10 @@ public class LMSTrainer extends Trainer {
 
     // TODO Convenience methods below?
 
+    @Override
+    public void init() {
+    }
+
     /**
      * Iterate network training.
      */

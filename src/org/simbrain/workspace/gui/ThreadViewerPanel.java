@@ -87,7 +87,15 @@ public class ThreadViewerPanel extends JPanel {
 
         // Set up top statistics panel
         topStatsPanel.add(updateName);
-        topStatsPanel.addSeparator(new Dimension(50,10));
+        topStatsPanel.addSeparator();
+        JButton resetUpdateMethodButton = new JButton("Reset update method");
+        resetUpdateMethodButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                workspace.resetUpdateController();
+            }
+        });
+        topStatsPanel.add(resetUpdateMethodButton);
+        topStatsPanel.addSeparator();        
         topStatsPanel.add(new JLabel("Number of Threads: "));
         updatorNumThreads.setMaximumSize(new Dimension(100,100));
         topStatsPanel.add(updatorNumThreads);
@@ -99,8 +107,8 @@ public class ThreadViewerPanel extends JPanel {
 			}
 
         });
-        topStatsPanel.add(setThreadsButton);
-        topStatsPanel.addSeparator(new Dimension(50,10));
+        topStatsPanel.add(setThreadsButton);        
+        topStatsPanel.addSeparator();
         topStatsPanel.add(new JLabel("Number of Processors: "
                 + Runtime.getRuntime().availableProcessors()));
         updateStats();
@@ -199,7 +207,7 @@ public class ThreadViewerPanel extends JPanel {
 	 * just one.
 	 */
     private void updateStats() {
-        updateName.setText("Current updator: "
+        updateName.setText("Current update method: "
                 + workspace.getWorkspaceUpdator().getCurrentUpdatorName());    	
         updatorNumThreads.setText("" + workspace.getWorkspaceUpdator().getNumThreads());
     }

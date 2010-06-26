@@ -23,10 +23,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JInternalFrame;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.trainer.TrainerGUI;
-import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.couplingmanager2.DesktopCouplingManager;
 
 /**
  * Open data world in current workspace.
@@ -43,7 +42,7 @@ public final class NewTrainerAction extends AbstractAction {
      */
     public NewTrainerAction(SimbrainDesktop desktop) {
         super("Add Network Trainer");
-        //putValue(SMALL_ICON, ResourceManager.getImageIcon("Properties.png")); TODO
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
         this.desktop = desktop;
     }
 

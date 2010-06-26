@@ -58,7 +58,7 @@ public class ConsumingColumn<E> extends SingleAttributeConsumer<E> {
     public void setValue(final E value) {
         // TODO: The cast to double is there to make the compiler happy; not
         // sure why it was needed.
-        parent.getDataModel().set(columnNumber, (Double) value);
+        parent.getDataModel().setValueCurrentRow(columnNumber, (Double) value);
     }
 
     /**

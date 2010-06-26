@@ -131,7 +131,7 @@ public abstract class Trainer {
 
         if (trainingData[0].length != outputLayer.size()) {
             return;
-            // throw new
+            // TODO: Throw appropriate exception
             // Exception("Training data size must be the same as output layer size");
         }
         // TODO: CHECK correct throw exception otherwise

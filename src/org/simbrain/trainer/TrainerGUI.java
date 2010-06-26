@@ -57,6 +57,8 @@ import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
+import org.simbrain.util.table.SimbrainDataTable;
+import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -82,13 +84,13 @@ public class TrainerGUI extends JPanel {
 	private JComboBox cbInputLayer = new JComboBox();
 
 	/** Table displaying input data. */
-	private JTable inputDataTable;
+	private SimbrainJTable inputDataTable;
 		
 	/** Output layer combo box. */
     JComboBox cbOutputLayer = new JComboBox();
     
     /** Table displaying training data. */
-    private JTable trainingDataTable;
+    private SimbrainJTable trainingDataTable;
 
 	/** Reference to trainer object. */
 	private Trainer trainer;
@@ -104,25 +106,6 @@ public class TrainerGUI extends JPanel {
     
     /** Text field for setting number of iterations to run. */
     private JTextField tfIterations;
-
-	// Sample data to start with
-	Object [][] data = {
-			{"1",null, null,null,null},
-			{"2",null, null,null,null},
-			{"3",null, null,null,null},
-			{"4",null, null,null,null},
-			{"5",null, null,null,null},
-			{"6",null, null,null,null},
-			{"7",null, null,null,null},
-			{"8",null, null,null,null},
-			{"9",null, null,null,null},
-			{"10",null, null,null,null},
-			{"11",null, null,null,null},
-			{"12",null, null,null,null},
-			{"13",null, null,null,null},
-			{"14",null, null,null,null},
-			{"15",null, null,null,null},
-	};	
 	
 	/**
 	 * Default constructor.
@@ -215,6 +198,8 @@ public class TrainerGUI extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 currentNetwork.randomizeBiases(-1, 1);
                 trainer.init();
+                trainer.setInputData(inputDataTable.getData().asArray());
+                trainer.setTrainingData(trainingDataTable.getData().asArray());
             }
         });
         
@@ -239,54 +224,39 @@ public class TrainerGUI extends JPanel {
 		splitPane.setRightComponent(rightPanel);		
 		
 	    // Input Data 
-		DefaultTableModel inputDataModel = new DefaultTableModel(data, columnNames);
-        inputDataTable = new JTable(inputDataModel);
-        inputDataTable.setGridColor(Color.LIGHT_GRAY);
-        TableColumn inColumn = null;
-        inColumn = inputDataTable.getColumnModel().getColumn(0);
-        inColumn.setPreferredWidth(18);
+		//DefaultTableModel inputDataModel = new DefaultTableModel(data, columnNames);
+        inputDataTable = new SimbrainJTable(new SimbrainDataTable(4, 2));
+        inputDataTable.getData().fill(new Double(0));
+  //      TableColumn inColumn = null;
+ //       inColumn = inputDataTable.getColumnModel().getColumn(0);
+//        inColumn.setPreferredWidth(18);
         JScrollPane leftScroll = new JScrollPane(inputDataTable);
-        leftScroll.setPreferredSize(new Dimension(400, 200));
+ //       leftScroll.setPreferredSize(new Dimension(400, 200));
         JPanel leftMenuPanel = new JPanel();
 		leftMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 		JLabel inputLabel = new JLabel("Input Layer:");
 		leftMenuPanel.add(inputLabel);
 		leftMenuPanel.add(cbInputLayer);
-		JButton leftSave = new JButton("Save");
-		leftMenuPanel.add(leftSave);
-		JButton leftImport = new JButton("Import");
-		leftMenuPanel.add(leftImport);
-		leftImport.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                loadData(inputDataTable);
-            }
-		});		
+        leftMenuPanel.add(inputDataTable.getToolbarCSV());
+        leftMenuPanel.add(inputDataTable.getToolbarRandomize());
         leftPanel.add("North", leftMenuPanel);
         leftPanel.add("Center", leftScroll);
         
         // Training Data
-        DefaultTableModel trainingDataModel = new DefaultTableModel(data, columnNames);
-        trainingDataTable = new JTable(trainingDataModel);
-        trainingDataTable.setGridColor(Color.LIGHT_GRAY);
+        trainingDataTable = new SimbrainJTable(new SimbrainDataTable(4, 2));
+        trainingDataTable.getData().fill(new Double(0));
         TableColumn outColumn = null;
-        outColumn = trainingDataTable.getColumnModel().getColumn(0);
-        outColumn.setPreferredWidth(18);
+//        outColumn = trainingDataTable.getColumnModel().getColumn(0);
+//        outColumn.setPreferredWidth(18);
         JScrollPane rightScroll = new JScrollPane(trainingDataTable);
-        rightScroll.setPreferredSize(new Dimension(400, 200));
+//        //rightScroll.setPreferredSize(new Dimension(400, 200));
 		JPanel rightMenuPanel = new JPanel();
 		rightMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 		JLabel outputLabel = new JLabel("Output Layer:");
 		rightMenuPanel.add(outputLabel);
 		rightMenuPanel.add(cbOutputLayer);
-		JButton rightSave = new JButton("Save");
-		rightMenuPanel.add(rightSave);		
-		JButton rightImport = new JButton("Import");
-		rightMenuPanel.add(rightImport);
-		rightImport.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent arg0) {
-	                loadData(trainingDataTable);
-	            }	            
-	        });
+		rightMenuPanel.add(trainingDataTable.getToolbarCSV());
+		rightMenuPanel.add(trainingDataTable.getToolbarRandomize());
 		rightPanel.add("North", rightMenuPanel);
 		rightPanel.add("Center", rightScroll);
 		
@@ -475,8 +445,8 @@ public class TrainerGUI extends JPanel {
 
 	    // If there are more neurons than columns in the table, enlarge the table
 	    if (groupSize > tableSize) {
-	        ((DefaultTableModel)table.getModel()).setColumnCount(groupSize); 
-	        ((DefaultTableModel)table.getModel()).fireTableStructureChanged();
+	        //((DefaultTableModel)table.getModel()).setColumnCount(groupSize); 
+	        //((DefaultTableModel)table.getModel()).fireTableStructureChanged();
 	    }
 
 	    // Rename column headings

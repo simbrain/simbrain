@@ -67,7 +67,7 @@ public class ProducingColumn<E> extends SingleAttributeProducer<E> {
      * {@inheritDoc}
      */
     public E getValue() {
-        return (E) parent.getDataModel().get(columnNumber);
+        return (E) parent.getDataModel().getValueCurrentRow(columnNumber);
     }
 
     /**

@@ -38,7 +38,7 @@ import com.Ostermiller.util.CSVPrinter;
  */
 public class Utils {
 
-    /** File system seperator. */
+    /** File system separator. */
     private static final String FS = System.getProperty("file.separator");
 
      /**
@@ -128,14 +128,17 @@ public class Utils {
     }
 
     /**
-     * Helper method to create a relative path for use in saving simulation files which refer to files within
-     * directories.   Substracts the absolutePath of  the local user directory from the absolute path of the file to
-     * be saved, and converts  file-separators into forward slashes, which are used for saving simualtion files.
-     *
+     * Helper method to create a relative path for use in saving simulation
+     * files which refer to files within directories. Substracts the
+     * absolutePath of the local user directory from the absolute path of the
+     * file to be saved, and converts file-separators into forward slashes,
+     * which are used for saving simualtion files.
+     * 
      * @param baseDir absolute path of the local simbrain directory.
      * @param absolutePath the absolute path of the file to be saved
-     *
-     * @return the relative path from the local directory to the file to be saved
+     * 
+     * @return the relative path from the local directory to the file to be
+     *         saved
      */
     public static String getRelativePath(final String baseDir, final String absolutePath) {
         int localLength = baseDir.length();

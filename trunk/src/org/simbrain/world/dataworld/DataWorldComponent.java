@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.simbrain.util.table.SimbrainDataTable;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
@@ -45,14 +46,14 @@ public class DataWorldComponent extends WorkspaceComponent {
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private DataModel<Double> dataModel; //TODO: Generalize to arbitrary data type?
+    private SimbrainDataTable dataModel; 
 
     /**
      * This method is the default constructor.
      */
     public DataWorldComponent(final String name) {
         super(name);
-        dataModel = new DataModel<Double>();
+        dataModel = new SimbrainDataTable();
         init();
     }
 
@@ -65,14 +66,14 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public DataWorldComponent(final String name, int rows, int columns) {
         super(name);
-        dataModel = new DataModel<Double>(rows, columns);
+        dataModel = new SimbrainDataTable(rows, columns);
         init();
     }
 
     @SuppressWarnings("unchecked")
-    private DataWorldComponent(final String name, final DataModel<?> dataModel) {
+    private DataWorldComponent(final String name, final SimbrainDataTable dataModel) {
         super(name);
-        this.dataModel = (DataModel<Double>) dataModel;
+        this.dataModel = (SimbrainDataTable) dataModel;
         init();
     }
 
@@ -89,7 +90,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     }
 
     /** Listener. */
-    private final DataModel.Listener listener = new DataModel.Listener() {
+    private final SimbrainDataTable.TableListener listener = new SimbrainDataTable.TableListener() {
 
         public void columnAdded(int column) {
             int index = dataModel.getColumnCount() - 1;
@@ -122,6 +123,10 @@ public class DataWorldComponent extends WorkspaceComponent {
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
+        public void structureChanged() {
+            DataWorldComponent.this.setChangedSinceLastSave(true);
+        }
+
     };
 
     /**
@@ -134,7 +139,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public static DataWorldComponent open(InputStream input, String name, String format) {
         // TODO: Use format  to determine how to open this.
-        DataModel<?> model = (DataModel<?>) DataModel.getXStream().fromXML(input);
+        SimbrainDataTable model = (SimbrainDataTable) SimbrainDataTable.getXStream().fromXML(input);
         return new  DataWorldComponent(name,  model);
     }
 
@@ -154,7 +159,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      *
      * @return The data model for this component.
      */
-    public DataModel<Double> getDataModel() {
+    public SimbrainDataTable getDataModel() {
         return dataModel;
     }
 
@@ -163,7 +168,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        DataModel.getXStream().toXML(dataModel, output);
+        SimbrainDataTable.getXStream().toXML(dataModel, output);
     }
 
     @SuppressWarnings("unchecked")
@@ -194,32 +199,7 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return DataModel.getXStream().toXML(dataModel);
+        return SimbrainDataTable.getXStream().toXML(dataModel);
     }
 
-    /**
-     * Read in stored dataset file as CVS File.
-     *
-     * @param file Name of file to read in
-     * @throws FileNotFoundException
-     */
-    public void readData(final File file) {
-
-        try {
-            CSVParser theParser = new CSVParser(new FileInputStream(file), "", "", "#");
-
-            // # is a comment delimeter in net files
-            String[][] values = theParser.getAllValues();
-            dataModel.modifyRowsColumns(values.length, values[0].length, new Double(0));
-            for (int i = 0; i < values.length; i++) {
-                for (int j = 0; j < values[0].length; j++) {
-                    if (((String)(values[i][j])).length() > 0) {
-                        dataModel.set(i, j, Double.valueOf(values[i][j]));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

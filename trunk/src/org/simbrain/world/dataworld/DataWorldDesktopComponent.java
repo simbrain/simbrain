@@ -23,6 +23,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -54,10 +55,12 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
     /** File menu. */
     private JMenu fileItem = new JMenu("File  ");
-    
+
     /** Save menu item. */
     private JMenuItem saveItem = new JMenuItem("Save");
 
+    /** Determines whether table is in iteration mode. */
+    private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem("Iteration mode");
 
     /** Component. */
     private final DataWorldComponent component;
@@ -76,20 +79,20 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         // Initialize data
         component.getDataModel().initValues(0);
-        
+
         // Set up table
         table = new SimbrainJTable(component.getDataModel());
         scroller = new JScrollPane();
         scroller.setViewportView(table);
         add(scroller, BorderLayout.CENTER);
-        
+
         // Add toolbars
         JPanel toolbarPanel = new JPanel();
         toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         toolbarPanel.add(table.getToolbarCSV()); //TODO: Use regular open / close
         toolbarPanel.add(table.getToolbarRandomize());
         add(toolbarPanel, BorderLayout.NORTH);
-        
+
         addMenuBar(table);
 
     }
@@ -128,25 +131,31 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
             }
         });
         fileMenu.add(saveAsItem);
-                
+
         // TODO : add import / export
-        
+
         // Edit menu
-        mb.add(table.getMenuEdit());
+        JMenu editMenu = table.getMenuEdit();
+        iterationMode.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                component.getDataModel().setIterationMode(
+                        iterationMode.getState());
+             }
+        });
+        editMenu.add(iterationMode);
+        mb.add(editMenu);
 
         // Add coupling menu
-        JMenu producerMenu = new ComponentMenu("Couple",  getWorkspaceComponent().getWorkspace(), getWorkspaceComponent());
+        JMenu producerMenu = new ComponentMenu("Couple",
+                getWorkspaceComponent().getWorkspace(), getWorkspaceComponent());
         mb.add(producerMenu);
 
         getParentFrame().setJMenuBar(mb);
     }
 
-    private ActionListener iterationModeListener = new ActionListener() {
-        public void actionPerformed(final ActionEvent e) {
-           // component.getDataModel().setIterationMode(iterationMode.getState());
-        }
-    };
-    
+    /**
+     * Listen for menu events.
+     */
     private final MenuListener menuListener = new MenuListener() {
         /**
          * Menu selected event.
@@ -162,10 +171,10 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
                 }
             }
         }
-    
+
         public void menuDeselected(final MenuEvent e) {
         }
-    
+
         public void menuCanceled(final MenuEvent e) {
         }
     };
@@ -180,7 +189,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         // Set max size somehow?
         repaint();
     }
-    
+
     @Override
     public void postAddInit() {
         if (this.getParentFrame().getJMenuBar() == null) {

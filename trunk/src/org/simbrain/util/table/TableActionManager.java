@@ -35,12 +35,11 @@ import org.simbrain.util.Utils;
 
 /**
  * Contains actions for use in SimbrainJTables.
- * 
+ *
  * @author jyoshimi
  */
 public class TableActionManager {
 
-    
     /**
      * Action for opening from comma separate value file.
      *
@@ -49,7 +48,7 @@ public class TableActionManager {
      */
     public static Action getOpenCSVAction(final SimbrainDataTable table) {
         return new AbstractAction() {
-            
+
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
@@ -70,7 +69,7 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
      * Action for saving to comma separated value file.
      *
@@ -79,7 +78,7 @@ public class TableActionManager {
      */
     public static Action getSaveCSVAction(final SimbrainDataTable table) {
         return new AbstractAction() {
-            
+
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
@@ -100,7 +99,7 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
      * Action for randomizing table.
      *
@@ -109,7 +108,7 @@ public class TableActionManager {
      */
     public static Action getRandomizeAction(final SimbrainDataTable table) {
         return new AbstractAction() {
-            
+
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
@@ -126,7 +125,7 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
      * Action for setting table bounds.
      *
@@ -135,7 +134,7 @@ public class TableActionManager {
      */
     public static Action getSetTableBoundsAction(final SimbrainDataTable table) {
         return new AbstractAction() {
-                        
+
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.gif"));
@@ -174,7 +173,7 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
      * Action for setting table structure.
      *
@@ -183,7 +182,7 @@ public class TableActionManager {
      */
     public static Action getChangeTableStructureAction(final SimbrainDataTable table) {
         return new AbstractAction() {
-            
+
             // Initialize
             {
                 //putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.gif"));
@@ -248,7 +247,7 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
      * Action for inserting a column in to a jtable.
      *
@@ -276,7 +275,7 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
      * Action for deleting a row from to a jtable.
      *
@@ -351,14 +350,13 @@ public class TableActionManager {
             public void actionPerformed(ActionEvent arg0) {
                 String numRows = (String)JOptionPane.showInputDialog(
                         null,
-                        "Number of rows to add:",
-                        "5");
+                        "Number of rows to add:", "5");
                 table.addRows(Integer.parseInt(numRows), 0);
            }
 
         };
     }
-    
+
     /**
      * Action for adding columns to a jtable.
      *
@@ -381,9 +379,8 @@ public class TableActionManager {
             public void actionPerformed(ActionEvent arg0) {
                 String numCols= (String)JOptionPane.showInputDialog(
                         null,
-                        "Number of columns to add:",
-                        "5");
-                table.addRows(Integer.parseInt(numCols), 0);
+                        "Number of columns to add:", "5");
+                table.addColumns(Integer.parseInt(numCols), 0);
            }
 
         };
@@ -414,9 +411,9 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
-     * Action for filling a table with specific values 
+     * Action for filling a table with specific values.
      *
      * @param table table to fill
      * @return the action
@@ -444,6 +441,5 @@ public class TableActionManager {
 
         };
     }
- 
 
 }

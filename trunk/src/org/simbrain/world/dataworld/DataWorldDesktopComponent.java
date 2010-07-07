@@ -90,7 +90,6 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         JPanel toolbarPanel = new JPanel();
         toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         toolbarPanel.add(table.getToolbarCSV()); //TODO: Use regular open / close
-        toolbarPanel.add(table.getToolbarRandomize());
         add(toolbarPanel, BorderLayout.NORTH);
 
         addMenuBar(table);
@@ -142,6 +141,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
                         iterationMode.getState());
              }
         });
+        editMenu.addSeparator();
         editMenu.add(iterationMode);
         mb.add(editMenu);
 

@@ -19,13 +19,16 @@
 package org.simbrain.trainer;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -66,7 +69,7 @@ import org.simbrain.workspace.WorkspaceListener;
 /**
  * GUI for supervised learning in Simbrain, using back-propagation, LMS, and
  * (eventually) other algorithms. A front end for the trainer class.
- * 
+ *
  * @author ericneilj
  * @author jeff yoshimi
  * @see org.simbrain.trainer.Trainer
@@ -76,37 +79,37 @@ public class TrainerGUI extends JPanel {
 	private String[] columnNames = {"#","N1","N2","N3","N4"};
 	private String[] trainingAlgorithms = {"Backprop  ", "Other"};
 	private String[] errorSignal = {"SSE           ", "Other"};
-		
+
 	/** Network selection combo box. */
 	private JComboBox cbNetworkChooser = new JComboBox();
-	
+
 	/** Input layer combo box. */
 	private JComboBox cbInputLayer = new JComboBox();
 
 	/** Table displaying input data. */
 	private SimbrainJTable inputDataTable;
-		
+
 	/** Output layer combo box. */
     JComboBox cbOutputLayer = new JComboBox();
-    
+
     /** Table displaying training data. */
     private SimbrainJTable trainingDataTable;
 
 	/** Reference to trainer object. */
 	private Trainer trainer;
-	
+
 	/** Reference to workspace object. */
-	private Workspace workspace; 
-	
+	private Workspace workspace;
+
 	/** Current network. */
 	private RootNetwork currentNetwork;
-	
+
 	/** Data for the error graph. */
     private XYSeries graphData;
-    
+
     /** Text field for setting number of iterations to run. */
     private JTextField tfIterations;
-	
+
 	/**
 	 * Default constructor.
 	 */
@@ -115,7 +118,7 @@ public class TrainerGUI extends JPanel {
 	    // Initial setup
 		this.workspace = workspace;
 		workspace.addListener(workspaceListener);
-				
+
 		// Initialize combo box action listeners
 		cbNetworkChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -127,7 +130,7 @@ public class TrainerGUI extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 updateInputTable();
             }
-        });		
+        });
         cbOutputLayer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 updateOutputTable();
@@ -138,19 +141,19 @@ public class TrainerGUI extends JPanel {
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		//mainPanel.setBorder(BorderFactory.createTitledBorder("Backprop properties"));
-		
+
 		//Top Panel
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
-		//topPanel.setPreferredSize(new Dimension(800, 200));	
-		
+		//topPanel.setPreferredSize(new Dimension(800, 200));
+
 		//Network and Algorithm Selector
 		LabelledItemPanel netSelect = new LabelledItemPanel();
 		netSelect.setBorder(BorderFactory.createTitledBorder("Training properties"));
 		netSelect.setLayout(new FlowLayout(FlowLayout.LEFT));
 		netSelect.setPreferredSize(new Dimension(140, 220));
 		JLabel netSelectLabel = new JLabel("Network");
-		netSelect.add(netSelectLabel);        
+		netSelect.add(netSelectLabel);
 		netSelect.add(cbNetworkChooser);
 		JLabel algoSelectLabel = new JLabel("Training Algorithm");
 		netSelect.add(algoSelectLabel);
@@ -163,13 +166,13 @@ public class TrainerGUI extends JPanel {
 		JComboBox errorCombo = new JComboBox(errorSignal);
 		netSelect.add(errorCombo);
 		topPanel.add("West", netSelect);
-		
+
 		//Graph
 		JPanel trainerDisplay = new JPanel();
 		trainerDisplay.setLayout(new BorderLayout());
 		XYSeriesCollection series = new XYSeriesCollection();
 		graphData = new XYSeries(1);
-		series.addSeries(graphData);		
+		series.addSeries(graphData);
 		JFreeChart chart = ChartFactory.createXYLineChart(
 	            "Error", // Title
 	            "Iterations", // x-axis Label
@@ -179,7 +182,7 @@ public class TrainerGUI extends JPanel {
 	            false, // Show Legend
 	            true, // Use tooltips
 	            false // Configure chart to generate URLs?
-	        );		
+	        );
 		ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new Dimension(800,200));
 		JPanel runButtons = new JPanel();
@@ -202,14 +205,14 @@ public class TrainerGUI extends JPanel {
                 trainer.setTrainingData(trainingDataTable.getData().asArray());
             }
         });
-        
+
         tfIterations = new JTextField("300");
         runButtons.add(tfIterations);
         runButtons.add(new JButton("Clear"));
-        trainerDisplay.add("Center",chartPanel);
-        trainerDisplay.add("South",runButtons);
+        trainerDisplay.add("Center", chartPanel);
+        trainerDisplay.add("South", runButtons);
     	topPanel.add("East", trainerDisplay);
-				
+
 		// Split Pane (Main Center Panel)
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane.setBorder(null);
@@ -221,8 +224,8 @@ public class TrainerGUI extends JPanel {
 		leftPanel.setLayout(new BorderLayout());
 		rightPanel.setLayout(new BorderLayout());
 		splitPane.setLeftComponent(leftPanel);
-		splitPane.setRightComponent(rightPanel);		
-		
+		splitPane.setRightComponent(rightPanel);
+
 	    // Input Data 
 		//DefaultTableModel inputDataModel = new DefaultTableModel(data, columnNames);
         inputDataTable = new SimbrainJTable(new SimbrainDataTable(4, 2));
@@ -238,12 +241,11 @@ public class TrainerGUI extends JPanel {
 		leftMenuPanel.add(inputLabel);
 		leftMenuPanel.add(cbInputLayer);
         leftMenuPanel.add(inputDataTable.getToolbarCSV());
-        leftMenuPanel.add(inputDataTable.getToolbarRandomize());
         leftPanel.add("North", leftMenuPanel);
         leftPanel.add("Center", leftScroll);
-        
+
         // Training Data
-        trainingDataTable = new SimbrainJTable(new SimbrainDataTable(4, 2));
+        trainingDataTable = new SimbrainJTable(new SimbrainDataTable(4,2));
         trainingDataTable.getData().fill(new Double(0));
         TableColumn outColumn = null;
 //        outColumn = trainingDataTable.getColumnModel().getColumn(0);
@@ -259,21 +261,20 @@ public class TrainerGUI extends JPanel {
 		rightMenuPanel.add(trainingDataTable.getToolbarRandomize());
 		rightPanel.add("North", rightMenuPanel);
 		rightPanel.add("Center", rightScroll);
-		
+
 		//Bottom Button Panel 
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.add(new JButton("Cancel"));
 		bottomPanel.add(new JButton("Ok"));
-		
+
 		// Put it all together
 		mainPanel.add("North", topPanel);
 		mainPanel.add("Center", splitPane);
 		mainPanel.add("South", bottomPanel);
-		add(mainPanel);		
+		add(mainPanel);
         resetNetworkSelectionBox();
 	}
-	
-	
+
 	/**
 	 * Load data into a JTable.
 	 *
@@ -296,7 +297,7 @@ public class TrainerGUI extends JPanel {
                 trainer.setTrainingData(theFile);
             }
         }
-        
+
         double[][] doubleVals = Utils.getDoubleMatrix(theFile);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setNumRows(doubleVals.length);
@@ -311,18 +312,18 @@ public class TrainerGUI extends JPanel {
             }
         }
     }
-	
+
     /**
      * User has changed the current network in the network selection combo box.
      * Make appropriate changes.
      */
 	private void updateCurrentNetwork() {
-	    
-	    Object object = cbNetworkChooser.getSelectedItem(); 
+
+	    Object object = cbNetworkChooser.getSelectedItem();
 	    if (object instanceof NetworkComponent) {
 	        currentNetwork = ((NetworkComponent)object).getRootNetwork();
 	    } else {
-	        currentNetwork = null;	 
+	        currentNetwork = null;
 	        return;
 	    }
         updateInputTable();
@@ -330,24 +331,24 @@ public class TrainerGUI extends JPanel {
 
         // Initialize trainer
         if (trainer == null) {
-            trainer = new BackpropTrainer(currentNetwork);          
+            trainer = new BackpropTrainer(currentNetwork);
             trainer.listeners.add(new TrainerListener() {
 
                 public void errorUpdated(double error) {
                     graphData.add(trainer.getIteration() , error);
                 }
-                
+
             });
         } else {
             trainer.setNetwork(currentNetwork);
         }
-        
+
 	    //TODO: Remove old listener
 	    //previousNetwork.removeGroupListener(previousListener)
 	    currentNetwork.addGroupListener(new GroupListener() {
 
             public void groupAdded(NetworkEvent<Group> e) {
-                updateLayerBoxes();            
+                updateLayerBoxes();
              }
 
             public void groupChanged(NetworkEvent<Group> networkEvent) {
@@ -358,48 +359,48 @@ public class TrainerGUI extends JPanel {
                 updateLayerBoxes();
             }
 	    });
-	    
+
 	}
-	
+
 	/**
-	 *  Reset the network selection combo box
+	 *  Reset the network selection combo box.
 	 */
 	private void resetNetworkSelectionBox() {
-	    
+
 	        cbNetworkChooser.removeAllItems();
 	        for (WorkspaceComponent component : workspace
                     .getComponentList(NetworkComponent.class)) {
-	            cbNetworkChooser.addItem(component);	            
+	            cbNetworkChooser.addItem(component);
 	        }
 	        // TODO: This does not seem to work.  Test: Set box to network 3, add a network, it resets to 1
 	        if (currentNetwork != null) {
-	            cbNetworkChooser.setSelectedItem(currentNetwork);	            
+	            cbNetworkChooser.setSelectedItem(currentNetwork);
 	        } else {
 	            if (cbNetworkChooser.getItemCount() >= 1)  {
 	                cbNetworkChooser.setSelectedIndex(1);
 	            }
 	        }
-	        
+
 	        updateInputTable();
 	        updateOutputTable();
 	}
-	
+
 
     /**
-     * Update input data table
+     * Update input data table.
      */
     private void updateInputTable() {
         NeuronGroup group = (NeuronGroup) cbInputLayer.getSelectedItem();
         if (group != null) {
             if (trainer != null) {
-                trainer.setInputLayer(group);    
+                trainer.setInputLayer(group);
             }
             updateTable(group, inputDataTable);
         }
     }
-    
+
     /**
-     * Update training data table
+     * Update training data table.
      */
     private void updateOutputTable() {
         NeuronGroup group = (NeuronGroup) cbOutputLayer.getSelectedItem();
@@ -410,59 +411,72 @@ public class TrainerGUI extends JPanel {
             updateTable(group, trainingDataTable);
         }
     }
-	
+
     /**
      * Update the input layer and output layer combo boxes (when groups are
      * added, removed, or changed in the current network).
      */
 	private void updateLayerBoxes() {
-	    
+
 	    if (currentNetwork != null) {
 	        cbInputLayer.removeAllItems();
 	        for (Group group : currentNetwork.getGroupList()) {
 	            if (group instanceof NeuronGroup) {
-	                cbInputLayer.addItem(group);	                
+	                cbInputLayer.addItem(group);
 	            }
 	        }
 	        cbOutputLayer.removeAllItems();
 	        for (Group group : currentNetwork.getGroupList()) {
                 if (group instanceof NeuronGroup) {
                     cbOutputLayer.addItem(group);
+                    //TODO: Abstract this in an appropriate way
+                    if (group.getLabel().equalsIgnoreCase("Output Layer")) {
+                        cbOutputLayer.setSelectedItem(group);
+                    }
                 }
-	        }  
+	        }
 	        updateInputTable();
 	        updateOutputTable();
 	    }
 	}
-	
+
 	/**
 	 * Update table using the supplied neuron group.
 	 */
-	private void updateTable(Group group, JTable table) {
-	          
+	private void updateTable(Group group, SimbrainJTable table) {
+
 	    int groupSize = group.getNeuronList().size();
 	    int tableSize = table.getColumnCount();
 
-	    // If there are more neurons than columns in the table, enlarge the table
-	    if (groupSize > tableSize) {
-	        //((DefaultTableModel)table.getModel()).setColumnCount(groupSize); 
-	        //((DefaultTableModel)table.getModel()).fireTableStructureChanged();
+	    // Make sure table and group have same number of columns
+	    if (groupSize != tableSize) {
+            table.getData().modifyRowsColumns(table.getData().getRowCount(),
+                    groupSize, 0);
 	    }
 
 	    // Rename column headings
 	    // Note the for loop starts at column 1 (column 0 is the "#" value)
-        // TODO: Get neurons in proper order
+
+	    // (TODO) Order Neurons by label
+//        List<Neuron> neuronList = new ArrayList(group.getNeuronList());
+//	    Collections.sort(neuronList, new Comparator() {
+//            public int compare(Object neuron1, Object neuron2) {
+//                return ((Neuron)neuron1).getLabel().compareTo(((Neuron)neuron2).getLabel());
+//            }
+//	    });
+
 	    Iterator<Neuron> neuronIterator = group.getNeuronList().iterator();
         for (int i = 1; i < tableSize; i++) { 
             if (neuronIterator.hasNext()) {
-                table.getColumnModel().getColumn(i).setHeaderValue(neuronIterator.next().getDescription());                
+                table.getColumnModel().getColumn(i).setHeaderValue(neuronIterator.next().getDescription());
             } else {
                 // Table columns not assigned to a neuron
-                table.getColumnModel().getColumn(i).setHeaderValue("--");
+                // TODO: Current not working properly (when reducing columns of table)
+                // table.getColumnModel().getColumn(i).setHeaderValue("--");
             }
 	    }
         table.getTableHeader().resizeAndRepaint();
-        
+
 	}
 
     /**
@@ -493,7 +507,7 @@ public class TrainerGUI extends JPanel {
             resetNetworkSelectionBox();
         }
     };
-    
+
 	/**
 	 * Test GUI.
 	 *
@@ -501,7 +515,7 @@ public class TrainerGUI extends JPanel {
 	 */
 	public static void main(String[] args) {
 	    Workspace workspace = new Workspace();
-	    	    
+
 	    // Make network 1
         RootNetwork network = new RootNetwork();
         LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
@@ -514,13 +528,12 @@ public class TrainerGUI extends JPanel {
         // Make network 2
         RootNetwork network2 = new RootNetwork();
         LayeredNetworkBuilder builder2 = new LayeredNetworkBuilder();
-        int[] nodesPerLayer2 = new int[]{12,4, 8};
+        int[] nodesPerLayer2 = new int[]{6, 4, 8};
         builder2.setNodesPerLayer(nodesPerLayer2);
         builder2.buildNetwork(network2);
         NetworkComponent networkComponent2 = new NetworkComponent("Net 2", network2);
         workspace.addWorkspaceComponent(networkComponent2);
 
-        
         JFrame topFrame = new JFrame();
 		TrainerGUI trainer = new TrainerGUI(workspace);
 		topFrame.setContentPane(trainer);

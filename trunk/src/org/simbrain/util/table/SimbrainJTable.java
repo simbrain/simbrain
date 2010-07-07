@@ -57,19 +57,19 @@ public class SimbrainJTable extends JXTable {
 
     /** Grid Color. */
     private Color gridColor = Color.LIGHT_GRAY;
-    
+
     /** Data model. */
     private SimbrainDataTable data;
 
     /**
      * Creates a new instance of the data world.
-     * 
+     *
      * @param dataModel
      */
     public SimbrainJTable(SimbrainDataTable dataModel) {
-        
+
         data = dataModel;
-        this.setModel(new SimbrainTableModel());        
+        this.setModel(new SimbrainTableModel());
         addKeyListener(keyListener);
         addMouseListener(mouseListener);
         setColumnSelectionAllowed(true);
@@ -77,19 +77,22 @@ public class SimbrainJTable extends JXTable {
         setRowSelectionAllowed(true);
         setGridColor(gridColor);
         updateRowSelection();
-        
+
         // First column displays row numbers
         this.setDefaultRenderer(Double.class, new  CustomCellRenderer());
-        
+
+        // Sorting is not helpful in datatable contexts (possibly add an option to put it back in)
+        this.setSortable(false);
+
         // Below initially forces first column to specific width; but has other side effects
         //setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         //getColumnModel().getColumn(0).setPreferredWidth(30);
 
     }
-   
+
     /**
      * Returns the currently selected column.
-     * 
+     *
      * @return the currently selected column
      */
     public int getSelectedColumn() {
@@ -98,7 +101,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Returns the currently selected row.
-     * 
+     *
      * @return the currently selected row
      */
     public int getSelectedRow() {
@@ -139,21 +142,25 @@ public class SimbrainJTable extends JXTable {
      * @return The context menu.
      */
     private JPopupMenu buildPopupMenu() {
-        JPopupMenu ret = new JPopupMenu();
 
-        ret.add(getMenuCSV());
-        ret.addSeparator();
-        ret.add(getMenuEdit());
-        ret.addSeparator();
+        JPopupMenu ret = new JPopupMenu();
         ret.add(TableActionManager.getInsertRowAction(this));
-        if (getSelectedColumn() != 0) {
+        if (getSelectedColumn() >= 0) {
             ret.add(TableActionManager.getInsertColumnAction(this));
         }
         ret.add(TableActionManager.getDeleteRowAction(this));
         if (getSelectedColumn() != 0) {
             ret.add(TableActionManager.getDeleteColumnAction(this));
         }
-        
+        ret.addSeparator();
+        ret.add(getMenuCSV());
+        ret.addSeparator();
+        ret.add(getMenuEdit());
+        ret.addSeparator();
+        ret.add(getMenuRandomize());
+        ret.addSeparator();
+        ret.add(getMenuFill());
+
         // JMenu producerMenu = new ProducingAttributeMenu(
         // "Receive coupling from", component.getWorkspace(), component
         // .getConsumingAttributes().get(getSelectedColumn()));
@@ -189,7 +196,7 @@ public class SimbrainJTable extends JXTable {
         toolbar.add(TableActionManager.getSetTableBoundsAction(getData()));
         return toolbar;
     }
-    
+
     /**
      * Return a menu with items for opening from and saving to .csv files.
      *
@@ -201,7 +208,32 @@ public class SimbrainJTable extends JXTable {
         menu.add(new JMenuItem(TableActionManager.getSaveCSVAction(getData())));
         return menu;
     }
-    
+
+    /**
+     * Return a menu with items for randomizing table values.
+     *
+     * @return the edit menu
+     */
+    public JMenu getMenuRandomize() {
+        JMenu menu = new JMenu("Randomize");
+        menu.add(TableActionManager.getRandomizeAction(getData()));
+        menu.add(TableActionManager.getNormalizeAction(this));
+        menu.add(TableActionManager.getSetTableBoundsAction(getData()));
+        return menu;
+    }
+
+    /**
+     * Return a menu with items for filling table values.
+     *
+     * @return the edit menu
+     */
+    public JMenu getMenuFill() {
+        JMenu menu = new JMenu("Fill values");
+        menu.add(new JMenuItem(TableActionManager.getFillAction(getData())));
+        menu.add(new JMenuItem(TableActionManager.getZeroFillAction(getData())));
+        return menu;
+    }
+
     /**
      * Return a menu with items for changing the table structure.
      *
@@ -209,20 +241,16 @@ public class SimbrainJTable extends JXTable {
      */
     public JMenu getMenuEdit() {
         JMenu menu = new JMenu("Edit");
-        menu.add(new JMenuItem(TableActionManager.getChangeTableStructureAction(getData())));
-        menu.add(new JMenuItem(TableActionManager.getAddColumnsAction(getData())));
-        menu.add(new JMenuItem(TableActionManager.getAddRowsAction(getData())));
-        menu.add(new JMenuItem(TableActionManager.getFillAction(getData())));
-        menu.add(new JMenuItem(TableActionManager.getZeroFillAction(getData())));
+        menu.add(new JMenuItem(TableActionManager.changeRowsColumns(getData())));
         return menu;
     }
-    
+
     /**
      * Select current row.
      */
     public void updateRowSelection() {
      // TODO: If I don't call this, the line below does not work. Not sure why.
-        selectAll(); 
+        selectAll();
         setRowSelectionInterval(data.getCurrentRow(), data.getCurrentRow());
     }
 
@@ -235,7 +263,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Sets the selected point.
-     * 
+     *
      * @param selectedPoint the selected point
      */
     public void setSelectedPoint(final Point selectedPoint) {
@@ -248,7 +276,7 @@ public class SimbrainJTable extends JXTable {
     private KeyListener keyListener = new KeyAdapter() {
         /**
          * Responds to key typed events.
-         * 
+         *
          * @param arg0 Key event
          */
         public void keyTyped(final KeyEvent arg0) {
@@ -280,11 +308,12 @@ public class SimbrainJTable extends JXTable {
             if (column == 0) {
                 JLabel label = new JLabel();
                 label.setOpaque(true);
-                label.setText("" + (int)(row + 1));
+                label.setText("" + (int) (row + 1));
                 return label;
-            } else
+            } else {
                 return super.getTableCellRendererComponent(table, value,
                         selected, focused, row, column);
+            }
         }
     }
 
@@ -352,7 +381,7 @@ public class SimbrainJTable extends JXTable {
 
         /**
          * Construct the table model.
-         * 
+         *
          * @param model reference to underlying data.
          */
         public SimbrainTableModel() {
@@ -383,7 +412,7 @@ public class SimbrainJTable extends JXTable {
         @Override
         public String getColumnName(int columnIndex) {
             if (columnIndex > 0) {
-                return "" + (columnIndex);                
+                return "" + (columnIndex);
             } else {
                 return "#";
             }
@@ -410,9 +439,8 @@ public class SimbrainJTable extends JXTable {
             if (column == 0) {
                 return (row + 1); // First column displays the row number.
             } else {
-                return data.get(row, column-1); 
+                return data.get(row, column - 1);
             }
-                                              
         }
 
     }

@@ -130,11 +130,10 @@ public abstract class Trainer {
     public void setTrainingData(double[][] trainingData)  {
 
         if (trainingData[0].length != outputLayer.size()) {
+            System.err.println("Training data size must be the same as output layer size");
             return;
             // TODO: Throw appropriate exception
-            // Exception("Training data size must be the same as output layer size");
         }
-        // TODO: CHECK correct throw exception otherwise
         this.trainingData = trainingData;
     }
 

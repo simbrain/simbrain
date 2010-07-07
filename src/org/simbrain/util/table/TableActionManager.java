@@ -127,6 +127,32 @@ public class TableActionManager {
     }
 
     /**
+     * Action for normalizing table.
+     *
+     * @param jtable table to normalize
+     * @return the action
+     */
+    public static Action getNormalizeAction(final SimbrainJTable jtable) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                putValue(NAME, "Normalize");
+                putValue(SHORT_DESCRIPTION, "Normalize column");
+            }
+
+            /**
+             * {@ineritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                jtable.getData().normalizeColumn(jtable.getSelectedColumn()-1);
+            }
+
+        };
+    }
+
+    /**
      * Action for setting table bounds.
      *
      * @param table table to adjust bounds on
@@ -219,11 +245,56 @@ public class TableActionManager {
 
         };
     }
-    
+
+    /**
+     * Action for changing the number of rows and columns in the table.
+     *
+     * @param table table to change structure of
+     * @return the action
+     */
+    public static Action changeRowsColumns(final SimbrainDataTable table) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.gif"));
+                putValue(NAME, "Set rows / columns");
+                putValue(SHORT_DESCRIPTION, "Set number of rows and columns (cells are zeroed out)");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                StandardDialog dialog = new StandardDialog();
+                JPanel pane = new JPanel();
+                JTextField rows = new JTextField();
+                JTextField columns = new JTextField();
+                rows.setText(Integer.toString(table.getRowCount()));
+                rows.setColumns(3);
+                columns.setText(Integer.toString(table.getColumnCount()));
+                columns.setColumns(3);
+                pane.add(new JLabel("Rows"));
+                pane.add(rows);
+                pane.add(new JLabel("Columns"));
+                pane.add(columns);
+
+                dialog.setContentPane(pane);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                if (!dialog.hasUserCancelled()) {
+                    table.modifyRowsColumns(Integer.parseInt(rows.getText()),
+                            Integer.parseInt(columns.getText()), 0);
+                }
+            }
+
+        };
+    }
     /**
      * Action for inserting a row in to a jtable.
      *
-     * @param table table to insert row into
+     * @param jtable table to insert row into
      * @return the action
      */
     public static Action getInsertRowAction(final SimbrainJTable jtable) {
@@ -234,7 +305,7 @@ public class TableActionManager {
                 // putValue(SMALL_ICON,
                 // ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Insert row");
-                putValue(SHORT_DESCRIPTION, "Insert row");
+                putValue(SHORT_DESCRIPTION, "Insert row (above)");
             }
 
             /**
@@ -251,7 +322,7 @@ public class TableActionManager {
     /**
      * Action for inserting a column in to a jtable.
      *
-     * @param table table to insert column into
+     * @param jtable table to insert column into
      * @return the action
      */
     public static Action getInsertColumnAction(final SimbrainJTable jtable) {
@@ -262,14 +333,14 @@ public class TableActionManager {
                 // putValue(SMALL_ICON,
                 // ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Insert column");
-                putValue(SHORT_DESCRIPTION, "Insert column");
+                putValue(SHORT_DESCRIPTION, "Insert column (to right)");
             }
 
             /**
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().insertNewColumn(jtable.getSelectedRow(),
+                jtable.getData().insertNewColumn(jtable.getSelectedColumn(),
                         new Double(0));
             }
 
@@ -279,7 +350,7 @@ public class TableActionManager {
     /**
      * Action for deleting a row from to a jtable.
      *
-     * @param table table to delete a row from
+     * @param jtable table to delete a row from
      * @return the action
      */
     public static Action getDeleteRowAction(final SimbrainJTable jtable) {
@@ -301,11 +372,11 @@ public class TableActionManager {
 
         };
     }
- 
+
     /**
      * Action for deleting a column from a jtable.
      *
-     * @param table table to delete column from
+     * @param jtable table to delete column from
      * @return the action
      */
     public static Action getDeleteColumnAction(final SimbrainJTable jtable) {
@@ -387,7 +458,7 @@ public class TableActionManager {
     }
 
     /**
-     * Action for zeroing out cells of a table
+     * Action for zeroing out cells of a table.
      *
      * @param table table to zero out
      * @return the action

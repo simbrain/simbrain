@@ -36,7 +36,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * An optional concept of "current row" is implemented which allows the table to
  * iterated from row to row when updated.
  */
-public class SimbrainDataTable {
+public final class SimbrainDataTable {
 
     /** Default initial number of rows. */
     private static final int DEFAULT_ROW_COUNT = 30;
@@ -150,6 +150,26 @@ public class SimbrainDataTable {
     public void fill(final double value) {
         for (List<Double> row : rowData) {
             Collections.fill(row, value);
+        }
+        this.fireDataChanged();
+    }
+
+    /**
+     * Normalize data in selected column.
+     *
+     * TODO: Use bounds.
+     *
+     * @param columnIndex column to normalize.
+     */
+    public void normalizeColumn(final int columnIndex) {
+        double max = 0;
+        for (List<Double> row : rowData) {
+            if (row.get(columnIndex) > max) {
+                max = row.get(columnIndex);
+            }
+        }
+        for (List<Double> row : rowData) {
+            row.set(columnIndex, row.get(columnIndex)/max);
         }
         this.fireDataChanged();
     }
@@ -310,7 +330,8 @@ public class SimbrainDataTable {
     }
 
     /**
-     * Adds or removes rows and columns.
+     * Adds or removes rows and columns.  Does not change value of existing
+     * cells.
      *
      * @param row Number of rows in table.
      * @param col Number of columns in table.
@@ -354,10 +375,10 @@ public class SimbrainDataTable {
      * Adds a specified nmber of columns to the right of the table.
      *
      * @param colsToAdd number of columns to add.
-     * @param number value for cells of new columns
+     * @param defaultValue value for cells of new columns
      */
-    public void addColumns(final int colsToAdd, final double number) {
-        addRowsColumns(0, colsToAdd, number);
+    public void addColumns(final int colsToAdd, final double defaultValue) {
+        addRowsColumns(0, colsToAdd, defaultValue);
     }
 
     /**
@@ -432,7 +453,7 @@ public class SimbrainDataTable {
     }
 
     /**
-     * Lower bound for (e.g.) randomization
+     * Lower bound for (e.g.) randomization.
      *
      * @return The lower bound.
      */
@@ -477,7 +498,8 @@ public class SimbrainDataTable {
     }
 
     /**
-     * Whether the table is in iteration mode (where update increments the current row).
+     * Whether the table is in iteration mode (where update increments the
+     * current row).
      *
      * @return true if in iteration mode
      */
@@ -568,7 +590,7 @@ public class SimbrainDataTable {
         }
         return stringArray;
     }
-    
+
     /**
      * Read in stored dataset file as CVS File.
      *

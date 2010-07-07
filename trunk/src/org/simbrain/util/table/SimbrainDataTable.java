@@ -175,6 +175,15 @@ public final class SimbrainDataTable {
     }
 
     /**
+     * Normalize the whole table.
+     */
+    public void normalizeTable() {
+        for (int i = 0; i < this.getColumnCount(); i++) {
+            normalizeColumn(i);
+        }
+    }
+
+    /**
      * Randomize neurons within specified bounds.
      */
     public void randomize() {

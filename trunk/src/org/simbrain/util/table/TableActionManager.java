@@ -127,18 +127,18 @@ public class TableActionManager {
     }
 
     /**
-     * Action for normalizing table.
+     * Action for normalizing the currently selected column in a table.
      *
      * @param jtable table to normalize
      * @return the action
      */
-    public static Action getNormalizeAction(final SimbrainJTable jtable) {
+    public static Action getNormalizeColumnAction(final SimbrainJTable jtable) {
         return new AbstractAction() {
 
             // Initialize
             {
                 //putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-                putValue(NAME, "Normalize");
+                putValue(NAME, "Normalize column");
                 putValue(SHORT_DESCRIPTION, "Normalize column");
             }
 
@@ -152,6 +152,32 @@ public class TableActionManager {
         };
     }
 
+    /**
+     * Action for normalizing a table.
+     *
+     * @param jtable table to normalize
+     * @return the action
+     */
+    public static Action getNormalizeAction(final SimbrainJTable jtable) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                putValue(NAME, "Normalize table");
+                putValue(SHORT_DESCRIPTION, "Normalize table");
+            }
+
+            /**
+             * {@ineritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                jtable.getData().normalizeTable();
+            }
+
+        };
+    }
+    
     /**
      * Action for setting table bounds.
      *
@@ -291,6 +317,7 @@ public class TableActionManager {
 
         };
     }
+
     /**
      * Action for inserting a row in to a jtable.
      *

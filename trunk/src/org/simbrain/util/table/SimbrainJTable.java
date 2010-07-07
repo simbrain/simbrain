@@ -40,9 +40,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.jdesktop.swingx.JXTable;
 
 /**
- * <b>SimbrainJTable</b> is a version of a JTable which wraps a Simbrain data table object.
- * Also provides sets of menus and buttons that can be used by components which use this table
- * 
+ * <b>SimbrainJTable</b> is a version of a JTable which wraps a Simbrain data
+ * table object. Also provides sets of menus and buttons that can be used by
+ * components which use this table.
+ *
  * @author jyoshimi
  */
 public class SimbrainJTable extends JXTable {
@@ -153,13 +154,15 @@ public class SimbrainJTable extends JXTable {
             ret.add(TableActionManager.getDeleteColumnAction(this));
         }
         ret.addSeparator();
-        ret.add(getMenuCSV());
-        ret.addSeparator();
         ret.add(getMenuEdit());
         ret.addSeparator();
         ret.add(getMenuRandomize());
         ret.addSeparator();
+        ret.add(getMenuNormalize());
+        ret.addSeparator();
         ret.add(getMenuFill());
+        ret.addSeparator();
+        ret.add(getMenuCSV());
 
         // JMenu producerMenu = new ProducingAttributeMenu(
         // "Receive coupling from", component.getWorkspace(), component
@@ -212,20 +215,31 @@ public class SimbrainJTable extends JXTable {
     /**
      * Return a menu with items for randomizing table values.
      *
-     * @return the edit menu
+     * @return the randomize menu
      */
     public JMenu getMenuRandomize() {
         JMenu menu = new JMenu("Randomize");
         menu.add(TableActionManager.getRandomizeAction(getData()));
-        menu.add(TableActionManager.getNormalizeAction(this));
         menu.add(TableActionManager.getSetTableBoundsAction(getData()));
+        return menu;
+    }
+
+    /**
+     * Return a menu with items for normalizing the data in a table.
+     *
+     * @return the normalize menu
+     */
+    public JMenu getMenuNormalize() {
+        JMenu menu = new JMenu("Normalize");
+        menu.add(TableActionManager.getNormalizeColumnAction(this));
+        menu.add(TableActionManager.getNormalizeAction(this));
         return menu;
     }
 
     /**
      * Return a menu with items for filling table values.
      *
-     * @return the edit menu
+     * @return the fill menu
      */
     public JMenu getMenuFill() {
         JMenu menu = new JMenu("Fill values");

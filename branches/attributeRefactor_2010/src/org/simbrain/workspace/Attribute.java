@@ -26,21 +26,33 @@ package org.simbrain.workspace;
  */
 public interface Attribute {
 
-    //TODO: Add type here?  The visibility modifier can be ignored.
 
-    /**
-     * Returns the descriptive name of this attribute.
-     *
-     * @return the name of this attribute.
-     */
-    String getDescription();
 
     /**
      * Returns a reference to the parent component.
      *
      * @return parent parent component
      */
-    WorkspaceComponent getParentComponent();
+    public WorkspaceComponent getParentComponent();
 
-    //TODO: GetLocation
+    /*
+     * Returns the base object associated with this attribute.
+     *
+     * @return the base object.
+     */
+    public Object getBaseObject();
+
+    /*
+     * Returns the type of this attribute.
+     *
+     * @return the data type, as a class.
+     */
+    public Class getDataType();
+
+    /**
+     * Returns the descriptive name of this attribute.
+     *
+     * @return the name of this attribute.
+     */
+    public String getDescription();
 }

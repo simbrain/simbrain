@@ -19,22 +19,26 @@
 package org.simbrain.workspace;
 
 /**
- * Encapsulates type information about a particular attribute or potential
- * attribute.  Used to determine which potential attributes are visible in 
- * coupling creation GUI.
+ * Encapsulates type information about potential attribute. Used to determine
+ * which potential attributes are visible in coupling creation GUI.
+ *
+ * Displayed as typename:method<datatype>
  *
  * @author jyoshimi
  */
 public class AttributeType {
 
-    /** ID for this type. */
-    private String typeID;
+    /** Reference to parent component; needed so that visibility change events can be fired. */
+    private WorkspaceComponent parentComponent;
+
+    /** Description of this attribute type; generally a description of the object type. */
+    private final String typeID;
 
     /** The root name of a getter or setter; i.e. "X" in "getX" or "setX".  */
-    private String methodBaseName;
+    private final String methodBaseName;
 
     /** Class of this attribute. */
-    private Class<?> dataType;
+    private final Class<?> dataType;
 
     /** Whether this type of attribute is currently visible. */
     private boolean visible;
@@ -42,12 +46,14 @@ public class AttributeType {
     /**
      * Construct an attribute type object.
      *
+     * @param parent reference to parent component
      * @param typeID String identification of type id
-     * @param methodName name of method 
+     * @param methodName name of method
      * @param dataType data type (return type for producers; argument type for consumers)
      * @param visible whether this attribute should be visible for a given component
      */
-    public AttributeType(String typeID, String methodName, Class dataType, boolean visible) {
+    public AttributeType(WorkspaceComponent parent, String typeID, String methodName, Class dataType, boolean visible) {
+        this.parentComponent = parent;
         this.typeID = typeID;
         this.methodBaseName = methodName;
         this.dataType = dataType;
@@ -69,7 +75,7 @@ public class AttributeType {
     }
 
     /**
-     * Returns a description of this potential attribute.
+     * Returns a description of this attribute type.
      *
      * @return the description
      */
@@ -100,6 +106,7 @@ public class AttributeType {
      */
     public void setVisible(boolean visible) {
         this.visible = visible;
+        parentComponent.fireAttributeTypeVisibilityChanged(this);
     }
 
     /**
@@ -110,13 +117,6 @@ public class AttributeType {
     }
 
     /**
-     * @param typeID the typeID to set
-     */
-    public void setTypeID(String typeID) {
-        this.typeID = typeID;
-    }
-
-    /**
      * @return the subtype
      */
     public String getAttributeName() {
@@ -124,24 +124,10 @@ public class AttributeType {
     }
 
     /**
-     * @param subtype the subtype to set
-     */
-    public void setAttributeName(String subtype) {
-        this.methodBaseName = subtype;
-    }
-
-    /**
      * @return the dataType
      */
     public Class getDataType() {
         return dataType;
-    }
-
-    /**
-     * @param dataType the dataType to set
-     */
-    public void setDataType(Class dataType) {
-        this.dataType = dataType;
     }
 
 }

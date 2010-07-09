@@ -159,7 +159,7 @@ public final class Coupling<E> {
         }
         return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
      }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -27,6 +27,7 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
+import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -61,18 +62,18 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        getAttributeTypes().add(new AttributeType("Neuron", "Activation", double.class, true));
-        getAttributeTypes().add(new AttributeType("Neuron", "UpperBound", double.class, false));
-        getAttributeTypes().add(new AttributeType("Neuron", "LowerBound", double.class, false));
-        getAttributeTypes().add(new AttributeType("Neuron", "Label", String.class, false));
-        getAttributeTypes().add(new AttributeType("Synapse", "Strength", double.class, false));
+        getAttributeTypes().add(new AttributeType(this, "Neuron", "Activation", double.class, true));
+        getAttributeTypes().add(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
+        getAttributeTypes().add(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
+        getAttributeTypes().add(new AttributeType(this, "Neuron", "Label", String.class, false));
+        getAttributeTypes().add(new AttributeType(this, "Synapse", "Strength", double.class, false));
 
         rootNetwork.addNeuronListener(new NeuronListener() {
             /**
              * {@inheritDoc}
              */
             public void neuronAdded(NetworkEvent<Neuron> e) {
-                NetworkComponent.this.firePotentialAttributeUpdateEvent(NetworkComponent.this);
+                firePotentialAttributesChanged();
             }
 
             /**
@@ -91,12 +92,33 @@ public final class NetworkComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void neuronRemoved(NetworkEvent<Neuron> e) {
-                NetworkComponent.this.firePotentialAttributeUpdateEvent(NetworkComponent.this);
+                firePotentialAttributesChanged();
+                fireAttributeObjectRemoved(e.getObject());
             }
 
             public void neuronChanged(NetworkEvent<Neuron> e) {
             }
         });
+
+        rootNetwork.addSynapseListener(new SynapseListener() {
+
+            public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
+                firePotentialAttributesChanged();
+            }
+
+            public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
+                firePotentialAttributesChanged();
+            }
+
+            public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
+                firePotentialAttributesChanged();
+            }
+
+            public void synapseTypeChanged(NetworkEvent<Synapse> networkEvent) {
+            }
+
+        });
+
     }
 
     /**
@@ -144,11 +166,11 @@ public final class NetworkComponent extends WorkspaceComponent {
             if (type.isVisible()) {
                 if (type.getTypeID().equalsIgnoreCase("Neuron")) {
                     for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                        returnList.add(new PotentialAttribute(this, neuron.getId(), neuron, type));
+                        returnList.add(new PotentialAttribute(this, neuron, neuron.getId(), type));
                     }
                 } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
                     for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                        returnList.add(new PotentialAttribute(this, synapse.getId(), synapse, type));
+                        returnList.add(new PotentialAttribute(this, synapse, synapse.getId(), type));
                     }
                 }
 

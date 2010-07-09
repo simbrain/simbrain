@@ -50,7 +50,7 @@ public abstract class WorkspaceComponent {
     private final Collection<WorkspaceComponentListener> workspaceComponentListeners;
 
     /** List of attribute listeners. */
-    private final Collection<PotentialAttributeListener> potentialAttributeListeners;
+    private final Collection<AttributeListener> attributeListeners;
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
@@ -96,7 +96,7 @@ public abstract class WorkspaceComponent {
 //        producers = new CopyOnWriteArrayList<Producer>();
 //        attributeTypes = new ArrayList<String>();
         workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
-        potentialAttributeListeners = new HashSet<PotentialAttributeListener>();
+        attributeListeners = new HashSet<AttributeListener>();
     }
 
     /**
@@ -150,53 +150,89 @@ public abstract class WorkspaceComponent {
         /* no default implementation */
     }
 
-    ////////////// NEW STUFF BEGIN ////////////////
-
+    /**
+     * Return the potential consumers associated with this component. Subclasses
+     * should override this to make their consumers available.
+     *
+     * @return the consumer list.
+     */
     public List<PotentialAttribute> getPotentialConsumers() {
         return Collections.EMPTY_LIST;
     }
 
+    /**
+     * Return the potential producers associated with this component. Subclasses
+     * should override this to make their producers available.
+     *
+     * @return the producer list.
+     */
     public List<PotentialAttribute> getPotentialProducers() {
         return Collections.EMPTY_LIST;
     }
 
+    /**
+     * Returns a list of attribute types associated with this component.
+     * Subclasses should override this to make attribute available.
+     *
+     * @return the attribute types.
+     */
     public List<AttributeType> getAttributeTypes() {
         return attributeTypeList;
     }
 
-    // For serialization...
-    public Producer<?> getProducer(final String objectKey,
-            final String methodBaseName, final String className, final String description) {
-        Object parentObject = this.getObjectFromKey(objectKey);
-        Class dataType = null;
-        try {
-            dataType = Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            System.err.println("The class name provided was wrong");
-            e.printStackTrace();
+    /**
+     * Fire attribute object removed event (when the base object of an attribute
+     * is removed).
+     *
+     * @param object the object which was removed
+     */
+    public void fireAttributeObjectRemoved(Object object) {
+        for (AttributeListener listener : attributeListeners) {
+            listener.attributeObjectRemoved(object);
         }
-        return getProducer(parentObject, methodBaseName, dataType, description);
-    }
-
-    public Producer<?> getProducer(final Object parentObject,
-            final String methodBaseName, final Class dataType) {
-        // TODO: Abstract formatting below which is repeated in
-        // PotentialAttribute
-        String description = parentObject.getClass().getSimpleName() + ":"
-                + methodBaseName + "<" + dataType.getSimpleName() + ">";
-        return getProducer(parentObject, methodBaseName, dataType, description);   
-    }
-
-    public Producer<?> getProducer(final PotentialAttribute potentialAttribute) {
-        return getProducer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodBaseName(), potentialAttribute.getDataType(),
-                potentialAttribute.getDescription());
     }
 
     /**
-     * Create a producer.
+     * Fire potential attributes changed event.
      */
-    public Producer<?> getProducer(final Object parentObject,
+    public void firePotentialAttributesChanged() {
+        for (AttributeListener listener : attributeListeners) {
+            listener.potentialAttributesChanged();
+        }
+    }
+
+    /**
+     * Fire attribute type visibility changed event.
+     *
+     * @param type the type whose visibility changed.
+     */
+    public void fireAttributeTypeVisibilityChanged(AttributeType type) {
+        for (AttributeListener listener : attributeListeners) {
+            listener.attributeTypeVisibilityChanged();
+        }
+
+    }
+
+    /**
+     * Adds a AttributeListener to this component.
+     *
+     * @param listener the AttributeListener to add.
+     */
+    public void addAttributeListener(final AttributeListener listener) {
+        attributeListeners.add(listener);
+    }
+
+    /**
+     * Create a producer. This version of the method does the real work; others
+     * forward to it.
+     *
+     * @param parentObject parent object
+     * @param methodBaseName name of method
+     * @param dataType type of data
+     * @param description description
+     * @return the resulting producer
+     */
+    public Producer<?> createProducer(final Object parentObject,
             final String methodBaseName, final Class dataType,
             final String description) {
 
@@ -243,25 +279,106 @@ public abstract class WorkspaceComponent {
             public String getDescription() {
                 return description;
             }
+
+            public Class getDataType() {
+                return dataType;
+            }
+
+            public Object getBaseObject() {
+                return parentObject;
+            }
         };
         return producer;
 
     }
 
-    public Consumer<?> getConsumer(final Object parentObject,
+
+    /**
+     * Create a producer without specifying a custom description (the description is
+     * created automatically).
+     *
+     * @param parentObject parent object
+     * @param methodBaseName method name
+     * @param dataType data type
+     * @return created producer
+     */
+    public Producer<?> getProducer(final Object parentObject,
             final String methodBaseName, final Class dataType) {
+        // TODO: Abstract formatting below which is repeated in
+        // PotentialAttribute
         String description = parentObject.getClass().getSimpleName() + ":"
                 + methodBaseName + "<" + dataType.getSimpleName() + ">";
-        return getConsumer(parentObject, methodBaseName, dataType, description);   
+        return createProducer(parentObject, methodBaseName, dataType, description);
     }
 
-    public Consumer<?> getConsumer(final PotentialAttribute potentialAttribute) {
-        return getConsumer(potentialAttribute.getBaseObject(), potentialAttribute
+    /**
+     * Create an actual producer from a potential producer.
+     *
+     * @param potentialAttribute the potential attribute to actualize
+     * @return the resulting producer
+     */
+    public Producer<?> createProducer(final PotentialAttribute potentialAttribute) {
+        return createProducer(potentialAttribute.getBaseObject(), potentialAttribute
                 .getMethodBaseName(), potentialAttribute.getDataType(),
                 potentialAttribute.getDescription());
     }
 
-    public Consumer<?> getConsumer(final Object parentObject,
+    /**
+     * For serialization...
+     */
+//    public Producer<?> getProducer(final String objectKey,
+//            final String methodBaseName, final String className,
+//            final String description) {
+//        Object parentObject = this.getObjectFromKey(objectKey);
+//        Class dataType = null;
+//        try {
+//            dataType = Class.forName(className);
+//        } catch (ClassNotFoundException e) {
+//            System.err.println("The class name provided was wrong");
+//            e.printStackTrace();
+//        }
+//        return createProducer(parentObject, methodBaseName, dataType, description);
+////    }
+//
+//
+
+    /**
+     * Create a consumer using
+     *  1) Parent Object
+     *  2) Method name
+     *  3) Data type
+     *  Description is automatically created.
+     */
+    public Consumer<?> createConsumer(final Object parentObject,
+            final String methodBaseName, final Class dataType) {
+        String description = parentObject.getClass().getSimpleName() + ":"
+                + methodBaseName + "<" + dataType.getSimpleName() + ">";
+        return createConsumer(parentObject, methodBaseName, dataType, description);   
+    }
+
+    /**
+     * Create an actual consumer from a potential consumer.
+     *
+     * @param potentialAttribute the potential attribute to actualize
+     * @return the resulting consumer
+     */
+    public Consumer<?> createConsumer(final PotentialAttribute potentialAttribute) {
+        return createConsumer(potentialAttribute.getBaseObject(), potentialAttribute
+                .getMethodBaseName(), potentialAttribute.getDataType(),
+                potentialAttribute.getDescription());
+    }
+
+    /**
+     * Create a consumer. This version of the method does the real work; others
+     * forward to it.
+     *
+     * @param parentObject parent object
+     * @param methodBaseName name of method
+     * @param dataType type of data
+     * @param description description
+     * @return the resulting consumer
+     */
+    public Consumer<?> createConsumer(final Object parentObject,
             final String methodBaseName, final Class dataType,
             final String description) {
 
@@ -308,6 +425,14 @@ public abstract class WorkspaceComponent {
                 return description;
             }
 
+            public Class getDataType() {
+                return dataType;
+            }
+
+            public Object getBaseObject() {
+                return parentObject;
+            }
+
         };
         return consumer;
 
@@ -318,27 +443,14 @@ public abstract class WorkspaceComponent {
      * Classes which offer this should override it.
      *
      * @param objectKey
-     * @return
+     * @return the corresponding object
      */
-    public Object getObjectFromKey(String objectKey) {
+    public Object getObjectFromKey(final String objectKey) {
         // TODO Should this be public?
+        // TODO: Throw exception if object not found...
         return null;
     }
 
-    /**
-     * Adds a AttributeListener to this component.
-     *
-     * @param listener the AttributeListener to add.
-     */
-    public void addAttributeListener(final PotentialAttributeListener listener) {
-        potentialAttributeListeners.add(listener);
-    }
-
-    public void firePotentialAttributeUpdateEvent(WorkspaceComponent component) {
-        for (PotentialAttributeListener listener: potentialAttributeListeners) {
-            listener.update(component);
-        }
-    }
 
     //////////// NEW STUFF END ////////////////
 

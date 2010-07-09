@@ -88,7 +88,7 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void initializeAttributes() {
 
-        getAttributeTypes().add(new AttributeType("Dimension", null, double.class, true));
+        getAttributeTypes().add(new AttributeType(this, "Dimension", null, double.class, true));
 
         //TODO: Move this
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
@@ -108,14 +108,16 @@ public class BarChartComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                firePotentialAttributeUpdateEvent(BarChartComponent.this);
+                firePotentialAttributesChanged();
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                firePotentialAttributeUpdateEvent(BarChartComponent.this);
+                // fireAttributeObjectRemoved(); //TODO: How to get right "dimension" object?
+                    // Problem with attributes being anonymous objects...
+                firePotentialAttributesChanged();
             }
         });
     }
@@ -167,9 +169,9 @@ public class BarChartComponent extends WorkspaceComponent {
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
             PotentialAttribute consumerID = new PotentialAttribute(
                     this,
-                    "Bar_" + i,
                     new BarChartSetter(i),
-                    "Value", Double.class);
+                    "Bar_" + i,
+                    "Value", double.class);
             returnList.add(consumerID);
         }
         return returnList;

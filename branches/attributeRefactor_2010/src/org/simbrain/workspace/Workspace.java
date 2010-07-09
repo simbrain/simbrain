@@ -19,8 +19,6 @@
 package org.simbrain.workspace;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -56,7 +54,7 @@ public class Workspace {
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
 
     /** The coupling manager for this workspace. */
-    private final CouplingManager manager = new CouplingManager();
+    private final CouplingManager manager;
 
     /** List of workspace components. */
     private List<WorkspaceComponent> componentList = Collections
@@ -93,15 +91,23 @@ public class Workspace {
     private Object updatorLock = new Object();
 
     /**
-     * Delay in milliseconds between update cycles. Used to artificially slow down
-     * simulation (sometimes useful in teaching).
+     * Delay in milliseconds between update cycles. Used to artificially slow
+     * down simulation (sometimes useful in teaching).
      */
     private int updateDelay = 0;
 
     /**
      * The updator used to manage component updates.
      */
-    private WorkspaceUpdator updator = new WorkspaceUpdator(this, manager);
+    private WorkspaceUpdator updator;
+
+    /**
+     * Construct a workspace.
+     */
+    public Workspace() {
+        manager = new CouplingManager(this);
+        updator = new WorkspaceUpdator(this, manager);
+    }
 
     /**
      * Adds a listener to the workspace.
@@ -136,7 +142,11 @@ public class Workspace {
             for (PotentialAttribute  consumingAttribute : targetAttributes) {
                 Coupling<?> coupling = new Coupling(producingAttribute
                         .createProducer(), consumingAttribute.createConsumer());
-                getCouplingManager().addCoupling(coupling);
+                try {
+                    getCouplingManager().addCoupling(coupling);
+                } catch (UmatchedAttributesException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -159,7 +169,11 @@ public class Workspace {
                 Producer producer = producerID.createProducer();
                 Consumer consumer = consumerIterator.next().createConsumer();
                 Coupling<?> coupling = new Coupling(producer, consumer);
-                getCouplingManager().addCoupling(coupling);
+                try {
+                    getCouplingManager().addCoupling(coupling);
+                } catch (UmatchedAttributesException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -493,16 +507,20 @@ public class Workspace {
 
     /**
      * Adds a coupling to the CouplingManager.
-     * 
+     *
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
-        manager.addCoupling(coupling);
+        try {
+            manager.addCoupling(coupling);
+        } catch (UmatchedAttributesException e) {
+            e.printStackTrace();
+        }
     }
-    
+
     /**
      * Removes a coupling from the CouplingManager.
-     * 
+     *
      * @param coupling The coupling to remove.
      */
     public void removeCoupling(final Coupling<?> coupling) {

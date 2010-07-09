@@ -19,14 +19,18 @@
 package org.simbrain.workspace;
 
 /**
- * Interface for updating components when couplings are changed.
+ * Exception thrown when a coupling is created with mismatched attributes.
+ *
+ * @author jyoshimi
  *
  */
-public interface CouplingComponentListener {
+public class UmatchedAttributesException extends Exception {
 
     /**
-     * Called when couplings are updated.
+     * @param arg0
      */
-    void couplingListUpdated();
+    public UmatchedAttributesException(final String message) {
+        super(message);
+    }
 
 }

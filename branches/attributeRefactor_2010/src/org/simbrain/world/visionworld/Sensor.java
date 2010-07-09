@@ -284,4 +284,14 @@ public final class Sensor implements Producer {
         // TODO Auto-generated method stub
         return null;
     }
+
+    public Class getDataType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Object getBaseObject() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

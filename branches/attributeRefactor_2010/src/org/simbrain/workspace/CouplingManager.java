@@ -38,6 +38,9 @@ public class CouplingManager {
     /** The static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(CouplingManager.class);
 
+    /** Parent workspace. */
+    private final Workspace workspace;
+
     /** All couplings for the workspace. */
     private List<Coupling<?>> all = new CopyOnWriteArrayList<Coupling<?>>();
 
@@ -60,8 +63,40 @@ public class CouplingManager {
     private int priority = DEFAULT_PRIORITY;
 
     /** List of listeners to fire updates when couplings are changed. */
-    private ArrayList<CouplingComponentListener> couplingManagerListeners
-      = new ArrayList<CouplingComponentListener>();
+    private List<CouplingListener> couplingListeners = new ArrayList<CouplingListener>();
+
+    /**
+     * Construct a coupling manager.
+     */
+    public CouplingManager(Workspace workspace) {
+        this.workspace = workspace;
+        workspace.addListener(new WorkspaceListener(){
+
+            public void componentAdded(WorkspaceComponent component) {
+                component.addAttributeListener(new AttributeListener() {
+
+                    public void attributeObjectRemoved(Object object) {
+                        removeDeadCouplings(object);
+                    }
+
+                    public void attributeTypeVisibilityChanged() {
+                    }
+
+                    public void potentialAttributesChanged() {
+                    }
+
+                });
+            }
+
+            public void componentRemoved(WorkspaceComponent component) {
+                // TODO
+            }
+
+            public void workspaceCleared() {
+            }
+
+        });
+    }
 
     /**
      * Helper method to cleanup nasty generics declarations.
@@ -169,9 +204,13 @@ public class CouplingManager {
     /**
      * Adds a coupling to this instance.
      *
-     * @param coupling The coupling to add.
+     * @param coupling
+     *            The coupling to add.
+     * @throws UmatchedAttributesException
+     *             thrown if the attributes in this coupling have mismatched
+     *             data types
      */
-    public void addCoupling(final Coupling<?> coupling) {
+    public void addCoupling(final Coupling<?> coupling) throws UmatchedAttributesException {
 //        Coupling<?> old = consumingAttributes.get(coupling.getConsumingAttribute());
 //        
 //        // TODO warning that old was deleted
@@ -183,6 +222,15 @@ public class CouplingManager {
 //
 //        consumingAttributes.put(coupling.getConsumingAttribute(), coupling);
 
+        if (coupling.getConsumer().getDataType() != coupling.getProducer()
+                .getDataType()) {
+            String warning = "Producer type ("
+                    + coupling.getProducer().getDataType().getCanonicalName()
+                    + ") does not match consumer type ("
+                    + coupling.getConsumer().getDataType().getCanonicalName()
+                    + ")";
+            throw new UmatchedAttributesException(warning);
+        }
         all.add(coupling);
 
         WorkspaceComponent source = coupling.getProducer().getParentComponent();
@@ -197,7 +245,27 @@ public class CouplingManager {
         // TODO is this the way to do this?
         targetCouplings.put(target, addCouplingToList(
             targetCouplings.get(source), coupling));
-        fireCouplingListUpdated();
+        fireCouplingAdded(coupling);
+    }
+
+    /**
+     * Remove any couplings associated with the "dead" object.
+     *
+     * @param object the object that has been removed
+     */
+    private void removeDeadCouplings(Object object) {
+        List<Coupling> toRemove = new ArrayList<Coupling>();
+        for (Coupling<?> coupling : getCouplings()) {
+            if (coupling.getConsumer().getBaseObject() == object) {
+                toRemove.add(coupling);
+            }
+            if (coupling.getProducer().getBaseObject() == object) {
+                toRemove.add(coupling);
+            }
+        }
+        for(Coupling coupling : toRemove) {
+            removeCoupling(coupling);
+        }
     }
 
     /**
@@ -210,9 +278,9 @@ public class CouplingManager {
      */
     @SuppressWarnings("unchecked")
     public void replaceCouplings(final Attribute oldAttr, final Attribute newAttr) {
-        
+
         //TODO: Think
-        
+
 //        for (Coupling<?> coupling : new ArrayList<Coupling<?>>(all)) {
 //            boolean replace = false;
 //            ProducingAttribute producer = coupling.getProducingAttribute();
@@ -307,7 +375,8 @@ public class CouplingManager {
         source.couplingRemoved(coupling);
 
         if (target != source) { target.couplingRemoved(coupling); }
-        fireCouplingListUpdated();
+
+        fireCouplingRemoved(coupling);
     }
 
     /**
@@ -322,35 +391,35 @@ public class CouplingManager {
             list.remove(coupling);
         }
     }
-    
+
     /**
      * A Simple holder for linking a source and a target.
-     * 
+     *
      * @author Matt Watson
      */
     private static class SourceTarget {
+
         /** An arbitrary prime used to improve hashing distribution. */
         private static final int ARBITRARY_PRIME = 57;
-        
         /** The source component. */
         private final WorkspaceComponent source;
         /** The target component. */
         private final WorkspaceComponent target;
-        
+
         /**
          * Creates an instance.
-         * 
+         *
          * @param source The source.
          * @param target The target.
          */
         SourceTarget(final WorkspaceComponent source, final WorkspaceComponent target) {
             if (source == null) throw new IllegalArgumentException("source cannot be null");
             if (target == null) throw new IllegalArgumentException("target cannot be null");
-            
+
             this.source = source;
             this.target = target;
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -358,13 +427,13 @@ public class CouplingManager {
         public boolean equals(final Object o) {
             if (o instanceof SourceTarget) {
                 SourceTarget other = (SourceTarget) o;
-                
+
                 return other.source == source && other.target == target;
             } else {
                 return false;
             }
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -373,16 +442,18 @@ public class CouplingManager {
             return source.hashCode() + (ARBITRARY_PRIME * target.hashCode());
         }
     }
-    
+
     /**
-     * {@inheritDoc}
+     * Get the priority.
      */
     public int getPriority() {
         return priority;
     }
-    
+
     /**
-     * {@inheritDoc}
+     * Set the priority.
+     *
+     * @param value the priority to set
      */
     public void setPriority(final int value) {
         priority = value;
@@ -390,12 +461,22 @@ public class CouplingManager {
 
 
     /**
-     * Sends updates to all listeners when changes are made.
+     * Coupling added.
      */
-    private void fireCouplingListUpdated() {
+    private void fireCouplingAdded(Coupling coupling) {
 
-        for (CouplingComponentListener listeners : couplingManagerListeners) {
-            listeners.couplingListUpdated();
+        for (CouplingListener listeners : couplingListeners) {
+            listeners.couplingAdded(coupling);
+        }
+    }
+
+    /**
+     * Coupling removed.
+     */
+    private void fireCouplingRemoved(Coupling coupling) {
+
+        for (CouplingListener listeners : couplingListeners) {
+            listeners.couplingRemoved(coupling);
         }
     }
 
@@ -403,15 +484,15 @@ public class CouplingManager {
      * Adds a new listener to be updated when changes are made.
      * @param listener to be updated of changes
      */
-    public void addCouplingListener(final CouplingComponentListener listener) {
-        couplingManagerListeners.add(listener);
+    public void addCouplingListener(final CouplingListener listener) {
+        couplingListeners.add(listener);
     }
 
     /**
      * Removes the listener from the list.
      * @param listener to be removed
      */
-    public void removeCouplingListener(final CouplingComponentListener listener) {
-        couplingManagerListeners.remove(listener);
+    public void removeCouplingListener(final CouplingListener listener) {
+        couplingListeners.remove(listener);
     }
 }

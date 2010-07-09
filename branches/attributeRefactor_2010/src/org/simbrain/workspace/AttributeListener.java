@@ -19,12 +19,30 @@
 package org.simbrain.workspace;
 
 /**
- * Listener for consumer and producer events.
+ * Listener for attribute related events, broadly (this includes potential
+ * attributes and attribute types).
  *
  * @author jyoshimi
  */
-public interface PotentialAttributeListener {
+public interface AttributeListener {
 
-   void update(WorkspaceComponent component);
-   
+    /**
+     * The visibility of an attribute type changed.
+     */
+    public void attributeTypeVisibilityChanged();
+
+    /**
+     * Potential attributes have changed in some way, such that the list of
+     * potential attributes for a given workspace component is changed.
+     */
+    public void potentialAttributesChanged();
+
+    /**
+     * The base object of an attribute has been removed. The corresponding
+     * coupling should therefore be deleted.
+     *
+     * @param object the removed object.
+     */
+    public void attributeObjectRemoved(Object object);
+
 }

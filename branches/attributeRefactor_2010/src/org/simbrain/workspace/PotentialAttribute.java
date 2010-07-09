@@ -30,12 +30,6 @@ public class PotentialAttribute {
     /** Parent workspace component. */
     private WorkspaceComponent parent;
 
-    /**
-     * A string which can be used to obtain a reference to the object. Also used
-     * by getDescription()
-     */
-    private String objectKey;
-
     /** Potential producing or consuming object. */
     private Object baseObject;
 
@@ -46,30 +40,38 @@ public class PotentialAttribute {
     private Class dataType;
 
     /**
+     * An identifier for the object. Used by the GUI to display attribute
+     * information.
+     */
+    private String objectName;
+
+    /**
      * Construct a potential attribute.
      *
      * @param parent parent workspace component
-     * @param objectKey string key or object
+     * @param objectName name of object
      * @param methodBaseName method name
      * @param dataType class of data
      */
-    public PotentialAttribute(WorkspaceComponent parent, String objectKey, Object object,
+    public PotentialAttribute(WorkspaceComponent parent, Object object, String objectName,
             String methodBaseName, Class dataType) {
         this.parent = parent;
-        this.objectKey = objectKey;
+        this.objectName = objectName;
         this.baseObject = object;
         this.methodBaseName = methodBaseName;
         this.dataType = dataType;
     }
 
     /**
-     * @param parent
-     * @param objectKey
-     * @param dataType
+     * Create a potential attribute using an attribute type object as a shortcut.
+     *
+     * @param parent parent object
+     * @param objectName name of object
+     * @param type attribute type of object
      */
-    public PotentialAttribute(WorkspaceComponent parent, String objectName, Object object, AttributeType type) {
+    public PotentialAttribute(WorkspaceComponent parent, Object object, String objectName, AttributeType type) {
         this.parent = parent;
-        this.objectKey = objectName;
+        this.objectName = objectName;
         this.baseObject = object;
         this.methodBaseName = type.getAttributeName();
         this.dataType = type.getDataType();
@@ -81,7 +83,7 @@ public class PotentialAttribute {
      * @return the producer corresponding to this potential attribute.
      */
     public Producer createProducer() {
-        return parent.getProducer(this);
+        return parent.createProducer(this);
     }
 
     /**
@@ -90,18 +92,16 @@ public class PotentialAttribute {
      * @return the consumer corresponding to this potential attribute.
      */
     public Consumer createConsumer() {
-        return parent.getConsumer(this);
+        return parent.createConsumer(this);
     }
 
     /**
      * Returns a description of this potential attribute; used in GUI.
      *
-     * @param objectKey
-     * @param type
-     * @return
+     * @return a description of this attribute
      */
     public String getDescription() {
-        return objectKey + ":" + methodBaseName + "<"
+        return objectName + ":" + methodBaseName + "<"
                 + dataType.getCanonicalName() + ">";
     }
 
@@ -110,13 +110,6 @@ public class PotentialAttribute {
      */
     public WorkspaceComponent getParent() {
         return parent;
-    }
-
-    /**
-     * @return the objectKey
-     */
-    public String getObjectKey() {
-        return objectKey;
     }
 
     /**

@@ -18,17 +18,25 @@
  */
 package org.simbrain.workspace;
 
-
 /**
- * TODO.
+ * Listener for coupling related events.
+ *
  */
-public interface Producer<E> extends Attribute {
+public interface CouplingListener {
+
 
     /**
-     * Return the value for this producer.
+     * Called when a coupling is added.
      *
-     * @return the value for this producer
+     * @param coupling the new coupling
      */
-    E getValue();
+    public void couplingAdded(Coupling coupling);
+
+    /**
+     * Called when a coupling is removed.
+     *
+     * @param coupling the coupling that is being removed
+     */
+    public void couplingRemoved(Coupling coupling);
 
 }

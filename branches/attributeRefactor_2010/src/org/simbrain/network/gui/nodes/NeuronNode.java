@@ -269,7 +269,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         JPopupMenu contextMenu = new JPopupMenu();
 
-        // Cut, copy, paste, delte
+        // Cut, copy, paste, delete
         contextMenu.add(new CutAction(getNetworkPanel()));
         contextMenu.add(new CopyAction(getNetworkPanel()));
         contextMenu.add(new PasteAction(getNetworkPanel()));

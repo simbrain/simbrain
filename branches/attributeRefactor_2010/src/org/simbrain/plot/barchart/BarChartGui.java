@@ -51,13 +51,13 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
 
     /** Panel for chart. */
     private ChartPanel chartPanel = new ChartPanel(null);
-    
+
     /** Preferred frame size. */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
     /** Plot action manager. */
     private PlotActionManager actionManager;
-    
+
     /**
      * Construct the GUI Bar Chart.
      *
@@ -80,19 +80,19 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(deleteButton);
         buttonPanel.add(addButton);
-                
+
         createAttachMenuBar();
 
         add("Center", chartPanel);
         add("South", buttonPanel);
     }
-    
+
     /**
      * Initializes frame.
      */
     @Override
     public void postAddInit() {
-        
+
         // Generate the graph
         chart = ChartFactory.createBarChart("Bar Chart", // chart title
                 "Category", // domain axis label
@@ -120,11 +120,11 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
             // chart, chart.getCategoryPlot(),
             // chart.getCategoryPlot().getRenderer(), chartPanel..
             public void chartSettingsUpdated() {
-                
+
                 // Update colors
                 chart.getCategoryPlot().getRenderer().setSeriesPaint(0,
                         getWorkspaceComponent().getModel().getBarColor());
-                
+
                 // Update auto-range
                 chart.getCategoryPlot().getRangeAxis().setAutoRange(
                         getWorkspaceComponent().getModel().isAutoRange());
@@ -137,7 +137,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
                 }
             }
         });
-        
+
         // Fire the chart listener to update settings
         getWorkspaceComponent().getModel().fireSettingsChanged();
     }

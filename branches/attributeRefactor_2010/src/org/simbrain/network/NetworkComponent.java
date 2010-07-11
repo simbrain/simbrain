@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+h * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,14 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -62,6 +64,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
+        getAttributeTypes().add(new AttributeType(this, "Neuron", "InputValue", double.class, true));
         getAttributeTypes().add(new AttributeType(this, "Neuron", "Activation", double.class, true));
         getAttributeTypes().add(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
         getAttributeTypes().add(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
@@ -121,6 +124,59 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     }
 
+    @Override
+    public List<PotentialAttribute> getPotentialConsumers() {
+        List<PotentialAttribute> returnList = new ArrayList<PotentialAttribute>();
+        for (AttributeType type : this.getAttributeTypes()) {
+            if (type.isVisible()) {
+                if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+                    for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                        returnList.add(new PotentialAttribute(this, neuron, neuron.getId(), type));
+                    }
+                } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+                    for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                        returnList.add(new PotentialAttribute(this, synapse, synapse.getId(), type));
+                    }
+                }
+
+            }
+        }
+        return returnList;
+    }
+
+    @Override
+    public List<PotentialAttribute> getPotentialProducers() {
+        List<PotentialAttribute> returnList = new ArrayList<PotentialAttribute>();
+        for(PotentialAttribute attribute : getPotentialConsumers()) {
+            if (attribute.getMethodBaseName().equalsIgnoreCase("InputValue")) {
+                continue;
+            } else {
+                returnList.add(attribute);
+            }
+        }
+        return returnList;
+    }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        if (objectKey.startsWith("Neuron")) {
+            return this.getRootNetwork().getNeuron(objectKey);
+        } else if (objectKey.startsWith("Synapse")) {
+            return this.getRootNetwork().getSynapse(objectKey);
+        }
+        return null;
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof Neuron) {
+            return ((Neuron)object).getId();
+        } else if (object instanceof Synapse) {
+            return ((Synapse)object).getId();
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -156,33 +212,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public String getXML() {
         return RootNetwork.getXStream().toXML(rootNetwork);
-    }
-
-
-    @Override
-    public List<PotentialAttribute> getPotentialConsumers() {
-        List<PotentialAttribute> returnList = new ArrayList<PotentialAttribute>();
-        for (AttributeType type : this.getAttributeTypes()) {
-            if (type.isVisible()) {
-                if (type.getTypeID().equalsIgnoreCase("Neuron")) {
-                    for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                        returnList.add(new PotentialAttribute(this, neuron, neuron.getId(), type));
-                    }
-                } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
-                    for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                        returnList.add(new PotentialAttribute(this, synapse, synapse.getId(), type));
-                    }
-                }
-
-            }
-        }
-        return returnList;
-    }
-
-    @Override
-    public List<PotentialAttribute> getPotentialProducers() {
-        // Thus far, potential consumer and producers are the same
-        return getPotentialConsumers();
     }
 
     // TODO: Link to NetworkSettings.

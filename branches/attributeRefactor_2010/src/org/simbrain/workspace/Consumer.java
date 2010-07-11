@@ -19,7 +19,11 @@
 package org.simbrain.workspace;
 
 /**
- * TODO.
+ * A wrapper for a public setter in a Simbrain object. The second component of a
+ * coupling, which "consumes" values of type E from a corresponding producer
+ * object.
+ *
+ * @param <E> the type of data taken by the setter.
  */
 public interface Consumer<E> extends Attribute {
 

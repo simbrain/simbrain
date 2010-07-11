@@ -21,6 +21,7 @@ package org.simbrain.workspace.gui;
 import javax.swing.JMenu;
 
 import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -31,20 +32,21 @@ import org.simbrain.workspace.WorkspaceListener;
  */
 public class ProducerMenu extends JMenu implements WorkspaceListener {
 
-	/** Reference to workspace. */
+    /** Reference to workspace. */
     Workspace workspace;
 
     /** The component to couple to. */
-    Consumer<?> targetConsumingAttribute;
+    PotentialAttribute targetConsumer;
 
     /**
      * @param menuName the name of the menu
      * @param workspace the workspace
      * @param sourceComponent the target consuming attribute.
      */
-    public ProducerMenu(final String menuName, final Workspace workspace, final Consumer<?> targetConsumer) {
+    public ProducerMenu(final String menuName, final Workspace workspace, final PotentialAttribute targetConsumer) {
 		super(menuName);
 		this.workspace = workspace;
+		this.targetConsumer = targetConsumer;
 		workspace.addListener(this);
 		updateMenu();
 	}

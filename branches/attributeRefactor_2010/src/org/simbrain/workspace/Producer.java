@@ -18,9 +18,12 @@
  */
 package org.simbrain.workspace;
 
-
 /**
- * TODO.
+ * A wrapper for a public getter in a Simbrain object. The first component of a
+ * coupling, which "produces" values of type E for a corresponding consumer
+ * object which wraps a setter method on another object.
+ *
+ * @param <E> the type of data returned by the getter.
  */
 public interface Producer<E> extends Attribute {
 

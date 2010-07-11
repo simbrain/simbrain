@@ -46,6 +46,7 @@ public class AttributeTypePanel extends JPanel  {
 
     /**
      * Workspace component list panel constructor.
+     *
      * @param desktop reference.
      */
     public AttributeTypePanel(final WorkspaceComponent component) {
@@ -61,8 +62,10 @@ public class AttributeTypePanel extends JPanel  {
         table.setGridColor(Color.LIGHT_GRAY);
         table.setFocusable(false);
 
-        for (AttributeType type : component.getAttributeTypes()) {
-           model.addRow(type);
+        if (component != null) {
+            for (AttributeType type : component.getAttributeTypes()) {
+                model.addRow(type);
+             }
         }
 
         JScrollPane scrollPane = new JScrollPane(table);

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -88,7 +88,8 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void initializeAttributes() {
 
-        getAttributeTypes().add(new AttributeType(this, "Dimension", null, double.class, true));
+        getAttributeTypes().add(
+                new AttributeType(this, "Dimension", null, double.class, true));
 
         //TODO: Move this
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
@@ -115,11 +116,32 @@ public class BarChartComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                // fireAttributeObjectRemoved(); //TODO: How to get right "dimension" object?
-                    // Problem with attributes being anonymous objects...
+                if(getSetter(index) != null) {
+                    fireAttributeObjectRemoved(getSetter(index));
+                }
                 firePotentialAttributesChanged();
             }
         });
+    }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        try {
+            int i = Integer.parseInt(objectKey);
+            BarChartSetter setter = new BarChartSetter(i);
+            setterList.add(setter);
+            return  setter;
+        } catch (NumberFormatException e) {
+            return null; // the supplied string was not an integer
+        }
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof BarChartSetter) {
+            return "" + ((BarChartSetter)object).getIndex();
+        }
+        return null;
     }
 
     /**
@@ -133,6 +155,7 @@ public class BarChartComponent extends WorkspaceComponent {
 
     /**
      * Opens a saved bar chart.
+     *
      * @param input stream
      * @param name name of file
      * @param format format
@@ -140,7 +163,8 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     public static BarChartComponent open(final InputStream input,
             final String name, final String format) {
-        BarChartModel dataModel = (BarChartModel) BarChartModel.getXStream().fromXML(input);
+        BarChartModel dataModel = (BarChartModel) BarChartModel.getXStream()
+                .fromXML(input);
         return new BarChartComponent(name, dataModel);
     }
 
@@ -167,11 +191,13 @@ public class BarChartComponent extends WorkspaceComponent {
     public List<PotentialAttribute> getPotentialConsumers() {
         List<PotentialAttribute> returnList = new ArrayList<PotentialAttribute>();
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
+            BarChartSetter setter =  new BarChartSetter(i);
             PotentialAttribute consumerID = new PotentialAttribute(
                     this,
-                    new BarChartSetter(i),
+                    setter,
                     "Bar_" + i,
                     "Value", double.class);
+            setterList.add(setter);
             returnList.add(consumerID);
         }
         return returnList;
@@ -179,13 +205,18 @@ public class BarChartComponent extends WorkspaceComponent {
 
 
     /**
-     * Return the specified setter object. Used for making consumers.
+     * Return the setter with specified index, or null if none found.
      *
      * @param i index of setter
      * @return the setter object
      */
     public BarChartSetter getSetter(int i) {
-        return setterList.get(i);
+        for(BarChartSetter setter : setterList) {
+            if(setter.getIndex() == i) {
+                return setter;
+            }
+        }
+        return null;
     }
 
     /**
@@ -213,6 +244,13 @@ public class BarChartComponent extends WorkspaceComponent {
          */
         public void setValue(final double val) {
             model.setValue(val, index);
+        }
+
+        /**
+         * @return the index
+         */
+        public int getIndex() {
+            return index;
         }
     }
 

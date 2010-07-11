@@ -28,13 +28,23 @@ package org.simbrain.workspace;
  */
 public class AttributeType {
 
-    /** Reference to parent component; needed so that visibility change events can be fired. */
+    /**
+     * Reference to parent component; needed so that visibility change events
+     * can be fired.
+     */
     private WorkspaceComponent parentComponent;
 
-    /** Description of this attribute type; generally a description of the object type. */
+    /**
+     * Description of this attribute type; generally a description of the object
+     * type.
+     */
     private final String typeID;
 
-    /** The root name of a getter or setter; i.e. "X" in "getX" or "setX".  */
+    /**
+     * The root name of a getter or setter; i.e. "X" in "getX" or "setX".
+     * Effectively serves as a "subtype" of a class of attributes associated
+     * with the base object.
+     */
     private final String methodBaseName;
 
     /** Class of this attribute. */
@@ -49,10 +59,12 @@ public class AttributeType {
      * @param parent reference to parent component
      * @param typeID String identification of type id
      * @param methodName name of method
-     * @param dataType data type (return type for producers; argument type for consumers)
-     * @param visible whether this attribute should be visible for a given component
+     * @param dataType data type (return type for producers;
+     *        argument type for consumers)
+     * @param visible whether this attribute should be visible for a given
+     *        component.
      */
-    public AttributeType(WorkspaceComponent parent, String typeID, String methodName, Class dataType, boolean visible) {
+    public AttributeType(WorkspaceComponent parent, String typeID, String methodName, Class<?> dataType, boolean visible) {
         this.parentComponent = parent;
         this.typeID = typeID;
         this.methodBaseName = methodName;

@@ -23,6 +23,7 @@ package org.simbrain.workspace;
  * Defines the base API for consumers and producers.
  *
  * @author Matt Watson
+ * @author Jeff Yoshimi
  */
 public interface Attribute {
 
@@ -47,7 +48,15 @@ public interface Attribute {
      *
      * @return the data type, as a class.
      */
-    public Class getDataType();
+    public Class<?> getDataType();
+
+    /**
+     * Returns the base name of the method associated with this attribute (that
+     * is, the method name without "get" or "set")
+     *
+     * @return base method name
+     */
+    public String getMethodBaseName();
 
     /**
      * Returns the descriptive name of this attribute.

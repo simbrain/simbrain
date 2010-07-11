@@ -104,10 +104,10 @@ public class WorkspaceSerializer {
 
         for (WorkspaceComponent component : workspace.getComponentList()) {
 
-            ArchiveContents.Component archiveComp = archive
+            ArchiveContents.ArchivedComponent archiveComp = archive
                     .addComponent(component);
 
-            ZipEntry entry = new ZipEntry(archiveComp.uri);
+            ZipEntry entry = new ZipEntry(archiveComp.getUri());
             zipStream.putNextEntry(entry);
             serializer.serializeComponent(component);
 
@@ -119,9 +119,9 @@ public class WorkspaceSerializer {
              * it's serialized here.
              */
             if (desktopComponent != null) {
-                ArchiveContents.Component.DesktopComponent dc
+                ArchiveContents.ArchivedComponent.ArchivedDesktopComponent dc
                     = archiveComp.addDesktopComponent(desktopComponent);
-                entry = new ZipEntry(dc.uri);
+                entry = new ZipEntry(dc.getUri());
                 zipStream.putNextEntry(entry);
                 desktopComponent.save(zipStream);
             }
@@ -186,57 +186,63 @@ public class WorkspaceSerializer {
         }
 
         // Add Components
-        if (contents.getComponents() != null) {
-            for (ArchiveContents.Component component : contents.getComponents()) {
-                if (exclude.contains(component.uri)) {
+        if (contents.getArchivedComponents() != null) {
+            for (ArchiveContents.ArchivedComponent archivedComponent : contents.getArchivedComponents()) {
+                if (exclude.contains(archivedComponent.getUri())) {
                     continue;
                 }
 
-                WorkspaceComponent wc = componentDeserializer.deserializeWorkspaceComponent(
-                    component, new ByteArrayInputStream(entries.get(component.uri)));
+                WorkspaceComponent wc = componentDeserializer
+                        .deserializeWorkspaceComponent(archivedComponent,
+                                new ByteArrayInputStream(entries
+                                        .get(archivedComponent.getUri())));
 
-                // This will cause a desktop component (GuiComponent) to be created
+                // This will cause a desktop component (GuiComponent) to be
+                // created
                 workspace.addWorkspaceComponent(wc);
 
-                if (component.desktopComponent != null) {
-                    Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(new ByteArrayInputStream(
-                            entries.get(component.desktopComponent.uri)));
-                    GuiComponent desktopComponent = desktop.getDesktopComponent(wc);
+                if (archivedComponent.getDesktopComponent() != null) {
+                    Rectangle bounds = (Rectangle) new XStream(new DomDriver())
+                            .fromXML(new ByteArrayInputStream(entries
+                                    .get(archivedComponent
+                                            .getDesktopComponent().getUri())));
+                    GuiComponent desktopComponent = desktop
+                            .getDesktopComponent(wc);
                     desktopComponent.getParentFrame().setBounds(bounds);
                 }
             }
         }
 
         // Add Couplings
-        if (contents.getCouplings() != null) {
-            for (ArchiveContents.CouplingReference couplingRef : contents.getCouplings()) {
-                if (exclude.contains(couplingRef.source.uri)
-                || exclude.contains(couplingRef.target.uri)) {
+        if (contents.getArchivedCouplings() != null) {
+            for (ArchiveContents.ArchivedCoupling couplingRef : contents
+                    .getArchivedCouplings()) {
+                if (exclude.contains(couplingRef.getArchivedProducer().getParentRef())
+                        || exclude.contains(couplingRef.getArchivedProducer().getParentRef())) {
                     continue;
                 }
 
-                WorkspaceComponent sourceComponent
-                    = componentDeserializer.getComponent(couplingRef.source.uri);
-                WorkspaceComponent targetComponent
-                    = componentDeserializer.getComponent(couplingRef.target.uri);
-                
-                //TODO: Redo
-                
-//
-//                ProducingAttribute<?> producingAttribute = (ProducingAttribute<?>) sourceComponent
-//                        .getProducingAttribute(
-//                               couplingRef.source.attributeHolderID,
-//                                couplingRef.source.attributeID);
-//                //System.out.println("producing: " + producingAttribute);
-//
-//                ConsumingAttribute<?> consumingAttribute = (ConsumingAttribute<?>) targetComponent
-//                        .getConsumingAttribute(
-//                                couplingRef.target.attributeHolderID,
-//                               couplingRef.target.attributeID);
-//                //System.out.println("consuming: " + consumingAttribute);
-//
-//                workspace.addCoupling(new Coupling(producingAttribute,
-//                        consumingAttribute));
+                // Get workspace components from references
+                WorkspaceComponent sourceComponent = componentDeserializer
+                        .getComponent(couplingRef.getArchivedProducer().getParentRef());
+                WorkspaceComponent targetComponent = componentDeserializer
+                        .getComponent(couplingRef.getArchivedConsumer().getParentRef());
+
+
+                // Get attributes from references
+                Producer<?> producer =
+                    (Producer<?>) sourceComponent.createProducer(
+                                sourceComponent.getObjectFromKey(couplingRef.getArchivedProducer().getBaseObjectKey()),
+                                couplingRef.getArchivedProducer().getMethodBaseName(),
+                                couplingRef.getArchivedProducer().getDataType(),
+                                couplingRef.getArchivedProducer().getDescription());
+                Consumer<?> consumer =
+                    (Consumer<?>) targetComponent.createConsumer(
+                        targetComponent.getObjectFromKey(couplingRef.getArchivedConsumer().getBaseObjectKey()),
+                        couplingRef.getArchivedConsumer().getMethodBaseName(),
+                        couplingRef.getArchivedConsumer().getDataType(),
+                        couplingRef.getArchivedConsumer().getDescription());
+                workspace.addCoupling(new Coupling(producer, consumer));
 
             }
         }

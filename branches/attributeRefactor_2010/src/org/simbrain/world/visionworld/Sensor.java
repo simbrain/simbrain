@@ -34,7 +34,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Sensor.
  */
-public final class Sensor implements Producer {
+public final class Sensor {
 
     /** Filter for this sensor. */
     private Filter filter;
@@ -267,31 +267,5 @@ public final class Sensor implements Producer {
     public void setParentComponent(final WorkspaceComponent parentComponent) {
         this.parentComponent = parentComponent;
     }
-    
-    //TODO
 
-    public String getAttributeDescription() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public AttributeType getAttributeType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String getKey() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Class getDataType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Object getBaseObject() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

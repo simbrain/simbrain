@@ -18,94 +18,76 @@
  */
 package org.simbrain.workspace.gui;
 
-import javax.swing.JMenuItem;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponent;
+import javax.swing.JCheckBoxMenuItem;
+
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.Workspace;
 
 /**
- * Packages elements of a coupling into a JMenuItem.
+ * A menu item corresponding to a potential coupling. When the menuitem is
+ * invoked, a coupling is created (see ActionPerformed in CouplingMenuItem.java)
+ * It's a checkbox menu item. Checking it creates the coupling, unchecking it
+ * removes it.
  */
-public class CouplingMenuItem extends JMenuItem {
+public class CouplingMenuItem extends JCheckBoxMenuItem {
 
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
 
     /** Reference to producing attribute. */
-    private Producer<?> producer = null;
+    private final PotentialAttribute potentialProducer;
 
     /** Reference to consuming attribute. */
-    private Consumer<?> consumer = null;
+    private final PotentialAttribute potentialConsumer;
 
-    /** Reference to a coupling container. */
-    private WorkspaceComponent component = null;
-
-    /**
-     * The type of menu item being created. These items can be used to draw
-     * information from a single producer or consumer, or lists of either.
-     */
-    public enum EventType {
-        /** Identifies a single producer list event. */
-        PRODUCER_LIST,
-        /** Identifies a single consumer list event. */
-        CONSUMER_LIST
-    }
-
-    /** The event type for this event. */
-    private final EventType eventType;
+    /** The workspace this object belongs to. */
+    private final Workspace workspace;
 
     /**
      * Creates a new instance.
      *
-     * @param component The component that this menuItem belongs to.
-     * @param type The type of event this menuItem should fire.
+     * @param workspace The parent workspace.
+     * @param description The description of the menu item.
+     * @param producer The producer for the coupling.
+     * @param consumer The consumer for the coupling.
      */
-    public CouplingMenuItem(final WorkspaceComponent component, final EventType type) {
-        this.component = component;
-        this.eventType = type;
-        setSelected(true);
+    @SuppressWarnings("unchecked")
+    public CouplingMenuItem(final Workspace workspace, final String description,
+            final PotentialAttribute producer,
+            final PotentialAttribute consumer) {
+        super(description,
+                workspace.getCouplingManager().containseEquivalentCoupling(
+                        new Coupling(producer.createProducer(), consumer.createConsumer())));
+        this.workspace = workspace;
+        this.potentialProducer = producer;
+        this.potentialConsumer = consumer;
+
+        addActionListener(listener);
     }
 
-    /**
-     * @return the container
-     */
-    public WorkspaceComponent getWorkspaceComponent() {
-        return component;
-    }
 
     /**
-     * @return the eventType
+     * Listens for events where this item is clicked. If this item is selected
+     * when there is no coupling one is created. If it is selected, then the
+     * coupling is removed.
      */
-    public EventType getEventType() {
-        return eventType;
-    }
+    @SuppressWarnings("unchecked")
+    private final ActionListener listener = new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+            if (getState()) {
+                workspace.addCoupling(new Coupling(potentialProducer
+                        .createProducer(), potentialConsumer.createConsumer()));
+                setSelected(true);
+            } else {
+                workspace.getCouplingManager().removeMatchingCoupling(new Coupling(potentialProducer
+                        .createProducer(), potentialConsumer.createConsumer()));
+                setSelected(false);
+            }
+        }
+    };
 
-    /**
-     * @return the producer
-     */
-    public Producer<?> getProducer() {
-        return producer;
-    }
-
-    /**
-     * @param producer the producer to set
-     */
-    public void setProducer(Producer<?> producer) {
-        this.producer = producer;
-    }
-
-    /**
-     * @return the consumer
-     */
-    public Consumer<?> getConsumer() {
-        return consumer;
-    }
-
-    /**
-     * @param consumer the consumer to set
-     */
-    public void setConsumer(Consumer<?> consumer) {
-        this.consumer = consumer;
-    }
 }

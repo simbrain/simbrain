@@ -1,11 +1,14 @@
 package org.simbrain.network.desktop;
 
+import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.CouplingMenuConsumer;
+import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * Version of a Neuron Node with a coupling menu.
@@ -37,16 +40,15 @@ public class NeuronNodeDesktop extends NeuronNode {
         Workspace workspace = component.getWorkspaceComponent().getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
-            
-            //TODO: Redo?
-//            JMenu producerMenu = new ProducingAttributeMenu(
-//                    "Receive coupling from", workspace, component
-//                            .getWorkspaceComponent().findConsumingActivationAttribute(neuron));
-//               contextMenu.add(producerMenu);
-//               JMenu consumerMenu = new ConsumingAttributeMenu(
-//                       "Send coupling to", workspace, component
-//                               .getWorkspaceComponent().findProducingActivationAttribute(neuron));
-//                  contextMenu.add(consumerMenu);
+
+            JMenu producerMenu = new CouplingMenuProducer(
+                    "Send coupling to", workspace, component
+                            .getWorkspaceComponent().getPotentialProducer(neuron, "activation"));
+            contextMenu.add(producerMenu);
+            JMenu consumerMenu = new CouplingMenuConsumer(
+                    "Receive coupling from", workspace, component
+                            .getWorkspaceComponent().getPotentialConsumer(neuron, "inputValue"));
+            contextMenu.add(consumerMenu);
         }
         return contextMenu;
     }

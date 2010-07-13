@@ -22,16 +22,14 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**

@@ -36,7 +36,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.util.SFileChooser;
-import org.simbrain.workspace.gui.ComponentMenu;
+import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -198,7 +198,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         edit.add(iterationMode);
         mb.add(edit);
         
-        JMenu producerMenu = new ComponentMenu("Couple",  getWorkspaceComponent().getWorkspace(), getWorkspaceComponent());
+        JMenu producerMenu = new CouplingMenuComponent("Couple",  getWorkspaceComponent().getWorkspace(), getWorkspaceComponent());
         mb.add(producerMenu);
 
         getParentFrame().setJMenuBar(mb);

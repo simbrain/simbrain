@@ -73,15 +73,15 @@ public class Workspace {
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
     /**
-     * Listeners on this workspace. The CopyOnWriteArrayList is not a problem because
-     * writes to this list are uncommon.
+     * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
+     * because writes to this list are uncommon.
      */
     private CopyOnWriteArrayList<WorkspaceListener> listeners =
         new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
-     * Mapping from workspace component types to integers which show how many have been added.
-     * For naming.
+     * Mapping from workspace component types to integers which show how many
+     * have been added. For naming.
      */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
@@ -447,7 +447,7 @@ public class Workspace {
                             throw new IllegalStateException("no more elements");
                         }
                     }
-                    
+
                     return current.next();
                 }
 
@@ -455,15 +455,15 @@ public class Workspace {
                     throw new UnsupportedOperationException();
                 }
             };
-            
+
             return syncRest(locks, task);
         }
     }
-    
+
     /**
      * Recursively synchronizes on the next component in the iterator and executes
      * task if there are no more components.
-     * 
+     *
      * @param <E> The return type of task.
      * @param iterator The iterator of the remaining components to synchronize on.
      * @param task The task to synchronize.
@@ -526,11 +526,11 @@ public class Workspace {
     public void removeCoupling(final Coupling<?> coupling) {
         manager.removeCoupling(coupling);
     }
-    
+
     /**
      * By default, the workspace is updated as followed: 1) Update couplings 2)
      * Call "update" on all workspacecomponents
-     * 
+     *
      * Sometimes this way of updating is not sufficient, and the user will want
      * updates (in the GUI, presses of the iterate and play buttons) to update
      * components and couplings in a different way.

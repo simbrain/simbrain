@@ -507,6 +507,48 @@ public abstract class WorkspaceComponent {
         return null;
     }
 
+
+    /**
+     * Find the potential producer whose base object matches the supplied
+     * object.
+     *
+     * @param baseObject object to match
+     * @param methodName method name to match
+     * @return matching producer, or null if there is none.
+     */
+    public PotentialAttribute getPotentialProducer(Object baseObject,
+            String methodName) {
+        for (PotentialAttribute producer : this.getPotentialProducers()) {
+            boolean baseObjectMatches = (producer.getBaseObject() == baseObject);
+            boolean methodNameMatches = (producer.getMethodBaseName()
+                    .equalsIgnoreCase(methodName));
+            if (baseObjectMatches && methodNameMatches) {
+                return producer;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find the potential consumer whose base object matches the supplied
+     * object.
+     *
+     * @param baseObject object to match
+     * @param methodName method name to match
+     * @return matching producer, or null if there is none.
+     */
+    public PotentialAttribute getPotentialConsumer(Object baseObject,
+            String methodName) {
+        for (PotentialAttribute consumer : this.getPotentialConsumers()) {
+            boolean baseObjectMatches = (consumer.getBaseObject() == baseObject);
+            boolean methodNameMatches = (consumer.getMethodBaseName()
+                    .equalsIgnoreCase(methodName));
+            if (baseObjectMatches && methodNameMatches) {
+                return consumer;
+            }
+        }
+        return null;
+    }
     /**
      * Returns the collection of update parts for this component.
      *

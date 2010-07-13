@@ -29,23 +29,24 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 
 /**
- * For coupling a specific source component to a selected target component,
- * using one of the built in coupling methods (one to one, all to all, etc.).
+ * A menu for creating a set of couplings from one component to another. The
+ * menu shows components. Selecting a menu items couples each visible attribute
+ * in the source component to a visible attribute in the target component.
  */
-public class ComponentMenu extends JMenu implements WorkspaceListener {
+public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
 
-	/** Reference to workspace. */
-    Workspace workspace;
+    /** Reference to workspace. */
+    private Workspace workspace;
 
     /** The component to couple to. */
-    WorkspaceComponent sourceComponent;
+    private WorkspaceComponent sourceComponent;
 
     /**
      * @param menuName the name of the menu
      * @param workspace the workspace
      * @param sourceComponent the source component
      */
-    public ComponentMenu(final String menuName, final Workspace workspace,
+    public CouplingMenuComponent(final String menuName, final Workspace workspace,
             WorkspaceComponent sourceComponent) {
         super(menuName);
         this.workspace = workspace;
@@ -83,7 +84,7 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
     }
 
 	/**
-     * Update the menu when components are added.
+     * Update the menu.
      */
     private void updateMenu() {
         this.removeAll();
@@ -93,8 +94,9 @@ public class ComponentMenu extends JMenu implements WorkspaceListener {
                     .getName());
             componentMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    workspace.coupleOneToOne(
-                            sourceComponent.getPotentialProducers(), targetComponent.getPotentialConsumers());
+                    workspace.coupleOneToOne(sourceComponent
+                            .getPotentialProducers(), targetComponent
+                            .getPotentialConsumers());
                 }
             });
             this.add(componentMenuItem);

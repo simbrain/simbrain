@@ -221,11 +221,56 @@ public class CouplingManager {
     /**
      * Returns whether the coupling is referenced by this manager.
      *
-     * @param coupling The coupling to search for.
+     * @param toCheck The coupling to search for.
      * @return whether the coupling is referenced by this manager.
      */
-    public boolean containsCoupling(final Coupling<?> coupling) {
-        return couplingList.contains(coupling);
+    public boolean containseEquivalentCoupling(final Coupling<?> toCheck) {
+        for (Coupling<?> coupling : getCouplings()) {
+            boolean consumersMatch = attributesMatch(coupling.getConsumer(),
+                    toCheck.getConsumer());
+            boolean producersMatch = attributesMatch(coupling.getProducer(),
+                    toCheck.getProducer());
+            if (consumersMatch && producersMatch) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check whether two attributes are the same
+     *
+     * @param attribute1 first attribute to compare
+     * @param attribute2 second attribute to compare
+     * @return whether they match
+     */
+    private boolean attributesMatch(Attribute attribute1,
+            Attribute attribute2) {
+        boolean baseObjectMatches = (attribute1.getBaseObject() == attribute2
+                .getBaseObject());
+        boolean methodNameMatches = (attribute1.getMethodBaseName()
+                .equalsIgnoreCase(attribute2.getMethodBaseName()));
+        boolean typeMatches = (attribute1.getDataType() == attribute2
+                .getDataType());
+        return (baseObjectMatches && methodNameMatches && typeMatches);
+    }
+
+    /**
+     * Remove coupling (if any) that is essentially a copy of the supplied
+     * coupling.
+     *
+     * @param toRemove  the coupling type to remove
+     */
+    public void removeMatchingCoupling(Coupling<?> toRemove) {
+        for (Coupling<?> coupling : getCouplings()) {
+            boolean consumersMatch = attributesMatch(coupling.getConsumer(),
+                    toRemove.getConsumer());
+            boolean producersMatch = attributesMatch(coupling.getProducer(),
+                    toRemove.getProducer());
+            if (consumersMatch && producersMatch) {
+                removeCoupling(coupling);
+            }
+        }
     }
 
     /**
@@ -249,7 +294,7 @@ public class CouplingManager {
         }
         consumers.put(coupling.getConsumer(), coupling);
 
-        // Throw exception if dataypes are unmatched
+        // Throw exception if datatypes are unmatched
         if (coupling.getConsumer().getDataType() != coupling.getProducer()
                 .getDataType()) {
             String warning = "Producer type ("

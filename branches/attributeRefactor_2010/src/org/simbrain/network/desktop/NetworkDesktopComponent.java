@@ -27,7 +27,7 @@ import javax.swing.JMenuBar;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
-import org.simbrain.workspace.gui.ComponentMenu;
+import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -84,7 +84,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         menuBar.add(networkPanel.createViewMenu());
         menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
         //menuBar.add(createAttributeMenu());
-        menuBar.add(new ComponentMenu("Couple", this.getWorkspaceComponent()
+        menuBar.add(new CouplingMenuComponent("Couple", this.getWorkspaceComponent()
                 .getWorkspace(), this.getWorkspaceComponent()));
         menuBar.add(networkPanel.createHelpMenu());
         getParentFrame().setJMenuBar(menuBar);

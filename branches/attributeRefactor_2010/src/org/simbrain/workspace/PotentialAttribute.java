@@ -82,7 +82,7 @@ public class PotentialAttribute {
      *
      * @return the producer corresponding to this potential attribute.
      */
-    public Producer createProducer() {
+    public Producer<?> createProducer() {
         return parent.createProducer(this);
     }
 
@@ -91,7 +91,7 @@ public class PotentialAttribute {
      *
      * @return the consumer corresponding to this potential attribute.
      */
-    public Consumer createConsumer() {
+    public Consumer<?> createConsumer() {
         return parent.createConsumer(this);
     }
 

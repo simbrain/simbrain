@@ -55,8 +55,11 @@ public abstract class WorkspaceComponent {
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
 
-    /** Attribute Type List for this component. */
-    private List<AttributeType> attributeTypeList = new ArrayList<AttributeType>();
+    /** List of producer types. */
+    private final List<AttributeType> producerTypes = new ArrayList<AttributeType>();
+
+    /** List of consumer types. */
+    private final List<AttributeType> consumerTypes = new ArrayList<AttributeType>();
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
@@ -168,16 +171,6 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Returns a list of attribute types associated with this component.
-     * Subclasses should override this to make attribute available.
-     *
-     * @return the attribute types.
-     */
-    public List<AttributeType> getAttributeTypes() {
-        return attributeTypeList;
-    }
-
-    /**
      * Fire attribute object removed event (when the base object of an attribute
      * is removed).
      *
@@ -226,6 +219,24 @@ public abstract class WorkspaceComponent {
      */
     public void removeAttributeListener(AttributeListener listener) {
         attributeListeners.remove(listener);
+    }
+
+    /**
+     * Add a new type of producer.
+     *
+     * @param type type to add
+     */
+    public void addProducerType(AttributeType type) {
+        producerTypes.add(type);
+    }
+
+    /**
+     * Add a new type of consumer.
+     *
+     * @param type type to add
+     */
+    public void addConsumerType(AttributeType type) {
+        consumerTypes.add(type);
     }
 
     /**
@@ -846,6 +857,20 @@ public abstract class WorkspaceComponent {
     public void setUpdateOn(Boolean updateOn) {
         this.updateOn = updateOn;
         this.fireComponentToggleEvent();
+    }
+
+    /**
+     * @return the producerTypes
+     */
+    public List<AttributeType> getProducerTypes() {
+        return producerTypes;
+    }
+
+    /**
+     * @return the consumerTypes
+     */
+    public List<AttributeType> getConsumerTypes() {
+        return consumerTypes;
     }
 
 }

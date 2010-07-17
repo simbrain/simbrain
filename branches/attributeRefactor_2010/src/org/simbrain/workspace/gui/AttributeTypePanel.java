@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,6 +33,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.PotentialAttributePanel.ProducerOrConsumer;
 
 /**
  * Displays a list of attribute types.
@@ -49,7 +51,7 @@ public class AttributeTypePanel extends JPanel  {
      *
      * @param desktop reference.
      */
-    public AttributeTypePanel(final WorkspaceComponent component) {
+    public AttributeTypePanel(final WorkspaceComponent component, final ProducerOrConsumer poc) {
         super(new BorderLayout());
 
         // Set up table
@@ -63,9 +65,21 @@ public class AttributeTypePanel extends JPanel  {
         table.setFocusable(false);
 
         if (component != null) {
-            for (AttributeType type : component.getAttributeTypes()) {
-                model.addRow(type);
-             }
+            if (poc == ProducerOrConsumer.Consuming) {
+                for (AttributeType type : component.getConsumerTypes()) {
+                    setBorder(BorderFactory
+                            .createTitledBorder("Consumer type visibility for "
+                                    + component.getName()));
+                    model.addRow(type);
+                }
+            } else {
+                for (AttributeType type : component.getProducerTypes()) {
+                    setBorder(BorderFactory
+                            .createTitledBorder("Producer type visibility for "
+                                    + component.getName()));
+                    model.addRow(type);
+                }
+            }
         }
 
         JScrollPane scrollPane = new JScrollPane(table);

@@ -88,8 +88,7 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void initializeAttributes() {
 
-        getAttributeTypes().add(
-                new AttributeType(this, "Dimension", null, double.class, true));
+        addConsumerType(new AttributeType(this, "Dimension", null, double.class, true));
 
         //TODO: Move this
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
@@ -230,8 +229,7 @@ public class BarChartComponent extends WorkspaceComponent {
         /**
          * Construct a setter object.
          *
-         * @param plot the parent component
-         * @param name the name of this consumer (displayed in the plot)
+         * @param index index of the bar to set
          */
         public BarChartSetter(final int index) {
             this.index = index;

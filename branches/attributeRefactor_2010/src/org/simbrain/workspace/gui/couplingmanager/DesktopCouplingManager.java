@@ -79,12 +79,12 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         this.frame = frame;
 
         // Left Panel
-        Border leftBorder = BorderFactory.createTitledBorder("Source Producing Attributes");
+        Border leftBorder = BorderFactory.createTitledBorder("Producers");
         producingAttributes = new PotentialAttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Producing);
         producingAttributes.setBorder(leftBorder);
 
         // Right Panel
-        Border rightBorder = BorderFactory.createTitledBorder("Target Consuming Attributes");
+        Border rightBorder = BorderFactory.createTitledBorder("Consumers");
         consumingAttributes = new PotentialAttributePanel(desktop.getWorkspace(),  ProducerOrConsumer.Consuming);
         consumingAttributes.setBorder(rightBorder);
 

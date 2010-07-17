@@ -133,10 +133,6 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
         parentFrame.pack();
     }
 
-    public void setCurrentWorkspaceComponent(WorkspaceComponent component) {
-           attributeTypes.setListData(new Vector(component.getAttributeTypes()));
-    }
-
     /**
      * Add a listener to the specified workspace component.
      *
@@ -180,7 +176,7 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
     private void refresh(final WorkspaceComponent component) {
 
        // attributeTypes.setListData(new Vector(component.getAttributeTypes()));
-        attributeTypePanel = new AttributeTypePanel(component);
+        attributeTypePanel = new AttributeTypePanel(component, producerOrConsumer);
 
         // Set Attribute list
         if (component != null) {

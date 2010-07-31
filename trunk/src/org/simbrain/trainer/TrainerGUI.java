@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Iterator;
+import java.util.concurrent.Executors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -113,6 +114,18 @@ public class TrainerGUI extends JPanel {
     /** Text field for setting number of iterations to run. */
     private JTextField tfIterations;
 
+    /** Play button. */
+    private JButton jbPlay = new JButton(ResourceManager.getImageIcon("Play.png"));
+
+    /** Step button. */
+    private JButton jbStep = new JButton(ResourceManager.getImageIcon("Step.png"));
+
+    /** Error label. */
+    private JLabel rmsError = new JLabel();
+
+    /** Update completed boolean value. */
+    private boolean updateCompleted = true;
+
 	/**
 	 * Default constructor.
 	 */
@@ -153,7 +166,6 @@ public class TrainerGUI extends JPanel {
 		topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		//topPanel.setPreferredSize(new Dimension(800, 200));
 
-
 		//Graph
 		JPanel trainerDisplay = new JPanel();
 		//trainerDisplay.setBorder(BorderFactory.createTitledBorder("Trainer"));
@@ -175,17 +187,51 @@ public class TrainerGUI extends JPanel {
 		chartPanel.setPreferredSize(new Dimension(chartPanel.getPreferredSize().width,200));
 
 		// Top Buttons
-		JPanel runButtons = new JPanel();
-        JButton runButton = new JButton(ResourceManager.getImageIcon("Play.png"));
+		JPanel  buttonPanel = new JPanel();
         LabelledItemPanel netSelect = new LabelledItemPanel();
         //netSelect.setBorder(BorderFactory.createTitledBorder("Network trainer"));
         netSelect.setLayout(new FlowLayout(FlowLayout.LEFT));
         //netSelect.setPreferredSize(new Dimension(140, 220));
         JLabel netSelectLabel = new JLabel("Network");
-        runButtons.add(netSelectLabel);
-        runButtons.add(cbNetworkChooser);
+        buttonPanel.add(netSelectLabel);
+        buttonPanel.add(cbNetworkChooser);
 
-        runButtons.add(runButton);
+        buttonPanel.add(jbPlay);
+        jbPlay.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent arg0) {
+
+                if (isUpdateCompleted()) {
+                    // Start running
+                    setUpdateCompleted(false);
+                    Executors.newSingleThreadExecutor().submit(new Runnable() {
+                        public void run() {
+                            while (!isUpdateCompleted()) {
+                                iterate();
+                            }
+                        }
+                    });
+                    jbPlay.setIcon(ResourceManager.getImageIcon("Stop.png"));
+                } else {
+                    // Stop running
+                    setUpdateCompleted(true);
+                    jbPlay.setIcon(ResourceManager.getImageIcon("Play.png"));
+                }
+
+            }
+        });
+        buttonPanel.add(jbStep);
+        jbStep.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                iterate();
+            }
+
+        });
+        buttonPanel.add(rmsError);
+
+        JButton runButton = new JButton("Batch");
+        buttonPanel.add(runButton);
         runButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 if (trainer != null) {
@@ -194,7 +240,7 @@ public class TrainerGUI extends JPanel {
             }
         });
         JButton initButton = new JButton("Init");
-        runButtons.add(initButton);
+        buttonPanel.add(initButton);
         initButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 currentNetwork.randomizeBiases(-1, 1);
@@ -204,15 +250,15 @@ public class TrainerGUI extends JPanel {
             }
         });
         tfIterations = new JTextField("300");
-        runButtons.add(tfIterations);
+        buttonPanel.add(tfIterations);
         JButton clearButton = new JButton("Clear");
-        runButtons.add(initButton);
+        buttonPanel.add(initButton);
         clearButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 graphData.clear();
             }
         });
-        runButtons.add(clearButton);
+        buttonPanel.add(clearButton);
 
         JPanel trainerPropertiesPanel = new JPanel();
         JLabel algoSelectLabel = new JLabel("Training Algorithm");
@@ -223,7 +269,7 @@ public class TrainerGUI extends JPanel {
         trainerPropertiesPanel.add(properties);
 
         trainerDisplay.add("Center", chartPanel);
-        trainerDisplay.add("North", runButtons);
+        trainerDisplay.add("North", buttonPanel);
         trainerDisplay.add("South", trainerPropertiesPanel);
     	topPanel.add(trainerDisplay);
 
@@ -248,7 +294,6 @@ public class TrainerGUI extends JPanel {
  //       inColumn = inputDataTable.getColumnModel().getColumn(0);
 //        inColumn.setPreferredWidth(18);
         leftScroll = new JScrollPane(inputDataTable);
- //       leftScroll.setPreferredSize(new Dimension(400, 200));
         JPanel leftMenuPanel = new JPanel();
 		leftMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 		JLabel inputLabel = new JLabel("Input Layer:");
@@ -530,6 +575,31 @@ public class TrainerGUI extends JPanel {
             resetNetworkSelectionBox();
         }
     };
+
+    /**
+     * Iterate the trainer one time and update graphics.
+     */
+    private void iterate() {
+        trainer.train(1);
+        rmsError.setText("" +  Utils.round(trainer.getCurrentError(), 6));
+        graphData.add(trainer.getIteration() ,trainer.getCurrentError());
+    }
+
+    /**
+     * @return boolean updated completed.
+     */
+    public boolean isUpdateCompleted() {
+        return updateCompleted;
+    }
+
+    /**
+     * Sets updated completed value.
+     *
+     * @param updateCompleted Updated completed value to be set
+     */
+    public void setUpdateCompleted(final boolean updateCompleted) {
+        this.updateCompleted = updateCompleted;
+    }
 
 	/**
 	 * Test GUI.

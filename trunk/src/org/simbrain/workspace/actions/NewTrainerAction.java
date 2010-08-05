@@ -21,10 +21,10 @@ package org.simbrain.workspace.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JInternalFrame;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.trainer.TrainerGUI;
+import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -34,6 +34,7 @@ public final class NewTrainerAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
+    /** Reference to desktop. */
     private SimbrainDesktop desktop;
 
     /**
@@ -41,7 +42,7 @@ public final class NewTrainerAction extends AbstractAction {
      * workspace.
      */
     public NewTrainerAction(SimbrainDesktop desktop) {
-        super("Add Network Trainer");
+        super("Network Trainer");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
         this.desktop = desktop;
     }
@@ -49,9 +50,9 @@ public final class NewTrainerAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        TrainerGUI trainer = new TrainerGUI(desktop.getWorkspace());
-        JInternalFrame frame = new JInternalFrame();
+        GenericJInternalFrame frame = new GenericJInternalFrame();
         frame.setTitle("Network Trainer");
+        TrainerGUI trainer = new TrainerGUI(desktop.getWorkspace(), frame);
         frame.setContentPane(trainer);
         frame.setResizable(true);
         frame.setClosable(true);

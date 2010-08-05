@@ -25,21 +25,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Iterator;
-import java.util.concurrent.Executors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -64,6 +64,8 @@ import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GenericJFrame;
 
 /**
  * GUI for supervised learning in Simbrain, using back-propagation, LMS, and
@@ -74,6 +76,9 @@ import org.simbrain.workspace.WorkspaceListener;
  * @see org.simbrain.trainer.Trainer
  */
 public class TrainerGUI extends JPanel {
+
+    /** Parent frame. */
+    GenericFrame parentFrame;
 
     /** Choices of training algorithms. */
 	private String[] trainingAlgorithms = {"Backprop  ", "Least Mean Squares"};
@@ -114,14 +119,8 @@ public class TrainerGUI extends JPanel {
     /** Text field for setting number of iterations to run. */
     private JTextField tfIterations;
 
-    /** Play button. */
-    private JButton jbPlay = new JButton(ResourceManager.getImageIcon("Play.png"));
-
-    /** Step button. */
-    private JButton jbStep = new JButton(ResourceManager.getImageIcon("Step.png"));
-
     /** Error label. */
-    private JLabel rmsError = new JLabel();
+    private JLabel rmsError = new JLabel("Error: --- ");
 
     /** Update completed boolean value. */
     private boolean updateCompleted = true;
@@ -129,14 +128,12 @@ public class TrainerGUI extends JPanel {
 	/**
 	 * Default constructor.
 	 */
-	public TrainerGUI(Workspace workspace) {
+	public TrainerGUI(Workspace workspace, GenericFrame frame) {
 
 	    // Initial setup
 		this.workspace = workspace;
 		workspace.addListener(workspaceListener);
-
-        // Set border
-        setBorder(BorderFactory.createTitledBorder("Network trainer"));
+		this.parentFrame = frame;
 
 		// Initialize combo box action listeners
 		cbNetworkChooser.addActionListener(new ActionListener() {
@@ -163,82 +160,129 @@ public class TrainerGUI extends JPanel {
 
 		//Top Panel
 		JPanel topPanel = new JPanel();
-		topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		topPanel.setLayout(new BorderLayout());
 		//topPanel.setPreferredSize(new Dimension(800, 200));
 
-		//Graph
-		JPanel trainerDisplay = new JPanel();
-		//trainerDisplay.setBorder(BorderFactory.createTitledBorder("Trainer"));
-		trainerDisplay.setLayout(new BorderLayout());
-		XYSeriesCollection series = new XYSeriesCollection();
-		graphData = new XYSeries(1);
-		series.addSeries(graphData);
-		JFreeChart chart = ChartFactory.createXYLineChart(
-	            null, // Title
-	            "Iterations", // x-axis Label
-	            "Error", // y-axis Label
-	            series, // Dataset
-	            PlotOrientation.VERTICAL, // Plot Orientation
-	            false, // Show Legend
-	            true, // Use tooltips
-	            false // Configure chart to generate URLs?
-	        );
-		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new Dimension(chartPanel.getPreferredSize().width,200));
 
-		// Top Buttons
-		JPanel  buttonPanel = new JPanel();
-        LabelledItemPanel netSelect = new LabelledItemPanel();
-        //netSelect.setBorder(BorderFactory.createTitledBorder("Network trainer"));
+		// Top items
+		JPanel  topItems = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    topItems.setBorder(BorderFactory.createEtchedBorder());
+	    LabelledItemPanel netSelect = new LabelledItemPanel();
         netSelect.setLayout(new FlowLayout(FlowLayout.LEFT));
         //netSelect.setPreferredSize(new Dimension(140, 220));
-        JLabel netSelectLabel = new JLabel("Network");
-        buttonPanel.add(netSelectLabel);
-        buttonPanel.add(cbNetworkChooser);
+        JLabel netSelectLabel = new JLabel("Select Root Network");
+        topItems.add(netSelectLabel);
+        topItems.add(cbNetworkChooser);
 
-        buttonPanel.add(jbPlay);
-        jbPlay.addActionListener(new ActionListener() {
+        topItems.add(new JLabel("Training Algorithm"));
+        JComboBox cbTrainingAlgorithm = new JComboBox(trainingAlgorithms);
+        topItems.add(cbTrainingAlgorithm);
+        JButton properties = new JButton(ResourceManager.getImageIcon("Prefs.png"));
+        topItems.add(properties);
+        topPanel.add("North", topItems);
+    	topPanel.add("Center", getGraphPanel());
 
-            public void actionPerformed(ActionEvent arg0) {
+		// Split Pane (Contains two data tables)
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane.setBorder(null);
+		splitPane.setResizeWeight(.5); //keeps divider centered on resize
+		JPanel leftPanel = new JPanel();
+		leftPanel.setBorder(BorderFactory.createTitledBorder("Input data"));
+		JPanel rightPanel = new JPanel();
+		rightPanel.setBorder(BorderFactory.createTitledBorder("Training data"));
+		leftPanel.setLayout(new BorderLayout());
+		rightPanel.setLayout(new BorderLayout());
+		splitPane.setLeftComponent(leftPanel);
+		splitPane.setRightComponent(rightPanel);
 
-                if (isUpdateCompleted()) {
-                    // Start running
-                    setUpdateCompleted(false);
-                    Executors.newSingleThreadExecutor().submit(new Runnable() {
-                        public void run() {
-                            while (!isUpdateCompleted()) {
-                                iterate();
-                            }
-                        }
-                    });
-                    jbPlay.setIcon(ResourceManager.getImageIcon("Stop.png"));
-                } else {
-                    // Stop running
-                    setUpdateCompleted(true);
-                    jbPlay.setIcon(ResourceManager.getImageIcon("Play.png"));
-                }
+	    // Input Data
+        inputDataTable = new SimbrainJTable(new SimbrainDataTable(5, 4));
+        leftScroll = new JScrollPane(inputDataTable);
+        leftScroll.setPreferredSize(new Dimension(100,100));
+        JPanel leftMenuPanel = new JPanel();
+		leftMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		JLabel inputLabel = new JLabel("Input Layer:");
+		leftMenuPanel.add(inputLabel);
+		leftMenuPanel.add(cbInputLayer);
+        leftMenuPanel.add(inputDataTable.getToolbarCSV());
+        leftPanel.add("North", leftMenuPanel);
+        leftPanel.add("Center", leftScroll);
 
-            }
-        });
-        buttonPanel.add(jbStep);
-        jbStep.addActionListener(new ActionListener() {
+        // Training Data
+        trainingDataTable = new SimbrainJTable(new SimbrainDataTable(5,4));
+        rightScroll = new JScrollPane(trainingDataTable);
+        rightScroll.setPreferredSize(new Dimension(100,100));
+		JPanel rightMenuPanel = new JPanel();
+		rightMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		JLabel outputLabel = new JLabel("Output Layer:");
+		rightMenuPanel.add(outputLabel);
+		rightMenuPanel.add(cbOutputLayer);
+		rightMenuPanel.add(trainingDataTable.getToolbarCSV());
+		//rightMenuPanel.add(trainingDataTable.getToolbarRandomize());
+		rightPanel.add("North", rightMenuPanel);
+		rightPanel.add("Center", rightScroll);
 
-            public void actionPerformed(ActionEvent e) {
-                iterate();
-            }
+		//Bottom Button Panel
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.add(new JButton("Cancel"));
+		bottomPanel.add(new JButton("Ok"));
 
-        });
-        buttonPanel.add(rmsError);
+		// Put it all together
+		mainPanel.add("North", topPanel);
+		mainPanel.add("Center", splitPane);
+		add(mainPanel);
 
-        JButton runButton = new JButton("Batch");
-        buttonPanel.add(runButton);
-        runButton.addActionListener(new ActionListener() {
+		// Initialize selection box
+        resetNetworkSelectionBox();
+
+        // Initialize menus
+        createMenus();
+	}
+
+	/**
+	 * Create the graph panel.
+	 *
+	 * @return the graph panel
+	 */
+	private JPanel getGraphPanel() {
+
+	    //Graph
+        JPanel graphPanel = new JPanel();
+        graphPanel.setBorder(BorderFactory.createTitledBorder("Error / Trainer Controls"));
+        graphPanel.setLayout(new BorderLayout());
+        XYSeriesCollection series = new XYSeriesCollection();
+        graphData = new XYSeries(1);
+        series.addSeries(graphData);
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                null, // Title
+                "Iterations", // x-axis Label
+                "Error", // y-axis Label
+                series, // Dataset
+                PlotOrientation.VERTICAL, // Plot Orientation
+                false, // Show Legend
+                true, // Use tooltips
+                false // Configure chart to generate URLs?
+            );
+        chart.setBackgroundPaint(null);
+        ChartPanel centerPanel = new ChartPanel(chart);
+        centerPanel.setPreferredSize(new Dimension(centerPanel
+                .getPreferredSize().width, 200));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(new JButton(TrainerGuiActions.getRunAction(this)));
+
+        JButton batchButton = new JButton("Batch Train");
+        buttonPanel.add(batchButton);
+        batchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 if (trainer != null) {
                     trainer.train(Integer.parseInt(tfIterations.getText()));
+                    rmsError.setText("Error:" +  Utils.round(trainer.getCurrentError(), 6));
+                    // TODO (above): repeated code
                 }
             }
         });
+        buttonPanel.add(rmsError);
         JButton initButton = new JButton("Init");
         buttonPanel.add(initButton);
         initButton.addActionListener(new ActionListener() {
@@ -258,82 +302,38 @@ public class TrainerGUI extends JPanel {
                 graphData.clear();
             }
         });
-        buttonPanel.add(clearButton);
+        //buttonPanel.add(clearButton);
 
-        JPanel trainerPropertiesPanel = new JPanel();
-        JLabel algoSelectLabel = new JLabel("Training Algorithm");
-        trainerPropertiesPanel.add(algoSelectLabel);
-        JComboBox algoSelectCombo = new JComboBox(trainingAlgorithms);
-        trainerPropertiesPanel.add(algoSelectCombo);
-        JButton properties = new JButton(ResourceManager.getImageIcon("Prefs.png"));
-        trainerPropertiesPanel.add(properties);
+        graphPanel.add("Center", centerPanel);
+        graphPanel.add("South", buttonPanel);
+        return graphPanel;
+	}
 
-        trainerDisplay.add("Center", chartPanel);
-        trainerDisplay.add("North", buttonPanel);
-        trainerDisplay.add("South", trainerPropertiesPanel);
-    	topPanel.add(trainerDisplay);
+	/**
+	 * Create menus.
+	 */
+	private void createMenus() {
+        JMenuBar menuBar = new JMenuBar();
 
-		// Split Pane (Main Center Panel)
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		splitPane.setBorder(null);
-		splitPane.setResizeWeight(.5); //keeps divider centered on resize
-		JPanel leftPanel = new JPanel();
-		leftPanel.setBorder(BorderFactory.createTitledBorder("Input data"));
-		JPanel rightPanel = new JPanel();
-		rightPanel.setBorder(BorderFactory.createTitledBorder("Training data"));
-		leftPanel.setLayout(new BorderLayout());
-		rightPanel.setLayout(new BorderLayout());
-		splitPane.setLeftComponent(leftPanel);
-		splitPane.setRightComponent(rightPanel);
+        // File Menu
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.add(new JMenuItem("Open")); // TODO
+        fileMenu.add(new JMenuItem("Save")); // TODO
+        fileMenu.add(new JMenuItem("Save as...")); // TODO
+        menuBar.add(fileMenu);
 
-	    // Input Data 
-		//DefaultTableModel inputDataModel = new DefaultTableModel(data, columnNames);
-        inputDataTable = new SimbrainJTable(new SimbrainDataTable(4, 4));
-        inputDataTable.getData().fill(new Double(0));
-  //      TableColumn inColumn = null;
- //       inColumn = inputDataTable.getColumnModel().getColumn(0);
-//        inColumn.setPreferredWidth(18);
-        leftScroll = new JScrollPane(inputDataTable);
-        JPanel leftMenuPanel = new JPanel();
-		leftMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
-		JLabel inputLabel = new JLabel("Input Layer:");
-		leftMenuPanel.add(inputLabel);
-		leftMenuPanel.add(cbInputLayer);
-        leftMenuPanel.add(inputDataTable.getToolbarCSV());
-        leftPanel.add("North", leftMenuPanel);
-        leftPanel.add("Center", leftScroll);
+        // File Menu
+        JMenu buildMenu = new JMenu("Build");
+        JMenuItem threeLayerItem = new JMenuItem(TrainerGuiActions
+                .getBuildThreeLayerAction(this));
+        buildMenu.add(threeLayerItem);
+        JMenuItem multiLayerItem = new JMenuItem(TrainerGuiActions
+                .getBuildMultiLayerAction(this));
+        buildMenu.add(multiLayerItem);
+        menuBar.add(buildMenu);
 
-        // Training Data
-        trainingDataTable = new SimbrainJTable(new SimbrainDataTable(4,4));
-        trainingDataTable.getData().fill(new Double(0));
-        TableColumn outColumn = null;
-//        outColumn = trainingDataTable.getColumnModel().getColumn(0);
-//        outColumn.setPreferredWidth(18);
-         rightScroll = new JScrollPane(trainingDataTable);
-//        //rightScroll.setPreferredSize(new Dimension(400, 200));
-		JPanel rightMenuPanel = new JPanel();
-		rightMenuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
-		JLabel outputLabel = new JLabel("Output Layer:");
-		rightMenuPanel.add(outputLabel);
-		rightMenuPanel.add(cbOutputLayer);
-		rightMenuPanel.add(trainingDataTable.getToolbarCSV());
-		//rightMenuPanel.add(trainingDataTable.getToolbarRandomize());
-		rightPanel.add("North", rightMenuPanel);
-		rightPanel.add("Center", rightScroll);
+        parentFrame.setJMenuBar(menuBar);
 
-		//Bottom Button Panel
-		JPanel bottomPanel = new JPanel();
-		bottomPanel.add(new JButton("Cancel"));
-		bottomPanel.add(new JButton("Ok"));
-
-		// Put it all together
-		mainPanel.add("North", topPanel);
-		mainPanel.add("Center", splitPane);
-		//mainPanel.add(bottomPanel);
-		add(mainPanel);
-
-		// Initialize selection box
-        resetNetworkSelectionBox();
 	}
 
 	/**
@@ -579,9 +579,9 @@ public class TrainerGUI extends JPanel {
     /**
      * Iterate the trainer one time and update graphics.
      */
-    private void iterate() {
+    public void iterate() {
         trainer.train(1);
-        rmsError.setText("" +  Utils.round(trainer.getCurrentError(), 6));
+        rmsError.setText("Error:" +  Utils.round(trainer.getCurrentError(), 6));
         graphData.add(trainer.getIteration() ,trainer.getCurrentError());
     }
 
@@ -627,11 +627,32 @@ public class TrainerGUI extends JPanel {
         NetworkComponent networkComponent2 = new NetworkComponent("Net 2", network2);
         workspace.addWorkspaceComponent(networkComponent2);
 
-        JFrame topFrame = new JFrame();
-		TrainerGUI trainer = new TrainerGUI(workspace);
+        GenericJFrame topFrame = new GenericJFrame();
+		TrainerGUI trainer = new TrainerGUI(workspace, topFrame);
 		topFrame.setContentPane(trainer);
         topFrame.pack();
         topFrame.setVisible(true);
 	}
 
+    /**
+     * @return the currentNetwork
+     */
+    public RootNetwork getCurrentNetwork() {
+        return currentNetwork;
+    }
+
+    /**
+     * @return the inputDataTable
+     */
+    public SimbrainJTable getInputDataTable() {
+        return inputDataTable;
+    }
+
+    /**
+     * @return the trainingDataTable
+     */
+    public SimbrainJTable getTrainingDataTable() {
+        return trainingDataTable;
+    }
+    
 }

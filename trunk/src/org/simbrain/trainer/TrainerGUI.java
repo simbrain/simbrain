@@ -177,7 +177,7 @@ public class TrainerGUI extends JPanel {
         topItems.add(new JLabel("Training Algorithm"));
         JComboBox cbTrainingAlgorithm = new JComboBox(trainingAlgorithms);
         topItems.add(cbTrainingAlgorithm);
-        JButton properties = new JButton(ResourceManager.getImageIcon("Prefs.png"));
+        JButton properties = new JButton(TrainerGuiActions.getPropertiesDialogAction(this));
         topItems.add(properties);
         topPanel.add("North", topItems);
     	topPanel.add("Center", getGraphPanel());
@@ -268,21 +268,10 @@ public class TrainerGUI extends JPanel {
         centerPanel.setPreferredSize(new Dimension(centerPanel
                 .getPreferredSize().width, 200));
 
+        // Make button panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(new JButton(TrainerGuiActions.getRunAction(this)));
 
-        JButton batchButton = new JButton("Batch Train");
-        buttonPanel.add(batchButton);
-        batchButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                if (trainer != null) {
-                    trainer.train(Integer.parseInt(tfIterations.getText()));
-                    rmsError.setText("Error:" +  Utils.round(trainer.getCurrentError(), 6));
-                    // TODO (above): repeated code
-                }
-            }
-        });
-        buttonPanel.add(rmsError);
+        // Init
         JButton initButton = new JButton("Init");
         buttonPanel.add(initButton);
         initButton.addActionListener(new ActionListener() {
@@ -293,17 +282,41 @@ public class TrainerGUI extends JPanel {
                 trainer.setTrainingData(trainingDataTable.getData().asArray());
             }
         });
+
+        // Run
+        buttonPanel.add(new JButton(TrainerGuiActions.getRunAction(this)));
+
+
+        // Batch
+        JButton batchButton = new JButton("Batch");
+        buttonPanel.add(batchButton);
+        batchButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                if (trainer != null) {
+                    trainer.train(Integer.parseInt(tfIterations.getText()));
+                    rmsError.setText("Error:" +  Utils.round(trainer.getCurrentError(), 6));
+                    // TODO (above): repeated code
+                }
+            }
+        });
+
+        // Iterations
         tfIterations = new JTextField("300");
+        buttonPanel.add(new JLabel("Iterations"));
         buttonPanel.add(tfIterations);
+
+        // Error
+        buttonPanel.add(rmsError);
+
+        // Clear Button (Not used)
         JButton clearButton = new JButton("Clear");
-        buttonPanel.add(initButton);
         clearButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 graphData.clear();
             }
         });
-        //buttonPanel.add(clearButton);
 
+        // Finish up panel
         graphPanel.add("Center", centerPanel);
         graphPanel.add("South", buttonPanel);
         return graphPanel;
@@ -653,6 +666,20 @@ public class TrainerGUI extends JPanel {
      */
     public SimbrainJTable getTrainingDataTable() {
         return trainingDataTable;
+    }
+
+    /**
+     * @return the trainer
+     */
+    public Trainer getTrainer() {
+        return trainer;
+    }
+
+    /**
+     * @return the workspace
+     */
+    public Workspace getWorkspace() {
+        return workspace;
     }
     
 }

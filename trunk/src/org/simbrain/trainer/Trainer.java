@@ -38,7 +38,7 @@ public abstract class Trainer {
 
     //TODO: Tools for batch training at this level?
     // train(min-error) / train to get past an error
-    
+
     /**
      * Reference to the network being trained.
      */
@@ -77,7 +77,7 @@ public abstract class Trainer {
     public Trainer(Network network) {
         this.network = network;
     }
-    
+
     /**
      * Initialize the trainer.
      */

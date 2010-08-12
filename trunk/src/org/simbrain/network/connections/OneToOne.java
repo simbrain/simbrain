@@ -27,6 +27,7 @@ import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.util.Comparators;
 
 /**
  * Connect each source neuron to a single target.
@@ -46,39 +47,16 @@ public class OneToOne extends ConnectNeurons {
      */
     private static boolean useBidirectionalConnections = false;
 
-    /**
-     * Comparator which orders by X coordinate.
-     */
-    static final Comparator<Neuron> X_ORDER = new Comparator<Neuron>() {
-        public String toString() {
-            return "X_ORDER";
-        }
-        public int compare(final Neuron neuron1, final Neuron neuron2) {
-            return Double.compare(neuron1.getX(), neuron2.getX());
-        }
-    };
-
-    /**
-     * Comparator which orders by X coordinate.
-     */
-    static final Comparator<Neuron> Y_ORDER = new Comparator<Neuron>() {
-        public String toString() {
-            return "Y_ORDER";
-        }
-        public int compare(final Neuron neuron1, final Neuron neuron2) {
-            return Double.compare(neuron1.getY(), neuron2.getY());
-        }
-    };
 
     /** Orientation of how to connect neurons. */
-    private static Comparator<Neuron> connectOrientation = X_ORDER;
+    private static Comparator<Neuron> connectOrientation = Comparators.X_ORDER;
 
     /**
      * Used for populating combo box with orientation types.
      * @return Array of connection types.
      */
     public static Comparator[] getOrientationTypes() {
-        return new Comparator[] {X_ORDER, Y_ORDER};
+        return new Comparator[] {Comparators.X_ORDER, Comparators.Y_ORDER};
     }
 
 

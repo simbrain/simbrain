@@ -201,7 +201,7 @@ public abstract class Trainer {
      * @param outputLayer the outputLayer to set
      */
     public void setOutputLayer(NeuronGroup outputGroup) {
-        this.outputLayer = outputGroup.getNeuronList(); // TODO: This should be all that's available!
+        this.outputLayer = outputGroup.getNeuronList(); 
     }
 
     /**
@@ -217,7 +217,7 @@ public abstract class Trainer {
     public void setNetwork(Network network) {
         this.network = network;
     }
-    
+
     /**
      * Notify listeners that the error value has been updated.
      */

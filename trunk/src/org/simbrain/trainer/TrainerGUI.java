@@ -531,14 +531,6 @@ public class TrainerGUI extends JPanel {
 	    // Rename column headings
 	    // Note the for loop starts at column 1 (column 0 is the "#" value)
 
-	    // (TODO) Order Neurons by label
-//        List<Neuron> neuronList = new ArrayList(group.getNeuronList());
-//	    Collections.sort(neuronList, new Comparator() {
-//            public int compare(Object neuron1, Object neuron2) {
-//                return ((Neuron)neuron1).getLabel().compareTo(((Neuron)neuron2).getLabel());
-//            }
-//	    });
-
 	    Iterator<Neuron> neuronIterator = group.getNeuronList().iterator();
         for (int i = 1; i < tableSize; i++) { 
             if (neuronIterator.hasNext()) {

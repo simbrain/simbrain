@@ -27,16 +27,21 @@ import java.util.Set;
  * <b>Group</b> a group of neurons, synapses, and networks which are separately
  * contained in the main network hierarchy but to which additional rules should
  * be applied.
- *
- *  TODO:
- * - Make complete sets of methods (add, delete, contains, etc)
- * - Rethink object refs, add all, use of networks at all!
- * - Work on gui representation (text box, etc.)
+ * 
+ * Refactoring notes (Aug, 2010)
+ * 
+ * Move in the direction of this only containing code for labels, size, etc.
+ * Things used by the GUI group node. All maintenance of actual objects
+ * (neurons, etc.) should be moved to the subclasses.
+ * 
+ * So, possibly remove neuron, synapse, network list. Then make "update" an
+ * abstract function, so that some groups can be updated every time a network is
+ * updated.
  */
 public abstract class Group {
 
     /** Set of neurons. */
-    private Set<Neuron> neuronList = new HashSet<Neuron>();
+    private List<Neuron> neuronList = new ArrayList<Neuron>();
 
     /** Set of synapses. */
     private Set<Synapse> synapseList = new HashSet<Synapse>();
@@ -127,13 +132,13 @@ public abstract class Group {
         ret += ("and " + this.getNetworkList().size() + " network(s).");
         return ret;
     }
-    
+
     @Override
     public String toString() {
         if (label != null) {
             return label;
         } else {
-            return id;            
+            return id;
         }
     }
 
@@ -234,7 +239,7 @@ public abstract class Group {
      * @return a list of neurons
      */
     public List<Neuron> getNeuronList() {
-        return new ArrayList<Neuron>(neuronList);
+        return neuronList;
     }
 
     /**

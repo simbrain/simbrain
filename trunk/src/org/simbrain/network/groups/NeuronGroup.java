@@ -17,15 +17,19 @@
  */
 package org.simbrain.network.groups;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.util.Comparators;
 
 /**
  * Generic group of neurons.
+ *
+ * TODO: Make horizontal and vertical orientation possible for group ordering.
  */
 public class NeuronGroup extends Group {
 
@@ -36,6 +40,7 @@ public class NeuronGroup extends Group {
         for (Neuron neuron : neurons) {
             this.addNeuron(neuron);
         }
+        Collections.sort(this.getNeuronList(), Comparators.X_ORDER);
     }
 
     /** @Override. */

@@ -30,7 +30,6 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
@@ -49,7 +48,6 @@ public final class LayeredNetworkBuilder {
     // TODO: Default neurons, synapses (input / output special?). upper /lower bounds 
     // TODO: Possibly add "justification" (right, left, center) field 
     // TODO: Allow Horizontal vs. vertical layout 
-    // TODO: Implement centering 
     // TODO: Option: within layer recurrence?
 
     /**
@@ -99,8 +97,8 @@ public final class LayeredNetworkBuilder {
             network.addNeuron(neuron);
             inputLayer.add(neuron);
         }
-        layout.setInitialLocation(new Point((int) initialPosition.getX(),
-                (int) initialPosition.getY()));
+        layout.setInitialLocation(new Point((int) initialPosition.getX()
+                - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
         layout.layoutNeurons(inputLayer);
         if (addGroups) {
             NeuronGroup group = new NeuronGroup(network, inputLayer);
@@ -116,7 +114,7 @@ public final class LayeredNetworkBuilder {
         // Memory of last layer created
         List<Neuron> lastLayer = inputLayer;
 
-        // Make hidden layers
+        // Make hidden layers and output layer
         for (int i = 1; i < nodesPerLayer.length; i++) {
             List<Neuron> hiddenLayer = new ArrayList<Neuron>();
             for (int j = 0; j < nodesPerLayer[i]; j++) {
@@ -125,9 +123,11 @@ public final class LayeredNetworkBuilder {
                 network.addNeuron(neuron);
                 hiddenLayer.add(neuron);
             }
-            layout.setInitialLocation(new Point((int) initialPosition.getX(),
-                    (int) initialPosition.getY()
-                            - (betweenLayerInterval * (i + 1))));
+
+            int layerWidth = getWidth(hiddenLayer);
+            layout.setInitialLocation(new Point((int) initialPosition.getX()
+                    - layerWidth / 2, (int) initialPosition.getY()
+                    - (betweenLayerInterval * i)));
             layout.layoutNeurons(hiddenLayer);
             if (addGroups) {
                 NeuronGroup group = new NeuronGroup(network, hiddenLayer);
@@ -151,6 +151,16 @@ public final class LayeredNetworkBuilder {
         // Randomize weights
         network.randomizeWeights();
 
+    }
+
+    /**
+     * Return the width of the specified layer, in pixels.
+     *
+     * @param layer layer to "measure"
+     * @return width of layer
+     */
+    private int getWidth(List<Neuron> layer) {
+        return layer.size() * betweenNeuronInterval;
     }
 
     /**

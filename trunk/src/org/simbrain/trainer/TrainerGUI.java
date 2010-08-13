@@ -264,6 +264,7 @@ public class TrainerGUI extends JPanel {
                 false // Configure chart to generate URLs?
             );
         chart.setBackgroundPaint(null);
+        //chart.getXYPlot().getRangeAxis().setUpperBound(1); TODO: Make autorange a dialog option
         ChartPanel centerPanel = new ChartPanel(chart);
         centerPanel.setPreferredSize(new Dimension(centerPanel
                 .getPreferredSize().width, 200));
@@ -315,6 +316,10 @@ public class TrainerGUI extends JPanel {
                 graphData.clear();
             }
         });
+
+        // Randomize
+        buttonPanel.add(new JButton(TrainerGuiActions.getRandomizeNetworkAction(this)));
+
 
         // Finish up panel
         graphPanel.add("Center", centerPanel);
@@ -673,5 +678,5 @@ public class TrainerGUI extends JPanel {
     public Workspace getWorkspace() {
         return workspace;
     }
-    
+
 }

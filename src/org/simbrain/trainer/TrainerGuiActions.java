@@ -121,6 +121,37 @@ public class TrainerGuiActions {
     }
 
     /**
+     * Randomizes network.
+     *
+     * TODO: Randomizes the _whole_ target network; not just the trained network.
+     *
+     * @param trainerGui reference to trainer gui
+     * @return the action
+     */
+    public static Action getRandomizeNetworkAction(final TrainerGUI trainerGui) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                //putValue(NAME, "Show properties");
+                putValue(SHORT_DESCRIPTION, "Randomize network");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                if (trainerGui.getCurrentNetwork() != null) {
+                    trainerGui.getCurrentNetwork().randomizeWeights();
+                    trainerGui.getCurrentNetwork().randomizeBiases(-1, 1);
+                }
+            }
+
+        };
+    }
+
+    /**
      * Returns an action for building a three layer network.
      *
      * @param trainerGui reference to trainer gui

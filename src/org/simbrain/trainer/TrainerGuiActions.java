@@ -142,9 +142,10 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                if (trainerGui.getCurrentNetwork() != null) {
-                    trainerGui.getCurrentNetwork().randomizeWeights();
-                    trainerGui.getCurrentNetwork().randomizeBiases(-1, 1);
+                if (trainerGui.getTrainer() != null) {
+                    if (trainerGui.getTrainer() instanceof BackpropTrainer) {
+                        ((BackpropTrainer) trainerGui.getTrainer()).randomize();
+                    }
                 }
             }
 

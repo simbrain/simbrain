@@ -611,10 +611,7 @@ public abstract class Network {
      */
     public void randomizeBiases(double lower, double upper) {
         for (Neuron neuron : neuronList) {
-            if (neuron instanceof BiasedNeuron) {
-                ((BiasedNeuron) neuron).setBias((upper - lower) * Math.random()
-                        + lower);
-            }
+            neuron.randomizeBias(lower, upper);
         }
     }
 

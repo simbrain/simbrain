@@ -72,7 +72,7 @@ public class BackpropTrainer extends Trainer {
     private HashMap<BiasedNeuron, Double> biasDeltaMap = new HashMap<BiasedNeuron, Double>();
 
     /** Internal representation of network. */
-    private ArrayList<NeuronGroup> layers = new ArrayList<NeuronGroup>();
+    private List<NeuronGroup> layers = new ArrayList<NeuronGroup>();
 
     /**
      * Constructor.
@@ -86,7 +86,22 @@ public class BackpropTrainer extends Trainer {
     @Override
     public void init() {
         layers.clear();
+        errorMap.clear();
+        weightDeltaMap.clear();
+        biasDeltaMap.clear();
         buildNetworkRepresentation();
+    }
+
+    /**
+     * Randomize the network associated with this trainer.
+     */
+    public final void randomize() {
+        for (NeuronGroup layer : layers) {
+            if (layer != null) {
+                layer.randomizeIncomingWeights();
+                layer.randomizeBiases(0, 1);
+            }
+        }
     }
 
     /**
@@ -244,7 +259,7 @@ public class BackpropTrainer extends Trainer {
     }
 
     /**
-     * Propagate error....
+     * Propagate error from one neuron to those that connect to it.
      *
      * @param neuron neuron whose activation function's derivative is used
      * @param error error to multiply by (Base error)

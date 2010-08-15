@@ -718,7 +718,7 @@ public abstract class Neuron  {
     public double getTargetValue() {
         return targetValue;
     }
-    
+
     /**
      * Set target value.
      *
@@ -802,6 +802,29 @@ public abstract class Neuron  {
     public void setPosition(Point2D position) {
         this.setX(position.getX());
         this.setY(position.getY());
+    }
+
+    /**
+     * If this neuron has a bias field, randomize it within the specified
+     * bounds.
+     *
+     * @param lower lower bound for randomization.
+     * @param upper upper bound for randomization.
+     * */
+    public void randomizeBias(double lower, double upper) {
+        if (this instanceof BiasedNeuron) {
+            ((BiasedNeuron) this).setBias((upper - lower) * Math.random()
+                    + lower);
+        }
+    }
+
+    /**
+     * Randomize all synapses that attach to this neuron.
+     */
+    public void randomizeFanIn() {
+        for (Synapse synapse : getFanIn()) {
+            synapse.randomize();
+        }
     }
 
 }

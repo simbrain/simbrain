@@ -320,7 +320,6 @@ public class TrainerGUI extends JPanel {
         // Randomize
         buttonPanel.add(new JButton(TrainerGuiActions.getRandomizeNetworkAction(this)));
 
-
         // Finish up panel
         graphPanel.add("Center", centerPanel);
         graphPanel.add("South", buttonPanel);

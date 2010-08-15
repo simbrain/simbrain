@@ -43,6 +43,36 @@ public class NeuronGroup extends Group {
         Collections.sort(this.getNeuronList(), Comparators.X_ORDER);
     }
 
+    /**
+     * Randomize fan-in for all neurons in group.
+     */
+    public void randomizeIncomingWeights() {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.randomizeFanIn();
+        }
+    }
+
+    /**
+     * Randomize all neurons in group.
+     */
+    public void randomize() {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.randomize();
+        }
+    }
+
+    /**
+     * Randomize bias for all neurons in group.
+     *
+     * @param lower lower bound for randomization.
+     * @param upper upper bound for ranodmization.
+     */
+    public void randomizeBiases(double lower, double upper) {
+        for (Neuron neuron : this.getNeuronList()) {
+            neuron.randomizeBias(lower, upper);
+        }
+    }
+
     /** @Override. */
     public Network duplicate() {
         // TODO Auto-generated method stub

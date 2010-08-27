@@ -55,12 +55,12 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.util.table.SimbrainDataTable;
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.SimbrainTableListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -75,13 +75,13 @@ import org.simbrain.workspace.gui.GenericJFrame;
  * @author jeff yoshimi
  * @see org.simbrain.trainer.Trainer
  */
-public class TrainerGUI extends JPanel {
+public class TrainerGUI extends JPanel implements SimbrainTableListener {
 
     /** Parent frame. */
     GenericFrame parentFrame;
 
     /** Choices of training algorithms. */
-	private String[] trainingAlgorithms = {"Backprop  ", "Least Mean Squares"};
+    private String[] trainingAlgorithms = { "Backprop  ", "Least Mean Squares" };
 
 	/** Network selection combo box. */
 	private JComboBox cbNetworkChooser = new JComboBox();
@@ -237,9 +237,17 @@ public class TrainerGUI extends JPanel {
 
         // Initialize menus
         createMenus();
+
+        // Initialize listeners
+        inputDataTable.getData().addListener(this);
+        trainingDataTable.getData().addListener(this);
+
 	}
 
-	/**
+
+
+
+    /**
 	 * Create the graph panel.
 	 *
 	 * @return the graph panel
@@ -273,16 +281,16 @@ public class TrainerGUI extends JPanel {
         JPanel buttonPanel = new JPanel();
 
         // Init
-        JButton initButton = new JButton("Init");
-        buttonPanel.add(initButton);
-        initButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                currentNetwork.randomizeBiases(-1, 1);
-                trainer.init();
-                trainer.setInputData(inputDataTable.getData().asArray());
-                trainer.setTrainingData(trainingDataTable.getData().asArray());
-            }
-        });
+//        JButton initButton = new JButton("Init");
+//        buttonPanel.add(initButton);
+//        initButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent arg0) {
+//                //currentNetwork.randomizeBiases(-1, 1);
+//                //trainer.init();
+//                trainer.setInputData(inputDataTable.getData().asArray());
+//                trainer.setTrainingData(trainingDataTable.getData().asArray());
+//            }
+//        });
 
         // Run
         buttonPanel.add(new JButton(TrainerGuiActions.getRunAction(this)));
@@ -309,16 +317,11 @@ public class TrainerGUI extends JPanel {
         // Error
         buttonPanel.add(rmsError);
 
-        // Clear Button (Not used)
-        JButton clearButton = new JButton("Clear");
-        clearButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                graphData.clear();
-            }
-        });
-
         // Randomize
         buttonPanel.add(new JButton(TrainerGuiActions.getRandomizeNetworkAction(this)));
+
+        // Clear
+        buttonPanel.add(new JButton(TrainerGuiActions.getClearGraphAction(this)));
 
         // Finish up panel
         graphPanel.add("Center", centerPanel);
@@ -395,7 +398,7 @@ public class TrainerGUI extends JPanel {
      * User has changed the current network in the network selection combo box.
      * Make appropriate changes.
      */
-	private void updateCurrentNetwork() {
+	void updateCurrentNetwork() {
 
 	    Object object = cbNetworkChooser.getSelectedItem();
 	    if (object instanceof NetworkComponent) {
@@ -419,6 +422,9 @@ public class TrainerGUI extends JPanel {
             });
         } else {
             trainer.setNetwork(currentNetwork);
+            //TODO: Temporary; this should not be done here
+            trainer.setInputData(inputDataTable.getData().asArray());
+            trainer.setTrainingData(trainingDataTable.getData().asArray());
         }
 
 	    //TODO: Remove old listener
@@ -437,6 +443,7 @@ public class TrainerGUI extends JPanel {
                 updateLayerBoxes();
             }
 	    });
+
 
 	}
 
@@ -536,7 +543,7 @@ public class TrainerGUI extends JPanel {
 	    // Note the for loop starts at column 1 (column 0 is the "#" value)
 
 	    Iterator<Neuron> neuronIterator = group.getNeuronList().iterator();
-        for (int i = 1; i < tableSize; i++) { 
+        for (int i = 1; i < tableSize; i++) {
             if (neuronIterator.hasNext()) {
                 table.getColumnModel().getColumn(i).setHeaderValue(neuronIterator.next().getDescription());
             } else {
@@ -551,7 +558,7 @@ public class TrainerGUI extends JPanel {
         int cols = table.getData().getColumnCount();
         //((JComponent)table).getParent().getParent().setPreferredSize(new Dimension(200 + cols * 100, rows *  25));
         if (((JComponent)table).getParent() != null) {
-            ((JScrollPane)((JComponent)table).getParent().getParent()).revalidate();            
+            ((JScrollPane)((JComponent)table).getParent().getParent()).revalidate();
         }
 
 	}
@@ -608,6 +615,16 @@ public class TrainerGUI extends JPanel {
      */
     public void setUpdateCompleted(final boolean updateCompleted) {
         this.updateCompleted = updateCompleted;
+    }
+
+    /**
+     * Clear the graph data and reset trainer iteration.
+     */
+    public void clearGraph() {
+        graphData.clear();
+        if (trainer != null) {
+            trainer.setIteration(0);
+        }
     }
 
 	/**
@@ -676,6 +693,46 @@ public class TrainerGUI extends JPanel {
      */
     public Workspace getWorkspace() {
         return workspace;
+    }
+
+    public void columnAdded(int column) {
+    }
+
+    public void columnRemoved(int column) {
+    }
+
+    public void dataChanged() {
+        System.out.println("data changed");
+        //TODO: Redundant: changes both tables
+        if (trainer != null) {
+            trainer.setInputData(inputDataTable.getData().asArray());
+            trainer.setTrainingData(trainingDataTable.getData().asArray());
+        }
+    }
+
+    public void itemChanged(int row, int column) {
+        //TODO: Eeek!  called every time!   Make it change the specific component?
+        System.out.println("item changed");
+        //TODO: Redundant: changes both tables
+        if (trainer != null) {
+            trainer.setInputData(inputDataTable.getData().asArray());
+            trainer.setTrainingData(trainingDataTable.getData().asArray());
+        }
+    }
+
+    public void rowAdded(int row) {
+    }
+
+    public void rowRemoved(int row) {
+    }
+
+    public void structureChanged() {
+        //TODO: Redundant: changes both tables
+        System.out.println("Trainer");
+        if (trainer != null) {
+            trainer.setInputData(inputDataTable.getData().asArray());
+            trainer.setTrainingData(trainingDataTable.getData().asArray()); 
+        }
     }
 
 }

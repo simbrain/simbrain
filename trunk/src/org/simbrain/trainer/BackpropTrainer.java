@@ -39,6 +39,7 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.util.SimbrainMath;
 
 /**
  * Backprop trainer.
@@ -93,26 +94,14 @@ public class BackpropTrainer extends Trainer {
     }
 
     /**
-     * Randomize the network associated with this trainer.
-     */
-    public final void randomize() {
-        for (NeuronGroup layer : layers) {
-            if (layer != null) {
-                layer.randomizeIncomingWeights();
-                layer.randomizeBiases(0, 1);
-            }
-        }
-    }
-
-    /**
      * Recursively build up a representation of the network, beginning with
      * output layer.
      *
      * TODO: May be useful elsewhere; possibly refactor to a separate class.
      */
     private void buildNetworkRepresentation() {
-        System.out.println("Building network representation...");
-        System.out.println("Adding layer " + layers.size());
+        //System.out.println("Building network representation...");
+        //System.out.println("Adding layer " + layers.size());
 
         NeuronGroup outputLayer = new NeuronGroup(this.getNetwork()
                 .getRootNetwork(), this.getOutputLayer());
@@ -136,7 +125,7 @@ public class BackpropTrainer extends Trainer {
                 furtherConnectionCount += synapse.getSource().getFanIn().size();
             }
         }
-        System.out.println("Adding layer " + layers.size());
+        //System.out.println("Adding layer " + layers.size());
         newGroup.setLabel("Layer" + layers.size());
         layers.add(newGroup);
 
@@ -160,7 +149,8 @@ public class BackpropTrainer extends Trainer {
         for (int i = layers.size() - 2; i >= 0; i--) {
             //int j = 0; System.out.println("\nUpdating group: " + layers.get(i).getName()
             //        + " iteration: " + j++);
-            for (Neuron neuron : layers.get(i).getNeuronList()) {
+            NeuronGroup currentLayer = layers.get(i);
+            for (Neuron neuron : currentLayer.getNeuronList()) {
                 neuron.update();
                 neuron.setActivation(neuron.getBuffer());
                 //  TODO: Make a better method.  "forceUpdate" or something.
@@ -187,8 +177,8 @@ public class BackpropTrainer extends Trainer {
         // Set local variables
         int numRows = getInputData().length;
         int numInputs = getInputLayer().size();
+        //System.out.println("Data:" + numInputs + "/" + numRows);
 
-        // Iterate through training data; each pass is an epoch.
         for (int row = 0; row < numRows; row++) {
 
             // Set activations on input layer
@@ -199,8 +189,9 @@ public class BackpropTrainer extends Trainer {
             // Update network
             updateNetwork();
 
-            // Iterate through layers and set weight and bias deltas
-            setWeightBiasDeltas(row);
+            // Update all weight and bias deltas in tables.
+            //  These tables will then be used to update the weights and biases
+            updateWeightBiasDeltas(row);
 
             // Update weights
             for (Synapse synapse : weightDeltaMap.keySet()) {
@@ -218,7 +209,7 @@ public class BackpropTrainer extends Trainer {
         // Update RMS error
         rmsError = Math.sqrt(rmsError / (numRows * getOutputLayer().size()));
         this.setCurrentError(rmsError);
-        this.setIteration(this.getIteration()+1);
+        this.setIteration(this.getIteration() + 1);
     }
 
     /**
@@ -226,8 +217,11 @@ public class BackpropTrainer extends Trainer {
      *
      * @param row row of training data to use for updating.
      */
-    private void setWeightBiasDeltas(int row) {
+    private void updateWeightBiasDeltas(int row) {
         int numOutputs = getOutputLayer().size();
+
+        // Iterate through layers, beginning with the output layer
+        //  for each layer update weight and bias deltas
         for (NeuronGroup layer : layers) {
             // Special update for output layer
             if (layer == layers.get(0)) {
@@ -236,12 +230,13 @@ public class BackpropTrainer extends Trainer {
                     Neuron target = getOutputLayer().get(i);
                     double targetValue = this.getTrainingData()[row][i];
                     double outputError = targetValue - target.getActivation();
-                    //System.out.println(targetValue + " |--| " + target.getActivation());
-                    double error = propagateError(target, outputError);
-                    rmsError += Math.pow(error, 2);
-                    //TODO: Choose error, sq. error, mean of each
-
-                }
+                    propagateError(target, outputError);
+                    rmsError += Math.pow(outputError, 2);
+                    //System.out.println("Row " + row + "," + target.getId() + ":"
+                    //        + targetValue + " - " + 
+                    //        SimbrainMath.roundDouble(target.getActivation(),2) + " (" + 
+                    //        SimbrainMath.roundDouble(outputError,2) + ")");                
+                    }
             } else {
                 for (Neuron neuron : layer.getNeuronList()) {
 
@@ -252,6 +247,7 @@ public class BackpropTrainer extends Trainer {
                         sumFanOutErrors += (errorMap.get(outputNeuron)
                                 * synapse.getStrength());
                     }
+                    // Propagate errors back to previous layer
                     propagateError(neuron, sumFanOutErrors);
                 }
             }
@@ -263,7 +259,7 @@ public class BackpropTrainer extends Trainer {
      *
      * @param neuron neuron whose activation function's derivative is used
      * @param error error to multiply by (Base error)
-     * @return product of derivative and error
+     * @return product of derivative and error //TODO: Why? Used?
      */
     private double propagateError(Neuron neuron, Double error) {
         // TODO:  - Add more activation functions.
@@ -292,9 +288,23 @@ public class BackpropTrainer extends Trainer {
     }
 
     /**
+     * Randomize the network associated with this trainer.
+     */
+    public final void randomize() {
+        for (NeuronGroup layer : layers) {
+            if (layer != null) {
+                layer.randomizeIncomingWeights();
+                layer.randomizeBiases(0, 1);
+            }
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /**
      * Test method.
      *
-     * @param args 
+     * @param args
      */
     public static void main(String[] args) {
         test();
@@ -393,7 +403,7 @@ public class BackpropTrainer extends Trainer {
         trainer.setInputData(inputData);
         trainer.setTrainingData(trainingData);
         trainer.init();
-        int epochs = 10000;
+        int epochs = 10;
         for (int i = 0; i < epochs; i++) {
             double error = trainer.train(1);
             System.out.println("Epoch " + i + ", error = " + error);

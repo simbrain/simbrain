@@ -66,7 +66,7 @@ public final class SimbrainDataTable {
     private int currentRow = 0;
 
     /** Listeners. */
-    private List<TableListener> listeners;
+    private List<SimbrainTableListener> listeners;
 
     // TODO: Document this.
     boolean initialized = false;
@@ -97,7 +97,7 @@ public final class SimbrainDataTable {
         for (int i = 0; i < numRows; i++) {
             rowData.add((List<Double>) getNewRow(0));
         }
-        listeners = new ArrayList<TableListener>();
+        listeners = new ArrayList<SimbrainTableListener>();
     }
 
 
@@ -249,7 +249,7 @@ public final class SimbrainDataTable {
      */
     public void setValue(final int row, final int column, final double value) {
         rowData.get(row).set(column, value);
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.itemChanged(row, column);
         }
     }
@@ -294,7 +294,7 @@ public final class SimbrainDataTable {
     public void addNewRow(final double value) {
         numRows++;
         rowData.add(getNewRow(value));
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.rowAdded(numRows - 1);
         }
     }
@@ -308,7 +308,7 @@ public final class SimbrainDataTable {
     public void insertNewRow(final int at, final double value) {
         numRows++;
         rowData.add(at, getNewRow(value));
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.rowAdded(at);            
         }
     }
@@ -323,7 +323,7 @@ public final class SimbrainDataTable {
         for (List<Double> row : rowData) {
             row.add(value);
         }
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.columnAdded(numColumns - 1);
         }
     }
@@ -401,7 +401,7 @@ public final class SimbrainDataTable {
         for (List<Double> row : rowData) {
             row.add(at, value);
         }
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.columnAdded(at);
         }
     }
@@ -412,7 +412,7 @@ public final class SimbrainDataTable {
     public void removeLastRow() {
         numRows--;
         rowData.remove(numRows);
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.rowRemoved(numRows);
         }
     }
@@ -428,7 +428,7 @@ public final class SimbrainDataTable {
             currentRow = numRows - 1;
         }
         rowData.remove(rowToRemoveIndex);
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.rowRemoved(rowToRemoveIndex);
         }
     }
@@ -441,7 +441,7 @@ public final class SimbrainDataTable {
         for (List<Double> row : rowData) {
             row.remove(numColumns);
         }
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.columnRemoved(numColumns);
         }
     }
@@ -456,7 +456,7 @@ public final class SimbrainDataTable {
         for (List<Double> row : rowData) {
             row.remove(columnToRemoveIndex);
         }
-        for (TableListener listener : listeners) {
+        for (SimbrainTableListener listener : listeners) {
             listener.columnRemoved(columnToRemoveIndex);
         }
     }
@@ -622,59 +622,7 @@ public final class SimbrainDataTable {
                 }
             }
         }
-
-    }
-
-    /**
-     * Listener interface for receiving table structure and data change events.
-     */
-    public interface TableListener {
-
-        /**
-         * A column was added.
-         *
-         * @param column index of new column
-         */
-        void columnAdded(int column);
-
-        /**
-         * A column was removed.
-         *
-         * @param column index of removed column
-         */
-        void columnRemoved(int column);
-
-        /**
-         * A row was added.
-         *
-         * @param row index of added row.
-         */
-        void rowAdded(int row);
-
-        /**
-         * A row was removed.
-         *
-         * @param row index of removed row
-         */
-        void rowRemoved(int row);
-
-        /**
-         * A cell was changed.
-         *
-         * @param row row index
-         * @param column column index
-         */
-        void itemChanged(int row, int column);
-
-        /**
-         * The table structure changed.
-         */
-        void structureChanged();
-
-        /**
-         * The table data changed.
-         */
-        void dataChanged();
+        fireStructureChanged(); //TODO: Redundant (called by reset)
 
     }
 
@@ -682,7 +630,7 @@ public final class SimbrainDataTable {
      * Fire data changed event.
      */
     public void fireDataChanged() {
-        for(TableListener listener : listeners) {
+        for(SimbrainTableListener listener : listeners) {
             listener.dataChanged();
         }
     }
@@ -691,7 +639,7 @@ public final class SimbrainDataTable {
      * Fire data changed event.
      */
     public void fireStructureChanged() {
-        for(TableListener listener : listeners) {
+        for(SimbrainTableListener listener : listeners) {
             listener.structureChanged();
         }
     }
@@ -701,7 +649,7 @@ public final class SimbrainDataTable {
      *
      * @param listener listener to add
      */
-    public void addListener(TableListener listener) {
+    public void addListener(SimbrainTableListener listener) {
         listeners.add(listener);
     }
 
@@ -710,7 +658,7 @@ public final class SimbrainDataTable {
      *
      * @param listener listener to remove
      */
-    public void removeListener(TableListener listener) {
+    public void removeListener(SimbrainTableListener listener) {
         listeners.remove(listener);
     }
 }

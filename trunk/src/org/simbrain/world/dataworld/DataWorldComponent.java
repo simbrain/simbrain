@@ -18,10 +18,6 @@
  */
 package org.simbrain.world.dataworld;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -29,12 +25,11 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.table.SimbrainDataTable;
+import org.simbrain.util.table.SimbrainTableListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
-
-import com.Ostermiller.util.CSVParser;
 
 /**
  * <b>DataWorldComponent</b> is a data table which other Simbrain components can
@@ -46,7 +41,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private SimbrainDataTable dataModel; 
+    private SimbrainDataTable dataModel;
 
     /**
      * This method is the default constructor.
@@ -90,7 +85,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     }
 
     /** Listener. */
-    private final SimbrainDataTable.TableListener listener = new SimbrainDataTable.TableListener() {
+    private final SimbrainTableListener listener = new SimbrainTableListener() {
 
         public void columnAdded(int column) {
             int index = dataModel.getColumnCount() - 1;

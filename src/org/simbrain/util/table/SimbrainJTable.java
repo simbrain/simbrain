@@ -338,7 +338,7 @@ public class SimbrainJTable extends JXTable {
     private class SimbrainTableModel extends AbstractTableModel {
 
         /** Listener. */
-        private final SimbrainDataTable.TableListener listener = new SimbrainDataTable.TableListener() {
+        private final SimbrainTableListener listener = new SimbrainTableListener() {
 
             /**
              * {@inheritDoc}

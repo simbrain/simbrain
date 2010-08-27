@@ -153,6 +153,32 @@ public class TrainerGuiActions {
     }
 
     /**
+     * Clear the error graph.
+     *
+     * @param trainerGui reference to trainer gui
+     * @return the action
+     */
+    public static Action getClearGraphAction(final TrainerGUI trainerGui) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                //putValue(NAME, "Show properties");
+                putValue(SHORT_DESCRIPTION, "Reset graph");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+               trainerGui.clearGraph();
+            }
+
+        };
+    }
+
+    /**
      * Returns an action for building a three layer network.
      *
      * @param trainerGui reference to trainer gui
@@ -192,6 +218,8 @@ public class TrainerGuiActions {
                         "Backprop network");
                 builder.buildNetwork(network.getRootNetwork());
                 trainerGui.getWorkspace().addWorkspaceComponent(network);
+                trainerGui.getTrainer().setNetwork(network.getRootNetwork());
+                trainerGui.updateCurrentNetwork(); //TODO: Bad smell here! 
             }
 
         };
@@ -244,7 +272,9 @@ public class TrainerGuiActions {
                         "Backprop network");
                 builder.buildNetwork(network.getRootNetwork());
                 trainerGui.getWorkspace().addWorkspaceComponent(network);
-            }
+                trainerGui.getTrainer().setNetwork(network.getRootNetwork());
+                trainerGui.updateCurrentNetwork(); //TODO: Bad smell here! 
+                }
 
         };
     }

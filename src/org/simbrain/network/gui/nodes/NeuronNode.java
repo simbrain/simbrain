@@ -39,6 +39,7 @@ import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.FixedFanout;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
@@ -463,6 +464,21 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             }
             
         });
+        
+        JMenuItem fixedMenuItem = new JMenuItem("Fixed Fanout");
+        fixedMenuItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
+                    return;
+                }
+                ConnectNeurons connection = new FixedFanout();
+                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
+                        getNetworkPanel().getSelectedModelNeurons(),
+                        getNetworkPanel().getSelectedModelNeurons());
+            }
+            
+        });
 
         JMenuItem oneMenuItem = new JMenuItem("One to One");
         oneMenuItem.addActionListener(new ActionListener() {
@@ -510,6 +526,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         });
 
         menu.add(allMenuItem);
+        menu.add(fixedMenuItem);
         menu.add(oneMenuItem);
         menu.add(radialMenuItem);
         menu.add(sparseMenuItem);

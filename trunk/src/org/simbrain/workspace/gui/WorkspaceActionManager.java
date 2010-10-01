@@ -559,6 +559,9 @@ public class WorkspaceActionManager {
         return showPropertyDialogAction;
     }
 
+    /**
+     * @return new trainer action
+     */
     public Action getNewTrainerAction() {
         return newTrainerAction;
     }

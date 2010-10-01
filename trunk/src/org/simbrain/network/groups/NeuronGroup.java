@@ -65,7 +65,7 @@ public class NeuronGroup extends Group {
      * Randomize bias for all neurons in group.
      *
      * @param lower lower bound for randomization.
-     * @param upper upper bound for ranodmization.
+     * @param upper upper bound for randomization.
      */
     public void randomizeBiases(double lower, double upper) {
         for (Neuron neuron : this.getNeuronList()) {

@@ -467,7 +467,7 @@ public class SimbrainDesktop {
         });
         button.setComponentPopupMenu(gaugeMenu);
         bar.add(button);
-
+        bar.add(actionManager.getNewTrainerAction());
         bar.add(actionManager.getNewConsoleAction());
 
         // Initialize time label

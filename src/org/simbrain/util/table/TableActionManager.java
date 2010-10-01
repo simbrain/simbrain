@@ -177,7 +177,7 @@ public class TableActionManager {
 
         };
     }
-    
+
     /**
      * Action for setting table bounds.
      *
@@ -329,8 +329,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Rand.png"));
+                putValue(SMALL_ICON,ResourceManager.getImageIcon("AddTableRow.png"));
                 putValue(NAME, "Insert row");
                 putValue(SHORT_DESCRIPTION, "Insert row (above)");
             }
@@ -357,8 +356,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Rand.png"));
+                putValue(SMALL_ICON,ResourceManager.getImageIcon("AddTableColumn.png"));
                 putValue(NAME, "Insert column");
                 putValue(SHORT_DESCRIPTION, "Insert column (to right)");
             }
@@ -385,7 +383,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteRowTable.png"));
                 putValue(NAME, "Delete row");
                 putValue(SHORT_DESCRIPTION, "Delete row");
             }
@@ -411,7 +409,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteColumnTable.png"));
                 putValue(NAME, "Delete column");
                 putValue(SHORT_DESCRIPTION, "Delete column");
             }

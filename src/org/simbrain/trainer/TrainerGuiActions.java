@@ -121,6 +121,32 @@ public class TrainerGuiActions {
     }
 
     /**
+     * Batch train network.
+     *
+     * @param trainerGui reference to trainer gui
+     * @return the action
+     */
+    public static Action getBatchTrainAction(final TrainerGUI trainerGui) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON,  ResourceManager.getImageIcon("BatchPlay.png"));
+                //putValue(NAME, "Batch");
+                putValue(SHORT_DESCRIPTION, "Batch train network");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                trainerGui.batchTrain();
+            }
+
+        };
+    }
+
+    /**
      * Randomizes network.
      *
      * TODO: Randomizes the _whole_ target network; not just the trained network.
@@ -164,8 +190,7 @@ public class TrainerGuiActions {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-                //putValue(NAME, "Show properties");
-                putValue(SHORT_DESCRIPTION, "Reset graph");
+                putValue(SHORT_DESCRIPTION, "Clear graph data");
             }
 
             /**

@@ -97,7 +97,11 @@ public class SimbrainJTable extends JXTable {
      * @return the currently selected column
      */
     public int getSelectedColumn() {
-        return columnAtPoint(selectedPoint);
+        if (selectedPoint == null) {
+            return this.getColumnCount() - 1;
+        } else {
+            return columnAtPoint(selectedPoint);            
+        }
     }
 
     /**
@@ -185,6 +189,20 @@ public class SimbrainJTable extends JXTable {
         JToolBar toolbar = new JToolBar();
         toolbar.add(TableActionManager.getOpenCSVAction(getData()));
         toolbar.add(TableActionManager.getSaveCSVAction(getData()));
+        return toolbar;
+    }
+
+    /**
+     * Return a toolbar with buttons for randomzing the table cells.
+     *
+     * @return the randomization toolbar
+     */
+    public JToolBar getToolbarEditTable() {
+        JToolBar toolbar = new JToolBar();
+        toolbar.add(TableActionManager.getInsertColumnAction(this));
+        toolbar.add(TableActionManager.getDeleteColumnAction(this));
+        toolbar.add(TableActionManager.getInsertRowAction(this));
+        toolbar.add(TableActionManager.getDeleteRowAction(this));
         return toolbar;
     }
 

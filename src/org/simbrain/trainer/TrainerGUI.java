@@ -241,11 +241,7 @@ public class TrainerGUI extends JPanel implements SimbrainTableListener {
         // Initialize listeners
         inputDataTable.getData().addListener(this);
         trainingDataTable.getData().addListener(this);
-
 	}
-
-
-
 
     /**
 	 * Create the graph panel.
@@ -280,34 +276,11 @@ public class TrainerGUI extends JPanel implements SimbrainTableListener {
         // Make button panel
         JPanel buttonPanel = new JPanel();
 
-        // Init
-//        JButton initButton = new JButton("Init");
-//        buttonPanel.add(initButton);
-//        initButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent arg0) {
-//                //currentNetwork.randomizeBiases(-1, 1);
-//                //trainer.init();
-//                trainer.setInputData(inputDataTable.getData().asArray());
-//                trainer.setTrainingData(trainingDataTable.getData().asArray());
-//            }
-//        });
-
         // Run
         buttonPanel.add(new JButton(TrainerGuiActions.getRunAction(this)));
 
-
         // Batch
-        JButton batchButton = new JButton("Batch");
-        buttonPanel.add(batchButton);
-        batchButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                if (trainer != null) {
-                    trainer.train(Integer.parseInt(tfIterations.getText()));
-                    rmsError.setText("Error:" +  Utils.round(trainer.getCurrentError(), 6));
-                    // TODO (above): repeated code
-                }
-            }
-        });
+        buttonPanel.add(new JButton(TrainerGuiActions.getBatchTrainAction(this)));
 
         // Iterations
         tfIterations = new JTextField("300");
@@ -355,44 +328,6 @@ public class TrainerGUI extends JPanel implements SimbrainTableListener {
         parentFrame.setJMenuBar(menuBar);
 
 	}
-
-	/**
-	 * Load data into a JTable.
-	 *
-	 * @param table table to laod data in to
-	 */
-	private void loadData(JTable table) {
-
-        SFileChooser chooser = new SFileChooser(".", "Comma Separated Values",
-                "csv");
-        File theFile = chooser.showOpenDialog();
-        if (theFile == null) {
-            return;
-        }
-
-        // Load data in to trainer
-        if (trainer != null) {
-            if (table == inputDataTable) {
-                trainer.setInputData(theFile);
-            } else if (table == trainingDataTable) {
-                trainer.setTrainingData(theFile);
-            }
-        }
-
-        double[][] doubleVals = Utils.getDoubleMatrix(theFile);
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.setNumRows(doubleVals.length);
-        model.setColumnCount(doubleVals[0].length + 1);
-        for (int i = 0; i < doubleVals.length; i++) {
-            for (int j = 0; j < doubleVals[i].length + 1; j++) {
-                if (j == 0) {
-                    model.setValueAt(i + 1, i, j); // Row number column
-                } else {
-                    model.setValueAt(doubleVals[i][j - 1], i, j);
-                }
-            }
-        }
-    }
 
     /**
      * User has changed the current network in the network selection combo box.
@@ -593,11 +528,29 @@ public class TrainerGUI extends JPanel implements SimbrainTableListener {
     };
 
     /**
+     * Update error text field.
+     */
+    private void updateErrorField() {
+        rmsError.setText("Error:" +  Utils.round(trainer.getCurrentError(), 6));
+    }
+
+    /**
+     * Batch train network, using text field.
+     */
+    public void batchTrain() {
+        if (trainer != null) {
+            trainer.train(Integer.parseInt(tfIterations.getText()));
+            updateErrorField();
+        }
+
+    }
+
+    /**
      * Iterate the trainer one time and update graphics.
      */
     public void iterate() {
         trainer.train(1);
-        rmsError.setText("Error:" +  Utils.round(trainer.getCurrentError(), 6));
+        updateErrorField();
         graphData.add(trainer.getIteration() ,trainer.getCurrentError());
     }
 

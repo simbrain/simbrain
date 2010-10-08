@@ -31,7 +31,7 @@ public interface NetworkListener {
      * change, but activations, synapse strengths, etc. change.
      */
     void networkChanged();
-    
+
     /**
      * Invoked when the network update method is changed (e.g. from default
      * update to priority based update)

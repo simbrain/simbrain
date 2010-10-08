@@ -903,14 +903,6 @@ public abstract class Network {
      */
     public void deleteNetwork(final Network toDelete) {
 
-        Group group = getRootNetwork().containedInGroup(toDelete);
-        if (group != null) {
-            group.deleteNetwork(toDelete);
-            if (group.isEmpty()) {
-                this.getRootNetwork().deleteGroup(group);
-            }
-        }
-
         // Remove all neurons (and the synapses with them)
         while (toDelete.getNeuronList().size() > 0) {
             toDelete.deleteNeuron(toDelete.getNeuron(0));
@@ -946,7 +938,9 @@ public abstract class Network {
     public void addGroup(final Group group) {
         group.setParent(rootNetwork);
         if ((rootNetwork != null)) {
-            group.setId(getRootNetwork().getGroupIdGenerator().getId());
+            String id = getRootNetwork().getGroupIdGenerator().getId();
+            group.setId(id);
+            group.setLabel(id.replaceAll("_"," "));
             groupList.add(group);
             rootNetwork.fireGroupAdded(group);
         }

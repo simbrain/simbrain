@@ -27,7 +27,7 @@ public class GeneRec extends Group {
     /** @see Group */
     public GeneRec(final RootNetwork net, final ArrayList<Object> items) {
         super(net);
-        this.addObjectReferences(items);
+        //this.addObjectReferences(items);
         //referenceNetwork.setUpdateMethod(getParent().getUpdateMethod());
     }
 

@@ -35,7 +35,7 @@ import org.simbrain.network.interfaces.Group;
 import edu.umd.cs.piccolo.PNode;
 
 /**
- * Represents a group of neurons and weights that are part of other networks.
+ * Represents a {@link org.simbrain.network.interfaces.Group}. 
  */
 public class GroupNode extends CustomOutline implements PropertyChangeListener {
 
@@ -60,8 +60,8 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
      *
      * @param networkPanel
      *            networkPanel for this subnetwork node, must not be null.
-     * @param subnetwork
-     *            subnetwork for this subnetwork node, must not be null.
+     * @param group
+     *            the group object being represented
      */
     public GroupNode(final NetworkPanel networkPanel, final Group group) {
         super(networkPanel);

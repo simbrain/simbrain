@@ -24,33 +24,24 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * <b>Group</b> a group of neurons, synapses, and networks which are separately
- * contained in the main network hierarchy but to which additional rules should
- * be applied.
- * 
- * Refactoring notes (Aug, 2010)
- * 
- * Move in the direction of this only containing code for labels, size, etc.
- * Things used by the GUI group node. All maintenance of actual objects
- * (neurons, etc.) should be moved to the subclasses.
- * 
- * So, possibly remove neuron, synapse, network list. Then make "update" an
- * abstract function, so that some groups can be updated every time a network is
- * updated.
+ * <b>Group</b>: a logical group of neurons and synapses (and perhaps other
+ * items later). In some cases this is useful for custom updating. In other
+ * cases it is useful simply as a logical grouping of nodes (e.g. to represent
+ * the "layers" of a feedforward network) Its gui representation is
+ * {@link org.simbrain.network.gui.nodes.GroupNode}.
+ *
+ * Possibly add a flag to have the group visible or not.
  */
 public abstract class Group {
+
+    /** Reference to the network this group is a part of. */
+    private RootNetwork parent;
 
     /** Set of neurons. */
     private List<Neuron> neuronList = new ArrayList<Neuron>();
 
     /** Set of synapses. */
     private Set<Synapse> synapseList = new HashSet<Synapse>();
-
-    /** Set of networks. */
-    private Set<Network> networkList = new HashSet<Network>();
-
-    /** Reference to the network this group is a part of. */
-    private RootNetwork parent;
 
     /** Whether this Group should be active or not. */
     private boolean isOn = true;
@@ -93,7 +84,7 @@ public abstract class Group {
     }
 
     /**
-     * @return the isOn
+     * @return whether the group is "on" or not.
      */
     public boolean isOn() {
         return isOn;
@@ -107,8 +98,7 @@ public abstract class Group {
     public boolean isEmpty() {
         boolean neuronsGone = neuronList.isEmpty();
         boolean synapsesGone = synapseList.isEmpty();
-        boolean networksGone = networkList.isEmpty();
-        return (neuronsGone && synapsesGone && networksGone);
+        return (neuronsGone && synapsesGone);
     }
 
     /**
@@ -128,8 +118,7 @@ public abstract class Group {
     public String debugString() {
         String ret =  new String();
         ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
-        ret += (" " + this.getSynapseList().size() + " synapse(s),");
-        ret += ("and " + this.getNetworkList().size() + " network(s).");
+        ret += (" " + this.getSynapseList().size() + " synapse(s).");
         return ret;
     }
 
@@ -161,53 +150,6 @@ public abstract class Group {
     }
 
     /**
-     * Adds a list of neural network elements (synapses, neurons, subnetworks)
-     * to this network.
-     *
-     * @param toAdd list of objects to add.
-     */
-    public void addObjectReferences(final List<Object> toAdd) {
-
-        // To avoid adding networks as well as their children
-        //  No doubt there is a better way to do this!
-        ArrayList<Object> possibleOverlaps = new ArrayList<Object>();
-
-        // Add the networks
-        for (final Object object : toAdd) {
-            if (object instanceof Network) {
-                final Network net = (Network) object;
-                networkList.add(net);
-                possibleOverlaps.addAll(net.getFlatNeuronList());
-                possibleOverlaps.addAll(net.getFlatSynapseList());
-            }
-        }
-
-        // Add those children not contained in any network
-        for (final Object object : toAdd) {
-            if (object instanceof Neuron) {
-                if (!possibleOverlaps.contains(object)) {
-                    final Neuron neuron = (Neuron) object;
-                    neuronList.add(neuron);
-                }
-            } else if (object instanceof Synapse) {
-                if (!possibleOverlaps.contains(object)) {
-                    final Synapse synapse = (Synapse) object;
-                    synapseList.add(synapse);
-                }
-            }
-        }
-    }
-    /**
-     * Delete a network.
-     *
-     * @param toDelete network to delete
-     */
-    public void deleteNetwork(Network toDelete) {
-        networkList.remove(toDelete);
-        parent.fireGroupChanged(this, this);
-    }
-
-    /**
      * Delete a neuron.
      *
      * @param toDelete neuron to delete
@@ -225,14 +167,6 @@ public abstract class Group {
     public void deleteSynapse(Synapse toDelete) {
         synapseList.remove(toDelete);
         parent.fireGroupChanged(this, this);
-    }
-
-
-    /**
-     * @return a list of networks
-     */
-    public List<Network> getNetworkList() {
-        return new ArrayList<Network>(networkList);
     }
 
     /**
@@ -253,18 +187,8 @@ public abstract class Group {
      * Update group.  Override for special updating.
      */
     public void update() {
-        updateAllNetworks();
         updateAllNeurons();
         updateAllSynapses();
-    }
-
-    /**
-     * Update all networks.
-     */
-    public void updateAllNetworks() {
-        for (Network network : networkList) {
-            network.update();
-        }
     }
 
     /**

@@ -45,7 +45,7 @@ public final class GroupAction
      * @param networkPanel network panel, must not be null
      */
     public GroupAction(final NetworkPanel networkPanel) {
-        super("Group");
+        super("Group gui objects");
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
@@ -55,7 +55,7 @@ public final class GroupAction
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SHORT_DESCRIPTION, "Group objects");
+        putValue(SHORT_DESCRIPTION, "Group gui objects");
 
         updateAction();
         // add a selection listener to update state based on selection

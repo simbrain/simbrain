@@ -49,7 +49,7 @@ public final class UngroupAction
      * @param networkPanel network panel, must not be null
      */
     public UngroupAction(final NetworkPanel networkPanel, final ViewGroupNode node) {
-        super("Ungroup");
+        super("Ungroup gui objects");
         this.node = node;
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -60,7 +60,7 @@ public final class UngroupAction
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_U, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SHORT_DESCRIPTION, "Ungroup objects");
+        putValue(SHORT_DESCRIPTION, "Ungroup gui objects");
 
 //        updateAction();
 //        // add a selection listener to update state based on selection

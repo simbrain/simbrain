@@ -269,7 +269,7 @@ public class RootNetwork extends Network {
                     }
                 }
             }
-            
+
             // For now just neuron based priorities
 //            // update sub-networks with priority level i
 //            for (Network n : this.getNetworkList()) {
@@ -294,10 +294,6 @@ public class RootNetwork extends Network {
                 }
             } else if (object instanceof Synapse) {
                 if (group.getSynapseList().contains(object)) {
-                    return group;
-                }
-            } else if (object instanceof Network) {
-                if (group.getNetworkList().contains(object)) {
                     return group;
                 }
             }
@@ -445,7 +441,7 @@ public class RootNetwork extends Network {
             listener.networkChanged();
         }
     }
-    
+
     /**
      * Fire a network update method changed event to all registered model
      * listeners.

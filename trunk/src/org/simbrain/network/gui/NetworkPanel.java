@@ -329,7 +329,7 @@ public class NetworkPanel extends PCanvas  {
     }
 
     /**
-     * Register and define all network listeners
+     * Register and define all network listeners.
      */
     private void addNetworkListeners() {
 
@@ -337,7 +337,6 @@ public class NetworkPanel extends PCanvas  {
         rootNetwork.addNetworkListener(new NetworkListener() {
 
             public void networkChanged() {
-
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         for (PNode node : getPersistentNodes()) {
@@ -466,12 +465,6 @@ public class NetworkPanel extends PCanvas  {
 
                 // Make a list of neuron and synapse nodes
                 ArrayList<PNode> nodes = new ArrayList<PNode>();
-                for (Network network : e.getObject().getNetworkList()) {
-                    SubnetworkNode node = findSubnetworkNode(network);
-                    if (node != null) {
-                        nodes.add(node);
-                    }
-                }
                 for (Neuron neuron : e.getObject().getNeuronList()) {
                     NeuronNode node = findNeuronNode(neuron);
                     if (node != null) {
@@ -507,12 +500,6 @@ public class NetworkPanel extends PCanvas  {
 
                 // Make a list of neuron and synapse nodes
                 ArrayList<PNode> nodes = new ArrayList<PNode>();
-                for (Network network : e.getObject().getNetworkList()) {
-                    SubnetworkNode node = findSubnetworkNode(network);
-                    if (node != null) {
-                        nodes.add(node);
-                    }
-                }
                 for (Neuron neuron : e.getObject().getNeuronList()) {
                     NeuronNode node = findNeuronNode(neuron);
                     if (node != null) {

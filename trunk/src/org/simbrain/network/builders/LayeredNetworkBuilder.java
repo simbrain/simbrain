@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.NeuronLayer;
+import org.simbrain.network.groups.NeuronLayer.LayerType;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.LineLayout;
@@ -75,7 +76,7 @@ public final class LayeredNetworkBuilder {
      */
     public LayeredNetworkBuilder() {
     }
-
+    
     /**
      * Add the layered network to the specified network.
      *
@@ -101,8 +102,7 @@ public final class LayeredNetworkBuilder {
                 - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
         layout.layoutNeurons(inputLayer);
         if (addGroups) {
-            NeuronGroup group = new NeuronGroup(network, inputLayer);
-            group.setLabel("Input Layer");
+            NeuronLayer group = new NeuronLayer(network, inputLayer, LayerType.Input);
             network.addGroup(group);
         }
 
@@ -130,13 +130,13 @@ public final class LayeredNetworkBuilder {
                     - (betweenLayerInterval * i)));
             layout.layoutNeurons(hiddenLayer);
             if (addGroups) {
-                NeuronGroup group = new NeuronGroup(network, hiddenLayer);
                 if (i == nodesPerLayer.length - 1) {
-                    group.setLabel("Output Layer");
+                    NeuronLayer group = new NeuronLayer(network, hiddenLayer, LayerType.Output);
+                    network.addGroup(group);
                 } else {
-                    group.setLabel("Hidden Layer " + i);
+                    NeuronLayer group = new NeuronLayer(network, hiddenLayer, LayerType.Hidden);
+                    network.addGroup(group);
                 }
-                network.addGroup(group);
             }
 
             // Connect input layer to hidden layer

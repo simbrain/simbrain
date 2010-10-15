@@ -156,7 +156,7 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
     /**
      * Update location of interaciton box.
      */
-    private void updateInteractionBox() {
+    protected void updateInteractionBox() {
         if (hasInteractionBox) {
             interactionBox.setOffset(this.getBounds().getX()
                     - interactionBox.getOFFSET_X(), this.getBounds().getY()

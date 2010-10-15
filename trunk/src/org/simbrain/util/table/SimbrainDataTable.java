@@ -340,11 +340,11 @@ public final class SimbrainDataTable {
 
     /**
      * Adds or removes rows and columns.  Does not change value of existing
-     * cells.
+     * cells.  Sets new cells to a specified value.
      *
      * @param row Number of rows in table.
      * @param col Number of columns in table.
-     * @param value to be added in the table.
+     * @param value to be used for any new columns or rows added to the table.
      */
     public void modifyRowsColumns(final int row, final int col, final double value) {
         int currentColNum = numColumns;

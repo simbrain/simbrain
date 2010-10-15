@@ -117,6 +117,14 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
     }
 
     /**
+     * Update the text label to reflect underlying group label.
+     */
+    public void updateText() {
+        this.setTextLabel(group.getLabel());
+        this.updateInteractionBox();
+    }
+
+    /**
      * Remove a reference node.
      *
      * @param node node to remove.

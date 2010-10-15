@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.simbrain.network.listeners.NetworkEvent;
+
 /**
  * <b>Group</b>: a logical group of neurons and synapses (and perhaps other
  * items later). In some cases this is useful for custom updating. In other
@@ -126,8 +128,10 @@ public abstract class Group {
     public String toString() {
         if (label != null) {
             return label;
-        } else {
+        } else if (id != null){
             return id;
+        } else {
+            return super.toString();
         }
     }
 
@@ -242,6 +246,7 @@ public abstract class Group {
      */
     public void setLabel(String label) {
         this.label = label;
+        parent.fireGroupParametersChanged(this);
     }
 
     /**

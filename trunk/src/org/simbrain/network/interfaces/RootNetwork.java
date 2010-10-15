@@ -640,7 +640,7 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Fire a group changed event to all registered model listeners.
+     * Fire a group changed event to all registered model listeners. TODO: Change to grouptype changed?
      *
      * @param old Old group
      * @param changed New changed group
@@ -649,6 +649,18 @@ public class RootNetwork extends Network {
 
         for (GroupListener listener : groupListeners) {
             listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
+        }
+    }
+
+
+    /**
+     * Fire a group parameters changed event.
+     *
+     * @param group reference to group whose parameters changed
+     */
+    public void fireGroupParametersChanged(final Group group) {
+        for (GroupListener listener : groupListeners) {
+            listener.groupParameterChanged(new NetworkEvent<Group>(this, group, group));
         }
     }
 
@@ -925,5 +937,6 @@ public class RootNetwork extends Network {
     public SimpleId getGroupIdGenerator() {
         return groupIdGenerator;
     }
+
 
 }

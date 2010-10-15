@@ -940,7 +940,9 @@ public abstract class Network {
         if ((rootNetwork != null)) {
             String id = getRootNetwork().getGroupIdGenerator().getId();
             group.setId(id);
-            group.setLabel(id.replaceAll("_"," "));
+            if (group.getLabel() == null) {
+                group.setLabel(id.replaceAll("_"," "));                
+            }
             groupList.add(group);
             rootNetwork.fireGroupAdded(group);
         }

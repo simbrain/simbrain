@@ -224,8 +224,7 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
-                int numInputs = trainerGui.getInputDataTable().getData()
-                        .getColumnCount();
+                int numInputs = trainerGui.getInputData().getColumnCount()-1;//TODO: Another way to do this? Make getNumInputs function
                 String hiddenUnitsString = (String) JOptionPane
                         .showInputDialog(null, "Number of hidden units", "4");
                 int numHidden;
@@ -234,8 +233,7 @@ public class TrainerGuiActions {
                 } else {
                     return; // User pressed cancel
                 }
-                int numOutputs = trainerGui.getTrainingDataTable().getData()
-                        .getColumnCount();
+                int numOutputs = trainerGui.getTrainingData().getColumnCount()-1; 
                 int[] nodesPerLayer = new int[] { numInputs, numHidden,
                         numOutputs };
                 builder.setNodesPerLayer(nodesPerLayer);
@@ -243,8 +241,7 @@ public class TrainerGuiActions {
                         "Backprop network");
                 builder.buildNetwork(network.getRootNetwork());
                 trainerGui.getWorkspace().addWorkspaceComponent(network);
-                trainerGui.getTrainer().setNetwork(network.getRootNetwork());
-                trainerGui.updateCurrentNetwork(); //TODO: Bad smell here! 
+                trainerGui.setNetwork(network.getRootNetwork());
             }
 
         };
@@ -272,10 +269,8 @@ public class TrainerGuiActions {
             public void actionPerformed(ActionEvent arg0) {
                 LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
                 int[] topology;
-                int numInputs = trainerGui.getInputDataTable().getData()
-                        .getColumnCount();
-                int numOutputs = trainerGui.getTrainingDataTable().getData()
-                        .getColumnCount();
+                int numInputs = trainerGui.getInputData().getColumnCount() - 1;
+                int numOutputs = trainerGui.getTrainingData().getColumnCount() - 1;
                 String defaultTopologyString = numInputs + ",3,3," + numOutputs;
                 String topologyString = (String) JOptionPane
                         .showInputDialog(
@@ -297,9 +292,8 @@ public class TrainerGuiActions {
                         "Backprop network");
                 builder.buildNetwork(network.getRootNetwork());
                 trainerGui.getWorkspace().addWorkspaceComponent(network);
-                trainerGui.getTrainer().setNetwork(network.getRootNetwork());
-                trainerGui.updateCurrentNetwork(); //TODO: Bad smell here! 
-                }
+                trainerGui.setNetwork(network.getRootNetwork());
+            }
 
         };
     }

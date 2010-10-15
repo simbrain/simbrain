@@ -526,6 +526,14 @@ public class NetworkPanel extends PCanvas  {
                 node.removeFromParent();
             }
 
+            /** @see NetworkListener */
+            public void groupParameterChanged(NetworkEvent<Group> event) {
+                GroupNode node = findModelGroupNode(event.getObject());
+                if (node != null) {
+                    node.updateText();                    
+                }
+            }
+
         });
 
 

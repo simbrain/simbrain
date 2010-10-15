@@ -32,5 +32,4 @@ public interface TrainerListener {
      */
     public void errorUpdated(double error);
 
- 
 }

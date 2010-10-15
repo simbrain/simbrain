@@ -57,7 +57,7 @@ public abstract class Trainer {
     private int iteration;
 
     /** Listener list. */
-    public List<TrainerListener> listeners = new ArrayList<TrainerListener>();
+    private List<TrainerListener> listeners = new ArrayList<TrainerListener>();
 
     /**
      * Same number of columns as input network.
@@ -95,14 +95,14 @@ public abstract class Trainer {
     /**
      * @return the inputData
      */
-    public double[][] getInputData() {
+    public final double[][] getInputData() {
         return inputData;
     }
 
     /**
      * @param inputData the inputData to set
      */
-    public void setInputData(double[][] inputData) {
+    public final void setInputData(double[][] inputData) {
         this.inputData = inputData;
     }
 
@@ -111,14 +111,14 @@ public abstract class Trainer {
      *
      * @param inputFile the inputData as a csv file
      */
-    public void setInputData(final File inputFile) {
+    public final void setInputData(final File inputFile) {
         this.inputData = Utils.getDoubleMatrix(inputFile);
     }
 
     /**
      * @return the trainingData
      */
-    public double[][] getTrainingData() {
+    public final double[][] getTrainingData() {
         return trainingData;
     }
 
@@ -129,11 +129,12 @@ public abstract class Trainer {
      */
     public void setTrainingData(double[][] trainingData)  {
 
-        if (trainingData[0].length != outputLayer.size()) {
-            System.err.println("Training data size must be the same as output layer size");
-            return;
-            // TODO: Throw appropriate exception
-        }
+        //TODO: Think about this.
+//        if (trainingData[0].length != outputLayer.size()) {
+//            System.err.println("Training data size must be the same as output layer size");
+//            return;
+//            // TODO: Throw appropriate exception
+//        }
         this.trainingData = trainingData;
     }
 
@@ -216,7 +217,6 @@ public abstract class Trainer {
      */
     public void setNetwork(Network network) {
         this.network = network;
-        init();
     }
 
     /**
@@ -224,7 +224,7 @@ public abstract class Trainer {
      */
     public void fireErrorUpdated() {
         for (TrainerListener listener : listeners) {
-            listener.errorUpdated(currentError); 
+            listener.errorUpdated(currentError);
         }
     }
 
@@ -255,6 +255,15 @@ public abstract class Trainer {
      */
     public void setIteration(int iteration) {
         this.iteration = iteration;
+    }
+
+    /**
+     * Add a listener.
+     *
+     * @param trainerListener the listener to add
+     */
+    public void addListener(TrainerListener trainerListener) {
+        listeners.add(trainerListener);
     }
 
 }

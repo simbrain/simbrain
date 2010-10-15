@@ -48,4 +48,11 @@ public interface GroupListener {
      */
     void groupChanged(NetworkEvent<Group> networkEvent);
 
+    /**
+     * Invoked when a group is changed.
+     *
+     * @param networkEvent event which holds reference to old and changed group.
+     */
+    void groupParameterChanged(NetworkEvent<Group> networkEvent);
+
 }

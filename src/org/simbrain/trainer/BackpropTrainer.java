@@ -103,6 +103,9 @@ public class BackpropTrainer extends Trainer {
         //System.out.println("Building network representation...");
         //System.out.println("Adding layer " + layers.size());
 
+        if (this.getOutputLayer() == null) {
+            return;
+        }
         NeuronGroup outputLayer = new NeuronGroup(this.getNetwork()
                 .getRootNetwork(), this.getOutputLayer());
         layers.add(outputLayer);
@@ -125,8 +128,7 @@ public class BackpropTrainer extends Trainer {
                 furtherConnectionCount += synapse.getSource().getFanIn().size();
             }
         }
-        //System.out.println("Adding layer " + layers.size());
-        newGroup.setLabel("Layer" + layers.size());
+        // System.out.println("Adding layer " + layers.size());
         layers.add(newGroup);
 
         // Recursive step

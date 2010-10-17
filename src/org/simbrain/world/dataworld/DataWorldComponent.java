@@ -102,11 +102,11 @@ public class DataWorldComponent extends WorkspaceComponent {
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
-        public void dataChanged() {
+        public void tableDataChanged() {
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
-        public void itemChanged(int row, int column) {
+        public void cellDataChanged(int row, int column) {
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
@@ -118,7 +118,7 @@ public class DataWorldComponent extends WorkspaceComponent {
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
-        public void structureChanged() {
+        public void tableStructureChanged() {
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 

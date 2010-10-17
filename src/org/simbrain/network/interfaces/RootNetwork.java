@@ -99,7 +99,7 @@ public class RootNetwork extends Network {
      *  is stored in this set.
      */
     private SortedSet<Integer> updatePriorities = null;
-    
+
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
 
@@ -214,7 +214,7 @@ public class RootNetwork extends Network {
         updateTime();
 
         switch (this.updateMethod) {
-	        case PRIORITYBASED:
+        case PRIORITYBASED:
             logger.debug("priority-based update");
             updateByPriority();
             updateAllSynapses();
@@ -249,7 +249,7 @@ public class RootNetwork extends Network {
         if (this.getUpdatePriorities() == null) {
             return;
         }
-                
+
         // TODO: Re-implement update using a <Priority,Neuron> treemap
         for (Integer i : this.getUpdatePriorities()) {
             // System.out.print(i.intValue() + "\n");
@@ -893,6 +893,16 @@ public class RootNetwork extends Network {
     public void addGroupListener(final GroupListener listener) {
         groupListeners.add(listener);
     }
+
+    /**
+     * Remove a group listener.
+     *
+     * @param listener the observer to remove
+     */
+    public void removeGroupListener(final GroupListener listener) {
+        groupListeners.remove(listener);
+    }
+
 
     /**
      * Search for a neuron by label. If there are more than one with the same

@@ -9,3 +9,4 @@ clipboard
 piccolo
 combo
 updator
+simbrain

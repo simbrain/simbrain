@@ -100,7 +100,7 @@ public class SimbrainJTable extends JXTable {
         if (selectedPoint == null) {
             return this.getColumnCount() - 1;
         } else {
-            return columnAtPoint(selectedPoint);            
+            return columnAtPoint(selectedPoint);
         }
     }
 
@@ -377,7 +377,7 @@ public class SimbrainJTable extends JXTable {
             /**
              * {@inheritDoc}
              */
-            public void itemChanged(int row, int column) {
+            public void cellDataChanged(int row, int column) {
                 fireTableCellUpdated(row, column);
             }
 
@@ -398,14 +398,14 @@ public class SimbrainJTable extends JXTable {
             /**
              * {@inheritDoc}
              */
-            public void structureChanged() {
+            public void tableStructureChanged() {
                 fireTableStructureChanged();
             }
 
             /**
              * {@inheritDoc}
              */
-            public void dataChanged() {
+            public void tableDataChanged() {
                 fireTableDataChanged();
             }
 
@@ -430,14 +430,14 @@ public class SimbrainJTable extends JXTable {
             if (column == 0) {
                 return false;
             } else {
-                return true;                
+                return true;
             }
         }
 
         @Override
         public void setValueAt(Object value, int row, int column) {
             if (column > 0) {
-                data.setValue(row, column-1, (Double) value);                
+                data.setValue(row, column-1, (Double) value);
             }
         }
 

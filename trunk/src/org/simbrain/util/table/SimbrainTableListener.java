@@ -57,16 +57,16 @@ public interface SimbrainTableListener {
      * @param row row index
      * @param column column index
      */
-    void itemChanged(int row, int column);
-
-    /**
-     * The table structure changed.
-     */
-    void structureChanged();
+    void cellDataChanged(int row, int column);
 
     /**
      * The table data changed.
      */
-    void dataChanged();
+    void tableDataChanged();
+
+    /**
+     * The table structure changed.
+     */
+    void tableStructureChanged();
 
 }

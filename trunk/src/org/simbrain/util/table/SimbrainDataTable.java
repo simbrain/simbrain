@@ -117,7 +117,7 @@ public final class SimbrainDataTable {
             rowData.add((List<Double>) getNewRow(0));
         }
 
-        fireStructureChanged();
+        fireTableStructureChanged();
     }
 
     /**
@@ -151,7 +151,7 @@ public final class SimbrainDataTable {
         for (List<Double> row : rowData) {
             Collections.fill(row, value);
         }
-        this.fireDataChanged();
+        this.fireTableDataChanged();
     }
 
     /**
@@ -171,7 +171,7 @@ public final class SimbrainDataTable {
         for (List<Double> row : rowData) {
             row.set(columnIndex, row.get(columnIndex)/max);
         }
-        this.fireDataChanged();
+        this.fireTableDataChanged();
     }
 
     /**
@@ -192,9 +192,10 @@ public final class SimbrainDataTable {
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++ ) {
                 double value = (rand.nextDouble() * range) + getLowerBound();
-                setValue(i , j, value);
+                setValue(i , j, value, false);
             }
         }
+        fireTableDataChanged();
     }
 
     /**
@@ -248,9 +249,21 @@ public final class SimbrainDataTable {
      * @param value value to add
      */
     public void setValue(final int row, final int column, final double value) {
+        setValue(row, column, value, true);
+    }
+
+    /**
+     * Set the value at specific position in the table.
+     *
+     * @param row row index
+     * @param column column index
+     * @param value value to add
+     * @param boolean true if an event should be fired, false otherwise.
+     */
+    public void setValue(final int row, final int column, final double value, final boolean fireEvent) {
         rowData.get(row).set(column, value);
-        for (SimbrainTableListener listener : listeners) {
-            listener.itemChanged(row, column);
+        if (fireEvent) {
+            fireCellDataChanged(row, column);
         }
     }
 
@@ -309,7 +322,7 @@ public final class SimbrainDataTable {
         numRows++;
         rowData.add(at, getNewRow(value));
         for (SimbrainTableListener listener : listeners) {
-            listener.rowAdded(at);            
+            listener.rowAdded(at);
         }
     }
 
@@ -569,30 +582,30 @@ public final class SimbrainDataTable {
 
     /**
      * Returns an array representation of the table.
-     * 
+     *
      * @return representation of table as double arroy
      */
     public double[][] asArray() {
+
         double returnList[][] = new double[getRowCount()][getColumnCount()];
-        
-        for(int i = 0; i < getRowCount(); i++) {
+        for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
                 returnList[i][j] = (Double) this.get(i, j);
             }
         }
         return returnList;
     }
-    
 
     /**
-     * Returns a string array representation of the table, useful in csv parsing.
+     * Returns a string array representation of the table, useful in csv
+     * parsing.
      *
      * @return string array version of table
      */
     public String[][] asStringArray() {
         double doubleArray[][] = asArray();
         String stringArray[][] = new String[getRowCount()][getColumnCount()];
-        for(int i = 0; i < getRowCount(); i++) {
+        for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
                 stringArray[i][j] = "" + doubleArray[i][j];
             }
@@ -617,30 +630,42 @@ public final class SimbrainDataTable {
                         num = Double.valueOf(values[i][j]);
                     } catch (NumberFormatException exception) {
                     } finally {
-                        setValue(i, j, num);
+                        setValue(i, j, num, false);
                     }
                 }
             }
         }
-        fireStructureChanged(); //TODO: Redundant (called by reset)
+        fireTableStructureChanged();
 
     }
 
+    //TODO: Add other fire event methods.  Currently they are buried in the code.
+
     /**
-     * Fire data changed event.
+     * Fire table data changed event. Only call when all data has changed. When
+     * a specific bit of data has changed call itemChanged.
      */
-    public void fireDataChanged() {
-        for(SimbrainTableListener listener : listeners) {
-            listener.dataChanged();
+    public void fireTableDataChanged() {
+        for (SimbrainTableListener listener : listeners) {
+            listener.tableDataChanged();
         }
     }
 
     /**
-     * Fire data changed event.
+     * Fire cell data changed event.
      */
-    public void fireStructureChanged() {
-        for(SimbrainTableListener listener : listeners) {
-            listener.structureChanged();
+    public void fireCellDataChanged(int row, int column) {
+        for (SimbrainTableListener listener : listeners) {
+            listener.cellDataChanged(row, column);
+        }
+    }
+
+    /**
+     * Fire table structure changed event.
+     */
+    public void fireTableStructureChanged() {
+        for (SimbrainTableListener listener : listeners) {
+            listener.tableStructureChanged();
         }
     }
 

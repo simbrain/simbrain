@@ -266,4 +266,25 @@ public abstract class Trainer {
         listeners.add(trainerListener);
     }
 
+    @Override
+    public String toString() {
+        String retString = "";
+        if (network != null) {
+            retString += "Network: " + network.getId() + "\n";
+        }
+        if (inputLayer != null) {
+            retString += "Input Layer: " + inputLayer.size() + " neuron(s) \n";
+        }
+        if (outputLayer != null) {
+            retString += "Output Layer: " + outputLayer.size() + " neuron(s) \n";
+        }
+        if (inputData != null) {
+            retString += "Input Data: " + inputData.length + "x" + inputData[0].length + " table \n";            
+        }
+        if (trainingData != null) {
+            retString += "Training Data: " + trainingData.length + "x" + trainingData[0].length + "table \n";
+        }
+        return retString;
+    }
+
 }

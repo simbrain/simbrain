@@ -61,7 +61,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
 
     /**
      * Construct a time series plot gui.
-     * 
+     *
      * @param frame parent frame
      * @param component the underlying component
      */
@@ -97,7 +97,7 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
      */
     @Override
     public void postAddInit() {
-        
+
         // Convenience reference
         final TimeSeriesModel model = getWorkspaceComponent().getModel();
         // Generate the graph
@@ -194,5 +194,4 @@ public class TimeSeriesPlotGui extends GuiComponent<TimeSeriesPlotComponent>
             this.getWorkspaceComponent().getModel().clearData();
         }
     }
-   
 }

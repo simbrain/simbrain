@@ -53,6 +53,8 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.plot.timeseries.TimeSeriesModel;
+import org.simbrain.plot.timeseries.TimeSeriesPlotPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
 import org.simbrain.util.table.SimbrainDataTable;
@@ -99,7 +101,7 @@ public class TrainerGUI extends JPanel {
     private RootNetwork currentNetwork;
 
     /** Data for the error graph. */
-    private XYSeries graphData;
+    private TimeSeriesModel model;
 
     /** Text field for setting number of iterations to run. */
     private JTextField tfIterations;
@@ -277,56 +279,48 @@ public class TrainerGUI extends JPanel {
      */
     private JPanel createGraphPanel() {
 
-        // Graph
-        JPanel graphPanel = new JPanel();
+        // Configure time series model
+        model = new TimeSeriesModel(1);
+        model.setRangeLowerBound(0);
+        model.setRangeUpperBound(1);
+        model.setAutoRange(false);
+        model.setWindowSize(1000);
+
+        // Configure time series plot
+        TimeSeriesPlotPanel graphPanel = new TimeSeriesPlotPanel(model);
         graphPanel.setBorder(BorderFactory
                 .createTitledBorder("Error / Trainer Controls"));
-        graphPanel.setLayout(new BorderLayout());
-        XYSeriesCollection series = new XYSeriesCollection();
-        graphData = new XYSeries(1);
-        series.addSeries(graphData);
-        JFreeChart chart = ChartFactory.createXYLineChart(null, // Title
-                "Iterations", // x-axis Label
-                "Error", // y-axis Label
-                series, // Dataset
-                PlotOrientation.VERTICAL, // Plot Orientation
-                false, // Show Legend
-                true, // Use tooltips
-                false // Configure chart to generate URLs?
-                );
-        chart.setBackgroundPaint(null);
-        // chart.getXYPlot().getRangeAxis().setUpperBound(1); TODO: Make
-        // autorange a dialog option
-        ChartPanel centerPanel = new ChartPanel(chart);
-        centerPanel.setPreferredSize(new Dimension(centerPanel
-                .getPreferredSize().width, 200));
+        graphPanel.getChartPanel().getChart().setTitle("");
+        graphPanel.getChartPanel().getChart().getXYPlot().getDomainAxis().setLabel("Iterations");
+        graphPanel.getChartPanel().getChart().getXYPlot().getRangeAxis().setLabel("Error");
+        graphPanel.getChartPanel().getChart().removeLegend();
+        graphPanel.setPreferredSize(new Dimension(graphPanel.getPreferredSize().width, 250));
 
-        // Make button panel
-        JPanel buttonPanel = new JPanel();
+        // Customize button panel; first remove all buttons
+        graphPanel.removeAllButtonsFromToolBar();
 
         // Run
-        buttonPanel.add(new JButton(TrainerGuiActions.getRunAction(this)));
+        graphPanel.getButtonPanel().add(new JButton(TrainerGuiActions.getRunAction(this)));
 
         // Batch
-        buttonPanel.add(new JButton(TrainerGuiActions.getBatchTrainAction(this)));
+        graphPanel.getButtonPanel().add(new JButton(TrainerGuiActions.getBatchTrainAction(this)));
 
         // Iterations
         tfIterations = new JTextField("300");
-        buttonPanel.add(new JLabel("Iterations"));
-        buttonPanel.add(tfIterations);
+        graphPanel.getButtonPanel().add(new JLabel("Iterations"));
+        graphPanel.getButtonPanel().add(tfIterations);
 
         // Error
-        buttonPanel.add(rmsError);
+        graphPanel.getButtonPanel().add(rmsError);
 
         // Randomize
-        buttonPanel.add(new JButton(TrainerGuiActions.getRandomizeNetworkAction(this)));
+        graphPanel.getButtonPanel().add(new JButton(TrainerGuiActions.getRandomizeNetworkAction(this)));
 
-        // Clear
-        buttonPanel.add(new JButton(TrainerGuiActions.getClearGraphAction(this)));
+        // Add clear and prefs button
+        graphPanel.addClearGraphDataButton();
+        graphPanel.addPreferencesButton();
 
-        // Finish up panel
-        graphPanel.add("Center", centerPanel);
-        graphPanel.add("South", buttonPanel);
+
         return graphPanel;
     }
 
@@ -367,7 +361,8 @@ public class TrainerGUI extends JPanel {
         trainer = new BackpropTrainer(currentNetwork);
         trainer.addListener(new TrainerListener() {
             public void errorUpdated(final double error) {
-                graphData.add(trainer.getIteration(), error);
+                model.update();
+                model.addData(0, trainer.getIteration(), error);
             }
         });
     }
@@ -378,7 +373,11 @@ public class TrainerGUI extends JPanel {
      * @param network the network to associated the network with.
      */
     public final void setNetwork(final RootNetwork network) {
-        clearGraph();
+
+        if (model != null) {
+            model.clearData();
+        }
+
         if (currentNetwork != null) {
             currentNetwork.removeGroupListener(groupListener);
         }
@@ -438,7 +437,7 @@ public class TrainerGUI extends JPanel {
     public final void iterate() {
         trainer.train(1);
         updateErrorField();
-        graphData.add(trainer.getIteration(), trainer.getCurrentError());
+        model.addData(0, trainer.getIteration(), trainer.getCurrentError());
     }
 
     /**
@@ -458,15 +457,6 @@ public class TrainerGUI extends JPanel {
         this.updateCompleted = updateCompleted;
     }
 
-    /**
-     * Clear the graph data and reset trainer iteration.
-     */
-    public final void clearGraph() {
-        graphData.clear();
-        if (trainer != null) {
-            trainer.setIteration(0);
-        }
-    }
 
     /**
      * @return the currentNetwork

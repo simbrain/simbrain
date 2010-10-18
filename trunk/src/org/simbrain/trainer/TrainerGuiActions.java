@@ -197,7 +197,7 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-               trainerGui.clearGraph();
+               //trainerGui.clearGraph();
             }
 
         };

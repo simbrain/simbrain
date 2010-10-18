@@ -18,12 +18,14 @@
  */
 package org.simbrain.plot.timeseries;
 
+import java.awt.EventQueue;
+import java.util.Iterator;
+
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Data model for a time series plot.
@@ -36,32 +38,17 @@ public class TimeSeriesModel extends ChartModel {
     /** Default number of data sources for plot initialization. */
     private static final int INITIAL_DATA_SOURCES = 5;
 
-    /** Should fixed window size be used. */
-    private boolean fixedWindow = true;
-
-    /** Should the domain automatically change to reflect the data. */
-    private boolean autoDomain = true;
-
     /** Should the range automatically change to reflect the data. */
     private boolean autoRange = true;
 
     /** Size of window. */
     private int windowSize = 100;
 
-    /** Upper boundary of the chart domain. */
-    private double upperDomainBoundary = 1;
+    /** Upper bound of the chart range. */
+    private double rangeUpperBound = 1;
 
-    /** Lower boundary of the chart domain. */
-    private double lowerDomainBoundary = 0;
-
-    /** Upper boundary of the chart range. */
-    private double upperRangeBoundary = 1;
-
-    /** Lower boundary of the chart range. */
-    private double lowerRangeBoundary = 0;
-    
-    /** Maximum iteration size if this chart is fixed width. */
-    private int maxSize = 100;
+    /** Lower bound of the chart range. */
+    private double rangeLowerBound = 0;
 
     /** Whether this chart if fixed width or not. */
     private boolean fixedWidth = true;
@@ -72,6 +59,15 @@ public class TimeSeriesModel extends ChartModel {
      * @param parent component
      */
     public TimeSeriesModel() {
+    }
+
+    /**
+     * Initialize model to specified number of data sources.
+     *
+     * @param parent component
+     */
+    public TimeSeriesModel(int numDataSources) {
+        addDataSources(numDataSources);
     }
 
     /**
@@ -146,7 +142,7 @@ public class TimeSeriesModel extends ChartModel {
      * See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
@@ -154,47 +150,17 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
-     * @return the fixedWindowSize
+     * @return the fixedWidth
      */
-    public boolean isFixedWindow() {
-        return fixedWindow;
+    public boolean isFixedWidth() {
+        return fixedWidth;
     }
 
     /**
-     * @param fixedWindowSize the fixedWindowSize to set
+     * @param fixedWidth the fixedWidth to set
      */
-    public void setFixedWindow(final boolean fixedWindow) {
-        this.fixedWindow = fixedWindow;
-        fireSettingsChanged();
-    }
-
-    /**
-     * @return the autoDomain
-     */
-    public boolean isAutoDomain() {
-        return autoDomain;
-    }
-
-    /**
-     * @param autoDomain the autoDomain to set
-     */
-    public void setAutoDomain(final boolean autoDomain) {
-        this.autoDomain = autoDomain;
-        fireSettingsChanged();
-    }
-
-    /**
-     * @return the autoRange
-     */
-    public boolean isAutoRange() {
-        return autoRange;
-    }
-
-    /**
-     * @param autoRange the autoRange to set
-     */
-    public void setAutoRange(final boolean autoRange) {
-        this.autoRange = autoRange;
+    public void setFixedWidth(final boolean fixedWidth) {
+        this.fixedWidth = fixedWidth;
         fireSettingsChanged();
     }
 
@@ -214,93 +180,86 @@ public class TimeSeriesModel extends ChartModel {
     }
 
     /**
-     * @return the upperDomainBoundary
+     * @return the autoRange
      */
-    public double getUpperDomainBoundary() {
-        return upperDomainBoundary;
+    public boolean isAutoRange() {
+        return autoRange;
     }
 
     /**
-     * @param upperDomainBoundary the upperDomainBoundary to set
+     * @param autoRange the autoRange to set
      */
-    public void setUpperDomainBoundary(final double upperDomainBoundary) {
-        this.upperDomainBoundary = upperDomainBoundary;
-        fireSettingsChanged();
-    }
-
-    /**
-     * @return the lowerDomainBoundary
-     */
-    public double getLowerDomainBoundary() {
-        return lowerDomainBoundary;
-    }
-
-    /**
-     * @param lowerDomainBoundary the lowerDomainBoundary to set
-     */
-    public void setLowerDomainBoundary(final double lowerDomainBoundary) {
-        this.lowerDomainBoundary = lowerDomainBoundary;
+    public void setAutoRange(final boolean autoRange) {
+        this.autoRange = autoRange;
         fireSettingsChanged();
     }
 
     /**
      * @return the upperRangeBoundary
      */
-    public double getUpperRangeBoundary() {
-        return upperRangeBoundary;
+    public double getRangeUpperBound() {
+        return rangeUpperBound;
     }
 
     /**
      * @param upperRangeBoundary the upperRangeBoundary to set
      */
-    public void setUpperRangeBoundary(final double upperRangeBoundary) {
-        this.upperRangeBoundary = upperRangeBoundary;
-        fireSettingsChanged();        
+    public void setRangeUpperBound(final double upperBound) {
+        this.rangeUpperBound = upperBound;
+        fireSettingsChanged();
     }
 
     /**
      * @return the lowerRangeBoundary
      */
-    public double getLowerRangeBoundary() {
-        return lowerRangeBoundary;
+    public double getRangeLowerBound() {
+        return rangeLowerBound;
     }
 
     /**
      * @param lowerRangeBoundary the lowerRangeBoundary to set
      */
-    public void setLowerRangeBoundary(final double lowerRangeBoundary) {
-        this.lowerRangeBoundary = lowerRangeBoundary;
-        fireSettingsChanged();        
-    }
-
-    /**
-     * @return the maxSize
-     */
-    public int getMaxSize() {
-        return maxSize;
-    }
-
-    /**
-     * @param maxSize the maxSize to set
-     */
-    public void setMaxSize(final int maxSize) {
-        this.maxSize = maxSize;
+    public void setRangeLowerBound(final double lowerRangeBoundary) {
+        this.rangeLowerBound = lowerRangeBoundary;
         fireSettingsChanged();
     }
 
     /**
-     * @return the fixedWidth
+     * Add data to this model.
+     *
+     * @param dataSourceIndex index of data source to use
+     * @param time data for x axis
+     * @param value data for y axis
      */
-    public boolean isFixedWidth() {
-        return fixedWidth;
+    public void addData(final int dataSourceIndex, final double time,
+            final double value) {
+        getDataset().getSeries(dataSourceIndex).add(time, value);
     }
 
     /**
-     * @param fixedWidth the fixedWidth to set
+     * Update the model; currently used to remove unused data when in "fixed width" mode.
      */
-    public void setFixedWidth(final boolean fixedWidth) {
-        this.fixedWidth = fixedWidth;
-        fireSettingsChanged();
+    public void update() {
+
+        // Trim appropriately if fixed width
+
+        // TODO: This does not work well in trainer.gui.   Concurrency issues.  So disabling for now.
+//        if (isFixedWidth()) {
+//            System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
+//            for (Iterator iterator = getDataset().getSeries().iterator(); iterator
+//                    .hasNext();) {
+//                XYSeries series = (XYSeries) iterator.next();
+//                if (series.getItemCount() > getWindowSize()) {
+//                    int diff = Math
+//                            .abs(series.getItemCount() - getWindowSize());
+//                    System.out.println("diff:" + diff);
+//                    for (int i = 0; i < diff; i++) {
+//                        series.remove(i);
+//                    }
+//                }
+//            }
+//        }
+
     }
-    
+
 }

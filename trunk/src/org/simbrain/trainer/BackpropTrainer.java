@@ -170,6 +170,21 @@ public class BackpropTrainer extends Trainer {
     }
 
     /**
+     * Returns the number of rows in whichever dataset has fewer rows.
+     *
+     * @return least number of rows
+     */
+    private int getMinimumNumRows() {
+        int inputRows = getInputData().length;
+        int targetRows = getTrainingData().length;
+        if (inputRows < targetRows) {
+            return inputRows;
+        } else {
+            return targetRows;
+        }
+    }
+
+    /**
      * Iterate network training.
      */
     public void iterate() {
@@ -177,7 +192,7 @@ public class BackpropTrainer extends Trainer {
         rmsError = 0;
 
         // Set local variables
-        int numRows = getInputData().length;
+        int numRows = getMinimumNumRows();
         int numInputs = getInputLayer().size();
         //System.out.println("Data:" + numInputs + "/" + numRows);
 

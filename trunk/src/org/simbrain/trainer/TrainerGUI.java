@@ -37,12 +37,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.builders.LayeredNetworkBuilder;
 import org.simbrain.network.groups.NeuronGroup;
@@ -182,8 +176,7 @@ public class TrainerGUI extends JPanel {
                 if (((NetworkComponent) workspaceComponent).getRootNetwork() == currentNetwork) {
                     setNetwork(null);
                 }
-                cbNetworkChooser
-                        .removeItem((NetworkComponent) workspaceComponent);
+                cbNetworkChooser.removeItem((NetworkComponent) workspaceComponent);
             }
         }
     };
@@ -191,7 +184,7 @@ public class TrainerGUI extends JPanel {
     /**
      * Default constructor.
      */
-    public TrainerGUI(Workspace workspace, GenericFrame frame) {
+    public TrainerGUI(final Workspace workspace, final GenericFrame frame) {
 
         // Initial setup
         this.workspace = workspace;
@@ -400,6 +393,7 @@ public class TrainerGUI extends JPanel {
         updateGroupComboBoxes();
         inputDataWindow.initializeSelectedGroup();
         trainingDataWindow.initializeSelectedGroup();
+        parentFrame.pack();
 
         // Initialize trainer, but only after layers are updated
         trainer.init();
@@ -596,7 +590,6 @@ public class TrainerGUI extends JPanel {
                  */
                 public void columnAdded(int column) {
                     updateParentTrainerData();
-                    // TODO: Possibly call reconcileTableWithLayer
                 }
 
                 /**
@@ -664,6 +657,9 @@ public class TrainerGUI extends JPanel {
          */
         private void updateParentTrainerData() {
             if (trainer != null) {
+                if (getCurrentNeuronGroup() != null) {
+                    reconcileTableWithLayer(dataTable, getCurrentNeuronGroup());
+                }
                 if (type == WindowType.Input) {
                     trainer.setInputData(dataTable.getData().asArray());
                 } else if (type == WindowType.Trainer) {

@@ -18,12 +18,9 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
 
-import org.jfree.data.xy.XYSeries;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -129,7 +126,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
@@ -167,35 +164,18 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public void closing() {
         // TODO Auto-generated method stub
     }
-    
+
     @Override
     public void update() {
-
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                // Add the data
-                
-                // Trim appropriately if fixed width
-                if (model.isFixedWidth()) {
-                    // System.out.println("Dataset Size: " + dataset.getSeries(0).getItemCount());
-                    for (Iterator iterator = model.getDataset().getSeries()
-                            .iterator(); iterator.hasNext();) {
-                        XYSeries series = (XYSeries) iterator.next();
-                        if (series.getItemCount() > model.getMaxSize()) {
-                            series.remove(0);
-                        }
-                    }
-                }
-        
-                for (Consumer consumer : getConsumers()) {
-                    TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
-                    model.getDataset().getSeries(t_consumer.getIndex()).add(
-                            getWorkspace().getTime(), t_consumer.getValue());
-                }
-            }
-        });
+        model.update();
+        for (Consumer consumer : getConsumers()) {
+            TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
+            model.addData(t_consumer.getIndex().intValue(), getWorkspace()
+                    .getTime().doubleValue(), t_consumer.getValue()
+                    .doubleValue());
+        }
     }
- 
+
     @Override
     public String getXML() {
         return TimeSeriesModel.getXStream().toXML(model);

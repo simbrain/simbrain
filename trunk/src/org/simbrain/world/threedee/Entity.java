@@ -5,30 +5,31 @@ import java.util.List;
 /**
  * Abstraction that defines a entity in the environment that agents
  * may interact with.
- * 
+ *
  * @author Matt Watson
  */
 public interface Entity {
+
     /** The default odor strength. */
     double DEFAULT_ODOR_STRENGTH = 1;
-    
+
     /**
      * Returns the odors that this entity produces.
-     * 
+     *
      * @return The odors that this entity produces.
      */
     List<Odor> getOdors();
-    
+
     /**
      * Return the current location.
      *
      * @return the current location
      */
     Point getLocation();
-    
+
     /**
      * Holds the name of the odor and it's strength.
-     * 
+     *
      * @author Matt Watson
      */
     class Odor {

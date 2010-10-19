@@ -4,7 +4,7 @@ import com.jme.renderer.Camera;
 
 /**
  * Interface of an element that can be the vantage point of a view.
- * 
+ *
  * @author Matt Watson
  */
 public interface Viewable {
@@ -15,7 +15,7 @@ public interface Viewable {
 
     /**
      * Renders the view.
-     * 
+     *
      * @param camera the camera
      */
     void render(Camera camera);

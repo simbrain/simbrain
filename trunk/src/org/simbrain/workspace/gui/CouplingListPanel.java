@@ -36,13 +36,13 @@ import javax.swing.border.Border;
 
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingComponentListener;
+import org.simbrain.workspace.CouplingListener;
 
 /**
  * Displays a list of the current couplings in the network.
  *
  */
-public class CouplingListPanel extends JPanel implements CouplingComponentListener, ActionListener {
+public class CouplingListPanel extends JPanel implements CouplingListener, ActionListener {
 
     /** List of network couplings. */
     private JList couplings = new JList();
@@ -102,7 +102,7 @@ public class CouplingListPanel extends JPanel implements CouplingComponentListen
     /**
      * Updates the list of couplings when new couplings are made.
      */
-    public void couplingListUpdated() {
+    private void couplingsUpdated() {
         couplingList = new Vector(desktop.getWorkspace().getCouplingManager().getCouplings());
         couplings.setListData(couplingList);
     }
@@ -119,9 +119,8 @@ public class CouplingListPanel extends JPanel implements CouplingComponentListen
                 desktop.getWorkspace().getCouplingManager().removeCouplings(getSelectedCouplings());
             }
         }
-        
     }
-    
+
     /**
      * Returns consumers selected in consumer list.
      * @return selected consumers.
@@ -132,6 +131,20 @@ public class CouplingListPanel extends JPanel implements CouplingComponentListen
             ret.add((Coupling<?>) object);
         }
         return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void couplingAdded(Coupling coupling) {
+        couplingsUpdated();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void couplingRemoved(Coupling coupling) {
+        couplingsUpdated();
     }
 
 

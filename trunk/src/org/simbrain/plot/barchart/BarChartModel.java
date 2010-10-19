@@ -19,6 +19,7 @@
 package org.simbrain.plot.barchart;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.plot.ChartModel;
@@ -127,6 +128,20 @@ public class BarChartModel extends ChartModel {
     public static XStream getXStream() {
         XStream xstream = ChartModel.getXStream();
         return xstream;
+    }
+
+    /**
+     * Set value of a specified bar.
+     *
+     * @param value value of bar
+     * @param index which bar value to set
+     */
+    public void setValue(final Double value, final Integer index) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                getDataset().setValue(value, new Integer(1), index);
+            }
+        });
     }
 
     /**

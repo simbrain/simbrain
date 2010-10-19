@@ -50,23 +50,24 @@ public class WorkspaceComponentDeserializer {
      * Deserializes a workspace component using the information from the
      * provided component and input stream.
      *
-     * @param component
+     * @param archivedComponent
      *            The component entry from the archive contents.
      * @param input
      *            The input stream to read data from.
      * @return The deserialized WorkspaceComponent.
      */
     @SuppressWarnings("unchecked")
-    WorkspaceComponent deserializeWorkspaceComponent(final ArchiveContents.Component component,
+    WorkspaceComponent deserializeWorkspaceComponent(
+            final ArchiveContents.ArchivedComponent archivedComponent,
             final InputStream input) {
         try {
-            Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>)
-              Class.forName(component.className);
+            Class<WorkspaceComponent> clazz = (Class<WorkspaceComponent>) Class
+                    .forName(archivedComponent.getClassName());
 
-            WorkspaceComponent wc = deserializeWorkspaceComponent(
-               clazz, component.name, input, null);
+            WorkspaceComponent wc = deserializeWorkspaceComponent(clazz,
+                    archivedComponent.getClassName(), input, null);
 
-            componentKeys.put(component.uri, wc);
+            componentKeys.put(archivedComponent.getUri(), wc);
             wc.setChangedSinceLastSave(false);
             return wc;
         } catch (ClassNotFoundException e) {

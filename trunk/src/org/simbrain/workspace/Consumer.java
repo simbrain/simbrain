@@ -1,19 +1,37 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace;
 
-import java.util.List;
-
 /**
- * A consumer is an object that contains two or more consuming attributes. If it
- * has just one consuming attribute use SingleAttributeConsumer.
+ * A wrapper for a public setter in a Simbrain object. The second component of a
+ * coupling, which "consumes" values of type E from a corresponding producer
+ * object.
+ *
+ * @param <E> the type of data taken by the setter.
  */
-public interface Consumer extends AttributeHolder {
+public interface Consumer<E> extends Attribute {
 
     /**
-     * Return an unmodifiable list of consuming attributes for this consumer.
-     * The list may be empty but may not be null.
+     * Set the value for this consuming attribute to <code>value</code>.
      *
-     * @return an unmodifiable list of consuming attributes for this consumer
+     * @param value value for this consuming attribute
      */
-    List<? extends ConsumingAttribute<?>> getConsumingAttributes();
+    void setValue(E value);
 
 }

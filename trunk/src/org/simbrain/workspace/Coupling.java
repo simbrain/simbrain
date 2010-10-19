@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace;
 
 import java.util.concurrent.Callable;
@@ -18,10 +36,10 @@ public final class Coupling<E> {
     private static final int ARBITRARY_PRIME = 59;
 
     /** Producing attribute for this coupling. */
-    private ProducingAttribute<E> producingAttribute;
+    private Producer<E> producer;
 
     /** Consuming attribute for this coupling. */
-    private ConsumingAttribute<E> consumingAttribute;
+    private Consumer<E> consumer;
 
     /** Value of buffer. */
     private E buffer;
@@ -30,24 +48,24 @@ public final class Coupling<E> {
      * Create a coupling between a specified consuming attribute, without yet
      * specifying the corresponding producing attribute.
      *
-     * @param consumingAttribute
+     * @param Consumer
      *            the attribute that consumes.
      */
-    public Coupling(final ConsumingAttribute<E> consumingAttribute) {
+    public Coupling(final Consumer<E> Consumer) {
         super();
-        this.consumingAttribute = consumingAttribute;
+        this.consumer = Consumer;
     }
 
     /**
      * Create a coupling between a specified producing attribute, without yet
      * specifying the corresponding consuming attribute.
      *
-     * @param producingAttribute
+     * @param Producer
      *            the attribute that produces.
      */
-    public Coupling(final ProducingAttribute<E> producingAttribute) {
+    public Coupling(final Producer<E> Producer) {
         super();
-        this.producingAttribute = producingAttribute;
+        this.producer = Producer;
     }
 
 
@@ -55,17 +73,17 @@ public final class Coupling<E> {
      * Create a new coupling between the specified producing attribute
      * and consuming attribute.
      *
-     * @param producingAttribute producing attribute for this coupling
-     * @param consumingAttribute consuming attribute for this coupling
+     * @param Producer producing attribute for this coupling
+     * @param Consumer consuming attribute for this coupling
      */
-    public Coupling(final ProducingAttribute<E> producingAttribute,
-                    final ConsumingAttribute<E> consumingAttribute) {
+    public Coupling(final Producer<E> Producer,
+                    final Consumer<E> Consumer) {
         LOGGER.debug("new Coupling");
-//        System.out.println("producing " + producingAttribute.getAttributeDescription());
-//        System.out.println("consuming " + consumingAttribute.getAttributeDescription());
+//        System.out.println("producing " + Producer.getAttributeDescription());
+//        System.out.println("consuming " + Consumer.getAttributeDescription());
 
-        this.producingAttribute = producingAttribute;
-        this.consumingAttribute = consumingAttribute;
+        this.producer = Producer;
+        this.consumer = Consumer;
     }
 
 
@@ -74,12 +92,12 @@ public final class Coupling<E> {
      */
     public void setBuffer() {
         final WorkspaceComponent producerComponent
-            = producingAttribute.getParent().getParentComponent();
+            = producer.getParentComponent();
 
         try {
             buffer = Workspace.syncRest(producerComponent.getLocks().iterator(), new Callable<E>() {
                 public E call() throws Exception {
-                    return producingAttribute.getValue();
+                    return producer.getValue();
                 }
             });
         } catch (Exception e) {
@@ -94,20 +112,20 @@ public final class Coupling<E> {
      * Update this coupling.
      */
     public void update() {
-        if ((consumingAttribute != null) && (producingAttribute != null)) {
+        if ((consumer != null) && (producer != null)) {
             final WorkspaceComponent consumerComponent
-                = consumingAttribute.getParent().getParentComponent();
+                = consumer.getParentComponent();
             try {
                 Workspace.syncRest(consumerComponent.getLocks().iterator(),
                         new Callable<E>() {
                             public E call() throws Exception {
-                                consumingAttribute.setValue(buffer);
-                                LOGGER.debug(consumingAttribute.getParent()
+                                consumer.setValue(buffer);
+                                LOGGER.debug(consumer.getParentComponent()
                                         .getDescription()
                                         + " just consumed "
-                                        + producingAttribute.getValue()
+                                        + producer.getValue()
                                         + " from "
-                                        + producingAttribute.getParent()
+                                        + producer.getParentComponent()
                                                 .getDescription());
 
                                 return null;
@@ -122,17 +140,17 @@ public final class Coupling<E> {
 
 
     /**
-     * @return the producingAttribute
+     * @return the Producer
      */
-    public ProducingAttribute<E> getProducingAttribute() {
-        return producingAttribute;
+    public Producer<E> getProducer() {
+        return producer;
     }
 
     /**
-     * @return the consumingAttribute
+     * @return the Consumer
      */
-    public ConsumingAttribute<E> getConsumingAttribute() {
-        return consumingAttribute;
+    public Consumer<E> getConsumer() {
+        return consumer;
     }
 
     /**
@@ -145,21 +163,21 @@ public final class Coupling<E> {
         String producerComponent = "";
         String consumerString;
         String consumerComponent = "";
-        if (producingAttribute == null) {
+        if (producer == null) {
             producerString = "Null";
         } else {
-            producerComponent =  "[" + producingAttribute.getParent().getParentComponent().toString() +"]";
-            producerString = producingAttribute.getAttributeDescription();
+            producerComponent =  "[" + producer.getParentComponent().toString() +"]";
+            producerString = producer.getDescription();
         }
-        if (consumingAttribute == null) {
+        if (consumer == null) {
             consumerString = "Null";
         } else {
-            consumerComponent = "[" + consumingAttribute.getParent().getParentComponent().toString() +"]";
-            consumerString = consumingAttribute.getAttributeDescription();
+            consumerComponent = "[" + consumer.getParentComponent().toString() +"]";
+            consumerString = consumer.getDescription();
         }
         return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
      }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -167,8 +185,8 @@ public final class Coupling<E> {
         if (o instanceof Coupling) {
             Coupling<?> other = (Coupling<?>) o;
             
-            return other.producingAttribute.equals(producingAttribute)
-                && other.consumingAttribute.equals(consumingAttribute);
+            return other.producer.equals(producer)
+                && other.consumer.equals(consumer);
         } else {
             return false;
         }
@@ -177,6 +195,6 @@ public final class Coupling<E> {
      * {@inheritDoc}
      */
     public int hashCode() {
-        return producingAttribute.hashCode() + (ARBITRARY_PRIME * consumingAttribute.hashCode());
+        return producer.hashCode() + (ARBITRARY_PRIME * consumer.hashCode());
     }
 }

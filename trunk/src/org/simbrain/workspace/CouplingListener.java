@@ -19,19 +19,24 @@
 package org.simbrain.workspace;
 
 /**
- * A wrapper for a public getter in a Simbrain object. The first component of a
- * coupling, which "produces" values of type E for a corresponding consumer
- * object which wraps a setter method on another object.
+ * Listener for coupling related events.
  *
- * @param <E> the type of data returned by the getter.
  */
-public interface Producer<E> extends Attribute {
+public interface CouplingListener {
+
 
     /**
-     * Return the value for this producer.
+     * Called when a coupling is added.
      *
-     * @return the value for this producer
+     * @param coupling the new coupling
      */
-    E getValue();
+    public void couplingAdded(Coupling coupling);
+
+    /**
+     * Called when a coupling is removed.
+     *
+     * @param coupling the coupling that is being removed
+     */
+    public void couplingRemoved(Coupling coupling);
 
 }

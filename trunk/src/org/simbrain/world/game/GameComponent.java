@@ -26,7 +26,7 @@ public class GameComponent extends WorkspaceComponent {
      */
     public GameComponent() {
         super("Tic Tac Toe");
-        addConsumer(attributes);
+        //addConsumer(attributes);
     }
 
     /**

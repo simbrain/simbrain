@@ -19,14 +19,30 @@
 package org.simbrain.workspace;
 
 /**
- * Interface for updating components when couplings are changed.
+ * Listener for attribute related events, broadly (this includes potential
+ * attributes and attribute types).
  *
+ * @author jyoshimi
  */
-public interface CouplingComponentListener {
+public interface AttributeListener {
 
     /**
-     * Called when couplings are updated.
+     * The visibility of an attribute type changed.
      */
-    void couplingListUpdated();
+    public void attributeTypeVisibilityChanged();
+
+    /**
+     * Potential attributes have changed in some way, such that the list of
+     * potential attributes for a given workspace component is changed.
+     */
+    public void potentialAttributesChanged();
+
+    /**
+     * The base object of an attribute has been removed. The corresponding
+     * coupling should therefore be deleted.
+     *
+     * @param object the removed object.
+     */
+    public void attributeObjectRemoved(Object object);
 
 }

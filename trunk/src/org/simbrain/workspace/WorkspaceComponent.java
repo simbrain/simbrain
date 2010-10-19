@@ -19,16 +19,14 @@
 package org.simbrain.workspace;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.ComponentUpdatePart;
@@ -51,23 +49,17 @@ public abstract class WorkspaceComponent {
     /** The set of all WorkspaceComponentListeners on this component. */
     private final Collection<WorkspaceComponentListener> workspaceComponentListeners;
 
-    /** Consumer list. */
-    private final List<Consumer> consumers;
-
-    /** Producer list. */
-    private final List<Producer> producers;
-
-    /** Available attribute types. */
-    protected final List<String> attributeTypes;
-
     /** List of attribute listeners. */
-    private final Collection<AttributeHolderListener> attributeListeners;
+    private final Collection<AttributeListener> attributeListeners;
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
-    
-    /** Update priority. */
-    private int updatePriority;
+
+    /** List of producer types. */
+    private final List<AttributeType> producerTypes = new ArrayList<AttributeType>();
+
+    /** List of consumer types. */
+    private final List<AttributeType> consumerTypes = new ArrayList<AttributeType>();
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
@@ -103,11 +95,8 @@ public abstract class WorkspaceComponent {
      * Initializer
      */
     {
-        consumers = new CopyOnWriteArrayList<Consumer>();
-        producers = new CopyOnWriteArrayList<Producer>();
-        attributeTypes = new ArrayList<String>();
         workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
-        attributeListeners = new HashSet<AttributeHolderListener>();
+        attributeListeners = new HashSet<AttributeListener>();
     }
 
     /**
@@ -162,6 +151,416 @@ public abstract class WorkspaceComponent {
     }
 
     /**
+     * Return the potential consumers associated with this component. Subclasses
+     * should override this to make their consumers available.
+     *
+     * @return the consumer list.
+     */
+    public List<PotentialConsumer> getPotentialConsumers() {
+        return Collections.EMPTY_LIST;
+    }
+
+    /**
+     * Return the potential producers associated with this component. Subclasses
+     * should override this to make their producers available.
+     *
+     * @return the producer list.
+     */
+    public List<PotentialProducer> getPotentialProducers() {
+        return Collections.EMPTY_LIST;
+    }
+
+    /**
+     * Fire attribute object removed event (when the base object of an attribute
+     * is removed).
+     *
+     * @param object the object which was removed
+     */
+    public void fireAttributeObjectRemoved(Object object) {
+        for (AttributeListener listener : attributeListeners) {
+            listener.attributeObjectRemoved(object);
+        }
+    }
+
+    /**
+     * Fire potential attributes changed event.
+     */
+    public void firePotentialAttributesChanged() {
+        for (AttributeListener listener : attributeListeners) {
+            listener.potentialAttributesChanged();
+        }
+    }
+
+    /**
+     * Fire attribute type visibility changed event.
+     *
+     * @param type the type whose visibility changed.
+     */
+    public void fireAttributeTypeVisibilityChanged(AttributeType type) {
+        for (AttributeListener listener : attributeListeners) {
+            listener.attributeTypeVisibilityChanged();
+        }
+
+    }
+
+    /**
+     * Adds a AttributeListener to this component.
+     *
+     * @param listener the AttributeListener to add.
+     */
+    public void addAttributeListener(final AttributeListener listener) {
+        attributeListeners.add(listener);
+    }
+
+    /**
+     * Removes an AttributeListener from this component.
+     *
+     * @param listener the AttributeListener to remove.
+     */
+    public void removeAttributeListener(AttributeListener listener) {
+        attributeListeners.remove(listener);
+    }
+
+    /**
+     * Add a new type of producer.
+     *
+     * @param type type to add
+     */
+    public void addProducerType(AttributeType type) {
+        producerTypes.add(type);
+    }
+
+    /**
+     * Add a new type of consumer.
+     *
+     * @param type type to add
+     */
+    public void addConsumerType(AttributeType type) {
+        consumerTypes.add(type);
+    }
+
+    /**
+     * Create a producer. This version of the method does the real work; others
+     * forward to it.
+     *
+     * @param parentObject parent object
+     * @param methodBaseName name of method
+     * @param dataType type of data
+     * @param description description
+     * @return the resulting producer
+     */
+    public Producer<?> createProducer(
+            final Object parentObject,
+            final String methodBaseName,
+            final Class<?> dataType,
+            final String description) {
+
+        Producer<?> producer = new Producer() {
+
+            private Method theMethod;
+
+            // Static initializer
+            {
+                try {
+                    theMethod = parentObject.getClass().getMethod(
+                            "get" + methodBaseName, null);
+                } catch (SecurityException e1) {
+                    e1.printStackTrace();
+                } catch (NoSuchMethodException e1) {
+                    System.err.println("Could not find method "
+                            + methodBaseName + " with return type of "
+                            + dataType.getCanonicalName());
+                    e1.printStackTrace();
+                }
+
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public Object getValue() {
+                try {
+                    return theMethod.invoke(parentObject, null);
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public WorkspaceComponent getParentComponent() {
+                return WorkspaceComponent.this;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public Object getBaseObject() {
+                return parentObject;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public String getMethodBaseName() {
+                return methodBaseName;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public Class<?> getDataType() {
+                return dataType;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public String getDescription() {
+                return description;
+            }
+
+        };
+        return producer;
+
+    }
+
+
+    /**
+     * Create a producer without specifying a custom description (the
+     * description is created automatically).
+     *
+     * @param baseObject
+     *            base object
+     * @param methodBaseName
+     *            method name
+     * @param dataType
+     *            data type
+     * @return created producer
+     */
+    public Producer<?> createProducer(final Object baseObject,
+            final String methodBaseName, final Class<?> dataType) {
+        String description = getDescriptionString(baseObject, methodBaseName, dataType);
+        return createProducer(baseObject, methodBaseName, dataType, description);
+    }
+
+    /**
+     * Create an actual producer from a potential producer.
+     *
+     * @param potentialAttribute the potential attribute to actualize
+     * @return the resulting producer
+     */
+    public Producer<?> createProducer(final PotentialAttribute potentialAttribute) {
+        return createProducer(potentialAttribute.getBaseObject(), potentialAttribute
+                .getMethodBaseName(), potentialAttribute.getDataType(),
+                potentialAttribute.getDescription());
+    }
+
+    /**
+     * Create a consumer. This version of the method does the real work; others
+     * forward to it.
+     *
+     * @param parentObject parent object
+     * @param methodBaseName name of method
+     * @param dataType type of data
+     * @param description description
+     * @return the resulting consumer
+     */
+    public Consumer<?> createConsumer(final Object parentObject,
+            final String methodBaseName, final Class<?> dataType,
+            final String description) {
+
+        Consumer<?> consumer = new Consumer() {
+
+            Method theMethod;
+
+            // Static initializer
+            {
+                try {
+                    theMethod = parentObject.getClass().getMethod(
+                            "set" + methodBaseName, new Class[] { dataType });
+                } catch (SecurityException e1) {
+                    e1.printStackTrace();
+                } catch (NoSuchMethodException e1) {
+                    System.err.println("Could not find method "
+                            + methodBaseName + " with argument of type of "
+                            + dataType.getCanonicalName());
+                    e1.printStackTrace();
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void setValue(Object value) {
+                try {
+                    theMethod.invoke(parentObject, new Object[] { value });
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public WorkspaceComponent getParentComponent() {
+                return WorkspaceComponent.this;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public Object getBaseObject() {
+                return parentObject;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public String getMethodBaseName() {
+                return methodBaseName;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public Class<?> getDataType() {
+                return dataType;
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public String getDescription() {
+                return description;
+            }
+
+        };
+        return consumer;
+
+    }
+
+    /**
+     * Create a consumer using
+     *  1) Parent Object
+     *  2) Method name
+     *  3) Data type
+     *  Description is automatically created.
+     */
+    public Consumer<?> createConsumer(final Object baseObject,
+            final String methodBaseName, final Class<?> dataType) {
+        String description = getDescriptionString(baseObject, methodBaseName, dataType);
+        return createConsumer(baseObject, methodBaseName, dataType, description);
+    }
+
+    /**
+     * Create an actual consumer from a potential consumer.
+     *
+     * @param potentialAttribute the potential attribute to actualize
+     * @return the resulting consumer
+     */
+    public Consumer<?> createConsumer(final PotentialAttribute potentialAttribute) {
+        return createConsumer(potentialAttribute.getBaseObject(), potentialAttribute
+                .getMethodBaseName(), potentialAttribute.getDataType(),
+                potentialAttribute.getDescription());
+    }
+
+    /**
+     * Returns a formatted description string
+     *
+     * @param baseObject base object
+     * @param methodBaseName base name of method
+     * @param dataType class of data
+     * @return formatted string
+     */
+    private String getDescriptionString(Object baseObject,
+            String methodBaseName, Class<?> dataType) {
+        return baseObject.getClass().getSimpleName() + ":" + methodBaseName
+                + "<" + dataType.getSimpleName() + ">";
+    }
+
+    /**
+     * Finds objects based on a key. Used in deserializing attributes. Any class
+     * that produces attributes should override this for serialization.
+     *
+     * @param objectKey String key
+     * @return the corresponding object
+     */
+    public Object getObjectFromKey(final String objectKey) {
+        return null;
+    }
+
+    /**
+     * Returns a unique key associated with an object. Used in serializing
+     * attributes. Any class that produces attributes should override this for
+     * serialization.
+     *
+     * @param object object which should be associated with a key
+     * @return the key
+     */
+    public String getKeyFromObject(Object object) {
+        return null;
+    }
+
+
+    /**
+     * Find the potential producer whose base object matches the supplied
+     * object.
+     *
+     * @param baseObject object to match
+     * @param methodName method name to match
+     * @return matching producer, or null if there is none.
+     */
+    public PotentialAttribute getPotentialProducer(Object baseObject,
+            String methodName) {
+        for (PotentialAttribute producer : this.getPotentialProducers()) {
+            boolean baseObjectMatches = (producer.getBaseObject() == baseObject);
+            boolean methodNameMatches = (producer.getMethodBaseName()
+                    .equalsIgnoreCase(methodName));
+            if (baseObjectMatches && methodNameMatches) {
+                return producer;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find the potential consumer whose base object matches the supplied
+     * object.
+     *
+     * @param baseObject object to match
+     * @param methodName method name to match
+     * @return matching producer, or null if there is none.
+     */
+    public PotentialAttribute getPotentialConsumer(Object baseObject,
+            String methodName) {
+        for (PotentialAttribute consumer : this.getPotentialConsumers()) {
+            boolean baseObjectMatches = (consumer.getBaseObject() == baseObject);
+            boolean methodNameMatches = (consumer.getMethodBaseName()
+                    .equalsIgnoreCase(methodName));
+            if (baseObjectMatches && methodNameMatches) {
+                return consumer;
+            }
+        }
+        return null;
+    }
+    /**
      * Returns the collection of update parts for this component.
      *
      * @return The collection of update parts for this component.
@@ -173,7 +572,8 @@ public abstract class WorkspaceComponent {
             }
         };
 
-        return Collections.singleton(new ComponentUpdatePart(this, callable, toString(), this));
+        return Collections.singleton(new ComponentUpdatePart(this, callable,
+                toString(), this));
     }
 
     /**
@@ -255,32 +655,7 @@ public abstract class WorkspaceComponent {
         workspaceComponentListeners.remove(listener);
     }
     
-    /**
-     * Returns the Attribute Listeners on this component.
-     * 
-     * @return The Attribute Listeners on this component.
-     */
-    public Collection<AttributeHolderListener> getAttributeListeners() {
-        return Collections.unmodifiableCollection(attributeListeners);
-    }
 
-    /**
-     * Adds a AttributeHolderListener to this component.
-     *
-     * @param listener the AttributeHolderListener to add.
-     */
-    public void addAttributeListener(final AttributeHolderListener listener) {
-        attributeListeners.add(listener);
-    }
-
-    /**
-     * Adds a AttributeHolderListener to this component.
-     *
-     * @param listener the AttributeHolderListener to add.
-     */
-    public void removeAttributeListener(final AttributeHolderListener listener) {
-        attributeListeners.remove(listener);
-    }
 
     /**
      * Returns the name of this component.
@@ -325,55 +700,7 @@ public abstract class WorkspaceComponent {
         return simpleName;
     }
 
-    /**
-     * Return producing attributes in a particular order, for use in creating
-     * couplings.
-     *
-     * Can be overridden if the attributes should be displayed in some special
-     * order.
-     *
-     * @return custom list of producing attributes.
-     */
-    public ArrayList<ProducingAttribute<?>> getProducingAttributes() {
 
-        ArrayList<ProducingAttribute<?>> list = new ArrayList<ProducingAttribute<?>>();
-
-        for (Producer producer : this.getProducers()) {
-            for (ProducingAttribute<?> attribute : producer
-                    .getProducingAttributes()) {
-                list.add(attribute);
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Return consuming attributes in a specified order.
-     *
-     * Can be overridden if the attributes should be displayed in some special
-     * order.
-     *
-     * @return custom list of producing attributes.
-     */
-    public ArrayList<ConsumingAttribute<?>> getConsumingAttributes() {
-
-        ArrayList<ConsumingAttribute<?>> list = new ArrayList<ConsumingAttribute<?>>();
-        for (Consumer consumer : this.getConsumers()) {
-            for (ConsumingAttribute<?> attribute : consumer
-                    .getConsumingAttributes()) {
-                list.add(attribute);
-            }
-        }
-        return list;
-    }
-    
-//    public void addAttribute(Class<?> producerType, Attribute attribute) {
-//        for (Producer producer : producers) {
-//            if (producer.getClass() == producerType) {
-//                // producer.addAttribute(attribute);
-//            }
-//        }
-//    }
 
     /**
      * Override for use with open service.
@@ -384,282 +711,7 @@ public abstract class WorkspaceComponent {
         return null;
     }
 
-    /**
-     * Returns the producers associated with this component.
-     *
-     * @return The producers associated with this component.
-     */
-    public List<Producer> getProducers() {
-        return producers;
-    }
-    
-    /**
-     * Returns the consumers associated with this component.
-     * 
-     * @return The consumers associated with this component.
-     */
-    public List<Consumer> getConsumers() {
-        return consumers;
-    }
 
-    /**
-     * Returns true if the component contains the consumer, false otherwise.
-     *
-     * @param consumer the consumer to check
-     * @return true if the component contains the consumer
-     */
-    public boolean containsConsumer(final Consumer consumer) {
-        if (this.getConsumer(consumer.getDescription()) != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Returns true if the component contains the producer, false otherwise.
-     *
-     * @param producer the producer to check
-     * @return true if the component contains the producer
-     */
-    public boolean containsProducer(final Producer producer) {
-        if (this.getProducer(producer.getDescription()) != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Adds the specified consumer.
-     *
-     * @param consumer consumer to add.
-     */
-    public void addConsumer(final Consumer consumer) {
-        if (!containsConsumer(consumer)) {
-            consumers.add(consumer);
-            for (AttributeHolderListener listener : attributeListeners) {
-                listener.consumerAdded(consumer);
-            }
-        }
-    }
-
-    /**
-     * Adds the specified producer.
-     *
-     * @param producer producer to add.
-     */
-    public void addProducer(final Producer producer) {
-        if (!containsProducer(producer)) {
-            producers.add(producer);
-            for (AttributeHolderListener listener : attributeListeners) {
-                listener.producerAdded(producer);
-            }
-        }
-    }
-
-    /**
-     * Removes specified consumer.
-     *
-     * @param consumer consumer to remove
-     */
-    public void removeConsumer(final Consumer consumer) {
-        workspace.getCouplingManager().removeAttachedCouplings(consumer);
-        consumers.remove(consumer);
-        for (AttributeHolderListener listener : attributeListeners) {
-            listener.consumerRemoved(consumer);
-        }
-    }
-
-    /**
-     * Removes specified producer.
-     *
-     * @param producer producer to remove
-     */
-    public void removeProducer(final Producer producer) {
-        workspace.getCouplingManager().removeAttachedCouplings(producer);
-        producers.remove(producer);
-        for (AttributeHolderListener listener : attributeListeners) {
-            listener.producerRemoved(producer);
-        }
-    }
-
-    /**
-     * Remove all producers of the specified type.
-     *
-     * @param producerType the type of producer to be removed
-     */
-    public void removeProducers(final Class<?> producerType) {
-        for (Producer producer : producers) {
-            if (producer.getClass() == producerType) {
-                removeProducer(producer);
-            }
-        }
-    }
-
-    /**
-     * Remove all consumers of the specified type.
-     *
-     * @param consumerType the type of consumer to be removed
-     */
-    public void removeConsumers(final Class<?> consumerType) {
-        for (Consumer consumer : consumers) {
-            if (consumer.getClass() == consumerType) {
-                removeConsumer(consumer);
-            }
-        }
-    }
-
-    /**
-     * Get a SingleConsumingAttribute by name.
-     *
-     * @param consumerId id of single consuming attribute
-     * @return the attribute
-     */
-    public ConsumingAttribute<?> getSingleConsumingAttribute(final String consumerId) {
-        for (Consumer consumer : getConsumers()) {
-            if (consumer instanceof SingleAttributeConsumer) {
-                if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
-                    return ((SingleAttributeConsumer<?>)consumer).getAttribute();
-                }
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * Get a SingleProducingAttribute by id.
-     *
-     * @param producerId id of single producing attribute
-     * @return the attribute
-     */
-    public ProducingAttribute<?> getSingleProducingAttribute(final String producerId) {
-        for (Producer producer : getProducers()) {
-            if (producer instanceof SingleAttributeProducer) {
-                if (producer.getDescription().equalsIgnoreCase(producerId)) {
-                    return ((SingleAttributeProducer<?>)producer).getAttribute();
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-    * Finds a consumer by name and returns it, or null if it is not found.
-    *
-    * @param consumerId the name of the consumer (attribute holder)
-    * @return the the consumer
-    */
-    public Consumer getConsumer(final String consumerId) {
-        for (Consumer consumer : getConsumers()) {
-            //System.out.println(consumerId + "==" + consumer.getDescription() + "?");
-            if (consumer.getDescription().equalsIgnoreCase(consumerId)) {
-                //System.out.println(consumer.getDescription() + "==" + consumerId + "?");
-                return consumer;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get a consuming attribute, using the id of the attribute holder and the attribute itself.
-     *
-     * @param consumerId the name of the consumer (attribute holder)
-     * @param attributeId the name of the attribute
-     * @return the consuming attribute
-     */
-    public ConsumingAttribute<?> getConsumingAttribute(final String consumerId,
-            final String attributeId) {
-        Consumer consumer = getConsumer(consumerId);
-        if (consumer != null) {
-            for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
-                //System.out.println(attribute.getKey() + "==" + attributeId + "?");
-                if (attribute.getKey().equals(attributeId)) {
-                    return attribute;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Finds a producer by name and returns it, or none if it is not found.
-     *
-     * @param producerId the name of the producer (attribute holder)
-     * @return the producer
-     */
-    public Producer getProducer(final String producerId) {
-        for (Producer producer : getProducers()) {
-            // System.out.println(producerId + "==" + producer.getDescription()
-            // + "?");
-            if (producer.getDescription().equalsIgnoreCase(producerId)) {
-                return producer;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get a producing attribute, using the id of the attribute holder and the attribute itself.
-     *
-     * @param producerId the name of the producing (attribute holder)
-     * @param attributeId the name of the attribute
-     * @return the producing attribute
-     */
-    public ProducingAttribute<?> getProducingAttribute(final String producerId,
-            final String attributeId) {
-        Producer producer = getProducer(producerId);
-        if (producer != null) {
-            for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
-                if (attribute.getKey().equals(attributeId)) {
-                    return attribute;
-                }
-            }
-        }
-        return null;
-    }
-    
-    public ProducingAttribute<Double> createDoubleProducingAttribute(final Producer producer,
-            final String getterName, final String key, final String description) {
-        if (producer == null) {
-            return null;
-        } else {
-            return new ProducingAttribute<Double>() {
-                public Producer getParent() {
-                    return producer;
-                }
-                public Double getValue() {
-                    Method theMethod = null;
-                    Double theVal = new Double(0);
-                    try {
-                        theMethod = producer.getClass().getMethod(getterName,(Class[]) null);
-                    } catch (SecurityException e1) {
-                        e1.printStackTrace();
-                    } catch (NoSuchMethodException e1) {
-                        e1.printStackTrace();
-                    }
-
-                    try {
-                        if (theMethod != null) {
-                            theVal = (Double) theMethod.invoke(producer, null);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return theVal;
-                }
-
-                public String getAttributeDescription() {
-                    return description;
-                }
-
-                public String getKey() {
-                    return key;
-                }
-            };
-        }
-    }
 
 
     /**
@@ -808,24 +860,17 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * @return the attributeTypes
+     * @return the producerTypes
      */
-    public List<String> getAttributeTypes() {
-        return attributeTypes;
+    public List<AttributeType> getProducerTypes() {
+        return producerTypes;
     }
 
     /**
-     * @return the updatePriority
+     * @return the consumerTypes
      */
-    public int getUpdatePriority() {
-        return updatePriority;
-    }
-
-    /**
-     * @param updatePriority the updatePriority to set
-     */
-    public void setUpdatePriority(int updatePriority) {
-        this.updatePriority = updatePriority;
+    public List<AttributeType> getConsumerTypes() {
+        return consumerTypes;
     }
 
 }

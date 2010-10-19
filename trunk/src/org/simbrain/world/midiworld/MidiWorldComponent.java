@@ -2,20 +2,15 @@ package org.simbrain.world.midiworld;
 
 import java.io.OutputStream;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 import promidi.Controller;
 import promidi.MidiIO;
 import promidi.MidiOut;
 import promidi.Note;
 import promidi.ProgramChange;
+
+//TODO: See pre revision 2252 for some specific consumer, producer types
 
 /**
  * MIDI world component.
@@ -73,8 +68,8 @@ public final class MidiWorldComponent
      */
     void addController(final int number, final int value) {
         Controller controller = new Controller(number, value);
-        MidiControllerConsumer consumer = new MidiControllerConsumer(controller, this);
-        getConsumers().add(consumer);
+//        MidiControllerConsumer consumer = new MidiControllerConsumer(controller, this);
+//        getConsumers().add(consumer);
         // fire event?
     }
 
@@ -88,8 +83,8 @@ public final class MidiWorldComponent
      */
     void addNote(final int pitch, final int velocity, final int length) {
         Note note = new Note(pitch, velocity, length);
-        MidiNoteConsumer consumer = new MidiNoteConsumer(note, this);
-        getConsumers().add(consumer);
+//        MidiNoteConsumer consumer = new MidiNoteConsumer(note, this);
+//        getConsumers().add(consumer);
         // fire event?
     }
 
@@ -101,8 +96,11 @@ public final class MidiWorldComponent
      */
     void addProgramChange(final int number) {
         ProgramChange programChange = new ProgramChange(number);
-        MidiProgramChangeConsumer consumer = new MidiProgramChangeConsumer(programChange, this);
-        getConsumers().add(consumer);
+//        MidiProgramChangeConsumer consumer = new MidiProgramChangeConsumer(programChange, this);
+//        getConsumers().add(consumer);
         // fire event?
     }
+
+    
+    
 }

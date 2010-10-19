@@ -18,13 +18,9 @@
  */
 package org.simbrain.plot.scatterplot;
 
-import java.awt.EventQueue;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.simbrain.plot.ChartListener;
-import org.simbrain.plot.barchart.BarChartConsumer;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -78,10 +74,12 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        this.getConsumers().clear();
-        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-            addConsumer(new ScatterPlotConsumer(this, i));
-        }
+        
+        //TODO: REDO
+//        this.getConsumers().clear();
+//        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+//            addConsumer(new ScatterPlotConsumer(this, i));
+//        }
     }
 
     /**
@@ -89,25 +87,27 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      */
     private void addListener() {
         
-        model.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceAdded(final int index) {
-                ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(ScatterPlotComponent.this, index);
-                addConsumer(newAttribute);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceRemoved(final int index) {
-                ScatterPlotConsumer toBeRemoved = (ScatterPlotConsumer) getConsumers().get(index);
-                removeConsumer(toBeRemoved);
-            }
-            
-        });
+        //TODO: REDO
+        
+//        model.addListener(new ChartListener() {
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceAdded(final int index) {
+//                ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(ScatterPlotComponent.this, index);
+//                addConsumer(newAttribute);
+//            }
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceRemoved(final int index) {
+//                ScatterPlotConsumer toBeRemoved = (ScatterPlotConsumer) getConsumers().get(index);
+//                removeConsumer(toBeRemoved);
+//            }
+//            
+//        });
   }
 
     /**
@@ -152,22 +152,23 @@ public class ScatterPlotComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                // Constantly erase. How is performance for this version?
-                for (Consumer consumer : getConsumers()) {
-                    ScatterPlotConsumer s_consumer = (ScatterPlotConsumer) consumer;
-                    Integer index = s_consumer.getIndex();
-                    if (!model.isShowHistory()) {
-                        getModel().getDataset().getSeries(index).clear();
-                    }
-                    model.getDataset().getSeries(index).add(s_consumer.getX(),
-                            s_consumer.getY());
-                    // System.out.println("[" + consumer.getIndex() + "]:" +
-                    // dataset.getSeries(consumer.getIndex()).getItemCount());
-                }
-            }
-        });
+        //TODO: REDO
+//        EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                // Constantly erase. How is performance for this version?
+//                for (Consumer consumer : getConsumers()) {
+//                    ScatterPlotConsumer s_consumer = (ScatterPlotConsumer) consumer;
+//                    Integer index = s_consumer.getIndex();
+//                    if (!model.isShowHistory()) {
+//                        getModel().getDataset().getSeries(index).clear();
+//                    }
+//                    model.getDataset().getSeries(index).add(s_consumer.getX(),
+//                            s_consumer.getY());
+//                    // System.out.println("[" + consumer.getIndex() + "]:" +
+//                    // dataset.getSeries(consumer.getIndex()).getItemCount());
+//                }
+//            }
+//        });
     }
 
 }

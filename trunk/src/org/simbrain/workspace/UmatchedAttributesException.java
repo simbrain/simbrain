@@ -19,19 +19,18 @@
 package org.simbrain.workspace;
 
 /**
- * A wrapper for a public getter in a Simbrain object. The first component of a
- * coupling, which "produces" values of type E for a corresponding consumer
- * object which wraps a setter method on another object.
+ * Exception thrown when a coupling is created with mismatched attributes.
  *
- * @param <E> the type of data returned by the getter.
+ * @author jyoshimi
+ *
  */
-public interface Producer<E> extends Attribute {
+public class UmatchedAttributesException extends Exception {
 
     /**
-     * Return the value for this producer.
-     *
-     * @return the value for this producer
+     * @param arg0
      */
-    E getValue();
+    public UmatchedAttributesException(final String message) {
+        super(message);
+    }
 
 }

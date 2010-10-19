@@ -19,8 +19,6 @@
 package org.simbrain.workspace;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +29,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
@@ -58,7 +55,7 @@ public class Workspace {
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
 
     /** The coupling manager for this workspace. */
-    private final CouplingManager manager = new CouplingManager();
+    private final CouplingManager manager;
 
     /** List of workspace components. */
     private List<WorkspaceComponent> componentList = Collections
@@ -77,15 +74,15 @@ public class Workspace {
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
     /**
-     * Listeners on this workspace. The CopyOnWriteArrayList is not a problem because
-     * writes to this list are uncommon.
+     * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
+     * because writes to this list are uncommon.
      */
     private CopyOnWriteArrayList<WorkspaceListener> listeners =
         new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
-     * Mapping from workspace component types to integers which show how many have been added.
-     * For naming.
+     * Mapping from workspace component types to integers which show how many
+     * have been added. For naming.
      */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
@@ -95,15 +92,23 @@ public class Workspace {
     private Object updatorLock = new Object();
 
     /**
-     * Delay in milliseconds between update cycles. Used to artificially slow down
-     * simulation (sometimes useful in teaching).
+     * Delay in milliseconds between update cycles. Used to artificially slow
+     * down simulation (sometimes useful in teaching).
      */
     private int updateDelay = 0;
 
     /**
      * The updator used to manage component updates.
      */
-    private WorkspaceUpdator updator = new WorkspaceUpdator(this, manager);
+    private WorkspaceUpdator updator;
+
+    /**
+     * Construct a workspace.
+     */
+    public Workspace() {
+        manager = new CouplingManager(this);
+        updator = new WorkspaceUpdator(this, manager);
+    }
 
     /**
      * Adds a listener to the workspace.
@@ -123,6 +128,7 @@ public class Workspace {
         listeners.remove(listener);
     }
 
+
     /**
      * Couple each source attribute to all target attributes.
      *
@@ -131,35 +137,48 @@ public class Workspace {
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToMany(
-            final ArrayList<ProducingAttribute<?>> sourceAttributes,
-            final ArrayList<ConsumingAttribute<?>> targetAttributes) {
-        for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
-            for (ConsumingAttribute<?> consumingAttribute : targetAttributes) {
-                Coupling<?> coupling = new Coupling(producingAttribute, consumingAttribute);
-                getCouplingManager().addCoupling(coupling);
+            final List<PotentialProducer> sourceAttributes,
+            final List<PotentialConsumer> targetAttributes) {
+        for (PotentialProducer producingAttribute : sourceAttributes) {
+            for (PotentialConsumer  consumingAttribute : targetAttributes) {
+                Coupling<?> coupling = new Coupling(producingAttribute
+                        .createProducer(), consumingAttribute.createConsumer());
+                try {
+                    getCouplingManager().addCoupling(coupling);
+                } catch (UmatchedAttributesException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
-    
+
     /**
-     * Couple each source attribute to one target attribute, as long as there are target attributes
-     * to couple to.
-     * 
+     * Couple each source attribute to one target attribute, as long as there
+     * are target attributes to couple to.
+     *
      * @param sourceAttributes source producing attributes
-     * @param targetAttributes target producing attributes
+     * @param targetAttributes target consuming attributes
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToOne(
-            final ArrayList<ProducingAttribute<?>> sourceAttributes,
-            final ArrayList<ConsumingAttribute<?>> targetAttributes) {
-        Iterator<ConsumingAttribute<?>> consumingAttributes = targetAttributes.iterator();
-        for (ProducingAttribute<?> producingAttribute : sourceAttributes) {
-            if (consumingAttributes.hasNext()) {
-                Coupling<?> coupling = new Coupling(producingAttribute, consumingAttributes.next());
-                getCouplingManager().addCoupling(coupling);
+            final List<PotentialProducer> producerKeys, final List<PotentialConsumer> consumerKeys) {
+
+        Iterator<PotentialConsumer> consumerIterator = consumerKeys.iterator();
+
+        for (PotentialProducer  producerID : producerKeys) {
+            if (consumerIterator.hasNext()) {
+                Producer<?> producer = producerID.createProducer();
+                Consumer<?> consumer = consumerIterator.next().createConsumer();
+                Coupling<?> coupling = new Coupling(producer, consumer);
+                try {
+                    getCouplingManager().addCoupling(coupling);
+                } catch (UmatchedAttributesException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
+
 
     /**
      * Adds a workspace component to the workspace.
@@ -429,7 +448,7 @@ public class Workspace {
                             throw new IllegalStateException("no more elements");
                         }
                     }
-                    
+
                     return current.next();
                 }
 
@@ -437,15 +456,15 @@ public class Workspace {
                     throw new UnsupportedOperationException();
                 }
             };
-            
+
             return syncRest(locks, task);
         }
     }
-    
+
     /**
      * Recursively synchronizes on the next component in the iterator and executes
      * task if there are no more components.
-     * 
+     *
      * @param <E> The return type of task.
      * @param iterator The iterator of the remaining components to synchronize on.
      * @param task The task to synchronize.
@@ -489,26 +508,30 @@ public class Workspace {
 
     /**
      * Adds a coupling to the CouplingManager.
-     * 
+     *
      * @param coupling The coupling to add.
      */
     public void addCoupling(final Coupling<?> coupling) {
-        manager.addCoupling(coupling);
+        try {
+            manager.addCoupling(coupling);
+        } catch (UmatchedAttributesException e) {
+            e.printStackTrace();
+        }
     }
-    
+
     /**
      * Removes a coupling from the CouplingManager.
-     * 
+     *
      * @param coupling The coupling to remove.
      */
     public void removeCoupling(final Coupling<?> coupling) {
         manager.removeCoupling(coupling);
     }
-    
+
     /**
      * By default, the workspace is updated as followed: 1) Update couplings 2)
      * Call "update" on all workspacecomponents
-     * 
+     *
      * Sometimes this way of updating is not sufficient, and the user will want
      * updates (in the GUI, presses of the iterate and play buttons) to update
      * components and couplings in a different way.
@@ -574,6 +597,25 @@ public class Workspace {
     }
 
     /**
+     * Returns all components of the specified type, e.g. all
+     * WorkspaceComponents of type NetworkComponent.class.
+     *
+     * @param componentType the type of the component, in the sense of its class
+     * @return list of components
+     */
+    public Collection<? extends WorkspaceComponent> getComponentList(
+            Class<?> componentType) {
+        List<WorkspaceComponent> returnList = new ArrayList<WorkspaceComponent>();
+        for (WorkspaceComponent component : componentList) {
+            if (component.getClass() == componentType) {
+                returnList.add(component);
+            }
+        }
+        return returnList;
+    }
+
+
+    /**
      * Returns global time.
      *
      * @return the time
@@ -610,22 +652,6 @@ public class Workspace {
      */
     public void setUpdateDelay(int updateDelay) {
         this.updateDelay = updateDelay;
-    }
-
-    /**
-     * Returns all components of the specified type, e.g. all WorkspaceComponents of type NetworkComponent.class.
-     *
-     * @param componentType the type of the component, in the sense of its class
-     * @return list of components
-     */
-    public Collection<? extends WorkspaceComponent> getComponentList(Class componentType) {
-        List<WorkspaceComponent> returnList = new ArrayList<WorkspaceComponent>();
-        for (WorkspaceComponent component : componentList) {
-            if (component.getClass() == componentType) {
-                returnList.add(component);
-            }
-        }
-        return returnList;
     }
 
 }

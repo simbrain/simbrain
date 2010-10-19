@@ -43,6 +43,8 @@ import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * OSC world component.
+ * 
+ * TODO: For this and MIDI make sure to note that consumer, producer classes removed
  */
 public final class OscWorldComponent
     extends WorkspaceComponent {
@@ -171,42 +173,42 @@ public final class OscWorldComponent
 
     //TODO: Moving consumer, producer lists to top level breaks this stuff which uses glazed lists..
     
-    /**
-     * Add the specified OSC message consumer list event listener.
-     *
-     * @param listener OSC message consumer list event listener to add
-     */
-    void addConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
-//        getConsumers().addListEventListener(listener);
-    }
-
-    /**
-     * Remove the specified OSC message consumer list event listener.
-     *
-     * @param listener OSC message consumer list event listener to remove
-     */
-    void removeConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
- //       getConsumers().removeListEventListener(listener);
-    }
-
-
-    /**
-     * Add the specified OSC message producer list event listener.
-     *
-     * @param listener OSC message producer list event listener to add
-     */
-    void addProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
-   //     getConsumers().addListEventListener(listener);
-    }
-
-    /**
-     * Remove the specified OSC message producer list event listener.
-     *
-     * @param listener OSC message producer list event listener to remove
-     */
-    void removeProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
-//        getConsumers().removeListEventListener(listener);
-    }
+//    /**
+//     * Add the specified OSC message consumer list event listener.
+//     *
+//     * @param listener OSC message consumer list event listener to add
+//     */
+//    void addConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
+////        getConsumers().addListEventListener(listener);
+//    }
+//
+//    /**
+//     * Remove the specified OSC message consumer list event listener.
+//     *
+//     * @param listener OSC message consumer list event listener to remove
+//     */
+//    void removeConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
+// //       getConsumers().removeListEventListener(listener);
+//    }
+//
+//
+//    /**
+//     * Add the specified OSC message producer list event listener.
+//     *
+//     * @param listener OSC message producer list event listener to add
+//     */
+//    void addProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
+//   //     getConsumers().addListEventListener(listener);
+//    }
+//
+//    /**
+//     * Remove the specified OSC message producer list event listener.
+//     *
+//     * @param listener OSC message producer list event listener to remove
+//     */
+//    void removeProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
+////        getConsumers().removeListEventListener(listener);
+//    }
 
     /**
      * Add a new OSC in message with the specified address.
@@ -215,8 +217,8 @@ public final class OscWorldComponent
      *    <code>'/'</code> character
      */
     public void addInMessage(final String address) {
-        OscMessageProducer producer = new OscMessageProducer(address, this);
-        addProducer(producer);
+//        OscMessageProducer producer = new OscMessageProducer(address, this);
+ //       addProducer(producer);
     }
 
     /**
@@ -226,7 +228,7 @@ public final class OscWorldComponent
      *    <code>'/'</code> character
      */
     public void addOutMessage(final String address) {
-        OscMessageConsumer consumer = new OscMessageConsumer(address, this);
-        addConsumer(consumer);
+//        OscMessageConsumer consumer = new OscMessageConsumer(address, this);
+//        addConsumer(consumer);
     }
 }

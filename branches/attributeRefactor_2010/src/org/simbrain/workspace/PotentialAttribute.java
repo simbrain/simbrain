@@ -53,7 +53,7 @@ public class PotentialAttribute {
      * @param methodBaseName method name
      * @param dataType class of data
      */
-    public PotentialAttribute(WorkspaceComponent parent, Object object, String objectName,
+    protected PotentialAttribute(WorkspaceComponent parent, Object object, String objectName,
             String methodBaseName, Class dataType) {
         this.parent = parent;
         this.objectName = objectName;
@@ -63,13 +63,14 @@ public class PotentialAttribute {
     }
 
     /**
-     * Create a potential attribute using an attribute type object as a shortcut.
+     * Create a potential attribute using an attribute type object as a
+     * shortcut.
      *
      * @param parent parent object
      * @param objectName name of object
      * @param type attribute type of object
      */
-    public PotentialAttribute(WorkspaceComponent parent, Object object, String objectName, AttributeType type) {
+    protected PotentialAttribute(WorkspaceComponent parent, Object object, String objectName, AttributeType type) {
         this.parent = parent;
         this.objectName = objectName;
         this.baseObject = object;

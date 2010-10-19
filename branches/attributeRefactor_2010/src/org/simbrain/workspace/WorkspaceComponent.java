@@ -156,7 +156,7 @@ public abstract class WorkspaceComponent {
      *
      * @return the consumer list.
      */
-    public List<PotentialAttribute> getPotentialConsumers() {
+    public List<PotentialConsumer> getPotentialConsumers() {
         return Collections.EMPTY_LIST;
     }
 
@@ -166,7 +166,7 @@ public abstract class WorkspaceComponent {
      *
      * @return the producer list.
      */
-    public List<PotentialAttribute> getPotentialProducers() {
+    public List<PotentialProducer> getPotentialProducers() {
         return Collections.EMPTY_LIST;
     }
 

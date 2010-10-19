@@ -136,10 +136,10 @@ public class Workspace {
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToMany(
-            final List<PotentialAttribute> sourceAttributes,
-            final List<PotentialAttribute> targetAttributes) {
-        for (PotentialAttribute producingAttribute : sourceAttributes) {
-            for (PotentialAttribute  consumingAttribute : targetAttributes) {
+            final List<PotentialProducer> sourceAttributes,
+            final List<PotentialConsumer> targetAttributes) {
+        for (PotentialProducer producingAttribute : sourceAttributes) {
+            for (PotentialConsumer  consumingAttribute : targetAttributes) {
                 Coupling<?> coupling = new Coupling(producingAttribute
                         .createProducer(), consumingAttribute.createConsumer());
                 try {
@@ -160,14 +160,14 @@ public class Workspace {
      */
     @SuppressWarnings("unchecked")
     public void coupleOneToOne(
-            final List<PotentialAttribute> producerKeys, final List<PotentialAttribute> consumerKeys) {
+            final List<PotentialProducer> producerKeys, final List<PotentialConsumer> consumerKeys) {
 
-        Iterator<PotentialAttribute> consumerIterator = consumerKeys.iterator();
+        Iterator<PotentialConsumer> consumerIterator = consumerKeys.iterator();
 
-        for (PotentialAttribute  producerID : producerKeys) {
+        for (PotentialProducer  producerID : producerKeys) {
             if (consumerIterator.hasNext()) {
-                Producer producer = producerID.createProducer();
-                Consumer consumer = consumerIterator.next().createConsumer();
+                Producer<?> producer = producerID.createProducer();
+                Consumer<?> consumer = consumerIterator.next().createConsumer();
                 Coupling<?> coupling = new Coupling(producer, consumer);
                 try {
                     getCouplingManager().addCoupling(coupling);

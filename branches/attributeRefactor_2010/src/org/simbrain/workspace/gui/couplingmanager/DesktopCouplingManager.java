@@ -36,6 +36,8 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.GenericFrame;
@@ -153,9 +155,9 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      */
     private void addCouplings() {
 
-        List<PotentialAttribute> potentialProducers = (List<PotentialAttribute>) producingAttributes
+        List<PotentialProducer> potentialProducers = (List<PotentialProducer>) producingAttributes
                 .getSelectedAttributes();
-        List<PotentialAttribute> potentialConsumers = (List<PotentialAttribute>) consumingAttributes
+        List<PotentialConsumer> potentialConsumers = (List<PotentialConsumer>) consumingAttributes
                 .getSelectedAttributes();
 
         if ((potentialProducers.size() == 0) || (potentialConsumers.size() == 0)) {

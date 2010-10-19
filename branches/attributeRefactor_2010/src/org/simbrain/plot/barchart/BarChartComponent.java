@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -88,7 +88,8 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void initializeAttributes() {
 
-        addConsumerType(new AttributeType(this, "Dimension", null, double.class, true));
+        addConsumerType(new AttributeType(this, "Dimension", null,
+                double.class, true));
 
         //TODO: Move this
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
@@ -115,7 +116,7 @@ public class BarChartComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                if(getSetter(index) != null) {
+                if (getSetter(index) != null) {
                     fireAttributeObjectRemoved(getSetter(index));
                 }
                 firePotentialAttributesChanged();
@@ -138,7 +139,7 @@ public class BarChartComponent extends WorkspaceComponent {
     @Override
     public String getKeyFromObject(Object object) {
         if (object instanceof BarChartSetter) {
-            return "" + ((BarChartSetter)object).getIndex();
+            return "" + ((BarChartSetter) object).getIndex();
         }
         return null;
     }
@@ -187,11 +188,11 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<PotentialAttribute> getPotentialConsumers() {
-        List<PotentialAttribute> returnList = new ArrayList<PotentialAttribute>();
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
             BarChartSetter setter =  new BarChartSetter(i);
-            PotentialAttribute consumerID = new PotentialAttribute(
+            PotentialConsumer consumerID = new PotentialConsumer(
                     this,
                     setter,
                     "Bar_" + i,

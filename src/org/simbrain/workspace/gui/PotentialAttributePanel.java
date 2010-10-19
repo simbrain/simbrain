@@ -23,26 +23,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolderListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.AttributeListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
@@ -51,7 +47,7 @@ import org.simbrain.workspace.WorkspaceListener;
  * Displays a panel with a JComboBox, which the user uses to select a component,
  * and a JList of attributes for that component.
  */
-public class AttributePanel extends JPanel implements ActionListener,
+public class PotentialAttributePanel extends JPanel implements ActionListener,
         MouseListener {
 
     /** Parent frame. */
@@ -60,21 +56,25 @@ public class AttributePanel extends JPanel implements ActionListener,
     /** Drop down box for workspace components. */
     private ComponentDropDownBox componentList;
 
-    /** Drop down box for attributes. */
-    private AttributeDropDownBox attributeDropDownBox = new AttributeDropDownBox(
-            "Extra Attributes");
-
     /** List of Attributes in a specified Component. */
     private JList attributeList;
 
     /** List model. */
     private DefaultListModel model;
 
-    // TODO: Replace with generic parameter if possible.
-    public enum AttributeType {
+    // TODO: Get rid of this...
+    public enum ProducerOrConsumer {
         Producing, Consuming
     };
-    private AttributeType attributeType;
+
+    private ProducerOrConsumer producerOrConsumer;
+
+    /** Panel for setting visibility of attribute types. */
+    private AttributeTypePanel attributeTypePanel;
+
+
+    /** List of network couplings. */
+    private JList attributeTypes = new JList();
 
     /**
      * Creates a new attribute list panel.
@@ -82,9 +82,9 @@ public class AttributePanel extends JPanel implements ActionListener,
      * @param workspace
      *            reference to workspace
      */
-    public AttributePanel(final Workspace workspace, AttributeType attributeType) {
+    public PotentialAttributePanel(final Workspace workspace, ProducerOrConsumer attributeType) {
         super(new BorderLayout());
-        this.attributeType = attributeType;
+        this.producerOrConsumer = attributeType;
 
         // Set up attribute lists
         model = new DefaultListModel();
@@ -108,9 +108,20 @@ public class AttributePanel extends JPanel implements ActionListener,
 
         // Bottom panel
         JPanel bottomPanel = new JPanel();
-        JMenuBar bar = new JMenuBar();
-        bar.add(attributeDropDownBox);
-        bottomPanel.add(bar);
+        JButton button = new JButton("Set attribute visibility"); 
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+
+                if (attributeTypePanel != null) {
+                    JDialog dialog = new JDialog(parentFrame);
+                    dialog.setContentPane(attributeTypePanel);
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(null);
+                    dialog.setVisible(true);
+                }
+            }
+        });
+        bottomPanel.add(button);
         add(bottomPanel, BorderLayout.SOUTH);
 
         // Listen for attribute changes
@@ -128,24 +139,20 @@ public class AttributePanel extends JPanel implements ActionListener,
      * @param component component to listen to
      */
     private void addAttributeListener(final WorkspaceComponent component) {
-        component.addAttributeListener(new AttributeHolderListener() {
 
-            public void consumerAdded(Consumer consumer) {
-                refresh(consumer.getParentComponent());
+        component.addAttributeListener(new AttributeListener() {
+
+            public void attributeTypeVisibilityChanged() {
+                refresh(component);
             }
 
-            public void consumerRemoved(Consumer consumer) {
-                refresh(consumer.getParentComponent());
+            public void attributeObjectRemoved(Object object) {
+                // No implementation
             }
 
-            public void producerAdded(Producer producer) {
-                refresh(producer.getParentComponent());
+            public void potentialAttributesChanged() {
+                refresh(component);
             }
-
-            public void producerRemoved(Producer producer) {
-                refresh(producer.getParentComponent());
-            }
-
         });
 
     }
@@ -168,20 +175,19 @@ public class AttributePanel extends JPanel implements ActionListener,
      */
     private void refresh(final WorkspaceComponent component) {
 
+       // attributeTypes.setListData(new Vector(component.getAttributeTypes()));
+        attributeTypePanel = new AttributeTypePanel(component, producerOrConsumer);
+
         // Set Attribute list
         if (component != null) {
             model.clear();
-            attributeDropDownBox.initializeDropDownBox(component); // TODO: Disaggregate into producer / consumer
-            if (attributeType == AttributeType.Producing) {
-                for (ProducingAttribute<?> attribute : component
-                        .getProducingAttributes()) {
-                    //System.out.println("adding producing attribute: " + attribute);
-                    model.addElement(attribute);
+            if (producerOrConsumer == ProducerOrConsumer.Producing) {
+                for (PotentialAttribute potentialProducer : component.getPotentialProducers()) {
+                    model.addElement(potentialProducer);
                 }
-            } else if (attributeType == AttributeType.Consuming) {
-                for (ConsumingAttribute<?> attribute : component
-                        .getConsumingAttributes()) {
-                    model.addElement(attribute);
+            } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
+                for (PotentialAttribute potentialConsumer : component.getPotentialConsumers()) {
+                    model.addElement(potentialConsumer);
                 }
             }
         }
@@ -200,16 +206,18 @@ public class AttributePanel extends JPanel implements ActionListener,
      * @return list of selected attributes.
      */
     public ArrayList<?> getSelectedAttributes() {
-        if (attributeType == AttributeType.Producing) {
-            ArrayList<ProducingAttribute<?>> ret = new ArrayList<ProducingAttribute<?>>();
+
+        //TODO: Redo
+        if (producerOrConsumer == ProducerOrConsumer.Producing) {
+            ArrayList<PotentialAttribute> ret = new ArrayList<PotentialAttribute>();
             for (Object object : attributeList.getSelectedValues()) {
-                ret.add((ProducingAttribute<?>) object);
+                ret.add((PotentialAttribute) object);
             }
             return ret;
-        } else if (attributeType == AttributeType.Consuming) {
-            ArrayList<ConsumingAttribute<?>> ret = new ArrayList<ConsumingAttribute<?>>();
+        } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
+            ArrayList<PotentialAttribute> ret = new ArrayList<PotentialAttribute>();
             for (Object object : attributeList.getSelectedValues()) {
-                ret.add((ConsumingAttribute<?>) object);
+                ret.add((PotentialAttribute) object);
             }
             return ret;
         }
@@ -245,75 +253,14 @@ public class AttributePanel extends JPanel implements ActionListener,
             DefaultListCellRenderer renderer = (DefaultListCellRenderer) super
                     .getListCellRendererComponent(list, object, index,
                             isSelected, cellHasFocus);
-            Attribute attribute = (Attribute) object;
+            PotentialAttribute id = (PotentialAttribute) object;
 
-            renderer.setText(attribute.getAttributeDescription());
+            renderer.setText(id.getDescription());
             return renderer;
         }
 
     }
 
-    /**
-     * A JMenu whose items can be used to add or remove custom attribute types
-     * to particular components.
-     *
-     * NOTE: This is currently experimental and not fully implemented!
-     *
-     * The idea is that components can provide a list of methods that can be
-     * called which are used to add custom attributes to the method. These can
-     * be called in the attribute panel since it's where the attributes are
-     * viewed and edited.
-     *
-     * TODO: 
-     *  - Only display if a component has some methods 
-     *  - Change lists from lists of strings to lists of objects containing a description 
-     *     and a method name.
-     */
-    private class AttributeDropDownBox extends JMenu  {
-
-        /**
-         * Constructor
-         */
-        public AttributeDropDownBox(final String string) {
-            super(string);
-        }
-
-        /**
-         * Initialize dropdown box with attribute-related methods that can be
-         * called on workspace components.
-         *
-         * @param component
-         */
-        public void initializeDropDownBox(final WorkspaceComponent component) {
-            this.removeAll();
-            for(final String string : component.getAttributeTypes()) {
-                JCheckBoxMenuItem theItem = new JCheckBoxMenuItem(string);
-                theItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent arg0) {
-                        Method theMethod = null;
-                        try {
-                            theMethod = component.getClass().getMethod(string,
-                                    new Class[] { boolean.class });
-                        } catch (SecurityException e1) {
-                            e1.printStackTrace();
-                        } catch (NoSuchMethodException e1) {
-                            e1.printStackTrace();
-                        }
-
-                        try {
-                            if (theMethod != null) {
-                                theMethod.invoke(component,
-                                        new Object[] { false });
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                this.add(theItem);
-            }
-        }
-    }
 
     /**
      * A JComboBox which listens to the workspace and updates accordingly.
@@ -334,7 +281,7 @@ public class AttributePanel extends JPanel implements ActionListener,
             }
             if (this.getModel().getSize() > 0) {
                 this.setSelectedIndex(0);
-                AttributePanel.this.refresh((WorkspaceComponent) this.getItemAt(0));
+                PotentialAttributePanel.this.refresh((WorkspaceComponent) this.getItemAt(0));
             }
             workspace.addListener(this);
         }
@@ -360,7 +307,7 @@ public class AttributePanel extends JPanel implements ActionListener,
         public void componentRemoved(final WorkspaceComponent component) {
             this.removeItem(component);
             if (this.getItemCount() == 0) {
-                AttributePanel.this.clearList();
+                PotentialAttributePanel.this.clearList();
             }
         }
 
@@ -369,7 +316,7 @@ public class AttributePanel extends JPanel implements ActionListener,
          */
         public void workspaceCleared() {
             this.removeAllItems();
-            AttributePanel.this.clearList();
+            PotentialAttributePanel.this.clearList();
         }
     }
 

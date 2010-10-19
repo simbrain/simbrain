@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+h * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,19 @@ package org.simbrain.network;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.simbrain.network.attributes.NeuronWrapper;
-import org.simbrain.network.attributes.SynapseWrapper;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialAttribute;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -60,10 +60,135 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     /**
-     * By default, neuronwrappers are all that is added.
+     * Iniitalize attribute types and listeners.
      */
     private void init() {
-        addNeuronWrappers();
+
+        // Initialize attribute types and their default visibility
+        addProducerType(new AttributeType(this, "Neuron", "Activation", double.class, true));
+        addProducerType(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "Label", String.class, false));
+        addProducerType(new AttributeType(this, "Synapse", "Strength", double.class, false));
+        
+        addConsumerType(new AttributeType(this, "Neuron", "InputValue", double.class, true));
+        addConsumerType(new AttributeType(this, "Neuron", "Activation", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "Label", String.class, false));
+        addConsumerType(new AttributeType(this, "Synapse", "Strength", double.class, false));
+
+        rootNetwork.addNeuronListener(new NeuronListener() {
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronAdded(NetworkEvent<Neuron> e) {
+                firePotentialAttributesChanged();
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronTypeChanged(NetworkEvent<Neuron> e) {
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronMoved(NetworkEvent<Neuron> e) {
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void neuronRemoved(NetworkEvent<Neuron> e) {
+                firePotentialAttributesChanged();
+                fireAttributeObjectRemoved(e.getObject());
+            }
+
+            public void neuronChanged(NetworkEvent<Neuron> e) {
+            }
+        });
+
+        rootNetwork.addSynapseListener(new SynapseListener() {
+
+            public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
+                firePotentialAttributesChanged();
+            }
+
+            public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
+                firePotentialAttributesChanged();
+            }
+
+            public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
+                firePotentialAttributesChanged();
+            }
+
+            public void synapseTypeChanged(NetworkEvent<Synapse> networkEvent) {
+            }
+
+        });
+
+    }
+
+    @Override
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        for (AttributeType type : getConsumerTypes()) {
+            if (type.isVisible()) {
+                if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+                    for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                        returnList.add(new PotentialConsumer(this, neuron, neuron.getId(), type));
+                    }
+                } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+                    for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                        returnList.add(new PotentialConsumer(this, synapse, synapse.getId(), type));
+                    }
+                }
+
+            }
+        }
+        return returnList;
+    }
+
+    @Override
+    public List<PotentialProducer> getPotentialProducers() {
+        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+        for (AttributeType type : getProducerTypes()) {
+            if (type.isVisible()) {
+                if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+                    for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                        returnList.add(new PotentialProducer(this, neuron, neuron.getId(), type));
+                    }
+                } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+                    for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                        returnList.add(new PotentialProducer(this, synapse, synapse.getId(), type));
+                    }
+                }
+
+            }
+        }
+        return returnList;
+    }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        if (objectKey.startsWith("Neuron")) {
+            return this.getRootNetwork().getNeuron(objectKey);
+        } else if (objectKey.startsWith("Synapse")) {
+            return this.getRootNetwork().getSynapse(objectKey);
+        }
+        return null;
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof Neuron) {
+            return ((Neuron)object).getId();
+        } else if (object instanceof Synapse) {
+            return ((Synapse)object).getId();
+        }
+        return null;
     }
 
     /**
@@ -116,281 +241,5 @@ public final class NetworkComponent extends WorkspaceComponent {
 //        return null;
 //    }
 
-    /**
-     * Set upper bound attribute to all neuron wrappers.
-     */
-    public void setUpperBoundAttributes(boolean upperBoundSelected) {
-        NeuronWrapper.setUseUpperBoundAttribute(upperBoundSelected); 
-        if (upperBoundSelected) {
-            for (Consumer consumer : getConsumers()) {
-                if (consumer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)consumer).addUpperBoundAttribute();
-                    removeConsumer(consumer);
-                    addConsumer(consumer);
-                }
-            }
-            for (Producer producer: getProducers()) {
-                if (producer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)producer).addUpperBoundAttribute();
-                    removeProducer(producer);
-                    addProducer(producer);
-                }
-            }
-        } else {
-            for (Consumer consumer : getConsumers()) {
-                if (consumer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)consumer).removeUpperBoundAttribute();
-                    removeConsumer(consumer);
-                    addConsumer(consumer);
-                }
-            }
-            for (Producer producer: getProducers()) {
-                if (producer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)producer).removeUpperBoundAttribute();
-                    removeProducer(producer);
-                    addProducer(producer);
-                }
-            }
-        }
 
-    }
-
-    /**
-     * Set lower bound attribute to all neuron wrappers.
-     */
-    public void setLowerBoundAttributes(boolean lowerBoundSelected) {
-        NeuronWrapper.setUseLowerBoundAttribute(lowerBoundSelected); 
-        if (lowerBoundSelected) {
-            for (Consumer consumer : getConsumers()) {
-                if (consumer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)consumer).addLowerBoundAttribute();
-                    removeConsumer(consumer);
-                    addConsumer(consumer);
-                }
-            }
-            for (Producer producer: getProducers()) {
-                if (producer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)producer).addLowerBoundAttribute();
-                    removeProducer(producer);
-                    addProducer(producer);
-                }
-            }
-        } else {
-            for (Consumer consumer : getConsumers()) {
-                if (consumer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)consumer).removeLowerBoundAttribute();
-                    removeConsumer(consumer);
-                    addConsumer(consumer);
-                }
-            }
-            for (Producer producer: getProducers()) {
-                if (producer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)producer).removeLowerBoundAttribute();
-                    removeProducer(producer);
-                    addProducer(producer);
-                }
-            }
-        }
-    }
-
-    /**
-     * Set target value attributes to all neuron wrappers.
-     */
-    public void setTargetValueAttributes(boolean targetValueSelected) {
-        NeuronWrapper.setUseTargetValueAttribute(targetValueSelected); 
-        if(targetValueSelected) {
-            for (Consumer consumer : getConsumers()) {
-                if (consumer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)consumer).addTargetValueAttribute();
-                    removeConsumer(consumer);
-                    addConsumer(consumer);
-                }
-            }
-            for (Producer producer: getProducers()) {
-                if (producer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)producer).addTargetValueAttribute();
-                    removeProducer(producer);
-                    addProducer(producer);
-                }
-            }
-        } else {
-            for (Consumer consumer : getConsumers()) {
-                if (consumer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)consumer).removeTargetValueAttribute();
-                    removeConsumer(consumer);
-                    addConsumer(consumer);
-                }
-            }
-            for (Producer producer: getProducers()) {
-                if (producer instanceof NeuronWrapper) {
-                    ((NeuronWrapper)producer).removeTargetValueAttribute();
-                    removeProducer(producer);
-                    addProducer(producer);
-                }
-            }
-        }
-    }
-
-    /**
-     * The synapse listener.
-     */
-    SynapseListener synapseListener = new SynapseListener() {
-        /**
-         * {@inheritDoc}
-         */
-        public void synapseAdded(NetworkEvent<Synapse> e) {
-            SynapseWrapper wrapper = new SynapseWrapper(e.getObject(), NetworkComponent.this);
-            addConsumer(wrapper);
-            addProducer(wrapper);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void synapseTypeChanged(NetworkEvent<Synapse> e) {
-            SynapseWrapper wrapper = (SynapseWrapper) getConsumer(e.getOldObject().getId());
-            wrapper.setSynapse(e.getObject());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void synapseRemoved(NetworkEvent<Synapse> e) {
-            for (Consumer consumer : getConsumers()) {
-                if (consumer instanceof SynapseWrapper) {
-                    if (((SynapseWrapper)consumer).getSynapse() == e.getObject()) {
-                        removeConsumer(consumer);
-                        break;
-                    }
-                }
-            }
-            for (Producer producer : getProducers()) {
-                if (producer instanceof SynapseWrapper) {
-                    if (((SynapseWrapper)producer).getSynapse() == e.getObject()) {
-                        removeProducer(producer);
-                    }
-                }
-            }
-        }
-
-        public void synapseChanged(NetworkEvent<Synapse> e) {
-            // No implementation
-        }
-    };
-
-    /**
-     * Add synapse wrappers, as well as a listener so new synapse wrappers are
-     * automatically created.
-     *
-     * @param useSynapseWrappers whether to use synapse attributes
-     */
-    public void setUsingSynapseWrappers(boolean useSynapseWrappers) {
-        SynapseWrapper.setUsingSynapseAttributes(useSynapseWrappers);
-        if (useSynapseWrappers) {
-            // Add attributes for existing synapses
-            for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                SynapseWrapper wrapper = new SynapseWrapper(synapse, this);
-                addConsumer(wrapper);
-                addProducer(wrapper);
-            }
-            // Add the synapse listener
-            rootNetwork.addSynapseListener(synapseListener);
-        } else {
-            // Remove attributes for existing synapses
-            this.removeConsumers(SynapseWrapper.class);
-            this.removeProducers(SynapseWrapper.class);
-            // Remove the synapse listener
-            rootNetwork.removeSynapseListener(synapseListener);
-        }
-    }
-
-    public ConsumingAttribute findConsumingActivationAttribute(Neuron neuron) {
-        for (Consumer consumer : getConsumers()) {
-            if (consumer instanceof NeuronWrapper) {
-                if (((NeuronWrapper)consumer).getNeuron() == neuron) {
-                    return consumer.getConsumingAttributes().get(0);
-                }
-            }
-        }
-        return null;
-    }
-
-    //TODO: Use this below in listener.  Apply template to odor world listenres?
-    
-    public ProducingAttribute findProducingActivationAttribute(Neuron neuron) {
-        for (Producer producers : getProducers()) {
-            if (producers instanceof NeuronWrapper) {
-                if (((NeuronWrapper)producers).getNeuron() == neuron) {
-                    return producers.getProducingAttributes().get(0);
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Initialize getConsumers(), getProducers(), and listener.
-     */
-    private void addNeuronWrappers() {
-
-        for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-            NeuronWrapper wrapper = new NeuronWrapper(neuron, this);
-            addConsumer(wrapper);
-            addProducer(wrapper);
-        }
-
-        // Add the neuron listener
-        rootNetwork.addNeuronListener(new NeuronListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void neuronAdded(NetworkEvent<Neuron> e) {
-                NeuronWrapper wrapper = new NeuronWrapper(e.getObject(), NetworkComponent.this);
-                addConsumer(wrapper);
-                addProducer(wrapper);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void neuronTypeChanged(NetworkEvent<Neuron> e) {
-                NeuronWrapper wrapper = (NeuronWrapper) getConsumer(e.getOldObject().getId());
-                wrapper.setNeuron(e.getObject());
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void neuronMoved(NetworkEvent<Neuron> e) {
-                // TODO Auto-generated method stub
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void neuronRemoved(NetworkEvent<Neuron> e) {
-                for (Consumer consumer : getConsumers()) {
-                    if (consumer instanceof NeuronWrapper) {
-                        if (((NeuronWrapper)consumer).getNeuron() == e.getObject()) {
-                            removeConsumer(consumer);
-                            break;
-                        }
-                    }
-                }
-                for (Producer producer : getProducers()) {
-                    if (producer instanceof NeuronWrapper) {
-                        if (((NeuronWrapper)producer).getNeuron() == e.getObject()) {
-                            removeProducer(producer);
-                        }
-                    }
-                }
-            }
-            public void neuronChanged(NetworkEvent<Neuron> e) {
-                // TODO Auto-generated method stub
-            }
-        });
-
-
-    }
 }

@@ -1,12 +1,5 @@
 package org.simbrain.world.game;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -14,7 +7,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  * 
  * @author Matt Watson
  */
-public class GameAttributes implements Producer, Consumer {
+public class GameAttributes {
 
     /** The parent component. */
     private final WorkspaceComponent parent;
@@ -46,43 +39,43 @@ public class GameAttributes implements Producer, Consumer {
         return parent;
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public List<ConsumingAttribute<Double>> getConsumingAttributes() {
-        List<ConsumingAttribute<Double>> attributes = new ArrayList<ConsumingAttribute<Double>>();
-        
-        for (int i = 0; i < model.size(); i++) {
-            for (int j = 0; j < model.size(); j++) {
-                final int x = i;
-                final int y = j;
-                
-                attributes.add(new ConsumingAttribute<Double>() {
-
-                    public Consumer getParent() {
-                        return GameAttributes.this;
-                    }
-
-                    public void setValue(final Double value) {
-                        model.set(x, y, value);
-                    }
-
-                    public String getAttributeDescription() {
-                        return model.getName() + " at " + x + "," + y;
-                    }
-
-                    public String getKey() {
-                        return x + "," + y;
-                    }
-                });
-            }
-        }
-        
-        return attributes;
-    }
-
-    public List<? extends ProducingAttribute<?>> getProducingAttributes() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public List<ConsumingAttribute<Double>> getConsumingAttributes() {
+//        List<ConsumingAttribute<Double>> attributes = new ArrayList<ConsumingAttribute<Double>>();
+//        
+//        for (int i = 0; i < model.size(); i++) {
+//            for (int j = 0; j < model.size(); j++) {
+//                final int x = i;
+//                final int y = j;
+//                
+//                attributes.add(new ConsumingAttribute<Double>() {
+//
+//                    public Consumer getParent() {
+//                        return GameAttributes.this;
+//                    }
+//
+//                    public void setValue(final Double value) {
+//                        model.set(x, y, value);
+//                    }
+//
+//                    public String getAttributeDescription() {
+//                        return model.getName() + " at " + x + "," + y;
+//                    }
+//
+//                    public String getKey() {
+//                        return x + "," + y;
+//                    }
+//                });
+//            }
+//        }
+//        
+//        return attributes;
+//    }
+//
+//    public List<? extends ProducingAttribute<?>> getProducingAttributes() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 }

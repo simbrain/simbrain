@@ -509,7 +509,6 @@ public abstract class Neuron  {
      */
     public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
-        // this.targetValue = inputValue; //TODO: This is temporary!
     }
 
     /**

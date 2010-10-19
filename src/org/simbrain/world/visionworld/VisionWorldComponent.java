@@ -107,7 +107,7 @@ public final class VisionWorldComponent extends WorkspaceComponent {//implements
             for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
                 Sensor sensor = sensorMatrix.getSensor(row, column);
                 sensor.setParentComponent(this);
-                producers.add(sensor);
+                //producers.add(sensor);
             }
         }
         return Collections.unmodifiableList(producers);

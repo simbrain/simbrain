@@ -169,8 +169,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
                 return data.get(row).getGuiOn();
             case 3:
                 return data.get(row).getUpdateOn();
-            case 4:
-                return data.get(row).getUpdatePriority();
             default:
                 return null;
             }

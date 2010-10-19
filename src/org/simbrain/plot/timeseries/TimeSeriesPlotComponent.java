@@ -67,10 +67,10 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        this.getConsumers().clear();
-        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-            addConsumer(new TimeSeriesConsumer(this, i));
-        }
+//        this.getConsumers().clear();
+//        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+//            addConsumer(new TimeSeriesConsumer(this, i));
+//        }
     }
 
 
@@ -100,16 +100,16 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             public void dataSourceAdded(final int index) {
                 TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(
                         TimeSeriesPlotComponent.this, index);
-                addConsumer(newAttribute);
+               // addConsumer(newAttribute);
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers()
-                        .get(index);
-                removeConsumer(toBeRemoved);
+//                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers()
+//                        .get(index);
+               // removeConsumer(toBeRemoved);
             }
         });
     }
@@ -168,12 +168,12 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     @Override
     public void update() {
         model.update();
-        for (Consumer consumer : getConsumers()) {
-            TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
-            model.addData(t_consumer.getIndex().intValue(), getWorkspace()
-                    .getTime().doubleValue(), t_consumer.getValue()
-                    .doubleValue());
-        }
+//        for (Consumer consumer : getConsumers()) {
+//            TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
+//            model.addData(t_consumer.getIndex().intValue(), getWorkspace()
+//                    .getTime().doubleValue(), t_consumer.getValue()
+//                    .doubleValue());
+//        }
     }
 
     @Override

@@ -155,7 +155,8 @@ public class Sight {
         }
 
         public Double getValue() {
-            return sensor.sample(image);
+            return new Double(0);
+            //return sensor.sample(image);
         }
     }
 }

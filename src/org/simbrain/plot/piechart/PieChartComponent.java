@@ -60,10 +60,11 @@ public class PieChartComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        this.getConsumers().clear();
-        for (int i = 0; i < model.getDataset().getItemCount(); i++) {
-            addConsumer(new PieDataConsumer(this, i));
-        }
+        //TODO: REDO
+//        this.getConsumers().clear();
+//        for (int i = 0; i < model.getDataset().getItemCount(); i++) {
+//            addConsumer(new PieDataConsumer(this, i));
+//        }
     }
 
     /**
@@ -71,25 +72,26 @@ public class PieChartComponent extends WorkspaceComponent {
      */
     private void addListener() {
 
-        model.addListener(new ChartListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceAdded(final int index) {
-                PieDataConsumer newAttribute = new PieDataConsumer(PieChartComponent.this, index);
-                addConsumer(newAttribute);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void dataSourceRemoved(final int index) {
-                PieDataConsumer toBeRemoved = (PieDataConsumer) getConsumers().get(index);
-                removeConsumer(toBeRemoved);
-            }
-            
-        });
+        //TODO: REDO
+//        model.addListener(new ChartListener() {
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceAdded(final int index) {
+//                PieDataConsumer newAttribute = new PieDataConsumer(PieChartComponent.this, index);
+//                addConsumer(newAttribute);
+//            }
+//
+//            /**
+//             * {@inheritDoc}
+//             */
+//            public void dataSourceRemoved(final int index) {
+//                PieDataConsumer toBeRemoved = (PieDataConsumer) getConsumers().get(index);
+//                removeConsumer(toBeRemoved);
+//            }
+//            
+//        });
   }
 
 

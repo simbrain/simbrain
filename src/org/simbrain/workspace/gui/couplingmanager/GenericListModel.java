@@ -27,7 +27,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
 /**
- * A list of couplings viewed by a JList.
+ * A list of items viewed by a JList.
  *
  * @param <E> The type of the items in the model.
  */

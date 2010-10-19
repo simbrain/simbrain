@@ -48,8 +48,8 @@ import org.simbrain.plot.timeseries.*;
     // Make time series chart
     TimeSeriesPlotComponent chart = new TimeSeriesPlotComponent("Sub-threshold dynamics of a spiking neuron", 1);
     chart.getModel().setAutoRange(false);
-    chart.getModel().setUpperRangeBoundary(50);
-    chart.getModel().setLowerRangeBoundary(-100);
+    chart.getModel().setRangeUpperBound(50);
+    chart.getModel().setRangeLowerBound(-100);
     workspace.addWorkspaceComponent(chart);
     desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500,300);
 

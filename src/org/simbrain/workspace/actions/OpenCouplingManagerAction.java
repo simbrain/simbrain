@@ -25,7 +25,7 @@ import javax.swing.AbstractAction;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.couplingmanager2.DesktopCouplingManager;
+import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 
 /**
  * Open data world in current workspace.

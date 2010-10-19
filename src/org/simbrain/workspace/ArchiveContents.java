@@ -39,14 +39,13 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 class ArchiveContents {
 
     /** A map of all the components to their uris. */
-    private transient Map<WorkspaceComponent, String> componentUris
-        = new HashMap<WorkspaceComponent, String>();
+    private transient Map<WorkspaceComponent, String> componentUris = new HashMap<WorkspaceComponent, String>();
 
     /** All of the components in the archive. */
-    private List<Component> components = new ArrayList<Component>();
+    private List<ArchivedComponent> archivedComponents = new ArrayList<ArchivedComponent>();
 
     /** All of the couplings in the archive. */
-    private List<Coupling> couplings = new ArrayList<Coupling>();
+    private List<ArchivedCoupling> archivedCouplings = new ArrayList<ArchivedCoupling>();
 
     /** The serializer for this archive. */
     private final WorkspaceComponentSerializer serializer;
@@ -58,9 +57,11 @@ class ArchiveContents {
     /**
      * The component serializer for this archive.
      *
+     * @param workspace references to parent workspace
      * @param serializer The component serializer for this archive.
      */
-    ArchiveContents(final Workspace workspace, final WorkspaceComponentSerializer serializer) {
+    ArchiveContents(final Workspace workspace,
+            final WorkspaceComponentSerializer serializer) {
         this.workspaceParameters = workspace;
         this.serializer = serializer;
     }
@@ -71,9 +72,9 @@ class ArchiveContents {
      * @param workspaceComponent The workspace component to add.
      * @return The component created for this WorkspaceComponent.
      */
-    Component addComponent(final WorkspaceComponent workspaceComponent) {
-        Component component = new Component(serializer, workspaceComponent);
-        components.add(component);
+    ArchivedComponent addComponent(final WorkspaceComponent workspaceComponent) {
+        ArchivedComponent component = new ArchivedComponent(serializer, workspaceComponent);
+        archivedComponents.add(component);
         componentUris.put(workspaceComponent, component.uri);
         return component;
     }
@@ -83,12 +84,12 @@ class ArchiveContents {
      *
      * @return An immutable list of the components in this archive.
      */
-    List<? extends Component> getComponents() {
-        if (components == null) {
-            components = Collections.emptyList();
+    List<? extends ArchivedComponent> getArchivedComponents() {
+        if (archivedComponents == null) {
+            archivedComponents = Collections.emptyList();
         }
 
-        return Collections.unmodifiableList(components);
+        return Collections.unmodifiableList(archivedComponents);
     }
 
     /**
@@ -96,9 +97,11 @@ class ArchiveContents {
      *
      * @return An immutable list of the couplings in this archive.
      */
-    List<? extends Coupling> getCouplings() {
-        if (couplings == null) couplings = Collections.emptyList();
-        return Collections.unmodifiableList(couplings);
+    List<? extends ArchivedCoupling> getArchivedCouplings() {
+        if (archivedCouplings == null) {
+            archivedCouplings = Collections.emptyList();
+        }
+        return Collections.unmodifiableList(archivedCouplings);
     }
 
     /**
@@ -107,8 +110,8 @@ class ArchiveContents {
      * @param uri The uri for the component.
      * @return The component associated with the uri.
      */
-    Component getComponent(final String uri) {
-        for (Component component : components) {
+    ArchivedComponent getArchivedComponent(final String uri) {
+        for (ArchivedComponent component : archivedComponents) {
             if (component.uri.equals(uri)) {
                 return component;
             }
@@ -123,9 +126,9 @@ class ArchiveContents {
      * @param coupling The coupling to add.
      * @return The coupling entry in the archive.
      */
-    Coupling addCoupling(final org.simbrain.workspace.Coupling<?> coupling) {
-        Coupling c = new Coupling(this, coupling);
-        couplings.add(c);
+    ArchivedCoupling addCoupling(final Coupling<?> coupling) {
+        ArchivedCoupling c = new ArchivedCoupling(this, coupling);
+        archivedCouplings.add(c);
         return c;
     }
 
@@ -134,31 +137,31 @@ class ArchiveContents {
      *
      * @author Matt Watson
      */
-    static final class Component {
+    static final class ArchivedComponent {
 
         /** The name of the class for the component. */
-        final String className;
+        private final String className;
 
         /** The name of the Component. */
-        final String name;
+        private final String name;
 
         /** The uri for the serialized component. */
-        final String uri;
+        private final String uri;
 
         /** A unique id for the component in the archive. */
-        final int id;
+        private final int id;
 
         /**
          * A short String used to signify the format of the serialized
          * component.
          */
-        final String format;
+        private final String format;
 
         /**
          * The desktop component associated with the component (if there is
          * one).
          */
-        DesktopComponent desktopComponent;
+        private ArchivedDesktopComponent desktopComponent;
 
         /**
          * Creates a new Component entry.
@@ -166,7 +169,7 @@ class ArchiveContents {
          * @param serializer The component serializer for the archive.
          * @param component The workspace component this entry represents.
          */
-        private Component(final WorkspaceComponentSerializer serializer,
+        private ArchivedComponent(final WorkspaceComponentSerializer serializer,
                 final WorkspaceComponent component) {
             this.className = component.getClass().getCanonicalName();
             this.id = serializer.getId(component);
@@ -182,8 +185,9 @@ class ArchiveContents {
          * @param dc The desktop component to add an entry for.
          * @return The entry for the desktop component.
          */
-        DesktopComponent addDesktopComponent(final org.simbrain.workspace.gui.GuiComponent<?> dc) {
-            return desktopComponent = new DesktopComponent(this, dc);
+        ArchivedDesktopComponent addDesktopComponent(
+                final org.simbrain.workspace.gui.GuiComponent<?> dc) {
+            return desktopComponent = new ArchivedDesktopComponent(this, dc);
         }
 
         /**
@@ -191,13 +195,16 @@ class ArchiveContents {
          *
          * @author Matt Watson
          */
-        static final class DesktopComponent {
+        static final class ArchivedDesktopComponent {
+
             /** The class for the desktop component. */
-            final String className;
+            private final String className;
+
             /** The uri for the serialized data. */
-            final String uri;
+            private final String uri;
+
             /** The format for the serialized data. */
-            final String format;
+            private final String format;
 
             /**
              * Creates a new instance.
@@ -205,12 +212,61 @@ class ArchiveContents {
              * @param parent The parent component entry.
              * @param dc The desktop component this instance represents.
              */
-            private DesktopComponent(final Component parent, final org.simbrain.workspace.gui.GuiComponent<?> dc) {
+            private ArchivedDesktopComponent(final ArchivedComponent parent, final org.simbrain.workspace.gui.GuiComponent<?> dc) {
                 this.className = dc.getClass().getCanonicalName();
                 this.format = dc.getWorkspaceComponent().getDefaultFormat();
                 this.uri = "guis/" + parent.id + '_' + parent.name.replaceAll("\\s", "_")
                     + '.' + format;
             }
+
+            /**
+             * @return the uri
+             */
+            public String getUri() {
+                return uri;
+            }
+        }
+
+        /**
+         * @return the className
+         */
+        public String getClassName() {
+            return className;
+        }
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @return the uri
+         */
+        public String getUri() {
+            return uri;
+        }
+
+        /**
+         * @return the id
+         */
+        public int getId() {
+            return id;
+        }
+
+        /**
+         * @return the format
+         */
+        public String getFormat() {
+            return format;
+        }
+
+        /**
+         * @return the desktopComponent
+         */
+        public ArchivedDesktopComponent getDesktopComponent() {
+            return desktopComponent;
         }
     }
 
@@ -219,11 +275,13 @@ class ArchiveContents {
      *
      * @author Matt Watson
      */
-    static final class Coupling {
+    static final class ArchivedCoupling {
+
         /** The source attribute for the coupling. */
-        final AttributeID source;
+        private final ArchivedAttribute archivedProducer;
+
         /** The target attribute for the coupling. */
-        final AttributeID target;
+        private final ArchivedAttribute archivedConsumer;
 
         /**
          * Creates a new instance.
@@ -231,43 +289,111 @@ class ArchiveContents {
          * @param parent The parent archive.
          * @param coupling The coupling this instance represents.
          */
-        Coupling(final ArchiveContents parent, final org.simbrain.workspace.Coupling<?> coupling) {
-            ProducingAttribute<?> producing = coupling.getProducingAttribute();
-            ConsumingAttribute<?> consuming = coupling.getConsumingAttribute();
+        ArchivedCoupling(final ArchiveContents parent,
+                final org.simbrain.workspace.Coupling<?> coupling) {
 
-            this.source = new AttributeID(parent, producing);
-            this.target = new AttributeID(parent, consuming);
+            this.archivedProducer = new ArchivedAttribute(parent, coupling
+                    .getProducer());
+            this.archivedConsumer = new ArchivedAttribute(parent, coupling
+                    .getConsumer());
         }
 
         /**
-         * The class used to represent an attribute in the archive.
-         *
-         * @author Matt Watson
+         * @return the archivedProducer
          */
-        public static final class AttributeID {
-            /** The uri for the parent component of this attribute. */
-            final String uri;
+        public ArchivedAttribute getArchivedProducer() {
+            return archivedProducer;
+        }
 
-            /** The key that the component uses to identify the attribute. */
-            final String attributeHolderID;
+        /**
+         * @return the archivedConsumer
+         */
+        public ArchivedAttribute getArchivedConsumer() {
+            return archivedConsumer;
+        }
 
-            /** The key that the component uses to identify the attribute. */
-            final String attributeID;
+    }
 
-            /**
-             * Creates a new instance.
-             *
-             * @param parent The parent archive.
-             * @param attribute The attribute this instance represents.
-             */
-            AttributeID(final ArchiveContents parent,
-                    final org.simbrain.workspace.Attribute attribute) {
+    /**
+     * The class used to represent an attribute in the archive.
+     *
+     * @author Matt Watson
+     */
+    public static final class ArchivedAttribute {
 
-                WorkspaceComponent comp = attribute.getParent().getParentComponent();
-                this.uri = parent.componentUris.get(comp);
-                this.attributeID = attribute.getKey();
-                this.attributeHolderID = attribute.getParent().getDescription();
-            }
+        /** The uri for the parent component of this attribute. */
+        private final String parentComponentRef;
+
+        /** The key that the component uses to identify the base object. */
+        private final String baseObjectKey;
+
+        /** The key that the component uses to identify the method name. */
+        private final String methodBaseName;
+
+        /** Key for data type. */
+        private final Class<?> dataType;
+
+        /** Description. */
+        private final String description;
+
+        /**
+         * Creates a new instance.
+         *
+         * @param parent The parent archive.
+         * @param attribute The attribute this instance represents.
+         */
+        ArchivedAttribute(final ArchiveContents parent,
+                final Attribute attribute) {
+
+            WorkspaceComponent comp = attribute.getParentComponent();
+            this.parentComponentRef = parent.componentUris.get(comp);
+            this.baseObjectKey = comp.getKeyFromObject(attribute
+                    .getBaseObject());
+            this.methodBaseName = attribute.getMethodBaseName();
+            this.dataType = attribute.getDataType();
+            this.description = attribute.getDescription();
+        }
+
+        /**
+         * @return the parentComponentRef
+         */
+        public String getParentRef() {
+            return parentComponentRef;
+        }
+
+        /**
+         * @return the parentComponentRef
+         */
+        public String getParentComponentRef() {
+            return parentComponentRef;
+        }
+
+        /**
+         * @return the baseObjectKey
+         */
+        public String getBaseObjectKey() {
+            return baseObjectKey;
+        }
+
+        /**
+         * @return the methodBaseName
+         */
+        public String getMethodBaseName() {
+            return methodBaseName;
+        }
+
+        /**
+         * @return the dataType
+         */
+        public Class<?> getDataType() {
+            return dataType;
+        }
+
+        /**
+         * @return the description
+         */
+        public String getDescription() {
+            return description;
         }
     }
 
@@ -291,10 +417,10 @@ class ArchiveContents {
         XStream xstream = new XStream(new DomDriver());
 
         xstream.omitField(ArchiveContents.class, "serializer");
-        xstream.omitField(Component.class, "serializer");
-        xstream.omitField(Coupling.class, "serializer");
-        xstream.omitField(Component.class, "data");
-        xstream.omitField(Component.DesktopComponent.class, "data");
+        xstream.omitField(ArchivedComponent.class, "serializer");
+        xstream.omitField(ArchivedCoupling.class, "serializer");
+        xstream.omitField(ArchivedComponent.class, "data");
+        xstream.omitField(ArchivedComponent.ArchivedDesktopComponent.class, "data");
         xstream.omitField(Workspace.class, "LOGGER");
         xstream.omitField(Workspace.class, "manager");
         xstream.omitField(Workspace.class, "componentList");
@@ -308,13 +434,13 @@ class ArchiveContents {
         xstream.omitField(Workspace.class, "componentLock");
 
         xstream.alias("Workspace", ArchiveContents.class);
-        xstream.alias("Component", Component.class);
-        xstream.alias("Coupling", Coupling.class);
-        xstream.alias("DesktopComponent", Component.DesktopComponent.class);
+        xstream.alias("Component", ArchivedComponent.class);
+        xstream.alias("Coupling", ArchivedCoupling.class);
+        xstream.alias("DesktopComponent", ArchivedComponent.ArchivedDesktopComponent.class);
 
-        xstream.addImplicitCollection(ArchiveContents.class, "components", Component.class);
-        xstream.addImplicitCollection(ArchiveContents.class, "couplings", Coupling.class);
-        xstream.addImplicitCollection(Component.class, "desktopComponents");
+        xstream.addImplicitCollection(ArchiveContents.class, "components", ArchivedComponent.class);
+        xstream.addImplicitCollection(ArchiveContents.class, "couplings", ArchivedCoupling.class);
+        xstream.addImplicitCollection(ArchivedComponent.class, "desktopComponents");
 
         return xstream;
     }

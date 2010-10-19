@@ -25,7 +25,7 @@ import com.jme.scene.Node;
 /**
  * Represents the viewable world and is the container for adding elements and
  * views to that world.
- * 
+ *
  * @author Matt Watson
  */
 public class Environment {

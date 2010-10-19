@@ -280,6 +280,7 @@ public class WorkspaceActionManager {
         return Arrays.asList(new Action[] {
                 newDataWorldAction,
                 newOdorWorldAction,
+                // newThreeDeeWorldAction,
                 newVisionWorldAction });
     }
 

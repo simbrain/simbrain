@@ -6,20 +6,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
 import org.simbrain.world.threedee.ThreeDeeComponent;
@@ -27,16 +26,17 @@ import org.simbrain.world.threedee.sensors.Sight;
 
 /**
  * The main panel from which the 3D environment can be controlled.
- * 
+ *
  * @author Matt Watson
  */
 public class MainConsole extends GuiComponent<ThreeDeeComponent> {
+
     /** The number of milliseconds between refresh events. */
     public static final int REFRESH_WAIT = 50;
-    
+
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
-    
+
     /** Temporary hard-coded width of the frames. */
     private static final int WIDTH = 512;
     /** Temporary hard-coded height of the frames. */
@@ -177,49 +177,50 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
             final AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
             final CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
             final JFrame innerFrame = new JFrame("Agent " + agent.getName());
-                    
+
             innerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            
+
             final TimerTask task = new TimerTask() {
                 @Override
                 public void run() {
                     canvas.getCanvas().repaint();
                 }
             };
-            
+
             innerFrame.addWindowListener(new WindowAdapter() {
                 public void windowClosed(final WindowEvent e) {
                     view.close();
                     task.cancel();
                 }
             });
-            
+
             views.put(view, innerFrame);
-            
+
             BorderLayout layout = new BorderLayout();
-            
+
             innerFrame.getRootPane().setLayout(layout);
             innerFrame.getRootPane().add(canvas.getCanvas());
-            
+
             timer.schedule(task, REFRESH_WAIT, REFRESH_WAIT);
-            
+
             KeyHandler handler = getHandler(agent);
             agent.addInput(0, handler.getInput());
             innerFrame.addKeyListener(handler);
             innerFrame.setSize(WIDTH, HEIGHT);
             innerFrame.setResizable(false);
             innerFrame.setVisible(true);
-            
+
             JPanel panel = panels.get(agent);
-            
+
             final JButton button = new JButton(new AbstractAction("Vision") {
                 private static final long serialVersionUID = 1L;
-                
+
                 public void actionPerformed(ActionEvent e) {
-                    new Thread(new Runnable(){
+                    System.out.println("Here..");
+                    Thread thread = new Thread(new Runnable(){
                         public void run() {
                             final Sight sight = agent.getBindings().createSight(view);
-                            
+                            System.out.println("-->" + sight);
                             innerFrame.addWindowListener(new WindowAdapter() {
                                 public void windowClosed(final WindowEvent e) {
                                     System.out.println("closing");
@@ -227,12 +228,13 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
                                 }
                             });
                         }
-                    }).start();
+                    });
+                  Executors.newSingleThreadExecutor().execute(thread);
                 }
             });
-            
+
             panel.add(button);
-            
+
             innerFrame.addWindowListener(new WindowAdapter() {
                 public void windowClosed(final WindowEvent e) {
                     panels.get(agent).remove(button);

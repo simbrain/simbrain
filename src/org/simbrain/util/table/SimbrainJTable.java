@@ -168,15 +168,6 @@ public class SimbrainJTable extends JXTable {
         ret.addSeparator();
         ret.add(getMenuCSV());
 
-        // JMenu producerMenu = new ProducingAttributeMenu(
-        // "Receive coupling from", component.getWorkspace(), component
-        // .getConsumingAttributes().get(getSelectedColumn()));
-        // ret.add(producerMenu);
-        // JMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to",
-        // component.getWorkspace(), component.getProducingAttributes()
-        // .get(getSelectedColumn()));
-        // ret.add(consumerMenu);
-
         return ret;
     }
 

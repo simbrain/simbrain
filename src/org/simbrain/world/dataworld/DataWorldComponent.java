@@ -20,15 +20,15 @@ package org.simbrain.world.dataworld;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.table.SimbrainDataTable;
 import org.simbrain.util.table.SimbrainTableListener;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -42,6 +42,22 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     /** Table model. */
     private SimbrainDataTable dataModel;
+
+    /**
+     * Objects which can be used to get or set column values in the current row.
+     */
+    private List<ColumnAttribute> consumerList = new ArrayList<ColumnAttribute>();
+
+    /**
+     * Objects which can be used to get or set column values in the current row.
+     */
+    private List<ColumnAttribute> producerList = new ArrayList<ColumnAttribute>();
+
+    /** Producing column attribute type. */
+    private AttributeType producingColumn;
+
+    /** Consuming column attribute type. */
+    private AttributeType consumingColumn;
 
     /**
      * This method is the default constructor.
@@ -76,29 +92,67 @@ public class DataWorldComponent extends WorkspaceComponent {
      * Initialize consumers and producers.
      */
     private void init() {
-//        for (int i = 0; i < dataModel.getColumnCount(); i++) {
-//            addConsumer(new ConsumingColumn<Double>(this, i));
-//            addProducer(new ProducingColumn<Double>(this, i));
-//        }
+
+        producingColumn = new AttributeType(this, "Column", "Value", double.class, true);
+        consumingColumn = new AttributeType(this, "Column", "Value", double.class, true);
+
+        getProducerTypes().add(producingColumn);
+        getProducerTypes().add(consumingColumn);
+
+        for (int i = 0; i < dataModel.getColumnCount(); i++) {
+            addColumnAttribute(i, consumerList);
+            addColumnAttribute(i, producerList);
+        }
 
         dataModel.addListener(listener);
     }
+
+    @Override
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        if (consumingColumn.isVisible()) {
+            for (ColumnAttribute attribute : consumerList) {
+                PotentialConsumer consumer = new PotentialConsumer(attribute,
+                        "Column_" + attribute.getIndex(), consumingColumn);
+                returnList.add(consumer);
+            }
+        }
+        return returnList;
+    }
+
+    @Override
+    public List<PotentialProducer> getPotentialProducers() {
+        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+        if (producingColumn.isVisible()) {
+            for (ColumnAttribute attribute : consumerList) {
+                PotentialProducer producer = new PotentialProducer(attribute,
+                        "Column_" + attribute.getIndex(), producingColumn);
+                returnList.add(producer);
+            }
+        }
+        return returnList;
+    }
+
 
     /** Listener. */
     private final SimbrainTableListener listener = new SimbrainTableListener() {
 
         public void columnAdded(int column) {
             int index = dataModel.getColumnCount() - 1;
-//            addConsumer(new ConsumingColumn<Double>(DataWorldComponent.this, index));
-//            addProducer(new ProducingColumn<Double>(DataWorldComponent.this, index));
+            addColumnAttribute(index, consumerList);
+            addColumnAttribute(index, producerList);
+            DataWorldComponent.this.firePotentialAttributesChanged();
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
-        public void columnRemoved(int column) {
-            // TODO: This stuff is broken but waiting to refactor attribute stuff anyway
-            // int index = dataModel.getColumnCount();
-            // getProducers().remove(index);
-            // getProducers().remove(index);
+        public void columnRemoved(int index) {
+            ColumnAttribute producer = getColumnAttribute(index, producerList);
+            ColumnAttribute consumer = getColumnAttribute(index, consumerList);
+            DataWorldComponent.this.fireAttributeObjectRemoved(producer);
+            DataWorldComponent.this.fireAttributeObjectRemoved(consumer);
+            consumerList.remove(producer);
+            producerList.remove(consumer);
+            DataWorldComponent.this.firePotentialAttributesChanged();
             DataWorldComponent.this.setChangedSinceLastSave(true);
         }
 
@@ -123,6 +177,37 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
 
     };
+
+    /**
+     * Return the column attribute with specified index, or null if none found.
+     *
+     * @param i index of setter
+     * @param list list to check
+     * @return the column attribute
+     */
+    public ColumnAttribute getColumnAttribute(int i, List<ColumnAttribute> list) {
+        for (ColumnAttribute attribute : list) {
+            if (attribute.getIndex() == i) {
+                return attribute;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add a setter with the specified index.
+     *
+     * @param i index of setter
+     * @param list list to check
+     */
+    public void addColumnAttribute(int i, List<ColumnAttribute> list) {
+        for (ColumnAttribute attribute : list) {
+            if (attribute.getIndex() == i) {
+                return;
+            }
+        }
+        list.add(new ColumnAttribute(i));
+    }
 
     /**
      * Recreates an instance of this class from a saved component.
@@ -166,20 +251,24 @@ public class DataWorldComponent extends WorkspaceComponent {
         SimbrainDataTable.getXStream().toXML(dataModel, output);
     }
 
-    @SuppressWarnings("unchecked")
-    void wireCouplings(final Collection<? extends Producer> producers) {
-//        /* Handle Coupling wire-up */
-//        LOGGER.debug("wiring " + getProducers().size() + " producers");
-//
-//       Iterator<? extends Producer> producerIterator = getProducers().iterator();
-//
-//        for (Consumer consumer : getConsumers()) {
-//            if (producerIterator.hasNext()) {
-//                Coupling<?> coupling = new Coupling(producerIterator.next()
-//                    .getProducingAttributes().get(0), consumer.getConsumingAttributes().get(0));
-//                getWorkspace().addCoupling(coupling);
-//            }
-//        }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        try {
+            int i = Integer.parseInt(objectKey);
+            ColumnAttribute attribute = new ColumnAttribute(i);
+            return  attribute;
+        } catch (NumberFormatException e) {
+            return null; // the supplied string was not an integer
+        }
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof ColumnAttribute) {
+            return "" + ((ColumnAttribute) object).getIndex();
+        }
+        return null;
     }
 
     @Override
@@ -195,6 +284,50 @@ public class DataWorldComponent extends WorkspaceComponent {
     @Override
     public String getXML() {
         return SimbrainDataTable.getXStream().toXML(dataModel);
+    }
+
+    /**
+     * Object which sets a value of one bar in a bar chart.
+     */
+    public class ColumnAttribute {
+
+        /** Index. */
+        private int index;
+
+        /**
+         * Construct a column attribute object.
+         *
+         * @param index index of the bar to set
+         */
+        public ColumnAttribute(final int index) {
+            this.index = index;
+        }
+
+        /**
+         * Set the value.
+         *
+         * @param val value for the bar
+         */
+        public void setValue(final double val) {
+            dataModel.setValueCurrentRow(index, val);
+        }
+
+        /**
+         * Returns the value of the current row at the specified index.
+         *
+         * @return the value
+         */
+        public double getValue() {
+            return dataModel.getValueCurrentRow(index);
+        }
+
+        /**
+         * @return the index
+         */
+        public int getIndex() {
+            return index;
+        }
+
     }
 
 }

@@ -219,12 +219,12 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
                     System.out.println("Here..");
                     Thread thread = new Thread(new Runnable(){
                         public void run() {
-                            final Sight sight = agent.getBindings().createSight(view);
-                            System.out.println("-->" + sight);
+                            //final Sight sight = agent.getBindings().createSight(view);
+                            //System.out.println("-->" + sight);
                             innerFrame.addWindowListener(new WindowAdapter() {
                                 public void windowClosed(final WindowEvent e) {
                                     System.out.println("closing");
-                                    sight.close();
+                                    //sight.close();
                                 }
                             });
                         }

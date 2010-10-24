@@ -294,8 +294,7 @@ public final class SimbrainDataTable {
      * @param column column index
      * @return value of this column in current row
      */
-    public Double getValueCurrentRow(final int column) {
-        // TODO: Change Double to double after attribute refactor.
+    public double getValueCurrentRow(final int column) {
         return get(currentRow, column);
     }
 

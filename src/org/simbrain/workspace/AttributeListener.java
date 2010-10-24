@@ -28,8 +28,10 @@ public interface AttributeListener {
 
     /**
      * The visibility of an attribute type changed.
+     *
+     * @param type the type whose visibility changed
      */
-    public void attributeTypeVisibilityChanged();
+    public void attributeTypeVisibilityChanged(AttributeType type);
 
     /**
      * Potential attributes have changed in some way, such that the list of

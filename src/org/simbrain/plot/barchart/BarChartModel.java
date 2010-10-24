@@ -108,7 +108,7 @@ public class BarChartModel extends ChartModel {
      * Removes the last bar from the bar chart data.
      */
     public void removeColumn() {
-        if (dataset.getColumnCount() > 1) {
+        if (dataset.getColumnCount() > 0) {
             removeColumn(dataset.getColumnCount() - 1);
         }
     }

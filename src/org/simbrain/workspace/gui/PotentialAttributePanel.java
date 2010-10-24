@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.AttributeListener;
 import org.simbrain.workspace.Workspace;
@@ -142,8 +143,10 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
 
         component.addAttributeListener(new AttributeListener() {
 
-            public void attributeTypeVisibilityChanged() {
-                refresh(component);
+            public void attributeTypeVisibilityChanged(AttributeType type) {
+                if (type.getParentComponent() == component) {
+                    refresh(component);
+                }
             }
 
             public void attributeObjectRemoved(Object object) {

@@ -45,8 +45,8 @@ public class PotentialProducer extends PotentialAttribute {
      * @param objectName name of object
      * @param type attribute type of object
      */
-    public PotentialProducer(WorkspaceComponent parent, Object object, String objectName, AttributeType type) {
-        super(parent, object, objectName, type);
+    public PotentialProducer(Object baseObject, String objectName, AttributeType type) {
+        super(type.getParentComponent(), baseObject, objectName, type.getMethodBaseName(), type.getDataType());
     }
 
     /**

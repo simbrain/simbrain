@@ -101,7 +101,7 @@ public class CouplingManager {
                     /**
                      * {@ineritDoc}
                      */
-                    public void attributeTypeVisibilityChanged() {
+                    public void attributeTypeVisibilityChanged(AttributeType type) {
                     }
 
                     /**

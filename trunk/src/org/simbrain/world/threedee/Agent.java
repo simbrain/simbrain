@@ -35,8 +35,8 @@ public class Agent extends Moveable implements Entity {
     /** determines the limits (x, z) of the world. */
     private int limit;
     /** */
-    private AgentBindings bindings;
-        
+    //private AgentBindings bindings;
+
     /**
      * Create a new Agent with the given name.
      *
@@ -47,8 +47,8 @@ public class Agent extends Moveable implements Entity {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
         this.name = name;
-        this.bindings = new AgentBindings(this, component);
-        
+        //this.bindings = new AgentBindings(this, component);
+
         logger.debug("created new Agent: " + name);
 
         direction = new Vector(0, 0, 10).normalize();
@@ -59,14 +59,14 @@ public class Agent extends Moveable implements Entity {
 
     protected Object readResolve() {
         super.readResolve();
-        
+
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
-        bindings.setInputs();
-        
+        //bindings.setInputs();
+
         return this;
     }
-    
+
     /**
      * returns the name of the agent.
      *
@@ -257,14 +257,14 @@ public class Agent extends Moveable implements Entity {
         return Collections.singletonList(new Odor("red", this));
     }
     
-    /**
-     * Returns the bindings for this agent.
-     * 
-     * @return The bindings for this agent.
-     */
-    public AgentBindings getBindings() {
-        return bindings;
-    }
+//    /**
+//     * Returns the bindings for this agent.
+//     * 
+//     * @return The bindings for this agent.
+//     */
+//    public AgentBindings getBindings() {
+//        return bindings;
+//    }
     
     public String toString() {
         return "agent[" + name + "]";

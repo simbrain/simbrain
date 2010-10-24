@@ -138,11 +138,11 @@ public final class NetworkComponent extends WorkspaceComponent {
             if (type.isVisible()) {
                 if (type.getTypeID().equalsIgnoreCase("Neuron")) {
                     for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                        returnList.add(new PotentialConsumer(this, neuron, neuron.getId(), type));
+                        returnList.add(new PotentialConsumer(neuron, neuron.getId(), type));
                     }
                 } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
                     for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                        returnList.add(new PotentialConsumer(this, synapse, synapse.getId(), type));
+                        returnList.add(new PotentialConsumer(synapse, synapse.getId(), type));
                     }
                 }
 
@@ -154,18 +154,15 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
-        for (AttributeType type : getProducerTypes()) {
-            if (type.isVisible()) {
-                if (type.getTypeID().equalsIgnoreCase("Neuron")) {
-                    for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                        returnList.add(new PotentialProducer(this, neuron, neuron.getId(), type));
-                    }
-                } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
-                    for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                        returnList.add(new PotentialProducer(this, synapse, synapse.getId(), type));
-                    }
+        for (AttributeType type : getVisibleProducerTypes()) {
+            if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+                for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                    returnList.add(new PotentialProducer(neuron, neuron.getId(), type));
                 }
-
+            } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+                for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                    returnList.add(new PotentialProducer(synapse, synapse.getId(), type));
+                }
             }
         }
         return returnList;

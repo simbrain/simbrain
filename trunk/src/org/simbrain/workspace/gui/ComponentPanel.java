@@ -50,10 +50,10 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
 
     /** Table model. */
     private ComponentTableModel model;
-    
+
     /** Update method label. */
     private JLabel updateLabel = new JLabel();
-    
+
     /** Reference to Simbrain Desktop. */
     private SimbrainDesktop desktop;
 

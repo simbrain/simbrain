@@ -17,5 +17,5 @@ public class ThreeDeeModel {
      * The bindings that allow agents to be be wrapped as producers
      * and consumers.
      */
-    final List<Bindings> bindings = new ArrayList<Bindings>();
+    //final List<Bindings> bindings = new ArrayList<Bindings>();
 }

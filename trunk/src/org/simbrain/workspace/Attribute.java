@@ -49,7 +49,7 @@ public interface Attribute {
 
     /**
      * Returns the base name of the method associated with this attribute (that
-     * is, the method name without "get" or "set")
+     * is, the method name without "get" or "set").
      *
      * @return base method name
      */

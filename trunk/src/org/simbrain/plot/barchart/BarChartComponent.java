@@ -36,6 +36,9 @@ public class BarChartComponent extends WorkspaceComponent {
     /** Data model. */
     private BarChartModel model;
 
+    /** Producing column attribute type. */
+    private AttributeType barChartConsumer;
+
     /**
      * Objects which can be used to set bar chart. Component level interface to
      * plot.
@@ -52,7 +55,7 @@ public class BarChartComponent extends WorkspaceComponent {
         model = new BarChartModel();
         addListener();
         model.defaultInit();
-        initializeAttributes();
+        init();
     }
 
     /**
@@ -65,7 +68,7 @@ public class BarChartComponent extends WorkspaceComponent {
     public BarChartComponent(final String name, final BarChartModel model) {
         super(name);
         this.model = model;
-        initializeAttributes();
+        init();
         addListener();
     }
 
@@ -80,23 +83,22 @@ public class BarChartComponent extends WorkspaceComponent {
         model = new BarChartModel();
         addListener();
         model.addDataSources(numDataSources);
-        initializeAttributes();
+        init();
     }
 
     /**
-     * Initialize consuming attributes.
+     * Initialize component.
      */
-    private void initializeAttributes() {
+    private void init() {
 
-        addConsumerType(new AttributeType(this, "Dimension", null,
-                double.class, true));
+        barChartConsumer = new AttributeType(this, "Dimension", "Value",
+                double.class, true);
+        addConsumerType(barChartConsumer);
 
-        //TODO: Move this
         for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
-            setterList.add(new BarChartSetter(i));
+            addSetter(i);
         }
     }
-
 
     /**
      * Add chart listener to model.
@@ -109,16 +111,19 @@ public class BarChartComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                firePotentialAttributesChanged();
+                if (getSetter(index) == null) {
+                    addSetter(index);
+                    firePotentialAttributesChanged();
+                }
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                if (getSetter(index) != null) {
-                    fireAttributeObjectRemoved(getSetter(index));
-                }
+                BarChartSetter setter = getSetter(index);
+                fireAttributeObjectRemoved(setter);
+                setterList.remove(setter);
                 firePotentialAttributesChanged();
             }
         });
@@ -129,7 +134,6 @@ public class BarChartComponent extends WorkspaceComponent {
         try {
             int i = Integer.parseInt(objectKey);
             BarChartSetter setter = new BarChartSetter(i);
-            setterList.add(setter);
             return  setter;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
@@ -142,6 +146,35 @@ public class BarChartComponent extends WorkspaceComponent {
             return "" + ((BarChartSetter) object).getIndex();
         }
         return null;
+    }
+
+    /**
+     * Return the setter with specified index, or null if none found.
+     *
+     * @param i index of setter
+     * @return the setter object
+     */
+    public BarChartSetter getSetter(int i) {
+        for (BarChartSetter setter : setterList) {
+            if (setter.getIndex() == i) {
+                return setter;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add a setter with the specified index.
+     *
+     * @param i index of setter
+     */
+    public void addSetter(int i) {
+        for (BarChartSetter setter : setterList) {
+            if (setter.getIndex() == i) {
+                return;
+            }
+        }
+        setterList.add(new BarChartSetter(i));
     }
 
     /**
@@ -190,33 +223,14 @@ public class BarChartComponent extends WorkspaceComponent {
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        for (int i = 0; i < model.getDataset().getColumnCount(); i++) {
-            BarChartSetter setter =  new BarChartSetter(i);
-            PotentialConsumer consumerID = new PotentialConsumer(
-                    this,
-                    setter,
-                    "Bar_" + i,
-                    "Value", double.class);
-            setterList.add(setter);
-            returnList.add(consumerID);
-        }
-        return returnList;
-    }
-
-
-    /**
-     * Return the setter with specified index, or null if none found.
-     *
-     * @param i index of setter
-     * @return the setter object
-     */
-    public BarChartSetter getSetter(int i) {
-        for(BarChartSetter setter : setterList) {
-            if(setter.getIndex() == i) {
-                return setter;
+        if (barChartConsumer.isVisible()) {
+            for (BarChartSetter setter : setterList) {
+                PotentialConsumer consumerID = new PotentialConsumer(setter,
+                        "Bar_" + setter.getIndex(), barChartConsumer);
+               returnList.add(consumerID);
             }
         }
-        return null;
+        return returnList;
     }
 
     /**

@@ -198,7 +198,7 @@ public abstract class WorkspaceComponent {
      */
     public void fireAttributeTypeVisibilityChanged(AttributeType type) {
         for (AttributeListener listener : attributeListeners) {
-            listener.attributeTypeVisibilityChanged();
+            listener.attributeTypeVisibilityChanged(type);
         }
 
     }
@@ -482,7 +482,7 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Returns a formatted description string
+     * Returns a formatted description string.  
      *
      * @param baseObject base object
      * @param methodBaseName base name of method
@@ -871,6 +871,36 @@ public abstract class WorkspaceComponent {
      */
     public List<AttributeType> getConsumerTypes() {
         return consumerTypes;
+    }
+
+    /**
+     * Return visible producer types.
+     *
+     * @return the visible producerTypes
+     */
+    public List<AttributeType> getVisibleProducerTypes() {
+        List<AttributeType> returnList = new ArrayList<AttributeType>();
+        for (AttributeType type : getProducerTypes()) {
+            if (type.isVisible()) {
+                returnList.add(type);
+            }
+        }
+        return returnList;
+    }
+
+    /**
+     * Return visible consumer types.
+     *
+     * @return the visible consumerTypes
+     */
+    public List<AttributeType> getVisibleConsumerTypes() {
+        List<AttributeType> returnList = new ArrayList<AttributeType>();
+        for (AttributeType type : getConsumerTypes()) {
+            if (type.isVisible()) {
+                returnList.add(type);
+            }
+        }
+        return returnList;
     }
 
 }

@@ -142,4 +142,18 @@ public class AttributeType {
         return dataType;
     }
 
+    /**
+     * @return the parentComponent
+     */
+    public WorkspaceComponent getParentComponent() {
+        return parentComponent;
+    }
+
+    /**
+     * @return the methodBaseName
+     */
+    public String getMethodBaseName() {
+        return methodBaseName;
+    }
+
 }

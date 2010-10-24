@@ -30,6 +30,12 @@ public class PotentialAttribute {
     /** Parent workspace component. */
     private WorkspaceComponent parent;
 
+    /**
+     * An identifier for the object. Used by the GUI to display attribute
+     * information.
+     */
+    private String objectName;
+
     /** Potential producing or consuming object. */
     private Object baseObject;
 
@@ -37,13 +43,7 @@ public class PotentialAttribute {
     private String methodBaseName;
 
     /** The data type (double, string, etc) of a consumer or producer. */
-    private Class dataType;
-
-    /**
-     * An identifier for the object. Used by the GUI to display attribute
-     * information.
-     */
-    private String objectName;
+    private Class<?> dataType;
 
     /**
      * Construct a potential attribute.
@@ -60,22 +60,6 @@ public class PotentialAttribute {
         this.baseObject = object;
         this.methodBaseName = methodBaseName;
         this.dataType = dataType;
-    }
-
-    /**
-     * Create a potential attribute using an attribute type object as a
-     * shortcut.
-     *
-     * @param parent parent object
-     * @param objectName name of object
-     * @param type attribute type of object
-     */
-    protected PotentialAttribute(WorkspaceComponent parent, Object object, String objectName, AttributeType type) {
-        this.parent = parent;
-        this.objectName = objectName;
-        this.baseObject = object;
-        this.methodBaseName = type.getAttributeName();
-        this.dataType = type.getDataType();
     }
 
     /**

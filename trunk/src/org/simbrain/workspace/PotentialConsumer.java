@@ -41,12 +41,12 @@ public class PotentialConsumer extends PotentialAttribute {
     /**
      * Create a potential consumer using an attribute type object as a shortcut.
      *
-     * @param parent parent object
-     * @param objectName name of object
+     * @param baseObject base object
+     * @param objectName description of object
      * @param type attribute type of object
      */
-    public PotentialConsumer(WorkspaceComponent parent, Object object, String objectName, AttributeType type) {
-        super(parent, object, objectName, type);
+    public PotentialConsumer(Object baseObject, String objectName, AttributeType type) {
+        super(type.getParentComponent(), baseObject, objectName, type.getMethodBaseName(), type.getDataType());
     }
 
     /**

@@ -43,10 +43,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.workspace.gui.ConsumingAttributeMenu;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.workspace.gui.ProducingAttributeMenu;
 
 /**
  * OSC world desktop component.

@@ -26,15 +26,12 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
 
-import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
 

@@ -166,13 +166,13 @@ public final class Coupling<E> {
         if (producer == null) {
             producerString = "Null";
         } else {
-            producerComponent =  "[" + producer.getParentComponent().toString() +"]";
+            producerComponent =  "[" + producer.getParentComponent().getName() +"]";
             producerString = producer.getDescription();
         }
         if (consumer == null) {
             consumerString = "Null";
         } else {
-            consumerComponent = "[" + consumer.getParentComponent().toString() +"]";
+            consumerComponent = "[" + consumer.getParentComponent().getName() +"]";
             consumerString = consumer.getDescription();
         }
         return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
@@ -184,7 +184,7 @@ public final class Coupling<E> {
     public boolean equals(final Object o) {
         if (o instanceof Coupling) {
             Coupling<?> other = (Coupling<?>) o;
-            
+
             return other.producer.equals(producer)
                 && other.consumer.equals(consumer);
         } else {

@@ -36,7 +36,7 @@ public class BarChartComponent extends WorkspaceComponent {
     /** Data model. */
     private BarChartModel model;
 
-    /** Producing column attribute type. */
+    /** Bar chart consumer type. */
     private AttributeType barChartConsumer;
 
     /**

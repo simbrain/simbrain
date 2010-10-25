@@ -65,7 +65,7 @@ public class WorkspaceComponentDeserializer {
                     .forName(archivedComponent.getClassName());
 
             WorkspaceComponent wc = deserializeWorkspaceComponent(clazz,
-                    archivedComponent.getClassName(), input, null);
+                    archivedComponent.getName(), input, null);
 
             componentKeys.put(archivedComponent.getUri(), wc);
             wc.setChangedSinceLastSave(false);

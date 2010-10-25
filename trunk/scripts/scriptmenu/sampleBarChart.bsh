@@ -46,7 +46,7 @@ import java.awt.Color;
 
     // COUPLING NETWORK TO BARCHART
     for (int i = 1; i <= numNeurons; i++) {
-        Producer neuronAttribute = networkComponent.createProducer(network.getNeuron("Neuron_" + i), "Activation", double.class, "Neuron " + i); 
+        Producer neuronAttribute = networkComponent.createProducer(network.getNeuron("Neuron_" + i), "Activation", double.class); 
         Consumer barChartAttribute = barChart.createConsumer(barChart.getSetter(i-1), "Value", double.class, "Bar " + (i-1));
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, barChartAttribute));
     }

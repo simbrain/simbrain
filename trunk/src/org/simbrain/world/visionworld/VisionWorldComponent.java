@@ -18,30 +18,22 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
-import org.simbrain.world.dataworld.DataWorldComponent;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Vision world frame.
  */
-public final class VisionWorldComponent extends WorkspaceComponent {//implements CouplingContainer {
+public final class VisionWorldComponent extends WorkspaceComponent {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new vision world frame with the specified name.
@@ -50,67 +42,89 @@ public final class VisionWorldComponent extends WorkspaceComponent {//implements
      */
     public VisionWorldComponent(final String name) {
         this(name, new MutableVisionWorldModel());
+        initAttributes();
     }
 
+    /**
+     * Create a new vision world frame with the specified name and model.
+     *
+     * @param name name
+     * @param model model
+     */
     public VisionWorldComponent(final String name, VisionWorldModel model) {
         super(name);
         visionWorld = new VisionWorld(model);
+        initAttributes();
     }
-    
+
     /**
-     * Returns a properly initialized xstream object.
-     * @return the XStream object
+     * Initialize attributes.
      */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        // omit fields
-        return xstream;
+    private void initAttributes() {
+        if (getProducerTypes().size() == 0) {
+            addProducerType(new AttributeType(this, "Sensor", "Value", double.class, true));
+        }
+        visionWorld.getModel().addModelListener(new VisionWorldModelListener() {
+
+            public void pixelMatrixChanged(VisionWorldModelEvent event) {
+            }
+
+            public void sensorMatrixChanged(VisionWorldModelEvent event) {
+               VisionWorldComponent.this.firePotentialAttributesChanged();
+            }
+
+        });
     }
-    
-    /**
-     * Recreates an instance of this class from a saved component.
-     * 
-     * @param input
-     * @param name
-     * @param format
-     * @return
-     */
-    public static VisionWorldComponent open(InputStream input, String name, String format) {
-        return (VisionWorldComponent) getXStream().fromXML(input);
+
+    @Override
+    public List<PotentialProducer> getPotentialProducers() {
+        List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
+        for (AttributeType type : getVisibleProducerTypes()) {
+            if (type.getTypeID().equalsIgnoreCase("Sensor")) {
+              SensorMatrix sensorMatrix = getVisionWorld().getModel().getSensorMatrix();
+              for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                  for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+                      Sensor sensor = sensorMatrix.getSensor(row, column);
+                      returnList.add(new PotentialProducer(sensor, sensor.getKey(), type));
+                  }
+              }
+            }
+        }
+        return returnList;
+    }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        String[] rowCol = objectKey.split(","); //todo check that string is valid
+        int row = Integer.parseInt(rowCol[0]);
+        int col = Integer.parseInt(rowCol[1]);
+        return getVisionWorld().getModel().getSensorMatrix().getSensor(row, col);
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof Sensor) {
+            return ((Sensor)object).getKey();
+        }
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
+    public static VisionWorldComponent open(InputStream input, String name, String format) {
+        MutableVisionWorldModel model = (MutableVisionWorldModel) AbstractVisionWorldModel.getXStream().fromXML(input);
+        return new VisionWorldComponent(name, model);
+    }
+
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+         MutableVisionWorldModel.getXStream().toXML(visionWorld.getModel(), output);
     }
-    
+
     @Override
     public void closing() {
         // empty
-    }
-     
-
-
-    /** {@inheritDoc} */
-    public List<Consumer> getConsumers() {
-        return Collections.<Consumer>emptyList();
-    }
-    /** {@inheritDoc} */
-    public List<Producer> getProducers() {
-        List<Producer> producers = new ArrayList<Producer>();
-        VisionWorldModel model = visionWorld.getModel();
-        SensorMatrix sensorMatrix = model.getSensorMatrix();
-        for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-            for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-                Sensor sensor = sensorMatrix.getSensor(row, column);
-                sensor.setParentComponent(this);
-                //producers.add(sensor);
-            }
-        }
-        return Collections.unmodifiableList(producers);
     }
 
     /** {@inheritDoc} */
@@ -130,7 +144,7 @@ public final class VisionWorldComponent extends WorkspaceComponent {//implements
 
     /**
      * Returns vision world canvas.
-     * 
+     *
      * @return vision world.
      */
     public VisionWorld getVisionWorld() {

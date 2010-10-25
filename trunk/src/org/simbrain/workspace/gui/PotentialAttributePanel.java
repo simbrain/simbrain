@@ -144,8 +144,10 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
         component.addAttributeListener(new AttributeListener() {
 
             public void attributeTypeVisibilityChanged(AttributeType type) {
-                if (type.getParentComponent() == component) {
-                    refresh(component);
+                if (isSelectedComponent(component)) {
+                    if (component == type.getParentComponent()) { // Not sure if this is needed
+                        refresh(component);
+                    }
                 }
             }
 
@@ -154,10 +156,26 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
             }
 
             public void potentialAttributesChanged() {
-                refresh(component);
+                if (isSelectedComponent(component)) {
+                    refresh(component);
+                }
             }
         });
 
+    }
+
+    /**
+     * Returns true if the component is current, false otherwise.
+     *
+     * @param component the component to check
+     * @return whether the component is current
+     */
+    private boolean isSelectedComponent(final WorkspaceComponent component) {
+        if (component == componentList.getSelectedItem()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

@@ -46,11 +46,14 @@ public final class Sensor {
     /** Sample. */
     private double sample;
 
-    /** Producer description. */
-    private String producerDescription;
+    /** Description. */
+    private String description;
 
-    /** Reference to parent workspace component. */
-    private WorkspaceComponent parentComponent;
+    /** Row in parent sensor matrix. Used as a key. */
+    private int row;
+
+    /** Column in parent sensor matrix. Used as a key. */
+    private int col;
 
     /** No filter. */
     private static final Filter NO_FILTER = new Filter()
@@ -66,29 +69,36 @@ public final class Sensor {
             }
         };
 
-
     /**
      * Create a new sensor with the specified receptive field and no filter.
      *
+     * @param row row number
+     * @param col column number
      * @param receptiveField receptive field for this sensor, must not be null
      */
-    public Sensor(final ReceptiveField receptiveField) {
-        this(NO_FILTER, receptiveField);
+    public Sensor(final int row, final int col,
+            final ReceptiveField receptiveField) {
+        this(row, col, NO_FILTER, receptiveField);
     }
 
     /**
      * Create a new sensor with the specified filter and receptive field.
      *
+     * @param row row number
+     * @param col column number
      * @param filter filter for this sensor, must not be null
      * @param receptiveField receptive field for this sensor, must not be null
      */
-    public Sensor(final Filter filter, final ReceptiveField receptiveField) {
+    public Sensor(final int row, final int col, final Filter filter,
+            final ReceptiveField receptiveField) {
         if (filter == null) {
             throw new IllegalArgumentException("filter must not be null");
         }
         if (receptiveField == null) {
             throw new IllegalArgumentException("receptiveField must not be null");
         }
+        this.row = row;
+        this.col = col;
         this.filter = filter;
         this.receptiveField = receptiveField;
         updateProducerDescription();
@@ -228,14 +238,15 @@ public final class Sensor {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
-    /** {@inheritDoc} */
-    public WorkspaceComponent getParentComponent() {
-        return parentComponent;
+    /**
+     * Return a unique identifier for this sensor. Currently row and column
+     * numbers relative to a parent sensor matrix.
+     *
+     * @return the key
+     */
+    public String getKey() {
+        return row + "," + col;
     }
-
-//    public String getKey() {
-//        return filter.getDescription() + " (" + receptiveField.getCenterX() + ")(" + receptiveField.getCenterY() + ")";
-//    }
 
     /**
      * Update producer description.
@@ -248,22 +259,17 @@ public final class Sensor {
         sb.append(", ");
         sb.append(receptiveField.getCenterY());
         sb.append(")");
-        producerDescription = sb.toString();
+        description = sb.toString();
     }
 
     /** {@inheritDoc} */
     public String getDescription() {
-        return producerDescription;
+        return description;
     }
 
     /** {@inheritDoc} */
     public Double getValue() {
         return Double.valueOf(sample);
-    }
-
-    /** {@inheritDoc} */
-    public void setParentComponent(final WorkspaceComponent parentComponent) {
-        this.parentComponent = parentComponent;
     }
 
 }

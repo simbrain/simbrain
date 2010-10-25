@@ -60,7 +60,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     /**
-     * Iniitalize attribute types and listeners.
+     * Initialize attribute types and listeners.
      */
     private void init() {
 

@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.visionworld;
 
+
 /**
  * A vision world model has exactly one pixel matrix and exactly
  * one sensor matrix.  Interested classes may receive notification
@@ -76,4 +77,5 @@ public interface VisionWorldModel {
      * @param listener vision world model listener to remove
      */
     void removeModelListener(VisionWorldModelListener listener);
+
 }

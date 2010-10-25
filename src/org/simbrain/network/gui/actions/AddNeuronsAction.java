@@ -63,17 +63,19 @@ public final class AddNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        int numNeurons = Integer.parseInt(JOptionPane
-                .showInputDialog("Number of neurons to add"));
-        GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numNeurons));
-        ArrayList<Neuron> list = new ArrayList<Neuron>();
-        layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        for (int i = 0; i < numNeurons; i++) {
-            LinearNeuron neuron = new LinearNeuron();
-            list.add(neuron);
-            networkPanel.getRootNetwork().addNeuron(neuron);
+        String result = JOptionPane.showInputDialog("Number of neurons to add", "100");
+        if (result != null) {
+            int numNeurons = Integer.parseInt(result);
+            GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numNeurons));
+            ArrayList<Neuron> list = new ArrayList<Neuron>();
+            layout.setInitialLocation(networkPanel.getLastClickedPosition());
+            for (int i = 0; i < numNeurons; i++) {
+                LinearNeuron neuron = new LinearNeuron();
+                list.add(neuron);
+                networkPanel.getRootNetwork().addNeuron(neuron);
+            }
+            layout.layoutNeurons(list);
+            networkPanel.repaint();
         }
-        layout.layoutNeurons(list);
-        networkPanel.repaint();
     }
 }

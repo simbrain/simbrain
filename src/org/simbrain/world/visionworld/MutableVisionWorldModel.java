@@ -39,7 +39,7 @@ public final class MutableVisionWorldModel
     private SensorMatrix sensorMatrix;
 
     /** Empty pixel matrix. */
-    private static final PixelMatrix EMPTY_PIXEL_MATRIX = new EmptyPixelMatrix();
+    public static final PixelMatrix EMPTY_PIXEL_MATRIX = new EmptyPixelMatrix();
 
     /** Empty sensor matrix. */
     private static final SensorMatrix EMPTY_SENSOR_MATRIX = new EmptySensorMatrix();

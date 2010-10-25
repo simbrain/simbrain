@@ -26,6 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
 
+import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.visionworld.filter.PixelAccumulator;
@@ -80,6 +81,10 @@ public final class VisionWorldDesktopComponent extends GuiComponent<VisionWorldC
         menuBar.add(file);
         menuBar.add(edit);
         menuBar.add(view);
+
+        menuBar.add(new CouplingMenuComponent("Couple", this.getWorkspaceComponent()
+                .getWorkspace(), this.getWorkspaceComponent()));
+
         getParentFrame().setJMenuBar(menuBar);
 
         setLayout(new BorderLayout());

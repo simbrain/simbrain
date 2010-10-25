@@ -73,7 +73,12 @@ public final class DenseSensorMatrix
                 int x = column * receptiveFieldWidth;
                 int y = row * receptiveFieldHeight;
                 ReceptiveField receptiveField = new ReceptiveField(x, y, receptiveFieldWidth, receptiveFieldHeight);
-                Sensor sensor = (defaultFilter == null) ? new Sensor(receptiveField) : new Sensor(defaultFilter, receptiveField);
+                Sensor sensor;
+                if (defaultFilter == null) {
+                    sensor = new Sensor(row, column, receptiveField);
+                } else {
+                    sensor = new Sensor(row, column, defaultFilter, receptiveField);
+                }
                 sensors.set(row, column, sensor);
             }
         }

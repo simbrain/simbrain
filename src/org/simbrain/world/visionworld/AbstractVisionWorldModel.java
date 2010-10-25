@@ -18,6 +18,11 @@
  */
 package org.simbrain.world.visionworld;
 
+import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 /**
  * Abstract implementation of VisionWorldModel which
  * provides VisionWorldModelListener management.
@@ -32,5 +37,31 @@ abstract class AbstractVisionWorldModel
     protected AbstractVisionWorldModel() {
         super();
         setSource(this);
+    }
+
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    public static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+      //TODO: Too much is stored in pixel matrix and elsewhere
+        //  Also the pixels don't actually get stored
+      //xstream.omitField(MutableVisionWorldModel.class, "pixelMatrix"); 
+        return xstream;
+    }
+
+    /**
+     * Standard method call made to objects after they are deserialized.
+     * See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     *
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+//        logger = Logger.getLogger(RootNetwork.class);
+//        this.updatePriorities = new TreeSet<Integer>();
+        return this;
     }
 }

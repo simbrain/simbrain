@@ -24,8 +24,6 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,8 +103,6 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.ToggleButton;
-import org.simbrain.workspace.Attribute;
-import org.simbrain.workspace.AttributeHolder;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -2192,14 +2188,6 @@ public class NetworkPanel extends PCanvas  {
         /* no implementation */
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    public void attributeRemoved(AttributeHolder parent, Attribute attribute) {
-        /* no implementation */
-    }
-
     /**
      * Returns a NetworkDialog. Overriden by NetworkPanelDesktop, which returns
      * a NetworkDialog with additional features used in Desktop version of Simbrain.
@@ -2210,8 +2198,7 @@ public class NetworkPanel extends PCanvas  {
     public NetworkDialog getNetworkDialog(final NetworkPanel networkPanel) {
         return new NetworkDialog(networkPanel);
     }
-    
-    
+
     /**
      * Returns a neuron node. Overriden by NetworkPanelDesktop, which returns
      * a NeuronNode with additional features used in Desktop version of Simbrain.

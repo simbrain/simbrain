@@ -654,8 +654,6 @@ public abstract class WorkspaceComponent {
     public void removeWorkspaceComponentListener(final WorkspaceComponentListener listener) {
         workspaceComponentListeners.remove(listener);
     }
-    
-
 
     /**
      * Returns the name of this component.

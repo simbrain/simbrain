@@ -20,9 +20,12 @@ package org.simbrain.plot.timeseries;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.plot.ChartListener;
-import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -37,6 +40,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     /** The data model. */
     private final TimeSeriesModel model;
 
+    /** Time Series consumer type. */
+    private AttributeType timeSeriesConsumerType;
+
+     /** Objects which can be used to add data to time series plot. */
+    private List<TimeSeriesConsumer> consumerList = new ArrayList<TimeSeriesConsumer>();
+
+
     /**
      * Create new time series plot component.
      *
@@ -45,6 +55,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public TimeSeriesPlotComponent(final String name) {
         super(name);
         model = new TimeSeriesModel();
+        initializeAttributes();
         addListener();
         model.defaultInit();
     }
@@ -63,17 +74,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         addListener();
     }
 
-   /**
-     * Initialize consuming attributes.
-     */
-    private void initializeAttributes() {
-//        this.getConsumers().clear();
-//        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-//            addConsumer(new TimeSeriesConsumer(this, i));
-//        }
-    }
-
-
     /**
      * Initializes a JFreeChart with specific number of data sources.
      *
@@ -83,9 +83,66 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public TimeSeriesPlotComponent(final String name, final int numDataSources) {
         super(name);
         model = new TimeSeriesModel();
+        initializeAttributes();
         addListener();
         model.addDataSources(numDataSources);
     }
+
+
+
+   /**
+     * Initialize consuming attributes.
+     */
+    private void initializeAttributes() {
+        timeSeriesConsumerType = new AttributeType(this, "Series", "Value", double.class, true);
+        addConsumerType(timeSeriesConsumerType);
+        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+            addConsumer(i);
+        }
+    }
+
+    /**
+     * Return the setter with specified index, or null if none found.
+     *
+     * @param i index of setter
+     * @return the setter object
+     */
+    public TimeSeriesConsumer getConsumer(int i) {
+        for (TimeSeriesConsumer consumer : consumerList) {
+            if (consumer.getIndex() == i) {
+                return consumer;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add a time series consumer with the specified index.
+     *
+     * @param i index of setter
+     */
+    public void addConsumer(int i) {
+        for (TimeSeriesConsumer setter : consumerList) {
+            if (setter.getIndex() == i) {
+                return;
+            }
+        }
+        consumerList.add(new TimeSeriesConsumer(i));
+    }
+    
+    @Override
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        if (timeSeriesConsumerType.isVisible()) {
+            for (TimeSeriesConsumer consumer : consumerList) {
+                PotentialConsumer consumerID = new PotentialConsumer(consumer,
+                        "Series_" + consumer.getIndex(), timeSeriesConsumerType);
+               returnList.add(consumerID);
+            }
+        }
+        return returnList;
+    }
+
 
     /**
      * Add chart listener to model.
@@ -98,18 +155,20 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                TimeSeriesConsumer newAttribute = new TimeSeriesConsumer(
-                        TimeSeriesPlotComponent.this, index);
-               // addConsumer(newAttribute);
+                if (getConsumer(index) == null) {
+                    addConsumer(index);
+                    firePotentialAttributesChanged();
+                }
             }
 
             /**
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-//                TimeSeriesConsumer toBeRemoved = (TimeSeriesConsumer) getConsumers()
-//                        .get(index);
-               // removeConsumer(toBeRemoved);
+                TimeSeriesConsumer consumer = getConsumer(index);
+                fireAttributeObjectRemoved(consumer);
+                consumerList.remove(consumer);
+                firePotentialAttributesChanged();
             }
         });
     }
@@ -120,6 +179,27 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public TimeSeriesModel getModel() {
         return model;
     }
+
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        try {
+            int i = Integer.parseInt(objectKey);
+            TimeSeriesConsumer setter = new TimeSeriesConsumer(i);
+            return  setter;
+        } catch (NumberFormatException e) {
+            return null; // the supplied string was not an integer
+        }
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof TimeSeriesConsumer) {
+            return "" + ((TimeSeriesConsumer) object).getIndex();
+        }
+        return null;
+    }
+
 
     /**
      * Standard method call made to objects after they are deserialized.
@@ -168,16 +248,45 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     @Override
     public void update() {
         model.update();
-//        for (Consumer consumer : getConsumers()) {
-//            TimeSeriesConsumer t_consumer = (TimeSeriesConsumer) consumer;
-//            model.addData(t_consumer.getIndex().intValue(), getWorkspace()
-//                    .getTime().doubleValue(), t_consumer.getValue()
-//                    .doubleValue());
-//        }
     }
 
     @Override
     public String getXML() {
         return TimeSeriesModel.getXStream().toXML(model);
+    }
+
+    /**
+     * Object which adds data to a time series plot.
+     */
+    public class TimeSeriesConsumer {
+
+        /** Index. */
+        private int index;
+
+        /**
+         * Construct a setter object.
+         *
+         * @param index index of the bar to set
+         */
+        public TimeSeriesConsumer(final int index) {
+            this.index = index;
+        }
+
+        /**
+         * Set the value.
+         *
+         * @param val value for the bar
+         */
+        public void setValue(final double val) {
+            model.addData(index, TimeSeriesPlotComponent.this.getWorkspace()
+                    .getTime().doubleValue(), val);
+        }
+
+        /**
+         * @return the index
+         */
+        public int getIndex() {
+            return index;
+        }
     }
 }

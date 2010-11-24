@@ -20,19 +20,21 @@ package org.simbrain.plot.projection;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.plot.ChartListener;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Data for a projection component.
- * 
+ * Component for a projection plot.
+ *
  * TODO:
  *  Color "hot point"
  *  Tool-tips
- *  Add ability to plot multiple projections at once.
  *  Option of connecting data-points with lines
  */
 public class ProjectionComponent extends WorkspaceComponent {
@@ -44,7 +46,13 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Default number of sources. This is the dimensionality of the hi D
      * projectionModel
      */
-    private final int DEFAULT_NUMBER_OF_SOURCES = 25;
+    private final int DEFAULT_NUMBER_OF_DIMENSIONS = 25;
+
+    /** Time Series consumer type. */
+    private AttributeType projectionConsumerType;
+
+    /** Objects which can be used to add data to time series plot. */
+    private List<Dimension> dimensionList = new ArrayList<Dimension>();
 
     /**
      * Create new Projection Component.
@@ -52,8 +60,9 @@ public class ProjectionComponent extends WorkspaceComponent {
     public ProjectionComponent(final String name) {
         super(name);
         projectionModel = new ProjectionModel();
+        projectionModel.init(DEFAULT_NUMBER_OF_DIMENSIONS);
+        initializeConsumers();
         addListener();
-        projectionModel.init(DEFAULT_NUMBER_OF_SOURCES);
     }
 
     /**
@@ -65,8 +74,9 @@ public class ProjectionComponent extends WorkspaceComponent {
     public ProjectionComponent(final String name, final int numDataSources) {
         super(name);
         projectionModel = new ProjectionModel();
-        addListener();
         projectionModel.init(numDataSources);
+        initializeConsumers();
+        addListener();
     }
 
     /**
@@ -82,62 +92,143 @@ public class ProjectionComponent extends WorkspaceComponent {
 
         // Add the data to the chart.
         int numPoints = projectionModel.getProjector().getNumPoints();
+
         for (int i = 0; i < numPoints; i++) {
-            double[] point = projectionModel.getProjector().getDownstairs().getPoint(i);
+            double[] point = projectionModel.getProjector().getDownstairs()
+                    .getPoint(i);
             if (point != null) {
                 projectionModel.addPoint(point[0], point[1]);
             }
         }
 
-        // Initialize attributes
-        //TODO: REDO
-//        this.getConsumers().clear();
-//        for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
-//            addConsumer(new ProjectionConsumer(this, i));
-//        }
         addListener();
+    }
+
+    /**
+     * Initialize consumer.
+     */
+    private void initializeConsumers() {
+        projectionConsumerType = new AttributeType(this, "Dimension", "Value",
+                double.class, true);
+        addConsumerType(projectionConsumerType);
+        for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {
+            addDimension(i);
+        }
+    }
+
+    @Override
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        if (projectionConsumerType.isVisible()) {
+            for (Dimension consumer : dimensionList) {
+                PotentialConsumer consumerID = new PotentialConsumer(consumer,
+                        "Dimension_" + (consumer.getDimension() + 1),
+                        projectionConsumerType);
+               returnList.add(consumerID);
+            }
+        }
+        return returnList;
+    }
+
+    /**
+     * Add a dimension object.
+     *
+     * @param i index of dimension object
+     */
+    public void addDimension(int i) {
+        for (Dimension dimension : dimensionList) {
+            if (dimension.getDimension() == i) {
+                return;
+            }
+        }
+       dimensionList.add(new Dimension(i));
+    }
+
+    /**
+     * Return a dimension object.
+     *
+     * @param i index of dimension object to return
+     * @return the dimension object
+     */
+    public Dimension getDimension(int i) {
+        for (Dimension dimension : dimensionList) {
+            if (dimension.getDimension() == i) {
+                return dimension;
+            }
+        }
+        return null;
     }
 
     /**
      * Add chart listener to model.
      */
     private void addListener() {
-        
-        //TODO: REDO
-//        projectionModel.addListener(new ChartListener() {
-//
-//            /**
-//             * {@inheritDoc}
-//             */
-//            public void dataSourceAdded(final int index) {
-//                ProjectionConsumer newAttribute = new ProjectionConsumer(
-//                        ProjectionComponent.this, index);
-//                addConsumer(newAttribute);
-//            }
-//
-//            /**
-//             * {@inheritDoc}
-//             */
-//            public void dataSourceRemoved(final int index) {
-//                ProjectionConsumer toBeRemoved = (ProjectionConsumer) getConsumers()
-//                        .get(index);
-//                removeConsumer(toBeRemoved);
-//            }
-//        });
+
+        projectionModel.addListener(new ChartListener() {
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int dimension) {
+                if (getDimension(dimension) == null) {
+                    addDimension(dimension);
+                    ProjectionComponent.this.firePotentialAttributesChanged();
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                Dimension dimension = getDimension(index);
+                if (dimension != null) {
+                    fireAttributeObjectRemoved(dimension);
+                    dimensionList.remove(dimension);
+                    ProjectionComponent.this.firePotentialAttributesChanged();
+                }
+            }
+        });
 
     }
 
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        try {
+            int i = Integer.parseInt(objectKey);
+            Dimension dimension = new Dimension(i);
+            return  dimension;
+        } catch (NumberFormatException e) {
+            return null; // the supplied string was not an integer
+        }
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof Dimension) {
+            return "" + ((Dimension) object).getDimension();
+        }
+        return null;
+    }
+
+    @Override
+    public String getXML() {
+        return ProjectionModel.getXStream().toXML(this);
+    }
+
     /**
-     * Open component.
+     * Opens a saved projection component.
+     *
+     * @param input stream
+     * @param name name of file
+     * @param format format
+     * @return component to be opened
      */
     public static ProjectionComponent open(InputStream input,
             final String name, final String format) {
-        return new ProjectionComponent((ProjectionModel) ProjectionModel.getXStream().fromXML(input), name);
+        ProjectionModel model = (ProjectionModel)ProjectionModel.getXStream().fromXML(input);
+        return new ProjectionComponent(model, name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         projectionModel.getProjector().getUpstairs().preSaveInit();
@@ -155,31 +246,33 @@ public class ProjectionComponent extends WorkspaceComponent {
     public void closing() {
         // TODO Auto-generated method stub
     }
-   
+
     /**
-     * Get the current state of the consumers, send this to the projection algorithm,
-     * and update the graphics.
+     * Get the current state of the dimension proxies, send this to the projection
+     * algorithm, and update the graphics.
      */
     @Override
     public void update() {
-        
-        //TODO: REDO
+        // System.out.println(setterList.size() + "  " + projectionModel.getProjector().getDimensions());
 
-//    	// Create a new double array to be sent as a new "point" to the projection dataset
-//        double[] temp = new double[getConsumers().size()];
-//        int i = 0;
-//        for (Consumer consumer : getConsumers()) {
-//            // TODO: Class cast exception below?
-//            temp[i] = ((ProjectionConsumer)consumer).getValue();
-//            i++;
-//        }
-//        boolean newDatapointWasAdded = projectionModel.getProjector().addDatapoint(temp);
-//        if (newDatapointWasAdded) {
-//        	projectionModel.setCurrentItemIndex(projectionModel.getDataset().getItemCount(0));
-//            resetChartDataset(); 
-//        }
+        // Create a new double array to be sent as a new "point" to the
+        // projection dataset
+        double[] temp = new double[dimensionList.size()];
+        int i = 0;
+        for (Dimension dimension : dimensionList) {
+            temp[i] = dimension.getValue();
+            i++;
+        }
+        // System.out.println(Arrays.toString(temp));
+        boolean newDatapointWasAdded = projectionModel.getProjector()
+                .addDatapoint(temp);
+        if (newDatapointWasAdded) {
+            projectionModel.setCurrentItemIndex(projectionModel.getDataset()
+                    .getItemCount(0));
+            resetChartDataset();
+        }
     }
-    
+
     /**
      * Get reference to underlying projector object.
      *
@@ -188,7 +281,7 @@ public class ProjectionComponent extends WorkspaceComponent {
     public Projector getGauge() {
         return projectionModel.getProjector();
     }
-    
+
     /**
      * Clear the dataset.
      */
@@ -197,7 +290,7 @@ public class ProjectionComponent extends WorkspaceComponent {
         resetChartDataset();
         fireUpdateEvent();
     }
-    
+
     /**
      * Change projection.
      */
@@ -205,9 +298,10 @@ public class ProjectionComponent extends WorkspaceComponent {
         projectionModel.getProjector().getCurrentProjectionMethod().project(); // Should this have happened already?
         resetChartDataset();
     }
-    
+
     /**
-     * Update the entire dataset.  Called when the entire chart dataset is changed.
+     * Update the entire dataset. Called when the entire chart dataset is
+     * changed.
      */
     public void resetChartDataset() {
     	projectionModel.resetData();
@@ -225,15 +319,51 @@ public class ProjectionComponent extends WorkspaceComponent {
         System.out.println("--------------------------------------");
     }
 
-    @Override
-    public String getXML() {
-        return ProjectionModel.getXStream().toXML(this);
-    }
-
 	/**
 	 * @return the projectionModel
 	 */
 	public ProjectionModel getProjectionModel() {
 		return projectionModel;
 	}
+
+    /**
+     * Object which adds data to one dimension of a projection component.
+     */
+    public class Dimension {
+
+        /** Index. */
+        private int dimension;
+
+        /** Value of this dimension proxy object. */
+        private double value = 0;
+
+        /**
+         * Construct a Dimension object.
+         *
+         * @param index index of the bar to set
+         */
+        public Dimension(final int index) {
+            this.dimension = index;
+        }
+
+        public double getValue() {
+            return value;
+        }
+
+        /**
+         * Set the value.
+         *
+         * @param val value for the bar
+         */
+        public void setValue(final double val) {
+            value = val;
+        }
+
+        /**
+         * @return the index
+         */
+        public int getDimension() {
+            return dimension;
+        }
+    }
 }

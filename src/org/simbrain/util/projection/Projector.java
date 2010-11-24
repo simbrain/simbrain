@@ -77,6 +77,8 @@ public class Projector {
      */
     public boolean addDatapoint(final double[] point) {
 
+        //TODO: Throw exception if point does not match
+        
         logger.debug("addDatapoint called");
         if ((currentProjectionMethod == null) || (getUpstairs() == null)) {
             return false;

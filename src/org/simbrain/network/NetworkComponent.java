@@ -134,19 +134,19 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        for (AttributeType type : getConsumerTypes()) {
-            if (type.isVisible()) {
-                if (type.getTypeID().equalsIgnoreCase("Neuron")) {
-                    for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                        returnList.add(new PotentialConsumer(neuron, neuron.getId(), type));
-                    }
-                } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
-                    for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                        returnList.add(new PotentialConsumer(synapse, synapse.getId(), type));
-                    }
+        for (AttributeType type : getVisibleConsumerTypes()) {
+            if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+                for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                    returnList.add(new PotentialConsumer(neuron,
+                            neuron.getId(), type));
                 }
-
+            } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+                for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                    returnList.add(new PotentialConsumer(synapse, synapse
+                            .getId(), type));
+                }
             }
+
         }
         return returnList;
     }

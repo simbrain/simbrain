@@ -8,10 +8,7 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.plot.projection.*;
-import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.*;
 
 {
 
@@ -42,9 +39,9 @@ import org.simbrain.workspace.Workspace;
     desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
 
     // Make Couplings
-    for (int i = 1; i < numNeurons; i++) {
-        ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + i, "Activation"); 
-        ConsumingAttribute chartAttribute = chart.getSingleConsumingAttribute("Dimension" + i);
+    for (int i = 1; i <= numNeurons; i++) {
+        Producer neuronAttribute = networkComponent.createProducer(network.getNeuron("Neuron_" + i), "Activation", double.class); 
+        Consumer chartAttribute = chart.createConsumer(chart.getDimension(i-1), "Value", double.class, "Dimension " + i);
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
     }
 

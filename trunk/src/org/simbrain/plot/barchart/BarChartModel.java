@@ -32,7 +32,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * Data for a JFreeChart pie chart.
  */
 public class BarChartModel extends ChartModel {
-    
+
     /** JFreeChart dataset for bar charts. */
     private DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -62,7 +62,7 @@ public class BarChartModel extends ChartModel {
 
     /**
      * Return JFreeChart pie dataset.
-     * 
+     *
      * @return dataset
      */
     public DefaultCategoryDataset getDataset() {

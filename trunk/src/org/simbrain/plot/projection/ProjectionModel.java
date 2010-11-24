@@ -59,7 +59,7 @@ public class ProjectionModel extends ChartModel {
 
     /**
      * Initialize the projection model with a certain number of data sources.
-     * 
+     *
      * @param numDataSources
      *            number of sources to initialize model with.
      */
@@ -101,13 +101,14 @@ public class ProjectionModel extends ChartModel {
     public Projector getProjector() {
         return projector;
     }
-    
+
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
     public static XStream getXStream() {
         XStream xstream = ChartModel.getXStream();
+        //xstream.omitField(ProjectionModel.class, "dataset");
         xstream.omitField(Projector.class, "logger");
         xstream.omitField(Projector.class, "currentState");
         xstream.omitField(ProjectionMethod.class, "logger");
@@ -122,7 +123,7 @@ public class ProjectionModel extends ChartModel {
      * See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
@@ -138,7 +139,7 @@ public class ProjectionModel extends ChartModel {
 		return dataset;
 	}
 
-	/** 
+	/**
 	 * Convenience method for adding points to dataset.
 	 *
 	 * @param x x dimension of point to add
@@ -147,7 +148,7 @@ public class ProjectionModel extends ChartModel {
 	public void addPoint(double x, double y) {
 		dataset.getSeries(0).add(x, y, true);
     }
-	
+
 	/**
 	 * Resets the JFreeChart data and re-adds all the datapoint. Invoked when the projector must be
 	 * applied to an entire dataset.
@@ -192,7 +193,7 @@ public class ProjectionModel extends ChartModel {
     /**
      * This flag allows the user to start and stop iterative projection
      * techniques.
-     * 
+     *
      * @param b whether this component being updated by a thread or not.
      */
     public void setRunning(boolean b) {

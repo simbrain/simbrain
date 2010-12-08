@@ -99,11 +99,11 @@ public class BasicEntity extends OdorWorldEntity {
     public void setType(ComboBoxWrapper imageData) {
         setImage( (String) imageData.getCurrentObject());
     }
-    
+
     /**
      * Set type of object.
-     * 
-     * @param fileName file name.  //TODO!  BEtter doc
+     *
+     * @param fileName file name.  //TODO!  Better doc
      */
     public void setImage(String fileName) {
         this.setAnimation(new Animation(STATIC_IMAGE_DIR + fileName));

@@ -89,10 +89,8 @@ public class StraightMovementEffector implements Effector {
     /**
      * @param currentValue the currentValue to set
      */
-    public void setCurrentValue(double currentValue) {
+    public void setMovementAmount(double currentValue) {
         this.currentValue = currentValue;
     }
-    
-    
 
 }

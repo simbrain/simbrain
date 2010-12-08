@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.odorworld.entities;
 
 import java.awt.Image;
@@ -10,9 +28,13 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.RotationEffector;
+import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
+ * Parent class for all Odor World objects.
+ *
  * Adapted and extended from From Developing Games in Java, by David Brackeen.
  */
 public abstract class OdorWorldEntity {
@@ -21,7 +43,7 @@ public abstract class OdorWorldEntity {
      * Animation used to depict this object. If the animation has one frame this
      * is equivalent to just using a single image to represent it.
      */
-    private Animation animation;  
+    private Animation animation;    
 
     /** Name of this entity. */
     private String name;
@@ -305,7 +327,7 @@ public abstract class OdorWorldEntity {
     public OdorWorld getParentWorld() {
         return parentWorld;
     }
-    
+
     /**
      * Returns the location of the center of this entity as a double array.
      *
@@ -467,6 +489,21 @@ public abstract class OdorWorldEntity {
      */
     public void setBehavior(Behavior behavior) {
         this.behavior = behavior;
+    }
+
+    /**
+     * Return straight movement effector, or null if none found.
+     * Convenience method for use in scripts.
+     *
+     * @return straight effector if found
+     */
+    public Effector getStraightMovementEffector() {
+        for (Effector effector : getEffectors()) {
+            if (effector instanceof StraightMovementEffector) {
+                return effector;
+            }
+        }
+        return null;
     }
 
 }

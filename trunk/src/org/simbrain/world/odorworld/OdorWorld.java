@@ -115,7 +115,7 @@ public class OdorWorld {
         //centerSprite(sprite, tileX,tileY);
 
         recomputeMaxStimulusLength();
-        
+
         // Add entity to the map
         //map.addSprite(entity);
         entityList.add(entity);
@@ -129,7 +129,11 @@ public class OdorWorld {
      */
     public void addAgent(final OdorWorldEntity entity) {
         if (entity instanceof RotatingEntity) {
-            entity.addEffector(new RotationEffector((RotatingEntity) entity));
+            RotationEffector rightTurn = new RotationEffector((RotatingEntity) entity);
+            RotationEffector leftTurn = new RotationEffector((RotatingEntity) entity);
+            rightTurn.setScaleFactor(-1);
+            entity.addEffector(leftTurn);
+            entity.addEffector(rightTurn);
             entity.addEffector(new StraightMovementEffector((RotatingEntity) entity));
             entity.addSensor(new SmellSensor(entity, "Left", Math.PI/8, 50));
             entity.addSensor(new SmellSensor(entity, "Center", 0, 0));

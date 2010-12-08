@@ -56,7 +56,6 @@ public class RotationEffector implements Effector {
             parentObject.setHeading(parentObject.getHeading()
                     + turnAmount);
             turnAmount = 0;
-            scaleFactor = 1;
         }
     }
 
@@ -98,7 +97,8 @@ public class RotationEffector implements Effector {
      */
     public void setTurnAmount(double value) {
         if (!parentObject.isBlocked()) {
-            turnAmount += value * scaleFactor;
+            turnAmount += (value * scaleFactor);
         }
     }
+
 }

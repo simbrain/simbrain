@@ -1,0 +1,258 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.synapses.*;
+import org.simbrain.workspace.*;
+import javax.swing.JInternalFrame;
+import java.util.*;
+import org.jgap.*;
+import org.jgap.impl.*;
+
+{
+    /** Sample size. */
+    private final static int SAMPLE_SIZE = 10;
+
+    /** Number of evolutions to run the evolver. */
+    private final static int NUM_EVOLUTIONS = 10;
+
+    /** Maximum fitness. */
+    private final static int MAX_FITNESS = 1000;
+
+    // Sample chromosome, population size, and desired fitness function.
+    Configuration defaultConfig = new DefaultConfiguration();
+    Configuration.reset();
+    defaultConfig.setPreservFittestIndividual(true);
+    defaultConfig.setKeepPopulationSizeConstant(false);
+
+    // Initialize genotype
+    Genotype genotype = null;
+    try {
+
+        // Chromosome is a set of genes that specify:
+        //      number of neurons
+        //      parameters of a sparse connection on them
+        
+        //  Each gene has a minimum and maximum value
+        Gene[] genes = new Gene[7];
+        genes[0] = new IntegerGene(defaultConfig, 20, 100); // Neurons
+        genes[1] = new DoubleGene(defaultConfig, 50, 100); // Grid space
+        genes[2] = new DoubleGene(defaultConfig, 0, 1); // Inhibitory prob
+        genes[3] = new DoubleGene(defaultConfig, 10, 100); // Inhibitory radius
+        genes[4] = new DoubleGene(defaultConfig, 0, 1); // Excitatory prob
+        genes[5] = new DoubleGene(defaultConfig, 10, 100); // Excitatory radius
+        genes[6] = new IntegerGene(defaultConfig, 0, 3); // Neuron Type
+
+        IChromosome sampleChromosome = new Chromosome(defaultConfig, genes);
+        defaultConfig.setSampleChromosome(sampleChromosome);
+        defaultConfig.setPopulationSize(SAMPLE_SIZE);
+        defaultConfig.setFitnessFunction(new NetworkEvaluationFunction());
+        genotype = Genotype.randomInitialGenotype(defaultConfig);
+    } catch (InvalidConfigurationException e) {
+        e.printStackTrace();
+        System.exit(-2);
+    }
+    int progress = 0;
+    int percentEvolution = NUM_EVOLUTIONS / 100;
+    for (int i = 0; i < NUM_EVOLUTIONS; i++) {
+        genotype.evolve();
+
+        // Print progress.
+        if (percentEvolution > 0 && i % percentEvolution == 0) {
+            progress++;
+            IChromosome fittest = genotype.getFittestChromosome();
+            double fitness = fittest.getFitnessValue();
+            System.out.println("Currently fittest Chromosome has fitness "
+                    + fitness);
+            if (fitness >= MAX_FITNESS) {
+                break;
+            }
+        }
+    }
+
+    // Display winning network
+    IChromosome fittest = genotype.getFittestChromosome();
+    System.out.println("Fittest Chromosome has fitness "
+            + fittest.getFitnessValue() + "  number of neurons: "
+            + ((IntegerGene) fittest.getGene(0)).intValue());
+
+    RootNetwork network = (RootNetwork) fittest.getApplicationData();
+
+    // Initialize network component
+    NetworkComponent networkComponent = new NetworkComponent("Evolved network", network );
+    workspace.addWorkspaceComponent(networkComponent);
+    desktop.getDesktopComponent(networkComponent).postAddInit();
+
+
+    private class NetworkEvaluationFunction extends FitnessFunction {
+        // TODO: Base Synapse Types for inhib and excit...
+
+        protected double evaluate(IChromosome chromosome) {
+
+            RootNetwork network = new RootNetwork();
+            chromosome.setApplicationData(network);
+
+            // The basic description of the network using a chromosome
+            // Currently the emphasis is on networks with radial connections
+            int numNeurons = ((IntegerGene) chromosome.getGene(0)).intValue();
+            double gridSpace = ((DoubleGene) chromosome.getGene(1)).doubleValue();
+            double inhibProb = ((DoubleGene) chromosome.getGene(2)).doubleValue();
+            double inhibRadius = ((DoubleGene) chromosome.getGene(3)).doubleValue();
+            double excitProb = ((DoubleGene) chromosome.getGene(4)).doubleValue();
+            double excitRadius = ((DoubleGene) chromosome.getGene(5)).doubleValue();
+            int neuronType = ((IntegerGene) chromosome.getGene(6)).intValue();
+
+            // Build the network based on the current chromosome
+            for (int i = 0; i < numNeurons; i++) {
+                Neuron neuron = getNeuron(neuronType);
+                network.addNeuron(neuron);
+            }
+            GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math
+                    .sqrt(numNeurons));
+            layout.layoutNeurons(network);
+            Radial connection = new Radial(network, network.getFlatNeuronList(),
+                    network.getFlatNeuronList());
+            connection.setExcitatoryProbability(excitProb);
+            connection.setInhibitoryProbability(inhibProb);
+            connection.setExcitatoryRadius(excitRadius);
+            connection.setInhibitoryRadius(inhibRadius);
+            connection.connectNeurons();
+
+            // Currently, the default behavior is to randomize the neurons of a
+            // network and update it for a set number of iterations.
+            network.randomizeNeurons();
+            for (int i = 0; i < 50; i++) {
+                network.updateRootNetwork();
+            }
+
+            // ---------------------------------------------------------------
+            // Comment / uncomment / modify code below to change the specific
+            // fitness function implemented.
+            // ---------------------------------------------------------------
+
+            // return howCloseToValue(network, 150);
+            // return percentActive(network);
+             //return getAverageValue(network);
+            return percentActive(network, .50);
+        }
+
+        /**
+         * Helper method which returns a neuron type based on an integer value. More
+         * options can obviously be added here.
+         * 
+         * @param neuronType
+         *            integer value
+         * @return a neuron of the corresponding type
+         */
+        private Neuron getNeuron(int neuronType) {
+
+            switch (neuronType) {
+            case 0:
+                return new BinaryNeuron();
+            case 1:
+                return new LinearNeuron();
+            case 2:
+                return new SigmoidalNeuron();
+            case 3:
+                return new DecayNeuron();
+            default:
+                return new NakaRushtonNeuron();
+            }
+        }
+
+        /**
+         * Use this method to evolve a network for which a specified percentage of
+         * neurons will be active.
+         * 
+         * @param network
+         *            network reference
+         * @param target
+         *            target percentage
+         * @return how close the given network is to the specified percentage
+         */
+        private double percentActive(RootNetwork network, double target) {
+            return 1 - Math.abs(percentActive(network) - target);
+        }
+
+        /**
+         * Helper method. Determines the percentage of neurons in a network active,
+         * where "active" means activation greater than 1/2 * that neuron's upper
+         * bound.
+         *
+         * Takes average over several iterations, to avoid solutions that oscillate.
+         *
+         * @param network
+         *            reference
+         * @return percent active
+         */
+        private double percentActive(RootNetwork network) {
+
+            int numNeurons = network.getFlatNeuronList().size();
+            int numActive = 0;
+            int numIterations = 2;
+
+            for (int iterations = 0; iterations < numIterations; iterations++) {
+                for (Neuron neuron : network.getFlatNeuronList()) {
+                    if (neuron.getActivation() > neuron.getUpperBound() / 2) {
+                        // System.out.println(neuron.getId() + ":" +
+                        // neuron.getActivation() + "/" + neuron.getUpperBound());
+                        numActive++;
+                    }
+                }
+                network.update();
+            }
+
+            double percentActive = (double) numActive / (double) numNeurons
+                    / numIterations;
+            return percentActive;
+        }
+
+        /**
+         * Use this method to evolve a network whose average activity is as close as
+         * possible to a specified value.
+         * 
+         * @param network
+         *            reference to network
+         * @param value
+         *            target average activity
+         * @return how close the network's average value is to the target value.
+         */
+        private double howCloseToValue(RootNetwork network, double value) {
+
+            // A value between 0 and something..
+            double distanceToValue = Math.abs(getAverageValue(network) - value);
+            return 1000 - distanceToValue;
+        }
+
+        /**
+         * Helper method which returns the average activity of a network over a time
+         * window (specified by numIterations). Return only values greater than 0.
+         * 
+         * Takes average over several iterations, to avoid solutions that oscillate.
+         * 
+         * @param network
+         *            reference to network
+         * @return average value over specified window.
+         */
+        private double getAverageValue(RootNetwork network) {
+            double total = 0;
+            int numIterations = 2;
+
+            for (int iterations = 0; iterations < numIterations; iterations++) {
+                for (Neuron neuron : network.getFlatNeuronList()) {
+                    total += neuron.getActivation();
+                }
+                network.update();
+            }
+            double averageVal = total / network.getFlatNeuronList().size()
+                    / numIterations;
+            System.out.println("average value:" + averageVal);
+            return Math.max(0, averageVal);
+        }
+    }
+}
+
+

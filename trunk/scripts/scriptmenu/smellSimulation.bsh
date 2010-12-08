@@ -109,21 +109,21 @@ import org.simbrain.plot.projection.*;
     sparseConnect.connectNeurons();
 
     // Couple odor world to network
-    ProducingAttribute smell1 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-1");
-    ProducingAttribute smell2 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-2");
-    ProducingAttribute smell3 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-3");
-    ProducingAttribute smell4 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-4");
-    ProducingAttribute smell5 = odorWorld.getProducingAttribute("RotatingEntity-1-Center","Smell-5");
-    ConsumingAttribute inputNeuron1 = networkComponent.getConsumingAttribute("Neuron_26", "Activation"); 
-    ConsumingAttribute inputNeuron2 = networkComponent.getConsumingAttribute("Neuron_27", "Activation"); 
-    ConsumingAttribute inputNeuron3 = networkComponent.getConsumingAttribute("Neuron_28", "Activation"); 
-    ConsumingAttribute inputNeuron4 = networkComponent.getConsumingAttribute("Neuron_29", "Activation"); 
-    ConsumingAttribute inputNeuron5 = networkComponent.getConsumingAttribute("Neuron_30", "Activation"); 
+    Producer smell1 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 0), "Value", double.class, "Sensor 1"); 
+    Producer smell2 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 1), "Value", double.class, "Sensor 2"); 
+    Producer smell3 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 2), "Value", double.class, "Sensor 3"); 
+    Producer smell4 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 3), "Value", double.class, "Sensor 4"); 
+    Producer smell5 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 4), "Value", double.class, "Sensor 5");   
+    Consumer inputNeuron1 = networkComponent.createConsumer(network.getNeuron("Neuron_26"), "InputValue", double.class, "Output neuron 1"); 
+    Consumer inputNeuron2 = networkComponent.createConsumer(network.getNeuron("Neuron_27"), "InputValue", double.class, "Output neuron 2"); 
+    Consumer inputNeuron3 = networkComponent.createConsumer(network.getNeuron("Neuron_28"), "InputValue", double.class, "Output neuron 3"); 
+    Consumer inputNeuron4 = networkComponent.createConsumer(network.getNeuron("Neuron_29"), "InputValue", double.class, "Output neuron 4"); 
+    Consumer inputNeuron5 = networkComponent.createConsumer(network.getNeuron("Neuron_30"), "InputValue", double.class, "Output neuron 5"); 
     workspace.getCouplingManager().addCoupling(new Coupling(smell1, inputNeuron1));
-    workspace. getCouplingManager().addCoupling(new Coupling(smell2, inputNeuron2));
+    workspace.getCouplingManager().addCoupling(new Coupling(smell2, inputNeuron2));
     workspace.getCouplingManager().addCoupling(new Coupling(smell3, inputNeuron3));
-    workspace. getCouplingManager().addCoupling(new Coupling(smell4, inputNeuron4));
-    workspace. getCouplingManager().addCoupling(new Coupling(smell5, inputNeuron5));
+    workspace.getCouplingManager().addCoupling(new Coupling(smell4, inputNeuron4));
+    workspace.getCouplingManager().addCoupling(new Coupling(smell5, inputNeuron5));
 
     // Create projection plot
     ProjectionComponent chart = new ProjectionComponent("Network Projection");
@@ -132,12 +132,10 @@ import org.simbrain.plot.projection.*;
 
     // Couple network to projection chart
     for (int i = 1; i < 25; i++) {
-        ProducingAttribute neuronAttribute = networkComponent.getProducingAttribute("Neuron_" + i, "Activation"); 
-        ConsumingAttribute chartAttribute = chart.getSingleConsumingAttribute("Dimension" + i);
+        Producer neuronAttribute = networkComponent.createProducer(network.getNeuron("Neuron_" + i), "Activation", double.class, "Neuron " + i); 
+        Consumer chartAttribute = chart.createConsumer(chart.getDimension(i-1), "Value", double.class, "Dimension " + i);
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
     }
-
-
 
 
 }

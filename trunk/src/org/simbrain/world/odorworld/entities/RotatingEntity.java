@@ -19,11 +19,12 @@
 package org.simbrain.world.odorworld.entities;
 
 import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 
@@ -235,6 +236,31 @@ public class RotatingEntity extends OdorWorldEntity {
      */
     public void setType(ComboBoxWrapper imageData) {
         setEntityType((String) imageData.getCurrentObject());
+    }
+
+    /**
+     * Convenience method to get "left" and "right" rotators.  For use in scripts.
+     *
+     * TODO: Abstract left, right concept.
+     * @param name left or right
+     * @return matching effector, if any
+     */
+    public RotationEffector getRotationEffector(String name) {
+        for (Effector effector : getEffectors()) {
+            if (effector instanceof RotationEffector) {
+                RotationEffector rotator = (RotationEffector) effector;
+                if (name.equalsIgnoreCase("Right")) {
+                    if (rotator.getScaleFactor() < 0) {
+                        return rotator;
+                    }
+                } else if (name.equalsIgnoreCase("Left")) {
+                    if (rotator.getScaleFactor() > 0) {
+                        return rotator;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

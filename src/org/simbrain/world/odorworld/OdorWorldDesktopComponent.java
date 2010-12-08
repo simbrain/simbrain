@@ -85,7 +85,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     public OdorWorldPanel getWorldPanel() {
         return worldPanel;
     }
-    
+
     @Override
     public void postAddInit() {
         menu = new OdorWorldFrameMenu(this);

@@ -26,7 +26,7 @@ import org.simbrain.world.odorworld.entities.Animation;
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
  * have noise added and has built in functions to compute decay.
- * 
+ *
  * Standardly these objects represent "distal stimuli" relative to an organism.
  */
 public class SmellSource {
@@ -48,7 +48,7 @@ public class SmellSource {
 
         /**
          * Constructor.
-         * 
+         *
          * @param name name.
          */
         DecayFunction(String name) {
@@ -96,7 +96,7 @@ public class SmellSource {
         this.addNoise = addNoise;
         this.noiseLevel = noiseLevel;
     }
-    
+
     /**
      * Construct smell source from specified parameters.
      *
@@ -112,7 +112,6 @@ public class SmellSource {
         this.stimulusDispersion = dispersion;
         this.location = location;
     }
-    
 
     /**
      * Construct smell source from specified parameters.
@@ -126,15 +125,26 @@ public class SmellSource {
         this.decayFunction = decay;
         this.location = location;
     }
-    
+
     /**
      * Construct a smell source from a specified stimulus vector, using defaults
      * otherwise.
-     * 
+     *
      * @param distalstim the stimulus vector
      */
     public SmellSource(final double[] distalstim) {
         this.stimulusVector = distalstim;
+    }
+
+    /**
+     * Construct a smell source with a specified number of dimensions, randomly
+     * initialized.
+     * 
+     * @param numDimensions
+     *            number of dimensions of the stimulus vector.
+     */
+    public SmellSource(final int numDimensions) {
+        this.stimulusVector = SimbrainMath.randomVector(numDimensions);
     }
 
     /**

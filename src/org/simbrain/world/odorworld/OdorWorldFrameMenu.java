@@ -31,6 +31,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.world.odorworld.actions.OpenWorldAction;
 import org.simbrain.world.odorworld.actions.SaveWorldAction;
 import org.simbrain.world.odorworld.actions.SaveWorldAsAction;
@@ -43,11 +44,11 @@ import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
 
     private static final long serialVersionUID = 1L;
-    
+
     //TODO: Replace all this with actions.
 
     /** Parent frame. */
-    private OdorWorldDesktopComponent parentFrame;
+    private OdorWorldDesktopComponent parent;
     /** File menu. */
     private JMenu fileMenu = new JMenu("File  ");
     /** Save menu item. */
@@ -78,21 +79,21 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      * @param frame Frame to create menu
      */
     public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame) {
-        parentFrame = frame;
+        parent = frame;
     }
-    
+
     private final ActionListener saveListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            parentFrame.save();
+            parent.save();
         }
     };
-    
+
     private final ActionListener saveAsListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            parentFrame.showSaveFileDialog();
+            parent.showSaveFileDialog();
         }
     };
-    
+
     private final ActionListener helpItemListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             Utils.showQuickRef("World.html");
@@ -105,12 +106,12 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     public void setUpMenus() {
 
         setUpFileMenu();
-
         setUpEditMenu();
-
         add(getHelpMenu());
         getHelpMenu().add(getHelpItem());
         getHelpItem().addActionListener(helpItemListener);
+        add(new CouplingMenuComponent("Couple", parent.getWorkspaceComponent()
+                .getWorkspace(), parent.getWorkspaceComponent()));
     }
 
     /**
@@ -118,11 +119,11 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      */
     public void setUpFileMenu() {
         add(getFileMenu());
-        getFileMenu().add(new OpenWorldAction(parentFrame));
-        getFileMenu().add(new SaveWorldAction(parentFrame));
-        getFileMenu().add(new SaveWorldAsAction(parentFrame));
+        getFileMenu().add(new OpenWorldAction(parent));
+        getFileMenu().add(new SaveWorldAction(parent));
+        getFileMenu().add(new SaveWorldAsAction(parent));
         getFileMenu().addSeparator();
-        getFileMenu().add(new ShowWorldPrefsAction(parentFrame.getWorldPanel()));
+        getFileMenu().add(new ShowWorldPrefsAction(parent.getWorldPanel()));
         getFileMenu().add(getClose());
         getFileMenu().addMenuListener(this);
 
@@ -166,9 +167,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      */
     public void menuSelected(final MenuEvent e) {
         if (e.getSource().equals(getFileMenu())) {
-            if (parentFrame.getWorkspaceComponent().hasChangedSinceLastSave()) {
+            if (parent.getWorkspaceComponent().hasChangedSinceLastSave()) {
                 getSaveItem().setEnabled(true);
-            } else if (!parentFrame.getWorkspaceComponent().hasChangedSinceLastSave()) {
+            } else if (!parent.getWorkspaceComponent().hasChangedSinceLastSave()) {
                 getSaveItem().setEnabled(false);
             }
         }

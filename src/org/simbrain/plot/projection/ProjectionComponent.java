@@ -365,5 +365,6 @@ public class ProjectionComponent extends WorkspaceComponent {
         public int getDimension() {
             return dimension;
         }
+
     }
 }

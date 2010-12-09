@@ -20,18 +20,22 @@ package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
 
@@ -39,7 +43,7 @@ import org.simbrain.workspace.CouplingListener;
  * Displays a list of the current couplings in the network.
  *
  */
-public class CouplingListPanel extends JPanel implements CouplingListener, ActionListener {
+public class CouplingListPanel extends JPanel implements CouplingListener {
 
     /** List of network couplings. */
     private JList couplings = new JList();
@@ -52,6 +56,28 @@ public class CouplingListPanel extends JPanel implements CouplingListener, Actio
 
     /** List of couplings. */
     private Vector<Coupling<?>> couplingList = new Vector<Coupling<?>>();
+
+    /** Action which deletes current couplings. */
+    Action deleteCouplingsAction = new AbstractAction() {
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+            putValue(NAME, "Delete couplings");
+            putValue(SHORT_DESCRIPTION, "Delete selected couplings");
+            CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                    KeyStroke.getKeyStroke("BACK_SPACE"), this);
+            CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                    KeyStroke.getKeyStroke("DELETE"), this);
+            CouplingListPanel.this.getActionMap().put(this, this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            desktop.getWorkspace().getCouplingManager().removeCouplings(getSelectedCouplings());
+        }
+    };
 
     /**
      * Creates a new coupling list panel using the applicable desktop and coupling lists.
@@ -84,9 +110,7 @@ public class CouplingListPanel extends JPanel implements CouplingListener, Actio
 
         // Allows the user to delete couplings within the list frame.
         JPanel buttonPanel = new JPanel();
-        JButton deleteCouplingButton = new JButton("Delete");
-        deleteCouplingButton.setActionCommand("Delete");
-        deleteCouplingButton.addActionListener(this);
+        JButton deleteCouplingButton = new JButton(deleteCouplingsAction);
         buttonPanel.add(deleteCouplingButton);
 
         // Add scroll pane to JPanel
@@ -104,19 +128,6 @@ public class CouplingListPanel extends JPanel implements CouplingListener, Actio
         couplings.setListData(couplingList);
     }
 
-
-    /**
-     * @see ActionListener
-     * @param event Action event.
-     */
-    public void actionPerformed(final ActionEvent event) {
-        if (event.getSource() instanceof JButton) {
-            JButton button = (JButton) event.getSource();
-            if (button.getActionCommand().equals("Delete")) {
-                desktop.getWorkspace().getCouplingManager().removeCouplings(getSelectedCouplings());
-            }
-        }
-    }
 
     /**
      * Returns consumers selected in consumer list.
@@ -143,6 +154,5 @@ public class CouplingListPanel extends JPanel implements CouplingListener, Actio
     public void couplingRemoved(Coupling coupling) {
         couplingsUpdated();
     }
-
 
 }

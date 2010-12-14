@@ -1,5 +1,5 @@
 /*
-h * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,12 @@ public final class NetworkComponent extends WorkspaceComponent {
     /** Reference to root network, the main model network. */
     private RootNetwork rootNetwork = new RootNetwork();
 
+    /** Attribute type for activations. */
+    private AttributeType activationType = new AttributeType(this, "Neuron", "Activation", double.class, true);
+
+    /** Attribute type for input values. */
+    private AttributeType inputValueType = new AttributeType(this, "Neuron", "InputValue", double.class, true);
+
     /**
      * Create a new network component.
      */
@@ -65,13 +71,13 @@ public final class NetworkComponent extends WorkspaceComponent {
     private void init() {
 
         // Initialize attribute types and their default visibility
-        addProducerType(new AttributeType(this, "Neuron", "Activation", double.class, true));
+        addProducerType(activationType);
         addProducerType(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
         addProducerType(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
         addProducerType(new AttributeType(this, "Neuron", "Label", String.class, false));
         addProducerType(new AttributeType(this, "Synapse", "Strength", double.class, false));
-        
-        addConsumerType(new AttributeType(this, "Neuron", "InputValue", double.class, true));
+
+        addConsumerType(inputValueType);
         addConsumerType(new AttributeType(this, "Neuron", "Activation", double.class, false));
         addConsumerType(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
         addConsumerType(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
@@ -135,15 +141,15 @@ public final class NetworkComponent extends WorkspaceComponent {
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
-            if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+            if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                    returnList.add(new PotentialConsumer(neuron,
-                            neuron.getId(), type));
+                    String description = type.getDescription(neuron.getId());
+                    returnList.add(getAttributeManager().createPotentialConsumer(neuron, type, description));
                 }
-            } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+            } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                    returnList.add(new PotentialConsumer(synapse, synapse
-                            .getId(), type));
+                    String description = type.getDescription(synapse.getId());
+                    returnList.add(getAttributeManager().createPotentialConsumer(synapse, type, description));
                 }
             }
 
@@ -155,13 +161,15 @@ public final class NetworkComponent extends WorkspaceComponent {
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
-            if (type.getTypeID().equalsIgnoreCase("Neuron")) {
+            if (type.getTypeName().equalsIgnoreCase("Neuron")) {
                 for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
-                    returnList.add(new PotentialProducer(neuron, neuron.getId(), type));
+                    String description = type.getDescription(neuron.getId());
+                    returnList.add(getAttributeManager().createPotentialProducer(neuron, type, description));
                 }
-            } else if (type.getTypeID().equalsIgnoreCase("Synapse")) {
+            } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
                 for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
-                    returnList.add(new PotentialProducer(synapse, synapse.getId(), type));
+                    String description = type.getDescription(synapse.getId());
+                    returnList.add(getAttributeManager().createPotentialProducer(synapse, type, description));
                 }
             }
         }
@@ -223,6 +231,20 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public String getXML() {
         return RootNetwork.getXStream().toXML(rootNetwork);
+    }
+
+    /**
+     * @return the activationType
+     */
+    public AttributeType getActivationType() {
+        return activationType;
+    }
+
+    /**
+     * @return the inputValueType
+     */
+    public AttributeType getInputValueType() {
+        return inputValueType;
     }
 
     // TODO: Link to NetworkSettings.

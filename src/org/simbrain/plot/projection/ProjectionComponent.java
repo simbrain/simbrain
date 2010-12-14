@@ -121,9 +121,9 @@ public class ProjectionComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (projectionConsumerType.isVisible()) {
             for (Dimension consumer : dimensionList) {
-                PotentialConsumer consumerID = new PotentialConsumer(consumer,
-                        "Dimension_" + (consumer.getDimension() + 1),
-                        projectionConsumerType);
+                String description = projectionConsumerType.getSimpleDescription("Dimension " + (consumer.getDimension() + 1)); 
+                PotentialConsumer consumerID =
+                    getAttributeManager().createPotentialConsumer(consumer, projectionConsumerType, description);
                returnList.add(consumerID);
             }
         }

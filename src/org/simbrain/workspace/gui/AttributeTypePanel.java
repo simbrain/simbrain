@@ -128,7 +128,7 @@ public class AttributeTypePanel extends JPanel  {
         public Object getValueAt(int row, int col) {
             switch (col) {
             case 0:
-                return data.get(row).getSimpleDescription();
+                return data.get(row).getBaseDescription();
             case 1:
                 return data.get(row).getDataType().getSimpleName();
             case 2:

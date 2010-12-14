@@ -91,6 +91,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this class?
+        getParentFrame().pack(); // Force a repaint
     }
 
     /**

@@ -231,13 +231,13 @@ public class WorkspaceSerializer {
 
                 // Get attributes from references
                 Producer<?> producer =
-                    (Producer<?>) sourceComponent.createProducer(
+                    (Producer<?>) sourceComponent.getAttributeManager().createProducer(
                                 sourceComponent.getObjectFromKey(couplingRef.getArchivedProducer().getBaseObjectKey()),
                                 couplingRef.getArchivedProducer().getMethodBaseName(),
                                 couplingRef.getArchivedProducer().getDataType(),
                                 couplingRef.getArchivedProducer().getDescription());
                 Consumer<?> consumer =
-                    (Consumer<?>) targetComponent.createConsumer(
+                    (Consumer<?>) targetComponent.getAttributeManager().createConsumer(
                         targetComponent.getObjectFromKey(couplingRef.getArchivedConsumer().getBaseObjectKey()),
                         couplingRef.getArchivedConsumer().getMethodBaseName(),
                         couplingRef.getArchivedConsumer().getDataType(),

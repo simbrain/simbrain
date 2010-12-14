@@ -129,15 +129,16 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         }
         consumerList.add(new TimeSeriesConsumer(i));
     }
-    
+
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (timeSeriesConsumerType.isVisible()) {
             for (TimeSeriesConsumer consumer : consumerList) {
-                PotentialConsumer consumerID = new PotentialConsumer(consumer,
-                        "Series_" + consumer.getIndex(), timeSeriesConsumerType);
-               returnList.add(consumerID);
+                String description = timeSeriesConsumerType.getSimpleDescription("Time Series " + consumer.getIndex());
+                PotentialConsumer consumerID = getAttributeManager()
+                        .createPotentialConsumer(consumer, timeSeriesConsumerType, description);
+                returnList.add(consumerID);
             }
         }
         return returnList;

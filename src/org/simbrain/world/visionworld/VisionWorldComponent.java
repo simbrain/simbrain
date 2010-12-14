@@ -80,12 +80,13 @@ public final class VisionWorldComponent extends WorkspaceComponent {
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
-            if (type.getTypeID().equalsIgnoreCase("Sensor")) {
+            if (type.getTypeName().equalsIgnoreCase("Sensor")) {
               SensorMatrix sensorMatrix = getVisionWorld().getModel().getSensorMatrix();
               for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
                   for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
                       Sensor sensor = sensorMatrix.getSensor(row, column);
-                      returnList.add(new PotentialProducer(sensor, sensor.getKey(), type));
+                      String description = type.getDescription(sensor.getKey());
+                      returnList.add(getAttributeManager().createPotentialProducer(sensor, type, description));
                   }
               }
             }

@@ -54,10 +54,10 @@ public class DataWorldComponent extends WorkspaceComponent {
     private List<ColumnAttribute> producerList = new ArrayList<ColumnAttribute>();
 
     /** Producing column attribute type. */
-    private AttributeType producingColumn;
+    private final AttributeType producingColumnType = new AttributeType(this, "Column", "Value", double.class, true);
 
     /** Consuming column attribute type. */
-    private AttributeType consumingColumn;
+    private final AttributeType consumingColumnType = new AttributeType(this, "Column", "Value", double.class, true);
 
     /**
      * This method is the default constructor.
@@ -93,11 +93,8 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        producingColumn = new AttributeType(this, "Column", "Value", double.class, true);
-        consumingColumn = new AttributeType(this, "Column", "Value", double.class, true);
-
-        getProducerTypes().add(producingColumn);
-        getProducerTypes().add(consumingColumn);
+        getProducerTypes().add(producingColumnType);
+        getConsumerTypes().add(consumingColumnType);
 
         for (int i = 0; i < dataModel.getColumnCount(); i++) {
             addColumnAttribute(i, consumerList);
@@ -110,10 +107,10 @@ public class DataWorldComponent extends WorkspaceComponent {
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        if (consumingColumn.isVisible()) {
+        if (consumingColumnType.isVisible()) {
             for (ColumnAttribute attribute : consumerList) {
-                PotentialConsumer consumer = new PotentialConsumer(attribute,
-                        "Column_" + attribute.getIndex(), consumingColumn);
+                String description = consumingColumnType.getSimpleDescription("Column " + (attribute.getIndex() + 1));
+                PotentialConsumer consumer = getAttributeManager().createPotentialConsumer(attribute, consumingColumnType, description);
                 returnList.add(consumer);
             }
         }
@@ -123,10 +120,10 @@ public class DataWorldComponent extends WorkspaceComponent {
     @Override
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
-        if (producingColumn.isVisible()) {
+        if (producingColumnType.isVisible()) {
             for (ColumnAttribute attribute : consumerList) {
-                PotentialProducer producer = new PotentialProducer(attribute,
-                        "Column_" + attribute.getIndex(), producingColumn);
+                String description = producingColumnType.getDescription("Column_" + (attribute.getIndex() + 1));
+                PotentialProducer producer = getAttributeManager().createPotentialProducer(attribute, producingColumnType, description);
                 returnList.add(producer);
             }
         }
@@ -185,7 +182,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      * @param list list to check
      * @return the column attribute
      */
-    public ColumnAttribute getColumnAttribute(int i, List<ColumnAttribute> list) {
+    private ColumnAttribute getColumnAttribute(int i, List<ColumnAttribute> list) {
         for (ColumnAttribute attribute : list) {
             if (attribute.getIndex() == i) {
                 return attribute;
@@ -200,7 +197,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      * @param i index of setter
      * @param list list to check
      */
-    public void addColumnAttribute(int i, List<ColumnAttribute> list) {
+    private void addColumnAttribute(int i, List<ColumnAttribute> list) {
         for (ColumnAttribute attribute : list) {
             if (attribute.getIndex() == i) {
                 return;
@@ -328,6 +325,20 @@ public class DataWorldComponent extends WorkspaceComponent {
             return index;
         }
 
+    }
+
+    /**
+     * @return the producingColumnType
+     */
+    public AttributeType getProducingColumnType() {
+        return producingColumnType;
+    }
+
+    /**
+     * @return the consumingColumnType
+     */
+    public AttributeType getConsumingColumnType() {
+        return consumingColumnType;
     }
 
 }

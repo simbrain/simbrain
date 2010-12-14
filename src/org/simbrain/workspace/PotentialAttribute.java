@@ -30,12 +30,6 @@ public class PotentialAttribute {
     /** Parent workspace component. */
     private WorkspaceComponent parent;
 
-    /**
-     * An identifier for the object. Used by the GUI to display attribute
-     * information.
-     */
-    private String objectName;
-
     /** Potential producing or consuming object. */
     private Object baseObject;
 
@@ -44,22 +38,23 @@ public class PotentialAttribute {
 
     /** The data type (double, string, etc) of a consumer or producer. */
     private Class<?> dataType;
+    
+    private String description;
 
     /**
      * Construct a potential attribute.
      *
      * @param parent parent workspace component
-     * @param objectName name of object
      * @param methodBaseName method name
      * @param dataType class of data
      */
-    protected PotentialAttribute(WorkspaceComponent parent, Object object, String objectName,
-            String methodBaseName, Class dataType) {
+    protected PotentialAttribute(WorkspaceComponent parent, Object object, 
+            String methodBaseName, Class dataType, String description) {
         this.parent = parent;
-        this.objectName = objectName;
         this.baseObject = object;
         this.methodBaseName = methodBaseName;
         this.dataType = dataType;
+        this.description = description;
     }
 
     /**
@@ -68,7 +63,7 @@ public class PotentialAttribute {
      * @return the producer corresponding to this potential attribute.
      */
     public Producer<?> createProducer() {
-        return parent.createProducer(this);
+        return parent.getAttributeManager().createProducer(this);
     }
 
     /**
@@ -77,7 +72,7 @@ public class PotentialAttribute {
      * @return the consumer corresponding to this potential attribute.
      */
     public Consumer<?> createConsumer() {
-        return parent.createConsumer(this);
+        return parent.getAttributeManager().createConsumer(this);
     }
 
     /**
@@ -86,8 +81,7 @@ public class PotentialAttribute {
      * @return a description of this attribute
      */
     public String getDescription() {
-        return objectName + ":" + methodBaseName + "<"
-                + dataType.getCanonicalName() + ">";
+        return description;
     }
 
     /**

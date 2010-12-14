@@ -3,12 +3,12 @@ package org.simbrain.network.desktop;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.CouplingMenuConsumer;
-import org.simbrain.workspace.gui.CouplingMenuProducer;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.*;
 
 /**
  * Version of a Neuron Node with a coupling menu.
@@ -16,7 +16,7 @@ import org.simbrain.workspace.gui.CouplingMenuProducer;
 public class NeuronNodeDesktop extends NeuronNode {
 
     /** Reference to parent component. */
-    NetworkDesktopComponent component;
+    NetworkComponent component;
 
     /**
      * Constructs a Neuron Node.
@@ -25,7 +25,7 @@ public class NeuronNodeDesktop extends NeuronNode {
      * @param netPanel network panel.
      * @param neuron logical neuron this node represents
      */
-    public NeuronNodeDesktop(final NetworkDesktopComponent component, final NetworkPanel netPanel, Neuron neuron) {
+    public NeuronNodeDesktop(final NetworkComponent component, final NetworkPanel netPanel, Neuron neuron) {
         super(netPanel, neuron);
         this.component = component;
     }
@@ -37,17 +37,22 @@ public class NeuronNodeDesktop extends NeuronNode {
         JPopupMenu contextMenu = super.getContextMenu();
 
         // Add coupling menus
-        Workspace workspace = component.getWorkspaceComponent().getWorkspace();
+        Workspace workspace = component.getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
 
+            String producerDesc = component.getActivationType().getDescription(neuron.getId());
+            PotentialProducer producer = component.getAttributeManager()
+                    .createPotentialProducer(neuron, component.getActivationType(), producerDesc);
+            String consumerDesc = component.getInputValueType().getDescription(neuron.getId());
+            PotentialConsumer consumer = component.getAttributeManager()
+                    .createPotentialConsumer(neuron, component.getInputValueType(),consumerDesc);
+
             JMenu producerMenu = new CouplingMenuProducer(
-                    "Send coupling to", workspace, component
-                            .getWorkspaceComponent().getPotentialProducer(neuron, "activation"));
+                    "Send coupling to", workspace, producer);
             contextMenu.add(producerMenu);
             JMenu consumerMenu = new CouplingMenuConsumer(
-                    "Receive coupling from", workspace, component
-                            .getWorkspaceComponent().getPotentialConsumer(neuron, "inputValue"));
+                    "Receive coupling from", workspace, consumer);
             contextMenu.add(consumerMenu);
         }
         return contextMenu;

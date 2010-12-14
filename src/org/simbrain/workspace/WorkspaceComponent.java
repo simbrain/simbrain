@@ -91,12 +91,16 @@ public abstract class WorkspaceComponent {
      */
     private File currentFile;
 
+    /** Manage create of attributes on this component. */
+    private final AttributeManager attributeManager;
+
     /**
      * Initializer
      */
     {
         workspaceComponentListeners = new HashSet<WorkspaceComponentListener>();
         attributeListeners = new HashSet<AttributeListener>();
+        attributeManager = new AttributeManager(this);
     }
 
     /**
@@ -239,261 +243,7 @@ public abstract class WorkspaceComponent {
         consumerTypes.add(type);
     }
 
-    /**
-     * Create a producer. This version of the method does the real work; others
-     * forward to it.
-     *
-     * @param parentObject parent object
-     * @param methodBaseName name of method
-     * @param dataType type of data
-     * @param description description
-     * @return the resulting producer
-     */
-    public Producer<?> createProducer(
-            final Object parentObject,
-            final String methodBaseName,
-            final Class<?> dataType,
-            final String description) {
 
-        Producer<?> producer = new Producer() {
-
-            private Method theMethod;
-
-            // Static initializer
-            {
-                try {
-                    theMethod = parentObject.getClass().getMethod(
-                            "get" + methodBaseName, null);
-                } catch (SecurityException e1) {
-                    e1.printStackTrace();
-                } catch (NoSuchMethodException e1) {
-                    System.err.println("Could not find method "
-                            + methodBaseName + " with return type of "
-                            + dataType.getCanonicalName());
-                    e1.printStackTrace();
-                }
-
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public Object getValue() {
-                try {
-                    return theMethod.invoke(parentObject, null);
-                } catch (IllegalArgumentException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public WorkspaceComponent getParentComponent() {
-                return WorkspaceComponent.this;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public Object getBaseObject() {
-                return parentObject;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public String getMethodBaseName() {
-                return methodBaseName;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public Class<?> getDataType() {
-                return dataType;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public String getDescription() {
-                return description;
-            }
-
-        };
-        return producer;
-
-    }
-
-
-    /**
-     * Create a producer without specifying a custom description (the
-     * description is created automatically).
-     *
-     * @param baseObject
-     *            base object
-     * @param methodBaseName
-     *            method name
-     * @param dataType
-     *            data type
-     * @return created producer
-     */
-    public Producer<?> createProducer(final Object baseObject,
-            final String methodBaseName, final Class<?> dataType) {
-        String description = getDescriptionString(baseObject, methodBaseName, dataType);
-        return createProducer(baseObject, methodBaseName, dataType, description);
-    }
-
-    /**
-     * Create an actual producer from a potential producer.
-     *
-     * @param potentialAttribute the potential attribute to actualize
-     * @return the resulting producer
-     */
-    public Producer<?> createProducer(final PotentialAttribute potentialAttribute) {
-        return createProducer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodBaseName(), potentialAttribute.getDataType(),
-                potentialAttribute.getDescription());
-    }
-
-    /**
-     * Create a consumer. This version of the method does the real work; others
-     * forward to it.
-     *
-     * @param parentObject parent object
-     * @param methodBaseName name of method
-     * @param dataType type of data
-     * @param description description
-     * @return the resulting consumer
-     */
-    public Consumer<?> createConsumer(final Object parentObject,
-            final String methodBaseName, final Class<?> dataType,
-            final String description) {
-
-        Consumer<?> consumer = new Consumer() {
-
-            Method theMethod;
-
-            // Static initializer
-            {
-                try {
-                    theMethod = parentObject.getClass().getMethod(
-                            "set" + methodBaseName, new Class[] { dataType });
-                } catch (SecurityException e1) {
-                    e1.printStackTrace();
-                } catch (NoSuchMethodException e1) {
-                    System.err.println("Could not find method "
-                            + methodBaseName + " with argument of type of "
-                            + dataType.getCanonicalName());
-                    e1.printStackTrace();
-                }
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void setValue(Object value) {
-                try {
-                    theMethod.invoke(parentObject, new Object[] { value });
-                } catch (IllegalArgumentException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public WorkspaceComponent getParentComponent() {
-                return WorkspaceComponent.this;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public Object getBaseObject() {
-                return parentObject;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public String getMethodBaseName() {
-                return methodBaseName;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public Class<?> getDataType() {
-                return dataType;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public String getDescription() {
-                return description;
-            }
-
-        };
-        return consumer;
-
-    }
-
-    /**
-     * Create a consumer using
-     *  1) Parent Object
-     *  2) Method name
-     *  3) Data type
-     *  Description is automatically created.
-     */
-    public Consumer<?> createConsumer(final Object baseObject,
-            final String methodBaseName, final Class<?> dataType) {
-        String description = getDescriptionString(baseObject, methodBaseName, dataType);
-        return createConsumer(baseObject, methodBaseName, dataType, description);
-    }
-
-    /**
-     * Create an actual consumer from a potential consumer.
-     *
-     * @param potentialAttribute the potential attribute to actualize
-     * @return the resulting consumer
-     */
-    public Consumer<?> createConsumer(final PotentialAttribute potentialAttribute) {
-        return createConsumer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodBaseName(), potentialAttribute.getDataType(),
-                potentialAttribute.getDescription());
-    }
-
-    /**
-     * Returns a formatted description string.  
-     *
-     * @param baseObject base object
-     * @param methodBaseName base name of method
-     * @param dataType class of data
-     * @return formatted string
-     */
-    private String getDescriptionString(Object baseObject,
-            String methodBaseName, Class<?> dataType) {
-        return baseObject.getClass().getSimpleName() + ":" + methodBaseName
-                + "<" + dataType.getSimpleName() + ">";
-    }
 
     /**
      * Finds objects based on a key. Used in deserializing attributes. Any class
@@ -518,48 +268,6 @@ public abstract class WorkspaceComponent {
         return null;
     }
 
-
-    /**
-     * Find the potential producer whose base object matches the supplied
-     * object.
-     *
-     * @param baseObject object to match
-     * @param methodName method name to match
-     * @return matching producer, or null if there is none.
-     */
-    public PotentialAttribute getPotentialProducer(Object baseObject,
-            String methodName) {
-        for (PotentialAttribute producer : this.getPotentialProducers()) {
-            boolean baseObjectMatches = (producer.getBaseObject() == baseObject);
-            boolean methodNameMatches = (producer.getMethodBaseName()
-                    .equalsIgnoreCase(methodName));
-            if (baseObjectMatches && methodNameMatches) {
-                return producer;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Find the potential consumer whose base object matches the supplied
-     * object.
-     *
-     * @param baseObject object to match
-     * @param methodName method name to match
-     * @return matching producer, or null if there is none.
-     */
-    public PotentialAttribute getPotentialConsumer(Object baseObject,
-            String methodName) {
-        for (PotentialAttribute consumer : this.getPotentialConsumers()) {
-            boolean baseObjectMatches = (consumer.getBaseObject() == baseObject);
-            boolean methodNameMatches = (consumer.getMethodBaseName()
-                    .equalsIgnoreCase(methodName));
-            if (baseObjectMatches && methodNameMatches) {
-                return consumer;
-            }
-        }
-        return null;
-    }
     /**
      * Returns the collection of update parts for this component.
      *
@@ -736,7 +444,7 @@ public abstract class WorkspaceComponent {
      * or source of is removed from the workspace.  This method
      * will only be called once if the workspace owns both the
      * source and the target.
-     * 
+     *
      * @param coupling The coupling that has been removed.
      */
     protected void couplingRemoved(final Coupling<?> coupling) {
@@ -899,6 +607,13 @@ public abstract class WorkspaceComponent {
             }
         }
         return returnList;
+    }
+
+    /**
+     * @return the attributeManager
+     */
+    public AttributeManager getAttributeManager() {
+        return attributeManager;
     }
 
 }

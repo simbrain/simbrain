@@ -42,9 +42,8 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
-import org.simbrain.workspace.gui.PotentialAttributePanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.PotentialAttributePanel.ProducerOrConsumer;
+import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.ProducerOrConsumer;
 
 /**
  * GUI dialog for creating couplings.

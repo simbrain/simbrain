@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.gui;
+package org.simbrain.workspace.gui.couplingmanager;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,7 +33,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.PotentialAttributePanel.ProducerOrConsumer;
+import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.ProducerOrConsumer;
 
 /**
  * Displays a list of attribute types.

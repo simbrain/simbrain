@@ -109,16 +109,16 @@ import org.simbrain.plot.projection.*;
     sparseConnect.connectNeurons();
 
     // Couple odor world to network
-    Producer smell1 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 0), "Value", double.class, "Sensor 1"); 
-    Producer smell2 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 1), "Value", double.class, "Sensor 2"); 
-    Producer smell3 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 2), "Value", double.class, "Sensor 3"); 
-    Producer smell4 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 3), "Value", double.class, "Sensor 4"); 
-    Producer smell5 = odorWorld.createProducer(odorWorld.createSmellSensor(mouse,"Center", 4), "Value", double.class, "Sensor 5");   
-    Consumer inputNeuron1 = networkComponent.createConsumer(network.getNeuron("Neuron_26"), "InputValue", double.class, "Output neuron 1"); 
-    Consumer inputNeuron2 = networkComponent.createConsumer(network.getNeuron("Neuron_27"), "InputValue", double.class, "Output neuron 2"); 
-    Consumer inputNeuron3 = networkComponent.createConsumer(network.getNeuron("Neuron_28"), "InputValue", double.class, "Output neuron 3"); 
-    Consumer inputNeuron4 = networkComponent.createConsumer(network.getNeuron("Neuron_29"), "InputValue", double.class, "Output neuron 4"); 
-    Consumer inputNeuron5 = networkComponent.createConsumer(network.getNeuron("Neuron_30"), "InputValue", double.class, "Output neuron 5"); 
+    Producer smell1 = odorWorld.getAttributeManager().createProducer(odorWorld.createSmellSensor(mouse,"Center", 0), "Value", double.class, "Sensor 1"); 
+    Producer smell2 = odorWorld.getAttributeManager().createProducer(odorWorld.createSmellSensor(mouse,"Center", 1), "Value", double.class, "Sensor 2"); 
+    Producer smell3 = odorWorld.getAttributeManager().createProducer(odorWorld.createSmellSensor(mouse,"Center", 2), "Value", double.class, "Sensor 3"); 
+    Producer smell4 = odorWorld.getAttributeManager().createProducer(odorWorld.createSmellSensor(mouse,"Center", 3), "Value", double.class, "Sensor 4"); 
+    Producer smell5 = odorWorld.getAttributeManager().createProducer(odorWorld.createSmellSensor(mouse,"Center", 4), "Value", double.class, "Sensor 5");   
+    Consumer inputNeuron1 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_26"), "InputValue", double.class, "Output neuron 1"); 
+    Consumer inputNeuron2 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_27"), "InputValue", double.class, "Output neuron 2"); 
+    Consumer inputNeuron3 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_28"), "InputValue", double.class, "Output neuron 3"); 
+    Consumer inputNeuron4 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_29"), "InputValue", double.class, "Output neuron 4"); 
+    Consumer inputNeuron5 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_30"), "InputValue", double.class, "Output neuron 5"); 
     workspace.getCouplingManager().addCoupling(new Coupling(smell1, inputNeuron1));
     workspace.getCouplingManager().addCoupling(new Coupling(smell2, inputNeuron2));
     workspace.getCouplingManager().addCoupling(new Coupling(smell3, inputNeuron3));
@@ -132,8 +132,8 @@ import org.simbrain.plot.projection.*;
 
     // Couple network to projection chart
     for (int i = 1; i < 25; i++) {
-        Producer neuronAttribute = networkComponent.createProducer(network.getNeuron("Neuron_" + i), "Activation", double.class, "Neuron " + i); 
-        Consumer chartAttribute = chart.createConsumer(chart.getDimension(i-1), "Value", double.class, "Dimension " + i);
+        Producer neuronAttribute = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_" + i), "Activation", double.class, "Neuron " + i); 
+        Consumer chartAttribute = chart.getAttributeManager().createConsumer(chart.getDimension(i-1), "Value", double.class, "Dimension " + i);
         workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
     }
 

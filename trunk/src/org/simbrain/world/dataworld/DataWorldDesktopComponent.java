@@ -32,10 +32,8 @@ import javax.swing.JScrollPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.workspace.gui.CouplingMenuComponent;
-import org.simbrain.workspace.gui.GenericFrame;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.util.table.*;
+import org.simbrain.workspace.gui.*;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
@@ -48,7 +46,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
     private JScrollPane scroller;
 
     /** Data world. */
-    private SimbrainJTable table;
+    private DesktopJTable table;
 
     /** Menu bar. */
     private JMenuBar mb;
@@ -81,7 +79,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
         component.getDataModel().initValues(0);
 
         // Set up table
-        table = new SimbrainJTable(component.getDataModel());
+        table = new DesktopJTable(component.getDataModel(), component);
         scroller = new JScrollPane();
         scroller.setViewportView(table);
         add(scroller, BorderLayout.CENTER);

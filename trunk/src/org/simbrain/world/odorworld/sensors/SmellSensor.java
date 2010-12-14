@@ -163,4 +163,51 @@ public class SmellSensor implements Sensor {
     public void setName(String name) {
         this.name = name;
     }
+
+    /**
+     * Return smell sensor getter with specified index.
+     *
+     * @param i index
+     * @return the getter
+     */
+    public SmellSensorGetter createGetter(int i) {
+        return new SmellSensorGetter(i);
+    }
+
+    /**
+     * Helper object for use with couplings. An object of this class is
+     * associated with one dimension of a smell sensor.
+     */
+    public class SmellSensorGetter {
+
+        /** Index. */
+        private int index;
+
+        /**
+         * Construct a setter object.
+         *
+         * @param index index of the bar to set
+         */
+        public SmellSensorGetter(final int index) {
+            this.index = index;
+        }
+
+        /**
+         * Return the current value of the sensor for the given index.
+         *
+         * @return current value.
+         */
+        public double getValue() {
+            return getCurrentValue()[index];
+        }
+
+        /**
+         * Return the index number.
+         *
+         * @return the index
+         */
+        public int getIndex() {
+            return index;
+        }
+    }
 }

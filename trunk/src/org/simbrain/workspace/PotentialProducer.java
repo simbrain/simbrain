@@ -29,24 +29,13 @@ public class PotentialProducer extends PotentialAttribute {
      * Construct a potential producer.
      *
      * @param parent parent workspace component
-     * @param objectName name of object
      * @param methodBaseName method name
      * @param dataType class of data
+     * @param description description of this potential attribute 
      */
-    public PotentialProducer(WorkspaceComponent parent, Object object, String objectName,
-            String methodBaseName, Class dataType) {
-        super(parent, object, objectName, methodBaseName, dataType);
-    }
-
-    /**
-     * Create a potential producer using an attribute type object as a shortcut.
-     *
-     * @param parent parent object
-     * @param objectName name of object
-     * @param type attribute type of object
-     */
-    public PotentialProducer(Object baseObject, String objectName, AttributeType type) {
-        super(type.getParentComponent(), baseObject, objectName, type.getMethodBaseName(), type.getDataType());
+    public PotentialProducer(WorkspaceComponent parent, Object object,
+            String methodBaseName, Class dataType, String description) {
+        super(parent, object, methodBaseName, dataType, description);
     }
 
     /**
@@ -55,7 +44,7 @@ public class PotentialProducer extends PotentialAttribute {
      * @return the producer corresponding to this potential attribute.
      */
     public Producer<?> createProducer() {
-        return getParent().createProducer(this);
+        return getParent().getAttributeManager().createProducer(this);
     }
 
 

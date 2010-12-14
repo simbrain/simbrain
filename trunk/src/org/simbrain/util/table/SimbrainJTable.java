@@ -38,6 +38,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
+import org.simbrain.workspace.gui.CouplingMenuConsumer;
+import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * <b>SimbrainJTable</b> is a version of a JTable which wraps a Simbrain data
@@ -146,7 +148,7 @@ public class SimbrainJTable extends JXTable {
      *
      * @return The context menu.
      */
-    private JPopupMenu buildPopupMenu() {
+    protected JPopupMenu buildPopupMenu() {
 
         JPopupMenu ret = new JPopupMenu();
         ret.add(TableActionManager.getInsertRowAction(this));
@@ -167,7 +169,6 @@ public class SimbrainJTable extends JXTable {
         ret.add(getMenuFill());
         ret.addSeparator();
         ret.add(getMenuCSV());
-
         return ret;
     }
 

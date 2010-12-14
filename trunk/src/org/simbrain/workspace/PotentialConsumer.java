@@ -29,24 +29,13 @@ public class PotentialConsumer extends PotentialAttribute {
      * Construct a potential consumer.
      *
      * @param parent parent workspace component
-     * @param objectName name of object
      * @param methodBaseName method name
      * @param dataType class of data
+     * @param description description associated with potential consumer
      */
-    public PotentialConsumer(WorkspaceComponent parent, Object object, String objectName,
-            String methodBaseName, Class dataType) {
-        super(parent, object, objectName, methodBaseName, dataType);
-    }
-
-    /**
-     * Create a potential consumer using an attribute type object as a shortcut.
-     *
-     * @param baseObject base object
-     * @param objectName description of object
-     * @param type attribute type of object
-     */
-    public PotentialConsumer(Object baseObject, String objectName, AttributeType type) {
-        super(type.getParentComponent(), baseObject, objectName, type.getMethodBaseName(), type.getDataType());
+    public PotentialConsumer(WorkspaceComponent parent, Object object,
+            String methodBaseName, Class dataType, String description) {
+        super(parent, object, methodBaseName, dataType, description);
     }
 
     /**
@@ -55,7 +44,7 @@ public class PotentialConsumer extends PotentialAttribute {
      * @return the consumer corresponding to this potential attribute.
      */
     public Consumer<?> createConsumer() {
-        return getParent().createConsumer(this);
+        return getParent().getAttributeManager().createConsumer(this);
     }
 
 

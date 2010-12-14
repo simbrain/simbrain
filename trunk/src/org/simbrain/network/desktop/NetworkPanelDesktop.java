@@ -185,7 +185,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * @return desktop version of NeuronNode, with context menu
      */
     public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
-        return new NeuronNodeDesktop(component, net, neuron);
+        return new NeuronNodeDesktop(component.getWorkspaceComponent(), net, neuron);
     }
 
     /**

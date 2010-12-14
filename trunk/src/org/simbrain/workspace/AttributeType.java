@@ -36,9 +36,11 @@ public class AttributeType {
 
     /**
      * Description of this attribute type; generally a description of the object
-     * type.
+     * type. Useful when multiple attribute types correspond to the same method
+     * name. E.g. in odor world right and left are both based on turn-amount,
+     * but using different values.
      */
-    private final String typeID;
+    private final String typeName;
 
     /**
      * The root name of a getter or setter; i.e. "X" in "getX" or "setX".
@@ -57,46 +59,40 @@ public class AttributeType {
      * Construct an attribute type object.
      *
      * @param parent reference to parent component
-     * @param typeID String identification of type id
+     * @param typeName String identification of type id
      * @param methodName name of method
      * @param dataType data type (return type for producers;
      *        argument type for consumers)
      * @param visible whether this attribute should be visible for a given
      *        component.
      */
-    public AttributeType(WorkspaceComponent parent, String typeID, String methodName, Class<?> dataType, boolean visible) {
+    public AttributeType(WorkspaceComponent parent, String typeName, String methodName, Class<?> dataType, boolean visible) {
         this.parentComponent = parent;
-        this.typeID = typeID;
+        this.typeName = typeName;
         this.methodBaseName = methodName;
         this.dataType = dataType;
         this.visible = visible;
     }
 
     /**
-     * Return a description of the attribute.
+     * Returns a description using a custom base name (e.g. a named neuron, like
+     * "Neuron 5") as a base. Adds method base name and data type.
      *
-     * @return description
+     * @param baseName the custom base name
+     * @return the formatted string.
      */
-    public String getDescription() {
-        return getSimpleDescription() + typeClass();
-    }
-
-    @Override
-    public String toString() {
-        return getDescription();
+    public String getDescription(String baseName) {
+        return baseName + ":" + methodBaseName + typeClass();
     }
 
     /**
-     * Returns a description of this attribute type.
+     * Like getDescription(String) but does not add the method base name.
      *
-     * @return the description
+     * @param baseName the custom base name
+     * @return the formatted String
      */
-    public String getSimpleDescription() {
-        if (methodBaseName != null) {
-            return typeID + ":" + methodBaseName;
-        } else {
-            return typeID;
-        }
+    public String getSimpleDescription(String baseName) {
+        return baseName + typeClass();
     }
 
     /**
@@ -104,6 +100,44 @@ public class AttributeType {
      */
     private String typeClass() {
         return " <" + dataType.getSimpleName() + ">";
+    }
+
+    /**
+     * Returns a description of this type, including method base name and data type.
+     *
+     * @return the formatted String
+     */
+    public String getDescription() {
+        return getBaseDescription() + typeClass();
+    }
+
+
+    /**
+     * Like getDescription() but does not return method base name.
+     *
+     * @return the formatted String
+     */
+    public String getSimpleDescription() {
+        return  typeName + typeClass();
+    }
+
+    /**
+     * Returns the description string of this datatype, with a method name if
+     * there is one.
+     *
+     * @return the description
+     */
+    public String getBaseDescription() {
+        if (methodBaseName != null) {
+            return typeName + ":" + methodBaseName;
+        } else {
+            return typeName;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getBaseDescription();
     }
 
     /**
@@ -124,8 +158,8 @@ public class AttributeType {
     /**
      * @return the typeID
      */
-    public String getTypeID() {
-        return typeID;
+    public String getTypeName() {
+        return typeName;
     }
 
     /**

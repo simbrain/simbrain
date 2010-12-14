@@ -225,9 +225,9 @@ public class BarChartComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (barChartConsumer.isVisible()) {
             for (BarChartSetter setter : setterList) {
-                PotentialConsumer consumerID = new PotentialConsumer(setter,
-                        "Bar_" + setter.getIndex(), barChartConsumer);
-               returnList.add(consumerID);
+                String description = barChartConsumer.getSimpleDescription("Bar " + setter.getIndex());
+                PotentialConsumer consumer = getAttributeManager().createPotentialConsumer(setter, barChartConsumer, description);
+               returnList.add(consumer);
             }
         }
         return returnList;

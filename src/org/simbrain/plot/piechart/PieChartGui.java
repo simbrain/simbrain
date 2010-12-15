@@ -91,7 +91,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
      */
     @Override
     public void postAddInit() {
-        
+
         // Generate the graph
         chart = ChartFactory.createPieChart(
             "Pie Chart",
@@ -104,8 +104,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
 
         getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {
             public void chartSettingsUpdated() {
-                chart.getPlot().setOutlineVisible(getWorkspaceComponent()
-                        .getModel().isOutlineVisible());
+                // No implementation
             }
         });
     }
@@ -154,7 +153,5 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         } else if (e.getActionCommand().equalsIgnoreCase("Delete")) {
             this.getWorkspaceComponent().getModel().removeDataSource();
         }
-        
     }
-   
 }

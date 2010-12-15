@@ -20,7 +20,12 @@ package org.simbrain.plot.scatterplot;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.simbrain.plot.ChartListener;
+import org.simbrain.workspace.AttributeType;
+import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
@@ -31,20 +36,31 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     /** Data Model. */
     private ScatterPlotModel model;
 
+    /** x attribute type. */
+    private AttributeType xAttributeType;
+
+    /** y attribute type. */
+    private AttributeType yAttributeType;
+
+    /** Objects which can be used to set the scatter plot. */
+    private List<ScatterPlotSetter> setterList = new ArrayList<ScatterPlotSetter>();
+
     /**
-     * Create new PieChart Component.
+     * Create new ScatterChart Component.
      *
      * @param name chart name
      */
     public ScatterPlotComponent(final String name) {
         super(name);
         model = new ScatterPlotModel();
-        addListener();
         model.defaultInit();
+        addListener();
+        initializeAttributes();
     }
 
     /**
-     * Create new BarChart Component from a specified model.
+     * Create new Scatter Plot Component from a specified model.
+     *
      * Used in deserializing.
      *
      * @param name chart name
@@ -66,48 +82,105 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     public ScatterPlotComponent(final String name, final int numDataSources) {
         super(name);
         model = new ScatterPlotModel();
-        addListener();
         model.addDataSources(numDataSources);
+        initializeAttributes();
+        addListener();
     }
 
     /**
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        
-        //TODO: REDO
-//        this.getConsumers().clear();
-//        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-//            addConsumer(new ScatterPlotConsumer(this, i));
-//        }
+        xAttributeType = new AttributeType(this, "Point-x", "X", double.class, true);
+        yAttributeType = new AttributeType(this, "Point-y", "Y", double.class, true);
+        addConsumerType(xAttributeType);
+        addConsumerType(yAttributeType);
+        // TODO: What if called more than once?
+        for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
+            addSetter(i);
+        }
     }
+
+    @Override
+    public List<PotentialConsumer> getPotentialConsumers() {
+        List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
+        //TODO: visibility
+        
+        for (ScatterPlotSetter setter : setterList) {
+            String xDesc = xAttributeType.getSimpleDescription("Point "
+                    + setter.getIndex() + "[X]");
+            PotentialConsumer xConsumer = getAttributeManager()
+                    .createPotentialConsumer(setter, xAttributeType,
+                            xDesc);
+            returnList.add(xConsumer);
+            String yDesc = xAttributeType.getSimpleDescription("Point "
+                    + setter.getIndex() + "[Y]");
+            PotentialConsumer yConsumer = getAttributeManager()
+                    .createPotentialConsumer(setter, yAttributeType,
+                            yDesc);
+            returnList.add(yConsumer);
+        }
+        return returnList;
+    }
+
+    /**
+     * Return the setter with specified index, or null if none found.
+     *
+     * @param i index of setter
+     * @return the setter object
+     */
+    public ScatterPlotSetter getSetter(int i) {
+        for (ScatterPlotSetter setter : setterList) {
+            if (setter.getIndex() == i) {
+                return setter;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add a setter with the specified index.
+     *
+     * @param i index of setter
+     */
+    public void addSetter(int i) {
+        for (ScatterPlotSetter setter : setterList) {
+            if (setter.getIndex() == i) {
+                return;
+            }
+        }
+        setterList.add(new ScatterPlotSetter(i));
+    }
+
 
     /**
      * Add chart listener to model.
      */
     private void addListener() {
-        
-        //TODO: REDO
-        
-//        model.addListener(new ChartListener() {
-//
-//            /**
-//             * {@inheritDoc}
-//             */
-//            public void dataSourceAdded(final int index) {
-//                ScatterPlotConsumer newAttribute = new ScatterPlotConsumer(ScatterPlotComponent.this, index);
-//                addConsumer(newAttribute);
-//            }
-//
-//            /**
-//             * {@inheritDoc}
-//             */
-//            public void dataSourceRemoved(final int index) {
-//                ScatterPlotConsumer toBeRemoved = (ScatterPlotConsumer) getConsumers().get(index);
-//                removeConsumer(toBeRemoved);
-//            }
-//            
-//        });
+        model.addListener(new ChartListener() {
+
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceAdded(final int index) {
+                if (getSetter(index) == null) {
+                    addSetter(index);
+                    firePotentialAttributesChanged();
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void dataSourceRemoved(final int index) {
+                ScatterPlotSetter setter = getSetter(index);
+                fireAttributeObjectRemoved(setter);
+                setterList.remove(setter);
+                firePotentialAttributesChanged();
+            }
+
+        });
   }
 
     /**
@@ -127,7 +200,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
     public void closing() {
         // TODO Auto-generated method stub
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -152,23 +225,78 @@ public class ScatterPlotComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        //TODO: REDO
-//        EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                // Constantly erase. How is performance for this version?
-//                for (Consumer consumer : getConsumers()) {
-//                    ScatterPlotConsumer s_consumer = (ScatterPlotConsumer) consumer;
-//                    Integer index = s_consumer.getIndex();
-//                    if (!model.isShowHistory()) {
-//                        getModel().getDataset().getSeries(index).clear();
-//                    }
-//                    model.getDataset().getSeries(index).add(s_consumer.getX(),
-//                            s_consumer.getY());
-//                    // System.out.println("[" + consumer.getIndex() + "]:" +
-//                    // dataset.getSeries(consumer.getIndex()).getItemCount());
-//                }
-//            }
-//        });
+        // Constantly erase. How is performance for this version?
+        for (ScatterPlotSetter setter : setterList) {
+            Integer index = setter.getIndex();
+            if (!model.isShowHistory()) {
+                model.getDataset().getSeries(index).clear();
+            }
+            model.getDataset().getSeries(index).add(setter.getX(), setter.getY());
+        }
+    }
+
+    /**
+     * Object which sets a value of one slice of a scatter chart.
+     */
+    public class ScatterPlotSetter {
+
+        /** Index. */
+        private Integer index;
+
+        /** X Value. */
+        private double xval;
+
+        /** Y Value. */
+        private double yval;
+
+        /**
+         * Construct a setter object.
+         *
+         * @param index index of the bar to set
+         */
+        public ScatterPlotSetter(final Integer index) {
+            this.index = index;
+        }
+
+
+        /**
+         * @return the index
+         */
+        public int getIndex() {
+            return index;
+        }
+
+
+        /**
+         * @return the xval
+         */
+        public double getX() {
+            return xval;
+        }
+
+
+        /**
+         * @param xval the xval to set
+         */
+        public void setX(double xval) {
+            this.xval = xval;
+        }
+
+
+        /**
+         * @return the yval
+         */
+        public double getY() {
+            return yval;
+        }
+
+
+        /**
+         * @param yval the yval to set
+         */
+        public void setY(double yval) {
+            this.yval = yval;
+        }
     }
 
 }

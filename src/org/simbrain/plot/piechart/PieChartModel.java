@@ -26,7 +26,6 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Model for saving pie charts.
- * 
  */
 public class PieChartModel extends ChartModel {
 
@@ -36,9 +35,6 @@ public class PieChartModel extends ChartModel {
     /** JFreeChart dataset for pie charts. */
     private DefaultPieDataset dataset = new DefaultPieDataset();
 
-    /** Should the chart outline be visible. */
-    private boolean outlineVisible = true;
- 
     /** Current total value of all data items in pie chart dataset. */
     private double total = 0;
 
@@ -58,9 +54,8 @@ public class PieChartModel extends ChartModel {
     /**
      * Create specified number of set of data sources. Adds these two existing
      * data sources.
-     * 
-     * @param numDataSources
-     *            number of data sources to initialize plot with
+     *
+     * @param numDataSources number of data sources to initialize plot with
      */
     public void addDataSources(final int numDataSources) {
         for (int i = 0; i < numDataSources; i++) {
@@ -81,7 +76,7 @@ public class PieChartModel extends ChartModel {
      * Removes a data source from the plot.
      */
     public void removeDataSource() {
-        int removalIndex = dataset.getItemCount()    - 1;
+        int removalIndex = dataset.getItemCount() - 1;
         if (removalIndex > 0) {
             this.fireDataSourceRemoved(removalIndex);
             dataset.remove(removalIndex);
@@ -105,7 +100,7 @@ public class PieChartModel extends ChartModel {
             total += dataset.getValue(i).doubleValue();
         }
     }
-    
+
     /**
      * @return the data set.
      */
@@ -115,7 +110,7 @@ public class PieChartModel extends ChartModel {
 
     /**
      * Returns a properly initialized xstream object.
-     * 
+     *
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -127,26 +122,11 @@ public class PieChartModel extends ChartModel {
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
         return this;
-    }
-
-    /**
-     * @return the outlineVisible
-     */
-    public boolean isOutlineVisible() {
-        return outlineVisible;
-    }
-
-    /**
-     * @param outlineVisible the outlineVisible to set
-     */
-    public void setOutlineVisible(final boolean outlineVisible) {
-        this.outlineVisible = outlineVisible;
-        fireSettingsChanged();
     }
 
     /**

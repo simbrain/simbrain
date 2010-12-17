@@ -51,7 +51,7 @@ public class SmellSensor implements Sensor {
     private double[] currentValue = new double[5];
 
     /** The name of this smell sensor.. */
-    private String name;
+    private String id;
 
     /**
      * Construct a sensor.
@@ -60,10 +60,10 @@ public class SmellSensor implements Sensor {
      * @param sensorName name
      * @param dim stimulus dimension
      */
-    public SmellSensor(final OdorWorldEntity parent, final String name, double theta, double radius) {
+    public SmellSensor(final OdorWorldEntity parent, final String id, double theta, double radius) {
         this.parent = parent;
         this.theta = theta;
-        this.name = name;
+        this.id = id;
         this.radius = radius;
     }
 
@@ -71,7 +71,7 @@ public class SmellSensor implements Sensor {
      * @return the location
      */
     public double[] getLocation() {
-        //TODO: Formnalize rule that this sensor applies to rotating entity only,
+        //TODO: Formalize rule that this sensor applies to rotating entity only,
         //      or relax the code so that it will work for non-rotating entities
         RotatingEntity parent = (RotatingEntity) this.getParent();
         double x = parent.getCenterLocation()[0]
@@ -104,7 +104,7 @@ public class SmellSensor implements Sensor {
     /**
      * {@inheritDoc}
      */
-    public List<Class> getApplicableTypes() {
+    public List<Class<?>> getApplicableTypes() {
         return null;
     }
 
@@ -153,15 +153,15 @@ public class SmellSensor implements Sensor {
     /**
      * @return the name
      */
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     /**
      * @param name the name to set
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String name) {
+        this.id = name;
     }
 
     /**
@@ -208,6 +208,15 @@ public class SmellSensor implements Sensor {
          */
         public int getIndex() {
             return index;
+        }
+
+        /**
+         * Returns parent smell sensor.
+         *
+         * @return parent sensor.
+         */
+        public SmellSensor getParent() {
+            return SmellSensor.this;
         }
     }
 }

@@ -20,6 +20,8 @@ package org.simbrain.world.odorworld.effectors;
 
 import java.util.List;
 
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
 /**
  * Interface for Odor World effectors.
  */
@@ -28,11 +30,34 @@ public interface Effector {
     /**
      * Move the agent in a manner appropriate to the effector type.
      */
-    public void activate();
+    void activate();
 
     /**
      * Return a list of entity types which can use this type of effector.
+     *
+     * @return applicable type.
      */
-    public List<Class> getApplicableTypes();
+    List<Class<?>> getApplicableTypes();
+
+    /**
+     * Reference to parent entity.
+     *
+     * @return parent entity
+     */
+    OdorWorldEntity getParent();
+
+    /**
+     * Returns an identifying string.
+     *
+     * @return the id.
+     */
+    String getId();
+
+    /**
+     * Set the id.  Should be unique in the parent entity.
+     *
+     * @param id the id.
+     */
+    void setId(String id);
 
 }

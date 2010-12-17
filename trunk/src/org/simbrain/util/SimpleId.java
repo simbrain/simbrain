@@ -16,14 +16,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.util;
+package org.simbrain.util;
 
 /**
- * <b>SimpleId</b> provides an id based on a base name + an integer index.
+ * <b>SimpleId</b> provides an id based on a base name and an integer index.
  */
 public class SimpleId {
-
-    //TODO: This is fairly weak way of ensuring unique ids.   Better way?
 
     /** The base name of the id. */
     private String rootName;

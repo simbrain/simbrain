@@ -30,10 +30,6 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Represents time series data.
- *
- * TODO:    Ability to add and remove TimeSeriesConsumers
- *          Custom component listener to reflect number of consumers
- *          Ability to reset the plot.
  */
 public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
@@ -44,7 +40,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     private AttributeType timeSeriesConsumerType;
 
      /** Objects which can be used to add data to time series plot. */
-    private List<TimeSeriesConsumer> consumerList = new ArrayList<TimeSeriesConsumer>();
+    private List<TimeSeriesSetter> setterList = new ArrayList<TimeSeriesSetter>();
 
 
     /**
@@ -56,8 +52,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         super(name);
         model = new TimeSeriesModel();
         initializeAttributes();
-        addListener();
         model.defaultInit();
+        addListener();
     }
 
     /**
@@ -83,9 +79,9 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public TimeSeriesPlotComponent(final String name, final int numDataSources) {
         super(name);
         model = new TimeSeriesModel();
+        model.addDataSources(numDataSources);
         initializeAttributes();
         addListener();
-        model.addDataSources(numDataSources);
     }
 
 
@@ -97,7 +93,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         timeSeriesConsumerType = new AttributeType(this, "Series", "Value", double.class, true);
         addConsumerType(timeSeriesConsumerType);
         for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
-            addConsumer(i);
+            addTimeSeriesSetter(i);
         }
     }
 
@@ -107,37 +103,37 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @param i index of setter
      * @return the setter object
      */
-    public TimeSeriesConsumer getConsumer(int i) {
-        for (TimeSeriesConsumer consumer : consumerList) {
-            if (consumer.getIndex() == i) {
-                return consumer;
+    public TimeSeriesSetter getTimeSeriesSetter(int i) {
+        for (TimeSeriesSetter setter : setterList) {
+            if (setter.getIndex() == i) {
+                return setter;
             }
         }
         return null;
     }
 
     /**
-     * Add a time series consumer with the specified index.
+     * Add a time series setter with the specified index.
      *
      * @param i index of setter
      */
-    public void addConsumer(int i) {
-        for (TimeSeriesConsumer setter : consumerList) {
+    public void addTimeSeriesSetter(int i) {
+        for (TimeSeriesSetter setter : setterList) {
             if (setter.getIndex() == i) {
                 return;
             }
         }
-        consumerList.add(new TimeSeriesConsumer(i));
+        setterList.add(new TimeSeriesSetter(i));
     }
 
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (timeSeriesConsumerType.isVisible()) {
-            for (TimeSeriesConsumer consumer : consumerList) {
-                String description = timeSeriesConsumerType.getSimpleDescription("Time Series " + consumer.getIndex());
+            for (TimeSeriesSetter setter : setterList) {
+                String description = timeSeriesConsumerType.getSimpleDescription("Time Series " + setter.getIndex());
                 PotentialConsumer consumerID = getAttributeManager()
-                        .createPotentialConsumer(consumer, timeSeriesConsumerType, description);
+                        .createPotentialConsumer(setter, timeSeriesConsumerType, description);
                 returnList.add(consumerID);
             }
         }
@@ -156,8 +152,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceAdded(final int index) {
-                if (getConsumer(index) == null) {
-                    addConsumer(index);
+                if (getTimeSeriesSetter(index) == null) {
+                    addTimeSeriesSetter(index);
                     firePotentialAttributesChanged();
                 }
             }
@@ -166,9 +162,9 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void dataSourceRemoved(final int index) {
-                TimeSeriesConsumer consumer = getConsumer(index);
-                fireAttributeObjectRemoved(consumer);
-                consumerList.remove(consumer);
+                TimeSeriesSetter setter = getTimeSeriesSetter(index);
+                fireAttributeObjectRemoved(setter);
+                setterList.remove(setter);
                 firePotentialAttributesChanged();
             }
         });
@@ -181,12 +177,11 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return model;
     }
 
-
     @Override
     public Object getObjectFromKey(String objectKey) {
         try {
             int i = Integer.parseInt(objectKey);
-            TimeSeriesConsumer setter = new TimeSeriesConsumer(i);
+            TimeSeriesSetter setter = new TimeSeriesSetter(i);
             return  setter;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
@@ -195,8 +190,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public String getKeyFromObject(Object object) {
-        if (object instanceof TimeSeriesConsumer) {
-            return "" + ((TimeSeriesConsumer) object).getIndex();
+        if (object instanceof TimeSeriesSetter) {
+            return "" + ((TimeSeriesSetter) object).getIndex();
         }
         return null;
     }
@@ -259,7 +254,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     /**
      * Object which adds data to a time series plot.
      */
-    public class TimeSeriesConsumer {
+    public class TimeSeriesSetter {
 
         /** Index. */
         private int index;
@@ -269,7 +264,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
          *
          * @param index index of the bar to set
          */
-        public TimeSeriesConsumer(final int index) {
+        public TimeSeriesSetter(final int index) {
             this.index = index;
         }
 

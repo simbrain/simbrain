@@ -81,6 +81,12 @@ public class DataWorldComponent extends WorkspaceComponent {
         init();
     }
 
+    /**
+     * Construct data world from a model. Used in deserializing.
+     *
+     * @param name name of component
+     * @param dataModel the model
+     */
     @SuppressWarnings("unchecked")
     private DataWorldComponent(final String name, final SimbrainDataTable dataModel) {
         super(name);
@@ -248,24 +254,34 @@ public class DataWorldComponent extends WorkspaceComponent {
         SimbrainDataTable.getXStream().toXML(dataModel, output);
     }
 
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof ColumnAttribute) {
+            if (producerList.contains(object)) {
+                return "producerList:" + ((ColumnAttribute) object).getIndex();
+            } else if (consumerList.contains(object)) {
+                return "consumerList:" + ((ColumnAttribute) object).getIndex();
+            }
+        }
+        return null;
+    }
 
     @Override
     public Object getObjectFromKey(String objectKey) {
         try {
-            int i = Integer.parseInt(objectKey);
-            ColumnAttribute attribute = new ColumnAttribute(i);
+            String producerOrConsumer = objectKey.split(":")[0];
+            String index = objectKey.split(":")[1];
+            int i = Integer.parseInt(index);
+            ColumnAttribute attribute = null;
+            if (producerOrConsumer.equalsIgnoreCase("producerList")) {
+                attribute = getColumnAttribute(i, producerList);
+            } else if (producerOrConsumer.equalsIgnoreCase("consumerList")) {
+                attribute = getColumnAttribute(i, consumerList);
+            }
             return  attribute;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
         }
-    }
-
-    @Override
-    public String getKeyFromObject(Object object) {
-        if (object instanceof ColumnAttribute) {
-            return "" + ((ColumnAttribute) object).getIndex();
-        }
-        return null;
     }
 
     @Override

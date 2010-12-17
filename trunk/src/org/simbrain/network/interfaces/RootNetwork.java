@@ -30,7 +30,7 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
-import org.simbrain.network.util.SimpleId;
+import org.simbrain.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;

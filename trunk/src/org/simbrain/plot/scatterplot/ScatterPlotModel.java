@@ -39,7 +39,7 @@ public class ScatterPlotModel extends ChartModel {
 
     /** Scatter Plot Data. */
     private XYSeriesCollection dataset = new XYSeriesCollection();
-    
+
     /** Default number of sources. */
     private static final int DEFAULT_DATA_SOURCES = 5;
 
@@ -155,18 +155,6 @@ public class ScatterPlotModel extends ChartModel {
     public static XStream getXStream() {
         XStream xstream = ChartModel.getXStream();
         return xstream;
-    }
-
-    /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     * 
-     * @return Initialized object.
-     */
-    private Object readResolve() {
-        return this;
     }
 
     /**

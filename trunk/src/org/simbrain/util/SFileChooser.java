@@ -96,7 +96,7 @@ public class SFileChooser {
      */
     public SFileChooser(final String currentDirectory, final String description, final String extension) {
         this.currentDirectory = currentDirectory;
-        this.description = null;
+        this.description = description;
 
         if (description == null) {
             addExtension(extension);
@@ -125,7 +125,7 @@ public class SFileChooser {
     }
 
     /**
-     * Adds the filters for the extensions to the provided chooser
+     * Adds the filters for the extensions to the provided chooser.
      *
      * @param chooser the file chooser to add filters to
      * @return filter map

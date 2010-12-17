@@ -36,6 +36,10 @@ public class RotationEffector implements Effector {
 
     /** Makes the difference between Right and Left and how much. */
     private double scaleFactor = 1;
+   
+    /** Id for this effector. */
+    private String id;
+
 
     /**
      * Constructor.
@@ -62,8 +66,8 @@ public class RotationEffector implements Effector {
     /**
      * {@inheritDoc}
      */
-    public List<Class> getApplicableTypes() {
-        ArrayList<Class> list = new ArrayList<Class>();
+    public List<Class<?>> getApplicableTypes() {
+        ArrayList<Class<?>> list = new ArrayList<Class<?>>();
         list.add(RotatingEntity.class);
         return list;
     }
@@ -99,6 +103,20 @@ public class RotationEffector implements Effector {
         if (!parentObject.isBlocked()) {
             turnAmount += (value * scaleFactor);
         }
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
 }

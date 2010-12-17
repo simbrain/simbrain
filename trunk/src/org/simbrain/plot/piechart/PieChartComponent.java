@@ -58,7 +58,9 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     /**
-     * Initializes a jfreechart with specific number of data sources.
+     * Initializes a pie chart with a model.
+     *
+     * Used in deserializing.
      *
      * @param name name of component
      * @param model to use for the plot
@@ -132,7 +134,6 @@ public class PieChartComponent extends WorkspaceComponent {
 
         model.addListener(new ChartListener() {
 
-
             /**
              * {@inheritDoc}
              */
@@ -154,8 +155,27 @@ public class PieChartComponent extends WorkspaceComponent {
             }
 
         });
-  }
+    }
 
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof PieChartSetter) {
+            return "" + ((PieChartSetter) object).getIndex();
+        }
+        return null;
+    }
+
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        try {
+            int i = Integer.parseInt(objectKey);
+            PieChartSetter setter = new PieChartSetter(i);
+            return  setter;
+        } catch (NumberFormatException e) {
+            return null; // the supplied string was not an integer
+        }
+    }
 
     /**
      * Streams file data for opening saved charts.

@@ -42,6 +42,9 @@ public class StraightMovementEffector implements Effector {
     /** Value of straight movement which can vary in real time. */
     private double currentValue;
 
+    /** Id for this effector. */
+    private String id;
+
     /**
      * Construct the straight movement effector.
      *
@@ -80,8 +83,8 @@ public class StraightMovementEffector implements Effector {
     /**
      * {@inheritDoc}
      */
-    public List<Class> getApplicableTypes() {
-        ArrayList<Class> list = new ArrayList<Class>();
+    public List<Class<?>> getApplicableTypes() {
+        ArrayList<Class<?>> list = new ArrayList<Class<?>>();
         list.add(RotatingEntity.class);
         return list;
     }
@@ -93,4 +96,17 @@ public class StraightMovementEffector implements Effector {
         this.currentValue = currentValue;
     }
 
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
 }

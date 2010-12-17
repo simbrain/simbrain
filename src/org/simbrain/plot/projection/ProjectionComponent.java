@@ -92,7 +92,6 @@ public class ProjectionComponent extends WorkspaceComponent {
 
         // Add the data to the chart.
         int numPoints = projectionModel.getProjector().getNumPoints();
-
         for (int i = 0; i < numPoints; i++) {
             double[] point = projectionModel.getProjector().getDownstairs()
                     .getPoint(i);
@@ -101,6 +100,7 @@ public class ProjectionComponent extends WorkspaceComponent {
             }
         }
 
+        initializeConsumers();
         addListener();
     }
 
@@ -121,10 +121,13 @@ public class ProjectionComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (projectionConsumerType.isVisible()) {
             for (Dimension consumer : dimensionList) {
-                String description = projectionConsumerType.getSimpleDescription("Dimension " + (consumer.getDimension() + 1)); 
-                PotentialConsumer consumerID =
-                    getAttributeManager().createPotentialConsumer(consumer, projectionConsumerType, description);
-               returnList.add(consumerID);
+                String description = projectionConsumerType
+                        .getSimpleDescription("Dimension "
+                                + (consumer.getDimension() + 1));
+                PotentialConsumer consumerID = getAttributeManager()
+                        .createPotentialConsumer(consumer,
+                                projectionConsumerType, description);
+                returnList.add(consumerID);
             }
         }
         return returnList;
@@ -195,7 +198,7 @@ public class ProjectionComponent extends WorkspaceComponent {
     public Object getObjectFromKey(String objectKey) {
         try {
             int i = Integer.parseInt(objectKey);
-            Dimension dimension = new Dimension(i);
+            Dimension dimension = getDimension(i);
             return  dimension;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
@@ -248,8 +251,8 @@ public class ProjectionComponent extends WorkspaceComponent {
     }
 
     /**
-     * Get the current state of the dimension proxies, send this to the projection
-     * algorithm, and update the graphics.
+     * Get the current state of the dimension proxies, send this to the
+     * projection algorithm, and update the graphics.
      */
     @Override
     public void update() {

@@ -53,9 +53,9 @@ public class BarChartComponent extends WorkspaceComponent {
     public BarChartComponent(final String name) {
         super(name);
         model = new BarChartModel();
-        addListener();
         model.defaultInit();
         init();
+        addListener();
     }
 
     /**
@@ -81,9 +81,9 @@ public class BarChartComponent extends WorkspaceComponent {
     public BarChartComponent(final String name, final int numDataSources) {
         super(name);
         model = new BarChartModel();
-        addListener();
         model.addDataSources(numDataSources);
         init();
+        addListener();
     }
 
     /**
@@ -133,7 +133,7 @@ public class BarChartComponent extends WorkspaceComponent {
     public Object getObjectFromKey(String objectKey) {
         try {
             int i = Integer.parseInt(objectKey);
-            BarChartSetter setter = new BarChartSetter(i);
+            BarChartSetter setter = getSetter(i);
             return  setter;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer

@@ -40,16 +40,20 @@ public class BumpSensor implements Sensor {
     /** Parent agent. */
     private OdorWorldEntity parent;
 
+    /** Id for this sensor. */
+    private String id;
+
     /**
      * Construct bump sensor.
-     * 
-     * @param parent
-     * @param name
-     * @param bumpVal
+     *
+     * @param parent parent entity
+     * @param id id of the sensor
+     * @param bumpVal value
      */
-    public BumpSensor(OdorWorldEntity parent, String name, double bumpVal) {
+    public BumpSensor(OdorWorldEntity parent, String id, double bumpVal) {
         this.parent = parent;
         this.bumpValue = bumpVal;
+        this.id = id;
     }
 
     /**
@@ -77,9 +81,29 @@ public class BumpSensor implements Sensor {
         this.wasBumped = wasBumped;
     }
 
-    public List<Class> getApplicableTypes() {
-        // TODO Auto-generated method stub
+    public List<Class<?>> getApplicableTypes() {
         return null;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the parent
+     */
+    public OdorWorldEntity getParent() {
+        return parent;
     }
 
 }

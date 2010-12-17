@@ -18,7 +18,6 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,7 +29,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,42 +36,39 @@ import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.SpringLayout;
 import javax.swing.filechooser.FileFilter;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceSerializer;
-
 
 /**
  * <b>WorkspaceChangedDialog</b> tells the user what components have changed
  * since the last time they saved.
  */
 public class WorkspaceChangedDialog extends JDialog {
+
     /** The default serial version Id. */
     private static final long serialVersionUID = 1L;
+
     /** The parent desktop. */
     private final SimbrainDesktop desktop;
-    
+
     /**
      * Constructor for workspace changed dialog.
-     * 
+     *
      * @param desktop The parent desktop.
      */
     public WorkspaceChangedDialog(final SimbrainDesktop desktop) {
         this.desktop = desktop;
         init();
     }
-    
+
     /** Main Panel. */
 //    private JPanel panel;
 
@@ -87,9 +82,9 @@ public class WorkspaceChangedDialog extends JDialog {
 //        initPanel();
         SpringLayout layout = new SpringLayout();
         Container container = getContentPane();
-        
+
         container.setLayout(layout);//new BorderLayout());
-        
+
         JButton yesButton = new JButton(yes);
         JButton noButton = new JButton(no);
         JButton cancelButton = new JButton(cancel);
@@ -101,17 +96,17 @@ public class WorkspaceChangedDialog extends JDialog {
         textPanel.add(new JLabel("Would you like to save it?"));
 //        getContentPane().add(BorderLayout.NORTH, northPanel);
         getContentPane().add(textPanel);
-        
+
         JPanel browsePanel = addBrowsePanel();
         getContentPane().add(browsePanel);
-        
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(yesButton);
         buttonPanel.add(noButton);
         buttonPanel.add(cancelButton);
 //        getContentPane().add(BorderLayout.SOUTH, buttonPanel);
         getContentPane().add(buttonPanel);
-        
+
         layout.putConstraint(SpringLayout.NORTH, container,
                 -5, SpringLayout.NORTH, textPanel);
         layout.putConstraint(SpringLayout.SOUTH, container,
@@ -126,28 +121,28 @@ public class WorkspaceChangedDialog extends JDialog {
                 5, SpringLayout.SOUTH, textPanel);
         layout.putConstraint(SpringLayout.NORTH, buttonPanel,
                 5, SpringLayout.SOUTH, browsePanel);
-        
+
         setTitle("Save Resources");
-        
+
         setLocationRelativeTo(null);
         setModal(true);
-        
+
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 cancel();
             }
         });
-        
+
         pack();
         height = getSize().height;
-        
+
         this.addComponentListener(listener);
-        
+
         setVisible(true);
     }
-    
+
     int height;
-    
+
     ComponentListener listener = new ComponentAdapter() {
        public void componentResized( ComponentEvent ce ) {
            Dimension size = getSize();
@@ -159,19 +154,19 @@ public class WorkspaceChangedDialog extends JDialog {
            }
        }
     };
-    
+
     public JPanel addBrowsePanel() {
         JPanel panel = new JPanel();
         SpringLayout layout = new SpringLayout();
-        
+
         panel.setLayout(layout);
-        
+
         final JTextField location = new JTextField("", 25);
         JButton browse = new JButton("Browse");
-        
+
         panel.add(browse);
         panel.add(location);
-        
+
         layout.putConstraint(SpringLayout.NORTH, location,
                 5, SpringLayout.NORTH, panel);
         layout.putConstraint(SpringLayout.NORTH, browse,
@@ -186,33 +181,33 @@ public class WorkspaceChangedDialog extends JDialog {
                 5, SpringLayout.EAST, location);
         layout.putConstraint(SpringLayout.SOUTH, panel,
                 0, SpringLayout.SOUTH, browse);
-         
+
         browse.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 JFileChooser chooser = new JFileChooser(location.getText());
-                
+
                 chooser.addChoosableFileFilter(new Filter("zip", "Simbrain Archives"));
-                
+
                 switch (chooser.showOpenDialog(WorkspaceChangedDialog.this)) {
-                
+
                 case JFileChooser.APPROVE_OPTION:
                     location.setText(chooser.getSelectedFile().getAbsolutePath());
                 }
             }
         });
-        
+
         return panel;
     }
-    
+
     private static class Filter extends FileFilter {
         String extension;
         String description;
-        
+
         Filter(String extension, String description) {
             this.extension = extension;
             this.description = description;
         }
-        
+
         public boolean accept(File f) {
             return f.getName().endsWith('.' + extension);
         }
@@ -220,9 +215,9 @@ public class WorkspaceChangedDialog extends JDialog {
         @Override
         public String getDescription() {
             return description;
-        }    
+        }
     }
-    
+
 //    JPanel checkboxes;
 //    
 //    public void addCheckboxPanel() {
@@ -277,36 +272,36 @@ public class WorkspaceChangedDialog extends JDialog {
             dispose();
         }
     };
-    
+
     private final Action no = new AbstractAction("No") {
         public void actionPerformed(ActionEvent e) {
             userCancelled = false;
             dispose();
         }
     };
-    
+
     private final Action cancel = new AbstractAction("Cancel") {
         public void actionPerformed(ActionEvent e) {
             cancel();
         }
     };
-    
+
     private void cancel() {
         userCancelled = true;
         dispose();
     }
-    
+
     /**
      * Save all checked components.
      */
     private void doSaves() {
         Workspace workspace = desktop.getWorkspace();
-        
+
         WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
-        
+
         try {
             FileOutputStream ostream = new FileOutputStream("workspace.zip");
-            
+
             try {
                 serializer.serialize(ostream);
             } finally {
@@ -316,7 +311,7 @@ public class WorkspaceChangedDialog extends JDialog {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
 //        int i = 0;
 //        for (JCheckBox checkBox : checkBoxList) {
 //            if (checkBox.isSelected()) {

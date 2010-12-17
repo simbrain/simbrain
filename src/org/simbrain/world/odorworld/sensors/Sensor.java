@@ -20,17 +20,44 @@ package org.simbrain.world.odorworld.sensors;
 
 import java.util.List;
 
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+
 /**
  * Interface for 2d world sensors.
  */
 public interface Sensor {
 
-    /** Upate the sensor state. */
-    public void update();
+    /**
+     * Update the sensor.
+     */
+    void update();
 
     /**
      * Return a list of entity types which can use this type of sensor.
+     *
+     * @return list of applicable types.
      */
-    public List<Class> getApplicableTypes();
+    List<Class<?>> getApplicableTypes();
+
+    /**
+     * Reference to parent entity.
+     *
+     * @return parent entity
+     */
+    OdorWorldEntity getParent();
+
+    /**
+     * Returns an identifying string.
+     *
+     * @return the id.
+     */
+    String getId();
+
+    /**
+     * Set the id.  Should be unique in the parent entity.
+     *
+     * @param id the id.
+     */
+    void setId(String id);
 
 }

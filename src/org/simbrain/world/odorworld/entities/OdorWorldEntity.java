@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.util.SimpleId;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
@@ -86,6 +87,12 @@ public abstract class OdorWorldEntity {
 
     /** If true, show sensors. */
     private boolean showSensors = true;
+
+    /** Entity Id generator. */
+    private SimpleId sensorIDGenerator = new SimpleId("Sensor", 1);
+
+    /** Entity Id generator. */
+    private SimpleId effectorIDGenerator = new SimpleId("Effector", 1);
 
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the
@@ -271,6 +278,7 @@ public abstract class OdorWorldEntity {
      */
     public void addEffector(final Effector effector) {
         effectors.add(effector);
+        effector.setId(effectorIDGenerator.getId());
         parentWorld.fireEffectorAdded(effector);
     }
 
@@ -281,6 +289,7 @@ public abstract class OdorWorldEntity {
      */
     public void addSensor(final Sensor sensor) {
         sensors.add(sensor);
+        sensor.setId(sensorIDGenerator.getId());
         parentWorld.fireSensorAdded(sensor);
     }
 

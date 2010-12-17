@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.simbrain.workspace.AttributeType;
@@ -161,7 +162,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                         for (int i = 0; i < smell.getCurrentValue().length; i++) {
                             SmellSensorGetter getter =  smell.createGetter(i);
                             String description = smellSensorType.getSimpleDescription(entity
-                                    .getName() + ":" + smell.getName() + "[" + i + "]");
+                                    .getName() + ":" + smell.getId() + "[" + i + "]");
                             returnList.add(getAttributeManager().createPotentialProducer(getter, smellSensorType, description));
                         }
                         // TODO: A way of indicating sensor location (relative
@@ -230,7 +231,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 for (Sensor sensor : rotatingEntity.getSensors()) {
                     if (sensor instanceof SmellSensor) {
                         SmellSensor smellSensor = (SmellSensor) sensor;
-                        if (smellSensor.getName().equalsIgnoreCase(name)) {
+                        if (smellSensor.getId().equalsIgnoreCase(name)) {
                             return smellSensor.createGetter(i);
                         }
                     }
@@ -264,6 +265,49 @@ public class OdorWorldComponent extends WorkspaceComponent {
     @Override
     public void save(final OutputStream output, final String format) {
         OdorWorld.getXStream().toXML(world, output);
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof OdorWorldEntity) {
+            return ((OdorWorldEntity) object).getName();
+        } else if (object instanceof Sensor) {
+            String entityName = ((Sensor) object).getParent().getName();
+            String sensorName = ((Sensor) object).getId();
+            return entityName + ":sensor:" + sensorName;
+        } else if (object instanceof Effector) {
+            String entityName = ((Effector) object).getParent().getName();
+            String effectorName = ((Effector) object).getId();
+            return entityName + ":effector:" + effectorName;
+        } else if (object instanceof SmellSensorGetter) {
+            String entityName = ((SmellSensorGetter) object).getParent().getParent().getName();
+            String sensorName = ((SmellSensorGetter) object).getParent().getId();
+            String index = "" + ((SmellSensorGetter) object).getIndex();
+            return entityName + ":smellSensorGetter:" + sensorName + ":" + index; 
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        String[] parsedKey  = objectKey.split(":");
+        String entityName = parsedKey[0];
+        if (parsedKey.length == 1) {
+            return getWorld().getEntityFromKey(entityName);
+        } else {
+            String secondString = parsedKey[1];
+            if (secondString.equalsIgnoreCase("sensor")) {
+                return getWorld().getSensorFromKeys(entityName, parsedKey[2]);
+            } else if (secondString.equalsIgnoreCase("effector")) {
+                return getWorld().getEffectorFromKeys(entityName, parsedKey[2]);
+            } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
+                int index = Integer.parseInt(parsedKey[3]);
+                return getWorld().getSmellSensorGetter(entityName,
+                        parsedKey[2], index);
+            }
+        }
+        return null;
     }
 
     @Override

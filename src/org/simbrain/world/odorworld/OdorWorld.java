@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.SimpleId;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
@@ -33,6 +34,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor.SmellSensorGetter;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -60,7 +62,7 @@ public class OdorWorld {
     /** Renderer for this world. */
     private OdorWorldRenderer renderer;
 
-    /** Sum of lenths of smell vectors for all smelly objects in the world. */
+    /** Sum of lengths of smell vectors for all smelly objects in the world. */
     private double totalSmellVectorLength;
 
     /** Whether or not sprites wrap around or are halted at the borders */
@@ -77,6 +79,9 @@ public class OdorWorld {
 
     /** Width of world. */
     private int width;
+
+    /** Entity Id generator. */
+    private SimpleId entityIDGenerator = new SimpleId("Entity", 1);
 
     /**
      * Default constructor.
@@ -97,7 +102,7 @@ public class OdorWorld {
     public void update() {
         for (OdorWorldEntity object : entityList) {
             object.updateSensors();
-            object.applyEffectors(); 
+            object.applyEffectors();
             updateSprite(object, 1); // time defaults to 1 now
         }
         fireUpdateEvent();
@@ -109,8 +114,8 @@ public class OdorWorld {
      * @param entity the entity to add
      */
     public void addEntity(final OdorWorldEntity entity) {
-        // TODO: As usual, need a system for naming things..
-        entity.setName(entity.getClass().getSimpleName() + "-" + (entityList.size()+1));
+
+        entity.setName(entityIDGenerator.getId());
 
         //centerSprite(sprite, tileX,tileY);
 
@@ -140,6 +145,78 @@ public class OdorWorld {
             entity.addSensor(new SmellSensor(entity, "Right",-Math.PI/8, 50));
         }
         addEntity(entity);
+    }
+
+    /**
+     * Returns the entity with the given id, or null if none is found.
+     *
+     * @param id name of entity
+     * @return matching entity
+     */
+    public OdorWorldEntity getEntityFromKey(final String id ) {
+        for (OdorWorldEntity entity : entityList) {
+            if (entity.getName().equalsIgnoreCase(id)) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the sensor with the given id, or null if none is found.
+     *
+     * @param entityId entity to search
+     * @param sensorId sensor to search
+     * @return sensor if found
+     */
+    public Sensor getSensorFromKeys(final String entityId, final String sensorId ) {
+        OdorWorldEntity entity = getEntityFromKey(entityId);
+        if (entity == null) {
+            return null;
+        }
+        for (Sensor sensor : entity.getSensors()) {
+            if (sensor.getId().equalsIgnoreCase(sensorId)) {
+                return sensor;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the effector with the given id, or null if none is found.
+     *
+     * @param entityId entity to search
+     * @param effectorId sensor to search
+     * @return effector if found
+     */
+    public Effector getEffectorFromKeys(final String entityId, final String effectorId ) {
+        OdorWorldEntity entity = getEntityFromKey(entityId);
+        if (entity == null) {
+            return null;
+        }
+        for (Effector effector : entity.getEffectors()) {
+            if (effector.getId().equalsIgnoreCase(effectorId)) {
+                return effector;
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * Returns the sensor with the given id, or null if none is found.
+     *
+     * @param entityId entity to search
+     * @param sensorId sensor to search
+     * @return sensor if found
+     */
+    public SmellSensorGetter getSmellSensorGetter(final String entityId, final String sensorId, final int stimulusIndex ) {
+        Sensor sensor = getSensorFromKeys(entityId, sensorId);
+        if ((sensor == null) || !(sensor instanceof SmellSensor)) {
+            return null;
+        }
+        return ((SmellSensor)sensor).createGetter(stimulusIndex);
     }
 
 
@@ -217,7 +294,7 @@ public class OdorWorld {
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
-     * 
+     *
      * TODO: There is more to remove!
      */
     static XStream getXStream() {

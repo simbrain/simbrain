@@ -54,8 +54,8 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         super(name);
         model = new ScatterPlotModel();
         model.defaultInit();
-        addListener();
         initializeAttributes();
+        addListener();
     }
 
     /**
@@ -91,8 +91,8 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        xAttributeType = new AttributeType(this, "Point-x", "X", double.class, true);
-        yAttributeType = new AttributeType(this, "Point-y", "Y", double.class, true);
+        xAttributeType = new AttributeType(this, "Point", "X", double.class, true);
+        yAttributeType = new AttributeType(this, "Point", "Y", double.class, true);
         addConsumerType(xAttributeType);
         addConsumerType(yAttributeType);
         // TODO: What if called more than once?
@@ -103,22 +103,25 @@ public class ScatterPlotComponent extends WorkspaceComponent {
 
     @Override
     public List<PotentialConsumer> getPotentialConsumers() {
+
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
-        //TODO: visibility
-        
         for (ScatterPlotSetter setter : setterList) {
-            String xDesc = xAttributeType.getSimpleDescription("Point "
-                    + setter.getIndex() + "[X]");
-            PotentialConsumer xConsumer = getAttributeManager()
-                    .createPotentialConsumer(setter, xAttributeType,
-                            xDesc);
-            returnList.add(xConsumer);
-            String yDesc = xAttributeType.getSimpleDescription("Point "
-                    + setter.getIndex() + "[Y]");
-            PotentialConsumer yConsumer = getAttributeManager()
-                    .createPotentialConsumer(setter, yAttributeType,
-                            yDesc);
-            returnList.add(yConsumer);
+            if (xAttributeType.isVisible()) {
+                String xDesc = xAttributeType.getSimpleDescription("Point "
+                        + setter.getIndex() + "[X]");
+                PotentialConsumer xConsumer = getAttributeManager()
+                        .createPotentialConsumer(setter, xAttributeType,
+                                xDesc);
+                returnList.add(xConsumer);
+            }
+            if (yAttributeType.isVisible()) {
+                String yDesc = yAttributeType.getSimpleDescription("Point "
+                        + setter.getIndex() + "[Y]");
+                PotentialConsumer yConsumer = getAttributeManager()
+                        .createPotentialConsumer(setter, yAttributeType,
+                                yDesc);
+                returnList.add(yConsumer);
+            }
         }
         return returnList;
     }
@@ -208,6 +211,25 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             final String name, final String format) {
         ScatterPlotModel dataModel = (ScatterPlotModel) ScatterPlotModel.getXStream().fromXML(input);
         return new ScatterPlotComponent(name, dataModel);
+    }
+
+    @Override
+    public String getKeyFromObject(Object object) {
+        if (object instanceof ScatterPlotSetter) {
+            return "" + ((ScatterPlotSetter) object).getIndex();
+        }
+        return null;
+    }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
+        try {
+            int i = Integer.parseInt(objectKey);
+            ScatterPlotSetter setter = getSetter(i);
+            return  setter;
+        } catch (NumberFormatException e) {
+            return null; // the supplied string was not an integer
+        }
     }
 
     /**

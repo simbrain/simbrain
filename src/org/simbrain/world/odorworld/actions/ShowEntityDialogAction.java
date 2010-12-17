@@ -42,7 +42,7 @@ public final class ShowEntityDialogAction
      * @param component GUI component, must not be null.
      */
     public ShowEntityDialogAction(OdorWorldEntity entity) {
-        super("Edit entity...");
+        super("Edit entity" );
         this.entity = entity;
 //        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
 //                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -57,6 +57,7 @@ public final class ShowEntityDialogAction
         editor.setExcludeList(new String[] {"velocityX", "velocityY", "entityType"});
         editor.setObject(entity);
         JDialog dialog = editor.getDialog();
+        dialog.setTitle("Edit " + entity.getName());
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

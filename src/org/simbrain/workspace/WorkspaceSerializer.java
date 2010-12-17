@@ -263,7 +263,7 @@ public class WorkspaceSerializer {
             pos += read;
         }
     }
-    
+
     /**
      * Helper method for openings workspace components from a file.
      *

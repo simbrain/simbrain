@@ -19,72 +19,76 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
- * <b>IACNeuron</b>.
+ * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
  */
-public class IACNeuron extends Neuron {
+public class IACNeuron implements NeuronUpdateRule {
+
     /** Neuron decay. */
     private double decay = 0;
+
     /** Rest. */
     private double rest = 0;
+
     /** Noise dialog box. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Add noise to the neuron. */
     private boolean addNoise = false;
+
     /** Clipping. */
     private boolean clipping = true;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public IACNeuron() {
-    }
-
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to make type IAC
-     */
-    public IACNeuron(final Neuron n) {
-        super(n);
-    }
-
-    /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         // TODO Auto-generated method stub
         return 0;
     }
 
+//    /**
+//     * @return duplicate IACNeuron (used, e.g., in copy/paste).
+//     */
+//    public IACNeuron duplicate() {
+//        IACNeuron iac = new IACNeuron();
+//        iac = (IACNeuron) super.duplicate(iac);
+//        iac.setDecay(getDecay());
+//        iac.setRest(getRest());
+//        iac.setClipping(getClipping());
+//        iac.setAddNoise(getAddNoise());
+//        iac.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//        iac.duplicate(iac);
+//        
+//        return iac;
+//    }
+
     /**
-     * @return duplicate IACNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public IACNeuron duplicate() {
-        IACNeuron iac = new IACNeuron();
-        iac = (IACNeuron) super.duplicate(iac);
-        iac.setDecay(getDecay());
-        iac.setRest(getRest());
-        iac.setClipping(getClipping());
-        iac.setAddNoise(getAddNoise());
-        iac.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-        iac.duplicate(iac);
-        
-        return iac;
+    public String getName() {
+        return "IAC";
     }
 
     /**
-     * Update the neuron.
+     * @{inheritDoc}
      */
-    public void update() {
-        double val = activation;
+    public void init(Neuron neuron) {
+        // No implementation
+    }
+
+    /**
+     * @{inheritDoc}
+     */
+    public void update(Neuron neuron) {
+        double val = neuron.getActivation();
         double wtdSum = 0;
 
-        for (Synapse w : getFanIn()) {
+        for (Synapse w : neuron.getFanIn()) {
             Neuron source = w.getSource();
 
             if (source.getActivation() > 0) {
@@ -93,9 +97,9 @@ public class IACNeuron extends Neuron {
         }
 
         if (wtdSum > 0) {
-            val += ((wtdSum * (upperBound - activation)) - (decay * (activation - rest)));
+            val += ((wtdSum * (neuron.getUpperBound() - val)) - (decay * (val - rest)));
         } else {
-            val += ((wtdSum * (activation - lowerBound)) - (decay * (activation - rest)));
+            val += ((wtdSum * (val - neuron.getLowerBound())) - (decay * (val - rest)));
         }
 
         if (addNoise) {
@@ -103,10 +107,10 @@ public class IACNeuron extends Neuron {
         }
 
         if (clipping) {
-            val = clip(val);
+            val = neuron.clip(val);
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
@@ -135,13 +139,6 @@ public class IACNeuron extends Neuron {
      */
     public void setRest(final double rest) {
         this.rest = rest;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "IAC";
     }
 
     /**

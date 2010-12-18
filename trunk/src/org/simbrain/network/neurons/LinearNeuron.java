@@ -20,66 +20,71 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearNeuron extends Neuron implements BiasedNeuron {
+public class LinearNeuron implements NeuronUpdateRule, BiasedNeuron {
+
     /** Slope. */
     private double slope = 1;
+
     /** Bias. */
     private double bias = 0;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Add noise to the neuron. */
     private boolean addNoise = false;
+
     /** Clipping. */
     private boolean clipping = true;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public LinearNeuron() {
-    }
-
-    /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be made of type linear
+     * @{inheritDoc}
      */
-    public LinearNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Linear";
     }
 
     /**
-     * @return duplicate LinearNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public LinearNeuron duplicate() {
-        LinearNeuron ln = new LinearNeuron();
-        ln = (LinearNeuron) super.duplicate(ln);
-        ln.setBias(getBias());
-        ln.setSlope(getSlope());
-        ln.setClipping(getClipping());
-        ln.setAddNoise(getAddNoise());
-        ln.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-
-        return ln;
+    public void init(Neuron neuron) {
+        // No implementation
     }
 
+//    /**
+//     * @return duplicate LinearNeuron (used, e.g., in copy/paste).
+//     */
+//    public LinearNeuron duplicate() {
+//        LinearNeuron ln = new LinearNeuron();
+//        ln = (LinearNeuron) super.duplicate(ln);
+//        ln.setBias(getBias());
+//        ln.setSlope(getSlope());
+//        ln.setClipping(getClipping());
+//        ln.setAddNoise(getAddNoise());
+//        ln.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//
+//        return ln;
+//    }
+
     /**
-     * Updates the neuron.
+     * @{inheritDoc}
      */
-    public void update() {
-        double wtdInput = this.getWeightedInputs();
+    public void update(Neuron neuron) {
+        double wtdInput = neuron.getWeightedInputs();
         double val = slope * (wtdInput + bias);
 
         if (addNoise) {
@@ -87,10 +92,10 @@ public class LinearNeuron extends Neuron implements BiasedNeuron {
         }
 
         if (clipping) {
-            val = clip(val);
+            val = neuron.clip(val);
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
@@ -119,13 +124,6 @@ public class LinearNeuron extends Neuron implements BiasedNeuron {
      */
     public void setSlope(final double slope) {
         this.slope = slope;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Linear";
     }
 
     /**

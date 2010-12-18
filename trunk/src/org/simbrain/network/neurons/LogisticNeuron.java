@@ -19,60 +19,66 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 
 /**
- * <b>LogisticNeuron</b>.
+ * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
+ * for the default growth rate. Does not use inputs from other neurons.
  */
-public class LogisticNeuron extends Neuron {
+public class LogisticNeuron implements NeuronUpdateRule {
 
     /** Growth rate. */
     private double growthRate = 3.9;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public LogisticNeuron() {
-    }
-
-    /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be created
+     * @{inheritDoc}
      */
-    public LogisticNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Logistic";
     }
 
     /**
-     * @return duplicate LogisticNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public LogisticNeuron duplicate() {
-        LogisticNeuron ln = new LogisticNeuron();
-        ln = (LogisticNeuron) super.duplicate(ln);
-        ln.setGrowthRate(getGrowthRate());
-
-        return ln;
+    public void init(Neuron neuron) {
+        // No implementation
     }
 
-    /**
-     * TODO: Note that the inputs have to be within the neuron's bounds for behavior to be reasonable.
-     */
-    public void update() {
-        double x = getActivation();
+//    /**
+//     * @return duplicate LogisticNeuron (used, e.g., in copy/paste).
+//     */
+//    public LogisticNeuron duplicate() {
+//        LogisticNeuron ln = new LogisticNeuron();
+//        ln = (LogisticNeuron) super.duplicate(ln);
+//        ln.setGrowthRate(getGrowthRate());
+//
+//        return ln;
+//    }
 
-        double y = (x - lowerBound) / (upperBound - lowerBound);
+    /**
+     * @{inheritDoc}
+     */
+    public void update(Neuron neuron) {
+
+        // TODO: Note that the inputs have to be within the neuron's bounds for
+        // behavior to be reasonable.
+
+        double x = neuron.getActivation();
+
+        double y = (x - neuron.getLowerBound())
+                / (neuron.getUpperBound() - neuron.getLowerBound());
         y = growthRate * y * (1 - y);
-        x = ((upperBound - lowerBound) * y) + lowerBound;
+        x = ((neuron.getUpperBound() - neuron.getLowerBound()) * y)
+                + neuron.getLowerBound();
 
-        setBuffer(clip(x));
+        neuron.setBuffer(neuron.clip(x));
     }
 
     /**
@@ -87,12 +93,5 @@ public class LogisticNeuron extends Neuron {
      */
     public void setGrowthRate(final double growthRate) {
         this.growthRate = growthRate;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Logistic";
     }
 }

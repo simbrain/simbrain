@@ -64,9 +64,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      * @param net Network
      */
-    public AdditiveNeuronPanel(final Network net) {
-        parentNet = net;
-
+    public AdditiveNeuronPanel() {
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Lambda", tfLambda);
@@ -81,7 +79,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        AdditiveNeuron neuronRef = (AdditiveNeuron) neuronList.get(0);
+        AdditiveNeuron neuronRef = (AdditiveNeuron) ruleList.get(0);
 
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
@@ -90,19 +88,19 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, AdditiveNeuron.class, "getLambda")) {
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveNeuron.class, "getLambda")) {
             tfLambda.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, AdditiveNeuron.class, "getResistance")) {
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveNeuron.class, "getResistance")) {
             tfResistance.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, AdditiveNeuron.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveNeuron.class, "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, AdditiveNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, AdditiveNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
 
@@ -115,8 +113,8 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((AdditiveNeuron) neuronList.get(i)).getNoiseGenerator());
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((AdditiveNeuron) ruleList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -141,8 +139,8 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
     public void commitChanges() {
         parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            AdditiveNeuron neuronRef = (AdditiveNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            AdditiveNeuron neuronRef = (AdditiveNeuron) ruleList.get(i);
 
             if (!tfLambda.getText().equals(NULL_STRING)) {
                 neuronRef.setLambda(Double.parseDouble(tfLambda.getText()));

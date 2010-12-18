@@ -495,15 +495,16 @@ public class RootNetwork extends Network {
         }
     }
 
+    //TODO: May not be needed
     /**
      * Fire a neuron type changed event to all registered model listeners.
      *
-     * @param old the previous neuron, before the change
-     * @param changed the new, changed neuron
+     * @param old the old update rule
+     * @param changed the new update rule
      */
-    public void fireNeuronTypeChanged(final Neuron old, final Neuron changed) {
+    public void fireNeuronTypeChanged(final NeuronUpdateRule old, final NeuronUpdateRule changed) {
         for (NeuronListener listener : neuronListeners) {
-            listener.neuronTypeChanged(new NetworkEvent<Neuron>(this, old, changed));
+            listener.neuronTypeChanged(new NetworkEvent<NeuronUpdateRule>(this, old, changed));
         }
     }
 

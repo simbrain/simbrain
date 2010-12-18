@@ -19,63 +19,63 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 
 /**
- * <b>StochasticNeuron</b>.
+ * <b>StochasticNeuron</b> is a simple type of random neuron which takes the
+ * value of the upper bound if a random variable is above a specified firing
+ * probability, and the lower bound otherwise. Ignores inputs.
  */
-public class StochasticNeuron extends Neuron {
+public class StochasticNeuron implements NeuronUpdateRule {
+
     /** The default firing probability for the Neuron. */
     private static final double DEFAULT_FIRING_PROBABILITY = .5;
-    
+
     /** Probability the neuron will fire. */
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
 
     /**
-     * Default constructor needed for external calls which create neurons then
-     * set their parameters.
-     */
-    public StochasticNeuron() {
-    }
-
-    /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another
-     * neuron of another type Only values common to different types of neuron
-     * are copied.
-     * 
-     * @param n Neuron to be made type.
+     * @{inheritDoc}
      */
-    public StochasticNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Stochastic";
     }
 
     /**
-     * @return duplicate StochasticNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public StochasticNeuron duplicate() {
-        StochasticNeuron sn = new StochasticNeuron();
-        sn = (StochasticNeuron) super.duplicate(sn);
-        sn.setFiringProbability(getFiringProbability());
-
-        return sn;
+    public void init(Neuron neuron) {
+        // No implementation
     }
 
+//    /**
+//     * @return duplicate StochasticNeuron (used, e.g., in copy/paste).
+//     */
+//    public StochasticNeuron duplicate() {
+//        StochasticNeuron sn = new StochasticNeuron();
+//        sn = (StochasticNeuron) super.duplicate(sn);
+//        sn.setFiringProbability(getFiringProbability());
+//
+//        return sn;
+//    }
+
     /**
-     * Updates neuron.
+     * @{inheritDoc}
      */
-    public void update() {
+    public void update(Neuron neuron) {
         double rand = Math.random();
 
         if (rand > firingProbability) {
-            setBuffer(lowerBound);
+            neuron.setBuffer(neuron.getLowerBound());
         } else {
-            setBuffer(upperBound);
+            neuron.setBuffer(neuron.getUpperBound());
         }
     }
 
@@ -93,32 +93,4 @@ public class StochasticNeuron extends Neuron {
         this.firingProbability = firingProbability;
     }
 
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Stochastic";
-    }
-
-//    /**
-//     * Make firing probability a consuming attribute
-//     */
-//    private void addConsumerAttributes() {
-//        consumingAttributes().add(new StochasticConsumingAttribute());
-//    }
-//    
-//    private class StochasticConsumingAttribute extends AbstractAttribute
-//           implements ConsumingAttribute<Double> {
-//        public Consumer getParent() {
-//            return StochasticNeuron.this;
-//        }
-//
-//        public void setValue(final Double value) {
-//            firingProbability = value;
-//        }
-//
-//        public String getKey() {
-//            return "Firing Probability";
-//        }
-//    }
 }

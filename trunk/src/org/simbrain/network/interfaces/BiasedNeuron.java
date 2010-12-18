@@ -19,9 +19,10 @@
 package org.simbrain.network.interfaces;
 
 /**
- * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear neurons.
- * 
- * TODO: Add upper and loewr bound parameters?  Add randomize option?
+ * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
+ * neurons.
+ *
+ * TODO: Add upper and lower bound parameters? Add randomize option?
  */
 public interface BiasedNeuron {
     /**

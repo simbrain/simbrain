@@ -19,7 +19,7 @@
 package org.simbrain.network.synapses;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
 
 
@@ -128,8 +128,8 @@ public class ShortTermPlasticitySynapse extends Synapse {
      */
     public void update() {
         // Determine whether to activate short term dynamics
-        if (this.getSource() instanceof SpikingNeuron) {
-            if (((SpikingNeuron) this.getSource()).hasSpiked()) {
+        if (this.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+            if (((SpikingNeuronUpdateRule) getSource().getUpdateRule()).hasSpiked()) {
                 activated = true;
             } else {
                 activated = false;

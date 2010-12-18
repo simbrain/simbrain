@@ -19,73 +19,78 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
- * <b>SinusoidalNeuron</b>.
+ * <b>SinusoidalNeuron</b> produces a sine wave; inputs are ignored.
  */
-public class SinusoidalNeuron extends Neuron {
+public class SinusoidalNeuron implements NeuronUpdateRule {
+
     /** Phase. */
     private double phase = 1;
+
     /** Frequency. */
     private double frequency = .1;
 
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Add noise to the neuron. */
     private boolean addNoise = false;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public SinusoidalNeuron() {
-    }
-
-    /**
-     * TODO: As with clamped, no real time type...
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be made of type
+     * @{inheritDoc}
      */
-    public SinusoidalNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Sinusoidal";
     }
 
     /**
-     * @return duplicate SinusoidalNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public SinusoidalNeuron duplicate() {
-        SinusoidalNeuron sn = new SinusoidalNeuron();
-        sn = (SinusoidalNeuron) super.duplicate(sn);
-        sn.setPhase(getPhase());
-        sn.setFrequency(getFrequency());
-        sn.setAddNoise(getAddNoise());
-        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-
-        return sn;
+    public void init(Neuron neuron) {
+        // No implementation
     }
 
+//    /**
+//     * @return duplicate SinusoidalNeuron (used, e.g., in copy/paste).
+//     */
+//    public SinusoidalNeuron duplicate() {
+//        SinusoidalNeuron sn = new SinusoidalNeuron();
+//        sn = (SinusoidalNeuron) super.duplicate(sn);
+//        sn.setPhase(getPhase());
+//        sn.setFrequency(getFrequency());
+//        sn.setAddNoise(getAddNoise());
+//        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//
+//        return sn;
+//    }
+
     /**
-     * Updates the neuron.
+     * @{inheritDoc}
      */
-    public void update() {
+    public void update(Neuron neuron) {
+
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
         double range = upperBound - lowerBound;
-        double val = ((range / 2)  * Math.sin(frequency * getParentNetwork().getRootNetwork().getTime() + phase))
+        double val = ((range / 2)  * Math.sin(frequency * neuron.getParentNetwork().getRootNetwork().getTime() + phase))
             + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
@@ -128,13 +133,6 @@ public class SinusoidalNeuron extends Neuron {
      */
     public void setPhase(final double phase) {
         this.phase = phase;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Sinusoidal";
     }
 
     /**

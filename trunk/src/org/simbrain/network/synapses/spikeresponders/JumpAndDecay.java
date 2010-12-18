@@ -19,7 +19,7 @@
 package org.simbrain.network.synapses.spikeresponders;
 
 import org.simbrain.network.interfaces.SpikeResponder;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 
 
 /**
@@ -45,7 +45,7 @@ public class JumpAndDecay extends SpikeResponder {
      * Update the synapse.
      */
     public void update() {
-        if (((SpikingNeuron) parent.getSource()).hasSpiked()) {
+        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule()).hasSpiked())  {
             value = jumpHeight;
         } else {
             value += (decayRate * (baseLine - value));

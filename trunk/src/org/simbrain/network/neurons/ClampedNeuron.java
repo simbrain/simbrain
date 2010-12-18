@@ -19,18 +19,13 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 
 
 /**
- * <b>ClampedNeuron</b>.
+ * <b>ClampedNeuron</b> is a simple neuron that does nothing! 
  */
-public class ClampedNeuron extends Neuron {
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public ClampedNeuron() {
-        super();
-    }
+public class ClampedNeuron implements NeuronUpdateRule {
 
     /**
      * TODO: Not really true...
@@ -40,37 +35,34 @@ public class ClampedNeuron extends Neuron {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to make the type
-     */
-    public ClampedNeuron(final Neuron n) {
-        super(n);
-    }
-
-    /**
-     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
-     * @return Duplicated neuron
-     */
-    public ClampedNeuron duplicate() {
-        ClampedNeuron cn = new ClampedNeuron();
-        cn = (ClampedNeuron) super.duplicate(cn);
-
-        return cn;
-    }
+//    /**
+//     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
+//     * @return Duplicated neuron
+//     */
+//    public ClampedNeuron duplicate() {
+//        ClampedNeuron cn = new ClampedNeuron();
+//        cn = (ClampedNeuron) super.duplicate(cn);
+//
+//        return cn;
+//    }
 
     /**
      * Update neuron.
      */
-    public void update() {
-        setBuffer(activation);
+    public void update(Neuron neuron) {
+     }
+
+    /**
+     * @{inheritDoc}
+     */
+    public String getName() {
+        return "Clamped";
     }
 
     /**
-     * @return Name of neuron type.
+     * @{inheritDoc}
      */
-    public static String getName() {
-        return "Clamped";
+    public void init(Neuron neuron) {
+        // No implementation
     }
 }

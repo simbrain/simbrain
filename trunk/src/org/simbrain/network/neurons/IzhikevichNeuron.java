@@ -19,14 +19,14 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
  * <b>IzhikevichNeuron</b>. Default values correspond to "tonic spiking".
  */
-public class IzhikevichNeuron extends SpikingNeuron {
+public class IzhikevichNeuron extends SpikingNeuronUpdateRule {
 
     /** Recovery. */
     private double recovery = 0;
@@ -49,46 +49,29 @@ public class IzhikevichNeuron extends SpikingNeuron {
     /** Add noise to the neuron. */
     private boolean addNoise = false;
 
-    /**
-     * Default constructor needed for external calls which create neurons then
-     * set their parameters.
-     */
-    public IzhikevichNeuron() {
-    }
-
-    /**
-     * This constructor is used when creating a neuron of one type from another
-     * neuron of another type Only values common to different types of neuron
-     * are copied.
-     *
-     * @param n Neuron to make of the type
-     */
-    public IzhikevichNeuron(final Neuron n) {
-        super(n);
-    }
-
-    /**
-     * @return duplicate IzhikevichNeuron (used, e.g., in copy/paste).
-     */
-    public IzhikevichNeuron duplicate() {
-        IzhikevichNeuron in = new IzhikevichNeuron();
-        in = (IzhikevichNeuron) super.duplicate(in);
-        in.setA(getA());
-        in.setB(getB());
-        in.setC(getC());
-        in.setD(getD());
-        in.setAddNoise(getAddNoise());
-        in.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-
-        return in;
-    }
+//    /**
+//     * @return duplicate IzhikevichNeuron (used, e.g., in copy/paste).
+//     */
+//    public IzhikevichNeuron duplicate() {
+//        IzhikevichNeuron in = new IzhikevichNeuron();
+//        in = (IzhikevichNeuron) super.duplicate(in);
+//        in.setA(getA());
+//        in.setB(getB());
+//        in.setC(getC());
+//        in.setD(getD());
+//        in.setAddNoise(getAddNoise());
+//        in.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//
+//        return in;
+//    }
 
     /**
      * Updates the neuron.
      */
-    public void update() {
-        double timeStep = this.getParentNetwork().getRootNetwork().getTimeStep();
-        double inputs = getWeightedInputs();
+    public void update(Neuron neuron) {
+        double timeStep = neuron.getParentNetwork().getRootNetwork().getTimeStep();
+        double inputs = neuron.getWeightedInputs();
+        double activation = neuron.getActivation();
 
         if (addNoise) {
             inputs += noiseGenerator.getRandom();
@@ -109,7 +92,7 @@ public class IzhikevichNeuron extends SpikingNeuron {
             setHasSpiked(false);
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
@@ -171,7 +154,7 @@ public class IzhikevichNeuron extends SpikingNeuron {
     /**
      * @return Name of the neuron type.
      */
-    public static String getName() {
+    public String getName() {
         return "Izhikevich";
     }
 

@@ -34,7 +34,7 @@ import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
 
 import edu.umd.cs.piccolo.PNode;
@@ -182,8 +182,8 @@ public final class SynapseNode
     }
 
     /**
-     * Calculates the color for a weight, based on its current strength.  Positive values are (for example) red,
-     * negative values blue.
+     * Calculates the color for a weight, based on its current strength.
+     * Positive values are (for example) red, negative values blue.
      */
     public void updateColor() {
 
@@ -195,8 +195,8 @@ public final class SynapseNode
             circle.setPaint(NetworkGuiSettings.getExcitatoryColor());
         }
 
-        if (source.getNeuron() instanceof SpikingNeuron) {
-            if (((SpikingNeuron) source.getNeuron()).hasSpiked()) {
+        if (source.getNeuron().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+            if (((SpikingNeuronUpdateRule) source.getNeuron().getUpdateRule()).hasSpiked()) {
                 line.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {
                 line.setStrokePaint(NetworkGuiSettings.getLineColor());

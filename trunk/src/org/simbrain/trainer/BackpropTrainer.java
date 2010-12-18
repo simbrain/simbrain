@@ -282,7 +282,7 @@ public class BackpropTrainer extends Trainer {
         // TODO:  - Add more activation functions.
         //         - Generalize to arbitrary bounds
         double errorTimesDerivative = 0;
-        if (neuron instanceof SigmoidalNeuron) {
+        if (neuron.getUpdateRule() instanceof SigmoidalNeuron) {
             errorTimesDerivative = neuron.getActivation()
                     * (1 - neuron.getActivation())
                     * error;
@@ -346,7 +346,7 @@ public class BackpropTrainer extends Trainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            ClampedNeuron neuron = new ClampedNeuron();
+            Neuron neuron = new Neuron(new ClampedNeuron()); 
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
@@ -358,7 +358,7 @@ public class BackpropTrainer extends Trainer {
         // Set up hidden layer 1
         List<Neuron> hiddenLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 5; i++) {
-            SigmoidalNeuron neuron = new SigmoidalNeuron();
+            Neuron neuron = new Neuron(new SigmoidalNeuron());
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             hiddenLayer.add(neuron);
@@ -369,7 +369,7 @@ public class BackpropTrainer extends Trainer {
         // Set up hidden layer 2
         List<Neuron> hiddenLayer2 = new ArrayList<Neuron>();
         for (int i = 0; i < 5; i++) {
-            SigmoidalNeuron neuron = new SigmoidalNeuron();
+            Neuron neuron = new Neuron(new SigmoidalNeuron());
             neuron.setLowerBound(0);
           //  neuron.setClipping(true);
             network.addNeuron(neuron);
@@ -382,7 +382,7 @@ public class BackpropTrainer extends Trainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 1; i++) {
-            SigmoidalNeuron neuron = new SigmoidalNeuron();
+            Neuron neuron = new Neuron(new SigmoidalNeuron());
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             outputLayer.add(neuron);

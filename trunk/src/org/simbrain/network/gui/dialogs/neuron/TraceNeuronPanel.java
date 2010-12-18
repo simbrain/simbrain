@@ -46,17 +46,17 @@ public class TraceNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        TraceNeuron neuronRef = (TraceNeuron) neuronList.get(0);
+        TraceNeuron neuronRef = (TraceNeuron) ruleList.get(0);
 
         tfC1.setText(Double.toString(neuronRef.getC1()));
         tfC2.setText(Double.toString(neuronRef.getC2()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, TraceNeuron.class, "getC1")) {
+        if (!NetworkUtils.isConsistent(ruleList, TraceNeuron.class, "getC1")) {
             tfC1.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, TraceNeuron.class, "getC2")) {
+        if (!NetworkUtils.isConsistent(ruleList, TraceNeuron.class, "getC2")) {
             tfC2.setText(NULL_STRING);
         }
     }
@@ -75,8 +75,8 @@ public class TraceNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            TraceNeuron neuronRef = (TraceNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            TraceNeuron neuronRef = (TraceNeuron) ruleList.get(i);
 
             if (!tfC1.getText().equals(NULL_STRING)) {
                 neuronRef.setC1(Double.parseDouble(tfC1.getText()));

@@ -19,14 +19,15 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
- * <b>NakaRushtonNeuron</b> is a firing-rate based neuron which is intended to model spike rates of real
- * neurons.  It is used extensively in Hugh Wilson's Spikes, Decisions, and Action.
+ * <b>NakaRushtonNeuron</b> is a firing-rate based neuron which is intended to
+ * model spike rates of real neurons. It is used extensively in Hugh Wilson's
+ * Spikes, Decisions, and Action.
  */
-public class NakaRushtonNeuron extends Neuron {
+public class NakaRushtonNeuron implements NeuronUpdateRule {
 
     /** Steepness. */
     private double steepness = 2;
@@ -65,73 +66,77 @@ public class NakaRushtonNeuron extends Neuron {
     }
 
     /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be created
+     * @{inheritDoc}
      */
-    public NakaRushtonNeuron(final Neuron n) {
-        super(n);
-    }
-
-    @Override
-    public void init() {
-        lowerBound = 0;
-        upperBound = 100;
+    public String getName() {
+        return "Naka-Rushton";
     }
 
     /**
-     * @return duplicate NakaRushtonNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public NakaRushtonNeuron duplicate() {
-        NakaRushtonNeuron rn = new NakaRushtonNeuron();
-        rn = (NakaRushtonNeuron) super.duplicate(rn);
-        rn.setSteepness(getSteepness());
-        rn.setSemiSaturationConstant(getSemiSaturationConstant());
-        rn.setAddNoise(getAddNoise());
-        rn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-        rn.setUseAdaptation(getUseAdaptation());
-        rn.setAdaptationParameter(getAdaptationParameter());
-        rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
-        return rn;
+    public void init(Neuron neuron) {
+        neuron.setLowerBound(0);
+        neuron.setUpperBound(100);
     }
 
+//    /**
+//     * @return duplicate NakaRushtonNeuron (used, e.g., in copy/paste).
+//     */
+//    public NakaRushtonNeuron duplicate() {
+//        NakaRushtonNeuron rn = new NakaRushtonNeuron();
+//        rn = (NakaRushtonNeuron) super.duplicate(rn);
+//        rn.setSteepness(getSteepness());
+//        rn.setSemiSaturationConstant(getSemiSaturationConstant());
+//        rn.setAddNoise(getAddNoise());
+//        rn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//        rn.setUseAdaptation(getUseAdaptation());
+//        rn.setAdaptationParameter(getAdaptationParameter());
+//        rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
+//        return rn;
+//    }
+
     /**
-     * See Spikes (Hugh Wilson), pp. 20-21
+     * @{inheritDoc}
      */
-    public void update() {
-        double p = getWeightedInputs();
-        double val = getActivation();
+    public void update(Neuron neuron) {
+
+        // See Spikes (Hugh Wilson), pp. 20-21
+
+        double p = neuron.getWeightedInputs();
+        double val = neuron.getActivation();
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            a += (this.getParentNetwork().getRootNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
+            a += (neuron.getParentNetwork().getRootNetwork().getTimeStep() / adaptationTimeConstant)
+                    * (adaptationParameter * val - a);
         } else {
             a = 0;
         }
 
         if (p > 0) {
-            s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + a, steepness)
-                                + Math.pow(p, steepness));
+            s = (neuron.getUpperBound() * Math.pow(p, steepness))
+                    / (Math.pow(semiSaturationConstant + a, steepness) + Math
+                            .pow(p, steepness));
         } else {
             s = 0;
         }
 
-
         if (addNoise) {
-            val += (this.getParentNetwork().getRootNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s))
-            + noiseGenerator.getRandom()));
+            val += (neuron.getParentNetwork().getRootNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
+                    .getRandom()));
         } else {
-            val += (this.getParentNetwork().getRootNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+            val += (neuron.getParentNetwork().getRootNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
@@ -174,13 +179,6 @@ public class NakaRushtonNeuron extends Neuron {
      */
     public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Naka-Rushton";
     }
 
     /**
@@ -243,21 +241,21 @@ public class NakaRushtonNeuron extends Neuron {
         this.adaptationTimeConstant = adaptationTimeConstant;
     }
 
-    /** @see Neuron */
-    public void clear() {
-        activation = 0;
-        a = 0;
-        s = 0;
-    }
+//    /** @see Neuron */
+//    public void clear() {
+//        activation = 0;
+//        a = 0;
+//        s = 0;
+//    }
 
-    /** @see Neuron */
-    public String getToolTipText() {
-        if (useAdaptation) {
-            return "" + this.getActivation() + " A = " + a;
-        } else {
-            return super.getToolTipText();
-        }
-    }
+//    /** @see Neuron */
+//    public String getToolTipText() {
+//        if (useAdaptation) {
+//            return "" + this.getActivation() + " A = " + a;
+//        } else {
+//            return super.getToolTipText();
+//        }
+//    }
 
     /**
      * Return the adaptation parameter.

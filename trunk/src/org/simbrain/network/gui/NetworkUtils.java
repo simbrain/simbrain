@@ -32,17 +32,19 @@ import javax.swing.JTextField;
 
 
 /**
- * <b>SimnetUtils</b> provides static utility methods for the Network class.
+ * <b>NetworkUtils</b> provides static utility methods for the Network class.
  */
 public class NetworkUtils {
+
     /**
-     * Checks to see if all the objects in a list return the same value for a  method which the user provides by name.
-     * The method can have no arguments (typically a getter method).
+     * Checks to see if all the objects in a list return the same value for a
+     * method which the user provides by name. The method can have no arguments
+     * (typically a getter method).
      *
      * @param toCheck the list of objects to check for consistency
      * @param methodName the method to be invoked (uses reflection)
-     *
-     * @return true if the list of objects returns the same value for methodName, false otherwise
+     * @return true if the list of objects returns the same value for
+     *         methodName, false otherwise
      */
     public static boolean isConsistent(final List toCheck, final Class theClass, final String methodName) {
         Method theMethod = null;

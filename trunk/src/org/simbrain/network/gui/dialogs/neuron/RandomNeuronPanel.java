@@ -46,8 +46,8 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         ArrayList randomPanels = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            randomPanels.add(((RandomNeuron) neuronList.get(i)).getRandomizer());
+        for (int i = 0; i < ruleList.size(); i++) {
+            randomPanels.add(((RandomNeuron) ruleList.get(i)).getRandomizer());
         }
 
         rp.fillFieldValues(randomPanels);
@@ -64,8 +64,8 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            RandomNeuron neuronRef = (RandomNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            RandomNeuron neuronRef = (RandomNeuron) ruleList.get(i);
             rp.commitRandom(neuronRef.getRandomizer());
         }
     }

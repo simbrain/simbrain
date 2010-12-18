@@ -74,7 +74,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        LinearNeuron neuronRef = (LinearNeuron) neuronList.get(0);
+        LinearNeuron neuronRef = (LinearNeuron) ruleList.get(0);
 
         isAddNoise.setSelected(neuronRef.getAddNoise());
         tfSlope.setText(Double.toString(neuronRef.getSlope()));
@@ -83,19 +83,19 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, LinearNeuron.class, "getSlope")) {
+        if (!NetworkUtils.isConsistent(ruleList, LinearNeuron.class, "getSlope")) {
             tfSlope.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, LinearNeuron.class, "getBias")) {
+        if (!NetworkUtils.isConsistent(ruleList, LinearNeuron.class, "getBias")) {
             tfBias.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, LinearNeuron.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(ruleList, LinearNeuron.class, "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, LinearNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, LinearNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
 
@@ -108,8 +108,8 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((LinearNeuron) neuronList.get(i)).getNoiseGenerator());
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((LinearNeuron) ruleList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -131,8 +131,8 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            LinearNeuron neuronRef = (LinearNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            LinearNeuron neuronRef = (LinearNeuron) ruleList.get(i);
 
             if (!tfSlope.getText().equals(NULL_STRING)) {
                 neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));

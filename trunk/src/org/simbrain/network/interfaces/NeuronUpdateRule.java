@@ -16,34 +16,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.dialogs.neuron;
+package org.simbrain.network.interfaces;
 
 /**
- * <b>CustomNeuronPanel</b>.
+ * A rule for updating a neuron.
+ *
+ * @author jyoshimi
+ *
  */
-public class CustomNeuronPanel extends AbstractNeuronPanel {
+public interface NeuronUpdateRule {
 
-    /**
-     * This method is the default constructor.
-     */
-    public CustomNeuronPanel() {
-    }
+    int getTimeType(); // TODO: This should be an enumeration  
 
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-    }
+    void init(Neuron neuron);
 
-    /**
-     * Populate fields with default data.
-     */
-    public void fillDefaultValues() {
-    }
+    void update(Neuron neuron);
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-    }
+    //TODO: Remove?
+    String getName();
 }

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.PointNeuron;
@@ -72,7 +73,7 @@ public class KwtaNetwork extends Network {
         super();
         this.setRootNetwork(root);
         for (int i = 0; i < k; i++) {
-            addNeuron(new PointNeuron());
+            addNeuron(new Neuron(new PointNeuron()));
         }
         layout.layoutNeurons(this);
     }
@@ -93,9 +94,9 @@ public class KwtaNetwork extends Network {
      */
     private void setCurrentThresholdCurrent() {
 
-        double highest = ((PointNeuron) this.getNeuronList().get(k))
+        double highest = ((PointNeuron) this.getNeuronList().get(k).getUpdateRule())
               .getInhibitoryThresholdConductance();
-        double secondHighest = ((PointNeuron) this.getNeuronList().get(k-1))
+        double secondHighest = ((PointNeuron) this.getNeuronList().get(k-1).getUpdateRule())
             .getInhibitoryThresholdConductance();
 
         inhibitoryConductance = secondHighest + q * (highest - secondHighest);
@@ -104,8 +105,9 @@ public class KwtaNetwork extends Network {
         //  + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
 
         // Set inhibitory conductances in the layer
-        for (PointNeuron neuron : this.getNeuronList()) {
-            neuron.setInhibitoryConductance(inhibitoryConductance);
+        for (Neuron neuron : this.getNeuronList()) {
+            ((PointNeuron) neuron.getUpdateRule())
+                    .setInhibitoryConductance(inhibitoryConductance);
         }
     }
 
@@ -119,20 +121,21 @@ public class KwtaNetwork extends Network {
     /**
      * Used to sort PointNeurons by excitatory conductance.
      */
-    class PointNeuronComparator implements Comparator<PointNeuron> {
+    class PointNeuronComparator implements Comparator<Neuron> {
 
         /**
          * {@inheritDoc}
          */
-        public int compare(PointNeuron neuron1, PointNeuron neuron2) {
-            return (int) (neuron1.getExcitatoryConductance() - neuron2
-                    .getExcitatoryConductance());
+        public int compare(Neuron neuron1, Neuron neuron2) {
+            return 
+                (int) ((PointNeuron)neuron1.getUpdateRule()).getExcitatoryConductance() - 
+                (int)((PointNeuron)neuron1.getUpdateRule()).getExcitatoryConductance();
         }
     }
 
     @Override
-    public ArrayList<PointNeuron> getNeuronList() {
-        return (ArrayList<PointNeuron>) super.getNeuronList();
+    public ArrayList<Neuron> getNeuronList() {
+        return (ArrayList<Neuron>) super.getNeuronList();
     }
 
     /**

@@ -61,7 +61,7 @@ public class HodgkinHuxleyNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        HodgkinHuxleyNeuron neuronRef = (HodgkinHuxleyNeuron) neuronList.get(0);
+        HodgkinHuxleyNeuron neuronRef = (HodgkinHuxleyNeuron) ruleList.get(0);
 
         perNaChannels.setText(Double.toString(neuronRef.getPerNaChannels()));
         perKChannels.setText(Double.toString(neuronRef.getPerKChannels()));
@@ -70,7 +70,7 @@ public class HodgkinHuxleyNeuronPanel extends AbstractNeuronPanel {
         
         
 //        //Handle consistency of multiple selections
-//        if (!NetworkUtils.isConsistent(neuronList, HodgkinHuxleyNeuron.class, "getTemp")) {
+//        if (!NetworkUtils.isConsistent(ruleList, HodgkinHuxleyNeuron.class, "getTemp")) {
 //            tfTemp.setText(NULL_STRING);
 //        }
         
@@ -89,8 +89,8 @@ public class HodgkinHuxleyNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            HodgkinHuxleyNeuron neuronRef = (HodgkinHuxleyNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            HodgkinHuxleyNeuron neuronRef = (HodgkinHuxleyNeuron) ruleList.get(i);
 
 //          if (!tfTemp.getText().equals(NULL_STRING)) {
 //             neuronRef.setTemp(Double.parseDouble(tfTemp.getText()));

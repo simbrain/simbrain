@@ -36,7 +36,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.synapses.Hebbian;
@@ -185,7 +185,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
     /**
      * Retrieve those synapses which are spike responders.
-     * 
+     *
      * @return the list of synapses which are spike responders
      */
     private ArrayList<Synapse> getSpikeRespondingSynapses() {
@@ -193,7 +193,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
         for (Synapse synapse : synapseList) {
             Neuron source = synapse.getSource();
-            if ((source instanceof SpikingNeuron) && (source != null)) {
+            if ((source.getUpdateRule() instanceof SpikingNeuronUpdateRule) && (source != null)) {
                 ret.add(synapse);
             }
         }

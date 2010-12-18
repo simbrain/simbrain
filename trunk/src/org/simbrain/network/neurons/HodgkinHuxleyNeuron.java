@@ -4,96 +4,80 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 
 /**
- * Hodgkin and Huxley Neuron.
- * 
- * Adapted from software written by Anthony Fodor.
+ * Hodgkin-Huxley Neuron.
+ *
+ * Adapted from software written by Anthony Fodor, with help from Jonathan Vickrey.
  */
-public class HodgkinHuxleyNeuron extends Neuron {
+public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
 
-    /**Sodium Channels*/
+    /** Sodium Channels */
     private float perNaChannels = 100f;
- 
-    /**Potassium*/
+
+    /** Potassium */
     private float perKChannels = 100f;
-    
-    /**Resting Membrane Potential*/
+
+    /** Resting Membrane Potential */
     private double resting_v = 65;
-    
+
     /** */
     private double elapsedTime = 0;
-    
+
     /** */
     private double dv;
-    
+
     /** Membrane Capacitance */
     private double cm;
-    
+
     /** Constant leak permeabilities */
     private double gk, gna, gl;
-    
+
     /** voltage-dependent gating parameters */
-    private double n, m, h; 
-    
+    private double n, m, h;
+
     /** corresponding deltas */
-    private double dn, dm, dh; 
-    
+    private double dn, dm, dh;
+
     /** // rate constants */
-    private double an, bn, am, bm, ah, bh; 
-    
+    private double an, bn, am, bm, ah, bh;
+
     /** time step */
-    private double dt; 
-    
-    /**Ek-Er, Ena - Er, Eleak - Er*/
-    private double vk, vna, vl; 
-    
+    private double dt;
+
+    /** Ek-Er, Ena - Er, Eleak - Er */
+    private double vk, vna, vl;
+
     /** */
     private double n4;
-    
+
     /** */
     private double m3h;
-    
-    /**Sodium current*/
+
+    /** Sodium current */
     private double na_current;
-    
-    /**Potassium current*/
+
+    /** Potassium current */
     private double k_current;
-    
+
     /** */
     private double temp = 0;
-    
+
     /** */
     private boolean vClampOn = false;
-    
+
     /** */
     float vClampValue = convertV(0F);
 
-    /**
-     * Default Constructor
-     */
-    public HodgkinHuxleyNeuron() {
-        super();
-        initHH();
-    }
 
     /**
-     * Construct HH from existing neuron
-     * 
-     * @param n
-     *            neuron to construct from
+     * @{inheritDoc}
      */
-    public HodgkinHuxleyNeuron(Neuron n) {
-        super(n);
-        initHH();
-
-    }
-
-    /**
-     * Advances the model by dt and returns the new voltage
-     */
-    public void advance() {
-        double v = getActivation();
+    public void update(Neuron neuron) {
+        // Advances the model by dt and returns the new voltage
+        
+        double v = neuron.getActivation();
         bh = 1 / (Math.exp((v + 30) / 10) + 1);
         ah = 0.07 * Math.exp(v / 20);
         dh = (ah * (1 - h) - bh * h) * dt;
@@ -112,7 +96,7 @@ public class HodgkinHuxleyNeuron extends Neuron {
 
         dv = -1 * dt * (k_current + na_current + gl * (v - vl)) / cm;
 
-        this.setBuffer(-1 * (v + dv + resting_v));
+        neuron.setBuffer(-1 * (v + dv + resting_v));
         h += dh;
         m += dm;
         n += dn;
@@ -126,10 +110,13 @@ public class HodgkinHuxleyNeuron extends Neuron {
 
     }
 
-    private void initHH() {
+    /**
+     * @{inheritDoc}
+     */
+    public void init(Neuron neuron) {
 
         cm = 1.0;
-        double v = getActivation();
+        double v = neuron.getActivation();
         vna = -115;
         vk = 12;
         vl = -10.613;
@@ -153,25 +140,18 @@ public class HodgkinHuxleyNeuron extends Neuron {
         m = am / (am + bm);
         h = ah / (ah + bh);
 
-        advance();
+        update(neuron);
 
     }
 
-    @Override
-    public Neuron duplicate() {
-        return null;
-    }
-
-    @Override
+    /**
+     * @{inheritDoc}
+     */
     public int getTimeType() {
         return 0;
     }
 
-    @Override
-    public void update() {
 
-        advance();
-    }
 
     public double get_n4() {
         return n4;
@@ -305,6 +285,13 @@ public class HodgkinHuxleyNeuron extends Neuron {
 
     public void setTemp(double temp) {
         this.temp = temp;
+    }
+
+    /**
+     * @{inheritDoc}
+     */
+    public String getName() {
+        return "Hodgkin-Huxley";
     }
 
 }

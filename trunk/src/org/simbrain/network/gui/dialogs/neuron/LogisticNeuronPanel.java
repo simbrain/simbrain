@@ -46,12 +46,12 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        LogisticNeuron neuronRef = (LogisticNeuron) neuronList.get(0);
+        LogisticNeuron neuronRef = (LogisticNeuron) ruleList.get(0);
 
         tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, LogisticNeuron.class, "getGrowthRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, LogisticNeuron.class, "getGrowthRate")) {
             tfGrowthRate.setText(NULL_STRING);
         }
     }
@@ -68,8 +68,8 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            LogisticNeuron neuronRef = (LogisticNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            LogisticNeuron neuronRef = (LogisticNeuron) ruleList.get(i);
 
             if (!tfGrowthRate.getText().equals(NULL_STRING)) {
                 neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate.getText()));

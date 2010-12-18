@@ -19,83 +19,87 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 
 /**
- * <b>ThreeValuedNeuron</b>.
+ * <b>ThreeValuedNeuron</b> is a natural extension of a binary neuron, which
+ * takes one of three values depending on the inputs to the neuron in relation
+ * to two thresholds.
  */
-public class ThreeValuedNeuron extends Neuron {
+public class ThreeValueNeuron implements NeuronUpdateRule {
+
     /** Bias field. */
     private double bias = 0;
+
     /** Lower threshold field. */
     private double lowerThreshold = 0;
+
     /** Upper threshold field. */
     private double upperThreshold = 1;
+
     /** Lower value field. */
     private double lowerValue = -1;
+
     /** Middle value field. */
     private double middleValue = 0;
+
     /** Upper value field. */
     private double upperValue = 1;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public ThreeValuedNeuron() {
-    }
-
-    /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
+        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be created
+     * @{inheritDoc}
      */
-    public ThreeValuedNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Three valued";
     }
 
     /**
-     * @return duplicate ThreeValuedNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public ThreeValuedNeuron duplicate() {
-        ThreeValuedNeuron tv = new ThreeValuedNeuron();
-        tv = (ThreeValuedNeuron) super.duplicate(tv);
-        tv.setBias(getBias());
-        tv.setLowerThreshold(getLowerThreshold());
-        tv.setUpperThreshold(getUpperThreshold());
-        tv.setLowerValue(getLowerValue());
-        tv.setMiddleValue(getMiddleValue());
-        tv.setUpperValue(getUpperValue());
-
-        return tv;
+    public void init(Neuron neuron) {
+        upperValue = neuron.getUpperBound();
+        lowerValue = neuron.getLowerBound();
+        middleValue = upperValue / lowerValue;
+        lowerThreshold = (lowerValue + middleValue) / 2;
+        upperThreshold = (middleValue + upperValue) / 2;
     }
 
+//    /**
+//     * @return duplicate ThreeValuedNeuron (used, e.g., in copy/paste).
+//     */
+//    public ThreeValuedNeuron duplicate() {
+//        ThreeValuedNeuron tv = new ThreeValuedNeuron();
+//        tv = (ThreeValuedNeuron) super.duplicate(tv);
+//        tv.setBias(getBias());
+//        tv.setLowerThreshold(getLowerThreshold());
+//        tv.setUpperThreshold(getUpperThreshold());
+//        tv.setLowerValue(getLowerValue());
+//        tv.setMiddleValue(getMiddleValue());
+//        tv.setUpperValue(getUpperValue());
+//
+//        return tv;
+//    }
+
     /**
-     * Updates the neurons as inputs change.
+     * @{inheritDoc}
      */
-    public void update() {
-        double wtdInput = this.getWeightedInputs() + bias;
+    public void update(Neuron neuron) {
+        double wtdInput = neuron.getWeightedInputs() + bias;
 
         if (wtdInput < lowerThreshold) {
-            setBuffer(lowerValue);
+            neuron.setBuffer(lowerValue);
         } else if (wtdInput > upperThreshold) {
-            setBuffer(upperValue);
+            neuron.setBuffer(upperValue);
         } else {
-            setBuffer(middleValue);
+            neuron.setBuffer(middleValue);
         }
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Three valued";
     }
 
     /**

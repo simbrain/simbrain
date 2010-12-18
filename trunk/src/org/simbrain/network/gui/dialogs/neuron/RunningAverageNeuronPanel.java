@@ -47,12 +47,12 @@ public class RunningAverageNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        RunningAverageNeuron neuronRef = (RunningAverageNeuron) neuronList.get(0);
+        RunningAverageNeuron neuronRef = (RunningAverageNeuron) ruleList.get(0);
 
         tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, RunningAverageNeuron.class, "getRateConstant")) {
+        if (!NetworkUtils.isConsistent(ruleList, RunningAverageNeuron.class, "getRateConstant")) {
             tfRateConstant.setText(NULL_STRING);
         }
     }
@@ -69,8 +69,8 @@ public class RunningAverageNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            RunningAverageNeuron neuronRef = (RunningAverageNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            RunningAverageNeuron neuronRef = (RunningAverageNeuron) ruleList.get(i);
 
             if (!tfRateConstant.getText().equals(NULL_STRING)) {
                 neuronRef.setRateConstant(Double.parseDouble(tfRateConstant.getText()));

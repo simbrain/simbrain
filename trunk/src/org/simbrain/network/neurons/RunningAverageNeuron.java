@@ -19,67 +19,59 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 
 /**
- * <b>RunningAverageNeuron</b>.
+ * <b>RunningAverageNeuron</b> keeps a running average of current and past activity.
  */
-public class RunningAverageNeuron extends Neuron {
+public class RunningAverageNeuron implements NeuronUpdateRule {
 
     /** Rate constant variable. */
     private double rateConstant = .5;
 
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public RunningAverageNeuron() {
-    }
+    /** Last activation. */
+    private double val = 0;
 
     /**
-     * @return time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to make the type
+     * @{inheritDoc}
      */
-    public RunningAverageNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Running Average";
     }
 
     /**
-     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
-     * @return Duplicated neuron
+     * @{inheritDoc}
      */
-    public RunningAverageNeuron duplicate() {
-        RunningAverageNeuron cn = new RunningAverageNeuron();
-        cn = (RunningAverageNeuron) super.duplicate(cn);
-        cn.setRateConstant(getRateConstant());
-
-        return cn;
+    public void init(Neuron neuron) {
+        // No implementation
     }
-
-    /** */
-    private double val = 0;
+ 
+//   /**
+//     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
+//     * @return Duplicated neuron
+//     */
+//    public RunningAverageNeuron duplicate() {
+//        RunningAverageNeuron cn = new RunningAverageNeuron();
+//        cn = (RunningAverageNeuron) super.duplicate(cn);
+//        cn.setRateConstant(getRateConstant());
+//
+//        return cn;
+//    }
 
     /**
      * Update neuron.
      */
-    public void update() {
-        // "val" on left is activation at last time step
-        val = rateConstant * getWeightedInputs() + (1 - rateConstant) * val;
-        this.setBuffer(val);
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Running Average";
+    public void update(Neuron neuron) {
+        // "val" on right is activation at last time step
+        val = rateConstant * neuron.getWeightedInputs() + (1 - rateConstant) * val;
+        neuron.setBuffer(val);
     }
 
     /**

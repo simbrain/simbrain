@@ -65,11 +65,8 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
 
     /**
      * Creates an instance of this panel.
-     * @param net Network
      */
-    public IzhikevichNeuronPanel(final Network net) {
-        parentNet = net;
-
+    public IzhikevichNeuronPanel() {
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("A", tfA);
@@ -79,7 +76,6 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Add noise", tsNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
-        
         this.addBottomText("<html>For a list of useful parameter settings<p>"
                         + "press the \"Help\" Button.</html>");
     }
@@ -88,7 +84,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        IzhikevichNeuron neuronRef = (IzhikevichNeuron) neuronList.get(0);
+        IzhikevichNeuron neuronRef = (IzhikevichNeuron) ruleList.get(0);
 
         tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
 
@@ -99,23 +95,23 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         tsNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getA")) {
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichNeuron.class, "getA")) {
             tfA.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getB")) {
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichNeuron.class, "getB")) {
             tfB.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getC")) {
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichNeuron.class, "getC")) {
             tfC.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getD")) {
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichNeuron.class, "getD")) {
             tfD.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichNeuron.class, "getAddNoise")) {
             tsNoise.setNull();
         }
 
@@ -128,8 +124,8 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((IzhikevichNeuron) neuronList.get(i)).getNoiseGenerator());
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((IzhikevichNeuron) ruleList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -155,8 +151,8 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     public void commitChanges() {
         parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            IzhikevichNeuron neuronRef = (IzhikevichNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            IzhikevichNeuron neuronRef = (IzhikevichNeuron) ruleList.get(i);
 
             if (!tfA.getText().equals(NULL_STRING)) {
                 neuronRef.setA(Double.parseDouble(tfA.getText()));

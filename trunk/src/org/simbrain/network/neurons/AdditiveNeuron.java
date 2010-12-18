@@ -20,97 +20,98 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
- * <b>AdditiveNeuron</b>  See haykin (2002), section 14.5.  Used with continnuous Hopfield networks.
+ * <b>AdditiveNeuron</b> See Haykin (2002), section 14.5. Used with continuous
+ * Hopfield networks.
  */
-public class AdditiveNeuron extends Neuron {
+public class AdditiveNeuron implements NeuronUpdateRule {
+
     /** Lambda. */
     private double lambda = 1.4;
+
     /** Resistance. */
     private double resistance = 1;
+
     /** Clipping. */
     private boolean clipping = false;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** For adding noise to the neuron. */
     private boolean addNoise = false;
-    
+
     /**
-     * @return the time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
     }
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
+     * @{inheritDoc}
      */
-    public AdditiveNeuron() {
-        this.setUpperBound(1);
-        this.setLowerBound(-1);
-        this.setIncrement(.1);
+    public void init(Neuron neuron) {
+        neuron.setUpperBound(1);
+        neuron.setLowerBound(-1);
+        neuron.setIncrement(.1);
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to make of the type
-     */
-    public AdditiveNeuron(final Neuron n) {
-        super(n);
-    }
+
+//    /**
+//     * @return duplicate AdditiveNeuron (used, e.g., in copy/paste).
+//     */
+//    public AdditiveNeuron duplicate() {
+//        AdditiveNeuron an = new AdditiveNeuron();
+//        an = (AdditiveNeuron) super.duplicate(an);
+//        an.setLambda(getLambda());
+//        an.setResistance(getResistance());
+//        an.setClipping(getClipping());
+//        an.setAddNoise(getAddNoise());
+//        an.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//
+//        return an;
+//    }
 
     /**
-     * @return duplicate AdditiveNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public AdditiveNeuron duplicate() {
-        AdditiveNeuron an = new AdditiveNeuron();
-        an = (AdditiveNeuron) super.duplicate(an);
-        an.setLambda(getLambda());
-        an.setResistance(getResistance());
-        an.setClipping(getClipping());
-        an.setAddNoise(getAddNoise());
-        an.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+    public void update(Neuron neuron) {
 
-        return an;
-    }
-
-    /**
-     * Update buffer of additive neuron using Euler's method.
-     */
-    public void update() {
+        // Update buffer of additive neuron using Euler's method.
 
         // external input, if any
         double externalInput = 0;
-        if (this.isInput()) {
-            externalInput = g(this.getInputValue());
+        if (neuron.isInput()) {
+            externalInput = g(neuron.getInputValue());
         }
         double wtdSum = externalInput;
 
-        if (getFanIn().size() > 0) {
-            for (int j = 0; j < getFanIn().size(); j++) {
-                Synapse w = getFanIn().get(j);
+        if (neuron.getFanIn().size() > 0) {
+            for (int j = 0; j < neuron.getFanIn().size(); j++) {
+                Synapse w = neuron.getFanIn().get(j);
                 Neuron source = w.getSource();
-                wtdSum += (w.getStrength() *  g(source.getActivation()));
+                wtdSum += (w.getStrength() * g(source.getActivation()));
             }
         }
 
-        double val =  getActivation()
-                        + super.getParentNetwork().getRootNetwork().getTimeStep() * (-getActivation() / resistance + wtdSum);
+        double val = neuron.getActivation()
+                + neuron.getParentNetwork().getRootNetwork().getTimeStep()
+                * (-neuron.getActivation() / resistance + wtdSum);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
         if (clipping) {
-            val = clip(val);
+            val = neuron.clip(val);
         }
 
-        setBuffer(val);
-        this.setInputValue(0);
+        neuron.setBuffer(val);
+        neuron.setInputValue(0);
     }
 
     /**
@@ -124,9 +125,9 @@ public class AdditiveNeuron extends Neuron {
     }
 
     /**
-     * @return Name of neuron type.
+     * @{inheritDoc}
      */
-    public static String getName() {
+    public String getName() {
         return "Additive (Continuous Hopfield)";
     }
 

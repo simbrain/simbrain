@@ -19,11 +19,12 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 
 /**
- * <b>BinaryNeuron</b> takes one of two values.  See docs.
+ * <b>BinaryNeuron</b> takes one of two values.
  */
-public class BinaryNeuron extends Neuron {
+public class BinaryNeuron implements NeuronUpdateRule {
 
     /** Threshold for binary neurons. */
     private double threshold = .5;
@@ -32,48 +33,47 @@ public class BinaryNeuron extends Neuron {
     private double bias = 0;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public BinaryNeuron() {
-    }
-
-    /**
-     * @return time type of binary neuron.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be made the type
+     * @{inheritDoc}
      */
-    public BinaryNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Binary";
     }
 
     /**
-     * @return a duplicate BinaryNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public BinaryNeuron duplicate() {
-        BinaryNeuron bn = new BinaryNeuron();
-        bn = (BinaryNeuron) super.duplicate(bn);
-        bn.setThreshold(getThreshold());
-
-        return bn;
+    public void init(Neuron neuron) {
+        // No implementation
     }
 
+//    /**
+//     * @return a duplicate BinaryNeuron (used, e.g., in copy/paste).
+//     */
+//    public BinaryNeuron duplicate() {
+//        BinaryNeuron bn = new BinaryNeuron();
+//        bn = (BinaryNeuron) super.duplicate(bn);
+//        bn.setThreshold(getThreshold());
+//
+//        return bn;
+//    }
+
     /**
-     * Updates the neurons as inputs change.
+     * @{inheritDoc}
      */
-    public void update() {
-        double wtdInput = this.getWeightedInputs() + bias;
+    public void update(Neuron neuron) {
+        double wtdInput = neuron.getWeightedInputs() + bias;
 
         if (wtdInput > threshold) {
-            setBuffer(upperBound);
+            neuron.setBuffer(neuron.getUpperBound());
         } else {
-            setBuffer(lowerBound);
+            neuron.setBuffer(neuron.getLowerBound());
         }
     }
 
@@ -92,13 +92,6 @@ public class BinaryNeuron extends Neuron {
     }
 
     /**
-     * @return the name of the neuron.
-     */
-    public static String getName() {
-        return "Binary";
-    }
-
-    /**
      * @return the bias of the neuron.
      */
     public double getBias() {
@@ -111,5 +104,4 @@ public class BinaryNeuron extends Neuron {
     public void setBias(final double bias) {
         this.bias = bias;
     }
-
 }

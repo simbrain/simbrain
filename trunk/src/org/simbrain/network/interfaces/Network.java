@@ -763,47 +763,6 @@ public abstract class Network {
     }
 
     /**
-     * Change neuron type.
-     *
-     * @param oldNeuron out with the old
-     * @param newNeuron in with the new...
-     */
-    public void changeNeuronType(final Neuron oldNeuron, final Neuron newNeuron) {
-
-        // TODO: The code for changing neuron and synapse types may need to be
-        // refactored. Lots of stuff has to happen (here, in the listeners, and
-        // in the source for Neuron and Synapses themselves; see their duplicate()
-        // method). There is redundant code. Whenever I come back to this stuff I have to spend
-        // some time figuring out what's going on. And this is a place bugs periodically emerge. When
-        // features are added it's easy to forget about this stuff. So, for these reasons, it
-        // smells like a refactor might be useful. Then again it's working, at least for now.
-        
-        newNeuron.setId(oldNeuron.getId());
-        newNeuron.setParentNetwork(this);
-
-        rootNetwork.fireNeuronTypeChanged(oldNeuron, newNeuron);
-
-        for (Synapse s : new ArrayList<Synapse>(oldNeuron.getFanIn())) {
-            s.setTarget(newNeuron);
-        }
-
-        for (Synapse s : new ArrayList<Synapse>(oldNeuron.getFanOut())) {
-            s.setSource(newNeuron);
-        }
-        neuronList.remove(oldNeuron);
-        addNeuron(newNeuron);
-        for (Neuron neuron : getNeuronList()) {
-            neuron.setParentNetwork(this);
-        }
-
-        // If the neuron is a spiker, add spikeResponders to target weights, else remove them
-        for (Synapse s : newNeuron.getFanOut()) {
-            s.initSpikeResponder();
-        }
-        rootNetwork.updateTimeType();
-    }
-
-    /**
      * Change synapse type; replace one synapse with another.
      * deletes the old synapse
      *
@@ -811,7 +770,7 @@ public abstract class Network {
      * @param newSynapse in with the new...
      */
     public void changeSynapseType(final Synapse oldSynapse, final Synapse newSynapse) {
-        
+
         // Initialize the new synapse
         newSynapse.setTarget(oldSynapse.getTarget());
         newSynapse.setSource(oldSynapse.getSource());
@@ -819,7 +778,7 @@ public abstract class Network {
         newSynapse.setParentNetwork(this);
         newSynapse.initSpikeResponder();
         synapseList.add(newSynapse);
-        
+
         // Fire event now, before the old synapse is deleted; otherwise
         //      problems in listeners
         rootNetwork.fireSynapseTypeChanged(oldSynapse, newSynapse);

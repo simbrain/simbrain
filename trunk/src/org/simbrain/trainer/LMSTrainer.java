@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -110,7 +111,7 @@ public class LMSTrainer extends Trainer {
                 }
 
                 // Update bias of target neuron (TODO: Use interface?)
-                ((LinearNeuron)target).setBias(learningRate * error);
+                ((BiasedNeuron)target).setBias(learningRate * error);
             }
             rmsError = Math.sqrt(rmsError / (numInputs * numOutputs));
         }
@@ -135,7 +136,7 @@ public class LMSTrainer extends Trainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 4; i++) {
-            ClampedNeuron neuron = new ClampedNeuron();
+            Neuron neuron = new Neuron(new ClampedNeuron()); 
             network.addNeuron(neuron);
             inputLayer.add(neuron);
             System.out.println("Input " + i + " = " + neuron.getId());
@@ -144,8 +145,8 @@ public class LMSTrainer extends Trainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            LinearNeuron neuron = new LinearNeuron();
-            neuron.setBias(0);
+            Neuron neuron = new Neuron(new LinearNeuron());
+            ((BiasedNeuron)neuron).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);
@@ -198,7 +199,7 @@ public class LMSTrainer extends Trainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            ClampedNeuron neuron = new ClampedNeuron();
+            Neuron neuron = new Neuron(new ClampedNeuron()); 
             network.addNeuron(neuron);
             inputLayer.add(neuron);
             System.out.println("Input " + i + " = " + neuron.getId());
@@ -207,8 +208,8 @@ public class LMSTrainer extends Trainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            LinearNeuron neuron = new LinearNeuron();
-            neuron.setBias(0);
+            Neuron neuron = new Neuron(new LinearNeuron()); 
+            ((BiasedNeuron)neuron).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);

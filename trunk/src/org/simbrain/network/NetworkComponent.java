@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.workspace.AttributeType;
-import org.simbrain.workspace.PotentialAttribute;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -95,7 +95,7 @@ public final class NetworkComponent extends WorkspaceComponent {
             /**
              * {@inheritDoc}
              */
-            public void neuronTypeChanged(NetworkEvent<Neuron> e) {
+            public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> e) {
             }
 
             /**

@@ -19,14 +19,15 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
- * <b>IntegrateAndFireNeuron</b>.
+ * <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
  */
-public class IntegrateAndFireNeuron extends SpikingNeuron {
+public class IntegrateAndFireNeuron extends SpikingNeuronUpdateRule {
 
     /** Resistance. */
     private double resistance = 1;
@@ -52,55 +53,54 @@ public class IntegrateAndFireNeuron extends SpikingNeuron {
     /** Clipping. */
     private boolean clipping = false;
 
-    /**
-     * Default constructor needed for external calls which create neurons then
-     * set their parameters.
-     */
-    public IntegrateAndFireNeuron() {
+//    /**
+//     * @return duplicate IntegrateAndFireNeuron (used, e.g., in copy/paste).
+//     */
+//    public IntegrateAndFireNeuron duplicate() {
+//        IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();
+//        ifn = (IntegrateAndFireNeuron) super.duplicate(ifn);
+//        ifn.setRestingPotential(getRestingPotential());
+//        ifn.setResetPotential(getResetPotential());
+//        ifn.setThreshold(getThreshold());
+//        ifn.setTimeConstant(getTimeConstant());
+//        ifn.setResistance(getResistance());
+//        ifn.setClipping(getClipping());
+//        ifn.setAddNoise(getAddNoise());
+//        ifn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//
+//        return ifn;
+//    }
+
+    public void clear() {
+        super.setLastSpikeTime(0);
+    }
+
+    @Override
+    public String getName() {
+        return "Integrate and fire";
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another
-     * neuron of another type Only values common to different types of neuron
-     * are copied.
-     *
-     * @param n Neuron to be made type integrate and fire
+     * @{inheritDoc}
      */
-    public IntegrateAndFireNeuron(final Neuron n) {
-        super(n);
+    public int getTimeType() {
+        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * @return duplicate IntegrateAndFireNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public IntegrateAndFireNeuron duplicate() {
-        IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();
-        ifn = (IntegrateAndFireNeuron) super.duplicate(ifn);
-        ifn.setRestingPotential(getRestingPotential());
-        ifn.setResetPotential(getResetPotential());
-        ifn.setThreshold(getThreshold());
-        ifn.setTimeConstant(getTimeConstant());
-        ifn.setResistance(getResistance());
-        ifn.setClipping(getClipping());
-        ifn.setAddNoise(getAddNoise());
-        ifn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-
-        return ifn;
-    }
-
-    /**
-     * Update neuron.
-     */
-    public void update() {
-        double inputs = getWeightedInputs();
+    public void update(Neuron neuron) {
+        double inputs = neuron.getWeightedInputs();
 
         if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }
 
-        double val = getActivation()
-                     + (this.getParentNetwork().getRootNetwork().getTimeStep() / timeConstant * (restingPotential - getActivation()
-                     + (resistance * inputs)));
+        double val = neuron.getActivation()
+                + (neuron.getParentNetwork().getRootNetwork().getTimeStep()
+                        / timeConstant * (restingPotential
+                        - neuron.getActivation() + (resistance * inputs)));
 
         if (val > threshold) {
             setHasSpiked(true);
@@ -110,10 +110,10 @@ public class IntegrateAndFireNeuron extends SpikingNeuron {
         }
 
         if (clipping) {
-            val = clip(val);
+            val = neuron.clip(val);
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
@@ -142,13 +142,6 @@ public class IntegrateAndFireNeuron extends SpikingNeuron {
      */
     public void setResistance(final double resistance) {
         this.resistance = resistance;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Integrate and fire";
     }
 
     /**

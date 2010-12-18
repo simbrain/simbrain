@@ -32,10 +32,13 @@ import org.simbrain.network.neurons.LinearNeuron;
  * in an internally maintained list).
  */
 public class WinnerTakeAll extends Network {
+
     /** Number of neurons. */
     private int numUnits = 3;
+
     /** Winning value. */
     private double winValue = 1;
+
     /** Losing value. */
     private double loseValue = 0;
 
@@ -56,7 +59,7 @@ public class WinnerTakeAll extends Network {
         super();
         setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron());
+            this.addNeuron(new Neuron(new LinearNeuron()));
         }
         layout.layoutNeurons(this);
     }

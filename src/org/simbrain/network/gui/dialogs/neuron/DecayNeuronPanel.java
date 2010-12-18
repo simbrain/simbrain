@@ -110,7 +110,7 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        DecayNeuron neuronRef = (DecayNeuron) neuronList.get(0);
+        DecayNeuron neuronRef = (DecayNeuron) ruleList.get(0);
 
         cbRelAbs.setSelectedIndex(neuronRef.getRelAbs());
         tfBaseLine.setText(Double.toString(neuronRef.getBaseLine()));
@@ -120,27 +120,27 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getRelAbs")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayNeuron.class, "getRelAbs")) {
             cbRelAbs.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getBaseLine")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayNeuron.class, "getBaseLine")) {
             tfBaseLine.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getDecayFraction")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayNeuron.class, "getDecayFraction")) {
             tfDecayFraction.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getDecayAmount")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayNeuron.class, "getDecayAmount")) {
             tfDecayAmount.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayNeuron.class, "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, DecayNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
 
@@ -153,8 +153,8 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((DecayNeuron) neuronList.get(i)).getNoiseGenerator());
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((DecayNeuron) ruleList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -178,8 +178,8 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            DecayNeuron neuronRef = (DecayNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            DecayNeuron neuronRef = (DecayNeuron) ruleList.get(i);
 
             if (!cbRelAbs.isNull()) {
                 neuronRef.setRelAbs(cbRelAbs.getSelectedIndex());

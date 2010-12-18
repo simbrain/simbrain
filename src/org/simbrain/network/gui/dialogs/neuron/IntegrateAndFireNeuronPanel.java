@@ -71,10 +71,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 
     /**
      * Creates a new instance of the integrate and fire neuron panel.
-     * @param net Network
      */
-    public IntegrateAndFireNeuronPanel(final Network net) {
-        parentNet = net;
+    public IntegrateAndFireNeuronPanel() {
 
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
@@ -93,7 +91,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        IntegrateAndFireNeuron neuronRef = (IntegrateAndFireNeuron) neuronList.get(0);
+        IntegrateAndFireNeuron neuronRef = (IntegrateAndFireNeuron) ruleList.get(0);
 
         tfRestingPotential.setText(Double.toString(neuronRef.getRestingPotential()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
@@ -105,31 +103,31 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         isClipping.setSelected(neuronRef.getClipping());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, IntegrateAndFireNeuron.class, "getRestingPotential")) {
+        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireNeuron.class, "getRestingPotential")) {
             tfRestingPotential.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IntegrateAndFireNeuron.class, "getResistance")) {
+        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireNeuron.class, "getResistance")) {
             tfResistance.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IntegrateAndFireNeuron.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireNeuron.class, "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IntegrateAndFireNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IntegrateAndFireNeuron.class, "getResetPotential")) {
+        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireNeuron.class, "getResetPotential")) {
             tfReset.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IntegrateAndFireNeuron.class, "getTimeConstant")) {
+        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireNeuron.class, "getTimeConstant")) {
             tfTimeConstant.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IntegrateAndFireNeuron.class, "getThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, IntegrateAndFireNeuron.class, "getThreshold")) {
             tfThreshold.setText(NULL_STRING);
         }
 
@@ -142,8 +140,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((IntegrateAndFireNeuron) neuronList.get(i)).getNoiseGenerator());
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((IntegrateAndFireNeuron) ruleList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -156,7 +154,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         IntegrateAndFireNeuron neuronRef = new IntegrateAndFireNeuron();
         tfRestingPotential.setText(Double.toString(neuronRef.getRestingPotential()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(this.getParentNetwork().getRootNetwork().getTimeStep()));
         tfReset.setText(Double.toString(neuronRef.getResetPotential()));
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
@@ -171,8 +169,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     public void commitChanges() {
         parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            IntegrateAndFireNeuron neuronRef = (IntegrateAndFireNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            IntegrateAndFireNeuron neuronRef = (IntegrateAndFireNeuron) ruleList.get(i);
 
             if (!tfResistance.getText().equals(NULL_STRING)) {
                 neuronRef.setResistance(Double.parseDouble(tfResistance.getText()));

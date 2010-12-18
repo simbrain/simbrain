@@ -73,11 +73,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
 
     /**
      * Creates a new  Naka-Rushton neuron panel.
-     * @param net Reference to network
      */
-    public NakaRushtonNeuronPanel(final Network net) {
-        parentNet = net;
-
+    public NakaRushtonNeuronPanel() {
         tsUseAdaptation.addActionListener(this);
 
         this.add(tabbedPane);
@@ -109,7 +106,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) neuronList.get(0);
+        NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) ruleList.get(0);
 
         tfSemiSaturation.setText(Double.toString(neuronRef.getSemiSaturationConstant()));
         tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
@@ -122,31 +119,31 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         checkUsingAdaptation();
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getTimeConstant")) {
+        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonNeuron.class, "getTimeConstant")) {
             tfTimeConstant.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getSemiSaturationConstant")) {
+        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonNeuron.class, "getSemiSaturationConstant")) {
             tfSemiSaturation.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getSteepness")) {
+        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonNeuron.class, "getSteepness")) {
             tfSteepness.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonNeuron.class, "getAddNoise")) {
             tsNoise.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getUseAdaptation")) {
+        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonNeuron.class, "getUseAdaptation")) {
             tsUseAdaptation.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAdaptationTimeConstant")) {
+        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonNeuron.class, "getAdaptationTimeConstant")) {
             tfAdaptationTime.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAdaptationParameter")) {
+        if (!NetworkUtils.isConsistent(ruleList, NakaRushtonNeuron.class, "getAdaptationParameter")) {
             tfAdaptationParam.setText(NULL_STRING);
         }
         randTab.fillFieldValues(getRandomizers());
@@ -158,8 +155,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((NakaRushtonNeuron) neuronList.get(i)).getNoiseGenerator());
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((NakaRushtonNeuron) ruleList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -188,8 +185,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
     public void commitChanges() {
         parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) ruleList.get(i);
 
             if (!tfTimeConstant.getText().equals(NULL_STRING)) {
                 neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant.getText()));

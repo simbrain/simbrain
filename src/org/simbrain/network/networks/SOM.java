@@ -417,7 +417,7 @@ public class SOM extends Network {
      * @return ret default som neuron
      */
     private Neuron getDefaultSOMNeuron() {
-        LinearNeuron ret = new LinearNeuron();
+        Neuron ret = new Neuron(new LinearNeuron());
         ret.setIncrement(1);
         ret.setLowerBound(0);
         return ret;

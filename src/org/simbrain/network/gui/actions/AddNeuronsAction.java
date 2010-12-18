@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 
 /**
@@ -70,7 +71,7 @@ public final class AddNeuronsAction
             ArrayList<Neuron> list = new ArrayList<Neuron>();
             layout.setInitialLocation(networkPanel.getLastClickedPosition());
             for (int i = 0; i < numNeurons; i++) {
-                LinearNeuron neuron = new LinearNeuron();
+                Neuron neuron = new Neuron(new LinearNeuron()); 
                 list.add(neuron);
                 networkPanel.getRootNetwork().addNeuron(neuron);
             }

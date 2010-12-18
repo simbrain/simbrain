@@ -18,24 +18,19 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import java.util.ArrayList;
-
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.neurons.IntegrateAndFireNeuron;
-import org.simbrain.network.neurons.ProbabilisticSpikingNeuron;
+import org.simbrain.network.neurons.SpikingThresholdNeuron;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
 
 
 /**
  * <b>ProbabilisticSpikingNeuronPanel</b>.
  */
-public class ProbabilisticSpikingNeuronPanel extends AbstractNeuronPanel {
+public class SpikingThresholdNeuronPanel extends AbstractNeuronPanel {
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -44,58 +39,51 @@ public class ProbabilisticSpikingNeuronPanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /** Time step field. */
-    private JTextField tfFireProbability = new JTextField();
-
-    /** Random tab. */
-    private RandomPanel randTab = new RandomPanel(true);
+    private JTextField tfThreshold = new JTextField();
 
     /**
      * Creates a new instance of the probabilistic spiking neuron panel.
      * @param net Network
      */
-    public ProbabilisticSpikingNeuronPanel(final Network net) {
-        parentNet = net;
-
-        this.add(tabbedPane);
-        mainTab.addItem("Fire Probability", tfFireProbability);
-        tabbedPane.add(mainTab, "Main");
-        tabbedPane.add(randTab, "Noise");
+    public SpikingThresholdNeuronPanel() {
+        addItem("Threshold", tfThreshold);
     }
 
     /**
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-    	ProbabilisticSpikingNeuron neuronRef = (ProbabilisticSpikingNeuron) neuronList.get(0);
+        SpikingThresholdNeuron neuronRef = (SpikingThresholdNeuron) ruleList
+                .get(0);
 
-    	tfFireProbability.setText(Double.toString(neuronRef.getFireProbability()));
-    	
-    	//Handle consistency of multiple selections
-    	if (!NetworkUtils.isConsistent(neuronList, ProbabilisticSpikingNeuron.class, "getFireProbability")) {
-            tfFireProbability.setText(NULL_STRING);
+        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(ruleList, SpikingThresholdNeuron.class,
+                "getThreshold")) {
+            tfThreshold.setText(NULL_STRING);
         }
-    	
-        }
+    }
 
     /**
      * Populate fields with default data.
      */
     public void fillDefaultValues() {
-        ProbabilisticSpikingNeuron neuronRef = new ProbabilisticSpikingNeuron();
-        tfFireProbability.setText(Double.toString(neuronRef.getFireProbability()));
-        randTab.fillDefaultValues();
+        SpikingThresholdNeuron neuronRef = new SpikingThresholdNeuron();
+        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        
-    	for (int i = 0; i < neuronList.size(); i++) {
-            ProbabilisticSpikingNeuron neuronRef = (ProbabilisticSpikingNeuron) neuronList.get(i);
-            
-            if (!tfFireProbability.getText().equals(NULL_STRING)) {
-                neuronRef.setFireProbability(Double.parseDouble(tfFireProbability.getText()));
+
+        for (int i = 0; i < ruleList.size(); i++) {
+            SpikingThresholdNeuron neuronRef = (SpikingThresholdNeuron) ruleList
+                    .get(i);
+
+            if (!tfThreshold.getText().equals(NULL_STRING)) {
+                neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
             }
         }
     }

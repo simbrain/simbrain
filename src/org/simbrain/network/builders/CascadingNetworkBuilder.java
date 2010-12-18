@@ -33,21 +33,21 @@ import org.simbrain.network.synapses.ClampedSynapse;
  * @author jeff yoshimi
  */
 public final class CascadingNetworkBuilder {
-    
+
     // TODO: Make synapse type settable
     // TODO: Account for width of neuron
     // TODO: Allow for cascades in different directions
     // TODO: Add getRootNeuron method?
-    
+
     /** Number of layers in the cascade. */
     private int numLayers = 5;
-    
+
     /** Number of neurons per branch; sometimes called a "branching parameter". */
     private int numBrachesPerNeuron = 2;
-    
+
     /** Horizontal spacing between top-most neurons in cascade. */
-    private double horizontalSpacing = 50; 
-    
+    private double horizontalSpacing = 50;
+
     /** Vertical spacing between layers of the cascade. */
     private double verticalSpacing = 100;
 
@@ -55,76 +55,86 @@ public final class CascadingNetworkBuilder {
     private Point initialPosition = new Point(50, 50);
 
     /** Type of neuron to use in network. */
-    private static Neuron neuronType = new LinearNeuron();
+    private static Neuron neuronType = new Neuron(new LinearNeuron());
 
     /** Reference to root network. */
     private RootNetwork network;
 
     /**
-     * Create a cascading network builder with a specific number of layers and branches per neuron.
-     *
-     * @param numLayers number of layers
-     * @param numBrachesPerNeuron brahnces per neuron
-     * @param network parent network
+     * Create a cascading network builder with a specific number of layers and
+     * branches per neuron.
+     * 
+     * @param numLayers
+     *            number of layers
+     * @param numBrachesPerNeuron
+     *            brahnces per neuron
+     * @param network
+     *            parent network
      */
-    public CascadingNetworkBuilder(RootNetwork network, int numLayers, int numBrachesPerNeuron) {
+    public CascadingNetworkBuilder(RootNetwork network, int numLayers,
+            int numBrachesPerNeuron) {
         this.network = network;
         this.numLayers = numLayers;
         this.numBrachesPerNeuron = numBrachesPerNeuron;
     }
-    
+
     /**
-     * Create a cascading network builder using defaul values.
+     * Create a cascading network builder using default values.
      *
      * @param network parent network
      */
     public CascadingNetworkBuilder(RootNetwork network) {
         this.network = network;
     }
-    
+
     /**
      * Create the cascading network.
      */
     public void buildNetwork() {
-        
+
         Neuron firstNeuron = neuronType.duplicate();
         List<Neuron> currentLayer = new ArrayList<Neuron>();
         firstNeuron.setPosition(initialPosition);
-        currentLayer.add(firstNeuron);      
-        
-        // Layout values
-        int numNeuronsLastLayer = (int) Math.pow(numBrachesPerNeuron, numLayers);
-        double totalSpace = numNeuronsLastLayer * horizontalSpacing; 
-        
-        // Iterate through layers
-        for(int layerIndex = 1; layerIndex <= numLayers; layerIndex++) {
-            
-            // Make a list of neurons for this layer (these will be base neurons for the next layer)
-            List<Neuron> tempList = new ArrayList<Neuron>();            
-            
-            // Layout stuff
-            double layerSpacing = totalSpace / (int) Math.pow(numBrachesPerNeuron, layerIndex );            
-            double branchWidth = layerSpacing * (numBrachesPerNeuron-1);
+        currentLayer.add(firstNeuron);
 
-            // For each neuron in the current layer, add a branch (a set of target neurons)
+        // Layout values
+        int numNeuronsLastLayer = (int) Math
+                .pow(numBrachesPerNeuron, numLayers);
+        double totalSpace = numNeuronsLastLayer * horizontalSpacing;
+
+        // Iterate through layers
+        for (int layerIndex = 1; layerIndex <= numLayers; layerIndex++) {
+
+            // Make a list of neurons for this layer (these will be base neurons
+            // for the next layer)
+            List<Neuron> tempList = new ArrayList<Neuron>();
+
+            // Layout stuff
+            double layerSpacing = totalSpace
+                    / (int) Math.pow(numBrachesPerNeuron, layerIndex);
+            double branchWidth = layerSpacing * (numBrachesPerNeuron - 1);
+
+            // For each neuron in the current layer, add a branch (a set of
+            // target neurons)
             for (Neuron baseNeuron : currentLayer) {
-                network.addNeuron(baseNeuron);                
-                double initialXOffset = branchWidth/2;                
-                for(int j = 0; j < numBrachesPerNeuron; j++) {
+                network.addNeuron(baseNeuron);
+                double initialXOffset = branchWidth / 2;
+                for (int j = 0; j < numBrachesPerNeuron; j++) {
                     Neuron targetNeuron = neuronType.duplicate();
-                    targetNeuron.setLocation(
-                            baseNeuron.getX() - initialXOffset + (j * layerSpacing), 
-                            initialPosition.y - (layerIndex * verticalSpacing));
+                    targetNeuron.setLocation(baseNeuron.getX() - initialXOffset
+                            + (j * layerSpacing), initialPosition.y
+                            - (layerIndex * verticalSpacing));
                     tempList.add(targetNeuron);
                     network.addNeuron(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
-                    ClampedSynapse synapse = new ClampedSynapse(baseNeuron, targetNeuron);
+                    ClampedSynapse synapse = new ClampedSynapse(baseNeuron,
+                            targetNeuron);
                     network.addSynapse(synapse);
                 }
             }
-            currentLayer = tempList; 
+            currentLayer = tempList;
         }
-        
+
     }
 
     /**
@@ -135,7 +145,8 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param numLayers the numLayers to set
+     * @param numLayers
+     *            the numLayers to set
      */
     public void setNumLayers(int numLayers) {
         this.numLayers = numLayers;
@@ -149,7 +160,8 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param numBrachesPerNeuron the numBrachesPerNeuron to set
+     * @param numBrachesPerNeuron
+     *            the numBrachesPerNeuron to set
      */
     public void setNumBrachesPerNeuron(int numBrachesPerNeuron) {
         this.numBrachesPerNeuron = numBrachesPerNeuron;
@@ -163,7 +175,8 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param horizontalSpacing the horizontalSpacing to set
+     * @param horizontalSpacing
+     *            the horizontalSpacing to set
      */
     public void setHorizontalSpacing(double horizontalSpacing) {
         this.horizontalSpacing = horizontalSpacing;
@@ -177,7 +190,8 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param verticalSpacing the verticalSpacing to set
+     * @param verticalSpacing
+     *            the verticalSpacing to set
      */
     public void setVerticalSpacing(double verticalSpacing) {
         this.verticalSpacing = verticalSpacing;
@@ -191,7 +205,8 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
-     * @param initialPosition the initialPosition to set
+     * @param initialPosition
+     *            the initialPosition to set
      */
     public void setInitialPosition(Point initialPosition) {
         this.initialPosition = initialPosition;
@@ -203,5 +218,5 @@ public final class CascadingNetworkBuilder {
     public static void setNeuronType(Neuron type) {
         neuronType = type;
     }
-    
+
 }

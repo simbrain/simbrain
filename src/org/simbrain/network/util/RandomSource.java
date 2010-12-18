@@ -32,7 +32,7 @@ public class RandomSource {
     /** A uniform distribution. */
     public static final int UNIFORM = 0;
 
-    /** A gaussian distribution. */
+    /** A Gaussian distribution. */
     public static final int GAUSSIAN = 1;
 
     /** Which distribution is currently chosen. */

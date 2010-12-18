@@ -19,69 +19,63 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuron;
-
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 
 /**
  * A simple spiking neuron that fires when weighted inputs exceed a threshold.
  */
-public class SpikingThresholdNeuron extends SpikingNeuron {
-	
-	/** Threshold. */
-	private double threshold = .5;
+public class SpikingThresholdNeuron extends SpikingNeuronUpdateRule {
 
-    /**
-     * Default constructor needed for external calls which create neurons then
-     * set their parameters.
-     */
-    public SpikingThresholdNeuron() {
-    }
+    /** Threshold. */
+    private double threshold = .5;
 
-    /**
-     * Copy constructor.
-     *
-     * @param n Neuron to be made type integrate and fire
-     */
-    public SpikingThresholdNeuron(final Neuron n) {
-        super(n);
-    }
+//    /**
+//     * @return duplicate ProbabilisticSpiking (used, e.g., in copy/paste).
+//     */
+//    public SpikingThresholdNeuron duplicate() {
+//        SpikingThresholdNeuron ifn = new SpikingThresholdNeuron();
+//        ifn = (SpikingThresholdNeuron) super.duplicate(ifn);
+//        ifn.setThreshold(getThreshold());
+//
+//        return ifn;
+//    }
 
-    /**
-     * @return duplicate ProbabilisticSpiking (used, e.g., in copy/paste).
-     */
-    public SpikingThresholdNeuron duplicate() {
-        SpikingThresholdNeuron ifn = new SpikingThresholdNeuron();
-        ifn = (SpikingThresholdNeuron) super.duplicate(ifn);
-        ifn.setThreshold(getThreshold());
-        
-        return ifn;
-    }
-    
     @Override
-    public void init() {
-        lowerBound = 0;
+    public void init(Neuron neuron) {
+        super.init(neuron);
+        neuron.setLowerBound(0);
     }
-    
-    /**
-     * Update neuron.
-     */
-    public void update() {
-    	
-        if (getWeightedInputs() >= threshold){
-        	setHasSpiked(true);
-            setBuffer(getUpperBound());
-        } else{
+
+    @Override
+    public void update(Neuron neuron) {
+
+        if (neuron.getWeightedInputs() >= threshold) {
+            setHasSpiked(true);
+            neuron.setBuffer(neuron.getUpperBound());
+        } else {
             setHasSpiked(false);
-            setBuffer(0); // Make this a separate variable?
+            neuron.setBuffer(0); // Make this a separate variable?
         }
-    	
+
     }
-    
+
+    /**
+     * @return the threshold
+     */
     public double getThreshold() {
         return threshold;
     }
-    
-    public void setThreshold(final double fireProbability) {
-        this.threshold = fireProbability;
+
+    /**
+     * @param threshold the threshold to set
+     */
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
     }
+
+    @Override
+    public String getName() {
+        return "Spiking threshold";
+    }
+
 }

@@ -25,11 +25,14 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
- * <b>AbstractNeuronPanel</b>.
+ * <b>AbstractNeuronPanel</b> is the parent class for all panels used to set
+ * parameters of specific neuron rule types.
  */
 public abstract class AbstractNeuronPanel extends JPanel {
 
@@ -37,13 +40,13 @@ public abstract class AbstractNeuronPanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** Parent network. */
-    protected org.simbrain.network.interfaces.Network parentNet = null;
+    protected RootNetwork parentNet = null;
 
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /** The neurons being modified. */
-    protected ArrayList neuronList;
+    /** The neuron update rules whose values are being modified. */
+    protected ArrayList<NeuronUpdateRule> ruleList;
 
     /**
      * Adds a new item.
@@ -89,15 +92,15 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * @return Returns the neuron_list.
      */
-    public ArrayList getNeuronList() {
-        return neuronList;
+    public ArrayList<NeuronUpdateRule> getRuleList() {
+        return ruleList;
     }
 
     /**
-     * @param neuronList The neuron_list to set.
+     * @param ruleList The neuron_list to set.
      */
-    public void setNeuronList(final ArrayList neuronList) {
-        this.neuronList = neuronList;
+    public void setRuleList(final ArrayList<NeuronUpdateRule> ruleList) {
+        this.ruleList = ruleList;
     }
 
     /**
@@ -109,5 +112,19 @@ public abstract class AbstractNeuronPanel extends JPanel {
         JLabel theLabel = new JLabel(text);
         labelPanel.add(theLabel);
         this.add(labelPanel, BorderLayout.SOUTH);
+    }
+
+    /**
+     * @return the parentNet
+     */
+    public RootNetwork getParentNetwork() {
+        return parentNet;
+    }
+
+    /**
+     * @param parentNet the parentNet to set
+     */
+    public void setParentNetwork(RootNetwork parentNet) {
+        this.parentNet = parentNet;
     }
 }

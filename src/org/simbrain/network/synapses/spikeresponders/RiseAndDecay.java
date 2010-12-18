@@ -19,7 +19,7 @@
 package org.simbrain.network.synapses.spikeresponders;
 
 import org.simbrain.network.interfaces.SpikeResponder;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 
 
 /**
@@ -48,7 +48,7 @@ public class RiseAndDecay extends SpikeResponder {
      * Update the synapse.
      */
     public void update() {
-        if (((SpikingNeuron) parent.getSource()).hasSpiked()) {
+        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule()).hasSpiked()) {
             recovery = 1;
         }
 

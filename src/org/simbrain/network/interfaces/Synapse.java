@@ -129,10 +129,11 @@ public abstract class Synapse {
     }
 
     /**
-     * Set a default spike responder if the source neuron is a  spiking neuron, else set the spikeResponder to null.
+     * Set a default spike responder if the source neuron is a spiking neuron,
+     * else set the spikeResponder to null.
      */
     public void initSpikeResponder() {
-        if (source instanceof SpikingNeuron) {
+        if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             setSpikeResponder(new JumpAndDecay());
         } else {
             setSpikeResponder(null);
@@ -167,15 +168,16 @@ public abstract class Synapse {
     public abstract Synapse duplicate();
 
     /**
-     * For spiking source neurons, returns the spike-responder's value times the synapse strength.
-     * For non-spiking neurons, returns the pre-synaptic activation times the synapse strength.
+     * For spiking source neurons, returns the spike-responder's value times the
+     * synapse strength. For non-spiking neurons, returns the pre-synaptic
+     * activation times the synapse strength.
      *
      * @return Value
      */
     public double getValue() {
         double val;
 
-        if (source instanceof SpikingNeuron) {
+        if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             spikeResponder.update();
             val = strength * spikeResponder.getValue();
         } else {

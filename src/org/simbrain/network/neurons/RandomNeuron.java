@@ -19,67 +19,60 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
- * <b>RandomNeuron</b>.
+ * <b>RandomNeuron</b> produces random activations within specified parameters.
  */
-public class RandomNeuron extends Neuron {
-    /** Noise dialog. */
+public class RandomNeuron implements NeuronUpdateRule {
+
+    /** Noise source. */
     private RandomSource randomizer = new RandomSource();
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public RandomNeuron() {
-        randomizer.setUpperBound(this.getUpperBound());
-        randomizer.setLowerBound(this.getLowerBound());
-    }
-
-    /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be made of type
+     * @{inheritDoc}
      */
-    public RandomNeuron(final Neuron n) {
-        super(n);
-        randomizer.setUpperBound(this.getUpperBound());
-        randomizer.setLowerBound(this.getLowerBound());
+    public String getName() {
+        return "Random";
     }
 
     /**
-     * @return duplicate RandomNeuron (used, e.g., in copy/paste).
+     * @{inheritDoc}
      */
-    public RandomNeuron duplicate() {
-        RandomNeuron rn = new RandomNeuron();
-        rn = (RandomNeuron) super.duplicate(rn);
-        rn.randomizer = randomizer.duplicate(randomizer);
-
-        return rn;
+    public void init(Neuron neuron) {
+        // No implementation
+        randomizer.setUpperBound(neuron.getUpperBound());
+        randomizer.setLowerBound(neuron.getLowerBound());
     }
+
+
+//    /**
+//     * @return duplicate RandomNeuron (used, e.g., in copy/paste).
+//     */
+//    public RandomNeuron duplicate() {
+//        RandomNeuron rn = new RandomNeuron();
+//        rn = (RandomNeuron) super.duplicate(rn);
+//        rn.randomizer = randomizer.duplicate(randomizer);
+//
+//        return rn;
+//    }
 
     /**
      * Update neuron.
      */
-    public void update() {
-        randomizer.setUpperBound(this.getUpperBound());
-        randomizer.setLowerBound(this.getLowerBound());
-        setBuffer(randomizer.getRandom());
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Random";
+    public void update(Neuron neuron) {
+        randomizer.setUpperBound(neuron.getUpperBound());
+        randomizer.setLowerBound(neuron.getLowerBound());
+        neuron.setBuffer(randomizer.getRandom());
     }
 
     /**
@@ -94,7 +87,5 @@ public class RandomNeuron extends Neuron {
      */
     public void setRandomizer(final RandomSource randomizer) {
         this.randomizer = randomizer;
-        this.setUpperBound(randomizer.getUpperBound());
-        this.setLowerBound(randomizer.getLowerBound());
     }
 }

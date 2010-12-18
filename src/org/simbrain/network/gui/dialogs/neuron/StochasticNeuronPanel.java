@@ -46,12 +46,12 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
      * Populates the fields with current data.
      */
     public void fillFieldValues() {
-        StochasticNeuron neuronRef = (StochasticNeuron) neuronList.get(0);
+        StochasticNeuron neuronRef = (StochasticNeuron) ruleList.get(0);
 
         tfFiringProbability.setText(Double.toString(neuronRef.getFiringProbability()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, StochasticNeuron.class, "getFiringProbability")) {
+        if (!NetworkUtils.isConsistent(ruleList, StochasticNeuron.class, "getFiringProbability")) {
             tfFiringProbability.setText(NULL_STRING);
         }
     }
@@ -68,8 +68,8 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            StochasticNeuron neuronRef = (StochasticNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            StochasticNeuron neuronRef = (StochasticNeuron) ruleList.get(i);
 
             if (!tfFiringProbability.getText().equals(NULL_STRING)) {
                 neuronRef.setFiringProbability(Double.parseDouble(tfFiringProbability.getText()));

@@ -92,7 +92,7 @@ public final class LayeredNetworkBuilder {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
-            ClampedNeuron neuron = new ClampedNeuron();
+            Neuron neuron = new Neuron(new ClampedNeuron()); 
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
@@ -118,7 +118,7 @@ public final class LayeredNetworkBuilder {
         for (int i = 1; i < nodesPerLayer.length; i++) {
             List<Neuron> hiddenLayer = new ArrayList<Neuron>();
             for (int j = 0; j < nodesPerLayer[i]; j++) {
-                SigmoidalNeuron neuron = new SigmoidalNeuron();
+                Neuron neuron = new Neuron(new SigmoidalNeuron());
                 neuron.setLowerBound(0);
                 network.addNeuron(neuron);
                 hiddenLayer.add(neuron);

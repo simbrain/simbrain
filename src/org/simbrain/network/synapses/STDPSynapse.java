@@ -19,7 +19,7 @@
 package org.simbrain.network.synapses;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
@@ -98,13 +98,13 @@ public class STDPSynapse extends Synapse {
 
         double delta_t,delta_w;
 
-        boolean sourceSpiking = this.getSource() instanceof SpikingNeuron;
-        boolean targetSpiking = this.getTarget() instanceof SpikingNeuron;
+        boolean sourceSpiking = this.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule;
+        boolean targetSpiking = this.getTarget().getUpdateRule() instanceof SpikingNeuronUpdateRule;
 
         if (sourceSpiking && targetSpiking) {
-            SpikingNeuron src = (SpikingNeuron) getSource();
-            SpikingNeuron tar = (SpikingNeuron) getTarget();
-            delta_t = src.lastSpikeTime - tar.lastSpikeTime;
+            SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) getSource().getUpdateRule();
+            SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) getTarget().getUpdateRule();
+            delta_t = src.getLastSpikeTime() - tar.getLastSpikeTime();
             double timeStep = getRootNetwork().getTimeStep();
             if (delta_t > 0) {
                 delta_w = W_plus * Math.exp(-delta_t / (tau_plus / timeStep));

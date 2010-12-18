@@ -67,19 +67,16 @@ import org.simbrain.network.gui.nodes.TimeLabel;
 import org.simbrain.network.gui.nodes.UpdateStatusLabel;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.modelgroups.GeneRecNode;
-import org.simbrain.network.gui.nodes.subnetworks.ActorCriticNetworkNode;
-import org.simbrain.network.gui.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.CompetitiveNetworkNode;
-import org.simbrain.network.gui.nodes.subnetworks.ElmanNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.HopfieldNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.KwtaNetworkNode;
-import org.simbrain.network.gui.nodes.subnetworks.LMSNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.SOMNode;
 import org.simbrain.network.gui.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.GroupListener;
@@ -88,16 +85,12 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
-import org.simbrain.network.networks.Backprop;
 import org.simbrain.network.networks.Competitive;
-import org.simbrain.network.networks.Elman;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.networks.KwtaNetwork;
-import org.simbrain.network.networks.LMSNetwork;
 import org.simbrain.network.networks.SOM;
 import org.simbrain.network.networks.StandardNetwork;
 import org.simbrain.network.networks.WinnerTakeAll;
-import org.simbrain.network.networks.actorcritic.ActorCritic;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
@@ -394,9 +387,8 @@ public class NetworkPanel extends PCanvas  {
                 node.update();
             }
 
-            public void neuronTypeChanged(final NetworkEvent<Neuron> e) {
-                NeuronNode neuronNode = findNeuronNode(e.getOldObject());
-                neuronNode.setNeuron(e.getObject());
+            public void neuronTypeChanged(final NetworkEvent<NeuronUpdateRule> e) {
+                // TODO: No implementation
             }
 
             public void neuronMoved(final NetworkEvent<Neuron> e) {
@@ -542,13 +534,9 @@ public class NetworkPanel extends PCanvas  {
      */
     protected JMenu createNewNetworkMenu() {
         JMenu newNetMenu = new JMenu("Add Network");
-        newNetMenu.add(actionManager.getNewActorCriticNetworkAction());
-//        newNetMenu.add(actionManager.getNewBackpropNetworkAction());
         newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
-//        newNetMenu.add(actionManager.getNewElmanNetworkAction());
         newNetMenu.add(actionManager.getNewHopfieldNetworkAction());
         newNetMenu.add(actionManager.getNewKwtaNetworkAction());
-//        newNetMenu.add(actionManager.getNewLMSNetworkAction());
         newNetMenu.add(actionManager.getNewSOMNetworkAction());
         newNetMenu.add(actionManager.getNewStandardNetworkAction());
         newNetMenu.add(actionManager.getNewWTANetworkAction());
@@ -1358,7 +1346,7 @@ public class NetworkPanel extends PCanvas  {
             }
         }
 
-        LinearNeuron neuron = new LinearNeuron();
+        Neuron neuron = new Neuron(new LinearNeuron()); 
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.setActivation(0);
@@ -1489,16 +1477,8 @@ public class NetworkPanel extends PCanvas  {
     private SubnetworkNode getSubnetworkNodeFromSubnetwork(final Point2D upperLeft, final Network subnetwork) {
         SubnetworkNode ret = null;
 
-        if (subnetwork instanceof ActorCritic) {
-            ret = new ActorCriticNetworkNode(this, (ActorCritic) subnetwork, upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof Backprop) {
-            ret = new BackpropNetworkNode(this, (Backprop) subnetwork, upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof Competitive) {
+        if (subnetwork instanceof Competitive) {
             ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork, upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof LMSNetwork) {
-            ret = new LMSNetworkNode(this, (LMSNetwork) subnetwork, upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof Elman) {
-            ret = new ElmanNetworkNode(this, (Elman) subnetwork, upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof SOM) {
             ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof Hopfield) {

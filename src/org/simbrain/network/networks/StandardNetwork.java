@@ -19,6 +19,7 @@
 package org.simbrain.network.networks;
 
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.Layout;
@@ -66,14 +67,14 @@ public class StandardNetwork extends Network {
 
         numNeurons = nUnits;
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron());
+            this.addNeuron(new Neuron(new LinearNeuron()));
         }
         layout.layoutNeurons(this);
     }
 
     /**
-     * The core update function of the neural network.  Calls the current update function on each neuron, decays all
-     * the neurons, and checks their bounds.
+     * The core update function of the neural network. Calls the current update
+     * function on each neuron, decays all the neurons, and checks their bounds.
      */
     public void update() {
         updateAllNeurons();

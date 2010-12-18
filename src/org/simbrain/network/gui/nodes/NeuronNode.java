@@ -58,7 +58,7 @@ import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuron;
+import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
@@ -507,7 +507,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                         getNetworkPanel().getSelectedModelNeurons(),
                         getNetworkPanel().getSelectedModelNeurons());
             }
-            
         });
 
         JMenuItem sparseMenuItem = new JMenuItem("Sparse");
@@ -522,7 +521,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                         getNetworkPanel().getSelectedModelNeurons(),
                         getNetworkPanel().getSelectedModelNeurons());
             }
-            
+
         });
 
         menu.add(allMenuItem);
@@ -568,9 +567,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 layout.setInitialLocation(panel.getLastClickedPosition());
                 layout.layoutNeurons(panel.getSelectedModelNeurons());
                 panel.repaint();
-                
             }
-            
         });
 
         JMenuItem gridMenuItem = new JMenuItem("Hex");
@@ -586,7 +583,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 layout.layoutNeurons(panel.getSelectedModelNeurons());
                 panel.repaint();
             }
-            
         });
 
         menu.add(lineMenuItem);
@@ -640,8 +636,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                             (float) 1));
         }
 
-        if (neuron instanceof SpikingNeuron) {
-            if (((SpikingNeuron) neuron).hasSpiked()) {
+        if (neuron.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+            if (((SpikingNeuronUpdateRule) neuron.getUpdateRule()).hasSpiked()) {
                 circle.setStrokePaint(NetworkGuiSettings.getSpikingColor());
                 //outArrow.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {

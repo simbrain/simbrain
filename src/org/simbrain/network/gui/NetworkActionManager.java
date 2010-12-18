@@ -28,21 +28,14 @@ import org.simbrain.network.gui.actions.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.AlignVerticalAction;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
-import org.simbrain.network.gui.actions.ShowRunToolBarAction;
-import org.simbrain.network.gui.actions.WandEditModeAction;
-import org.simbrain.network.gui.actions.ZeroSelectedObjectsAction;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.GroupAction;
 import org.simbrain.network.gui.actions.IterateNetworkAction;
-import org.simbrain.network.gui.actions.NewActorCriticNetworkAction;
-import org.simbrain.network.gui.actions.NewBackpropNetworkAction;
 import org.simbrain.network.gui.actions.NewCompetitiveNetworkAction;
-import org.simbrain.network.gui.actions.NewElmanNetworkAction;
 import org.simbrain.network.gui.actions.NewHopfieldNetworkAction;
 import org.simbrain.network.gui.actions.NewKwtaNetworkAction;
-import org.simbrain.network.gui.actions.NewLMSNetworkAction;
 import org.simbrain.network.gui.actions.NewNeuronAction;
 import org.simbrain.network.gui.actions.NewSOMNetworkAction;
 import org.simbrain.network.gui.actions.NewStandardNetworkAction;
@@ -70,12 +63,15 @@ import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.actions.ShowIOInfoAction;
 import org.simbrain.network.gui.actions.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
+import org.simbrain.network.gui.actions.ShowRunToolBarAction;
 import org.simbrain.network.gui.actions.ShowWeightsAction;
 import org.simbrain.network.gui.actions.SpaceHorizontalAction;
 import org.simbrain.network.gui.actions.SpaceVerticalAction;
 import org.simbrain.network.gui.actions.StopNetworkAction;
 import org.simbrain.network.gui.actions.TextEditModeAction;
 import org.simbrain.network.gui.actions.UngroupAction;
+import org.simbrain.network.gui.actions.WandEditModeAction;
+import org.simbrain.network.gui.actions.ZeroSelectedObjectsAction;
 import org.simbrain.network.gui.actions.ZoomEditModeAction;
 import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 
@@ -180,23 +176,11 @@ public final class NetworkActionManager {
     /** Select all neurons action. */
     private final Action selectAllNeuronsAction;
 
-    /** New actor critic action. */
-    private final Action newActorCriticNetworkAction;
-
-    /** New backprop network action. */
-    private final Action newBackpropNetworkAction;
-
     /** New competitive network action. */
     private final Action newCompetitiveNetworkAction;
 
-    /** New elman network action. */
-    private final Action newElmanNetworkAction;
-
-    /** New discrete hopfield network action. */
+    /** New discrete Hopfield network action. */
     private final Action newHopfieldNetworkAction;
-
-    /** New LMS network action. */
-    private final Action newLMSNetworkAction;
 
     /** New winner take all network action. */
     private final Action newWTANetworkAction;
@@ -325,12 +309,8 @@ public final class NetworkActionManager {
         setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
         setTextPropertiesAction = new SetTextPropertiesAction(networkPanel);
 
-        newActorCriticNetworkAction = new NewActorCriticNetworkAction(networkPanel);
-        newBackpropNetworkAction = new NewBackpropNetworkAction(networkPanel);
         newCompetitiveNetworkAction = new NewCompetitiveNetworkAction(networkPanel);
-        newElmanNetworkAction = new NewElmanNetworkAction(networkPanel);
         newHopfieldNetworkAction = new NewHopfieldNetworkAction(networkPanel);
-        newLMSNetworkAction = new NewLMSNetworkAction(networkPanel);
         newWTANetworkAction = new NewWTANetworkAction(networkPanel);
         newSOMNetworkAction = new NewSOMNetworkAction(networkPanel);
         newStandardNetworkAction = new NewStandardNetworkAction(networkPanel);
@@ -415,11 +395,10 @@ public final class NetworkActionManager {
      * @return a list of the network types.
      */
     public List getNewNetworkActions() {
-        return Arrays.asList(new Action[] {newActorCriticNetworkAction,
-                newBackpropNetworkAction, newCompetitiveNetworkAction,
-                newElmanNetworkAction, newHopfieldNetworkAction,
-                newKwtaNetworkAction, newLMSNetworkAction, newSOMNetworkAction,
-                newStandardNetworkAction, newWTANetworkAction });
+        return Arrays.asList(new Action[] { newCompetitiveNetworkAction,
+                newHopfieldNetworkAction, newKwtaNetworkAction,
+                newSOMNetworkAction, newStandardNetworkAction,
+                newWTANetworkAction });
     }
 
 //    public List<JToggleButton> getClampBarActions() {
@@ -655,39 +634,12 @@ public final class NetworkActionManager {
     }
 
     /**
-     * Return the new actor critic action.
-     *
-     * @return the new actor critic action
-     */
-    public Action getNewActorCriticNetworkAction() {
-        return newActorCriticNetworkAction;
-    }
-
-    /**
-     * Return the new backprop network action.
-     *
-     * @return the new backprop network action
-     */
-    public Action getNewBackpropNetworkAction() {
-        return newBackpropNetworkAction;
-    }
-
-    /**
      * Return the new competitive network action.
      *
      * @return the new competitive network action
      */
     public Action getNewCompetitiveNetworkAction() {
         return newCompetitiveNetworkAction;
-    }
-
-    /**
-     * Return the new elman network action.
-     *
-     * @return the new elman network action
-     */
-    public Action getNewElmanNetworkAction() {
-        return newElmanNetworkAction;
     }
 
     /**
@@ -706,15 +658,6 @@ public final class NetworkActionManager {
      */
     public Action getNewWTANetworkAction() {
         return newWTANetworkAction;
-    }
-
-    /**
-     * Return the new LMSNetwork network action.
-     *
-     * @return the new LMSNetwork network action
-     */
-    public Action getNewLMSNetworkAction() {
-        return newLMSNetworkAction;
     }
 
     /**

@@ -66,10 +66,11 @@ public class Hopfield extends Network {
 
         //Create the neurons
         for (int i = 0; i < numNeurons; i++) {
-            BinaryNeuron n = new BinaryNeuron();
+            BinaryNeuron binary = new BinaryNeuron();
+            binary.setThreshold(0);
+            Neuron n = new Neuron(binary);
             n.setUpperBound(1);
             n.setLowerBound(-1);
-            n.setThreshold(0);
             n.setIncrement(1);
             addNeuron(n);
         }

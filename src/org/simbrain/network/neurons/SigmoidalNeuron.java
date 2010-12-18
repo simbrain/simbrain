@@ -20,13 +20,14 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
- * <b>SigmoidalNeuron</b>.
+ * <b>SigmoidalNeuron</b> provides variuos implementations of a standard
+ * sigmoidal neuron.
  */
-public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
+public class SigmoidalNeuron implements NeuronUpdateRule, BiasedNeuron {
 
     /** Function list. */
     private static String[] functionList = {"Sigmoidal", "Arctan", "Barebones" };
@@ -62,34 +63,34 @@ public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
     private boolean clipping = false;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public SigmoidalNeuron() {
-    }
-
-    /**
-     * @return Time type.
+     * @{inheritDoc}
      */
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to be made of type.
+     * @{inheritDoc}
      */
-    public SigmoidalNeuron(final Neuron n) {
-        super(n);
+    public String getName() {
+        return "Sigmoidal";
+    }
+
+    /**
+     * @{inheritDoc}
+     */
+    public void init(Neuron neuron) {
+        // No implementation
     }
 
     /**
      * Update neuron.
      */
-    public void update() {
-        double val = this.getWeightedInputs() + bias;
+    public void update(Neuron neuron) {
 
-        //System.out.println(implementationIndex);
+        double val = neuron.getWeightedInputs() + bias;
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
 
         // TANH not currently used because identical to SIGM
         if (implementationIndex == TANH) {
@@ -111,10 +112,10 @@ public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
         }
 
         if (clipping) {
-            val = clip(val);
+            val = neuron.clip(val);
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
@@ -138,21 +139,21 @@ public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
         return  1 / (1 + Math.exp(-in));
     }
 
-    /**
-     * @return duplicate SigmoidalNeuron (used, e.g., in copy/paste).
-     */
-    public SigmoidalNeuron duplicate() {
-        SigmoidalNeuron sn = new SigmoidalNeuron();
-        sn = (SigmoidalNeuron) super.duplicate(sn);
-        sn.setBias(getBias());
-        sn.setClipping(getClipping());
-        sn.setImplementationIndex(getImplementationIndex());
-        sn.setSlope(getSlope());
-        sn.setAddNoise(getAddNoise());
-        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-
-        return sn;
-    }
+//    /**
+//     * @return duplicate SigmoidalNeuron (used, e.g., in copy/paste).
+//     */
+//    public SigmoidalNeuron duplicate() {
+//        SigmoidalNeuron sn = new SigmoidalNeuron();
+//        sn = (SigmoidalNeuron) super.duplicate(sn);
+//        sn.setBias(getBias());
+//        sn.setClipping(getClipping());
+//        sn.setImplementationIndex(getImplementationIndex());
+//        sn.setSlope(getSlope());
+//        sn.setAddNoise(getAddNoise());
+//        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//
+//        return sn;
+//    }
 
     /**
      * @return Returns the inflectionPoint.
@@ -229,13 +230,6 @@ public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Sigmoidal";
     }
 
     /**

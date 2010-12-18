@@ -52,16 +52,16 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        BinaryNeuron neuronRef = (BinaryNeuron) neuronList.get(0);
+        BinaryNeuron neuronRef = (BinaryNeuron) ruleList.get(0);
 
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, BinaryNeuron.class, "getThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, BinaryNeuron.class, "getThreshold")) {
             tfThreshold.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, BinaryNeuron.class, "getBias")) {
+        if (!NetworkUtils.isConsistent(ruleList, BinaryNeuron.class, "getBias")) {
             tfBias.setText(NULL_STRING);
         }
     }
@@ -79,8 +79,8 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            BinaryNeuron neuronRef = (BinaryNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            BinaryNeuron neuronRef = (BinaryNeuron) ruleList.get(i);
 
             if (!tfThreshold.getText().equals(NULL_STRING)) {
                 neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));

@@ -74,7 +74,7 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        IACNeuron neuronRef = (IACNeuron) neuronList.get(0);
+        IACNeuron neuronRef = (IACNeuron) ruleList.get(0);
 
         tfDecay.setText(Double.toString(neuronRef.getDecay()));
         tfRest.setText(Double.toString(neuronRef.getRest()));
@@ -83,19 +83,19 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, IACNeuron.class, "getDecay")) {
+        if (!NetworkUtils.isConsistent(ruleList, IACNeuron.class, "getDecay")) {
             tfDecay.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IACNeuron.class, "getRest")) {
+        if (!NetworkUtils.isConsistent(ruleList, IACNeuron.class, "getRest")) {
             tfRest.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IACNeuron.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(ruleList, IACNeuron.class, "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, IACNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, IACNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
 
@@ -108,8 +108,8 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((IACNeuron) neuronList.get(i)).getNoiseGenerator());
+        for (int i = 0; i < ruleList.size(); i++) {
+            ret.add(((IACNeuron) ruleList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -131,8 +131,8 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            IACNeuron neuronRef = (IACNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            IACNeuron neuronRef = (IACNeuron) ruleList.get(i);
 
             if (!tfDecay.getText().equals(NULL_STRING)) {
                 neuronRef.setDecay(Double.parseDouble(tfDecay.getText()));

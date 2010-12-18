@@ -20,9 +20,9 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 
-
 /**
- * <b>TraceNeuron</b> is used to model Sutton and Barto's model of conditioning via "eligibility traces."
+ * <b>TraceNeuron</b> is used to model Sutton and Barto's model of conditioning
+ * via "eligibility traces."
  */
 public class TraceNeuron extends LinearNeuron {
 
@@ -35,68 +35,65 @@ public class TraceNeuron extends LinearNeuron {
     /** "Trace" of recent activity. */
     private double trace = 0;
 
-    /** Used to keep a history of traces so that this information is available before the neuron is updated. */
+    /**
+     * Used to keep a history of traces so that this information is available
+     * before the neuron is updated.
+     */
     private double tracehistory = 0;
 
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public TraceNeuron() {
-    }
+//    /**
+//     * Returns a duplicate TraceNeuron (used, e.g., in copy/paste).
+//     * @return Duplicated neuron
+//     */
+//    public TraceNeuron duplicate() {
+//        TraceNeuron tn = new TraceNeuron();
+//        tn = (TraceNeuron) super.duplicate(tn);
+//        tn.setC1(getC1());
+//        tn.setC2(getC2());
+//        return tn;
+//    }
 
-    /**
-     * @return time type.
-     */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
-    }
-
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to make the type
-     */
-    public TraceNeuron(final Neuron n) {
-        super(n);
-    }
-
-    /**
-     * Returns a duplicate TraceNeuron (used, e.g., in copy/paste).
-     * @return Duplicated neuron
-     */
-    public TraceNeuron duplicate() {
-        TraceNeuron tn = new TraceNeuron();
-        tn = (TraceNeuron) super.duplicate(tn);
-        tn.setC1(getC1());
-        tn.setC2(getC2());
-        return tn;
-    }
-
-    /**
-     * Update neuron.
-     */
-    public void update() {
+    @Override
+    public void update(Neuron neuron) {
         tracehistory = trace;
-        trace = c1 * trace +  c2 * activation;
-        super.update();
+        trace = c1 * trace +  c2 * neuron.getActivation();
+        super.update(neuron);
     }
 
+    @Override
+    public String getName() {
+        return "Trace";
+    }
+
+//  /** @see Neuron */
+//  public String getToolTipText() {
+//      return "" + this.getActivation() + " trace = " + trace;
+//  }
+
+//    /** @see Neuron */
+//    public void clear() {
+//        activation = 0;
+//        trace = 0;
+//    }
+
     /**
-     * Returns the difference betwen the predicted and actual output of this neuron.
-     *
+     * Returns the difference between the predicted and actual output of this
+     * neuron.
+     * 
      * @return activation - trace
      */
-    public double getDifference() {
-        return activation - trace;
+    public double getDifference(Neuron neuron) {
+        return neuron.getActivation()- trace;
     }
 
     /**
-     * Returns the difference betwen the predicted and actual output of this neuron.
+     * Returns the difference between the predicted and actual output of this
+     * neuron.
      *
      * @return activation - tracehistory
      */
-    public double getDifferenceHistory() {
-        return activation - tracehistory;
+    public double getDifferenceHistory(Neuron neuron) {
+        return neuron.getActivation() - tracehistory;
     }
 
     /**
@@ -104,13 +101,6 @@ public class TraceNeuron extends LinearNeuron {
      */
     public double getTrace() {
         return trace;
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public static String getName() {
-        return "Trace";
     }
 
     /**
@@ -143,17 +133,6 @@ public class TraceNeuron extends LinearNeuron {
      */
     public void setC2(final double c2) {
         this.c2 = c2;
-    }
-
-    /** @see Neuron */
-    public void clear() {
-        activation = 0;
-        trace = 0;
-    }
-
-    /** @see Neuron */
-    public String getToolTipText() {
-        return "" + this.getActivation() + " trace = " + trace;
     }
 
     /**

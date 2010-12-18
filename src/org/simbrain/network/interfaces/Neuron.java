@@ -21,8 +21,10 @@ package org.simbrain.network.interfaces;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import org.simbrain.network.neurons.*;
 import org.simbrain.util.Utils;
 
 /**
@@ -30,10 +32,13 @@ import org.simbrain.util.Utils;
  * of the neural network occurs here, in the update function.  Subclasses must
  * override update and duplicate (for copy / paste) and cloning generally.
  */
-public abstract class Neuron  {
+public class Neuron  {
 
-    /** The maximum number of digits to display in the tool tip. */
-    private static final int MAX_DIGITS = 9;
+    /**
+     * The update method of this neuron, which corresponds to what kind of
+     * neuron it is.
+     */
+    private NeuronUpdateRule updateRule;
 
     /** A unique id for this neuron. */
     private String id = null;
@@ -88,11 +93,30 @@ public abstract class Neuron  {
      */
     private int updatePriority = 0;
 
+    /** The maximum number of digits to display in the tool tip. */
+    private static final int MAX_DIGITS = 9;
+
+    //TODO: Make private
+    public static final String[] ruleList = { "Additive", "Binary", "Clamped",
+            "Decay", "HodgkinHuxley", "IAC", "IntegrateAndFire", "Izhikevich",
+            "Linear", "Logistic", "NakaRushton", "Point", "Random",
+            "RunningAverage", "Sigmoidal", "Sinusoidal", "SpikingThreshold",
+            "Stochastic", "ThreeValue", "Trace" };
+
     /**
      * Default constructor needed for external calls which create neurons then
      * set their parameters.
      */
     protected Neuron() {
+    }
+
+    /**
+     * Construct a specific type of neuron.
+     *
+     * @param update the update method
+     */
+    public Neuron(final NeuronUpdateRule update) {
+        setUpdateRule(update);
     }
 
     /**
@@ -116,15 +140,17 @@ public abstract class Neuron  {
     }
 
     /**
-     * Completes duplication of this neuron; used in copy/paste.
-     * This does not produce the copy!
-     * Matching source and targets is up to you!
+     * Duplication of this neuron; used in copy/paste.
+     * fanIn and fanOut are not duplicated.
+     *
+     * TODO: Remove?
      *
      * @param n Neuron to duplicate
      * @return duplicate neuron
      */
     protected Neuron duplicate(final Neuron n) {
         n.setParentNetwork(this.getParentNetwork());
+        n.setUpdateRule(this.getUpdateRule());
         n.setActivation(this.getActivation());
         n.setUpperBound(this.getUpperBound());
         n.setLowerBound(this.getLowerBound());
@@ -137,25 +163,67 @@ public abstract class Neuron  {
         return n;
     }
 
+    //TODO: Remove below
+
     /**
      * @return the time type.
      */
-    public abstract int getTimeType();
+    public int getTimeType() {return updateRule.getTimeType();}
 
     /**
      * @return a duplicate neuron.
      */
-    public abstract Neuron duplicate();
+    public Neuron duplicate() {return null;}
+
+    //TODO: Add "method" to end of below?
+    /**
+     * @return the neuronUpdateRule
+     */
+    public NeuronUpdateRule getUpdateRule() {
+        return updateRule;
+    }
+
+    //TODO: javadocs, add this option to constructor
+    public void setUpdateRule(String name) {
+        try {
+            NeuronUpdateRule newRule  = (NeuronUpdateRule) Class.forName(
+                    "org.simbrain.network.neurons." + name).newInstance();
+            setUpdateRule(newRule);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
-     * Updates network with attached world.
+     * @param updateRule the neuronUpdateRule to set
      */
-    public abstract void update();
+    public void setUpdateRule(NeuronUpdateRule neuronUpdate) {
+        updateRule = neuronUpdate;
+        for (Synapse s : getFanOut()) {
+            s.initSpikeResponder();
+        }
+        //TODO
+//        this.getParentNetwork().getRootNetwork().updateTimeType();
+//        getParentNetwork().getRootNetwork().fireNeuronTypeChanged(updateRule, neuronUpdate);
+        neuronUpdate.init(this);
+
+    }
 
     /**
-     * Override if initialization is needed.
+     * Updates neuron.
      */
-    public void init() {}
+    public void update() {
+       updateRule.update(this);
+    }
+
+    /**
+     * Initialize when changing update method.
+     */
+    public void init() {
+       updateRule.init(this);
+    }
 
     /**
      * Perform any initialization required when creating a neuron, but after
@@ -281,7 +349,7 @@ public abstract class Neuron  {
     /**
      * Connect this neuron to target neuron via a weight.
      *
-     * @param target the connnection between this neuron and a target neuron
+     * @param target the connection between this neuron and a target neuron
      */
     void addTarget(final Synapse target) {
         fanOut.add(target);
@@ -825,5 +893,4 @@ public abstract class Neuron  {
             synapse.randomize();
         }
     }
-
 }

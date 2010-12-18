@@ -19,37 +19,41 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
- * <b>DecayNeuron</b>.
+ * <b>DecayNeuron</b> implements various forms of standard decay.
  */
-public class DecayNeuron extends Neuron {
+public class DecayNeuron implements NeuronUpdateRule {
+
     /** Relative. */
     private static final int RELATIVE = 0;
+
     /** Absolute. */
     private static final int ABSOLUTE = 1;
+
     /** Relative absolute. */
     private int relAbs = RELATIVE;
+
     /** Decay amount. */
     private double decayAmount = .1;
+
     /** Decay fraction. */
     private double decayFraction = .1;
+
     /** Base line. */
     private double baseLine = 0;
+
     /** Clipping. */
     private boolean clipping = true;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Add noise to the neuron. */
     private boolean addNoise = false;
-
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public DecayNeuron() {
-    }
 
     /**
      * @return Time type.
@@ -57,37 +61,35 @@ public class DecayNeuron extends Neuron {
     public int getTimeType() {
         return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
     }
-
+    
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to make of the type
+     * @{inheritDoc}
      */
-    public DecayNeuron(final Neuron n) {
-        super(n);
+    public void init(Neuron neuron) {
+        // No implementation
     }
 
-    /**
-     * @return duplicate DecayNeuron (used, e.g., in copy/paste).
-     */
-    public DecayNeuron duplicate() {
-        DecayNeuron dn = new DecayNeuron();
-        dn = (DecayNeuron) super.duplicate(dn);
-        dn.setRelAbs(getRelAbs());
-        dn.setDecayAmount(getDecayAmount());
-        dn.setDecayFraction(getDecayFraction());
-        dn.setClipping(getClipping());
-        dn.setAddNoise(getAddNoise());
-        dn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//    /**
+//     * @return duplicate DecayNeuron (used, e.g., in copy/paste).
+//     */
+//    public DecayNeuron duplicate() {
+//        DecayNeuron dn = new DecayNeuron();
+//        dn = (DecayNeuron) super.duplicate(dn);
+//        dn.setRelAbs(getRelAbs());
+//        dn.setDecayAmount(getDecayAmount());
+//        dn.setDecayFraction(getDecayFraction());
+//        dn.setClipping(getClipping());
+//        dn.setAddNoise(getAddNoise());
+//        dn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+//
+//        return dn;
+//    }
 
-        return dn;
-    }
-
     /**
-     * Updates the neuron.
+     * @{inheritDoc}
      */
-    public void update() {
-        double val = activation + this.getWeightedInputs();
+    public void update(Neuron neuron) {
+        double val = neuron.getActivation() + neuron.getWeightedInputs();
         double decayVal = 0;
 
         if (relAbs == RELATIVE) {
@@ -118,16 +120,16 @@ public class DecayNeuron extends Neuron {
         }
 
         if (clipping) {
-            val = clip(val);
+            val = neuron.clip(val);
         }
 
-        setBuffer(val);
+        neuron.setBuffer(val);
     }
 
     /**
      * @return Name of neuron type.
      */
-    public static String getName() {
+    public String getName() {
         return "Decay";
     }
 

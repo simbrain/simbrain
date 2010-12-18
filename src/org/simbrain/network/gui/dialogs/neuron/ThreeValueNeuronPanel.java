@@ -21,14 +21,14 @@ package org.simbrain.network.gui.dialogs.neuron;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.neurons.ThreeValuedNeuron;
+import org.simbrain.network.neurons.ThreeValueNeuron;
 import org.simbrain.util.LabelledItemPanel;
 
 
 /**
  * <b>ThreeValuedNeuronPanel</b> creates a dialog for setting preferences of three valued neurons.
  */
-public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
+public class ThreeValueNeuronPanel extends AbstractNeuronPanel {
 
     /** Threshold for this neuron. */
     private JTextField tfLowerThreshold = new JTextField();
@@ -54,7 +54,7 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates binary neuron preferences panel.
      */
-    public ThreeValuedNeuronPanel() {
+    public ThreeValueNeuronPanel() {
         this.add(mainTab);
         mainTab.addItem("Bias", tfBias);
         mainTab.addItem("Lower threshold", tfLowerThreshold);
@@ -68,7 +68,7 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        ThreeValuedNeuron neuronRef = (ThreeValuedNeuron) neuronList.get(0);
+        ThreeValueNeuron neuronRef = (ThreeValueNeuron) ruleList.get(0);
 
         tfLowerThreshold.setText(Double.toString(neuronRef.getLowerThreshold()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
@@ -78,22 +78,22 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
         tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getLowerThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, ThreeValueNeuron.class, "getLowerThreshold")) {
             tfLowerThreshold.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getBias")) {
+        if (!NetworkUtils.isConsistent(ruleList, ThreeValueNeuron.class, "getBias")) {
             tfBias.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getUpperThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, ThreeValueNeuron.class, "getUpperThreshold")) {
             tfUpperThreshold.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getLowerValue")) {
+        if (!NetworkUtils.isConsistent(ruleList, ThreeValueNeuron.class, "getLowerValue")) {
             tfLowerValue.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getMiddleValue")) {
+        if (!NetworkUtils.isConsistent(ruleList, ThreeValueNeuron.class, "getMiddleValue")) {
             tfMiddleValue.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getUpperValue")) {
+        if (!NetworkUtils.isConsistent(ruleList, ThreeValueNeuron.class, "getUpperValue")) {
             tfUpperValue.setText(NULL_STRING);
         }
     }
@@ -102,7 +102,7 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
      * Fill field values to default values for binary neuron.
      */
     public void fillDefaultValues() {
-        ThreeValuedNeuron neuronRef = new ThreeValuedNeuron();
+        ThreeValueNeuron neuronRef = new ThreeValueNeuron();
         tfLowerThreshold.setText(Double.toString(neuronRef.getLowerThreshold()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
         tfUpperThreshold.setText(Double.toString(neuronRef.getUpperThreshold()));
@@ -115,8 +115,8 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            ThreeValuedNeuron neuronRef = (ThreeValuedNeuron) neuronList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            ThreeValueNeuron neuronRef = (ThreeValueNeuron) ruleList.get(i);
 
             if (!tfLowerThreshold.getText().equals(NULL_STRING)) {
                 neuronRef.setLowerThreshold(Double.parseDouble(tfLowerThreshold.getText()));

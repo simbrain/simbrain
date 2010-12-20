@@ -16,25 +16,25 @@ import org.simbrain.workspace.*;
 	double EXCITATORY_PROB = .1;
 	double EXCITATORY_RADIUS = 200;
 
-        // Build Network
-        NetworkComponent networkComponent = new NetworkComponent("SparseNetwork");
-        workspace.addWorkspaceComponent(networkComponent);
-        RootNetwork network = networkComponent.getRootNetwork();
-        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
-        layout.setInitialLocation(new Point(10, 10));
-        for (int i = 0; i < NUM_NEURONS; i++) {
-            IntegrateAndFireNeuron neuron = new IntegrateAndFireNeuron();
-	    neuron.setTimeConstant(.1);
-            network.addNeuron(neuron);
-        }
-        layout.layoutNeurons(network);
-        Radial connection = new Radial(network, network.getFlatNeuronList(),
-                network.getFlatNeuronList());
-        connection.setExcitatoryProbability(EXCITATORY_PROB);
-        connection.setInhibitoryProbability(INHIBITORY_PROB);
-        connection.setExcitatoryRadius(EXCITATORY_RADIUS);
-        connection.setInhibitoryRadius(INHIBITORY_RADIUS);
-        connection.connectNeurons();
+	// Build Network
+	NetworkComponent networkComponent = new NetworkComponent("SparseNetwork");
+	workspace.addWorkspaceComponent(networkComponent);
+	RootNetwork network = networkComponent.getRootNetwork();
+	GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
+	layout.setInitialLocation(new Point(10, 10));
+	for (int i = 0; i < NUM_NEURONS; i++) {
+	    Neuron neuron = new Neuron(network, "IntegrateAndFireNeuron");
+	    ((IntegrateAndFireNeuron)neuron.getUpdateRule()).setTimeConstant(.1);
+	    network.addNeuron(neuron);
+	}
+	layout.layoutNeurons(network);
+	Radial connection = new Radial(network, network.getFlatNeuronList(),
+	        network.getFlatNeuronList());
+	connection.setExcitatoryProbability(EXCITATORY_PROB);
+	connection.setInhibitoryProbability(INHIBITORY_PROB);
+	connection.setExcitatoryRadius(EXCITATORY_RADIUS);
+	connection.setInhibitoryRadius(INHIBITORY_RADIUS);
+	connection.connectNeurons();
 	network.randomizeNeurons();
 	desktop.getDesktopComponent(networkComponent).postAddInit();
 }

@@ -60,6 +60,26 @@ public class RandomSource {
     private Random randomGenerator = new Random();
 
     /**
+     * Default constructor.
+     */
+    public RandomSource() {
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param dup the <code>RandomSource</code> to duplicate.
+     * @return the duplicated <code>RandomSource</code> object.
+     */
+    public RandomSource(final RandomSource dup) {
+        setLowerBound(getLowerBound());
+        setUpperBound(getUpperBound());
+        setMean(getMean());
+        setStandardDeviation(getStandardDeviation());
+        setClipping(getClipping());
+    }
+
+    /**
      * Returns a random number.
      *
      * @return the next random number
@@ -98,22 +118,7 @@ public class RandomSource {
         return ret;
     }
 
-    /**
-     * Returns a duplicate random source.
-     *
-     * @param dup the <code>RandomSource</code> to duplicate.
-     * @return the duplicated <code>RandomSource</code> object.
-     */
-    public RandomSource duplicate(final RandomSource dup) {
-        RandomSource rs = dup;
-        rs.setLowerBound(getLowerBound());
-        rs.setUpperBound(getUpperBound());
-        rs.setMean(getMean());
-        rs.setStandardDeviation(getStandardDeviation());
-        rs.setClipping(getClipping());
 
-        return rs;
-    }
 
     /**
      * @return Returns the mean.

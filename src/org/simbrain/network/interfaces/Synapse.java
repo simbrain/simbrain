@@ -33,7 +33,6 @@ import org.simbrain.network.synapses.SignalSynapse;
 import org.simbrain.network.synapses.SimpleSynapse;
 import org.simbrain.network.synapses.SubtractiveNormalizationSynapse;
 import org.simbrain.network.synapses.TDSynapse;
-import org.simbrain.network.synapses.TraceSynapse;
 import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
 import org.simbrain.util.Utils;
 
@@ -101,8 +100,7 @@ public abstract class Synapse {
             HebbianThresholdSynapse.getName(), OjaSynapse.getName(),
             RandomSynapse.getName(), ShortTermPlasticitySynapse.getName(),
             SignalSynapse.getName(), SimpleSynapse.getName(), SubtractiveNormalizationSynapse.getName(),
-            STDPSynapse.getName(), TDSynapse.getName(), TraceSynapse.getName()
-    };
+            STDPSynapse.getName(), TDSynapse.getName(), };
     
     public Synapse(Neuron source, Neuron target) {
         setSource(source);

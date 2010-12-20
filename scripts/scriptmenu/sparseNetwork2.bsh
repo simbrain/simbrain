@@ -23,7 +23,7 @@ import org.simbrain.workspace.*;
     GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
     layout.setInitialLocation(new Point(10, 10));
     for (int i = 0; i < NUM_NEURONS; i++) {
-        NakaRushtonNeuron neuron = new NakaRushtonNeuron();
+        Neuron neuron = new Neuron(network, "NakaRushtonNeuron");
         network.addNeuron(neuron);
     }
     layout.layoutNeurons(network);

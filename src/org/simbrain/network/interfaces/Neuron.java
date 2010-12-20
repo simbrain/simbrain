@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.neurons.*;
+import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.Utils;
 
 /**
@@ -47,13 +49,13 @@ public class Neuron  {
     private String label = "";
 
     /** Activation value of the neuron.  The main state variable. */
-    protected double activation = 0;
+    private double activation = 0;
 
     /** Minimum value this neuron can take. */
-    protected double lowerBound = -1;
+    private double lowerBound = -1;
 
     /** Maximum value  this neuron can take. */
-    protected double upperBound = 1;
+    private double upperBound = 1;
 
     /** Amount by which to increment or decrement neuron. */
     private double increment = .1;
@@ -93,41 +95,57 @@ public class Neuron  {
      */
     private int updatePriority = 0;
 
-    /** The maximum number of digits to display in the tool tip. */
-    private static final int MAX_DIGITS = 9;
-
-    //TODO: Make private
-    public static final String[] ruleList = { "Additive", "Binary", "Clamped",
-            "Decay", "HodgkinHuxley", "IAC", "IntegrateAndFire", "Izhikevich",
-            "Linear", "Logistic", "NakaRushton", "Point", "Random",
-            "RunningAverage", "Sigmoidal", "Sinusoidal", "SpikingThreshold",
-            "Stochastic", "ThreeValue", "Trace" };
+    /** List of Neuron update rules; used in Gui Combo boxes. */
+    private static final ClassDescriptionPair[] RULE_LIST = {
+        new ClassDescriptionPair(AdditiveNeuron.class, new AdditiveNeuron().getDescription()),
+        new ClassDescriptionPair(BinaryNeuron.class, new BinaryNeuron().getDescription()),
+        new ClassDescriptionPair(DecayNeuron.class, new DecayNeuron().getDescription()),
+        new ClassDescriptionPair(IACNeuron.class, new IACNeuron().getDescription()),
+        new ClassDescriptionPair(IntegrateAndFireNeuron.class, new IntegrateAndFireNeuron().getDescription()),
+        new ClassDescriptionPair(IzhikevichNeuron.class, new IzhikevichNeuron().getDescription()),
+        new ClassDescriptionPair(LinearNeuron.class, new LinearNeuron().getDescription()),
+        new ClassDescriptionPair(LogisticNeuron.class, new LogisticNeuron().getDescription()),
+        new ClassDescriptionPair(NakaRushtonNeuron.class, new NakaRushtonNeuron().getDescription()),
+        new ClassDescriptionPair(RandomNeuron.class, new RandomNeuron().getDescription()),
+        new ClassDescriptionPair(RunningAverageNeuron.class, new RunningAverageNeuron().getDescription()),
+        new ClassDescriptionPair(SigmoidalNeuron.class, new SigmoidalNeuron().getDescription()),
+        new ClassDescriptionPair(RunningAverageNeuron.class, new RunningAverageNeuron().getDescription()),
+        new ClassDescriptionPair(SinusoidalNeuron.class, new SinusoidalNeuron().getDescription()),
+        new ClassDescriptionPair(SpikingThresholdNeuron.class, new SpikingThresholdNeuron().getDescription()),
+        new ClassDescriptionPair(StochasticNeuron.class, new StochasticNeuron().getDescription()),
+        new ClassDescriptionPair(ThreeValueNeuron.class, new ThreeValueNeuron().getDescription())};
 
     /**
-     * Default constructor needed for external calls which create neurons then
-     * set their parameters.
+     * Construct a specific type of neuron from a string description.
+     *
+     * @param parent parent network
+     * @param updateRule the update method
      */
-    protected Neuron() {
+    public Neuron(final Network parent, final String updateRule) {
+        this.parent = parent;
+        setUpdateRule(updateRule);
     }
 
     /**
      * Construct a specific type of neuron.
      *
-     * @param update the update method
+     * @param parent parent network
+     * @param updateRule the update method
      */
-    public Neuron(final NeuronUpdateRule update) {
-        setUpdateRule(update);
+    public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
+        this.parent = parent;
+        setUpdateRule(updateRule);
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another
-     * neuron of another type.  Only values common to different types of neuron
-     * are copied.
+     * Copy constructor.
      *
+     * @param parent parent network
      * @param n Neuron
      */
-    protected Neuron(final Neuron n) {
-        setParentNetwork(n.getParentNetwork());
+    public Neuron(final Network parent, final Neuron n) {
+        this.parent = parent;
+        setUpdateRule(n.getUpdateRule().deepCopy());
         setActivation(n.getActivation());
         setUpperBound(n.getUpperBound());
         setLowerBound(n.getLowerBound());
@@ -140,89 +158,74 @@ public class Neuron  {
     }
 
     /**
-     * Duplication of this neuron; used in copy/paste.
-     * fanIn and fanOut are not duplicated.
+     * Returns the time type of this neuron's update rule.
      *
-     * TODO: Remove?
-     *
-     * @param n Neuron to duplicate
-     * @return duplicate neuron
-     */
-    protected Neuron duplicate(final Neuron n) {
-        n.setParentNetwork(this.getParentNetwork());
-        n.setUpdateRule(this.getUpdateRule());
-        n.setActivation(this.getActivation());
-        n.setUpperBound(this.getUpperBound());
-        n.setLowerBound(this.getLowerBound());
-        n.setIncrement(this.getIncrement());
-        n.setX(this.getX());
-        n.setY(this.getY());
-        n.setUpdatePriority(this.getUpdatePriority());
-        n.setLabel(this.getLabel());
-
-        return n;
-    }
-
-    //TODO: Remove below
-
-    /**
      * @return the time type.
      */
-    public int getTimeType() {return updateRule.getTimeType();}
+    public TimeType getTimeType() {
+        return updateRule.getTimeType();
+    }
 
     /**
-     * @return a duplicate neuron.
-     */
-    public Neuron duplicate() {return null;}
-
-    //TODO: Add "method" to end of below?
-    /**
+     * Returns the current update rule.
+     *
      * @return the neuronUpdateRule
      */
     public NeuronUpdateRule getUpdateRule() {
         return updateRule;
     }
 
-    //TODO: javadocs, add this option to constructor
+    /**
+     * Sets the update rule using a String description. The provided description
+     * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
+     *
+     * @param name the "simple name" of the class associated with the neuron
+     *            rule to set.
+     */
     public void setUpdateRule(String name) {
         try {
             NeuronUpdateRule newRule  = (NeuronUpdateRule) Class.forName(
                     "org.simbrain.network.neurons." + name).newInstance();
             setUpdateRule(newRule);
-        } catch (RuntimeException e) {
-            throw e;
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(
+                    "The provided neuron rule name, \"" + name
+                            + "\", does not correspond to a known neuron type."
+                            + "\n Could not find " + e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
     /**
+     * Set a new update rule. Essentially like changing the type of the network.
+     *
      * @param updateRule the neuronUpdateRule to set
      */
-    public void setUpdateRule(NeuronUpdateRule neuronUpdate) {
-        updateRule = neuronUpdate;
+    public void setUpdateRule(final NeuronUpdateRule updateRule) {
+        this.updateRule = updateRule;
         for (Synapse s : getFanOut()) {
             s.initSpikeResponder();
         }
-        //TODO
-//        this.getParentNetwork().getRootNetwork().updateTimeType();
-//        getParentNetwork().getRootNetwork().fireNeuronTypeChanged(updateRule, neuronUpdate);
-        neuronUpdate.init(this);
-
+        if (getParentNetwork() != null) {
+            getRootNetwork().updateTimeType();
+            getRootNetwork().fireNeuronTypeChanged(updateRule, updateRule);
+        }
+        updateRule.init(this);
     }
 
     /**
      * Updates neuron.
      */
     public void update() {
-       updateRule.update(this);
+        updateRule.update(this);
     }
 
     /**
      * Initialize when changing update method.
      */
     public void init() {
-       updateRule.init(this);
+        updateRule.init(this);
     }
 
     /**
@@ -358,7 +361,7 @@ public class Neuron  {
     /**
      * Remove this neuron from target neuron via a weight.
      *
-     * @param target the connnection between this neuron and a target neuron
+     * @param target the connection between this neuron and a target neuron
      */
     void removeTarget(final Synapse target) {
         fanOut.remove(target);
@@ -367,7 +370,7 @@ public class Neuron  {
     /**
      * Connect this neuron to source neuron via a weight.
      *
-     * @param source the connnection between this neuron and a source neuron
+     * @param source the connection between this neuron and a source neuron
      */
     void addSource(final Synapse source) {
         fanIn.add(source);
@@ -376,20 +379,11 @@ public class Neuron  {
     /**
      * Remove this neuron from source neuron via a weight.
      *
-     * @param source the connnection between this neuron and a source neuron
+     * @param source the connection between this neuron and a source neuron
      */
     void removeSource(final Synapse source) {
         fanIn.remove(source);
     }
-// not used.  Consider deleting?
-//    /**
-//     * Add specified amount of activation to this neuron.
-//     *
-//     * @param amount amount to add to this neuron
-//     */
-//    public void addActivation(final double amount) {
-//        activation += amount;
-//    }
 
     /**
      * Sums the weighted signals that are sent to this node.
@@ -415,7 +409,7 @@ public class Neuron  {
      */
     public void randomize() {
         setActivation(getRandomValue());
-        this.getParentNetwork().getRootNetwork().fireNeuronChanged(this);
+        getRootNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -432,53 +426,6 @@ public class Neuron  {
     public void randomizeBuffer() {
         setBuffer(getRandomValue());
     }
-
-    /*
-     * Update all neurons n this neuron is connected to, by adding current activation
-     * times the connection-weight  NOT CURRENTLY USED.
-     */
-//    public void updateConnectedOutward() {
-//        // Update connected weights
-//        if (fanOut.size() > 0) {
-//            for (int j = 0; j < fanOut.size(); j++) {
-//                Synapse w = (Synapse) fanOut.get(j);
-//                Neuron target = w.getTarget();
-//                target.setActivation(w.getStrength() * activation);
-//                target.checkBounds();
-//            }
-//        }
-//    }
-
-    /**
-     * Check if this neuron is connected to a given weight.
-     *
-     * @param w weight to check
-     *
-     * @return true if this neuron has w in its fan_in or fan_out
-     */
-//    public boolean connectedToWeight(final Synapse w) {
-//        if (fanOut.size() > 0) {
-//            for (int j = 0; j < fanOut.size(); j++) {
-//                Synapse outW = (Synapse) fanOut.get(j);
-//
-//                if (w.equals(outW)) {
-//                    return true;
-//                }
-//            }
-//        }
-//
-//        if (fanIn.size() > 0) {
-//            for (int j = 0; j < fanIn.size(); j++) {
-//                Synapse inW = (Synapse) fanIn.get(j);
-//
-//                if (w.equals(inW)) {
-//                    return true;
-//                }
-//            }
-//        }
-//
-//        return false;
-//    }
 
     /**
      * Round the activation level of this neuron off to a specified precision.
@@ -515,7 +462,7 @@ public class Neuron  {
     }
 
     /**
-     * Sends relevant information about the network to standard output. TODO: Change to toString()
+     * Sends relevant information about the network to standard output.
      */
     public void debug() {
         System.out.println("neuron " + id);
@@ -535,6 +482,15 @@ public class Neuron  {
     }
 
     /**
+     * Returns the root network this neuron is embedded in.
+     *
+     * @return root network.
+     */
+    public RootNetwork getRootNetwork() {
+        return parent.getRootNetwork();
+    }
+
+    /**
      * @return reference to the Network object this neuron is part of
      */
     public Network getParentNetwork() {
@@ -542,15 +498,8 @@ public class Neuron  {
     }
 
     /**
-     * @param network reference to the Network object this neuron is part of.
-     */
-    public void setParentNetwork(final Network network) {
-        parent = network;
-    }
-
-    /**
-     * Temporary buffer which can be used for algorithms which should not depend on
-     * the order in which  neurons are updated.
+     * Temporary buffer which can be used for algorithms which should not depend
+     * on the order in which neurons are updated.
      *
      * @param d temporary value
      */
@@ -580,10 +529,14 @@ public class Neuron  {
     }
 
     /**
+     * The name of the update rule of the network; it's "type". Used via
+     * reflection for consistency checking in the gui. (Open multiple neurons
+     * and if they are of the different types the dialog is different).
+     *
      * @return the name of the class of this network.
      */
     public String getType() {
-        return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.') + 1);
+        return updateRule.getClass().getSimpleName();
     }
 
     /**
@@ -603,10 +556,10 @@ public class Neuron  {
     }
 
     /**
-     * Returns the number of neurons attaching to this one which have activity above
-     * a specified threshold.
+     * Returns the number of neurons attaching to this one which have activity
+     * above a specified threshold.
      *
-     * @param threshold value above which neurons are considered "active."
+     * @param threshold  value above which neurons are considered "active."
      * @return number of "active" neurons
      */
     public int getNumberOfActiveInputs(final int threshold) {
@@ -640,15 +593,6 @@ public class Neuron  {
         return ret;
     }
 
-//    /**
-//     * TODO:
-//     * Check if any couplings attach to this world and if there are no none, remove the listener.
-//     * @param world
-//     */
-//    private void removeWorldListener(World world) {
-//
-//    }
-
     /**
      * Return true if this neuron has a motor coupling attached.
      *
@@ -656,7 +600,6 @@ public class Neuron  {
      */
     public boolean isOutput() {
         return false;
-//        return (motorCoupling != null);
     }
 
     /**
@@ -666,7 +609,6 @@ public class Neuron  {
      */
     public boolean isInput() {
         return false;
-      //  return (sensoryCoupling != null);
     }
 
     /**
@@ -676,7 +618,7 @@ public class Neuron  {
      */
     public boolean isConnected(final Synapse s) {
         return (fanIn.contains(s) || fanOut.contains(s));
-     }
+    }
 
     /**
      * @return Returns the x coordinate.
@@ -716,12 +658,12 @@ public class Neuron  {
             }
         }
     }
-    
+
     /**
      * Set position.
      *
-     * @param x 
-     * @param y
+     * @param x x coordinate
+     * @param y y coordinate
      */
     public void setLocation(final double x, final double y) {
         setX(x);
@@ -740,7 +682,7 @@ public class Neuron  {
      * Delete fan in.
      */
     public void deleteFanIn() {
-       for (Synapse synapse : fanIn) {
+        for (Synapse synapse : fanIn) {
             synapse.getParentNetwork().deleteSynapse(synapse);
         }
     }
@@ -754,29 +696,28 @@ public class Neuron  {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String toString() {
-        return "Neuron [" + getId() + "] " 
-            + "  Activation = " + this.getActivation()
-            + "  Location = (" + this.x + "," + this.y + ")";
+        return "Neuron [" + getId() + "] " + getType() + "  Activation = "
+                + this.getActivation() + "  Location = (" + this.x + ","
+                + this.y + ")";
     }
 
-
     /**
-     * Set activation to 0; override for other "clearing" behavior.
+     * Forward to updaterule's clearing method. By default set activation to 0.
      */
     public void clear() {
-       activation = 0;
+        updateRule.clear(this);
     }
 
     /**
-     * Returns string for tool tip or short description.
+     * Forward to update rule's tool tip method, which returns string for tool
+     * tip or short description.
+     *
      * @return tool tip text
      */
     public String getToolTipText() {
-        return "(" + id + ") Activation: " + Utils.round(this.getActivation(), MAX_DIGITS);
+        return updateRule.getToolTipText(this);
     }
 
     /**
@@ -805,11 +746,11 @@ public class Neuron  {
     /**
      * @param updatePriority to set.
      */
-   public void setUpdatePriority(final int updatePriority) {
-       this.updatePriority = updatePriority;
+    public void setUpdatePriority(final int updatePriority) {
+        this.updatePriority = updatePriority;
         // notify the rootNetwork
         if (this.updatePriority != 0 && this.getParentNetwork() != null) {
-            this.getParentNetwork().getRootNetwork().setPriorityUpdate(updatePriority);
+            this.getRootNetwork().setPriorityUpdate(updatePriority);
         }
     }
 
@@ -827,15 +768,6 @@ public class Neuron  {
      */
     public void setClamped(final boolean clamped) {
         this.clamped = clamped;
-    }
-
-    /**
-     * Returns the id of the neuron.
-     *
-     * @return the id of the neuron.
-     */
-    public String getDescription() {
-        return getId();
     }
 
     /**
@@ -879,9 +811,9 @@ public class Neuron  {
      * @param upper upper bound for randomization.
      * */
     public void randomizeBias(double lower, double upper) {
-        if (this instanceof BiasedNeuron) {
-            ((BiasedNeuron) this).setBias((upper - lower) * Math.random()
-                    + lower);
+        if (this.getUpdateRule() instanceof BiasedNeuron) {
+            ((BiasedNeuron) this.getUpdateRule()).setBias((upper - lower)
+                    * Math.random() + lower);
         }
     }
 
@@ -892,5 +824,11 @@ public class Neuron  {
         for (Synapse synapse : getFanIn()) {
             synapse.randomize();
         }
+    }
+    /**
+     * @return the rulelist
+     */
+    public static ClassDescriptionPair[] getRulelist() {
+        return RULE_LIST;
     }
 }

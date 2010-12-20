@@ -20,33 +20,27 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
  */
-public class RandomNeuron implements NeuronUpdateRule {
+public class RandomNeuron extends NeuronUpdateRule {
 
     /** Noise source. */
     private RandomSource randomizer = new RandomSource();
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Random";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         // No implementation
@@ -54,20 +48,17 @@ public class RandomNeuron implements NeuronUpdateRule {
         randomizer.setLowerBound(neuron.getLowerBound());
     }
 
-
-//    /**
-//     * @return duplicate RandomNeuron (used, e.g., in copy/paste).
-//     */
-//    public RandomNeuron duplicate() {
-//        RandomNeuron rn = new RandomNeuron();
-//        rn = (RandomNeuron) super.duplicate(rn);
-//        rn.randomizer = randomizer.duplicate(randomizer);
-//
-//        return rn;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public RandomNeuron deepCopy() {
+        RandomNeuron rn = new RandomNeuron();
+        rn.randomizer = new RandomSource(randomizer);
+        return rn;
+    }
 
     /**
-     * Update neuron.
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
         randomizer.setUpperBound(neuron.getUpperBound());
@@ -87,5 +78,10 @@ public class RandomNeuron implements NeuronUpdateRule {
      */
     public void setRandomizer(final RandomSource randomizer) {
         this.randomizer = randomizer;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Random";
     }
 }

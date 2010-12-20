@@ -40,13 +40,22 @@ public abstract class AbstractNeuronPanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** Parent network. */
-    protected RootNetwork parentNet = null;
+    protected final RootNetwork parentNet;
 
     /** Main panel. */
-    protected LabelledItemPanel mainPanel = new LabelledItemPanel();
+    private final LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** The neuron update rules whose values are being modified. */
     protected ArrayList<NeuronUpdateRule> ruleList;
+
+    /**
+     * This method is the default constructor.
+     */
+    public AbstractNeuronPanel(RootNetwork parentNetwork) {
+        this.parentNet = parentNetwork; 
+        this.setLayout(new BorderLayout());
+        this.add(mainPanel, BorderLayout.CENTER);
+    }
 
     /**
      * Adds a new item.
@@ -59,19 +68,12 @@ public abstract class AbstractNeuronPanel extends JPanel {
 
     /**
      * Adds a new item label.
+     *
      * @param text Text to add
-     * @param comp Componenet to add.
+     * @param comp Component to add.
      */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
-    }
-
-    /**
-     * This method is the default constructor.
-     */
-    public AbstractNeuronPanel() {
-        this.setLayout(new BorderLayout());
-        this.add(mainPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -104,7 +106,9 @@ public abstract class AbstractNeuronPanel extends JPanel {
     }
 
     /**
-     * Add notes or other text to bottom of panel.  Can be html formatted.
+     * Override to add custom notes or other text to bottom of panel. Can be
+     * html formatted.
+     *
      * @param text Text to be added
      */
     public void addBottomText(final String text) {
@@ -119,12 +123,5 @@ public abstract class AbstractNeuronPanel extends JPanel {
      */
     public RootNetwork getParentNetwork() {
         return parentNet;
-    }
-
-    /**
-     * @param parentNet the parentNet to set
-     */
-    public void setParentNetwork(RootNetwork parentNet) {
-        this.parentNet = parentNet;
     }
 }

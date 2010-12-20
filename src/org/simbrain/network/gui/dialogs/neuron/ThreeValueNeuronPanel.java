@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.ThreeValueNeuron;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -54,7 +55,8 @@ public class ThreeValueNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates binary neuron preferences panel.
      */
-    public ThreeValueNeuronPanel() {
+    public ThreeValueNeuronPanel(RootNetwork network) {
+        super(network);
         this.add(mainTab);
         mainTab.addItem("Bias", tfBias);
         mainTab.addItem("Lower threshold", tfLowerThreshold);

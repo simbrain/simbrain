@@ -18,13 +18,16 @@
  */
 package org.simbrain.network.interfaces;
 
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
+import org.simbrain.network.neurons.SpikingThresholdNeuron;
+
 /**
  * <b>SpikingNeuron</b> is the superclass for spiking neuron types (e.g.
  * integrate and fire) with functions common to spiking neurons. For example a
- * boolean has spiked field is used in the gui to indicate that this neuron has
+ * boolean hasSpiked field is used in the gui to indicate that this neuron has
  * spiked.
  */
-public abstract class SpikingNeuronUpdateRule implements NeuronUpdateRule {
+public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
 
     /** Parent neuron. */
@@ -36,12 +39,38 @@ public abstract class SpikingNeuronUpdateRule implements NeuronUpdateRule {
     /** Whether a spike has occurred in the current time. */
     private boolean hasSpiked;
 
+    @Override
+    public void clear(Neuron neuron) {
+        super.clear(neuron);
+        setLastSpikeTime(0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void init(Neuron neuron) {
+        this.parentNeuron = neuron;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract void update(Neuron neuron);
+
     /**
      * @param hasSpiked the hasSpiked to set
      */
-    public void setHasSpiked(boolean hasSpiked) {
+    public void setHasSpiked(final boolean hasSpiked) {
         if (hasSpiked == true) {
-            lastSpikeTime = parentNeuron.getParentNetwork().getRootNetwork().getTime();
+            lastSpikeTime = parentNeuron.getRootNetwork()
+                    .getTime();
         }
         this.hasSpiked = hasSpiked;
     }
@@ -63,54 +92,10 @@ public abstract class SpikingNeuronUpdateRule implements NeuronUpdateRule {
     }
 
     /**
-     * @return the parentNeuron
-     */
-    public Neuron getParentNeuron() {
-        return parentNeuron;
-    }
-
-    /**
-     * @param parentNeuron the parentNeuron to set
-     */
-    public void setParentNeuron(Neuron parentNeuron) {
-        this.parentNeuron = parentNeuron;
-    }
-
-    /**
-     * @return the hasSpiked
-     */
-    public boolean isHasSpiked() {
-        return hasSpiked;
-    }
-
-    /**
      * @param lastSpikeTime the lastSpikeTime to set
      */
     public void setLastSpikeTime(double lastSpikeTime) {
         this.lastSpikeTime = lastSpikeTime;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void init(Neuron neuron) {
-        setParentNeuron(neuron); 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public abstract void update(Neuron neuron);
-
-    /**
-     * {@inheritDoc}
-     */
-    public abstract String getName();
 }

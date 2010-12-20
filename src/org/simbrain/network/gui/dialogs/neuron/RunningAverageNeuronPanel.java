@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.RunningAverageNeuron;
 import org.simbrain.util.LabelledItemPanel;
 
@@ -38,7 +39,8 @@ public class RunningAverageNeuronPanel extends AbstractNeuronPanel {
     /**
      * This method is the default constructor.
      */
-    public RunningAverageNeuronPanel() {
+    public RunningAverageNeuronPanel(RootNetwork network) {
+        super(network);
         add(mainTab);
         mainTab.addItem("Rate Constant", tfRateConstant);
     }

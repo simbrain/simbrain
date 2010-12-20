@@ -37,8 +37,8 @@ public class GeneRec extends Group {
      */
     public void randomize() {
         for (Neuron neuron : getNeuronList()) {
-            if (neuron instanceof BiasedNeuron) {
-                ((BiasedNeuron) neuron).setBias(neuron.getRandomValue());
+            if (neuron.getUpdateRule() instanceof BiasedNeuron) {
+                ((BiasedNeuron) neuron.getUpdateRule()).setBias(neuron.getRandomValue());
             }
         }
         for (Synapse synapse : getSynapseList()) {
@@ -99,8 +99,9 @@ public class GeneRec extends Group {
             double minusPhase = plusToMinusMapping.get(neuron);
             double delta = epsilon * (minusPhase - plusPhase);
             //System.out.println("Delta bias: " + delta);
-            if (neuron instanceof BiasedNeuron) {
-                ((BiasedNeuron) neuron).setBias(neuron.clip(((BiasedNeuron) neuron).getBias() + delta));
+            if (neuron.getUpdateRule() instanceof BiasedNeuron) {
+                double bias = ((BiasedNeuron) neuron.getUpdateRule()).getBias();
+                ((BiasedNeuron) neuron.getUpdateRule()).setBias(bias + delta);
             }
         }
 

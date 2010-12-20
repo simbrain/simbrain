@@ -526,7 +526,7 @@ public class TrainerGUI extends JPanel {
                     dataTable
                             .getColumnModel()
                             .getColumn(i)
-                            .setHeaderValue(neuronIterator.next().getDescription());
+                            .setHeaderValue(neuronIterator.next().getId());
                 }
             }
             dataTable.getTableHeader().resizeAndRepaint();

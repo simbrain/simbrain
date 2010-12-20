@@ -73,7 +73,7 @@ public class Clipboard {
         }
 
         // Create a copy of the clipboard objects.
-        ArrayList copy = CopyFactory.getCopy(clipboard);
+        ArrayList copy = CopyFactory.getCopy(net.getRootNetwork(), clipboard);
 
         // Gather data for translating the object then add the objects to the network.
         Point2D upperLeft = SimnetUtils.getUpperLeft(clipboard);

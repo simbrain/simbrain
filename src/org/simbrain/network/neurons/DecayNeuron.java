@@ -20,13 +20,14 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
-public class DecayNeuron implements NeuronUpdateRule {
+public class DecayNeuron extends NeuronUpdateRule {
 
     /** Relative. */
     private static final int RELATIVE = 0;
@@ -58,10 +59,10 @@ public class DecayNeuron implements NeuronUpdateRule {
     /**
      * @return Time type.
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
-    
+
     /**
      * @{inheritDoc}
      */
@@ -69,21 +70,19 @@ public class DecayNeuron implements NeuronUpdateRule {
         // No implementation
     }
 
-//    /**
-//     * @return duplicate DecayNeuron (used, e.g., in copy/paste).
-//     */
-//    public DecayNeuron duplicate() {
-//        DecayNeuron dn = new DecayNeuron();
-//        dn = (DecayNeuron) super.duplicate(dn);
-//        dn.setRelAbs(getRelAbs());
-//        dn.setDecayAmount(getDecayAmount());
-//        dn.setDecayFraction(getDecayFraction());
-//        dn.setClipping(getClipping());
-//        dn.setAddNoise(getAddNoise());
-//        dn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//
-//        return dn;
-//    }
+    /**
+     * @{inheritDoc}
+     */
+    public DecayNeuron deepCopy() {
+        DecayNeuron dn = new DecayNeuron();
+        dn.setRelAbs(getRelAbs());
+        dn.setDecayAmount(getDecayAmount());
+        dn.setDecayFraction(getDecayFraction());
+        dn.setClipping(getClipping());
+        dn.setAddNoise(getAddNoise());
+        dn.noiseGenerator = new RandomSource(noiseGenerator);
+        return dn;
+    }
 
     /**
      * @{inheritDoc}
@@ -124,13 +123,6 @@ public class DecayNeuron implements NeuronUpdateRule {
         }
 
         neuron.setBuffer(val);
-    }
-
-    /**
-     * @return Name of neuron type.
-     */
-    public String getName() {
-        return "Decay";
     }
 
     /**
@@ -230,4 +222,10 @@ public class DecayNeuron implements NeuronUpdateRule {
     public void setBaseLine(final double baseLine) {
         this.baseLine = baseLine;
     }
+
+    @Override
+    public String getDescription() {
+        return "Decay";
+    }
+
 }

@@ -40,7 +40,7 @@ public abstract class Network {
     private Logger logger = Logger.getLogger(Network.class);
 
     /** Reference to root network. */
-    private RootNetwork rootNetwork = null;
+    private RootNetwork rootNetwork;
 
     /** Id of this network; used in persistence. */
     private String id;
@@ -116,7 +116,7 @@ public abstract class Network {
      */
     public Network duplicate(final Network newNetwork) {
         newNetwork.setRootNetwork(this.getRootNetwork());
-        List<?> copy = CopyFactory.getCopy(this.getObjectList());
+        List<?> copy = CopyFactory.getCopy(this.getRootNetwork(), getObjectList());
         newNetwork.addObjects(copy);
         newNetwork.setUpdatePriority(this.getUpdatePriority());
         return newNetwork;
@@ -161,7 +161,7 @@ public abstract class Network {
      * @return the name of the class of this network
      */
     public String getType() {
-        return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.') + 1);
+        return this.getClass().getSimpleName();
     }
 
     /**
@@ -180,7 +180,8 @@ public abstract class Network {
     }
 
     /**
-     * @return a string of tabs for use in indenting debug info accroding to the depth of a subnet
+     * @return a string of tabs for use in indenting debug info accroding to the
+     *         depth of a subnet
      */
     public String getIndents() {
         String ret = new String("");
@@ -342,7 +343,6 @@ public abstract class Network {
      * @param neuron Type of neuron to add
      */
     public void addNeuron(final Neuron neuron) {
-        neuron.setParentNetwork(this);
         neuronList.add(neuron);
         if ((rootNetwork != null)) {
             neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
@@ -367,8 +367,8 @@ public abstract class Network {
     }
 
     /**
-     * Adds a weight to the neuron network, where that weight already has designated
-     * source and target neurons.
+     * Adds a weight to the neuron network, where that weight already has
+     * designated source and target neurons.
      *
      * @param synapse the weight object to add
      */
@@ -420,9 +420,9 @@ public abstract class Network {
     }
 
     /**
-     * Calls {@link Neuron#checkBounds} for each neuron, which makes sure the neuron has not
-     * exceeded its upper bound or gone below its lower bound.   TODO: Add or replace with
-     * normalization within bounds?
+     * Calls {@link Neuron#checkBounds} for each neuron, which makes sure the
+     * neuron has not exceeded its upper bound or gone below its lower bound.
+     * TODO: Add or replace with normalization within bounds?
      */
     public void checkAllBounds() {
         for (Neuron n : neuronList) {
@@ -561,7 +561,7 @@ public abstract class Network {
     /**
      * Returns the "state" of the network--the activation level of its neurons.
      * Used by the gauge component.
-     * 
+     *
      * @return an array representing the activation levels of all the neurons in
      *         this network
      */
@@ -624,7 +624,8 @@ public abstract class Network {
      * @return rounded number
      */
     public static double round(final double value, final int decimalPlace) {
-        return new BigDecimal(value).setScale(decimalPlace, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return new BigDecimal(value).setScale(decimalPlace,
+                BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     /**
@@ -719,7 +720,6 @@ public abstract class Network {
      */
     protected void addNeuronList(final ArrayList<Neuron> neurons) {
         for (Neuron n : neurons) {
-            n.setParentNetwork(this);
             addNeuron(n);
         }
     }
@@ -745,11 +745,12 @@ public abstract class Network {
     }
 
     /**
-     * Returns a reference to the synapse connecting two neurons, or null if there is none.
+     * Returns a reference to the synapse connecting two neurons, or null if
+     * there is none.
      *
      * @param src source neuron
      * @param tar target neuron
-     *
+     * 
      * @return synapse from source to target
      */
     public static Synapse getSynapse(final Neuron src, final Neuron tar) {
@@ -782,6 +783,7 @@ public abstract class Network {
         // Fire event now, before the old synapse is deleted; otherwise
         //      problems in listeners
         rootNetwork.fireSynapseTypeChanged(oldSynapse, newSynapse);
+        rootNetwork.updateTimeType();
 
         // Delete the old synapse
         oldSynapse.delete();

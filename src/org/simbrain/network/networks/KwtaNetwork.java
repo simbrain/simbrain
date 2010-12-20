@@ -73,7 +73,7 @@ public class KwtaNetwork extends Network {
         super();
         this.setRootNetwork(root);
         for (int i = 0; i < k; i++) {
-            addNeuron(new Neuron(new PointNeuron()));
+            addNeuron(new Neuron(root, new PointNeuron()));
         }
         layout.layoutNeurons(this);
     }

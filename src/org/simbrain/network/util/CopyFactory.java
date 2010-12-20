@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
@@ -37,9 +38,9 @@ public class CopyFactory {
      *  neurons, synapses, networks, etc.
      *
      * @param items the list of items to copy.
-     * @return an arrayilst of model elements.
+     * @return an arraylist of model elements.
      */
-    public static ArrayList getCopy(final ArrayList items) {
+    public static ArrayList<Object> getCopy(final RootNetwork newRoot, final ArrayList<Object> items) {
         ArrayList<Object> ret = new ArrayList<Object>();
         // Match new to old neurons for synapse adding
         Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
@@ -50,7 +51,7 @@ public class CopyFactory {
             if (item instanceof Neuron) {
                 Neuron oldNeuron = ((Neuron) item);
                 if (!isPartOfNetwork(items, oldNeuron)) {
-                    Neuron newNeuron = oldNeuron.duplicate();
+                    Neuron newNeuron = new Neuron(newRoot, oldNeuron);
                     ret.add(newNeuron);
                     neuronMappings.put(oldNeuron, newNeuron);
                 }

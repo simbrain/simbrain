@@ -607,7 +607,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * Update the neuron view based on the model neuron.
      */
     public void update() {
-        
         updateColor();
         updateText();
     }

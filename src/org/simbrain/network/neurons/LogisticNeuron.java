@@ -20,12 +20,13 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 
 /**
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
  * for the default growth rate. Does not use inputs from other neurons.
  */
-public class LogisticNeuron implements NeuronUpdateRule {
+public class LogisticNeuron extends NeuronUpdateRule {
 
     /** Growth rate. */
     private double growthRate = 3.9;
@@ -33,15 +34,8 @@ public class LogisticNeuron implements NeuronUpdateRule {
     /**
      * @{inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
-    }
-
-    /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Logistic";
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
@@ -51,16 +45,15 @@ public class LogisticNeuron implements NeuronUpdateRule {
         // No implementation
     }
 
-//    /**
-//     * @return duplicate LogisticNeuron (used, e.g., in copy/paste).
-//     */
-//    public LogisticNeuron duplicate() {
-//        LogisticNeuron ln = new LogisticNeuron();
-//        ln = (LogisticNeuron) super.duplicate(ln);
-//        ln.setGrowthRate(getGrowthRate());
-//
-//        return ln;
-//    }
+    /**
+     * @{inheritDoc}
+     */
+    public LogisticNeuron deepCopy() {
+        LogisticNeuron ln = new LogisticNeuron();
+        ln.setGrowthRate(getGrowthRate());
+
+        return ln;
+    }
 
     /**
      * @{inheritDoc}
@@ -93,5 +86,10 @@ public class LogisticNeuron implements NeuronUpdateRule {
      */
     public void setGrowthRate(final double growthRate) {
         this.growthRate = growthRate;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Logistic";
     }
 }

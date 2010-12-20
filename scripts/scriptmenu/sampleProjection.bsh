@@ -4,7 +4,7 @@ import java.awt.Point;
 import org.simbrain.network.neurons.*;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.*;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.plot.projection.*;
@@ -21,7 +21,7 @@ import org.simbrain.workspace.*;
     int numNeurons = 25;
     layout.setInitialLocation(new Point(10, 10));
     for (int i = 0; i < numNeurons; i++) {
-        NakaRushtonNeuron neuron = new NakaRushtonNeuron();
+        Neuron neuron = new Neuron(network, "NakaRushtonNeuron");
         network.addNeuron(neuron);
     }
     layout.layoutNeurons(network);

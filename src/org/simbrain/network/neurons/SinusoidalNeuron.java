@@ -20,13 +20,13 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
-
 
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave; inputs are ignored.
  */
-public class SinusoidalNeuron implements NeuronUpdateRule {
+public class SinusoidalNeuron extends NeuronUpdateRule {
 
     /** Phase. */
     private double phase = 1;
@@ -41,49 +41,41 @@ public class SinusoidalNeuron implements NeuronUpdateRule {
     private boolean addNoise = false;
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Sinusoidal";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
-//    /**
-//     * @return duplicate SinusoidalNeuron (used, e.g., in copy/paste).
-//     */
-//    public SinusoidalNeuron duplicate() {
-//        SinusoidalNeuron sn = new SinusoidalNeuron();
-//        sn = (SinusoidalNeuron) super.duplicate(sn);
-//        sn.setPhase(getPhase());
-//        sn.setFrequency(getFrequency());
-//        sn.setAddNoise(getAddNoise());
-//        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//
-//        return sn;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public SinusoidalNeuron deepCopy() {
+        SinusoidalNeuron sn = new SinusoidalNeuron();
+        sn.setPhase(getPhase());
+        sn.setFrequency(getFrequency());
+        sn.setAddNoise(getAddNoise());
+        sn.noiseGenerator = new RandomSource(noiseGenerator);
+        return sn;
+    }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
 
         double upperBound = neuron.getUpperBound();
         double lowerBound = neuron.getLowerBound();
         double range = upperBound - lowerBound;
-        double val = ((range / 2)  * Math.sin(frequency * neuron.getParentNetwork().getRootNetwork().getTime() + phase))
+        double val = ((range / 2) * Math.sin(frequency
+                * neuron.getRootNetwork().getTime() + phase))
             + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {
@@ -149,4 +141,8 @@ public class SinusoidalNeuron implements NeuronUpdateRule {
         this.frequency = frequency;
     }
 
+    @Override
+    public String getDescription() {
+        return "Sinusoidal";
+    }
 }

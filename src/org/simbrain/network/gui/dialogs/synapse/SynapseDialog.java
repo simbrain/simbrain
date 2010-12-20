@@ -50,7 +50,6 @@ import org.simbrain.network.synapses.SignalSynapse;
 import org.simbrain.network.synapses.SimpleSynapse;
 import org.simbrain.network.synapses.SubtractiveNormalizationSynapse;
 import org.simbrain.network.synapses.TDSynapse;
-import org.simbrain.network.synapses.TraceSynapse;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -561,26 +560,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
         creator = new Creator() {
             public String getName() {
-                return TraceSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new TraceSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new TraceSynapsePanel();
-            }
-        };
-
-        creatorsByName.put(TraceSynapse.getName(), creator);
-        creatorsByClass.put(TraceSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
                 return STDPSynapse.getName();
             }
-            
+
             public Synapse createSynapse(Synapse old) {
                 return new STDPSynapse(old);
             }

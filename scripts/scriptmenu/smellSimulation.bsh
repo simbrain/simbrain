@@ -92,7 +92,7 @@ import org.simbrain.plot.projection.*;
     // Add input layer to recurrent network
     LineLayout layout = new LineLayout(-20,350,70, LineOrientation.HORIZONTAL);
     for (int i = 0; i < 5; i++) {
-        LinearNeuron neuron = new LinearNeuron();
+        Neuron neuron = new Neuron(network, "LinearNeuron");
         neuron.setLowerBound(0);
         neuron.setUpperBound(100);
         network.addNeuron(neuron);

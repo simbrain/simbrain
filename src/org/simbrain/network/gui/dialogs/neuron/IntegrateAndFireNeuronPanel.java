@@ -26,7 +26,9 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.IntegrateAndFireNeuron;
+import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
@@ -72,7 +74,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates a new instance of the integrate and fire neuron panel.
      */
-    public IntegrateAndFireNeuronPanel() {
+    public IntegrateAndFireNeuronPanel(RootNetwork network) {
+        super(network);
 
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
@@ -91,6 +94,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
+        
         IntegrateAndFireNeuron neuronRef = (IntegrateAndFireNeuron) ruleList.get(0);
 
         tfRestingPotential.setText(Double.toString(neuronRef.getRestingPotential()));
@@ -137,13 +141,11 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList getRandomizers() {
-        ArrayList ret = new ArrayList();
-
+    private ArrayList<RandomSource> getRandomizers() {
+        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((IntegrateAndFireNeuron) ruleList.get(i)).getNoiseGenerator());
         }
-
         return ret;
     }
 

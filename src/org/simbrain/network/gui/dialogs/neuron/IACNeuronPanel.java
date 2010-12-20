@@ -25,7 +25,9 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.IACNeuron;
+import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
@@ -60,7 +62,8 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
      * This method is the default constructor.
      *
      */
-    public IACNeuronPanel() {
+    public IACNeuronPanel(RootNetwork network) {
+        super(network);
         this.add(tabbedPane);
         mainPanel.addItem("Decay", tfDecay);
         mainPanel.addItem("Rest", tfRest);
@@ -105,13 +108,11 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList getRandomizers() {
-        ArrayList ret = new ArrayList();
-
+    private ArrayList<RandomSource> getRandomizers() {
+        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((IACNeuron) ruleList.get(i)).getNoiseGenerator());
         }
-
         return ret;
     }
 

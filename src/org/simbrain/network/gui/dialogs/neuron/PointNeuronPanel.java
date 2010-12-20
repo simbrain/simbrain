@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.PointNeuron;
 import org.simbrain.network.neurons.PointNeuron.OutputFunction;
 import org.simbrain.util.LabelledItemPanel;
@@ -84,7 +85,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates an instance of this panel.
      */
-    public PointNeuronPanel() {
+    public PointNeuronPanel(RootNetwork network) {
+        super(network);
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Excitatory reversal", tfER);

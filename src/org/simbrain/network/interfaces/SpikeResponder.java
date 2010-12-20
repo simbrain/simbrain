@@ -72,13 +72,6 @@ public abstract class SpikeResponder {
     }
 
     /**
-     * @param typeList The typeList to set.
-     */
-    public static void setTypeList(final String[] typeList) {
-        SpikeResponder.typeList = typeList;
-    }
-
-    /**
      * Helper function for combo boxes.  Associates strings with indices.
      * @param type Type of spiker
      * @return Combo box index

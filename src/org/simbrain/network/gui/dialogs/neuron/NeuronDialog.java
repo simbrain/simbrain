@@ -20,9 +20,9 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -36,6 +36,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -60,7 +61,7 @@ public class NeuronDialog extends StandardDialog {
     private AbstractNeuronPanel neuronPanel;
 
     /** Neuron type combo box. */
-    private JComboBox cbNeuronType = new JComboBox(Neuron.ruleList);
+    private JComboBox cbNeuronType = new JComboBox(Neuron.getRulelist());
 
     /** Id Field. */
     private JLabel idLabel = new JLabel();
@@ -149,7 +150,7 @@ public class NeuronDialog extends StandardDialog {
         // update method
         JLabel priorityLabel = new JLabel("Update Priority");
         topPanel.addItemLabel(priorityLabel, tfPriority);
-        if (((Neuron) neuronList.get(0)).getParentNetwork().getRootNetwork().getUpdateMethod() != 
+        if (((Neuron) neuronList.get(0)).getRootNetwork().getUpdateMethod() != 
             RootNetwork.UpdateMethod.PRIORITYBASED) {
             priorityLabel.setEnabled(false);
             tfPriority.setEnabled(false);
@@ -164,7 +165,7 @@ public class NeuronDialog extends StandardDialog {
 
     }
 
-    /** @see StandardDialog */
+    @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
@@ -174,49 +175,71 @@ public class NeuronDialog extends StandardDialog {
      * Initialize the main neuron panel based on the type of the selected
      * neurons.
      */
-    public void initNeuronType() {
+    private void initNeuronType() {
 
+        RootNetwork parentNetwork = neuronList.get(0).getRootNetwork();
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getType")) {
             cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
             cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
             // Simply to serve as an empty panel
-            neuronPanel = new ClampedNeuronPanel();
+            neuronPanel = new ClampedNeuronPanel(parentNetwork);
         } else {
-            Neuron neuronRef = (Neuron) neuronList.get(0);
-            String name = getNeuronType(neuronRef);
-
-            cbNeuronType.setSelectedItem(name);
-
-            neuronPanel = getNeuronPanel(name);
-            neuronPanel.setParentNetwork(neuronRef.getParentNetwork().getRootNetwork());
+            setComboBox(neuronList.get(0).getUpdateRule().getDescription());
+            Class<?> neuronType = ((ClassDescriptionPair) cbNeuronType
+                    .getSelectedItem()).getTheClass();
+            neuronPanel = getNeuronPanel(parentNetwork, neuronType);
             neuronPanel.setRuleList(getRuleList());
             neuronPanel.fillFieldValues();
         }
     }
 
-    //TODO Better documentation
-    //      assumes class-name + panel
-
-    private String getNeuronType(Neuron neuron) {
-        return  ((NeuronUpdateRule) neuron.getUpdateRule()).getClass().getSimpleName().replaceAll("Neuron", "");
-    }
-
     /**
-     * Returns neuron panel corresponding to the given name.
-     *
-     * @param neuron neuron
-     * @return panel
+     * Utility for setting the selected item of a combo box based on a neuron's
+     * update rule description.
      */
-    private AbstractNeuronPanel getNeuronPanel(String name) {
-        try {
-            return (AbstractNeuronPanel)Class.forName("org.simbrain.network.gui.dialogs.neuron." + name + "NeuronPanel").newInstance();
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    private void setComboBox(final String description) {
+        for (int i = 0; i < cbNeuronType.getItemCount(); i++) {
+            ClassDescriptionPair pair = (ClassDescriptionPair) cbNeuronType
+                    .getItemAt(i);
+            if (pair.getDescription().equalsIgnoreCase(description)) {
+                cbNeuronType.setSelectedIndex(i);
+                return;
+            }
         }
     }
 
+    /**
+     * Returns neuron panel corresponding to the given update rule.
+     * Assumes the panel class name = update rule class name + "Panel"
+     * E.g. "LinearNeuron" > "LinearNeuronPanel".
+     *
+     * @param updateRuleClass  the class to match
+     * @return panel the matching panel
+     */
+    private AbstractNeuronPanel getNeuronPanel(RootNetwork network,  Class<?> updateRuleClass) {
+        // The panel name to look for
+        String panelClassName = "org.simbrain.network.gui.dialogs.neuron."
+                + updateRuleClass.getSimpleName() + "Panel";
+
+        try {
+            Class<?> theClass = Class.forName(panelClassName);
+            Constructor<?> constructor = theClass
+                    .getConstructor(new Class[] { RootNetwork.class });
+            return (AbstractNeuronPanel) constructor.newInstance(network);
+        } catch (ClassNotFoundException e) {
+            System.err.print("The class, \"" + panelClassName
+                    + "\", was not found.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Return the neuron update rules associated with the selected neurons.
+     *
+     * @return the rule list.
+     */
     private ArrayList<NeuronUpdateRule> getRuleList() {
         ArrayList<NeuronUpdateRule> ret = new ArrayList<NeuronUpdateRule>();
         for (Neuron neuron : neuronList) {
@@ -232,22 +255,26 @@ public class NeuronDialog extends StandardDialog {
 
         Object selected = cbNeuronType.getSelectedItem();
 
-        if (selected == NULL_STRING) { return; }
-
-        for (int i = 0; i < neuronList.size(); i++) {
-            neuronList.get(i).setUpdateRule(selected.toString() + "Neuron");
+        if (selected != NULL_STRING) {
+            String name = ((ClassDescriptionPair)selected).getSimpleName();
+            for (int i = 0; i < neuronList.size(); i++) {
+                neuronList.get(i).setUpdateRule(name);
+            }
         }
     }
 
     /**
      * Set the help page based on the currently selected neuron type.
+     * Assumes it
      */
     private void updateHelp() {
         if (cbNeuronType.getSelectedItem() == NULL_STRING) {
             helpAction.setTheURL("Network/neuron.html");
         } else {
-            String spacelessString = cbNeuronType.getSelectedItem().toString().replace(" ", "");
-            helpAction.setTheURL("Network/neuron/" + spacelessString + ".html");
+            String name = ((ClassDescriptionPair) cbNeuronType
+                    .getSelectedItem()).getSimpleName()
+                    .replaceAll("Neuron", "");
+            helpAction.setTheURL("Network/neuron/" + name + ".html");
         }
     }
 
@@ -260,7 +287,7 @@ public class NeuronDialog extends StandardDialog {
 
         public void actionPerformed(final ActionEvent e) {
             neuronsHaveChanged = true;
-            Neuron neuronRef = (Neuron) neuronList.get(0);
+            RootNetwork network = neuronList.get(0).getRootNetwork();
             updateHelp();
 
             Object selected = cbNeuronType.getSelectedItem();
@@ -269,8 +296,7 @@ public class NeuronDialog extends StandardDialog {
             }
 
             mainPanel.remove(neuronPanel);
-            neuronPanel = getNeuronPanel((String)selected);
-            neuronPanel.setParentNetwork(neuronRef.getParentNetwork().getRootNetwork());
+            neuronPanel = getNeuronPanel(network,((ClassDescriptionPair) selected).getTheClass());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
             pack();
@@ -282,7 +308,6 @@ public class NeuronDialog extends StandardDialog {
      */
     private void fillFieldValues() {
         Neuron neuronRef = neuronList.get(0);
-        neuronPanel.setParentNetwork(neuronRef.getParentNetwork().getRootNetwork());
         if (neuronList.size() == 1) {
             idLabel.setText(neuronRef.getId());
         } else {
@@ -363,7 +388,10 @@ public class NeuronDialog extends StandardDialog {
             changeNeuronTypes();
         }
 
+        // Notify the network that changes have been made 
         ((Neuron) neuronList.get(0)).getParentNetwork().getRootNetwork().fireNetworkChanged();
+
+        // Now commit changes specific to the neuron type
         neuronPanel.setRuleList(getRuleList());
         neuronPanel.commitChanges();
     }

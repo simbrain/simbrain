@@ -136,7 +136,7 @@ public class LMSTrainer extends Trainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 4; i++) {
-            Neuron neuron = new Neuron(new ClampedNeuron()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuron()); 
             network.addNeuron(neuron);
             inputLayer.add(neuron);
             System.out.println("Input " + i + " = " + neuron.getId());
@@ -145,7 +145,7 @@ public class LMSTrainer extends Trainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(new LinearNeuron());
+            Neuron neuron = new Neuron(network, new LinearNeuron());
             ((BiasedNeuron)neuron).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
@@ -199,7 +199,7 @@ public class LMSTrainer extends Trainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(new ClampedNeuron()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuron()); 
             network.addNeuron(neuron);
             inputLayer.add(neuron);
             System.out.println("Input " + i + " = " + neuron.getId());
@@ -208,7 +208,7 @@ public class LMSTrainer extends Trainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(new LinearNeuron()); 
+            Neuron neuron = new Neuron(network, new LinearNeuron()); 
             ((BiasedNeuron)neuron).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);

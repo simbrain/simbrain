@@ -25,7 +25,9 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
@@ -60,7 +62,8 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public LinearNeuronPanel() {
+    public LinearNeuronPanel(RootNetwork network) {
+        super(network);
         this.add(tabbedPane);
         mainTab.addItem("Slope", tfSlope);
         mainTab.addItem("Bias", tfBias);
@@ -105,8 +108,8 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     /**
      * @return List of randomizers.
      */
-    private ArrayList getRandomizers() {
-        ArrayList ret = new ArrayList();
+    private ArrayList<RandomSource> getRandomizers() {
+        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
 
         for (int i = 0; i < ruleList.size(); i++) {
             ret.add(((LinearNeuron) ruleList.get(i)).getNoiseGenerator());

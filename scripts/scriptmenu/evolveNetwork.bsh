@@ -107,8 +107,8 @@ import org.jgap.impl.*;
 
             // Build the network based on the current chromosome
             for (int i = 0; i < numNeurons; i++) {
-                Neuron neuron = getNeuron(neuronType);
-                network.addNeuron(neuron);
+                String type = getNeuron(neuronType);
+                network.addNeuron(new Neuron(network, type));
             }
             GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math
                     .sqrt(numNeurons));
@@ -147,19 +147,19 @@ import org.jgap.impl.*;
          *            integer value
          * @return a neuron of the corresponding type
          */
-        private Neuron getNeuron(int neuronType) {
+        private String getNeuron(int neuronType) {
 
             switch (neuronType) {
             case 0:
-                return new BinaryNeuron();
+                return "BinaryNeuron";
             case 1:
-                return new LinearNeuron();
+                return "LinearNeuron";
             case 2:
-                return new SigmoidalNeuron();
+                return "SigmoidalNeuron";
             case 3:
-                return new DecayNeuron();
+                return "DecayNeuron";
             default:
-                return new NakaRushtonNeuron();
+                return "NakaRushtonNeuron";
             }
         }
 

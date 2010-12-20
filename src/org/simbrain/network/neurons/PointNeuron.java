@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
@@ -32,7 +33,7 @@ import org.simbrain.network.listeners.SynapseListener;
  * Cognitive Neuroscience, chapter 2. All page references below are are to this
  * book.
  */
-public class PointNeuron implements NeuronUpdateRule, SynapseListener, BiasedNeuron {
+public class PointNeuron extends NeuronUpdateRule implements SynapseListener, BiasedNeuron {
 
     /** Excitatory inputs for connected Synapses. */
     private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
@@ -154,7 +155,7 @@ public class PointNeuron implements NeuronUpdateRule, SynapseListener, BiasedNeu
 
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         neuron.setLowerBound(0);
@@ -196,56 +197,38 @@ public class PointNeuron implements NeuronUpdateRule, SynapseListener, BiasedNeu
         }
     }
 
-
-//    /**
-//     * This constructor is used when creating a neuron of one type from another
-//     * neuron of another type Only values common to different types of neuron
-//     * are copied.
-//     *
-//     * @param n Neuron to make the type
-//     */
-//    public PointNeuron(final Neuron n) {
-//        super(n);
-//        postUnmarshallingInit();
-//    }
-
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public String getName() {
-        return "Point";
+    public PointNeuron deepCopy() {
+        PointNeuron cn = new PointNeuron();
+        //TODO
+        return cn;
     }
 
-//    @Override
-//    public PointNeuron duplicate() {
-//        PointNeuron cn = new PointNeuron();
-//        cn = (PointNeuron) super.duplicate(cn);
-//        return cn;
-//    }
-
-//    @Override
-//    public void clear() {
-//        membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
-//        activation = 0;
-//        setBuffer(0);
-//        excitatoryConductance = 0;
-//        inhibitoryConductance = 0;
-//        leakConductance = 0;
-//        excitatoryCurrent = 0;
-//        leakCurrent = 0;
-//        inhibitoryCurrent = 0;
-//        netCurrent = 0;
-//    }
+    @Override
+    public void clear(final Neuron neuron) {
+        membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
+        neuron.setActivation(0);
+        neuron.setBuffer(0);
+        excitatoryConductance = 0;
+        inhibitoryConductance = 0;
+        leakConductance = 0;
+        excitatoryCurrent = 0;
+        leakCurrent = 0;
+        inhibitoryCurrent = 0;
+        netCurrent = 0;
+    }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
 
@@ -332,16 +315,15 @@ public class PointNeuron implements NeuronUpdateRule, SynapseListener, BiasedNeu
         return (excitatoryTerm + leakTerm)
                 / (thresholdPotential - inhibitoryReversal);
     }
-//
-//    /**
-//     * {@inheritDoc}
-//     */
-//    public String getToolTipText() {
-//        return "Activation: " + neuron.getActivation() + "\nMembrane Potential: "
-//                + membranePotential + "\nNet Current: " + netCurrent
-//                + "\nExcitatory current:  " + excitatoryCurrent
-//                + "\nLeak current: " + leakCurrent;
-//    }
+
+
+    @Override
+    public String getToolTipText(final Neuron neuron) {
+        return "Activation: " + neuron.getActivation() + "\nMembrane Potential: "
+                + membranePotential + "\nNet Current: " + netCurrent
+                + "\nExcitatory current:  " + excitatoryCurrent
+                + "\nLeak current: " + leakCurrent;
+    }
 
     /**
      * Print debugging information.
@@ -732,4 +714,10 @@ public class PointNeuron implements NeuronUpdateRule, SynapseListener, BiasedNeu
     public void synapseTypeChanged(NetworkEvent<Synapse> networkEvent) {
         // No implementation
     }
+
+    @Override
+    public String getDescription() {
+        return "Point neuron (Leabra)";
+    }
+
 }

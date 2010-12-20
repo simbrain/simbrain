@@ -20,11 +20,12 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 
 /**
  * <b>BinaryNeuron</b> takes one of two values.
  */
-public class BinaryNeuron implements NeuronUpdateRule {
+public class BinaryNeuron extends NeuronUpdateRule {
 
     /** Threshold for binary neurons. */
     private double threshold = .5;
@@ -33,39 +34,30 @@ public class BinaryNeuron implements NeuronUpdateRule {
     private double bias = 0;
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Binary";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
-//    /**
-//     * @return a duplicate BinaryNeuron (used, e.g., in copy/paste).
-//     */
-//    public BinaryNeuron duplicate() {
-//        BinaryNeuron bn = new BinaryNeuron();
-//        bn = (BinaryNeuron) super.duplicate(bn);
-//        bn.setThreshold(getThreshold());
-//
-//        return bn;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public BinaryNeuron deepCopy() {
+        BinaryNeuron bn = new BinaryNeuron();
+        bn.setThreshold(getThreshold());
+        return bn;
+    }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
         double wtdInput = neuron.getWeightedInputs() + bias;
@@ -104,4 +96,10 @@ public class BinaryNeuron implements NeuronUpdateRule {
     public void setBias(final double bias) {
         this.bias = bias;
     }
+
+    @Override
+    public String getDescription() {
+        return "Binary";
+    }
+
 }

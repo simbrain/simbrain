@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
-import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.AdditiveNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
@@ -62,9 +62,11 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 
     /**
      * Creates an instance of this panel.
+     *
      * @param net Network
      */
-    public AdditiveNeuronPanel() {
+    public AdditiveNeuronPanel(RootNetwork network) {
+        super(network);
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Lambda", tfLambda);

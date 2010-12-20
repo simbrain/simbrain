@@ -21,13 +21,14 @@ package org.simbrain.network.neurons;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 /**
  * <b>SigmoidalNeuron</b> provides variuos implementations of a standard
  * sigmoidal neuron.
  */
-public class SigmoidalNeuron implements NeuronUpdateRule, BiasedNeuron {
+public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
 
     /** Function list. */
     private static String[] functionList = {"Sigmoidal", "Arctan", "Barebones" };
@@ -63,28 +64,21 @@ public class SigmoidalNeuron implements NeuronUpdateRule, BiasedNeuron {
     private boolean clipping = false;
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Sigmoidal";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
     /**
-     * Update neuron.
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
 
@@ -139,21 +133,19 @@ public class SigmoidalNeuron implements NeuronUpdateRule, BiasedNeuron {
         return  1 / (1 + Math.exp(-in));
     }
 
-//    /**
-//     * @return duplicate SigmoidalNeuron (used, e.g., in copy/paste).
-//     */
-//    public SigmoidalNeuron duplicate() {
-//        SigmoidalNeuron sn = new SigmoidalNeuron();
-//        sn = (SigmoidalNeuron) super.duplicate(sn);
-//        sn.setBias(getBias());
-//        sn.setClipping(getClipping());
-//        sn.setImplementationIndex(getImplementationIndex());
-//        sn.setSlope(getSlope());
-//        sn.setAddNoise(getAddNoise());
-//        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//
-//        return sn;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public SigmoidalNeuron deepCopy() {
+        SigmoidalNeuron sn = new SigmoidalNeuron();
+        sn.setBias(getBias());
+        sn.setClipping(getClipping());
+        sn.setImplementationIndex(getImplementationIndex());
+        sn.setSlope(getSlope());
+        sn.setAddNoise(getAddNoise());
+        sn.noiseGenerator =  new RandomSource(noiseGenerator);
+        return sn;
+    }
 
     /**
      * @return Returns the inflectionPoint.
@@ -244,5 +236,10 @@ public class SigmoidalNeuron implements NeuronUpdateRule, BiasedNeuron {
      */
     public void setClipping(final boolean clipping) {
         this.clipping = clipping;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Sigmoidal";
     }
 }

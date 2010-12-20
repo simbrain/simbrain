@@ -29,16 +29,12 @@ public class SpikingThresholdNeuron extends SpikingNeuronUpdateRule {
     /** Threshold. */
     private double threshold = .5;
 
-//    /**
-//     * @return duplicate ProbabilisticSpiking (used, e.g., in copy/paste).
-//     */
-//    public SpikingThresholdNeuron duplicate() {
-//        SpikingThresholdNeuron ifn = new SpikingThresholdNeuron();
-//        ifn = (SpikingThresholdNeuron) super.duplicate(ifn);
-//        ifn.setThreshold(getThreshold());
-//
-//        return ifn;
-//    }
+    @Override
+    public SpikingThresholdNeuron deepCopy() {
+        SpikingThresholdNeuron neuron = new SpikingThresholdNeuron();
+        neuron.setThreshold(getThreshold());
+        return neuron;
+    }
 
     @Override
     public void init(Neuron neuron) {
@@ -74,8 +70,7 @@ public class SpikingThresholdNeuron extends SpikingNeuronUpdateRule {
     }
 
     @Override
-    public String getName() {
+    public String getDescription() {
         return "Spiking threshold";
     }
-
 }

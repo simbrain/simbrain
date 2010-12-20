@@ -20,13 +20,14 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 
 /**
  * <b>ThreeValuedNeuron</b> is a natural extension of a binary neuron, which
  * takes one of three values depending on the inputs to the neuron in relation
  * to two thresholds.
  */
-public class ThreeValueNeuron implements NeuronUpdateRule {
+public class ThreeValueNeuron extends NeuronUpdateRule {
 
     /** Bias field. */
     private double bias = 0;
@@ -47,21 +48,14 @@ public class ThreeValueNeuron implements NeuronUpdateRule {
     private double upperValue = 1;
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Three valued";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         upperValue = neuron.getUpperBound();
@@ -71,24 +65,23 @@ public class ThreeValueNeuron implements NeuronUpdateRule {
         upperThreshold = (middleValue + upperValue) / 2;
     }
 
-//    /**
-//     * @return duplicate ThreeValuedNeuron (used, e.g., in copy/paste).
-//     */
-//    public ThreeValuedNeuron duplicate() {
-//        ThreeValuedNeuron tv = new ThreeValuedNeuron();
-//        tv = (ThreeValuedNeuron) super.duplicate(tv);
-//        tv.setBias(getBias());
-//        tv.setLowerThreshold(getLowerThreshold());
-//        tv.setUpperThreshold(getUpperThreshold());
-//        tv.setLowerValue(getLowerValue());
-//        tv.setMiddleValue(getMiddleValue());
-//        tv.setUpperValue(getUpperValue());
-//
-//        return tv;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public ThreeValueNeuron deepCopy() {
+        ThreeValueNeuron tv = new ThreeValueNeuron();
+        tv.setBias(getBias());
+        tv.setLowerThreshold(getLowerThreshold());
+        tv.setUpperThreshold(getUpperThreshold());
+        tv.setLowerValue(getLowerValue());
+        tv.setMiddleValue(getMiddleValue());
+        tv.setUpperValue(getUpperValue());
+
+        return tv;
+    }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
         double wtdInput = neuron.getWeightedInputs() + bias;
@@ -184,6 +177,11 @@ public class ThreeValueNeuron implements NeuronUpdateRule {
      */
     public void setUpperValue(final double upperValue) {
         this.upperValue = upperValue;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Three valued";
     }
 }
 

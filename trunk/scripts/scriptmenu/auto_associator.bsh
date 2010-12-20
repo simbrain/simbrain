@@ -29,8 +29,7 @@ import org.simbrain.util.*;
 
     // Create network component 
 
-    NetworkComponent networkComponent = new NetworkComponent(
-    "Auto-Associative Network");
+    NetworkComponent networkComponent = new NetworkComponent("Auto-Associative Network");
     final RootNetwork network = networkComponent.getRootNetwork();
     workspace.addWorkspaceComponent(networkComponent);
 
@@ -45,7 +44,7 @@ import org.simbrain.util.*;
     layout.setInitialLocation(new Point(10, 10));
     List sourceNeurons = new ArrayList();
     for (int i = 0; i < NUM_NEURONS; i++) {
-        AdditiveNeuron neuron = new AdditiveNeuron();
+        Neuron neuron = new Neuron(network, "AdditiveNeuron");
         neuron.setLowerBound(-10); // This is for nicer graphics
         neuron.setActivation(-1);
         network.addNeuron(neuron);

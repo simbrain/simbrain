@@ -20,13 +20,14 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.util.RandomSource;
 
 /**
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
  */
-public class IACNeuron implements NeuronUpdateRule {
+public class IACNeuron extends NeuronUpdateRule {
 
     /** Neuron decay. */
     private double decay = 0;
@@ -46,32 +47,21 @@ public class IACNeuron implements NeuronUpdateRule {
     /**
      * @{inheritDoc}
      */
-    public int getTimeType() {
-        // TODO Auto-generated method stub
-        return 0;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
-
-//    /**
-//     * @return duplicate IACNeuron (used, e.g., in copy/paste).
-//     */
-//    public IACNeuron duplicate() {
-//        IACNeuron iac = new IACNeuron();
-//        iac = (IACNeuron) super.duplicate(iac);
-//        iac.setDecay(getDecay());
-//        iac.setRest(getRest());
-//        iac.setClipping(getClipping());
-//        iac.setAddNoise(getAddNoise());
-//        iac.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//        iac.duplicate(iac);
-//        
-//        return iac;
-//    }
 
     /**
      * @{inheritDoc}
      */
-    public String getName() {
-        return "IAC";
+    public IACNeuron deepCopy() {
+        IACNeuron iac = new IACNeuron();
+        iac.setDecay(getDecay());
+        iac.setRest(getRest());
+        iac.setClipping(getClipping());
+        iac.setAddNoise(getAddNoise());
+        iac.noiseGenerator = new RandomSource(noiseGenerator);
+        return iac;
     }
 
     /**
@@ -181,5 +171,10 @@ public class IACNeuron implements NeuronUpdateRule {
      */
     public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
+    }
+
+    @Override
+    public String getDescription() {
+        return "IAC";
     }
 }

@@ -20,6 +20,7 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 /**
@@ -27,7 +28,7 @@ import org.simbrain.network.util.RandomSource;
  * model spike rates of real neurons. It is used extensively in Hugh Wilson's
  * Spikes, Decisions, and Action.
  */
-public class NakaRushtonNeuron implements NeuronUpdateRule {
+public class NakaRushtonNeuron extends NeuronUpdateRule {
 
     /** Steepness. */
     private double steepness = 2;
@@ -66,45 +67,37 @@ public class NakaRushtonNeuron implements NeuronUpdateRule {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Naka-Rushton";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         neuron.setLowerBound(0);
         neuron.setUpperBound(100);
     }
 
-//    /**
-//     * @return duplicate NakaRushtonNeuron (used, e.g., in copy/paste).
-//     */
-//    public NakaRushtonNeuron duplicate() {
-//        NakaRushtonNeuron rn = new NakaRushtonNeuron();
-//        rn = (NakaRushtonNeuron) super.duplicate(rn);
-//        rn.setSteepness(getSteepness());
-//        rn.setSemiSaturationConstant(getSemiSaturationConstant());
-//        rn.setAddNoise(getAddNoise());
-//        rn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//        rn.setUseAdaptation(getUseAdaptation());
-//        rn.setAdaptationParameter(getAdaptationParameter());
-//        rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
-//        return rn;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public NakaRushtonNeuron deepCopy() {
+        NakaRushtonNeuron rn = new NakaRushtonNeuron();
+        rn.setSteepness(getSteepness());
+        rn.setSemiSaturationConstant(getSemiSaturationConstant());
+        rn.setAddNoise(getAddNoise());
+        rn.setUseAdaptation(getUseAdaptation());
+        rn.setAdaptationParameter(getAdaptationParameter());
+        rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
+        rn.noiseGenerator = new RandomSource(noiseGenerator);
+        return rn;
+    }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
 
@@ -241,21 +234,21 @@ public class NakaRushtonNeuron implements NeuronUpdateRule {
         this.adaptationTimeConstant = adaptationTimeConstant;
     }
 
-//    /** @see Neuron */
-//    public void clear() {
-//        activation = 0;
-//        a = 0;
-//        s = 0;
-//    }
+    @Override
+    public void clear(Neuron neuron) {
+        super.clear(neuron);
+        a = 0;
+        s = 0;
+    }
 
-//    /** @see Neuron */
-//    public String getToolTipText() {
-//        if (useAdaptation) {
-//            return "" + this.getActivation() + " A = " + a;
-//        } else {
-//            return super.getToolTipText();
-//        }
-//    }
+    @Override
+    public String getToolTipText(Neuron neuron) {
+        if (useAdaptation) {
+            return "" + neuron.getActivation() + " A = " + a;
+        } else {
+            return super.getToolTipText(neuron);
+        }
+    }
 
     /**
      * Return the adaptation parameter.
@@ -273,5 +266,10 @@ public class NakaRushtonNeuron implements NeuronUpdateRule {
      */
     public void setAdaptationParameter(final double adaptationParameter) {
         this.adaptationParameter = adaptationParameter;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Naka-Rushton";
     }
 }

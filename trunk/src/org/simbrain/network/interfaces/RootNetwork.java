@@ -36,11 +36,16 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * <b>RootNetwork</b> is the top level of the network hierarchy. Subject for all
- * observers. Time is kept track of here. Also keeps track, currently, of
- * couplings to other workspace components. When instantiating a view (including
- * when using Simbrain as an API, or from a command-line, a root network must
- * first be created. Acts as a "container" for all subsequent networks.
+ * <b>RootNetwork</b> is the top level of the network hierarchy. All networks
+ * are instances are Network.java. But a network can itself have sub-networks.
+ * This is the root node in the network-subnetwork hierarchy. Acts as a
+ * "container" for all subsequent networks.
+ *
+ * Gui networks and NetworkComponents (workspace level wrappers for networks)
+ * always have a single unique root networks.
+ *
+ * Most network related event notifications are broadcast from here. Time is
+ * kept track of here.
  */
 public class RootNetwork extends Network {
 
@@ -51,15 +56,6 @@ public class RootNetwork extends Network {
 
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
-
-    /** Whether this is a discrete or continuous time network. */
-    private int timeType = DISCRETE;
-
-    /** If this is a discrete-time network. */
-    public static final int DISCRETE = 0;
-
-    /** If this is a continuous-time network. */
-    public static final int CONTINUOUS = 1;
 
     /** In iterations or msec. */
     private double time = 0;
@@ -78,6 +74,19 @@ public class RootNetwork extends Network {
 
     /** Whether network files should use tabs or not. */
     private boolean usingTabs = true;
+
+    /**
+     * Two types of time used in simulations.
+     *
+     * DISCRETE: Network update iterations are time-steps
+     *
+     * CONTINUOUS: Simulation of real time. Each updates advances time by length
+     * {@link timeStep}
+     */
+    public enum TimeType { DISCRETE, CONTINUOUS}
+
+    /** Whether this is a discrete or continuous time network. */
+    private TimeType timeType = TimeType.DISCRETE;
 
     /**
      * Enumeration for the update methods.
@@ -337,7 +346,7 @@ public class RootNetwork extends Network {
      * @return String string version of time, with units.
      */
     public String getTimeLabel() {
-        if (timeType == DISCRETE) {
+        if (timeType == TimeType.DISCRETE) {
             return "" + (int) time + " " + getUnits()[1];
         } else {
             return "" + round(time, getTimeStepPrecision()) + " " + getUnits()[0];
@@ -359,24 +368,24 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * @return integer representation of time type.
+     * @return The representation of time used by this network.
      */
-    public int getTimeType() {
+    public TimeType getTimeType() {
         return timeType;
     }
 
     /**
-     * If there is a single continuous neuron in the network, consider this a continuous network.
+     * If there is a single continuous neuron in the network, consider this a
+     * continuous network.
      */
     public void updateTimeType() {
-        timeType = DISCRETE;
+        timeType = TimeType.DISCRETE;
 
         for (Neuron n : getNeuronList()) {
-            if (n.getTimeType() == CONTINUOUS) {
-                timeType = CONTINUOUS;
+            if (n.getTimeType() == TimeType.CONTINUOUS) {
+                timeType = TimeType.CONTINUOUS;
             }
         }
-
         time = 0;
     }
 
@@ -385,7 +394,7 @@ public class RootNetwork extends Network {
      * this is a continuous or discrete. network.
      */
     public void updateTime() {
-        if (timeType == CONTINUOUS) {
+        if (timeType == TimeType.CONTINUOUS) {
             time += this.getTimeStep();
         } else {
             time += 1;

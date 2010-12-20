@@ -67,7 +67,7 @@ public class StandardNetwork extends Network {
 
         numNeurons = nUnits;
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new Neuron(new LinearNeuron()));
+            this.addNeuron(new Neuron(root, new LinearNeuron()));
         }
         layout.layoutNeurons(this);
     }

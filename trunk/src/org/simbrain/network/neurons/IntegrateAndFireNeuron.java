@@ -19,13 +19,15 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
  * <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
+ *
+ * TODO: Add custom tooltip
  */
 public class IntegrateAndFireNeuron extends SpikingNeuronUpdateRule {
 
@@ -53,42 +55,25 @@ public class IntegrateAndFireNeuron extends SpikingNeuronUpdateRule {
     /** Clipping. */
     private boolean clipping = false;
 
-//    /**
-//     * @return duplicate IntegrateAndFireNeuron (used, e.g., in copy/paste).
-//     */
-//    public IntegrateAndFireNeuron duplicate() {
-//        IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();
-//        ifn = (IntegrateAndFireNeuron) super.duplicate(ifn);
-//        ifn.setRestingPotential(getRestingPotential());
-//        ifn.setResetPotential(getResetPotential());
-//        ifn.setThreshold(getThreshold());
-//        ifn.setTimeConstant(getTimeConstant());
-//        ifn.setResistance(getResistance());
-//        ifn.setClipping(getClipping());
-//        ifn.setAddNoise(getAddNoise());
-//        ifn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//
-//        return ifn;
-//    }
-
-    public void clear() {
-        super.setLastSpikeTime(0);
-    }
-
-    @Override
-    public String getName() {
-        return "Integrate and fire";
-    }
-
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public IntegrateAndFireNeuron deepCopy() {
+        IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();
+        ifn.setRestingPotential(getRestingPotential());
+        ifn.setResetPotential(getResetPotential());
+        ifn.setThreshold(getThreshold());
+        ifn.setTimeConstant(getTimeConstant());
+        ifn.setResistance(getResistance());
+        ifn.setClipping(getClipping());
+        ifn.setAddNoise(getAddNoise());
+        ifn.noiseGenerator = new RandomSource(noiseGenerator);
+
+        return ifn;
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
         double inputs = neuron.getWeightedInputs();
@@ -233,5 +218,10 @@ public class IntegrateAndFireNeuron extends SpikingNeuronUpdateRule {
      */
     public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Integrate and Fire";
     }
 }

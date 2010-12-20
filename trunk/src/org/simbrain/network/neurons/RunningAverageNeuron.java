@@ -20,11 +20,13 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 
 /**
- * <b>RunningAverageNeuron</b> keeps a running average of current and past activity.
+ * <b>RunningAverageNeuron</b> keeps a running average of current and past
+ * activity.
  */
-public class RunningAverageNeuron implements NeuronUpdateRule {
+public class RunningAverageNeuron extends NeuronUpdateRule {
 
     /** Rate constant variable. */
     private double rateConstant = .5;
@@ -33,44 +35,35 @@ public class RunningAverageNeuron implements NeuronUpdateRule {
     private double val = 0;
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Running Average";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         // No implementation
     }
- 
-//   /**
-//     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
-//     * @return Duplicated neuron
-//     */
-//    public RunningAverageNeuron duplicate() {
-//        RunningAverageNeuron cn = new RunningAverageNeuron();
-//        cn = (RunningAverageNeuron) super.duplicate(cn);
-//        cn.setRateConstant(getRateConstant());
-//
-//        return cn;
-//    }
 
     /**
-     * Update neuron.
+     * {@inheritDoc}
+     */
+    public RunningAverageNeuron deepCopy() {
+        RunningAverageNeuron cn = new RunningAverageNeuron();
+        cn.setRateConstant(getRateConstant());
+        return cn;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
         // "val" on right is activation at last time step
-        val = rateConstant * neuron.getWeightedInputs() + (1 - rateConstant) * val;
+        val = rateConstant * neuron.getWeightedInputs() + (1 - rateConstant)
+                * val;
         neuron.setBuffer(val);
     }
 
@@ -86,5 +79,10 @@ public class RunningAverageNeuron implements NeuronUpdateRule {
      */
     public void setRateConstant(final double rateConstant) {
         this.rateConstant = rateConstant;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Running average";
     }
 }

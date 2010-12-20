@@ -5,13 +5,15 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 
 /**
  * Hodgkin-Huxley Neuron.
  *
- * Adapted from software written by Anthony Fodor, with help from Jonathan Vickrey.
+ * Adapted from software written by Anthony Fodor, with help from Jonathan
+ * Vickrey.
  */
-public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
+public class HodgkinHuxleyNeuron extends NeuronUpdateRule {
 
     /** Sodium Channels */
     private float perNaChannels = 100f;
@@ -70,13 +72,12 @@ public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
     /** */
     float vClampValue = convertV(0F);
 
-
     /**
      * @{inheritDoc}
      */
     public void update(Neuron neuron) {
         // Advances the model by dt and returns the new voltage
-        
+
         double v = neuron.getActivation();
         bh = 1 / (Math.exp((v + 30) / 10) + 1);
         ah = 0.07 * Math.exp(v / 20);
@@ -103,15 +104,15 @@ public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
 
         elapsedTime += dt;
 
-//        if (vClampOn)
-//          v = vClampValue;
+        // if (vClampOn)
+        // v = vClampValue;
 
-//        getV() converts the model's v to present day convention
+        // getV() converts the model's v to present day convention
 
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
 
@@ -135,7 +136,7 @@ public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
         dm = (am * (1 - m) - bm * m) * dt;
         dn = (an * (1 - n) - bn * n) * dt;
 
-        // start these paramaters in steady state
+        // start these parameters in steady state
         n = an / (an + bn);
         m = am / (am + bm);
         h = ah / (ah + bh);
@@ -145,13 +146,11 @@ public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return 0;
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
     }
-
-
 
     public double get_n4() {
         return n4;
@@ -257,7 +256,7 @@ public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
 
     /**
      * Converts a voltage from the modern convention to the convention used by
-     * the program
+     * the program.
      */
     public float convertV(float voltage) {
         return (float) (-1 * voltage - resting_v);
@@ -287,10 +286,13 @@ public class HodgkinHuxleyNeuron implements NeuronUpdateRule {
         this.temp = temp;
     }
 
-    /**
-     * @{inheritDoc}
-     */
-    public String getName() {
+    public NeuronUpdateRule deepCopy() {
+        // TODO 
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
         return "Hodgkin-Huxley";
     }
 

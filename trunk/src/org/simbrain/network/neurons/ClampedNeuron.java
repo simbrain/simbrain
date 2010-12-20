@@ -20,49 +20,46 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
-
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 
 /**
- * <b>ClampedNeuron</b> is a simple neuron that does nothing! 
+ * <b>ClampedNeuron</b> is a simple neuron that does nothing!
  */
-public class ClampedNeuron implements NeuronUpdateRule {
+public class ClampedNeuron extends NeuronUpdateRule {
 
     /**
-     * TODO: Not really true...
-     * @return time type.
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
-//    /**
-//     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
-//     * @return Duplicated neuron
-//     */
-//    public ClampedNeuron duplicate() {
-//        ClampedNeuron cn = new ClampedNeuron();
-//        cn = (ClampedNeuron) super.duplicate(cn);
-//
-//        return cn;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public ClampedNeuron deepCopy() {
+        ClampedNeuron cn = new ClampedNeuron();
+        return cn;
+    }
 
     /**
-     * Update neuron.
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
+        neuron.setBuffer(neuron.getActivation());
      }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Clamped";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         // No implementation
     }
+
+    @Override
+    public String getDescription() {
+        return "Clamped";
+    }
+
+
 }

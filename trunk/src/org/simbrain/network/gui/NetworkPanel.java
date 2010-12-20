@@ -1346,7 +1346,7 @@ public class NetworkPanel extends PCanvas  {
             }
         }
 
-        Neuron neuron = new Neuron(new LinearNeuron()); 
+        Neuron neuron = new Neuron(getRootNetwork(), new LinearNeuron()); 
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.setActivation(0);

@@ -31,7 +31,7 @@ public class JumpAndDecay extends SpikeResponder {
     /** Base line value. */
     private double baseLine = 0;
     /** Rate at which synapse will decay. */
-    private double decayRate = .001;
+    private double decayRate = .1;
 
     /**
      * @return null

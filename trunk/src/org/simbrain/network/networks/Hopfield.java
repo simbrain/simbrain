@@ -68,7 +68,7 @@ public class Hopfield extends Network {
         for (int i = 0; i < numNeurons; i++) {
             BinaryNeuron binary = new BinaryNeuron();
             binary.setThreshold(0);
-            Neuron n = new Neuron(binary);
+            Neuron n = new Neuron(this, binary);
             n.setUpperBound(1);
             n.setLowerBound(-1);
             n.setIncrement(1);

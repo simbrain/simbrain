@@ -21,7 +21,9 @@ package org.simbrain.network.gui.dialogs.neuron;
 import java.util.ArrayList;
 
 import org.simbrain.network.gui.dialogs.RandomPanel;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.RandomNeuron;
+import org.simbrain.network.util.RandomSource;
 
 
 /**
@@ -36,7 +38,8 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public RandomNeuronPanel() {
+    public RandomNeuronPanel(RootNetwork network) {
+        super(network);
         this.add(rp);
     }
 
@@ -44,7 +47,7 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        ArrayList randomPanels = new ArrayList();
+        ArrayList<RandomSource> randomPanels = new ArrayList<RandomSource>();
 
         for (int i = 0; i < ruleList.size(); i++) {
             randomPanels.add(((RandomNeuron) ruleList.get(i)).getRandomizer());

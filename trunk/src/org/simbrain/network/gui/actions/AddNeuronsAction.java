@@ -71,7 +71,7 @@ public final class AddNeuronsAction
             ArrayList<Neuron> list = new ArrayList<Neuron>();
             layout.setInitialLocation(networkPanel.getLastClickedPosition());
             for (int i = 0; i < numNeurons; i++) {
-                Neuron neuron = new Neuron(new LinearNeuron()); 
+                Neuron neuron = new Neuron(networkPanel.getRootNetwork(), new LinearNeuron()); 
                 list.add(neuron);
                 networkPanel.getRootNetwork().addNeuron(neuron);
             }

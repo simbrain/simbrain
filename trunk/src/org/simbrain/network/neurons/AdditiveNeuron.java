@@ -19,15 +19,16 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.util.RandomSource;
 
 /**
  * <b>AdditiveNeuron</b> See Haykin (2002), section 14.5. Used with continuous
  * Hopfield networks.
  */
-public class AdditiveNeuron implements NeuronUpdateRule {
+public class AdditiveNeuron extends NeuronUpdateRule {
 
     /** Lambda. */
     private double lambda = 1.4;
@@ -45,14 +46,14 @@ public class AdditiveNeuron implements NeuronUpdateRule {
     private boolean addNoise = false;
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.CONTINUOUS;
+    public TimeType getTimeType() {
+        return TimeType.CONTINUOUS;
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         neuron.setUpperBound(1);
@@ -60,24 +61,21 @@ public class AdditiveNeuron implements NeuronUpdateRule {
         neuron.setIncrement(.1);
     }
 
-
-//    /**
-//     * @return duplicate AdditiveNeuron (used, e.g., in copy/paste).
-//     */
-//    public AdditiveNeuron duplicate() {
-//        AdditiveNeuron an = new AdditiveNeuron();
-//        an = (AdditiveNeuron) super.duplicate(an);
-//        an.setLambda(getLambda());
-//        an.setResistance(getResistance());
-//        an.setClipping(getClipping());
-//        an.setAddNoise(getAddNoise());
-//        an.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//
-//        return an;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public AdditiveNeuron deepCopy() {
+        AdditiveNeuron an = new AdditiveNeuron();
+        an.setLambda(getLambda());
+        an.setResistance(getResistance());
+        an.setClipping(getClipping());
+        an.setAddNoise(getAddNoise());
+        an.noiseGenerator = new RandomSource(noiseGenerator);
+        return an;
+    }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
 
@@ -122,13 +120,6 @@ public class AdditiveNeuron implements NeuronUpdateRule {
      */
     private double g(final double x) {
         return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
-    }
-
-    /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Additive (Continuous Hopfield)";
     }
 
     /**
@@ -199,5 +190,10 @@ public class AdditiveNeuron implements NeuronUpdateRule {
      */
     public void setClipping(final boolean clipping) {
         this.clipping = clipping;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Additive (Continuous Hopfield)";
     }
 }

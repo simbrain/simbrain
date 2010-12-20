@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.BinaryNeuron;
 import org.simbrain.network.neurons.HodgkinHuxleyNeuron;
 import org.simbrain.util.LabelledItemPanel;
@@ -49,7 +50,8 @@ public class HodgkinHuxleyNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates HodgkinHuxley preferences panel.
      */
-    public HodgkinHuxleyNeuronPanel() {
+    public HodgkinHuxleyNeuronPanel(RootNetwork network) {
+        super(network);
         this.add(mainTab);
         mainTab.addItem("Sodium Channels", perNaChannels);        
         mainTab.addItem("Potassium Channels", perKChannels);

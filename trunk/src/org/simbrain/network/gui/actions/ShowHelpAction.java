@@ -27,16 +27,16 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
- * Show help action, opens help file <code>Network.html</code>
- * in an external web browser.
+ * Show help action, opens help file in an external web browser.
  */
-public final class ShowHelpAction
-    extends AbstractAction {
+public final class ShowHelpAction extends AbstractAction {
 
     /** Documentation URL. */
-    private String theURL = "Network.html";
+    private String theURL;
 
-    /**
+    //TODO: Construct with URL; throw exceptions for bad pages
+ 
+   /**
      * Create a new show help action.
      */
     public ShowHelpAction() {

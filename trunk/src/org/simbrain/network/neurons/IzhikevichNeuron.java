@@ -49,27 +49,26 @@ public class IzhikevichNeuron extends SpikingNeuronUpdateRule {
     /** Add noise to the neuron. */
     private boolean addNoise = false;
 
-//    /**
-//     * @return duplicate IzhikevichNeuron (used, e.g., in copy/paste).
-//     */
-//    public IzhikevichNeuron duplicate() {
-//        IzhikevichNeuron in = new IzhikevichNeuron();
-//        in = (IzhikevichNeuron) super.duplicate(in);
-//        in.setA(getA());
-//        in.setB(getB());
-//        in.setC(getC());
-//        in.setD(getD());
-//        in.setAddNoise(getAddNoise());
-//        in.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//
-//        return in;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public IzhikevichNeuron deepCopy() {
+        IzhikevichNeuron in = new IzhikevichNeuron();
+        in.setA(getA());
+        in.setB(getB());
+        in.setC(getC());
+        in.setD(getD());
+        in.setAddNoise(getAddNoise());
+        in.noiseGenerator = new RandomSource(noiseGenerator);
+
+        return in;
+    }
 
     /**
      * Updates the neuron.
      */
     public void update(Neuron neuron) {
-        double timeStep = neuron.getParentNetwork().getRootNetwork().getTimeStep();
+        double timeStep = neuron.getRootNetwork().getTimeStep();
         double inputs = neuron.getWeightedInputs();
         double activation = neuron.getActivation();
 
@@ -152,13 +151,6 @@ public class IzhikevichNeuron extends SpikingNeuronUpdateRule {
     }
 
     /**
-     * @return Name of the neuron type.
-     */
-    public String getName() {
-        return "Izhikevich";
-    }
-
-    /**
      * @return Returns the addNoise.
      */
     public boolean getAddNoise() {
@@ -185,4 +177,10 @@ public class IzhikevichNeuron extends SpikingNeuronUpdateRule {
     public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
+
+    @Override
+    public String getDescription() {
+        return "Izhikevich spiking neuron";
+    }
+
 }

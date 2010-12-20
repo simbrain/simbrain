@@ -57,7 +57,7 @@ public class RandomSynapse extends Synapse {
     public Synapse duplicate() {
         RandomSynapse rs = new RandomSynapse(this.getSource(), this.getTarget());
         rs = (RandomSynapse) super.duplicate(rs);
-        rs.randomizer = randomizer.duplicate(randomizer);
+        rs.randomizer = new RandomSource(randomizer);
 
         return rs;
     }

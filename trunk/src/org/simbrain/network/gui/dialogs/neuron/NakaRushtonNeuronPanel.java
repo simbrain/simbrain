@@ -28,7 +28,10 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.NakaRushtonNeuron;
+import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
@@ -74,7 +77,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
     /**
      * Creates a new  Naka-Rushton neuron panel.
      */
-    public NakaRushtonNeuronPanel() {
+    public NakaRushtonNeuronPanel(RootNetwork network) {
+        super(network);
         tsUseAdaptation.addActionListener(this);
 
         this.add(tabbedPane);
@@ -152,13 +156,13 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
     /**
      * @return an arraylist of randomizers.
      */
-    private ArrayList getRandomizers() {
-        ArrayList ret = new ArrayList();
-
-        for (int i = 0; i < ruleList.size(); i++) {
-            ret.add(((NakaRushtonNeuron) ruleList.get(i)).getNoiseGenerator());
+    private ArrayList<RandomSource> getRandomizers() {
+        ArrayList<RandomSource> ret = new ArrayList<RandomSource>();
+        for (NeuronUpdateRule rule : ruleList) {
+            if (rule instanceof NakaRushtonNeuron) {
+                ret.add(((NakaRushtonNeuron) rule).getNoiseGenerator());
+            }
         }
-
         return ret;
     }
 

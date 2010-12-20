@@ -54,8 +54,11 @@ public final class CascadingNetworkBuilder {
     /** Initial position of the root neuron in the cascade. */
     private Point initialPosition = new Point(50, 50);
 
+    /** Default of neuron to use in network. */
+    private static final String DEFAULT_NEURON_TYPE = "LinearNeuron";
+
     /** Type of neuron to use in network. */
-    private static Neuron neuronType = new Neuron(new LinearNeuron());
+    private String neuronType = DEFAULT_NEURON_TYPE;
 
     /** Reference to root network. */
     private RootNetwork network;
@@ -63,13 +66,10 @@ public final class CascadingNetworkBuilder {
     /**
      * Create a cascading network builder with a specific number of layers and
      * branches per neuron.
-     * 
-     * @param numLayers
-     *            number of layers
-     * @param numBrachesPerNeuron
-     *            brahnces per neuron
-     * @param network
-     *            parent network
+     *
+     * @param numLayers number of layers
+     * @param numBrachesPerNeuron branches per neuron
+     * @param network parent network
      */
     public CascadingNetworkBuilder(RootNetwork network, int numLayers,
             int numBrachesPerNeuron) {
@@ -92,7 +92,7 @@ public final class CascadingNetworkBuilder {
      */
     public void buildNetwork() {
 
-        Neuron firstNeuron = neuronType.duplicate();
+        Neuron firstNeuron = new Neuron(network, DEFAULT_NEURON_TYPE);
         List<Neuron> currentLayer = new ArrayList<Neuron>();
         firstNeuron.setPosition(initialPosition);
         currentLayer.add(firstNeuron);
@@ -120,7 +120,7 @@ public final class CascadingNetworkBuilder {
                 network.addNeuron(baseNeuron);
                 double initialXOffset = branchWidth / 2;
                 for (int j = 0; j < numBrachesPerNeuron; j++) {
-                    Neuron targetNeuron = neuronType.duplicate();
+                    Neuron targetNeuron = new Neuron(network, new LinearNeuron()); //TODO;
                     targetNeuron.setLocation(baseNeuron.getX() - initialXOffset
                             + (j * layerSpacing), initialPosition.y
                             - (layerIndex * verticalSpacing));
@@ -213,10 +213,17 @@ public final class CascadingNetworkBuilder {
     }
 
     /**
+     * @return the neuronType
+     */
+    public String getNeuronType() {
+        return neuronType;
+    }
+
+    /**
      * @param neuronType the neuronType to set
      */
-    public static void setNeuronType(Neuron type) {
-        neuronType = type;
+    public void setNeuronType(String neuronType) {
+        this.neuronType = neuronType;
     }
 
 }

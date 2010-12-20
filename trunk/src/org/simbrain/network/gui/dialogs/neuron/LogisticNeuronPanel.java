@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.LogisticNeuron;
 
 
@@ -36,9 +37,9 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public LogisticNeuronPanel() {
+    public LogisticNeuronPanel(RootNetwork network) {
+        super(network);
         addItem("Growth rate", tfGrowthRate);
-
         this.addBottomText("<html>Note: for chaos, growth rates between <p> 3.6 and 4 are recommended </html>");
     }
 

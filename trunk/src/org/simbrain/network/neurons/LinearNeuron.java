@@ -21,13 +21,14 @@ package org.simbrain.network.neurons;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearNeuron implements NeuronUpdateRule, BiasedNeuron {
+public class LinearNeuron extends NeuronUpdateRule implements BiasedNeuron {
 
     /** Slope. */
     private double slope = 1;
@@ -47,15 +48,8 @@ public class LinearNeuron implements NeuronUpdateRule, BiasedNeuron {
     /**
      * @{inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
-    }
-
-    /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Linear";
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
@@ -65,20 +59,18 @@ public class LinearNeuron implements NeuronUpdateRule, BiasedNeuron {
         // No implementation
     }
 
-//    /**
-//     * @return duplicate LinearNeuron (used, e.g., in copy/paste).
-//     */
-//    public LinearNeuron duplicate() {
-//        LinearNeuron ln = new LinearNeuron();
-//        ln = (LinearNeuron) super.duplicate(ln);
-//        ln.setBias(getBias());
-//        ln.setSlope(getSlope());
-//        ln.setClipping(getClipping());
-//        ln.setAddNoise(getAddNoise());
-//        ln.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-//
-//        return ln;
-//    }
+    /**
+     * @{inheritDoc}
+     */
+    public LinearNeuron deepCopy() {
+        LinearNeuron ln = new LinearNeuron();
+        ln.setBias(getBias());
+        ln.setSlope(getSlope());
+        ln.setClipping(getClipping());
+        ln.setAddNoise(getAddNoise());
+        ln.noiseGenerator = new RandomSource(noiseGenerator);
+        return ln;
+    }
 
     /**
      * @{inheritDoc}
@@ -166,5 +158,10 @@ public class LinearNeuron implements NeuronUpdateRule, BiasedNeuron {
      */
     public void setClipping(final boolean clipping) {
         this.clipping = clipping;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Linear";
     }
 }

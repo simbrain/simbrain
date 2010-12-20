@@ -217,8 +217,8 @@ public class BackpropTrainer extends Trainer {
             }
 
             // Update biases
-            for (BiasedNeuron neuron : biasDeltaMap.keySet()) {
-                neuron.setBias(neuron.getBias() + biasDeltaMap.get(neuron));
+            for (BiasedNeuron neuronRule : biasDeltaMap.keySet()) {
+                neuronRule.setBias(neuronRule.getBias() + biasDeltaMap.get(neuronRule));
             }
 
         }
@@ -296,8 +296,8 @@ public class BackpropTrainer extends Trainer {
         }
 
         // Compute and store bias delta
-        if (neuron instanceof BiasedNeuron) {
-            biasDeltaMap.put((BiasedNeuron) neuron,
+        if (neuron.getUpdateRule() instanceof BiasedNeuron) {
+            biasDeltaMap.put((BiasedNeuron) neuron.getUpdateRule(),
                     learningRate * errorTimesDerivative);
         }
 
@@ -346,7 +346,7 @@ public class BackpropTrainer extends Trainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(new ClampedNeuron()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuron()); 
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
@@ -358,7 +358,7 @@ public class BackpropTrainer extends Trainer {
         // Set up hidden layer 1
         List<Neuron> hiddenLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 5; i++) {
-            Neuron neuron = new Neuron(new SigmoidalNeuron());
+            Neuron neuron = new Neuron(network, new SigmoidalNeuron());
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             hiddenLayer.add(neuron);
@@ -369,7 +369,7 @@ public class BackpropTrainer extends Trainer {
         // Set up hidden layer 2
         List<Neuron> hiddenLayer2 = new ArrayList<Neuron>();
         for (int i = 0; i < 5; i++) {
-            Neuron neuron = new Neuron(new SigmoidalNeuron());
+            Neuron neuron = new Neuron(network, new SigmoidalNeuron());
             neuron.setLowerBound(0);
           //  neuron.setClipping(true);
             network.addNeuron(neuron);
@@ -382,7 +382,7 @@ public class BackpropTrainer extends Trainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 1; i++) {
-            Neuron neuron = new Neuron(new SigmoidalNeuron());
+            Neuron neuron = new Neuron(network, new SigmoidalNeuron());
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             outputLayer.add(neuron);

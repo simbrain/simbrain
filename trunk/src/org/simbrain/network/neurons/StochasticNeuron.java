@@ -20,13 +20,14 @@ package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.interfaces.RootNetwork.TimeType;
 
 /**
  * <b>StochasticNeuron</b> is a simple type of random neuron which takes the
  * value of the upper bound if a random variable is above a specified firing
  * probability, and the lower bound otherwise. Ignores inputs.
  */
-public class StochasticNeuron implements NeuronUpdateRule {
+public class StochasticNeuron extends NeuronUpdateRule {
 
     /** The default firing probability for the Neuron. */
     private static final double DEFAULT_FIRING_PROBABILITY = .5;
@@ -35,43 +36,33 @@ public class StochasticNeuron implements NeuronUpdateRule {
     private double firingProbability = DEFAULT_FIRING_PROBABILITY;
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
-    public int getTimeType() {
-        return org.simbrain.network.interfaces.RootNetwork.DISCRETE;
+    public TimeType getTimeType() {
+        return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
-     */
-    public String getName() {
-        return "Stochastic";
-    }
-
-    /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
-//    /**
-//     * @return duplicate StochasticNeuron (used, e.g., in copy/paste).
-//     */
-//    public StochasticNeuron duplicate() {
-//        StochasticNeuron sn = new StochasticNeuron();
-//        sn = (StochasticNeuron) super.duplicate(sn);
-//        sn.setFiringProbability(getFiringProbability());
-//
-//        return sn;
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    public StochasticNeuron deepCopy() {
+        StochasticNeuron sn = new StochasticNeuron();
+        sn.setFiringProbability(getFiringProbability());
+        return sn;
+    }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void update(Neuron neuron) {
         double rand = Math.random();
-
         if (rand > firingProbability) {
             neuron.setBuffer(neuron.getLowerBound());
         } else {
@@ -93,4 +84,8 @@ public class StochasticNeuron implements NeuronUpdateRule {
         this.firingProbability = firingProbability;
     }
 
+    @Override
+    public String getDescription() {
+        return "Stochastic";
+    }
 }

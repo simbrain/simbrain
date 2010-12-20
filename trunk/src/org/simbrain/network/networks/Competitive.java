@@ -60,7 +60,7 @@ public class Competitive extends Network {
         super();
         this.setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new Neuron(new LinearNeuron()));
+            this.addNeuron(new Neuron(root, new LinearNeuron()));
         }
         layout.layoutNeurons(this);
     }

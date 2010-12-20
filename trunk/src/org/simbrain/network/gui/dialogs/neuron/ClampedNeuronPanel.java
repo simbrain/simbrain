@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
+import org.simbrain.network.interfaces.RootNetwork;
+
 /**
  * <b>ClampedNeuronPanel</b>.
  */
@@ -26,7 +28,8 @@ public class ClampedNeuronPanel extends AbstractNeuronPanel {
     /**
      * This method is the default constructor.
      */
-    public ClampedNeuronPanel() {
+    public ClampedNeuronPanel(RootNetwork network) {
+        super(network);
     }
 
     /**

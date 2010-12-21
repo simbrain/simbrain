@@ -62,7 +62,7 @@ public class STDPSynapsePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (STDPSynapse) synapseList.get(0);
+        synapseRef = (STDPSynapse) ruleList.get(0);
 
         tfTauMinus.setText(Double.toString(synapseRef.getTau_minus()));
         tfTauPLus.setText(Double.toString(synapseRef.getTau_plus()));
@@ -71,19 +71,19 @@ public class STDPSynapsePanel extends AbstractSynapsePanel {
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         // Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, STDPSynapse.class, "getTau_minus")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPSynapse.class, "getTau_minus")) {
             tfTauMinus.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(synapseList, STDPSynapse.class, "getTau_plus")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPSynapse.class, "getTau_plus")) {
             tfTauPLus.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(synapseList, STDPSynapse.class, "getW_minus")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPSynapse.class, "getW_minus")) {
             tfWMinus.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(synapseList, STDPSynapse.class, "getW_plus")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPSynapse.class, "getW_plus")) {
             tfWPlus.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(synapseList, STDPSynapse.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPSynapse.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -106,8 +106,8 @@ public class STDPSynapsePanel extends AbstractSynapsePanel {
      */
     public void commitChanges() {
 
-        for (int i = 0; i < synapseList.size(); i++) {
-            STDPSynapse synapseRef = (STDPSynapse) synapseList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            STDPSynapse synapseRef = (STDPSynapse) ruleList.get(i);
 
             if (!tfTauMinus.getText().equals(NULL_STRING)) {
                 synapseRef.setTau_minus(Double.parseDouble(tfTauMinus.getText()));

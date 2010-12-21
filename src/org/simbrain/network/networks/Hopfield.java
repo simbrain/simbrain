@@ -85,14 +85,14 @@ public class Hopfield extends Network {
     public void createConnections() {
         for (int i = 0; i < this.getNeuronCount(); i++) {
             for (int j = 0; j < i; j++) {
-                ClampedSynapse w = new ClampedSynapse(this.getNeuron(i), this.getNeuron(j));
+                Synapse w = new Synapse(this.getNeuron(i), this.getNeuron(j), new ClampedSynapse());
                 addSynapse(w);
                 w.setUpperBound(1);
                 w.setLowerBound(-1);
                 w.randomize();
                 w.setStrength(Math.round(w.getStrength()));
 
-                ClampedSynapse w2 = new ClampedSynapse(this.getNeuron(j), this.getNeuron(i));
+                Synapse w2 = new Synapse(this.getNeuron(i), this.getNeuron(j), new ClampedSynapse());
                 addSynapse(w2);
                 w2.setUpperBound(1);
                 w2.setLowerBound(-1);
@@ -108,11 +108,14 @@ public class Hopfield extends Network {
         for (int i = 0; i < getNeuronCount(); i++) {
             for (int j = 0; j < i; j++) {
                 Synapse w = Network.getSynapse(getNeuron(i), getNeuron(j));
-                w.randomize();
-                w.setStrength(Math.round(w.getStrength()));
-
+                if (w != null) {
+                    w.randomize();
+                    w.setStrength(Math.round(w.getStrength()));
+                }
                 Synapse w2 = Network.getSynapse(getNeuron(j), getNeuron(i));
-                w2.setStrength(w.getStrength());
+                if (w2 != null) {
+                    w2.setStrength(w.getStrength());
+                }
             }
         }
         getRootNetwork().fireNetworkChanged();

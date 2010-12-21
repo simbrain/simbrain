@@ -19,100 +19,37 @@
 
 package org.simbrain.network.synapses;
 
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
  * A simple synpase should be used as part of sub-networks that implement the
  * weight-update rule for it. Simple synapse does not have any weight update
  * rule for itself.
  */
-public class SimpleSynapse extends Synapse {
+public class SimpleSynapse extends SynapseUpdateRule {
 
     /** Clipped. */
     private boolean clipped = false;
 
-    /**
-     * Creates a weight of some value connecting two neurons.
-     *
-     * @param src
-     *            source neuron
-     * @param tar
-     *            target neuron
-     * @param val
-     *            initial weight value
-     * @param theId
-     *            Id of synapse
-     */
-    public SimpleSynapse(final Neuron src, final Neuron tar, final double val,
-            final String theId) {
-        super(src, tar);
-        // setSource(src);
-        // setTarget(tar);
-        strength = val;
-        id = theId;
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * Creates a weight connecting source and target neurons.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     */
-    public SimpleSynapse(final Neuron source, final Neuron target) {
-        super(source, target);
+    @Override
+    public String getDescription() {
+        return "Simple Synapse";
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another
-     * neuron of another type Only values common to different types of neuron
-     * are copied.
-     *
-     * @param s Synapse to make of the type
-     */
-    public SimpleSynapse(final Synapse s) {
-        super(s);
-    }
-
-    /**
-     * @return duplicate ClampedSynapse (used, e.g., in copy/paste).
-     */
-    public Synapse duplicate() {
-        SimpleSynapse ss = new SimpleSynapse(this.getSource(), this.getTarget());
-        ss = (SimpleSynapse) super.duplicate(ss);
-
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        SimpleSynapse ss = new SimpleSynapse();
         return ss;
     }
 
-    /**
-     * Set strength.
-     */
-    public void setStrength(final double wt) {
-        if (clipped) {
-            super.setStrength(clip(wt));
-        } else {
-            super.setStrength(wt);
-        }
-    }
-
-    /**
-     * Returns strength.
-     */
-    public double getStrength() {
-        return super.getStrength();
-    }
-
-    /**
-     * Update the synapse.
-     */
-    public void update() {
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
-        return "Simple Synapse";
+    @Override
+    public void update(Synapse synapse) {
+        // Had a clipping option
     }
 
     /**

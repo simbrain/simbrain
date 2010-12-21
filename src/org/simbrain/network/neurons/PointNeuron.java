@@ -25,6 +25,7 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
 
@@ -711,7 +712,7 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
     /**
      * {@inheritDoc}
      */
-    public void synapseTypeChanged(NetworkEvent<Synapse> networkEvent) {
+    public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
         // No implementation
     }
 

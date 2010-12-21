@@ -18,55 +18,60 @@
  */
 package org.simbrain.network.synapses;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 
-/**
- * <b>ClampedSynapse</b>.
- */
-public class ClampedSynapse extends SynapseUpdateRule {
 
-    /** Clipped. */
-    public boolean clipped = false;
+/**
+ * <b>Hebbian</b> implements a standard Hebbian learning rule.
+ */
+public class HebbianSynapse extends SynapseUpdateRule {
+
+    /** Default learning rate. */
+    public static final double DEFAULT_LEARNING_RATE = 1;
+
+    /** Learning rate. */
+    private double learningRate = DEFAULT_LEARNING_RATE;
+
 
     @Override
     public void init(Synapse synapse) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public SynapseUpdateRule deepCopy() {
-        ClampedSynapse cs = new ClampedSynapse();
-        return cs;
-    }
-
-    @Override
-    public void update(Synapse synapse) {
-//        if (clipped) {
-//            super.setStrength(Synapse(synapse.getStrength()));
-//        }
     }
 
     @Override
     public String getDescription() {
-        return "Clamped (no learning)";
+        return "Hebbian";
+    }
+
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        HebbianSynapse h = new HebbianSynapse();
+        h.setLearningRate(getLearningRate());
+        return h;
+    }
+
+    @Override
+    public void update(Synapse synapse) {
+        double input = synapse.getSource().getActivation();
+        double output = synapse.getTarget().getActivation();
+        double strength = synapse.clip(synapse.getStrength()
+                + (learningRate * input * output));
+        synapse.setStrength(strength);
     }
 
     /**
-     * Return clipped.
+     * @return Returns the momentum.
      */
-    public boolean isClipped() {
-        return clipped;
+    public double getLearningRate() {
+        return learningRate;
     }
 
     /**
-     * @param clipped value to set
+     * @param rate The rate to set.
      */
-    public void setClipped(boolean clipped) {
-        this.clipped = clipped;
+    public void setLearningRate(final double rate) {
+        this.learningRate = rate;
     }
 
 }

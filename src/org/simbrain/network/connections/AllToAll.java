@@ -22,6 +22,7 @@ import java.util.List;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
@@ -35,7 +36,7 @@ public class AllToAll extends ConnectNeurons {
      * The synapse to be used as a basis for the connection. Default to a
      * clamped synapse.
      */
-    private static Synapse baseSynapse = new ClampedSynapse(null, null);
+    private static SynapseUpdateRule baseSynapseRule = new ClampedSynapse();
 
     /** Allows neurons to have a self connection. */
     private static boolean allowSelfConnection = true;
@@ -64,13 +65,15 @@ public class AllToAll extends ConnectNeurons {
                 }
                 if (!allowSelfConnection) {
                     if (source != target) {
-                        Synapse synapse = baseSynapse.duplicate();
+                       //Synapse synapse = baseSynapse.duplicate();
+                        Synapse synapse = new Synapse(source, target, baseSynapseRule.deepCopy());
                         synapse.setSource(source);
                         synapse.setTarget(target);
                         network.addSynapse(synapse);
                     }
                 } else {
-                    Synapse synapse = baseSynapse.duplicate();
+                    //Synapse synapse = baseSynapse.duplicate();
+                    Synapse synapse = new Synapse(source, target, baseSynapseRule.deepCopy());
                     synapse.setSource(source);
                     synapse.setTarget(target);
                     network.addSynapse(synapse);
@@ -82,15 +85,15 @@ public class AllToAll extends ConnectNeurons {
     /**
      * @return the baseSynapse
      */
-    public static Synapse getBaseSynapse() {
-        return baseSynapse;
+    public static SynapseUpdateRule getBaseSynapse() {
+        return baseSynapseRule;
     }
 
     /**
      * @param baseSynapse the baseSynapse to set
      */
     public static void setBaseSynapse(final Synapse theSynapse) {
-        baseSynapse = theSynapse;
+        //baseSynapse = theSynapse; //TODO:
     }
 
     /**

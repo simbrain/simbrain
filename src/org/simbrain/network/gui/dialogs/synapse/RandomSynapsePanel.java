@@ -45,8 +45,8 @@ public class RandomSynapsePanel extends AbstractSynapsePanel {
     public void fillFieldValues() {
         ArrayList randomPanels = new ArrayList();
 
-        for (int i = 0; i < synapseList.size(); i++) {
-            randomPanels.add(((RandomSynapse) synapseList.get(i)).getRandomizer());
+        for (int i = 0; i < ruleList.size(); i++) {
+            randomPanels.add(((RandomSynapse) ruleList.get(i)).getRandomizer());
         }
 
         rp.fillFieldValues(randomPanels);
@@ -63,8 +63,8 @@ public class RandomSynapsePanel extends AbstractSynapsePanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapseList.size(); i++) {
-            RandomSynapse synapseRef = (RandomSynapse) synapseList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            RandomSynapse synapseRef = (RandomSynapse) ruleList.get(i);
             rp.commitRandom(synapseRef.getRandomizer());
         }
     }

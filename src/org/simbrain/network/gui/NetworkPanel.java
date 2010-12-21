@@ -79,6 +79,7 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NetworkListener;
@@ -409,9 +410,7 @@ public class NetworkPanel extends PCanvas  {
                 synapseNode.updateDiameter();
             }
 
-            public void synapseTypeChanged(final NetworkEvent<Synapse> e) {
-                SynapseNode synapseNode = findSynapseNode(e.getOldObject());
-                synapseNode.setSynapse(e.getObject());
+            public void synapseTypeChanged(final NetworkEvent<SynapseUpdateRule> e) {
             }
 
             public void synapseAdded(final NetworkEvent<Synapse> e) {

@@ -26,6 +26,7 @@ import java.util.List;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.util.Comparators;
 
@@ -40,7 +41,7 @@ public class OneToOne extends ConnectNeurons {
      * The synapse to be used as a basis for the connection. Default to a
      * clamped synapse.
      */
-    private static Synapse baseSynapse = new ClampedSynapse(null, null);
+    private static SynapseUpdateRule baseLearningRule = new ClampedSynapse();
 
     /**
      * If true, synapses are added in both directions.
@@ -106,13 +107,13 @@ public class OneToOne extends ConnectNeurons {
             Neuron source = (Neuron) sources.next();
             if (targetsX.hasNext()) {
                 Neuron target = (Neuron) targetsX.next();
-                Synapse synapse = baseSynapse.duplicate();
+                Synapse synapse = new Synapse(source, target, baseLearningRule.deepCopy());
                 synapse.setSource(source);
                 synapse.setTarget(target);
                 network.addSynapse(synapse);
                 // Allow neurons to be connected back to source.
                 if (useBidirectionalConnections) {
-                    Synapse synapse2 = baseSynapse.duplicate();
+                    Synapse synapse2 = new Synapse(source, target, baseLearningRule.deepCopy());
                     synapse2.setSource(target);
                     synapse2.setTarget(source);
                     network.addSynapse(synapse2);
@@ -126,15 +127,15 @@ public class OneToOne extends ConnectNeurons {
     /**
      * @return the baseSynapse
      */
-    public static Synapse getBaseSynapse() {
-        return baseSynapse;
+    public static SynapseUpdateRule getBaseLearningRule() {
+        return baseLearningRule;
     }
 
     /**
      * @param baseSynapse the baseSynapse to set
      */
-    public static void setBaseSynapse(final Synapse baseSynapse) {
-        OneToOne.baseSynapse = baseSynapse;
+    public static void setBaseSynapse(final SynapseUpdateRule baseLearningRule) {
+        OneToOne.baseLearningRule = baseLearningRule;
     }
 
 

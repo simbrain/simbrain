@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.synapses;
 
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
  * <b>STDPSynapse</b> models spike time dependent plasticity.
@@ -28,10 +28,10 @@ import org.simbrain.network.interfaces.Synapse;
  * Only works if source and target neurons are spiking neurons.
  *
  * Default parameter values and equations inspired by Jean-Philippe Thivierge
- * and Paul Cisek (2008), Journal of Neuroscience. Nonperiodic Synchronization in
- * Heterogeneous Networks of Spiking Neurons
+ * and Paul Cisek (2008), Journal of Neuroscience. Nonperiodic Synchronization
+ * in Heterogeneous Networks of Spiking Neurons
  */
-public class STDPSynapse extends Synapse {
+public class STDPSynapse extends SynapseUpdateRule {
 
     // TODO: Check all below.  I made this up! And elaborate..
     // TODO: explain / code relation to time constant.
@@ -57,72 +57,51 @@ public class STDPSynapse extends Synapse {
     /** General learning rate. */
     private double learningRate = .001;
 
-    /**
-     * Creates a weight connecting source and target neurons.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     */
-    public STDPSynapse(final Neuron source, final Neuron target) {
-        super(source, target);
+
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another
-     * neuron of another type Only values common to different types of neuron
-     * are copied.
-     *
-     * @param s Synapse to make of the type
-     */
-    public STDPSynapse(final Synapse s) {
-        super(s);
+    @Override
+    public String getDescription() {
+        return "Spike Timing Dependent Plasticity Synapse";
     }
 
-    /**
-     * @return duplicate ClampedSynapse (used, e.g., in copy/paste).
-     */
-    public Synapse duplicate() {
-        STDPSynapse duplicateSynapse = new STDPSynapse(this.getSource(), this.getTarget());
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        STDPSynapse duplicateSynapse = new STDPSynapse();
         duplicateSynapse.setTau_minus(this.getTau_minus());
         duplicateSynapse.setTau_plus(this.getTau_plus());
         duplicateSynapse.setW_minus(this.getW_minus());
         duplicateSynapse.setW_plus(this.getW_plus());
         duplicateSynapse.setLearningRate(this.getLearningRate());
-        return super.duplicate(duplicateSynapse);
+        return duplicateSynapse;
     }
 
-    /**
-     * Update the synapse.
-     */
-    public void update() {
+    @Override
+    public void update(Synapse synapse) {
+        double delta_t, delta_w;
 
-        double delta_t,delta_w;
-
-        boolean sourceSpiking = this.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule;
-        boolean targetSpiking = this.getTarget().getUpdateRule() instanceof SpikingNeuronUpdateRule;
+        boolean sourceSpiking = synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule;
+        boolean targetSpiking = synapse.getTarget().getUpdateRule() instanceof SpikingNeuronUpdateRule;
 
         if (sourceSpiking && targetSpiking) {
-            SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) getSource().getUpdateRule();
-            SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) getTarget().getUpdateRule();
+            SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) synapse
+                    .getSource().getUpdateRule();
+            SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
+                    .getTarget().getUpdateRule();
             delta_t = src.getLastSpikeTime() - tar.getLastSpikeTime();
-            double timeStep = getRootNetwork().getTimeStep();
+            double timeStep = synapse.getRootNetwork().getTimeStep();
             if (delta_t > 0) {
                 delta_w = W_plus * Math.exp(-delta_t / (tau_plus / timeStep));
             } else {
                 delta_w = -W_minus * Math.exp(delta_t / (tau_minus / timeStep));
             }
             delta_w *= learningRate;
-            //System.out.println(delta_t + "/" + delta_w);
-            this.setStrength(this.getStrength() + delta_w);
+            // System.out.println(delta_t + "/" + delta_w);
+            synapse.setStrength(synapse.getStrength() + delta_w);
         }
 
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
-        return "Spike Timing Dependent Plasticity Synapse";
     }
 
     /**

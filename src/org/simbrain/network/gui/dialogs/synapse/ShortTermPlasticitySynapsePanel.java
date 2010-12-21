@@ -63,7 +63,7 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (ShortTermPlasticitySynapse) synapseList.get(0);
+        synapseRef = (ShortTermPlasticitySynapse) ruleList.get(0);
 
         cbPlasticityType.setSelectedIndex(synapseRef.getPlasticityType());
         tfBaseLineStrength.setText(Double.toString(synapseRef.getBaseLineStrength()));
@@ -72,23 +72,23 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
         tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getPlasticityType")) {
+        if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticitySynapse.class, "getPlasticityType")) {
             cbPlasticityType.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getBaseLineStrength")) {
+        if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticitySynapse.class, "getBaseLineStrength")) {
             tfBaseLineStrength.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getFiringThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticitySynapse.class, "getFiringThreshold")) {
             tfFiringThreshold.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getBumpRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticitySynapse.class, "getBumpRate")) {
             tfBumpRate.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getDecayRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, ShortTermPlasticitySynapse.class, "getDecayRate")) {
             tfDecayRate.setText(NULL_STRING);
         }
     }
@@ -109,8 +109,8 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapseList.size(); i++) {
-            ShortTermPlasticitySynapse synapseRef = (ShortTermPlasticitySynapse) synapseList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            ShortTermPlasticitySynapse synapseRef = (ShortTermPlasticitySynapse) ruleList.get(i);
 
             if (!cbPlasticityType.isNull()) {
                 synapseRef.setPlasticityType(cbPlasticityType.getSelectedIndex());

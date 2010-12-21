@@ -52,7 +52,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
      * This method is the default constructor.
      */
     public AbstractNeuronPanel(RootNetwork parentNetwork) {
-        this.parentNet = parentNetwork; 
+        this.parentNet = parentNetwork;
         this.setLayout(new BorderLayout());
         this.add(mainPanel, BorderLayout.CENTER);
     }

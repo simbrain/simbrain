@@ -391,7 +391,7 @@ public class BackpropTrainer extends Trainer {
         layout.layoutNeurons(outputLayer);
 
         // Prepare base synapse for connecting layers
-        ClampedSynapse synapse = new ClampedSynapse(null, null);
+        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(-.5);
         synapse.setUpperBound(.5);
 

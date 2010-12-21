@@ -343,6 +343,7 @@ public abstract class Network {
      * @param neuron Type of neuron to add
      */
     public void addNeuron(final Neuron neuron) {
+        //TODO: Exception if neuron.getParentNetwork != this.
         neuronList.add(neuron);
         if ((rootNetwork != null)) {
             neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
@@ -373,8 +374,7 @@ public abstract class Network {
      * @param synapse the weight object to add
      */
     public void addSynapse(final Synapse synapse) {
-        synapse.setParentNetwork(this);
-
+        //TODO: Exception if synapse.getParentNetwork != this.
         synapse.initSpikeResponder();
         synapseList.add(synapse);
         if ((rootNetwork != null)) {
@@ -499,6 +499,7 @@ public abstract class Network {
      */
     public void deleteSynapse(final Synapse toDelete) {
 
+        // If deleting this synapse empties a parent group, delete that group
         Group group = getRootNetwork().containedInGroup(toDelete);
         if (group != null) {
             group.deleteSynapse(toDelete);
@@ -506,8 +507,20 @@ public abstract class Network {
                 this.getRootNetwork().deleteGroup(group);
             }
         }
+
+        // Notify listeners that this synapse has been deleted
         this.getRootNetwork().fireSynapseDeleted(toDelete);
-        toDelete.delete();
+
+        // Remove references to this synapse from parent neurons
+        if (toDelete.getSource() != null) {
+            toDelete.getSource().removeTarget(toDelete);
+        }
+        if (toDelete.getTarget() != null) {
+            toDelete.getTarget().removeSource(toDelete);
+        }
+
+        // Remove from the list
+        synapseList.remove(toDelete);
     }
 
     /**
@@ -761,33 +774,6 @@ public abstract class Network {
         }
 
         return null;
-    }
-
-    /**
-     * Change synapse type; replace one synapse with another.
-     * deletes the old synapse
-     *
-     * @param oldSynapse out with the old
-     * @param newSynapse in with the new...
-     */
-    public void changeSynapseType(final Synapse oldSynapse, final Synapse newSynapse) {
-
-        // Initialize the new synapse
-        newSynapse.setTarget(oldSynapse.getTarget());
-        newSynapse.setSource(oldSynapse.getSource());
-        newSynapse.setId(oldSynapse.getId());
-        newSynapse.setParentNetwork(this);
-        newSynapse.initSpikeResponder();
-        synapseList.add(newSynapse);
-
-        // Fire event now, before the old synapse is deleted; otherwise
-        //      problems in listeners
-        rootNetwork.fireSynapseTypeChanged(oldSynapse, newSynapse);
-        rootNetwork.updateTimeType();
-
-        // Delete the old synapse
-        oldSynapse.delete();
-
     }
 
     /**

@@ -66,25 +66,26 @@ public class RadialPanel extends AbstractConnectionPanel {
         super(connection);
         this.addItem("Excitatory Radius", tfExciteRadius);
         this.addItem("Excitatory Probability", tfExciteProbability);
-        
+
 
         JButton setExcitatorySynapseType = new JButton("Set...");
         setExcitatorySynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> excitatoryList = new ArrayList<Synapse>();
-                excitatoryList.add(Radial.getBaseExcitatorySynapse());
-                SynapseDialog dialog = new SynapseDialog(excitatoryList);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                Synapse excitatorySynapse = dialog.getSynapseList().get(0);
-                Radial.setBaseExcitatorySynapse(excitatorySynapse);
-                baseExcitatorySynapseLabel.setText(excitatorySynapse.getType());
+                //TODO
+//                excitatoryList.add(Radial.getBaseExcitatorySynapse());
+//                SynapseDialog dialog = new SynapseDialog(excitatoryList);
+//                dialog.pack();
+//                dialog.setLocationRelativeTo(null);
+//                dialog.setVisible(true);
+//                Synapse excitatorySynapse = dialog.getSynapseList().get(0);
+//                Radial.setBaseExcitatorySynapse(excitatorySynapse);
+//                baseExcitatorySynapseLabel.setText(excitatorySynapse.getType());
             }
 
         });
-        baseExcitatorySynapseLabel.setText(Radial.getBaseExcitatorySynapse().getType());
+//        baseExcitatorySynapseLabel.setText(Radial.getBaseExcitatorySynapse().getType());
         this.addItem("Base Excitatory Synapse Type:", baseExcitatorySynapseLabel);
         this.addItem("Set Base Excitatory Synapse Type:", setExcitatorySynapseType);
 
@@ -95,19 +96,19 @@ public class RadialPanel extends AbstractConnectionPanel {
         setInhibitorySynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
-                inhibitoryList.add(Radial.getBaseInhibitorySynapse());
-                SynapseDialog dialog = new SynapseDialog(inhibitoryList);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
-                Radial.setBaseInhibitorySynapse(inhibitorySynapse);
-                baseInhibitorySynapseLabel.setText(inhibitorySynapse.getType());
+//                ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
+//                inhibitoryList.add(Radial.getBaseInhibitorySynapse());
+//                SynapseDialog dialog = new SynapseDialog(inhibitoryList);
+//                dialog.pack();
+//                dialog.setLocationRelativeTo(null);
+//                dialog.setVisible(true);
+//                Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
+//                Radial.setBaseInhibitorySynapse(inhibitorySynapse);
+//                baseInhibitorySynapseLabel.setText(inhibitorySynapse.getType());
             }
             
         });
-        baseInhibitorySynapseLabel.setText(Radial.getBaseInhibitorySynapse().getType());
+//        baseInhibitorySynapseLabel.setText(Radial.getBaseInhibitorySynapse().getType());
         this.addItem("Base Inhibitory Synapse Type:", baseInhibitorySynapseLabel);
         this.addItem("Set Inhibitory Base Synapse Type:", setInhibitorySynapseType);
 

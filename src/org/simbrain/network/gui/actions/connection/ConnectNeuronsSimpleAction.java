@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
@@ -57,8 +58,8 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
 
         for (NeuronNode source : sourceNeurons) {
                 networkPanel.getRootNetwork().addSynapse(
-                        new ClampedSynapse(source.getNeuron(), targetNeuron
-                                .getNeuron()));
+                    new Synapse(source.getNeuron(), targetNeuron.getNeuron(),
+                            new ClampedSynapse()));
         }
 
     }

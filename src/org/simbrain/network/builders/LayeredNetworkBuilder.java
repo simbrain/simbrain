@@ -28,6 +28,7 @@ import org.simbrain.network.groups.NeuronLayer;
 import org.simbrain.network.groups.NeuronLayer.LayerType;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
@@ -107,7 +108,7 @@ public final class LayeredNetworkBuilder {
         }
 
         // Prepare base synapse for connecting layers
-        ClampedSynapse synapse = new ClampedSynapse(null, null);
+        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(-10);
         synapse.setUpperBound(10);
 

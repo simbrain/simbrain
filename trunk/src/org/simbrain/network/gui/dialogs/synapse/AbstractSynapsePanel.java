@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -27,19 +26,21 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.util.LabelledItemPanel;
 
 
 /**
- * <b>AbstractSynapsePanel</b>.
+ * <b>AbstractSynapsePanel</b> is the parent class for all panels used to set
+ * parameters of specific synapse update rules.
  */
 public abstract class AbstractSynapsePanel extends JPanel {
 
     /** Null string. */
     public static final String NULL_STRING = "...";
 
-    /** The synapses being modified. */
-    protected List<Synapse> synapseList;
+    /** The synapse update rules being modified. */
+    protected List<SynapseUpdateRule> ruleList;
 
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -88,15 +89,15 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * @return Returns the synapse_list.
      */
-    public List<Synapse> getSynapseList() {
-        return synapseList;
+    public List<SynapseUpdateRule> getRuleList() {
+        return ruleList;
     }
 
     /**
-     * @param synapseList The synapse_list to set.
+     * @param ruleList The rule list to set.
      */
-    public void setSynapseList(final List<Synapse> synapseList) {
-        this.synapseList = synapseList;
+    public void setRuleList(final List<SynapseUpdateRule> ruleList) {
+        this.ruleList = ruleList;
     }
 
     /**

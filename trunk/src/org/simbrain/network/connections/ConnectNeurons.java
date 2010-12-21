@@ -8,7 +8,7 @@ import org.simbrain.network.interfaces.Neuron;
 /**
  * Subclasses create connections (collections of synapses) between groups of
  * neurons.
- * 
+ *
  * @author jyoshimi
  */
 public abstract class ConnectNeurons {
@@ -20,12 +20,12 @@ public abstract class ConnectNeurons {
      * made.
      */
     protected List<? extends Neuron> sourceNeurons;
-    
+
     /**
      * The target group of neurons, generally to which connections will be made.
      */
     protected List<? extends Neuron> targetNeurons;
-    
+
     /**
      * Holds "current" connection object. Used in Gui so that users can set a
      * current type (see parameter-free constructor below)then simply apply it.

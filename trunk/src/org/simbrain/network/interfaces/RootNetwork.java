@@ -504,10 +504,9 @@ public class RootNetwork extends Network {
         }
     }
 
-    //TODO: May not be needed
     /**
      * Fire a neuron type changed event to all registered model listeners.
-     *
+     * 
      * @param old the old update rule
      * @param changed the new update rule
      */
@@ -565,12 +564,12 @@ public class RootNetwork extends Network {
     /**
      * Fire a synapse type changed event to all registered model listeners.
      *
-     * @param old old synapse, before the change
-     * @param changed new, changed synapse
+     * @param oldRule old synapse, before the change
+     * @param learningRule new, changed synapse
      */
-    public void fireSynapseTypeChanged(final Synapse old, final Synapse changed) {
+    public void fireSynapseTypeChanged(final SynapseUpdateRule oldRule, final SynapseUpdateRule learningRule) {
         for (SynapseListener listener : synapseListeners) {
-            listener.synapseTypeChanged(new NetworkEvent<Synapse>(this, old, changed));
+            listener.synapseTypeChanged(new NetworkEvent<SynapseUpdateRule>(this, oldRule, learningRule));
         }
     }
 

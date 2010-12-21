@@ -21,10 +21,7 @@ package org.simbrain.network.gui.dialogs.synapse;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -38,18 +35,8 @@ import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.synapses.ClampedSynapse;
-import org.simbrain.network.synapses.Hebbian;
-import org.simbrain.network.synapses.HebbianCPCA;
-import org.simbrain.network.synapses.HebbianThresholdSynapse;
-import org.simbrain.network.synapses.OjaSynapse;
-import org.simbrain.network.synapses.RandomSynapse;
-import org.simbrain.network.synapses.STDPSynapse;
-import org.simbrain.network.synapses.ShortTermPlasticitySynapse;
-import org.simbrain.network.synapses.SignalSynapse;
-import org.simbrain.network.synapses.SimpleSynapse;
-import org.simbrain.network.synapses.SubtractiveNormalizationSynapse;
-import org.simbrain.network.synapses.TDSynapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -57,8 +44,6 @@ import org.simbrain.util.StandardDialog;
  * The <b>SynapseDialog</b> is initialized with a list of synapses. When
  * the dialog is closed the synapses are changed based on the state of the
  * dialog.
- *
- * TODO: Rewrite using method (or a form of the method) in NeuronDialog.java
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
 
@@ -72,7 +57,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private Box mainPanel = Box.createVerticalBox();
 
     /** Spike response panel. */
-    private SpikeResponsePanel spikeResponsePanel = null;
+    private SpikeResponsePanel spikeResponsePanel;
 
     /** Top panel. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
@@ -102,7 +87,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private JLabel lowerLabel = new JLabel("Lower bound");
 
     /** Synapse type combo box. */
-    private JComboBox cbSynapseType = new JComboBox(Synapse.getTypeList());
+    private JComboBox cbSynapseType = new JComboBox(Synapse.getRuleList());
 
     /** The synapses being modified. */
     private List<Synapse> synapseList = new ArrayList<Synapse>();
@@ -116,13 +101,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     /** Show Help Action. */
     private ShowHelpAction helpAction = new ShowHelpAction();
 
-    /** Associates synapse creator utilities with synapses by name. */
-    private Map<String, Creator> creatorsByName = new TreeMap<String, Creator>(
-            String.CASE_INSENSITIVE_ORDER);
-
-    /** Associates synapse creator utilities with synapses by class. */
-    private Map<Class, Creator> creatorsByClass = new HashMap<Class, Creator>();
-
     /**
      * Constructor for a list of SynapseNodes.
      *
@@ -130,11 +108,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      */
     public SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = (List<Synapse>) synapseList;
-        initializeCreators();
         init();
     }
-    
-    /** @see StandardDialog */
+
+    @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
@@ -200,25 +177,76 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Initialize the main synapse panel based on the type of the selected synapses.
+     * Initialize the main synapse panel based on the type of the selected
+     * synapses.
      */
     public void initSynapseType() {
-        Synapse synapseRef = (Synapse) synapseList.get(0);
-
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getType")) {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
-            cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
-            synapsePanel = new ClampedSynapsePanel(); // Default to clamped synapse panel
+            cbSynapseType.setSelectedIndex(Synapse.getRuleList().length);
+            // Default to clamped synapse panel
+            synapsePanel = new ClampedSynapsePanel();
         } else {
-            Creator creator = creatorsByClass.get(synapseRef.getClass());
-            if (creator == null) {
+            setComboBox(synapseList.get(0).getLearningRule().getDescription());
+            Class<?> synapseType = ((ClassDescriptionPair) cbSynapseType
+                    .getSelectedItem()).getTheClass();
+            synapsePanel = getSynapsePanel(synapseType);
+            synapsePanel.setRuleList(getRuleList());
+            synapsePanel.fillFieldValues();
+        }
+    }
+
+    /**
+     * Utility for setting the selected item of a combo box based on a synapse's
+     * update rule description.
+     */
+    private void setComboBox(final String description) {
+        for (int i = 0; i < cbSynapseType.getItemCount(); i++) {
+            ClassDescriptionPair pair = (ClassDescriptionPair) cbSynapseType
+                    .getItemAt(i);
+            if (pair.getDescription().equalsIgnoreCase(description)) {
+                cbSynapseType.setSelectedIndex(i);
                 return;
             }
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(creator.getName()));
-            synapsePanel = creator.createPanel();
         }
-        synapsePanel.setSynapseList(synapseList);
-        synapsePanel.fillFieldValues();
+    }
+
+    /**
+     * Returns synapse panel corresponding to the given update rule.
+     * Assumes the panel class name = update rule class name + "Panel"
+     * E.g. "HebbianSynapse" > "HebbianSynapsePanel".
+     *
+     * @param updateRuleClass  the class to match
+     * @return panel the matching panel
+     */
+    private AbstractSynapsePanel getSynapsePanel(Class<?> updateRuleClass) {
+        // The panel name to look for
+        String panelClassName = "org.simbrain.network.gui.dialogs.synapse."
+                + updateRuleClass.getSimpleName() + "Panel";
+
+        try {
+            return (AbstractSynapsePanel) Class.forName(panelClassName)
+                    .newInstance();
+        } catch (ClassNotFoundException e) {
+            System.err.print("The class, \"" + panelClassName
+                    + "\", was not found.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Return the neuron update rules associated with the selected neurons.
+     *
+     * @return the rule list.
+     */
+    private ArrayList<SynapseUpdateRule> getRuleList() {
+        ArrayList<SynapseUpdateRule> ret = new ArrayList<SynapseUpdateRule>();
+        for (Synapse synapse : synapseList) {
+            ret.add(synapse.getLearningRule());
+        }
+        return ret;
     }
 
     /**
@@ -226,21 +254,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      * the dialog.
      */
     public void changeSynapseTypes() {
-        
-        Creator creator = creatorsByName.get(cbSynapseType.getSelectedItem().toString());
-        if (creator == null) {
-            return;
-        }
-
-        //TODO: Only change those that have actually changed?
-        for (int i = 0; i < synapseList.size(); i++) {
-            Synapse oldSynapse = (Synapse) synapseList.get(i);
-            Synapse newSynapse = creator.createSynapse(oldSynapse);
-            synapseList.set(i, newSynapse);
-            // Don't need this if the relevant synapses have not yet been added to a network
-            //  (when the dialog is used to set an unattached collection of neurons)
-            if (oldSynapse.getSource() != null) {
-                    oldSynapse.getSource().getParentNetwork().changeSynapseType(oldSynapse, newSynapse);
+        Object selected = cbSynapseType.getSelectedItem();
+        if (selected != NULL_STRING) {
+            String name = ((ClassDescriptionPair)selected).getSimpleName();
+            for (int i = 0; i < synapseList.size(); i++) {
+                synapseList.get(i).setLearningeRule(name);
             }
         }
     }
@@ -251,20 +269,19 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
+
         weightsHaveChanged = true;
-
         updateHelp();
-
-        Creator creator = creatorsByName.get(cbSynapseType.getSelectedItem());
-        
-        if (creator != null) {
+        Object selected = cbSynapseType.getSelectedItem();
+        if (selected != NULL_STRING) {
             mainPanel.remove(synapsePanel);
-            synapsePanel = creator.createPanel();
+            synapsePanel = getSynapsePanel(((ClassDescriptionPair) selected)
+                    .getTheClass());
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
+            pack();
         }
-        
-        pack();
+
     }
 
     /**
@@ -279,7 +296,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         tfDelay.setText(Integer.toString(synapseRef.getDelay()));
 
         synapsePanel.fillFieldValues();
-        synapsePanel.setSynapseList(synapseList);
 
         if (spikeResponsePanel != null) {
             spikeResponsePanel.fillFieldValues();
@@ -334,7 +350,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             if (!tfDelay.getText().equals(NULL_STRING)) {
                 synapseRef.setDelay(Integer.parseInt(tfDelay.getText()));
             }
-            
         }
 
         if (weightsHaveChanged) {
@@ -345,11 +360,14 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             spikeResponsePanel.commitChanges();
         }
 
+        // Notify the network that changes have been made 
         Synapse firstSynapse = synapseList.get(0);
         if (firstSynapse.getParentNetwork() != null) {
             firstSynapse.getParentNetwork().getRootNetwork().fireNetworkChanged();
         }
-        synapsePanel.setSynapseList(synapseList);
+
+        // Now commit changes specific to the synapse type
+        synapsePanel.setRuleList(getRuleList());
         synapsePanel.commitChanges();
     }
 
@@ -360,254 +378,16 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         if (cbSynapseType.getSelectedItem() == NULL_STRING) {
             helpAction.setTheURL("Network/synapse.html");
         } else if (spikeResponsePanel != null) {
-            String spacelessString = spikeResponsePanel.getResponseFunction().replace(" ", "");
-            helpAction.setTheURL("Network/synapse/spikeresponders/" + spacelessString + ".html");
+            String spacelessString = spikeResponsePanel.getResponseFunction()
+                    .replace(" ", "");
+            helpAction.setTheURL("Network/synapse/spikeresponders/"
+                    + spacelessString + ".html");
         } else {
-            String spacelessString = cbSynapseType.getSelectedItem().toString().replace(" ", "");
-            helpAction.setTheURL("Network/synapse/" + spacelessString + ".html");
+            String name = ((ClassDescriptionPair) cbSynapseType
+                    .getSelectedItem()).getSimpleName()
+                    .replaceAll("Synapse", "");
+            helpAction.setTheURL("Network/synapse/" + name + ".html");
         }
-    }
-
-    /**
-     * Utility for producing information associated with synapses.
-     */
-    private static interface Creator {
-
-        /**
-         * Returns the name of the synapse.
-         *
-         * @return name of synapse.
-         */
-        String getName();
-
-        /**
-         * Creates a new synapse based on an old synapse. Used in changing
-         * synapse type.
-         * 
-         * @param old the old synapse
-         * @return the new synapse
-         */
-        Synapse createSynapse(Synapse old);
-        
-        /**
-         * Returns the type of synapse panel associated with this synapse type.
-         * 
-         * @return the new synapse panel.
-         */
-        AbstractSynapsePanel createPanel();
-    }
-    
-    /**
-     * Creates instances of the Creator interface.  These are added to
-     * two maps which are used to switch based on names or on the class
-     * type
-     */
-    private void initializeCreators() {
-        Creator creator;
-        
-        creator = new Creator() {
-            public String getName() {
-                return Hebbian.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new Hebbian(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new HebbianSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(Hebbian.getName(), creator);
-        creatorsByClass.put(Hebbian.class, creator);
-        
-        creator = new Creator() {
-            public String getName() {
-                return OjaSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new OjaSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new OjaSynapsePanel();
-            }
-        };
-
-        creatorsByName.put(OjaSynapse.getName(), creator);
-        creatorsByClass.put(OjaSynapse.class, creator);
-               
-        creator = new Creator() {
-            public String getName() {
-                return RandomSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new RandomSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new RandomSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(RandomSynapse.getName(), creator);
-        creatorsByClass.put(RandomSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return SubtractiveNormalizationSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new SubtractiveNormalizationSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new SubtractiveNormalizationSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(SubtractiveNormalizationSynapse.getName(), creator);
-        creatorsByClass.put(SubtractiveNormalizationSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return ClampedSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new ClampedSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new ClampedSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(ClampedSynapse.getName(), creator);
-        creatorsByClass.put(ClampedSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return ShortTermPlasticitySynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new ShortTermPlasticitySynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new ShortTermPlasticitySynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(ShortTermPlasticitySynapse.getName(), creator);
-        creatorsByClass.put(ShortTermPlasticitySynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return HebbianThresholdSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new HebbianThresholdSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new HebbianThresholdSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(HebbianThresholdSynapse.getName(), creator);
-        creatorsByClass.put(HebbianThresholdSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return SignalSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new SignalSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new SignalSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(SignalSynapse.getName(), creator);
-        creatorsByClass.put(SignalSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return SimpleSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new SimpleSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new SimpleSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(SimpleSynapse.getName(), creator);
-        creatorsByClass.put(SimpleSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return STDPSynapse.getName();
-            }
-
-            public Synapse createSynapse(Synapse old) {
-                return new STDPSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new STDPSynapsePanel();
-            }
-        };
-
-        creatorsByName.put(STDPSynapse.getName(), creator);
-        creatorsByClass.put(STDPSynapse.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return HebbianCPCA.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new HebbianCPCA(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new HebbianCPCAPanel();
-            }
-        };
-        
-        creatorsByName.put(HebbianCPCA.getName(), creator);
-        creatorsByClass.put(HebbianCPCA.class, creator);
-
-        creator = new Creator() {
-            public String getName() {
-                return TDSynapse.getName();
-            }
-            
-            public Synapse createSynapse(Synapse old) {
-                return new TDSynapse(old);
-            }
-
-            public AbstractSynapsePanel createPanel() {
-                return new TDSynapsePanel();
-            }
-        };
-        
-        creatorsByName.put(TDSynapse.getName(), creator);
-        creatorsByClass.put(TDSynapse.class, creator);
     }
 
     /**

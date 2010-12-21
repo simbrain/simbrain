@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs.synapse;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.synapses.Hebbian;
+import org.simbrain.network.synapses.HebbianSynapse;
 
 
 /**
@@ -33,7 +33,7 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
     private JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
-    private Hebbian synapseRef;
+    private HebbianSynapse synapseRef;
 
     /**
      * This method is the default constructor.
@@ -46,12 +46,12 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (Hebbian) synapseList.get(0);
+        synapseRef = (HebbianSynapse) ruleList.get(0);
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, Hebbian.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianSynapse.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -60,15 +60,15 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        tfLearningRate.setText(Double.toString(Hebbian.DEFAULT_LEARNING_RATE));
+        tfLearningRate.setText(Double.toString(HebbianSynapse.DEFAULT_LEARNING_RATE));
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapseList.size(); i++) {
-            Hebbian synapseRef = (Hebbian) synapseList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            HebbianSynapse synapseRef = (HebbianSynapse) ruleList.get(i);
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
                 synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
             }

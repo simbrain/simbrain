@@ -23,12 +23,13 @@ import java.util.List;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.synapses.*;
 
 /**
  * For each neuron, consider every neuron in an exictatory and inhibitory radius from it, and 
  * make excitatory and inhibitory synapses with them.
- * 
+ *
  * TODO: More complex connection making functions
  *       Custom randomization?
  *       Ability to connect in a range (e.g, between 109 and 209 units away)
@@ -42,21 +43,27 @@ public class Radial extends ConnectNeurons {
     private static boolean allowSelfConnections = false;
 
     /** Template synapse for excitatory synapses. */
-    private static Synapse baseExcitatorySynapse = new ClampedSynapse(null, null);
+    private static SynapseUpdateRule baseExcitatorySynapse = new ClampedSynapse();
 
-    /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
+    /**
+     * Probability of designating a given synapse excitatory. If not, it's
+     * inhibitory.
+     */
     private static double excitatoryProbability = .8;
 
     /** Radius within which to connect excitatory neurons. */
     private static double excitatoryRadius = 100;
 
     /** Template synapse for inhibitory synapses. */
-    private static Synapse baseInhibitorySynapse = new ClampedSynapse(null, null);
+    private static SynapseUpdateRule baseInhibitorySynapse = new ClampedSynapse();
 
     /** Radius within which to connect inhibitory neurons. */
     private static double inhibitoryRadius = 80;
-    
-    /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
+
+    /**
+     * Probability of designating a given synapse excitatory. If not, it's
+     * inhibitory.
+     */
     private static double inhibitoryProbability = .8;
 
     /**
@@ -108,7 +115,8 @@ public class Radial extends ConnectNeurons {
                 }
             }
             if (Math.random() < inhibitoryProbability) {
-                Synapse synapse = baseInhibitorySynapse.duplicate();
+                //Synapse synapse = baseInhibitorySynapse.duplicate();
+                Synapse synapse = new Synapse(source, target, null);
                 synapse.setSource(source);
                 synapse.setTarget(target);
                 synapse.setStrength(-1);
@@ -138,7 +146,8 @@ public class Radial extends ConnectNeurons {
                 }
             }
             if (Math.random() < excitatoryProbability) {
-                Synapse synapse = baseExcitatorySynapse.duplicate();
+                Synapse synapse = new Synapse(source, target, null);
+                //Synapse synapse = baseExcitatorySynapse.duplicate();
                 synapse.setSource(source);
                 synapse.setTarget(target);
                 synapse.setStrength(1);
@@ -220,29 +229,32 @@ public class Radial extends ConnectNeurons {
     /**
      * @return the baseExcitatorySynapse
      */
-    public static Synapse getBaseExcitatorySynapse() {
+    public static SynapseUpdateRule getBaseExcitatorySynapse() {
         return baseExcitatorySynapse;
     }
 
     /**
      * @param baseExcitatorySynapse the baseExcitatorySynapse to set
      */
-    public static void setBaseExcitatorySynapse(final Synapse baseExcitatorySynapse) {
+    public static void setBaseExcitatorySynapse(
+            SynapseUpdateRule baseExcitatorySynapse) {
         Radial.baseExcitatorySynapse = baseExcitatorySynapse;
     }
 
     /**
      * @return the baseInhibitorySynapse
      */
-    public static Synapse getBaseInhibitorySynapse() {
+    public static SynapseUpdateRule getBaseInhibitorySynapse() {
         return baseInhibitorySynapse;
     }
 
     /**
      * @param baseInhibitorySynapse the baseInhibitorySynapse to set
      */
-    public static void setBaseInhibitorySynapse(final Synapse baseInhibitorySynapse) {
+    public static void setBaseInhibitorySynapse(
+            SynapseUpdateRule baseInhibitorySynapse) {
         Radial.baseInhibitorySynapse = baseInhibitorySynapse;
     }
+
 
 }

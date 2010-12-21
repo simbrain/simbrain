@@ -254,7 +254,6 @@ public class NeuronDialog extends StandardDialog {
     private void changeNeuronTypes() {
 
         Object selected = cbNeuronType.getSelectedItem();
-
         if (selected != NULL_STRING) {
             String name = ((ClassDescriptionPair)selected).getSimpleName();
             for (int i = 0; i < neuronList.size(); i++) {
@@ -296,7 +295,8 @@ public class NeuronDialog extends StandardDialog {
             }
 
             mainPanel.remove(neuronPanel);
-            neuronPanel = getNeuronPanel(network,((ClassDescriptionPair) selected).getTheClass());
+            neuronPanel = getNeuronPanel(network,
+                    ((ClassDescriptionPair) selected).getTheClass());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
             pack();
@@ -352,7 +352,6 @@ public class NeuronDialog extends StandardDialog {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-
 
         for (int i = 0; i < neuronList.size(); i++) {
 

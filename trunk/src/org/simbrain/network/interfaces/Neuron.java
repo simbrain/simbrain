@@ -67,7 +67,7 @@ public class Neuron  {
     private double inputValue = 0;
 
     /** Reference to network this neuron is part of. */
-    private Network parent = null;
+    private Network parent;
 
     /** List of synapses this neuron attaches to. */
     private ArrayList<Synapse> fanOut = new ArrayList<Synapse>();
@@ -203,13 +203,14 @@ public class Neuron  {
      * @param updateRule the neuronUpdateRule to set
      */
     public void setUpdateRule(final NeuronUpdateRule updateRule) {
+        NeuronUpdateRule oldRule = updateRule;
         this.updateRule = updateRule;
         for (Synapse s : getFanOut()) {
             s.initSpikeResponder();
         }
         if (getParentNetwork() != null) {
             getRootNetwork().updateTimeType();
-            getRootNetwork().fireNeuronTypeChanged(updateRule, updateRule);
+            getRootNetwork().fireNeuronTypeChanged(oldRule, updateRule);
         }
         updateRule.init(this);
     }
@@ -529,7 +530,7 @@ public class Neuron  {
     }
 
     /**
-     * The name of the update rule of the network; it's "type". Used via
+     * The name of the update rule of this neuron; it's "type". Used via
      * reflection for consistency checking in the gui. (Open multiple neurons
      * and if they are of the different types the dialog is different).
      *
@@ -829,6 +830,13 @@ public class Neuron  {
      * @return the rulelist
      */
     public static ClassDescriptionPair[] getRulelist() {
+        return RULE_LIST;
+    }
+
+    /**
+     * @return the ruleList
+     */
+    public static ClassDescriptionPair[] getRuleList() {
         return RULE_LIST;
     }
 }

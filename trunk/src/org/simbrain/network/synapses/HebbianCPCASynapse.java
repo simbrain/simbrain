@@ -20,12 +20,13 @@ package org.simbrain.network.synapses;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 
 /**
  * <b>HebbianCPCA</b>.
  */
-public class HebbianCPCA extends Synapse {
+public class HebbianCPCASynapse extends SynapseUpdateRule {
 
     /** Default Learning rate. */
     public static final double DEFAULT_LEARNING_RATE = .005;
@@ -54,74 +55,39 @@ public class HebbianCPCA extends Synapse {
     /** Sigmoidal function. */
     private double lambda = DEFAULT_LAMBDA;
 
-    /**
-     * Creates a weight of some value connecting two neurons.
-     *
-     * @param src source neuron
-     * @param tar target neuron
-     * @param val initial weight value
-     * @param theId Id of the synapse
-     */
-    public HebbianCPCA(final Neuron src, final Neuron tar, final double val, final String theId) {
-        super(src, tar);
-        this.setStrength(val);
-        id = theId;
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another
-     * neuron of another type Only values common to different types of neuron
-     * are copied.
-     *
-     * @param s Synapse to make of the type
-     */
-    public HebbianCPCA(final Synapse s) {
-        super(s);
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
+    @Override
+    public String getDescription() {
         return "HebbianCPCA";
     }
 
-    /**
-     * @return duplicate Hebbian (used, e.g., in copy/paste).
-     */
-    public Synapse duplicate() {
-        HebbianCPCA h = new HebbianCPCA(this.getSource(), this.getTarget());
-        h.setLearningRate(getLearningRate());
-        h.setM(getM());
-        h.setTheta(getTheta());
-        h.setLambda(getLambda());
-
-        return super.duplicate(h);
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        HebbianCPCASynapse learningRule = new HebbianCPCASynapse();
+        learningRule.setLearningRate(getLearningRate());
+        learningRule.setM(getM());
+        learningRule.setTheta(getTheta());
+        learningRule.setLambda(getLambda());
+        return learningRule;
     }
 
-    /**
-     * Creates a weight connecting source and target neurons.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     */
-    public HebbianCPCA(final Neuron source, final Neuron target) {
-        super(source, target);
-    }
+    @Override
+    public void update(Synapse synapse) {
+        // Updates the synapse (see equation 4.18 in O'Reilly and Munakata).
 
-    /**
-     * Updates the synapse (see equation 4.18 in O'Reilly and Munakata).
-     */
-    public void update() {
-        double input = getSource().getActivation();
-        double output = getTarget().getActivation();
+        double input = synapse.getSource().getActivation();
+        double output = synapse.getTarget().getActivation();
 
-        double deltaW = learningRate * ((output * input) - (output * getStrength())); // Equation 4.12
+        double deltaW = learningRate * ((output * input) - (output * synapse.getStrength())); // Equation 4.12
         //deltaW = learningRate * (output * input * (m - strength) + output * (1 - input) * (-strength));
         //strength = sigmoidal(strength);
         //strength = clip(strength + deltaW);
-        setStrength(getStrength() + deltaW);
+        synapse.setStrength(synapse.getStrength() + deltaW);
     }
+
 
     /**
      * Sigmoidal Function (see equation 4.23 in O'Reilly and Munakata).
@@ -131,7 +97,6 @@ public class HebbianCPCA extends Synapse {
      */
     private double sigmoidal(final double arg) {
         return 1 / (1 + Math.pow(theta * (arg / (1 - arg)), -lambda));
-
     }
 
     /**

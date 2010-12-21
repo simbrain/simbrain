@@ -19,6 +19,7 @@
 package org.simbrain.network.listeners;
 
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
  * Listener interface for receiving network events relating to synapses. Classes
@@ -50,10 +51,10 @@ public interface SynapseListener {
     void synapseChanged(NetworkEvent<Synapse> networkEvent);
 
     /**
-     * Invoked when a synapse's type changes.
+     * Invoked when a synapse's update rule changes.
      *
-     * @param networkEvent reference to to old and new synapse
+     * @param networkEvent reference to to old and new synapse update rule
      */
-    void synapseTypeChanged(NetworkEvent<Synapse> networkEvent);
+    void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent);
 
 }

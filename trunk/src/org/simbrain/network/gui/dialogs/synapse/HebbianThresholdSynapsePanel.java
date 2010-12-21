@@ -59,7 +59,7 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (HebbianThresholdSynapse) synapseList.get(0);
+        synapseRef = (HebbianThresholdSynapse) ruleList.get(0);
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
         tfOutputThresholdMomentum.setText(Double.toString(synapseRef.getOutputThresholdMomentum()));
@@ -67,19 +67,19 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel {
         isOutputThreshold.setSelected(synapseRef.getUseSlidingOutputThreshold());
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, HebbianThresholdSynapse.class, "getMomentum")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdSynapse.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, HebbianThresholdSynapse.class, "getOutputThresholdMomentum")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdSynapse.class, "getOutputThresholdMomentum")) {
             tfOutputThresholdMomentum.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, HebbianThresholdSynapse.class, "getOutputThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdSynapse.class, "getOutputThreshold")) {
             tfOutputThreshold.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, HebbianThresholdSynapse.class, "getUseSlidingOutputThreshold")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianThresholdSynapse.class, "getUseSlidingOutputThreshold")) {
             isOutputThreshold.setNull();
         }
     }
@@ -99,8 +99,8 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapseList.size(); i++) {
-            HebbianThresholdSynapse synapseRef = (HebbianThresholdSynapse) synapseList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            HebbianThresholdSynapse synapseRef = (HebbianThresholdSynapse) ruleList.get(i);
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
                 synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));

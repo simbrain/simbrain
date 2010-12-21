@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
@@ -127,8 +128,7 @@ public final class CascadingNetworkBuilder {
                     tempList.add(targetNeuron);
                     network.addNeuron(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
-                    ClampedSynapse synapse = new ClampedSynapse(baseNeuron,
-                            targetNeuron);
+                    Synapse synapse = new Synapse(baseNeuron, targetNeuron, new ClampedSynapse());
                     network.addSynapse(synapse);
                 }
             }

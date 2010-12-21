@@ -50,17 +50,17 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (OjaSynapse) synapseList.get(0);
+        synapseRef = (OjaSynapse) ruleList.get(0);
 
         tfNormalize.setText(Double.toString(synapseRef.getNormalizationFactor()));
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, OjaSynapse.class, "getNormalizationFactor")) {
+        if (!NetworkUtils.isConsistent(ruleList, OjaSynapse.class, "getNormalizationFactor")) {
             tfNormalize.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, OjaSynapse.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, OjaSynapse.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -78,8 +78,8 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapseList.size(); i++) {
-            OjaSynapse synapseRef = (OjaSynapse) synapseList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            OjaSynapse synapseRef = (OjaSynapse) ruleList.get(i);
 
             if (!tfNormalize.getText().equals(NULL_STRING)) {
                 synapseRef.setNormalizationFactor(Double.parseDouble(tfNormalize.getText()));

@@ -18,104 +18,69 @@
  */
 package org.simbrain.network.synapses;
 
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 
 /**
  * <b>HebbianThresholdSynapse</b>.
  */
-public class HebbianThresholdSynapse extends Synapse {
+public class HebbianThresholdSynapse extends SynapseUpdateRule {
 
     /** Learning rate. */
     public static final double DEFAULT_LEARNING_RATE = .1;
+
     /** Output threshold momentum. */
     public static final double DEFAULT_OUTPUT_THRESHOLD_MOMENTUM = .1;
+
     /** Output threshold. */
     public static final double DEFAULT_OUTPUT_THRESHOLD = .5;
+
     /** Use sliding output threshold. */
     public static final boolean DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD = false;
-    
+
     /** Learning rate. */
     private double learningRate = .1;
+
     /** Output threshold momentum. */
     private double outputThresholdMomentum = .1;
+
     /** Output threshold. */
     private double outputThreshold = .5;
+
     /** Use sliding output threshold. */
     private boolean useSlidingOutputThreshold = false;
 
-    /**
-     * Creates a weight of some value connecting two neurons.
-     *
-     * @param src source neuron
-     * @param tar target neuron
-     * @param val initial weight value
-     * @param theId Id of the synapse
-     */
-    public HebbianThresholdSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-//    	  setSource(src);
-//        setTarget(tar);
-        super(src, tar);
-        strength = val;
-        id = theId;
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param s Synapse to make of the type
-     */
-    public HebbianThresholdSynapse(final Synapse s) {
-        super(s);
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
+    @Override
+    public String getDescription() {
         return "Hebbian threshold";
     }
 
-    /**
-     * @return Duplicate synapse.
-     */
-    public Synapse duplicate() {
-        HebbianThresholdSynapse h = new HebbianThresholdSynapse(this.getSource(), this.getTarget());
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        HebbianThresholdSynapse h = new HebbianThresholdSynapse();
         h.setLearningRate(getLearningRate());
         h.setOutputThreshold(this.getOutputThreshold());
         h.setOutputThresholdMomentum(this.getOutputThresholdMomentum());
         h.setUseSlidingOutputThreshold(this.getUseSlidingOutputThreshold());
-
-        return super.duplicate(h);
+        return h;
     }
 
-    /**
-     * Creates a weight connecting source and target neurons.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     */
-    public HebbianThresholdSynapse(final Neuron source, final Neuron target) {
-        super(source, target);
-//        setSource(source);
-//        setTarget(target);
-    }
-
-    /**
-     * Update the synapse.
-     */
-    public void update() {
-        double input = getSource().getActivation();
-        double output = getTarget().getActivation();
+    @Override
+    public void update(Synapse synapse) {
+        double input = synapse.getSource().getActivation();
+        double output = synapse.getTarget().getActivation();
 
         if (useSlidingOutputThreshold) {
             outputThreshold += (outputThresholdMomentum * ((output * output) - outputThreshold));
         }
-
-        strength += (learningRate * input * output * (output - outputThreshold));
-
-        strength = clip(strength);
+        double strength = synapse.getStrength()
+                + (learningRate * input * output * (output - outputThreshold));
+        synapse.setStrength(synapse.clip(strength));
     }
 
     /**

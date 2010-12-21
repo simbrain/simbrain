@@ -155,7 +155,7 @@ public class LMSTrainer extends Trainer {
         }
 
         // Connect input layer to output layer
-        ClampedSynapse synapse = new ClampedSynapse(null, null);
+        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
         AllToAll.setBaseSynapse(synapse);
@@ -218,7 +218,7 @@ public class LMSTrainer extends Trainer {
         }
 
         // Connect input layer to output layer
-        ClampedSynapse synapse = new ClampedSynapse(null, null);
+        Synapse synapse = new Synapse(null, null, null);
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
         AllToAll.setBaseSynapse(synapse);

@@ -20,88 +20,52 @@ package org.simbrain.network.synapses;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
-
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
- * <b>OjaSynapse</b> is a synapse which asymptotically normalizes the sum of squares of the weights
- * attaching to a neuron to a user-defined value.
+ * <b>OjaSynapse</b> is a synapse which asymptotically normalizes the sum of
+ * squares of the weights attaching to a neuron to a user-defined value.
  */
-public class OjaSynapse extends Synapse {
+public class OjaSynapse extends SynapseUpdateRule {
+
     /** Learning rate. */
     public static final double DEFAULT_LEARNING_RATE = .1;
     /** Normalization factor. */
+
     public static final double DEFAULT_NORMALIZATION_FACTOR = 1;
-    
+
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;
+
     /** Normalization factor. */
     private double normalizationFactor = DEFAULT_NORMALIZATION_FACTOR;
 
-    /**
-     * Creates a weight of some value connecting two neurons.
-     *
-     * @param src source neuron
-     * @param tar target neuron
-     * @param val initial weight value
-     * @param theId Id of the synapse
-     */
-    public OjaSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-        super(src, tar);
-//        setSource(src);
-//        setTarget(tar);
-        strength = val;
-        id = theId;
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param s Synapse to make of the type
-     */
-    public OjaSynapse(final Synapse s) {
-        super(s);
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
+    @Override
+    public String getDescription() {
         return "Oja";
     }
 
-    /**
-     * @return duplicate OjaSynapse (used, e.g., in copy/paste).
-     */
-    public Synapse duplicate() {
-        OjaSynapse os = new OjaSynapse(this.getSource(), this.getTarget());
-        os = (OjaSynapse) super.duplicate(os);
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        OjaSynapse os = new OjaSynapse();
         os.setNormalizationFactor(this.getNormalizationFactor());
         os.setLearningRate(getLearningRate());
-
         return os;
     }
 
-    /**
-     * Creates a weight connecting source and target neurons.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     */
-    public OjaSynapse(final Neuron source, final Neuron target) {
-        super(source, target);
-//        setSource(source);
-//        setTarget(target);
-    }
+    @Override
+    public void update(Synapse synapse) {
+        double input = synapse.getSource().getActivation();
+        double output = synapse.getTarget().getActivation();
 
-    /**
-     * Updates the synapse.
-     */
-    public void update() {
-        double input = getSource().getActivation();
-        double output = getTarget().getActivation();
-
-        strength += (learningRate * ((input * output) - ((output * output * strength) / normalizationFactor)));
-        strength = clip(strength);
+        double strength = synapse.getStrength()
+                + (learningRate * ((input * output) - ((output * output * synapse
+                        .getStrength()) / normalizationFactor)));
+        synapse.setStrength(synapse.clip(strength));
     }
 
     /**

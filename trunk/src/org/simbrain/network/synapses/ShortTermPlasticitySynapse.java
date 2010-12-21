@@ -18,141 +18,111 @@
  */
 package org.simbrain.network.synapses;
 
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 
 /**
  * <b>ShortTermPlasticitySynapse</b>.
  */
-public class ShortTermPlasticitySynapse extends Synapse {
+public class ShortTermPlasticitySynapse extends SynapseUpdateRule {
+
+    //TODO: Enum
 
     /** STD. */
     private static final int STD = 0;
-    
+
     /** Plasticity type. */
     public static final int DEFAULT_PLASTICITY_TYPE = STD;
+
     /** Pseudo spike threshold. */
     public static final double DEFAULT_FIRING_THRESHOLD = 0;
+
     /** Base line strength. */
     public static final double DEFAULT_BASE_LINE_STRENGTH = 1;
+
     /** Input threshold. */
     public static final double DEFAULT_INPUT_THRESHOLD = 0;
+
     /** Bump rate. */
     public static final double DEFAULT_BUMP_RATE = .5;
+
     /** Rate at which the synapse will decay. */
     public static final double DEFAULT_DECAY_RATE = .2;
+
     /** Activated. */
     public static final boolean DEFAULT_ACTIVATED = false;
-    
-    /** STF. */
-//    private static final int STF = 1;
 
     /** Plasticity type. */
     private int plasticityType = STD;
+
     /** Pseudo spike threshold. */
     private double firingThreshold = DEFAULT_FIRING_THRESHOLD;
+
     /** Base line strength. */
     private double baseLineStrength = DEFAULT_BASE_LINE_STRENGTH;
+
     /** Input threshold. */
     private double inputThreshold = DEFAULT_INPUT_THRESHOLD;
+
     /** Bump rate. */
     private double bumpRate = DEFAULT_BUMP_RATE;
+
     /** Rate at which the synapse will decay. */
     private double decayRate = DEFAULT_DECAY_RATE;
+
     /** Activated. */
     private boolean activated = DEFAULT_ACTIVATED;
 
-    /**
-     * Creates a weight of some value connecting two neurons.
-     *
-     * @param src source neuron
-     * @param tar target neuron
-     * @param val initial weight value
-     * @param theId Id of the synapse
-     */
-    public ShortTermPlasticitySynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	super(src, tar);
-//        setSource(src);
-//        setTarget(tar);
-        strength = val;
-        id = theId;
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param s Synapse to make of the type
-     */
-    public ShortTermPlasticitySynapse(final Synapse s) {
-        super(s);
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
+    @Override
+    public String getDescription() {
         return "Short term plasticity";
     }
 
-    /**
-     * @return duplicate DeltaRuleSynapse (used, e.g., in copy/paste).
-     */
-    public Synapse duplicate() {
-        ShortTermPlasticitySynapse stp = new ShortTermPlasticitySynapse(this.getSource(), this.getTarget());
-        stp = (ShortTermPlasticitySynapse) super.duplicate(stp);
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        ShortTermPlasticitySynapse stp = new ShortTermPlasticitySynapse();
         stp.setBaseLineStrength(getBaseLineStrength());
         stp.setBumpRate(getBumpRate());
         stp.setDecayRate(getDecayRate());
         stp.setInputThreshold(getInputThreshold());
         stp.setPlasticityType(getPlasticityType());
-
         return stp;
     }
 
-    /**
-     * Creates a weight connecting source and target neurons.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     */
-    public ShortTermPlasticitySynapse(final Neuron source, final Neuron target) {
-    	super(source, target);
-//        setSource(source);
-//        setTarget(target);
-    }
-
-    /**
-     * Updates the synapse.
-     */
-    public void update() {
+    @Override
+    public void update(Synapse synapse) {
         // Determine whether to activate short term dynamics
-        if (this.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-            if (((SpikingNeuronUpdateRule) getSource().getUpdateRule()).hasSpiked()) {
+        if (synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
+            if (((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule()).hasSpiked()) {
                 activated = true;
             } else {
                 activated = false;
             }
         } else {
-            if (this.getSource().getActivation() > firingThreshold) {
+            if (synapse.getSource().getActivation() > firingThreshold) {
                 activated = true;
             } else {
                 activated = false;
             }
         }
-
+        double strength = synapse.getStrength();
         if (activated) {
             if (plasticityType == STD) {
-                strength -= (bumpRate * (strength - lowerBound));
+                strength -= (bumpRate * (strength - synapse.getLowerBound()));
             } else {
-                strength += (bumpRate * (upperBound - strength));
+                strength += (bumpRate * (synapse.getUpperBound() - strength));
             }
         } else {
             strength -= (decayRate * (strength - baseLineStrength));
         }
 
-        strength = clip(strength);
+        synapse.setStrength(synapse.clip(strength));
     }
 
     /**

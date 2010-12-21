@@ -26,6 +26,7 @@ import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
@@ -130,7 +131,7 @@ public final class NetworkComponent extends WorkspaceComponent {
                 firePotentialAttributesChanged();
             }
 
-            public void synapseTypeChanged(NetworkEvent<Synapse> networkEvent) {
+            public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
             }
 
         });

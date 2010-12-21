@@ -54,7 +54,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
-                list.add(AllToAll.getBaseSynapse());
+                //list.add(AllToAll.getBaseSynapse()); //TODO:
                 SynapseDialog dialog = new SynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
@@ -65,7 +65,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
             }
             
         });
-        baseSynapseLabel.setText(AllToAll.getBaseSynapse().getType());
+        //baseSynapseLabel.setText(AllToAll.getBaseSynapse().getType()); //TODO
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
     }

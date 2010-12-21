@@ -46,12 +46,12 @@ public class SubtractiveNormalizationSynapsePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (SubtractiveNormalizationSynapse) synapseList.get(0);
+        synapseRef = (SubtractiveNormalizationSynapse) ruleList.get(0);
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, SubtractiveNormalizationSynapse.class, "getMomentum")) {
+        if (!NetworkUtils.isConsistent(ruleList, SubtractiveNormalizationSynapse.class, "getMomentum")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -68,8 +68,8 @@ public class SubtractiveNormalizationSynapsePanel extends AbstractSynapsePanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapseList.size(); i++) {
-            SubtractiveNormalizationSynapse synapseRef = (SubtractiveNormalizationSynapse) synapseList.get(i);
+        for (int i = 0; i < ruleList.size(); i++) {
+            SubtractiveNormalizationSynapse synapseRef = (SubtractiveNormalizationSynapse) ruleList.get(i);
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
                 synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));

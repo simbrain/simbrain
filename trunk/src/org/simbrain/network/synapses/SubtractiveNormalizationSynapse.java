@@ -20,67 +20,45 @@ package org.simbrain.network.synapses;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 
 /**
  * <b>SubtractiveNormalizationSynapse</b>.
  */
-public class SubtractiveNormalizationSynapse extends Synapse {
+public class SubtractiveNormalizationSynapse extends SynapseUpdateRule {
 
+    /** Default learning rate. */
     public static final double DEFAULT_LEARNING_RATE = 1;
-    
+
     /** Momentum. */
     private double learningRate = DEFAULT_LEARNING_RATE;
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param s Synapse to make of the type
-     */
-    public SubtractiveNormalizationSynapse(final Synapse s) {
-        super(s);
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
+    @Override
+    public String getDescription() {
         return "Subtractive Normalization";
     }
 
-    /**
-     * @return duplicate SubtractiveNormalizationSynapse (used, e.g., in copy/paste).
-     */
-    public Synapse duplicate() {
-        SubtractiveNormalizationSynapse sns = new SubtractiveNormalizationSynapse(this.getSource(), this.getTarget());
-        sns = (SubtractiveNormalizationSynapse) super.duplicate(sns);
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        SubtractiveNormalizationSynapse sns = new SubtractiveNormalizationSynapse();
         sns.setLearningRate(getLearningRate());
-
         return sns;
     }
 
-    /**
-     * Creates a weight connecting source and target neurons.
-     *
-     * @param source source neuron
-     * @param target target neuron
-     */
-    public SubtractiveNormalizationSynapse(final Neuron source, final Neuron target) {
-    	super(source, target);
-//        setSource(source);
-//        setTarget(target);
-    }
+    @Override
+    public void update(Synapse synapse) {
+        double input = synapse.getSource().getActivation();
+        double output = synapse.getTarget().getActivation();
+        double averageInput = synapse.getTarget().getAverageInput();
+        double strength = synapse.getStrength()
+                + (learningRate * ((output * (input - averageInput))));
+        synapse.setStrength(synapse.clip(strength));
 
-    /**
-     * Updates the syanpse.
-     */
-    public void update() {
-        double input = getSource().getActivation();
-        double output = getTarget().getActivation();
-        double averageInput = getTarget().getAverageInput();
-
-        strength += (learningRate * ((output * (input - averageInput))));
-        strength = clip(strength);
     }
 
     /**

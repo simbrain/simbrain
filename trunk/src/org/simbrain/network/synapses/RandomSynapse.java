@@ -20,63 +20,39 @@ package org.simbrain.network.synapses;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 
 /**
  * <b>RandomSynapse</b>.
  */
-public class RandomSynapse extends Synapse {
+public class RandomSynapse extends SynapseUpdateRule {
 
     /** Randomizer. */
     private RandomSource randomizer = new RandomSource();
 
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public RandomSynapse(final Neuron source, final Neuron target) {
-        super(source, target);
-        randomizer.setUpperBound(this.getUpperBound());
-        randomizer.setLowerBound(this.getLowerBound());
+    @Override
+    public void init(Synapse synapse) {
     }
 
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Synapse to be made of type
-     */
-    public RandomSynapse(final Synapse n) {
-        super(n);
-        randomizer.setUpperBound(this.getUpperBound());
-        randomizer.setLowerBound(this.getLowerBound());
+    @Override
+    public String getDescription() {
+        return "Random";
     }
 
-    /**
-     * @return duplicate RandomSynapse (used, e.g., in copy/paste).
-     */
-    public Synapse duplicate() {
-        RandomSynapse rs = new RandomSynapse(this.getSource(), this.getTarget());
-        rs = (RandomSynapse) super.duplicate(rs);
+    @Override
+    public SynapseUpdateRule deepCopy() {
+        RandomSynapse rs = new RandomSynapse();
         rs.randomizer = new RandomSource(randomizer);
-
         return rs;
     }
 
-    /**
-     * Updates the synapse.
-     */
-    public void update() {
-        randomizer.setUpperBound(this.getUpperBound());
-        randomizer.setLowerBound(this.getLowerBound());
-        strength = randomizer.getRandom();
-        strength = clip(strength);
-    }
-
-    /**
-     * @return Name of synapse type.
-     */
-    public static String getName() {
-        return "Random";
+    @Override
+    public void update(Synapse synapse) {
+        randomizer.setUpperBound(synapse.getUpperBound());
+        randomizer.setLowerBound(synapse.getLowerBound());
+        synapse.setStrength(synapse.clip(randomizer.getRandom()));
     }
 
     /**
@@ -84,14 +60,5 @@ public class RandomSynapse extends Synapse {
      */
     public RandomSource getRandomizer() {
         return randomizer;
-    }
-
-    /**
-     * @param randomizer The randomizer to set.
-     */
-    public void setRandomizer(final RandomSource randomizer) {
-        this.randomizer = randomizer;
-        this.setUpperBound(randomizer.getUpperBound());
-        this.setLowerBound(randomizer.getLowerBound());
     }
 }

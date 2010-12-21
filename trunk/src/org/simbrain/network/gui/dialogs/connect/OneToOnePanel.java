@@ -31,7 +31,7 @@ import javax.swing.JLabel;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.util.StandardDialog;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 
 /**
@@ -50,7 +50,7 @@ public class OneToOnePanel extends AbstractConnectionPanel {
 
     /** Connection. */
     private OneToOne connection = new OneToOne();
-    
+
     /**
      * Default constructor.
      */
@@ -63,18 +63,19 @@ public class OneToOnePanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
-                list.add(connection.getBaseSynapse());
+                Synapse temp = new Synapse(null, null, OneToOne.getBaseLearningRule(), null);
+                list.add(temp);
                 SynapseDialog dialog = new SynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                Synapse synapse = dialog.getSynapseList().get(0);
-                connection.setBaseSynapse(synapse);
-                baseSynapseLabel.setText(synapse.getType());
+                SynapseUpdateRule rule = dialog.getSynapseList().get(0).getLearningRule();
+                OneToOne.setBaseSynapse(rule);
+                baseSynapseLabel.setText(rule.getDescription());
             }
-            
+
         });
-        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
+        baseSynapseLabel.setText(connection.getBaseLearningRule().getDescription());
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
         this.addItem("Connection Orientaiton: ", orientationBox);

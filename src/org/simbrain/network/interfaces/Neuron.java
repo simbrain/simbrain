@@ -99,6 +99,7 @@ public class Neuron  {
     private static final ClassDescriptionPair[] RULE_LIST = {
         new ClassDescriptionPair(AdditiveNeuron.class, new AdditiveNeuron().getDescription()),
         new ClassDescriptionPair(BinaryNeuron.class, new BinaryNeuron().getDescription()),
+        new ClassDescriptionPair(ClampedNeuron.class, new ClampedNeuron().getDescription()),
         new ClassDescriptionPair(DecayNeuron.class, new DecayNeuron().getDescription()),
         new ClassDescriptionPair(IACNeuron.class, new IACNeuron().getDescription()),
         new ClassDescriptionPair(IntegrateAndFireNeuron.class, new IntegrateAndFireNeuron().getDescription()),
@@ -749,9 +750,10 @@ public class Neuron  {
      */
     public void setUpdatePriority(final int updatePriority) {
         this.updatePriority = updatePriority;
-        // notify the rootNetwork
-        if (this.updatePriority != 0 && this.getParentNetwork() != null) {
-            this.getRootNetwork().setPriorityUpdate(updatePriority);
+        // Update the root network's priority tree map
+        if (this.getParentNetwork() != null) {
+            // Resort the neuron in the priority sorted list
+            getRootNetwork().resortPriorities();
         }
     }
 

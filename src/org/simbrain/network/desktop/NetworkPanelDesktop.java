@@ -136,7 +136,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());
-        viewMenu.add(actionManager.getShowNodesAction());
+        viewMenu.add(actionManager.getShowPrioritiesAction());
+        viewMenu.add(actionManager.getShowWeightsAction());
 
         return viewMenu;
     }

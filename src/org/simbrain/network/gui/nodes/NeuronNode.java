@@ -177,21 +177,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 //        updateInArrow();
 //        updateInLabel();
 //        updateOutLabel();
+        
+        setPriorityView(getNetworkPanel().getPrioritiesVisible());
 
-        activationText = new PText(String.valueOf((int) Math.round(neuron.getActivation())));
+        activationText = new PText(String.valueOf((int) Math.round(neuron
+                .getActivation())));
         activationText.setFont(NEURON_FONT);
         setActivationTextPosition();
         addChild(activationText);
 
-        //Neuron update priority text
-        priorityText = new PText("" + neuron.getUpdatePriority());
-        priorityText.setFont(PRIORITY_FONT);
-        setPriorityTextPosition();
-        // TODO: Re-activate this once its visibility can be controlled (some
-        // refactoring in networkpanel needed first)
-        //addChild(priorityText);
-
-        
         // TODO: create a white background for the activation text
         labelBackground = new PNode();
         labelBackground.setPaint(this.getNetworkPanel().getBackground());
@@ -209,6 +203,24 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // The main circle is what users select
         setBounds(circle.getBounds());
+    }
+
+    /**
+     * Toggles the visibility of the priority view text label.
+     *
+     * @param visibility whether the priority text label should be visible
+     */
+    public void setPriorityView(boolean visibility) {
+        if (visibility == true) {
+            priorityText = new PText("" + neuron.getUpdatePriority());
+            priorityText.setFont(PRIORITY_FONT);
+            setPriorityTextPosition();
+            addChild(priorityText);
+        } else {
+            if (priorityText != null) {
+                removeChild(priorityText);
+            }
+        }
     }
 
     /**

@@ -138,10 +138,10 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("5"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (panel.isSynapseNodesOn()) {
-                    panel.setSynapseNodesOn(false);
+                if (panel.getWeightsVisible()) {
+                    panel.setWeightsVisible(false);
                 } else {
-                    panel.setSynapseNodesOn(true);
+                    panel.setWeightsVisible(true);
                 }
             }
         });

@@ -43,13 +43,14 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 
-
 /**
- * <b>NetworkDialog</b> is a dialog box for setting the properties of the  Network GUI.  If the user presses ok, values
- * become default values.  Restore defaults restores to original values.  When canceling out the values prior to
+ * <b>NetworkDialog</b> is a dialog box for setting the properties of the
+ * Network GUI. If the user presses ok, values become default values. Restore
+ * defaults restores to original values. When canceling out the values prior to
  * making any changes are restored.
  */
-public class NetworkDialog extends StandardDialog implements ActionListener, ChangeListener {
+public class NetworkDialog extends StandardDialog implements ActionListener,
+        ChangeListener {
 
     /** Background. */
     private static final String BACKGROUND = "Background";
@@ -88,8 +89,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     protected NetworkPanel networkPanel;
 
     /** List of items for combo box. */
-    private String[] objectColorList = {BACKGROUND, HOTNODE, COOLNODE, EXCITATORY,
-            INHIBITORY, SPIKE, ZERO, LASSO, LINE, SELECTION, SIGNAL};
+    private String[] objectColorList = { BACKGROUND, HOTNODE, COOLNODE,
+            EXCITATORY, INHIBITORY, SPIKE, ZERO, LASSO, LINE, SELECTION, SIGNAL };
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -125,10 +126,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private JPanel colorIndicator = new JPanel();
 
     /** Maximum size of weight slider. */
-    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
+    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL, 5,
+            50, 10);
 
     /** Minimum size of weight slider. */
-    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
+    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5,
+            50, 10);
 
     /** Precision text field. */
     private JTextField precisionField = new JTextField();
@@ -146,7 +149,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private JCheckBox showTimeBox = new JCheckBox();
 
     /** List of update methods. */
-    private String[] updateMethodList = {"Standard", "Priority Based", "Script Based"};
+    private String[] updateMethodList = { "Standard", "Priority Based",
+            "Script Based" };
 
     /** Root network update method combo box. */
     private JComboBox cbUpdateMethod = new JComboBox(updateMethodList);
@@ -156,7 +160,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /**
      * This method is the default constructor.
-     *
+     * 
      * @param np reference to <code>NetworkPanel</code>.
      */
     public NetworkDialog(final NetworkPanel np) {
@@ -168,7 +172,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * This method initialises the components on the panel.
      */
     private void init() {
-        //Initialize Dialog
+        // Initialize Dialog
         setTitle("Network Dialog");
         fillFieldValues();
         checkRounding();
@@ -177,7 +181,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         precisionField.setColumns(3);
         nudgeAmountField.setColumns(3);
 
-        //Set up sliders
+        // Set up sliders
         weightSizeMaxSlider.setMajorTickSpacing(25);
         weightSizeMaxSlider.setPaintTicks(true);
         weightSizeMaxSlider.setPaintLabels(true);
@@ -185,7 +189,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         weightSizeMinSlider.setPaintTicks(true);
         weightSizeMinSlider.setPaintLabels(true);
 
-        //Add Action Listeners
+        // Add Action Listeners
         showTimeBox.addActionListener(this);
         showSubnetOutlineBox.addActionListener(this);
         changeColorButton.addActionListener(this);
@@ -197,30 +201,30 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         cbUpdateMethod.addActionListener(this);
         scriptButton.addActionListener(this);
 
-        //Set up color pane
+        // Set up color pane
         colorPanel.add(cbChangeColor);
         colorIndicator.setSize(20, 20);
         colorPanel.add(colorIndicator);
         colorPanel.add(changeColorButton);
         setIndicatorColor();
 
-        //Set up grapics panel
+        // Set up grapics panel
         graphicsPanel.addItem("Color:", colorPanel);
         graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
         graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
         graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
         graphicsPanel.addItem("Show time", showTimeBox);
 
-        //Set up logic panel
+        // Set up logic panel
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
         logicPanel.addItem("Network Update Method", cbUpdateMethod);
         logicPanel.addItem("Set Script", scriptButton);
 
-        //Set up Misc Panel
+        // Set up Misc Panel
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
 
-        //Set up tab panels
+        // Set up tab panels
         tabGraphics.add(graphicsPanel);
         tabLogic.add(logicPanel);
         tabMisc.add(miscPanel);
@@ -244,8 +248,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Respond to button pressing events with immediate changes to network panel, where relevant.
-     *
+     * Respond to button pressing events with immediate changes to network
+     * panel, where relevant.
+     * 
      * @param e action event
      */
     public void actionPerformed(final ActionEvent e) {
@@ -253,7 +258,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
         if (o == isRoundingBox) {
             checkRounding();
-            networkPanel.getRootNetwork().setRoundingOff(isRoundingBox.isSelected());
+            networkPanel.getRootNetwork().setRoundingOff(
+                    isRoundingBox.isSelected());
         } else if (o == changeColorButton) {
             Color theColor = getColor();
             if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
@@ -266,27 +272,33 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
                 if (theColor != null) {
                     NetworkGuiSettings.setLineColor(theColor);
-               }
-
-            } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
-
-                if (theColor != null) {
-                    NetworkGuiSettings.setHotColor(Utils.colorToFloat(theColor));
                 }
 
-            } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
+            } else if (cbChangeColor.getSelectedItem().toString()
+                    .equals(HOTNODE)) {
 
                 if (theColor != null) {
-                    NetworkGuiSettings.setCoolColor(Utils.colorToFloat(theColor));
+                    NetworkGuiSettings
+                            .setHotColor(Utils.colorToFloat(theColor));
                 }
 
-            } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
+            } else if (cbChangeColor.getSelectedItem().toString()
+                    .equals(COOLNODE)) {
+
+                if (theColor != null) {
+                    NetworkGuiSettings.setCoolColor(Utils
+                            .colorToFloat(theColor));
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString()
+                    .equals(EXCITATORY)) {
 
                 if (theColor != null) {
                     NetworkGuiSettings.setExcitatoryColor(theColor);
                 }
 
-            } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
+            } else if (cbChangeColor.getSelectedItem().toString()
+                    .equals(INHIBITORY)) {
 
                 if (theColor != null) {
                     NetworkGuiSettings.setInhibitoryColor(theColor);
@@ -298,7 +310,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                     SelectionMarquee.setMarqueeColor(theColor);
                 }
 
-            } else if (cbChangeColor.getSelectedItem().toString().equals(SELECTION)) {
+            } else if (cbChangeColor.getSelectedItem().toString()
+                    .equals(SELECTION)) {
 
                 if (theColor != null) {
                     SelectionHandle.setSelectionColor(theColor);
@@ -325,7 +338,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             networkPanel.setShowTime(showTimeBox.isSelected());
             networkPanel.repaint();
         } else if (o == showSubnetOutlineBox) {
-            networkPanel.setShowSubnetOutline(showSubnetOutlineBox.isSelected());
+            networkPanel
+                    .setShowSubnetOutline(showSubnetOutlineBox.isSelected());
         } else if (o == cbUpdateMethod) {
             checkScript();
         }
@@ -337,14 +351,19 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     public void fillFieldValues() {
         showTimeBox.setSelected(networkPanel.getShowTime());
         showSubnetOutlineBox.setSelected(networkPanel.getShowSubnetOutline());
-        precisionField.setText(Integer.toString(networkPanel.getRootNetwork().getPrecision()));
-        nudgeAmountField.setText(Double.toString(NetworkGuiSettings.getNudgeAmount()));
-        isRoundingBox.setSelected(networkPanel.getRootNetwork().getRoundingOff());
+        precisionField.setText(Integer.toString(networkPanel.getRootNetwork()
+                .getPrecision()));
+        nudgeAmountField.setText(Double.toString(NetworkGuiSettings
+                .getNudgeAmount()));
+        isRoundingBox.setSelected(networkPanel.getRootNetwork()
+                .getRoundingOff());
         weightSizeMaxSlider.setValue(NetworkGuiSettings.getMaxDiameter());
         weightSizeMinSlider.setValue(NetworkGuiSettings.getMinDiameter());
-        if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.BUFFERED)) {
+        if (networkPanel.getRootNetwork().getUpdateMethod()
+                .equals(UpdateMethod.BUFFERED)) {
             cbUpdateMethod.setSelectedIndex(0);
-        } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.PRIORITYBASED)) {
+        } else if (networkPanel.getRootNetwork().getUpdateMethod()
+                .equals(UpdateMethod.PRIORITYBASED)) {
             cbUpdateMethod.setSelectedIndex(1);
         }
     }
@@ -353,24 +372,28 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * Commits changes not handled in action performed.
      */
     private void commitChanges() {
-        NetworkGuiSettings.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
-        networkPanel.getRootNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
+        NetworkGuiSettings.setNudgeAmount(Double.parseDouble(nudgeAmountField
+                .getText()));
+        networkPanel.getRootNetwork().setPrecision(
+                Integer.parseInt(precisionField.getText()));
         switch (cbUpdateMethod.getSelectedIndex()) {
-            case 0:
-                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.BUFFERED);
-                break;
-            case 1:
-                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.PRIORITYBASED);
-                break;
-            default:
-                break;
+        case 0:
+            networkPanel.getRootNetwork()
+                    .setUpdateMethod(UpdateMethod.BUFFERED);
+            break;
+        case 1:
+            networkPanel.getRootNetwork().setUpdateMethod(
+                    UpdateMethod.PRIORITYBASED);
+            break;
+        default:
+            break;
         }
         networkPanel.getUpdateStatusLabel().update();
     }
 
     /**
      * Listens and responds to slider state changes.
-     *
+     * 
      * @param e change event
      */
     public void stateChanged(final ChangeEvent e) {
@@ -387,19 +410,20 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /**
      * Show the color pallette and get a color.
-     *
+     * 
      * @return selected color
      */
     public Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this,
-                "Choose Color", colorIndicator.getBackground());
-        colorChooser.setLocation(200, 200); //Set location of color chooser
+        Color theColor = JColorChooser.showDialog(this, "Choose Color",
+                colorIndicator.getBackground());
+        colorChooser.setLocation(200, 200); // Set location of color chooser
         return theColor;
     }
 
     /**
-     * Enable or disable the precision field depending on state of rounding button.
+     * Enable or disable the precision field depending on state of rounding
+     * button.
      */
     private void checkRounding() {
         if (!isRoundingBox.isSelected()) {
@@ -410,10 +434,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Enable or disable the set button depending on the update method selection.
+     * Enable or disable the set button depending on the update method
+     * selection.
      */
     private void checkScript() {
-        if (cbUpdateMethod.getSelectedItem().toString().equalsIgnoreCase("Script Based")) {
+        if (cbUpdateMethod.getSelectedItem().toString()
+                .equalsIgnoreCase("Script Based")) {
             scriptButton.setEnabled(true);
         } else {
             scriptButton.setEnabled(false);
@@ -421,12 +447,13 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Set the color indicator based on the current selection  in the combo box.
+     * Set the color indicator based on the current selection in the combo box.
      */
     protected void setIndicatorColor() {
         if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
 
-            colorIndicator.setBackground(NetworkGuiSettings.getBackgroundColor());
+            colorIndicator.setBackground(NetworkGuiSettings
+                    .getBackgroundColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
 
@@ -434,19 +461,25 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
 
-            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings.getHotColor()));
+            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings
+                    .getHotColor()));
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
 
-            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings.getCoolColor()));
+            colorIndicator.setBackground(Utils.floatToHue(NetworkGuiSettings
+                    .getCoolColor()));
 
-        } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
+        } else if (cbChangeColor.getSelectedItem().toString()
+                .equals(EXCITATORY)) {
 
-            colorIndicator.setBackground(NetworkGuiSettings.getExcitatoryColor());
+            colorIndicator.setBackground(NetworkGuiSettings
+                    .getExcitatoryColor());
 
-        } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
+        } else if (cbChangeColor.getSelectedItem().toString()
+                .equals(INHIBITORY)) {
 
-            colorIndicator.setBackground(NetworkGuiSettings.getInhibitoryColor());
+            colorIndicator.setBackground(NetworkGuiSettings
+                    .getInhibitoryColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
 
@@ -462,7 +495,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {
 
-            colorIndicator.setBackground(NetworkGuiSettings.getZeroWeightColor());
+            colorIndicator.setBackground(NetworkGuiSettings
+                    .getZeroWeightColor());
 
         }
     }

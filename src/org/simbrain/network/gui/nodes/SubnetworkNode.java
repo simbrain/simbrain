@@ -177,11 +177,11 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
         initialChildLayoutComplete = false;
 
-        setPriorityAction = new AbstractAction("Set update priority") {
-            public void actionPerformed(final ActionEvent event) {
-                subnetwork.setUpdatePriority(Integer.parseInt((JOptionPane.showInputDialog("Update priority:"))));
-            }
-        };
+//        setPriorityAction = new AbstractAction("Set update priority") {
+//            public void actionPerformed(final ActionEvent event) {
+//                subnetwork.setUpdatePriority(Integer.parseInt((JOptionPane.showInputDialog("Update priority:"))));
+//            }
+//        };
 
         showOutlineAction = new AbstractAction("Show outline") {
             public void actionPerformed(final ActionEvent event) {

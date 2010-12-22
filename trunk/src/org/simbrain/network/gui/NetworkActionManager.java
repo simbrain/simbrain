@@ -63,6 +63,7 @@ import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.actions.ShowIOInfoAction;
 import org.simbrain.network.gui.actions.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
+import org.simbrain.network.gui.actions.ShowPrioritiesAction;
 import org.simbrain.network.gui.actions.ShowRunToolBarAction;
 import org.simbrain.network.gui.actions.ShowWeightsAction;
 import org.simbrain.network.gui.actions.SpaceHorizontalAction;
@@ -215,8 +216,11 @@ public final class NetworkActionManager {
      */
     private final JCheckBoxMenuItem showGUIAction;
 
-    /** Sets the nodes to be shown in GUI. Note that the action is wrapped in CheckBoxMenuItem. */
-    private final JCheckBoxMenuItem showNodesAction;
+    /** Whether weights should be shown or not. */
+    private final JCheckBoxMenuItem showWeightsAction;
+
+    /** Whether neuron priorities should be shown or not. */
+    private final JCheckBoxMenuItem showPrioritiesAction;
 
     /** Select all incoming synapses. */
     private final Action selectIncomingWeightsAction;
@@ -291,11 +295,10 @@ public final class NetworkActionManager {
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
         showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
         showRunToolBarAction = new ShowRunToolBarAction(networkPanel);
-        
-        ShowGUIAction theShowGUIAction = new ShowGUIAction(networkPanel);
-        showGUIAction = new JCheckBoxMenuItem(theShowGUIAction);
-        ShowWeightsAction theShowNodesAction = new ShowWeightsAction(networkPanel);
-        showNodesAction = new JCheckBoxMenuItem(theShowNodesAction);
+
+        showGUIAction = new JCheckBoxMenuItem(new ShowGUIAction(networkPanel));
+        showWeightsAction = new JCheckBoxMenuItem(new ShowWeightsAction(networkPanel));
+        showPrioritiesAction = new JCheckBoxMenuItem(new ShowPrioritiesAction(networkPanel));
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
@@ -767,9 +770,9 @@ public final class NetworkActionManager {
     /**
      * @return the showNodesAction
      */
-    public JCheckBoxMenuItem getShowNodesAction() {
-        showNodesAction.setSelected(networkPanel.isSynapseNodesOn());
-        return showNodesAction;
+    public JCheckBoxMenuItem getShowWeightsAction() {
+        showWeightsAction.setSelected(networkPanel.getWeightsVisible());
+        return showWeightsAction;
     }
 
 
@@ -812,12 +815,20 @@ public final class NetworkActionManager {
         return ungroupAction;
     }
 
+    /**
+     * @return the groupAction
+     */
+    public Action getGroupAction() {
+        return groupAction;
+    }
 
-	/**
-	 * @return the groupAction
-	 */
-	public Action getGroupAction() {
-		return groupAction;
-	}
+    /**
+     * @return the showPrioritiesAction
+     */
+    public JCheckBoxMenuItem getShowPrioritiesAction() {
+        return showPrioritiesAction;
+    }
+
+
 
 }

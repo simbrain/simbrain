@@ -19,6 +19,8 @@
 package org.simbrain.network.interfaces;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -83,7 +85,9 @@ public class RootNetwork extends Network {
      * CONTINUOUS: Simulation of real time. Each updates advances time by length
      * {@link timeStep}
      */
-    public enum TimeType { DISCRETE, CONTINUOUS}
+    public enum TimeType {
+        DISCRETE, CONTINUOUS
+    }
 
     /** Whether this is a discrete or continuous time network. */
     private TimeType timeType = TimeType.DISCRETE;
@@ -98,16 +102,21 @@ public class RootNetwork extends Network {
      * value are updated first.
      *
      */
-    public enum UpdateMethod { PRIORITYBASED, BUFFERED }
+    public enum UpdateMethod {
+        PRIORITYBASED, BUFFERED
+    }
 
     /** Current update method. */
     private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
 
     /**
-     * The updatePriority values used by neurons and sub-layers
-     *  is stored in this set.
+     * List of neurons sorted by their update priority. Used in priority based
+     * update.
      */
-    private SortedSet<Integer> updatePriorities = null;
+    private List<Neuron> prioritySortedNeuronList;
+
+    /** Comparator used for sorting the priority sorted neuron list. */
+    private PriorityComparator priorityComparator = new PriorityComparator();
 
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
@@ -150,13 +159,13 @@ public class RootNetwork extends Network {
      */
     private void init() {
         setRootNetwork(this);
-        this.updatePriorities = new TreeSet<Integer>();
-        this.updatePriorities.add(new Integer(0));
+        prioritySortedNeuronList = new ArrayList<Neuron>();
         this.setId("Root-network");
     }
 
     /**
      * Returns a properly initialized xstream object.
+     *
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -179,8 +188,7 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
+     * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
      *
@@ -188,18 +196,16 @@ public class RootNetwork extends Network {
      */
     private Object readResolve() {
         logger = Logger.getLogger(RootNetwork.class);
-        this.updatePriorities = new TreeSet<Integer>();
-        this.updatePriorities.add(new Integer(0));
         networkListeners = new ArrayList<NetworkListener>();
         neuronListeners = new ArrayList<NeuronListener>();
         synapseListeners = new ArrayList<SynapseListener>();
         subnetworkListeners = new ArrayList<SubnetworkListener>();
         groupListeners = new ArrayList<GroupListener>();
 
-        for(Neuron neuron : this.getFlatNeuronList()) {
+        for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.postUnmarshallingInit();
         }
-        for(Synapse synapse: this.getFlatSynapseList()) {
+        for (Synapse synapse : this.getFlatSynapseList()) {
             synapse.getTarget().getFanIn().add(synapse);
             synapse.getSource().getFanOut().add(synapse);
         }
@@ -219,13 +225,13 @@ public class RootNetwork extends Network {
 
         logger.debug("update called");
 
-        //Update Time
+        // Update Time
         updateTime();
 
         switch (this.updateMethod) {
         case PRIORITYBASED:
             logger.debug("priority-based update");
-            updateByPriority();
+            updateNeuronsByPriority();
             updateAllSynapses();
             break;
         default:
@@ -248,44 +254,41 @@ public class RootNetwork extends Network {
     }
 
     /**
+     * Update the priority list used for priority based update.
+     */
+    void updatePriorityList() {
+        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
+            prioritySortedNeuronList = this.getFlatNeuronList();
+            resortPriorities();
+        }
+    }
+
+    /**
+     * Resort the priorities in the priority list.
+     */
+    void resortPriorities() {
+        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
+            Collections.sort(prioritySortedNeuronList, priorityComparator);
+        }
+    }
+
+    /**
      * This function is used to update the neuron and sub-network activation
      * values if the user chooses to set different priority values for a subset
      * of neurons and sub-networks. The priority value determines the order in
      * which the neurons and sub-networks get updated - smaller priority value
      * elements will be updated before larger priority value elements.
      */
-    public void updateByPriority() {
-        if (this.getUpdatePriorities() == null) {
+    public void updateNeuronsByPriority() {
+
+        if (this.getClampNeurons() == true) {
             return;
         }
 
-        // TODO: Re-implement update using a <Priority,Neuron> treemap
-        for (Integer i : this.getUpdatePriorities()) {
-            // System.out.print(i.intValue() + "\n");
-            // update neurons with priority level i
-            if (!this.getClampNeurons()) {
-                // First update the activation buffers
-                for (Neuron n : this.getNeuronList()) {
-                    if (n.getUpdatePriority() == i.intValue()) {
-                        n.update(); // update neuron buffers
-                    }
-                }
-
-                // Then update the activations themselves
-                for (Neuron n : this.getNeuronList()) {
-                    if (n.getUpdatePriority() == i.intValue()) {
-                        n.setActivation(n.getBuffer());
-                    }
-                }
-            }
-
-            // For now just neuron based priorities
-//            // update sub-networks with priority level i
-//            for (Network n : this.getNetworkList()) {
-//                if (n.getUpdatePriority() == i.intValue()) {
-//                    n.update();
-//                }
-//            }
+        for (Neuron neuron : prioritySortedNeuronList) {
+            neuron.update();
+            neuron.setActivation(neuron.getBuffer());
+            //System.out.println("Priority:" + neuron.getUpdatePriority());
         }
     }
 
@@ -316,7 +319,7 @@ public class RootNetwork extends Network {
      */
     public void clearInputs() {
 
-        //TODO: Is there a more efficient way to handle this?
+        // TODO: Is there a more efficient way to handle this?
         // i.e. a way to get a list of neurons that (1) are coupled or better,
         // (2) have input values which consume.
         for (Neuron neuron : this.getFlatNeuronList()) {
@@ -349,7 +352,8 @@ public class RootNetwork extends Network {
         if (timeType == TimeType.DISCRETE) {
             return "" + (int) time + " " + getUnits()[1];
         } else {
-            return "" + round(time, getTimeStepPrecision()) + " " + getUnits()[0];
+            return "" + round(time, getTimeStepPrecision()) + " "
+                    + getUnits()[0];
         }
     }
 
@@ -426,8 +430,7 @@ public class RootNetwork extends Network {
      * @return Units by which to count.
      */
     public static String[] getUnits() {
-        String[] units = {"msec", "iterations" };
-
+        String[] units = { "msec", "iterations" };
         return units;
     }
 
@@ -461,8 +464,6 @@ public class RootNetwork extends Network {
         }
     }
 
-
-
     /**
      * Fire a neuron clamp toggle event to all registered model listeners.
      */
@@ -485,6 +486,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a network changed event to all registered model listeners.
+     *
      * @param moved Neuron that has been moved
      */
     public void fireNeuronMoved(final Neuron moved) {
@@ -506,13 +508,15 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a neuron type changed event to all registered model listeners.
-     * 
+     *
      * @param old the old update rule
      * @param changed the new update rule
      */
-    public void fireNeuronTypeChanged(final NeuronUpdateRule old, final NeuronUpdateRule changed) {
+    public void fireNeuronTypeChanged(final NeuronUpdateRule old,
+            final NeuronUpdateRule changed) {
         for (NeuronListener listener : neuronListeners) {
-            listener.neuronTypeChanged(new NetworkEvent<NeuronUpdateRule>(this, old, changed));
+            listener.neuronTypeChanged(new NetworkEvent<NeuronUpdateRule>(this,
+                    old, changed));
         }
     }
 
@@ -526,7 +530,6 @@ public class RootNetwork extends Network {
             listener.neuronChanged(new NetworkEvent<Neuron>(this, changed));
         }
     }
-
 
     /**
      * Fire a neuron added event to all registered model listeners.
@@ -567,9 +570,11 @@ public class RootNetwork extends Network {
      * @param oldRule old synapse, before the change
      * @param learningRule new, changed synapse
      */
-    public void fireSynapseTypeChanged(final SynapseUpdateRule oldRule, final SynapseUpdateRule learningRule) {
+    public void fireSynapseTypeChanged(final SynapseUpdateRule oldRule,
+            final SynapseUpdateRule learningRule) {
         for (SynapseListener listener : synapseListeners) {
-            listener.synapseTypeChanged(new NetworkEvent<SynapseUpdateRule>(this, oldRule, learningRule));
+            listener.synapseTypeChanged(new NetworkEvent<SynapseUpdateRule>(
+                    this, oldRule, learningRule));
         }
     }
 
@@ -649,7 +654,8 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Fire a group changed event to all registered model listeners. TODO: Change to grouptype changed?
+     * Fire a group changed event to all registered model listeners. TODO:
+     * Change to grouptype changed?
      *
      * @param old Old group
      * @param changed New changed group
@@ -661,7 +667,6 @@ public class RootNetwork extends Network {
         }
     }
 
-
     /**
      * Fire a group parameters changed event.
      *
@@ -669,7 +674,8 @@ public class RootNetwork extends Network {
      */
     public void fireGroupParametersChanged(final Group group) {
         for (GroupListener listener : groupListeners) {
-            listener.groupParameterChanged(new NetworkEvent<Group>(this, group, group));
+            listener.groupParameterChanged(new NetworkEvent<Group>(this, group,
+                    group));
         }
     }
 
@@ -682,6 +688,7 @@ public class RootNetwork extends Network {
 
     /**
      * Sets weights to clamped values.
+     *
      * @param clampWeights Weights to set
      */
     public void setClampWeights(final boolean clampWeights) {
@@ -698,6 +705,7 @@ public class RootNetwork extends Network {
 
     /**
      * Sets neurons to clamped values.
+     *
      * @param clampNeurons Neurons to set
      */
     public void setClampNeurons(final boolean clampNeurons) {
@@ -710,6 +718,7 @@ public class RootNetwork extends Network {
         // TODO Auto-generated method stub
         return null;
     }
+
     /**
      * @return Returns the isUsingTabs.
      */
@@ -722,23 +731,6 @@ public class RootNetwork extends Network {
      */
     public void setUsingTabs(final boolean usingTabs) {
         this.usingTabs = usingTabs;
-    }
-
-    /**
-     * @param priority to set.
-     */
-    public void setPriorityUpdate(final int priority) {
-       if (priority == 0) {
-           return;
-       }
-       this.updatePriorities.add(new Integer(priority));
-    }
-
-    /**
-     * @return the set of updatePriority values
-     */
-    public SortedSet<Integer> getUpdatePriorities() {
-        return this.updatePriorities;
     }
 
     /**
@@ -756,9 +748,7 @@ public class RootNetwork extends Network {
         this.fireNetworkUpdateMethodChanged();
     }
 
-    /**
-     * @see Object
-     */
+    @Override
     public String toString() {
 
         String ret = "Root Network \n================= \n";
@@ -778,7 +768,8 @@ public class RootNetwork extends Network {
 
         for (int i = 0; i < getNetworkList().size(); i++) {
             Network net = (Network) getNetworkList().get(i);
-            ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
+            ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " ("
+                    + net.getType() + ")");
             ret += (getIndents() + "--------------------------------\n");
             ret += net.toString();
         }
@@ -800,36 +791,6 @@ public class RootNetwork extends Network {
     public SimpleId getNeuronIdGenerator() {
         return neuronIdGenerator;
     }
-
-//    public Attribute getAttribute(String id) {
-//        System.out.println("id: " + id);
-//        
-//        Matcher matcher = Pattern.compile('(' + NEURON_ID_PREFIX + "_\\d+):(\\w+)").matcher(id);
-//        
-//        if (!matcher.matches()) return null;
-//        
-//        String parent = matcher.group(1);
-//        String attribute = matcher.group(2);
-//        
-//        System.out.println("parent: " + parent);
-//        System.out.println("attribute: " + attribute);
-//        
-//        for (Neuron n : getFlatNeuronList()) {
-//            if (n.getId().equals(parent)) {
-//                for (Attribute a : n.consumingAttributes()) {
-//                    System.out.println("\tchecking: " + a.getAttributeDescription());
-//                    if (a.getAttributeDescription().equals(attribute)) return a;
-//                }
-//                
-//                for (Attribute a : n.producingAttributes()) {
-//                    System.out.println("\tchecking: " + a.getAttributeDescription());
-//                    if (a.getAttributeDescription().equals(attribute)) return a;
-//                }
-//            }
-//        }
-//        
-//        return null;
-//    }
 
     /**
      * Return the generator for network ids.
@@ -864,7 +825,7 @@ public class RootNetwork extends Network {
      * @param listener the observer to register
      */
     public void addNeuronListener(final NeuronListener listener) {
-            neuronListeners.add(listener);
+        neuronListeners.add(listener);
     }
 
     /**
@@ -912,13 +873,11 @@ public class RootNetwork extends Network {
         groupListeners.remove(listener);
     }
 
-
     /**
      * Search for a neuron by label. If there are more than one with the same
      * label only the first one found is returned.
      *
-     * @param inputString
-     *            label of neuron to search for
+     * @param inputString label of neuron to search for
      * @return list of matched neurons, or null if none are found
      */
     public List<Neuron> getNeuronsByLabel(String inputString) {
@@ -934,9 +893,9 @@ public class RootNetwork extends Network {
             return foundNeurons;
         }
     }
-    
+
     /**
-     * Returns the first neuron in the array returned by getNeuronsByLabel
+     * Returns the first neuron in the array returned by getNeuronsByLabel.
      *
      * @param inputString label of neuron to search for
      * @return matched Neuron, if any
@@ -957,5 +916,15 @@ public class RootNetwork extends Network {
         return groupIdGenerator;
     }
 
+    /**
+     * Comparator for sorting neurons by update priority.
+     */
+    private class PriorityComparator implements Comparator<Neuron> {
+        public int compare(Neuron neuron1, Neuron neuron2) {
+            Integer priority1 = neuron1.getUpdatePriority();
+            Integer priority2 = neuron2.getUpdatePriority();
+            return priority1.compareTo(priority2);
+        }
+    }
 
 }

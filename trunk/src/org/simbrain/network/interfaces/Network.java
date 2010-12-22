@@ -118,7 +118,6 @@ public abstract class Network {
         newNetwork.setRootNetwork(this.getRootNetwork());
         List<?> copy = CopyFactory.getCopy(this.getRootNetwork(), getObjectList());
         newNetwork.addObjects(copy);
-        newNetwork.setUpdatePriority(this.getUpdatePriority());
         return newNetwork;
     }
 
@@ -347,6 +346,7 @@ public abstract class Network {
         neuronList.add(neuron);
         if ((rootNetwork != null)) {
             neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
+            rootNetwork.updatePriorityList();
             rootNetwork.fireNeuronAdded(neuron);
         }
         neuron.init();
@@ -460,6 +460,9 @@ public abstract class Network {
                     this.getRootNetwork().deleteGroup(group);
                 }
             }
+
+            // Update priority list
+            rootNetwork.updatePriorityList();
 
             // Remove outgoing synapses
             while (toDelete.getFanOut().size() > 0) {
@@ -1042,22 +1045,4 @@ public abstract class Network {
         this.rootNetwork = rootNetwork;
     }
 
-
-    /**
-     * @return updatePriority for the sub-network
-     */
-    public int getUpdatePriority() {
-        return updatePriority;
-    }
-
-    /**
-     * @param updatePriority to set.
-     */
-    public void setUpdatePriority(final int updatePriority) {
-        this.updatePriority = updatePriority;
-        if (this.updatePriority != 0 && this.getRootNetwork() != null) {
-            // notify the rootNetwork
-            this.getRootNetwork().setPriorityUpdate(updatePriority);
-        }
-    }
 }

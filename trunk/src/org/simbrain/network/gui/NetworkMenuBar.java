@@ -130,7 +130,8 @@ public class NetworkMenuBar {
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
         viewMenu.add(actionManager.getShowGUIAction());
-        viewMenu.add(actionManager.getShowNodesAction());
+        viewMenu.add(actionManager.getShowPrioritiesAction());
+        viewMenu.add(actionManager.getShowWeightsAction());
         returnMenu.add(viewMenu);
 
         JMenu helpMenu = new JMenu("Help");

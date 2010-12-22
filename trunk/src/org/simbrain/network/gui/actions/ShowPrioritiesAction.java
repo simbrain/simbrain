@@ -26,10 +26,9 @@ import javax.swing.JCheckBoxMenuItem;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
- * Show GUI weights action.
+ * Show Priorities action.
  */
-public final class ShowWeightsAction
-    extends AbstractAction {
+public final class ShowPrioritiesAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -41,9 +40,9 @@ public final class ShowWeightsAction
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public ShowWeightsAction(final NetworkPanel networkPanel) {
+    public ShowPrioritiesAction(final NetworkPanel networkPanel) {
 
-        super("Show Weights");
+        super("Show Priorities");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -51,17 +50,14 @@ public final class ShowWeightsAction
 
         this.networkPanel = networkPanel;
 
-        putValue(SHORT_DESCRIPTION, "Show weights in GUI");
+        putValue(SHORT_DESCRIPTION, "Show neuron priorities (for use in priority update)");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        // Perform action
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
-
-        // Determine status
-        networkPanel.setWeightsVisible(cb.isSelected());
+        networkPanel.setPrioritiesVisible(cb.isSelected());
 
     }
 }

@@ -221,8 +221,11 @@ public class NetworkPanel extends PCanvas  {
     /** Turn GUI on or off. */
     private boolean guiOn = true;
 
-    /** Turn synapse node on or off. */
-    private boolean synapseNodeOn = true;
+    /** Whether synapses are visible or not. */
+    private boolean weightsVisible = true;
+
+    /** Whether to display update priorities. */
+    private boolean prioritiesVisible = false;
 
     /** Text object event handler. */
     private TextEventHandler textHandle = new TextEventHandler(this);
@@ -306,6 +309,9 @@ public class NetworkPanel extends PCanvas  {
         getCamera().addChild(updateStatusLabel);
         //getCamera().setScale(.8); // Cheating to offset the toolbar
         updateStatusLabel.update();
+        if (rootNetwork.getUpdateMethod() == RootNetwork.UpdateMethod.PRIORITYBASED) {
+            setPrioritiesVisible(true);
+        }
 
         // Register support for tool tips
         // TODO: might be a memory leak, if not unregistered when the parent
@@ -366,7 +372,12 @@ public class NetworkPanel extends PCanvas  {
              */
             public void networkUpdateMethodChanged() {
                 updateStatusLabel.update();
-            }
+                if (rootNetwork.getUpdateMethod() == RootNetwork.UpdateMethod.PRIORITYBASED) {
+                    setPrioritiesVisible(true);
+                } else {
+                    setPrioritiesVisible(false);
+                }
+           }
 
         });
 
@@ -833,15 +844,6 @@ public class NetworkPanel extends PCanvas  {
     }
 
     /**
-     * Temporary debugging method for model updates.
-     */
-    public void updateNodesTemp() {
-        for (NeuronNode node : getNeuronNodes()) {
-            node.pullViewPositionFromModel();
-        }
-    }
-
-    /**
      * Aligns neurons vertically.
      */
     public void alignVertical() {
@@ -1227,7 +1229,7 @@ public class NetworkPanel extends PCanvas  {
 
     /**
      * Called by rootNetwork preferences as preferences are changed. Iterates
-     * through screen elemenets and resets relevant colors.
+     * through screen elements and resets relevant colors.
      */
     public void resetColors() {
         setBackground(NetworkGuiSettings.getBackgroundColor());
@@ -1753,19 +1755,6 @@ public class NetworkPanel extends PCanvas  {
         repaint();
     }
 
-//    /**
-//     * @param inOutMode The in out mode to set.
-//     */
-//    public void setInOutMode(final boolean inOutMode) {
-//        this.inOutMode = inOutMode;
-//        for (Iterator i = getCoupledNodes().iterator(); i.hasNext(); ) {
-//            NeuronNode node = (NeuronNode) i.next();
-//            node.updateInLabel();
-//            node.updateOutLabel();
-//        }
-//        repaint();
-//    }
-
     /**
      * @return Returns the in out mode.
      */
@@ -1946,27 +1935,57 @@ public class NetworkPanel extends PCanvas  {
     }
 
     /**
-     * Turns the displaying of synapses on and off (for performance increase or visual clarity).
+     * Turns the displaying of synapses on and off (for performance increase or
+     * visual clarity).
      *
      * @param synapseNodeOn turn synapse nodes on boolean
      */
-    public void setSynapseNodesOn(final boolean synapseNodeOn) {
-        this.synapseNodeOn = synapseNodeOn;
-        actionManager.getShowNodesAction().setState(synapseNodeOn);
+    public void setWeightsVisible(final boolean synapseNodeOn) {
+        this.weightsVisible = synapseNodeOn;
+        actionManager.getShowWeightsAction().setState(synapseNodeOn);
 
         if (synapseNodeOn) {
-            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes
-                    .hasNext();) {
+            for (Iterator<SynapseNode> synapseNodes = this.getSynapseNodes()
+                    .iterator(); synapseNodes.hasNext();) {
                 SynapseNode node = (SynapseNode) synapseNodes.next();
                 node.setVisible(true);
             }
         } else {
-            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes
-                    .hasNext();) {
+            for (Iterator<SynapseNode> synapseNodes = this.getSynapseNodes()
+                    .iterator(); synapseNodes.hasNext();) {
                 SynapseNode node = (SynapseNode) synapseNodes.next();
                 node.setVisible(false);
             }
         }
+    }
+
+    /**
+     * @return turn synapse nodes on.
+     */
+    public boolean getWeightsVisible() {
+        return weightsVisible;
+    }
+
+    /**
+     * Turns the displaying of neuron priorities on or off.
+     *
+     * @param prioritiesOn whether to show priorities or not
+     */
+    public void setPrioritiesVisible(final boolean prioritiesOn) {
+        this.prioritiesVisible = prioritiesOn;
+        actionManager.getShowPrioritiesAction().setState(prioritiesOn);
+        for (Iterator<NeuronNode> neuronNodes = this.getNeuronNodes()
+                .iterator(); neuronNodes.hasNext();) {
+            NeuronNode node = neuronNodes.next();
+            node.setPriorityView(prioritiesVisible);
+        }
+    }
+
+    /**
+     * @return the prioritiesVisible
+     */
+    public boolean getPrioritiesVisible() {
+        return prioritiesVisible;
     }
 
     /**
@@ -2102,21 +2121,6 @@ public class NetworkPanel extends PCanvas  {
     }
 
     /**
-     * @return turn synapse nodes on.
-     */
-    public boolean isSynapseNodesOn() {
-        return synapseNodeOn;
-    }
-
-
-    /**
-     * @param synapseNodeOn turn synapse nodes on.
-     */
-    public void setNodesOn(final boolean synapseNodeOn) {
-        this.synapseNodeOn = synapseNodeOn;
-    }
-
-    /**
      * @return the actionManager
      */
     public NetworkActionManager getActionManager() {
@@ -2169,7 +2173,8 @@ public class NetworkPanel extends PCanvas  {
 
     /**
      * Returns a NetworkDialog. Overriden by NetworkPanelDesktop, which returns
-     * a NetworkDialog with additional features used in Desktop version of Simbrain.
+     * a NetworkDialog with additional features used in Desktop version of
+     * Simbrain.
      *
      * @param networkPanel network panel
      * @return subclass version of network dialog.
@@ -2179,8 +2184,8 @@ public class NetworkPanel extends PCanvas  {
     }
 
     /**
-     * Returns a neuron node. Overriden by NetworkPanelDesktop, which returns
-     * a NeuronNode with additional features used in Desktop version of Simbrain.
+     * Returns a neuron node. Overriden by NetworkPanelDesktop, which returns a
+     * NeuronNode with additional features used in Desktop version of Simbrain.
      *
      * @param netPanel network panel.
      * @param neuron logical neuron this node represents

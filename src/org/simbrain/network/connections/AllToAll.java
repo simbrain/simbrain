@@ -22,7 +22,6 @@ import java.util.List;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
@@ -33,15 +32,23 @@ import org.simbrain.network.synapses.ClampedSynapse;
 public class AllToAll extends ConnectNeurons {
 
     /**
-     * The synapse to be used as a basis for the connection. Default to a
-     * clamped synapse.
+     * "Template" synapse to be used when applying the connection.
      */
-    private static SynapseUpdateRule baseSynapseRule = new ClampedSynapse();
+    private static Synapse baseSynapse = Synapse.getTemplateSynapse();
 
     /** Allows neurons to have a self connection. */
     private static boolean allowSelfConnection = true;
 
-    public AllToAll(final Network network, final List<? extends Neuron> neurons, final List<? extends Neuron> neurons2) {
+    /**
+     * Construct all to all connection object.
+     *
+     * @param network parent network
+     * @param neurons base neurons
+     * @param neurons2 target neurons
+     */
+    public AllToAll(final Network network,
+            final List<? extends Neuron> neurons,
+            final List<? extends Neuron> neurons2) {
         super(network, neurons, neurons2);
     }
 
@@ -65,17 +72,13 @@ public class AllToAll extends ConnectNeurons {
                 }
                 if (!allowSelfConnection) {
                     if (source != target) {
-                       //Synapse synapse = baseSynapse.duplicate();
-                        Synapse synapse = new Synapse(source, target, baseSynapseRule.deepCopy());
-                        synapse.setSource(source);
-                        synapse.setTarget(target);
+                        Synapse synapse = baseSynapse
+                                .instantiateTemplateSynapse(source, target, network);
                         network.addSynapse(synapse);
                     }
                 } else {
-                    //Synapse synapse = baseSynapse.duplicate();
-                    Synapse synapse = new Synapse(source, target, baseSynapseRule.deepCopy());
-                    synapse.setSource(source);
-                    synapse.setTarget(target);
+                    Synapse synapse = baseSynapse.instantiateTemplateSynapse(
+                            source, target, network);
                     network.addSynapse(synapse);
                 }
             }
@@ -85,15 +88,15 @@ public class AllToAll extends ConnectNeurons {
     /**
      * @return the baseSynapse
      */
-    public static SynapseUpdateRule getBaseSynapse() {
-        return baseSynapseRule;
+    public static Synapse getBaseSynapse() {
+        return baseSynapse;
     }
 
     /**
      * @param baseSynapse the baseSynapse to set
      */
     public static void setBaseSynapse(final Synapse theSynapse) {
-        //baseSynapse = theSynapse; //TODO:
+        baseSynapse = theSynapse;
     }
 
     /**

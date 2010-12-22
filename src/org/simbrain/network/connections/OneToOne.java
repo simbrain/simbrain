@@ -38,10 +38,9 @@ import org.simbrain.network.util.Comparators;
 public class OneToOne extends ConnectNeurons {
 
     /**
-     * The synapse to be used as a basis for the connection. Default to a
-     * clamped synapse.
+     * "Template" synapse to be used when applying the connection.
      */
-    private static SynapseUpdateRule baseLearningRule = new ClampedSynapse();
+    private static Synapse baseSynapse = Synapse.getTemplateSynapse();
 
     /**
      * If true, synapses are added in both directions.
@@ -107,13 +106,13 @@ public class OneToOne extends ConnectNeurons {
             Neuron source = (Neuron) sources.next();
             if (targetsX.hasNext()) {
                 Neuron target = (Neuron) targetsX.next();
-                Synapse synapse = new Synapse(source, target, baseLearningRule.deepCopy());
-                synapse.setSource(source);
-                synapse.setTarget(target);
+                Synapse synapse = baseSynapse.instantiateTemplateSynapse(
+                        source, target, network);
                 network.addSynapse(synapse);
                 // Allow neurons to be connected back to source.
                 if (useBidirectionalConnections) {
-                    Synapse synapse2 = new Synapse(source, target, baseLearningRule.deepCopy());
+                    Synapse synapse2 = baseSynapse.instantiateTemplateSynapse(
+                            source, target, network);
                     synapse2.setSource(target);
                     synapse2.setTarget(source);
                     network.addSynapse(synapse2);
@@ -125,32 +124,17 @@ public class OneToOne extends ConnectNeurons {
     }
 
     /**
-     * @return the baseSynapse
-     */
-    public static SynapseUpdateRule getBaseLearningRule() {
-        return baseLearningRule;
-    }
-
-    /**
-     * @param baseSynapse the baseSynapse to set
-     */
-    public static void setBaseSynapse(final SynapseUpdateRule baseLearningRule) {
-        OneToOne.baseLearningRule = baseLearningRule;
-    }
-
-
-    /**
      * @return the useBidirectionalConnections
      */
     public static boolean isUseBidirectionalConnections() {
         return useBidirectionalConnections;
     }
 
-
     /**
      * @param useBidirectionalConnections the useBidirectionalConnections to set
      */
-    public static void setUseBidirectionalConnections(final boolean useBidirectionalConnections) {
+    public static void setUseBidirectionalConnections(
+            final boolean useBidirectionalConnections) {
         OneToOne.useBidirectionalConnections = useBidirectionalConnections;
     }
 
@@ -165,7 +149,22 @@ public class OneToOne extends ConnectNeurons {
     /**
      * @param connectOrientation the connectOrientation to set
      */
-    public static void setConnectOrientation(final Comparator<Neuron> connectOrientation) {
+    public static void setConnectOrientation(
+            final Comparator<Neuron> connectOrientation) {
         OneToOne.connectOrientation = connectOrientation;
+    }
+
+    /**
+     * @return the baseSynapse
+     */
+    public static Synapse getBaseSynapse() {
+        return baseSynapse;
+    }
+
+    /**
+     * @param baseSynapse the baseSynapse to set
+     */
+    public static void setBaseSynapse(Synapse baseSynapse) {
+        OneToOne.baseSynapse = baseSynapse;
     }
 }

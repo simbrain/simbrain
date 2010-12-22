@@ -108,7 +108,7 @@ public final class LayeredNetworkBuilder {
         }
 
         // Prepare base synapse for connecting layers
-        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
+        Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapse());
         synapse.setLowerBound(-10);
         synapse.setUpperBound(10);
 

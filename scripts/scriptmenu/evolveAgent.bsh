@@ -107,9 +107,12 @@ import org.jgap.impl.*;
         private static final String rootDir = "static"
                 + System.getProperty("file.separator");
 
+        /** Reference to parent network. */
+        RootNetwork network;
+
         protected double evaluate(IChromosome chromosome) {
 
-            RootNetwork network = new RootNetwork();
+            network = new RootNetwork();
             chromosome.setApplicationData(network);
 
             Workspace evolverWorkspace = new Workspace();
@@ -144,8 +147,8 @@ import org.jgap.impl.*;
             connection.setInhibitoryProbability(inhibProb);
             connection.setExcitatoryRadius(excitRadius);
             connection.setInhibitoryRadius(inhibRadius);
-            connection.setBaseExcitatorySynapse(new ClampedSynapse(null,null));
-            connection.setBaseInhibitorySynapse(new ClampedSynapse(null,null));
+            connection.setBaseExcitatorySynapse(Synapse.getTemplateSynapse());
+            connection.setBaseInhibitorySynapse(Synapse.getTemplateSynapse());
             connection.connectNeurons();
 
             // Label neurons
@@ -160,7 +163,7 @@ import org.jgap.impl.*;
             network.getNeuron("Neuron_8").setLabel("Right");
 
             // Add reward Neuron
-            Neuron rewardNeuron = new DecayNeuron();
+            Neuron rewardNeuron = new Neuron(network, new ClampedNeuron());
             rewardNeuron.setLowerBound(-50);
             rewardNeuron.setUpperBound(100);
             rewardNeuron.setLabel("Reward");
@@ -195,15 +198,15 @@ import org.jgap.impl.*;
 
             switch (neuronType) {
             case 0:
-                return new BinaryNeuron();
+                return new Neuron(network, new BinaryNeuron());
             case 1:
-                return new LinearNeuron();
+                return new Neuron(network, new LinearNeuron());
             case 2:
-                return new SigmoidalNeuron();
+                return new Neuron(network, new SigmoidalNeuron());
             case 3:
-                return new DecayNeuron();
+                return new Neuron(network, new DecayNeuron());
             default:
-                return new NakaRushtonNeuron();
+                return new Neuron(network, new NakaRushtonNeuron());
             }
         }
 

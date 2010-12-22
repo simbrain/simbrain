@@ -169,8 +169,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
         for (Synapse synapse : synapseList) {
             Neuron source = synapse.getSource();
-            if ((source.getUpdateRule() instanceof SpikingNeuronUpdateRule) && (source != null)) {
-                ret.add(synapse);
+            if (source != null) {
+                if ((source.getUpdateRule() instanceof SpikingNeuronUpdateRule)
+                        && (source != null)) {
+                    ret.add(synapse);
+                }
             }
         }
         return ret;
@@ -258,7 +261,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         if (selected != NULL_STRING) {
             String name = ((ClassDescriptionPair)selected).getSimpleName();
             for (int i = 0; i < synapseList.size(); i++) {
-                synapseList.get(i).setLearningeRule(name);
+                synapseList.get(i).setLearningRule(name);
             }
         }
     }

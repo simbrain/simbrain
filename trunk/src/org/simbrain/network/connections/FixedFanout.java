@@ -31,6 +31,7 @@ import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
  * Connect every source neuron to every target neuron.
+ * 
  */
 public class FixedFanout extends ConnectNeurons {
 

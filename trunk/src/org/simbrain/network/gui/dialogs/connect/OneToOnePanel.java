@@ -31,11 +31,10 @@ import javax.swing.JLabel;
 import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
-
 
 /**
- * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one neuron connections.
+ * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one
+ * neuron connections.
  */
 public class OneToOnePanel extends AbstractConnectionPanel {
 
@@ -48,34 +47,30 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     /** Sets whether connections are bidirectional. */
     private JCheckBox bidirectionalConnection = new JCheckBox();
 
-    /** Connection. */
-    private OneToOne connection = new OneToOne();
-
     /**
      * Default constructor.
      */
     public OneToOnePanel(final OneToOne connection) {
         super(connection);
-        this.connection = connection;
         orientationBox = new JComboBox(OneToOne.getOrientationTypes());
         JButton setSynapseType = new JButton("Set...");
         setSynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
-                Synapse temp = new Synapse(null, null, OneToOne.getBaseLearningRule(), null);
+                Synapse temp = OneToOne.getBaseSynapse();
                 list.add(temp);
                 SynapseDialog dialog = new SynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-                SynapseUpdateRule rule = dialog.getSynapseList().get(0).getLearningRule();
-                OneToOne.setBaseSynapse(rule);
-                baseSynapseLabel.setText(rule.getDescription());
+                Synapse synapse = dialog.getSynapseList().get(0);
+                OneToOne.setBaseSynapse(synapse);
+                baseSynapseLabel.setText(synapse.getType());
             }
 
         });
-        baseSynapseLabel.setText(connection.getBaseLearningRule().getDescription());
+        baseSynapseLabel.setText(OneToOne.getBaseSynapse().getType());
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
         this.addItem("Connection Orientaiton: ", orientationBox);
@@ -86,15 +81,18 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-        OneToOne.setUseBidirectionalConnections(bidirectionalConnection.isSelected());
-        OneToOne.setConnectOrientation((Comparator) orientationBox.getSelectedItem());
+        OneToOne.setUseBidirectionalConnections(bidirectionalConnection
+                .isSelected());
+        OneToOne.setConnectOrientation((Comparator) orientationBox
+                .getSelectedItem());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        bidirectionalConnection.setSelected(OneToOne.isUseBidirectionalConnections());
+        bidirectionalConnection.setSelected(OneToOne
+                .isUseBidirectionalConnections());
         orientationBox.setSelectedItem(OneToOne.getConnectOrientation());
     }
 

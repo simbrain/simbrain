@@ -17,7 +17,7 @@ import org.simbrain.plot.timeseries.*;
     network.setTimeStep(.2);
 
     // Input neuron
-    ClampedNeuron inputNeuron = new ClampedNeuron();
+    Neuron inputNeuron = new Neuron(network, new ClampedNeuron());
     inputNeuron.setLocation(10,10);
     inputNeuron.setActivation(15);
     inputNeuron.setUpperBound(50);
@@ -27,18 +27,18 @@ import org.simbrain.plot.timeseries.*;
     network.addNeuron(inputNeuron);
 
     // Spiking neuron
-    IzhikevichNeuron spiker = new IzhikevichNeuron();
+    Neuron spiker = new Neuron(network, new IzhikevichNeuron());
     spiker.setLocation(150,10);
     spiker.setLabel("Spiking neuron");
-    spiker.setA(.02);
-    spiker.setB(.2);
-    spiker.setC(-50);
-    spiker.setD(2);
+    ((IzhikevichNeuron)spiker.getUpdateRule()).setA(.02);
+    ((IzhikevichNeuron)spiker.getUpdateRule()).setB(.2);
+    ((IzhikevichNeuron)spiker.getUpdateRule()).setC(-50);
+    ((IzhikevichNeuron)spiker.getUpdateRule()).setD(2);
 
     network.addNeuron(spiker);
 
     // Connect neurons
-    network.addSynapse(new ClampedSynapse(inputNeuron, spiker));
+    network.addSynapse(new Synapse(inputNeuron, spiker));
 
     // Initialize network
     networkComponent.update();  // TODO: Replace with better method

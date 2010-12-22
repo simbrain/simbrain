@@ -43,15 +43,15 @@ public class Sparse extends ConnectNeurons {
     public static double inhibitoryProbability = .1;
 
     /** Template synapse for excitatory synapses. */
-    private static SynapseUpdateRule baseExcitatorySynapse = new ClampedSynapse();
+    private static Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
 
     /** Template synapse for inhibitory synapses. */
-    private static SynapseUpdateRule baseInhibitorySynapse = new ClampedSynapse();
+    private static Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
 
     // Initialize base synapses
     {
-//        baseExcitatorySynapse.setStrength(10);
-//        baseInhibitorySynapse.setStrength(-10);
+        baseExcitatorySynapse.setStrength(10);
+        baseInhibitorySynapse.setStrength(-10);
     }
 
     /**
@@ -64,9 +64,8 @@ public class Sparse extends ConnectNeurons {
     public Sparse(final Network network, final List<? extends Neuron> neurons, final List<? extends Neuron> neurons2) {
         super(network, neurons, neurons2);
     }
-    
+
     /** {@inheritDoc} */
-    
     public Sparse() {}
 
     @Override
@@ -88,18 +87,14 @@ public class Sparse extends ConnectNeurons {
                 }
 
                 if (Math.random() < excitatoryProbability) {
-//                    Synapse synapse = baseExcitatorySynapse.duplicate();
-                    Synapse synapse = new Synapse(source, target, null);
-                    synapse.setSource(source);
-                    synapse.setTarget(target);
+                    Synapse synapse = baseExcitatorySynapse
+                            .instantiateTemplateSynapse(source, target, network);
                     network.addSynapse(synapse);
                     continue;
                 }
                 if (Math.random() < inhibitoryProbability) {
-//                    Synapse synapse = baseInhibitorySynapse.duplicate();
-                    Synapse synapse = new Synapse(source, target, null);
-                    synapse.setSource(source);
-                    synapse.setTarget(target);
+                    Synapse synapse = baseInhibitorySynapse
+                            .instantiateTemplateSynapse(source, target, network);
                     network.addSynapse(synapse);
                 }
             }
@@ -130,38 +125,36 @@ public class Sparse extends ConnectNeurons {
     /**
      * @param inhibitoryProbability the inhibitoryProbability to set
      */
-    public static void setInhibitoryProbability(final double inhibitoryProbability) {
+    public static void setInhibitoryProbability(
+            final double inhibitoryProbability) {
         Sparse.inhibitoryProbability = inhibitoryProbability;
     }
 
     /**
      * @return the baseExcitatorySynapse
      */
-    public static SynapseUpdateRule getBaseExcitatorySynapse() {
+    public static Synapse getBaseExcitatorySynapse() {
         return baseExcitatorySynapse;
     }
 
     /**
      * @param baseExcitatorySynapse the baseExcitatorySynapse to set
      */
-    public static void setBaseExcitatorySynapse(
-            SynapseUpdateRule baseExcitatorySynapse) {
+    public static void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
         Sparse.baseExcitatorySynapse = baseExcitatorySynapse;
     }
 
     /**
      * @return the baseInhibitorySynapse
      */
-    public static SynapseUpdateRule getBaseInhibitorySynapse() {
+    public static Synapse getBaseInhibitorySynapse() {
         return baseInhibitorySynapse;
     }
 
     /**
      * @param baseInhibitorySynapse the baseInhibitorySynapse to set
      */
-    public static void setBaseInhibitorySynapse(
-            SynapseUpdateRule baseInhibitorySynapse) {
+    public static void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
         Sparse.baseInhibitorySynapse = baseInhibitorySynapse;
     }
-
 }

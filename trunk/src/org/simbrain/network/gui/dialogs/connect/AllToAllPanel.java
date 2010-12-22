@@ -30,9 +30,9 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
-
 /**
- * <b>AllToAllPanel</b> creates a dialog for setting preferences of all to all neuron connections.
+ * <b>AllToAllPanel</b> creates a dialog for setting preferences of all to all
+ * neuron connections.
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 
@@ -54,7 +54,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
-                //list.add(AllToAll.getBaseSynapse()); //TODO:
+                list.add(AllToAll.getBaseSynapse());
                 SynapseDialog dialog = new SynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
@@ -63,9 +63,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
                 AllToAll.setBaseSynapse(synapse);
                 baseSynapseLabel.setText(synapse.getType());
             }
-            
         });
-        //baseSynapseLabel.setText(AllToAll.getBaseSynapse().getType()); //TODO
+        baseSynapseLabel.setText(AllToAll.getBaseSynapse().getType());
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
     }
@@ -74,7 +73,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-         AllToAll.setAllowSelfConnection(allowSelfConnect.isSelected());
+        AllToAll.setAllowSelfConnection(allowSelfConnect.isSelected());
     }
 
     /**

@@ -31,9 +31,9 @@ import org.simbrain.network.connections.Radial;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
-
 /**
- * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron connections.
+ * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron
+ * connections.
  */
 public class RadialPanel extends AbstractConnectionPanel {
 
@@ -60,6 +60,7 @@ public class RadialPanel extends AbstractConnectionPanel {
 
     /**
      * This method is the default constructor.
+     * 
      * @param connection type
      */
     public RadialPanel(final Radial connection) {
@@ -67,50 +68,54 @@ public class RadialPanel extends AbstractConnectionPanel {
         this.addItem("Excitatory Radius", tfExciteRadius);
         this.addItem("Excitatory Probability", tfExciteProbability);
 
-
         JButton setExcitatorySynapseType = new JButton("Set...");
         setExcitatorySynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> excitatoryList = new ArrayList<Synapse>();
-                //TODO
-//                excitatoryList.add(Radial.getBaseExcitatorySynapse());
-//                SynapseDialog dialog = new SynapseDialog(excitatoryList);
-//                dialog.pack();
-//                dialog.setLocationRelativeTo(null);
-//                dialog.setVisible(true);
-//                Synapse excitatorySynapse = dialog.getSynapseList().get(0);
-//                Radial.setBaseExcitatorySynapse(excitatorySynapse);
-//                baseExcitatorySynapseLabel.setText(excitatorySynapse.getType());
+                excitatoryList.add(Radial.getBaseExcitatorySynapse());
+                SynapseDialog dialog = new SynapseDialog(excitatoryList);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                Synapse excitatorySynapse = dialog.getSynapseList().get(0);
+                Radial.setBaseExcitatorySynapse(excitatorySynapse);
+                baseExcitatorySynapseLabel.setText(excitatorySynapse.getType());
             }
 
         });
-//        baseExcitatorySynapseLabel.setText(Radial.getBaseExcitatorySynapse().getType());
-        this.addItem("Base Excitatory Synapse Type:", baseExcitatorySynapseLabel);
-        this.addItem("Set Base Excitatory Synapse Type:", setExcitatorySynapseType);
+        baseExcitatorySynapseLabel.setText(Radial.getBaseExcitatorySynapse()
+                .getType());
+        this.addItem("Base Excitatory Synapse Type:",
+                baseExcitatorySynapseLabel);
+        this.addItem("Set Base Excitatory Synapse Type:",
+                setExcitatorySynapseType);
 
         this.addItem("Inhibitory Radius", tfInhibitRadius);
         this.addItem("Inhibitory Probability", tfInhibitProbability);
-        
+
         JButton setInhibitorySynapseType = new JButton("Set...");
         setInhibitorySynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-//                ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
-//                inhibitoryList.add(Radial.getBaseInhibitorySynapse());
-//                SynapseDialog dialog = new SynapseDialog(inhibitoryList);
-//                dialog.pack();
-//                dialog.setLocationRelativeTo(null);
-//                dialog.setVisible(true);
-//                Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
-//                Radial.setBaseInhibitorySynapse(inhibitorySynapse);
-//                baseInhibitorySynapseLabel.setText(inhibitorySynapse.getType());
+                ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
+                inhibitoryList.add(Radial.getBaseInhibitorySynapse());
+                SynapseDialog dialog = new SynapseDialog(inhibitoryList);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
+                Radial.setBaseInhibitorySynapse(inhibitorySynapse);
+                baseInhibitorySynapseLabel.setText(inhibitorySynapse.getType());
             }
-            
+
         });
-//        baseInhibitorySynapseLabel.setText(Radial.getBaseInhibitorySynapse().getType());
-        this.addItem("Base Inhibitory Synapse Type:", baseInhibitorySynapseLabel);
-        this.addItem("Set Inhibitory Base Synapse Type:", setInhibitorySynapseType);
+        baseInhibitorySynapseLabel.setText(Radial.getBaseInhibitorySynapse()
+                .getType());
+        this.addItem("Base Inhibitory Synapse Type:",
+                baseInhibitorySynapseLabel);
+        this.addItem("Set Inhibitory Base Synapse Type:",
+                setInhibitorySynapseType);
 
         this.addItem("Allow Self Connections", allowSelfConnect);
     }
@@ -119,22 +124,26 @@ public class RadialPanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-        Radial.setExcitatoryProbability(Double.parseDouble(tfExciteProbability.getText()));
+        Radial.setExcitatoryProbability(Double.parseDouble(tfExciteProbability
+                .getText()));
         Radial.setExcitatoryRadius(Double.parseDouble(tfExciteRadius.getText()));
-        Radial.setInhibitoryProbability(Double.parseDouble(tfInhibitProbability.getText()));
+        Radial.setInhibitoryProbability(Double.parseDouble(tfInhibitProbability
+                .getText()));
         Radial.setInhibitoryRadius(Double.parseDouble(tfInhibitRadius.getText()));
         Radial.setAllowSelfConnections(allowSelfConnect.isSelected());
     }
 
-    
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        tfExciteProbability.setText(Double.toString(Radial.getExcitatoryProbability()));
-        tfInhibitProbability.setText(Double.toString(Radial.getInhibitoryProbability()));
+        tfExciteProbability.setText(Double.toString(Radial
+                .getExcitatoryProbability()));
+        tfInhibitProbability.setText(Double.toString(Radial
+                .getInhibitoryProbability()));
         tfExciteRadius.setText(Double.toString(Radial.getExcitatoryRadius()));
-        tfInhibitProbability.setText(Double.toString(Radial.getInhibitoryProbability()));
+        tfInhibitProbability.setText(Double.toString(Radial
+                .getInhibitoryProbability()));
         tfInhibitRadius.setText(Double.toString(Radial.getInhibitoryRadius()));
         allowSelfConnect.setSelected(Radial.isAllowSelfConnections());
     }

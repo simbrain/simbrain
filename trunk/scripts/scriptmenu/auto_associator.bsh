@@ -56,9 +56,9 @@ import org.simbrain.util.*;
     // Connect neurons
     //AllToAll connection = new AllToAll(network, network.getFlatNeuronList(), network.getFlatNeuronList());
     Sparse connection = new Sparse(network, network.getFlatNeuronList(), network.getFlatNeuronList());
-    Hebbian synapse = new Hebbian(null, null);
+    Synapse synapse = Synapse.getTemplateSynapse("HebbianSynapse");
     synapse.setStrength(0);
-    synapse.setLearningRate(.01);
+    ((HebbianSynapse)synapse.getLearningRule()).setLearningRate(.01);
     connection.setBaseExcitatorySynapse(synapse);
     connection.connectNeurons();
 
@@ -74,7 +74,7 @@ import org.simbrain.util.*;
     SimbrainButton clearButton = new SimbrainButton("Reset simulation", workspace);
     clearButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            networkPanel.setSynapseNodesOn(true);
+            networkPanel.setWeightsVisible(true);
             network.setActivations(-1);
             network.setWeights(0);
             network.fireNetworkChanged();
@@ -86,7 +86,7 @@ import org.simbrain.util.*;
     SimbrainButton plusPattern = new SimbrainButton("+ Pattern", workspace);
     plusPattern.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            networkPanel.setSynapseNodesOn(true);
+            networkPanel.setWeightsVisible(true);
             network.setActivations(new double[] 
                                               {-1,-1,1,-1,-1,
                     -1,-1,1,-1,-1,
@@ -102,7 +102,7 @@ import org.simbrain.util.*;
     SimbrainButton oPattern = new SimbrainButton("O Pattern", workspace);
     oPattern.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            networkPanel.setSynapseNodesOn(true);
+            networkPanel.setWeightsVisible(true);
             network.setActivations(new double[] 
                                               {-1,1,1,1,-1,
                     1,-1,-1,-1,1,
@@ -118,7 +118,7 @@ import org.simbrain.util.*;
     SimbrainButton xPattern = new SimbrainButton("X Pattern", workspace);
     xPattern.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            networkPanel.setSynapseNodesOn(true);
+            networkPanel.setWeightsVisible(true);
             network.setActivations(new double[] 
                                               {1,-1,-1,-1,1,
                     -1,1,-1,1,-1,
@@ -134,7 +134,7 @@ import org.simbrain.util.*;
     SimbrainButton trainButton = new SimbrainButton("Train current pattern", workspace);
     trainButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            networkPanel.setSynapseNodesOn(true);
+            networkPanel.setWeightsVisible(true);
             network.setClampNeurons(true);
             network.setClampWeights(false);
             workspace.iterate(TRAINING_ITERATIONS);
@@ -146,7 +146,7 @@ import org.simbrain.util.*;
     SimbrainButton testPattern = new SimbrainButton("Test using random pattern", workspace);
     testPattern.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            networkPanel.setSynapseNodesOn(false);
+            networkPanel.setWeightsVisible(false);
             network.setClampNeurons(false);
             network.setClampWeights(true);
             network.randomizeNeurons();
@@ -159,7 +159,7 @@ import org.simbrain.util.*;
     SimbrainButton testingMode = new SimbrainButton("Test retrieval manually", workspace);
     testingMode.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            networkPanel.setSynapseNodesOn(false);
+            networkPanel.setWeightsVisible(false);
             network.setClampNeurons(false);
             network.setClampWeights(true);
             network.setActivations(0);

@@ -160,7 +160,6 @@ public class RootNetwork extends Network {
     private void init() {
         setRootNetwork(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
-        this.setId("Root-network");
     }
 
     /**

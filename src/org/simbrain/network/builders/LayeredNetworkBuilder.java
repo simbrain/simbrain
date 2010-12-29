@@ -36,20 +36,19 @@ import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
- * Adds a layered object to a network.
- *
- * The topology is specified by an array of integers I1...In which correspond to
- * the number of nodes in layers L1...Ln, and where L1 is the input layer and Ln
- * is the output layer.
+ * Adds a layered object to a network. The topology is specified by an array of
+ * integers I1...In which correspond to the number of nodes in layers L1...Ln,
+ * and where L1 is the input layer and Ln is the output layer.
  *
  * @author jeff yoshimi
  */
 public final class LayeredNetworkBuilder {
 
-    // TODO: Possibly abstract core concepts to a superclass 
-    // TODO: Default neurons, synapses (input / output special?). upper /lower bounds 
-    // TODO: Possibly add "justification" (right, left, center) field 
-    // TODO: Allow Horizontal vs. vertical layout 
+    // TODO: Possibly abstract core concepts to a superclass
+    // TODO: Default neurons, synapses (input / output special?). upper /lower
+    // bounds
+    // TODO: Possibly add "justification" (right, left, center) field
+    // TODO: Allow Horizontal vs. vertical layout
     // TODO: Option: within layer recurrence?
 
     /**
@@ -67,7 +66,7 @@ public final class LayeredNetworkBuilder {
     private int betweenNeuronInterval = 50;
 
     /** Initial position of network (from bottom left). */
-    Point2D.Double initialPosition = new Point2D.Double(0,0);
+    Point2D.Double initialPosition = new Point2D.Double(0, 0);
 
     /** Whether to put each layer in a neuron group. */
     private boolean addGroups = true;
@@ -77,12 +76,12 @@ public final class LayeredNetworkBuilder {
      */
     public LayeredNetworkBuilder() {
     }
-    
+
     /**
      * Add the layered network to the specified network.
      *
-     * @param network the parent network to which the layered network is being added
-     *
+     * @param network the parent network to which the layered network is being
+     *            added
      */
     public void buildNetwork(final RootNetwork network) {
 
@@ -93,7 +92,7 @@ public final class LayeredNetworkBuilder {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuron()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuron());
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
@@ -103,7 +102,8 @@ public final class LayeredNetworkBuilder {
                 - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
         layout.layoutNeurons(inputLayer);
         if (addGroups) {
-            NeuronLayer group = new NeuronLayer(network, inputLayer, LayerType.Input);
+            NeuronLayer group = new NeuronLayer(network, inputLayer,
+                    LayerType.Input);
             network.addGroup(group);
         }
 
@@ -132,10 +132,12 @@ public final class LayeredNetworkBuilder {
             layout.layoutNeurons(hiddenLayer);
             if (addGroups) {
                 if (i == nodesPerLayer.length - 1) {
-                    NeuronLayer group = new NeuronLayer(network, hiddenLayer, LayerType.Output);
+                    NeuronLayer group = new NeuronLayer(network, hiddenLayer,
+                            LayerType.Output);
                     network.addGroup(group);
                 } else {
-                    NeuronLayer group = new NeuronLayer(network, hiddenLayer, LayerType.Hidden);
+                    NeuronLayer group = new NeuronLayer(network, hiddenLayer,
+                            LayerType.Hidden);
                     network.addGroup(group);
                 }
             }

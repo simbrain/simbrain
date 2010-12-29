@@ -18,6 +18,11 @@
  */
 package org.simbrain.trainer;
 
+import java.util.List;
+
+import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.Neuron;
+
 /**
  * Observer class for trainer objects.
  *
@@ -30,6 +35,42 @@ public interface TrainerListener {
      *
      * @param error new error value
      */
-    public void errorUpdated(double error);
+    void errorUpdated(double error);
+
+    /**
+     * The trainer's network changed.
+     *
+     * @param oldNetwork the old network
+     * @param newNetwork the new network
+     */
+    void networkChanged(Network oldNetwork, Network newNetwork);
+
+    /**
+     * The trainer's input data changed.
+     *
+     * @param inputData the new input data.
+     */
+    void inputDataChanged(double[][] inputData);
+
+    /**
+     * The trainer's training data changed.
+     *
+     * @param trainingData the new training data
+     */
+    void trainingDataChanged(double[][] trainingData);
+
+    /**
+     * The trainer's input layer changed.
+     *
+     * @param inputLayer the new input layer
+     */
+    void inputLayerChanged(List<Neuron> inputLayer);
+
+    /**
+     * The trainer's output layer changed.
+     *
+     * @param outputLayer the new output layer
+     */
+    void outputLayerChanged(List<Neuron> outputLayer);
 
 }

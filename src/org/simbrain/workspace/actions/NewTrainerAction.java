@@ -23,43 +23,27 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.trainer.TrainerGUI;
-import org.simbrain.workspace.gui.GenericJInternalFrame;
-import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.trainer.TrainerComponent;
+import org.simbrain.workspace.Workspace;
 
 /**
- * Open data world in current workspace.
+ * Add trainer component to workspace.
  */
-public final class NewTrainerAction extends AbstractAction {
+public final class NewTrainerAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-    /** Reference to desktop. */
-    private SimbrainDesktop desktop;
-
     /**
-     * Create an open data world with the specified
-     * workspace.
+     * Create a new network action with the specified workspace.
      */
-    public NewTrainerAction(SimbrainDesktop desktop) {
-        super("Network Trainer");
+    public NewTrainerAction(Workspace workspace) {
+        super("New Trainer", workspace);
+        putValue(SHORT_DESCRIPTION, "New Trainer");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-        this.desktop = desktop;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GenericJInternalFrame frame = new GenericJInternalFrame();
-        frame.setTitle("Network Trainer");
-        TrainerGUI trainer = new TrainerGUI(desktop.getWorkspace(), frame);
-        frame.setContentPane(trainer);
-        frame.setResizable(true);
-        frame.setClosable(true);
-        frame.setMaximizable(true);
-        frame.setIconifiable(true);
-        frame.setVisible(true);
-        frame.pack();
-        desktop.addInternalFrame(frame);
+        workspace.addWorkspaceComponent(new TrainerComponent(""));
     }
 }

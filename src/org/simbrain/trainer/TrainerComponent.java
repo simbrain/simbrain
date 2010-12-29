@@ -61,9 +61,10 @@ public class TrainerComponent extends WorkspaceComponent {
     }
 
     /**
-     * Initialize the trainer.
+     * Initialize the trainer component.
      */
     private void init() {
+        setSerializePriority(Integer.MAX_VALUE);
     }
 
 

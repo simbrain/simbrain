@@ -32,15 +32,11 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.builders.LayeredNetworkBuilder;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.NeuronLayer;
@@ -53,16 +49,10 @@ import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
 import org.simbrain.util.table.SimbrainDataTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainTableListener;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceListener;
-import org.simbrain.workspace.gui.GenericFrame;
-import org.simbrain.workspace.gui.GenericJFrame;
 
 /**
  * GUI for supervised learning in Simbrain, using back-propagation, LMS, and
@@ -203,10 +193,34 @@ public class TrainerPanel extends JPanel {
         mainPanel.add("Center", splitPane);
         add(mainPanel);
 
+        // Initialize panel with trainer data
+        initializePanelFromTrainer();
+
         // Add trainer listener
         initializeTrainerListener();
 
     }
+
+    /**
+     * Initialize the panel using trainer data.
+     */
+    private void initializePanelFromTrainer() {
+        if (trainer != null) {
+            if (trainer.getInputData() != null) {
+                inputDataWindow.setData(trainer.getInputData());
+            }
+            if (trainer.getTrainingData() != null) {
+                trainingDataWindow.setData(trainer.getTrainingData());
+            }
+            if (trainer.getInputLayer() != null) {
+                inputDataWindow.setLayer(trainer.getInputLayer());
+            }
+            if (trainer.getInputData() != null) {
+                trainingDataWindow.setLayer(trainer.getOutputLayer());
+            }
+        }
+    }
+
 
     /**
      * Initialize the trainer listener. Update the panel based on changes that
@@ -434,8 +448,8 @@ public class TrainerPanel extends JPanel {
 
     /**
      * Check to see whether the provided table has as many columns as there are
-     * neurons in the provided neuron layer. If not, modify the table to match
-     * the neuron layer.
+     * neurons in the provided neuron layer. If not, modify the table so that it
+     * has as many columns as there are neurons in the layer.
      *
      * @param dataTable the table to check
      * @param group the neuron layer to check
@@ -443,21 +457,28 @@ public class TrainerPanel extends JPanel {
     private void reconcileTableWithLayer(final SimbrainJTable dataTable,
             final NeuronGroup group) {
 
-        // Modify the table so that it has exactly as many columns as there
-        // are neurons in this group.
-        int groupSize = group.getNeuronList().size();
-        int tableSize = dataTable.getColumnCount() - 1; // First column is "#"
-                                                        // sign
-        if (groupSize != tableSize) {
-            // TODO: Once this is cleared up, fold sysout in to the option pane
-            // message
-            System.out.println("Layer neurons:" + groupSize
-                    + " Table Columns: " + tableSize);
+        // Size of group (number of neurons)
+        int layerSize = group.getNeuronList().size();
+
+        // Size of column (First column is "#" sign so it's disregarded)
+        int tableSize = dataTable.getColumnCount() - 1;
+
+        // If group size no the same as table size, modify the table
+        if (layerSize != tableSize) {
+
+            // Notify user about what's happening
+            System.out.println("Table / Layer conflict.  Layer has "
+                    + layerSize + " neurons, table has " + tableSize
+                    + " columns. Modifying table to have " + layerSize
+                    + " columns.");
             // JOptionPane.showMessageDialog((Component) parentFrame,
             // "The table and current layer are incompatible and so the data in this table "
-            // +  "is being modified to match the layer.",  "Warning",  JOptionPane.WARNING_MESSAGE);
+            // + "is being modified to match the layer.", "Warning",
+            // JOptionPane.WARNING_MESSAGE);
+
+            // Modify the table
             dataTable.getData().modifyRowsColumns(
-                    dataTable.getData().getRowCount(), groupSize, 0);
+                    dataTable.getData().getRowCount(), layerSize, 0);
 
             // Rename column headings
             // Note the for loop starts at column 1 (column 0 shows the row
@@ -470,7 +491,6 @@ public class TrainerPanel extends JPanel {
                 }
             }
             dataTable.getTableHeader().resizeAndRepaint();
-
         }
 
     }
@@ -487,7 +507,7 @@ public class TrainerPanel extends JPanel {
         /** Table displaying input data. */
         private SimbrainJTable dataTable;
 
-        /** Left scroll pane. */
+        /** Scroll pane. */
         private JScrollPane scrollPane;
 
         /** Trainer vs. Input window. */
@@ -514,64 +534,62 @@ public class TrainerPanel extends JPanel {
             add("North", menuPanel);
             add("Center", scrollPane);
 
-            // Initialize tables
-            updateParentTrainerData();
-
             groupComboBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
-                    reconcileTableWithGroup();
+                    updateTrainerLayer();
                 }
             });
 
+            // Add listener to data table
             dataTable.getData().addListener(new SimbrainTableListener() {
 
                 /**
                  * {@inheritDoc}
                  */
                 public void columnAdded(int column) {
-                    updateParentTrainerData();
+                    updateTrainerData();
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 public void columnRemoved(int column) {
-                    updateParentTrainerData();
+                    updateTrainerData();
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 public void rowAdded(int row) {
-                    updateParentTrainerData();
+                    updateTrainerData();
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 public void rowRemoved(int row) {
-                    updateParentTrainerData();
+                    updateTrainerData();
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 public void cellDataChanged(int row, int column) {
-                    updateParentTrainerData();
+                    updateTrainerData();
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 public void tableStructureChanged() {
-                    updateParentTrainerData();
+                    updateTrainerData();
                 }
 
                 /**
                  * {@inheritDoc}
                  */
                 public void tableDataChanged() {
-                    updateParentTrainerData();
+                    updateTrainerData();
                 }
 
             });
@@ -579,8 +597,18 @@ public class TrainerPanel extends JPanel {
         }
 
         /**
-         * Get the current neuron group associated with layer selection combo
-         * box.
+         * Set the currently selected item in the combo box.
+         *
+         * @param layer the item to select
+         */
+        public void setLayer(List<Neuron> layer) {
+            //TODO: Check whether the box contains this item
+            groupComboBox.setSelectedItem(layer);
+        }
+
+        /**
+         * Get the current neuron group associated with the layer selection
+         * combo box.
          *
          * @return the selected group
          */
@@ -593,9 +621,10 @@ public class TrainerPanel extends JPanel {
         }
 
         /**
-         * Update the datatable in the trainer.
+         * Updates the parent trainer's input or training data, when the table
+         * data change.
          */
-        private void updateParentTrainerData() {
+        private void updateTrainerData() {
             if (trainer != null) {
                 if (getCurrentNeuronGroup() != null) {
                     reconcileTableWithLayer(dataTable, getCurrentNeuronGroup());
@@ -609,10 +638,48 @@ public class TrainerPanel extends JPanel {
         }
 
         /**
-         * Helper method which checks all the items in the groupComboBox, and
-         * returns the first NeuronLayer whose layer type is appropriate to this
-         * window (input for input, output for training). Returns null if no
-         * match.
+         * Updates the parent trainer's input or output layer, when the group
+         * combo box changes.
+         */
+        private void updateTrainerLayer() {
+            if (trainer != null) {
+                NeuronGroup group = getCurrentNeuronGroup();
+                if (group != null) {
+                    reconcileTableWithLayer(dataTable, group);
+                    if (type == WindowType.Input) {
+                        trainer.setInputLayer(group);
+                    } else if (type == WindowType.Trainer) {
+                        trainer.setOutputLayer(group);
+                    }
+                }
+            }
+        }
+
+        /**
+         * See if the current neuron group has any input / output layers in it
+         * and if so make that the currently selected item. Otherwise just use
+         * the first item.
+         */
+        public void initializeSelectedGroup() {
+
+            // TODO: Should only be used when the groupComboBox is being
+            // re-created
+
+            NeuronGroup newGroup = getMatchingGroup();
+            if (newGroup != null) {
+                groupComboBox.setSelectedItem(newGroup);
+            } else {
+                groupComboBox
+                        .setSelectedIndex(groupComboBox.getItemCount() - 1);
+            }
+            if (groupHasChanged()) {
+                updateTrainerLayer();
+            }
+        }
+
+        /**
+         * Helper method which looks for input layers (for an input window) or
+         * output layer (for a training window). Returns null if no match.
          *
          * @return the first matching layer, or null if none are found
          */
@@ -636,24 +703,6 @@ public class TrainerPanel extends JPanel {
         }
 
         /**
-         * See if the current neuron group has any input / output layers in it
-         * and if so make that the currently selected item. Otherwise just use
-         * the first item. Only use when the groupComboBox is being re-created.
-         */
-        public void initializeSelectedGroup() {
-            NeuronGroup newGroup = getMatchingGroup();
-            if (newGroup != null) {
-                groupComboBox.setSelectedItem(newGroup);
-            } else {
-                groupComboBox
-                        .setSelectedIndex(groupComboBox.getItemCount() - 1);
-            }
-            if (groupHasChanged()) {
-                reconcileTableWithGroup();
-            }
-        }
-
-        /**
          * Update the input layer and output layer combo boxes (when groups are
          * added, removed, or changed in the current network).
          */
@@ -668,7 +717,7 @@ public class TrainerPanel extends JPanel {
             }
             initializeSelectedGroup();
             if (groupHasChanged()) {
-                reconcileTableWithGroup();
+                updateTrainerLayer();
             }
         }
 
@@ -691,32 +740,6 @@ public class TrainerPanel extends JPanel {
         }
 
         /**
-         * This is called when the neuron group associated with this data window
-         * may have changed (e.g. when the combo box is used). If it has
-         * changed, the table must be updated appropriately.The tricky thing is
-         * that the group might have more or less neurons than there are columns
-         * than are in the table
-         */
-        private void reconcileTableWithGroup() {
-            if (trainer == null) {
-                return;
-            }
-            NeuronGroup group = getCurrentNeuronGroup();
-
-            if (group == null) {
-                return;
-            }
-
-            reconcileTableWithLayer(dataTable, group);
-            if (type == WindowType.Input) {
-                trainer.setInputLayer(group);
-            } else if (type == WindowType.Trainer) {
-                trainer.setOutputLayer(group);
-            }
-
-        }
-
-        /**
          * Return the underlying SimbrainJTable.
          *
          * @return the table
@@ -728,11 +751,21 @@ public class TrainerPanel extends JPanel {
         /**
          * Returns an array representation of the data.
          *
-         * @return
+         * @return the table data
          */
         double[][] getData() {
             return dataTable.getData().asArray();
         }
+
+        /**
+         * Set underlying model data.
+         *
+         * @param data
+         */
+        public void setData(double[][] data) {
+            dataTable.getData().setData(data);
+        }
+
 
     }
 

@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -652,6 +653,22 @@ public class Workspace {
      */
     public void setUpdateDelay(int updateDelay) {
         this.updateDelay = updateDelay;
+    }
+
+    /**
+     * Actions required prior to proper serialization.
+     *
+     * TODO: A bit of a hack. Currently just moves trainer components to the
+     * back of the list, so they are serialized last, and hence deserialized
+     * last.
+     */
+    void preSerializationInit() {
+        Collections.sort(componentList, new Comparator<WorkspaceComponent>() {
+            public int compare(WorkspaceComponent c1, WorkspaceComponent c2) {
+                return Integer.valueOf(c1.getSerializePriority()).compareTo(
+                        Integer.valueOf(c2.getSerializePriority()));
+            }
+        });
     }
 
 }

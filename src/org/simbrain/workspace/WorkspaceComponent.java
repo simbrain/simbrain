@@ -95,6 +95,14 @@ public abstract class WorkspaceComponent {
     private final AttributeManager attributeManager;
 
     /**
+     * If set to true, serialize this component before others. Possibly replace
+     * with priority system later.
+     *
+     * {@see org.simbrain.workspace.Workspace#preSerializationInit()}.
+     */
+    private int serializePriority = 0;
+
+    /**
      * Initializer
      */
     {
@@ -614,6 +622,20 @@ public abstract class WorkspaceComponent {
      */
     public AttributeManager getAttributeManager() {
         return attributeManager;
+    }
+
+    /**
+     * @return the serializePriority
+     */
+    protected int getSerializePriority() {
+        return serializePriority;
+    }
+
+    /**
+     * @param serializePriority the serializePriority to set
+     */
+    protected void setSerializePriority(int serializePriority) {
+        this.serializePriority = serializePriority;
     }
 
 }

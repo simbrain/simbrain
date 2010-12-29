@@ -27,10 +27,13 @@ import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.util.Utils;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 /**
  * Superclass for all forms of supervised training algorithms. A trainer
  * combines input data, training data, and error information in a single
- * package, which can be visualized in a special gui dialog.
+ * package, which can be visualized in a special GUI dialog.
  *
  * @author jyoshimi
  */
@@ -43,6 +46,18 @@ public abstract class Trainer {
      * Reference to the network being trained.
      */
     private Network network;
+
+    /** Name of network, for serializing. */
+    private String networkName;
+
+    // Note that persistence only works for networks with groups, since only
+    // groups (as opposed to arbitrary lists of neurons) have names
+
+    /** Name of input layer, for serializing. */
+    private String inputLayerName;
+
+    /** Name of output layer, for serializing. */
+    private String outputLayerName;
 
     /** Input layer. */
     private List<Neuron> inputLayer;
@@ -74,8 +89,14 @@ public abstract class Trainer {
     /**
      * @param network parent network
      */
+    public Trainer() {
+    }
+
+    /**
+     * @param network parent network
+     */
     public Trainer(Network network) {
-        this.network = network;
+        setNetwork(network);
     }
 
     /**
@@ -92,6 +113,15 @@ public abstract class Trainer {
      */
     public abstract double train(int iterations); // return error
 
+    // TODO: Below, Check that input data matches input layer? But they need to
+    // be set separately. Similarly for training data / training layer.
+    //  Example:
+    //  if (trainingData[0].length != outputLayer.size()) {
+    //  System.err.println("Training data size must be the same as output layer size");
+    //  return;
+    //  //Throw appropriate exception
+    //}
+
     /**
      * @return the inputData
      */
@@ -104,6 +134,8 @@ public abstract class Trainer {
      */
     public final void setInputData(double[][] inputData) {
         this.inputData = inputData;
+        init();
+        fireInputDataChanged(inputData);
     }
 
     /**
@@ -112,7 +144,7 @@ public abstract class Trainer {
      * @param inputFile the inputData as a csv file
      */
     public final void setInputData(final File inputFile) {
-        this.inputData = Utils.getDoubleMatrix(inputFile);
+        setInputData(Utils.getDoubleMatrix(inputFile));
     }
 
     /**
@@ -128,14 +160,9 @@ public abstract class Trainer {
      * @param trainingData the trainingData to set
      */
     public void setTrainingData(double[][] trainingData)  {
-
-        //TODO: Think about this.
-//        if (trainingData[0].length != outputLayer.size()) {
-//            System.err.println("Training data size must be the same as output layer size");
-//            return;
-//            // TODO: Throw appropriate exception
-//        }
         this.trainingData = trainingData;
+        init();
+        fireTrainingDataChanged(inputData);
     }
 
     /**
@@ -144,7 +171,7 @@ public abstract class Trainer {
      * @param trainingDataFile the training data as a .csv file
      */
     public void setTrainingData(final File trainingDataFile) {
-        this.trainingData = Utils.getDoubleMatrix(trainingDataFile);
+        setTrainingData(Utils.getDoubleMatrix(trainingDataFile));
     }
 
     /**
@@ -159,23 +186,17 @@ public abstract class Trainer {
      */
     public void setInputLayer(List<Neuron> inputLayer) {
         this.inputLayer = inputLayer;
+        init();
+        fireInputLayerChanged(inputLayer);
     }
 
     /**
-     * Set the input layer to a whole network.
-     *
-     * @param inputNetwork
+     * @param inputLayer the inputLayer to set
      */
-   public void setInputLayer(Network inputNetwork) {
-       this.inputLayer = inputNetwork.getFlatNeuronList();
-   }
-
-   /**
-    * @param inputLayer the inputLayer to set
-    */
-   public void setInputLayer(NeuronGroup inputGroup) {
-       this.inputLayer = inputGroup.getNeuronList(); // TODO: This should be all that's available!
-   }
+    public void setInputLayer(NeuronGroup inputGroup) {
+        inputLayerName = inputGroup.getId();
+        setInputLayer(inputGroup.getNeuronList());
+    }
 
     /**
      * @return the outputLayer
@@ -189,20 +210,16 @@ public abstract class Trainer {
      */
     public void setOutputLayer(List<Neuron> outputLayer) {
         this.outputLayer = outputLayer;
-    }
-
-    /**
-     * @param outputLayer the outputLayer to set
-     */
-    public void setOutputLayer(Network outputNetwork) {
-        this.outputLayer = outputNetwork.getFlatNeuronList();
+        init();
+        fireOutputLayerChanged(outputLayer);
     }
 
     /**
      * @param outputLayer the outputLayer to set
      */
     public void setOutputLayer(NeuronGroup outputGroup) {
-        this.outputLayer = outputGroup.getNeuronList();
+        outputLayerName = outputGroup.getId();
+        setOutputLayer(outputGroup.getNeuronList());
     }
 
     /**
@@ -215,8 +232,11 @@ public abstract class Trainer {
     /**
      * @param network the network to set
      */
-    public void setNetwork(Network network) {
-        this.network = network;
+    public void setNetwork(Network newNetwork) {
+        this.network = newNetwork;
+        networkName = network.getId();
+        fireNetworkChanged(network, newNetwork);
+        init();
     }
 
     /**
@@ -225,6 +245,51 @@ public abstract class Trainer {
     public void fireErrorUpdated() {
         for (TrainerListener listener : listeners) {
             listener.errorUpdated(currentError);
+        }
+    }
+
+    /**
+     * Notify listeners that the trainer's network has changed.
+     */
+    private void fireNetworkChanged(Network oldNetwork, Network newNetwork) {
+        for (TrainerListener listener : listeners) {
+            listener.networkChanged(oldNetwork, newNetwork);
+        }
+    }
+
+    /**
+     * Notify listeners that the input data has changed
+     */
+    private void fireInputDataChanged(double[][] inputData) {
+        for (TrainerListener listener : listeners) {
+            listener.inputDataChanged(inputData);
+        }
+    }
+
+    /**
+     * Notify listeners that the training data was changed.
+     */
+    private void fireTrainingDataChanged(double[][] trainingData) {
+        for (TrainerListener listener : listeners) {
+            listener.trainingDataChanged(inputData);
+        }
+    }
+
+    /**
+     * Notify listeners that input layer was changed.
+     */
+    private void fireInputLayerChanged(List<Neuron> newInputLayer) {
+        for (TrainerListener listener : listeners) {
+            listener.inputLayerChanged(newInputLayer);
+        }
+    }
+
+    /**
+     * Notify listeners that the output layer changed.
+     */
+    private void fireOutputLayerChanged(List<Neuron> outputLayer) {
+        for (TrainerListener listener : listeners) {
+            listener.outputLayerChanged(outputLayer);
         }
     }
 
@@ -285,6 +350,81 @@ public abstract class Trainer {
             retString += "Training Data: " + trainingData.length + "x" + trainingData[0].length + "table \n";
         }
         return retString;
+    }
+
+    /**
+     * Returns a properly initialized xstream object.
+     *
+     * @return the XStream object
+     */
+    public static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(Trainer.class, "network");
+        xstream.omitField(Trainer.class, "inputLayer");
+        xstream.omitField(Trainer.class, "outputLayer");
+        xstream.omitField(Trainer.class, "listeners");
+        xstream.omitField(BackpropTrainer.class, "layers");
+        xstream.omitField(BackpropTrainer.class, "errorMap");
+        xstream.omitField(BackpropTrainer.class, "biasDeltaMap");
+        xstream.omitField(BackpropTrainer.class, "weightDeltaMap");
+        return xstream;
+    }
+
+    /**
+     * Standard method call made to objects after they are deserialized. See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     *
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        if (listeners == null) {
+            listeners = new ArrayList<TrainerListener>();
+        }
+        return this;
+    }
+
+    /**
+     * Set the input and output groups using the given names.
+     */
+    public void postAddInit() {
+        if (listeners == null) {
+            listeners = new ArrayList<TrainerListener>();
+        }
+        if (network != null) {
+            NeuronGroup inputGroup = (NeuronGroup) network
+                    .getGroup(inputLayerName);
+            if (inputGroup != null) {
+                setInputLayer(inputGroup);
+            }
+            NeuronGroup outputGroup = (NeuronGroup) network
+                    .getGroup(outputLayerName);
+            if (outputGroup != null) {
+                setOutputLayer(outputGroup);
+            }
+            init();
+        }
+    }
+
+    /**
+     * @return the networkName
+     */
+    public String getNetworkName() {
+        return networkName;
+    }
+
+    /**
+     * @return the inputLayerName
+     */
+    public String getInputLayerName() {
+        return inputLayerName;
+    }
+
+    /**
+     * @return the outputLayerName
+     */
+    public String getOutputLayerName() {
+        return outputLayerName;
     }
 
 }

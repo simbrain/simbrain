@@ -22,12 +22,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * Component corresponding to a beanshell window.
  */
-public class ConsoleComponent extends  WorkspaceComponent {
+public class ConsoleComponent extends WorkspaceComponent {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -40,12 +39,22 @@ public class ConsoleComponent extends  WorkspaceComponent {
     @Override
     public void closing() {
         // TODO Auto-generated method stub
-        
+
     }
 
-    public static ConsoleComponent open(InputStream input, final String name, final String format) {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * Opens a saved component. There isn't much to do here since currently
+     * there is nothing to persist with a console. This just ensures that a
+     * component is created and (in the gui) presented.
+     *
+     * @param input stream
+     * @param name name of file
+     * @param format format
+     * @return component to be opened
+     */
+    public static ConsoleComponent open(InputStream input, final String name,
+            final String format) {
+        return new ConsoleComponent(name);
     }
 
     @Override
@@ -56,6 +65,6 @@ public class ConsoleComponent extends  WorkspaceComponent {
     @Override
     public void update() {
         // TODO Auto-generated method stub
-        
+
     }
 }

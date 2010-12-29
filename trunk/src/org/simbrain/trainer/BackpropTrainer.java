@@ -39,7 +39,8 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
-import org.simbrain.util.SimbrainMath;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Backprop trainer.
@@ -64,19 +65,26 @@ public class BackpropTrainer extends Trainer {
     private double learningRate = DEFAULT_LEARNING_RATE;
 
     /** For storing errors. */
-    private HashMap<Neuron, Double> errorMap = new HashMap<Neuron, Double>();
+    private HashMap<Neuron, Double> errorMap;
 
     /** For storing weight deltas. */
-    private HashMap<Synapse, Double> weightDeltaMap = new HashMap<Synapse, Double>();
+    private HashMap<Synapse, Double> weightDeltaMap;
 
     /** For storing bias deltas. */
-    private HashMap<BiasedNeuron, Double> biasDeltaMap = new HashMap<BiasedNeuron, Double>();
+    private HashMap<BiasedNeuron, Double> biasDeltaMap;
 
     /** Internal representation of network. */
-    private List<NeuronGroup> layers = new ArrayList<NeuronGroup>();
+    private List<NeuronGroup> layers;
 
     /**
-     * Constructor.
+     * Initialize without a network. A call to setNetwork and init() must occur
+     * before the trainer can be used.
+     */
+    public BackpropTrainer() {
+    }
+
+    /**
+     * Construct with an existing network.
      *
      * @param network
      */
@@ -86,10 +94,10 @@ public class BackpropTrainer extends Trainer {
 
     @Override
     public void init() {
-        layers.clear();
-        errorMap.clear();
-        weightDeltaMap.clear();
-        biasDeltaMap.clear();
+        errorMap = new HashMap<Neuron, Double>();
+        weightDeltaMap = new HashMap<Synapse, Double>();
+        biasDeltaMap = new HashMap<BiasedNeuron, Double>();
+        layers = new ArrayList<NeuronGroup>();
         buildNetworkRepresentation();
     }
 

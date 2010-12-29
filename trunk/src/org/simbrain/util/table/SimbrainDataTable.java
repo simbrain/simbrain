@@ -31,10 +31,9 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * A table of data, with convenience methods and functions useful in neural
- * network and other Simbrain applications.
- *
- * An optional concept of "current row" is implemented which allows the table to
- * iterated from row to row when updated.
+ * network and other Simbrain applications. An optional concept of "current row"
+ * is implemented which allows the table to iterated from row to row when
+ * updated.
  */
 public final class SimbrainDataTable {
 
@@ -100,7 +99,6 @@ public final class SimbrainDataTable {
         listeners = new ArrayList<SimbrainTableListener>();
     }
 
-
     /**
      * Reset the table structure.
      *
@@ -155,9 +153,7 @@ public final class SimbrainDataTable {
     }
 
     /**
-     * Normalize data in selected column.
-     *
-     * TODO: Use bounds.
+     * Normalize data in selected column. TODO: Use bounds.
      *
      * @param columnIndex column to normalize.
      */
@@ -169,7 +165,7 @@ public final class SimbrainDataTable {
             }
         }
         for (List<Double> row : rowData) {
-            row.set(columnIndex, row.get(columnIndex)/max);
+            row.set(columnIndex, row.get(columnIndex) / max);
         }
         this.fireTableDataChanged();
     }
@@ -190,9 +186,9 @@ public final class SimbrainDataTable {
         Random rand = new Random();
         int range = getUpperBound() - getLowerBound();
         for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++ ) {
+            for (int j = 0; j < getColumnCount(); j++) {
                 double value = (rand.nextDouble() * range) + getLowerBound();
-                setValue(i , j, value, false);
+                setValue(i, j, value, false);
             }
         }
         fireTableDataChanged();
@@ -260,7 +256,8 @@ public final class SimbrainDataTable {
      * @param value value to add
      * @param boolean true if an event should be fired, false otherwise.
      */
-    public void setValue(final int row, final int column, final double value, final boolean fireEvent) {
+    public void setValue(final int row, final int column, final double value,
+            final boolean fireEvent) {
         rowData.get(row).set(column, value);
         if (fireEvent) {
             fireCellDataChanged(row, column);
@@ -342,6 +339,7 @@ public final class SimbrainDataTable {
 
     /**
      * Adds rows or columns.
+     *
      * @param row number of rows to add.
      * @param col number of columns to add.
      * @param value to be added to the table.
@@ -351,14 +349,15 @@ public final class SimbrainDataTable {
     }
 
     /**
-     * Adds or removes rows and columns.  Does not change value of existing
-     * cells.  Sets new cells to a specified value.
+     * Adds or removes rows and columns. Does not change value of existing
+     * cells. Sets new cells to a specified value.
      *
      * @param row Number of rows in table.
      * @param col Number of columns in table.
      * @param value to be used for any new columns or rows added to the table.
      */
-    public void modifyRowsColumns(final int row, final int col, final double value) {
+    public void modifyRowsColumns(final int row, final int col,
+            final double value) {
         int currentColNum = numColumns;
         int currentRowNum = numRows;
         if (col > currentColNum) {
@@ -393,7 +392,7 @@ public final class SimbrainDataTable {
     }
 
     /**
-     * Adds a specified nmber of columns to the right of the table.
+     * Adds a specified number of columns to the right of the table.
      *
      * @param colsToAdd number of columns to add.
      * @param defaultValue value for cells of new columns
@@ -578,7 +577,6 @@ public final class SimbrainDataTable {
         }
     }
 
-
     /**
      * Returns an array representation of the table.
      *
@@ -638,7 +636,23 @@ public final class SimbrainDataTable {
 
     }
 
-    //TODO: Add other fire event methods.  Currently they are buried in the code.
+    /**
+     * Reset data using a 2-d array of doubles.
+     *
+     * @param data the new data
+     */
+    public void setData(double[][] data) {
+        reset(data.length, data[0].length, 0);
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[0].length; j++) {
+                setValue(i, j, data[i][j], false);
+            }
+        }
+        fireTableStructureChanged();
+    }
+
+    // TODO: Add other fire event methods. Currently they are buried in the
+    // code.
 
     /**
      * Fire table data changed event. Only call when all data has changed. When

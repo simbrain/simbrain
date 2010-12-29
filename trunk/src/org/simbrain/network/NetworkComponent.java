@@ -71,6 +71,9 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
+        // Set root networks' id to the component's name
+        rootNetwork.setId(super.getName());
+
         // Initialize attribute types and their default visibility
         addProducerType(activationType);
         addProducerType(new AttributeType(this, "Neuron", "UpperBound", double.class, false));

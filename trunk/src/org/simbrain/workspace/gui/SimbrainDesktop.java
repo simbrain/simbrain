@@ -81,6 +81,8 @@ import org.simbrain.plot.scatterplot.ScatterPlotGui;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.trainer.TrainerComponent;
+import org.simbrain.trainer.TrainerDesktopComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.ToggleButton;
@@ -346,6 +348,7 @@ public class SimbrainDesktop {
         registerComponent(ProjectionComponent.class, ProjectionGui.class);
         registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
         registerComponent(ThreeDeeComponent.class, MainConsole.class);
+        registerComponent(TrainerComponent.class, TrainerDesktopComponent.class);
         registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
         registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);

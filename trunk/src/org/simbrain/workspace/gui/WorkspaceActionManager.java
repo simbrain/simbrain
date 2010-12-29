@@ -228,7 +228,7 @@ public class WorkspaceActionManager {
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
 
-        newTrainerAction = new NewTrainerAction(desktop);
+        newTrainerAction = new NewTrainerAction(workspace);
 
         workspaceHelpAction = new WorkspaceHelpAction();
 

@@ -24,10 +24,7 @@ import java.util.concurrent.Executors;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.builders.LayeredNetworkBuilder;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
@@ -45,7 +42,7 @@ public class TrainerGuiActions {
      * @param trainerGui reference to trainer gui
      * @return the action
      */
-    public static Action getRunAction(final TrainerGUI trainerGui) {
+    public static Action getRunAction(final TrainerPanel trainerGui) {
         return new AbstractAction() {
 
             // Initialize
@@ -88,7 +85,7 @@ public class TrainerGuiActions {
      * @param trainerGui reference to trainer gui
      * @return the action
      */
-    public static Action getPropertiesDialogAction(final TrainerGUI trainerGui) {
+    public static Action getPropertiesDialogAction(final TrainerPanel trainerGui) {
         return new AbstractAction() {
 
             // Initialize
@@ -126,7 +123,7 @@ public class TrainerGuiActions {
      * @param trainerGui reference to trainer gui
      * @return the action
      */
-    public static Action getBatchTrainAction(final TrainerGUI trainerGui) {
+    public static Action getBatchTrainAction(final TrainerPanel trainerGui) {
         return new AbstractAction() {
 
             // Initialize
@@ -154,7 +151,7 @@ public class TrainerGuiActions {
      * @param trainerGui reference to trainer gui
      * @return the action
      */
-    public static Action getRandomizeNetworkAction(final TrainerGUI trainerGui) {
+    public static Action getRandomizeNetworkAction(final TrainerPanel trainerGui) {
         return new AbstractAction() {
 
             // Initialize
@@ -184,7 +181,7 @@ public class TrainerGuiActions {
      * @param trainerGui reference to trainer gui
      * @return the action
      */
-    public static Action getClearGraphAction(final TrainerGUI trainerGui) {
+    public static Action getClearGraphAction(final TrainerPanel trainerGui) {
         return new AbstractAction() {
 
             // Initialize
@@ -198,101 +195,6 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                //trainerGui.clearGraph();
-            }
-
-        };
-    }
-
-    /**
-     * Returns an action for building a three layer network.
-     *
-     * @param trainerGui reference to trainer gui
-     * @return the action
-     */
-    public static Action getBuildThreeLayerAction(final TrainerGUI trainerGui) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
-                putValue(NAME, "Build three-layer network...");
-                putValue(SHORT_DESCRIPTION, "Create a three-layer network");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
-                int numInputs = trainerGui.getInputData().getColumnCount()-1;//TODO: Another way to do this? Make getNumInputs function
-                String hiddenUnitsString = (String) JOptionPane
-                        .showInputDialog(null, "Number of hidden units", "4");
-                int numHidden;
-                if (hiddenUnitsString != null) {
-                    numHidden = Integer.parseInt(hiddenUnitsString);
-                } else {
-                    return; // User pressed cancel
-                }
-                int numOutputs = trainerGui.getTrainingData().getColumnCount()-1; 
-                int[] nodesPerLayer = new int[] { numInputs, numHidden,
-                        numOutputs };
-                builder.setNodesPerLayer(nodesPerLayer);
-                NetworkComponent network = new NetworkComponent(
-                        "Backprop network");
-                builder.buildNetwork(network.getRootNetwork());
-                trainerGui.getWorkspace().addWorkspaceComponent(network);
-                trainerGui.setNetwork(network.getRootNetwork());
-            }
-
-        };
-    }
-
-    /**
-     * Returns an action for building a multi layer network.
-     *
-     * @param trainerGui reference to trainer gui
-     * @return the action
-     */
-    public static Action getBuildMultiLayerAction(final TrainerGUI trainerGui) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
-                putValue(NAME, "Build multi-layer network...");
-                putValue(SHORT_DESCRIPTION, "Create a mutli-layer network");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
-                int[] topology;
-                int numInputs = trainerGui.getInputData().getColumnCount() - 1;
-                int numOutputs = trainerGui.getTrainingData().getColumnCount() - 1;
-                String defaultTopologyString = numInputs + ",3,3," + numOutputs;
-                String topologyString = (String) JOptionPane
-                        .showInputDialog(
-                                null,
-                                "Network structure, specifid as a list of numbers, \n"
-                                        + "corresponding to the number of neurons in each layer.",
-                                defaultTopologyString);
-                if (topologyString != null) {
-                    String[] parsedString = topologyString.split(",");
-                    topology = new int[parsedString.length];
-                    for (int i = 0; i < parsedString.length; i++) {
-                        topology[i] = Integer.parseInt(parsedString[i]);
-                    }
-                } else {
-                    return; // User pressed cancel
-                }
-                builder.setNodesPerLayer(topology);
-                NetworkComponent network = new NetworkComponent(
-                        "Backprop network");
-                builder.buildNetwork(network.getRootNetwork());
-                trainerGui.getWorkspace().addWorkspaceComponent(network);
-                trainerGui.setNetwork(network.getRootNetwork());
             }
 
         };

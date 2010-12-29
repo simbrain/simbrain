@@ -41,7 +41,8 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
     }
-    
+
+    @Override
     public void postAddInit() {
         setLayout(new BorderLayout());
         JConsole console = new JConsole();
@@ -50,12 +51,12 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
         add("Center", console);
         new Thread(interprerter).start();
     }
-    
+
     /**
-     * Returns a Simbrain interpreter
-     * 
+     * Returns a Simbrain interpreter.
+     *
      * @param console console for interpreter
-     * @param workspace workaspace references
+     * @param workspace workspace references
      * @return simbrain interpreter
      */
     public static Interpreter getSimbrainInterpreter(final JConsole console, final Workspace workspace) {
@@ -86,13 +87,11 @@ public class ConsoleDesktopComponent extends  GuiComponent<ConsoleComponent> {
     @Override
     public void closing() {
         // TODO Auto-generated method stub
-        
     }
 
 
     @Override
     protected void update() {
         // TODO Auto-generated method stub
-        
     }
 }

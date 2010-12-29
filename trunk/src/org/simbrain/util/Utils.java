@@ -32,7 +32,6 @@ import javax.swing.JOptionPane;
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 
-
 /**
  * <b>SimnetUtils</b>. Utility class for simbrain package.
  */
@@ -41,17 +40,16 @@ public class Utils {
     /** File system separator. */
     private static final String FS = System.getProperty("file.separator");
 
-     /**
+    /**
      * Read a csv (comma-separated-values) files.
      *
      * @param theFile the file to read in
-     *
      * @return an two-dimensional array of comma-separated values
      */
     public static double[][] getDoubleMatrix(final File theFile) {
         String[][] stringMatrix = getStringMatrix(theFile);
 
-        //convert strings to doubles
+        // convert strings to doubles
         double[][] ret = new double[stringMatrix.length][stringMatrix[0].length];
 
         for (int i = 0; i < stringMatrix.length; i++) {
@@ -67,7 +65,6 @@ public class Utils {
      * Read a csv (comma-separated-values) files.
      *
      * @param theFile the file to read in
-     *
      * @return an two-dimensional array of comma-separated values
      */
     public static String[][] getStringMatrix(final File theFile) {
@@ -76,19 +73,18 @@ public class Utils {
         String[][] stringMatrix;
 
         try {
-            //# is a comment delimeter in net files
+            // # is a comment delimeter in net files
             theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
             stringMatrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(
-                                          null, "Could not find the file \n" + theFile, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Could not find the file \n"
+                    + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 
             return null;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                                          null, "There was a problem opening the file \n" + theFile, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "There was a problem opening the file \n" + theFile,
+                    "Warning", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
 
             return null;
@@ -133,20 +129,20 @@ public class Utils {
      * absolutePath of the local user directory from the absolute path of the
      * file to be saved, and converts file-separators into forward slashes,
      * which are used for saving simualtion files.
-     * 
+     *
      * @param baseDir absolute path of the local simbrain directory.
      * @param absolutePath the absolute path of the file to be saved
-     * 
-     * @return the relative path from the local directory to the file to be
-     *         saved
+     * @return the relative path from the local directory to the file to be saved
      */
-    public static String getRelativePath(final String baseDir, final String absolutePath) {
+    public static String getRelativePath(final String baseDir,
+            final String absolutePath) {
         int localLength = baseDir.length();
         int totalLength = absolutePath.length();
         int diff = totalLength - localLength;
         String relativePath = absolutePath.substring(totalLength - diff);
         relativePath = relativePath.replaceAll("/./", "/");
-        relativePath.replace('/', System.getProperty("file.separator").charAt(0)); // For windows machines..
+        relativePath.replace('/', System.getProperty("file.separator")
+                .charAt(0)); // For windows machines..
         relativePath = new String("." + relativePath);
 
         return relativePath;
@@ -171,7 +167,11 @@ public class Utils {
      * @return the extracted directory path
      */
     public static String getDir(final File theFile) {
-        return theFile.getAbsolutePath().substring(0, theFile.getAbsolutePath().length() - theFile.getName().length());
+        return theFile.getAbsolutePath()
+                .substring(
+                        0,
+                        theFile.getAbsolutePath().length()
+                                - theFile.getName().length());
     }
 
     /**
@@ -179,10 +179,10 @@ public class Utils {
      *
      * @param theVec the array of doubles to convert
      * @param delimiter Delimiter
-     *
      * @return the String representation of the array
      */
-    public static String getVectorString(final double[] theVec, final String delimiter) {
+    public static String getVectorString(final double[] theVec,
+            final String delimiter) {
         String retString = "";
 
         for (int i = 0; i < (theVec.length - 1); i++) {
@@ -195,14 +195,15 @@ public class Utils {
     }
 
     /**
-     * Convert a delimeted string of doubles into an array of doubles.  Undoes String getVectorString.
+     * Convert a delimeted string of doubles into an array of doubles. Undoes
+     * String getVectorString.
      *
      * @param theVec string version of vector
      * @param delimiter delimeter used in that string
-     *
      * @return the corresponding array of doubles
      */
-    public static double[] getVectorString(final String theVec, final String delimiter) {
+    public static double[] getVectorString(final String theVec,
+            final String delimiter) {
         StringTokenizer st = new StringTokenizer(theVec, delimiter);
         double[] ret = new double[st.countTokens()];
         int i = 0;
@@ -219,7 +220,6 @@ public class Utils {
      * Converts an array of strings containing doubles into an array of values.
      *
      * @param line the array of strings
-     *
      * @return the array of doubles
      */
     public static double[] stringArrayToDoubleArray(final String[] line) {
@@ -236,7 +236,6 @@ public class Utils {
      * Utility to class to convert arrays of doubles to strings.
      *
      * @param data array of doubles
-     *
      * @return string representation of that array
      */
     public static String doubleArrayToString(final double[] data) {
@@ -258,7 +257,6 @@ public class Utils {
     /**
      * @param num double to convert
      * @param precision number of decimal places
-     *
      * @return string representation of rounded decimal
      */
     public static String round(final double num, final int precision) {
@@ -272,10 +270,10 @@ public class Utils {
      *
      * @param al the array list to check; must be an array of strings
      * @param theString the name to check for
-     *
      * @return true if the name is contained in the array, false otherwise
      */
-    public static boolean containsName(final ArrayList al, final String theString) {
+    public static boolean containsName(final ArrayList al,
+            final String theString) {
         boolean ret = false;
 
         for (int i = 0; i < al.size(); i++) {
@@ -288,17 +286,19 @@ public class Utils {
     }
 
     /**
-     * Shows the quick reference guide in the help menu.  The quick reference is an html page in the Simbrain/doc
-     * directory
+     * Shows the quick reference guide in the help menu. The quick reference is
+     * an html page in the Simbrain/doc directory
      */
     public static void showQuickRef() {
         String url = null;
 
         if (System.getProperty("os.name").startsWith("Windows")) {
-            url = new String(/*"file:" +*/
-                System.getProperty("user.dir") + FS + "docs" + FS + "SimbrainDocs.html");
+            url = new String(/* "file:" + */
+            System.getProperty("user.dir") + FS + "docs" + FS
+                    + "SimbrainDocs.html");
         } else {
-            url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "SimbrainDocs.html");
+            url = new String("file:" + System.getProperty("user.dir") + FS
+                    + "docs" + FS + "SimbrainDocs.html");
         }
 
         try {
@@ -309,7 +309,9 @@ public class Utils {
     }
 
     /**
-     * Converts a floating point value into a color in HSB, with Saturation and Brightness 1.
+     * Converts a floating point value into a color in HSB, with Saturation and
+     * Brightness 1.
+     *
      * @param fclr Float color
      * @return Hue, saturation, and brightness
      */
@@ -319,23 +321,26 @@ public class Utils {
 
     /**
      * returns the Hue associated with a Color.
+     *
      * @param clr Color
      * @return Hue, saturation and brightness
      */
     public static float colorToFloat(final Color clr) {
-        return Color.RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(), null)[0];
+        return Color
+                .RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(), null)[0];
     }
 
     /**
-     * Shows the quick reference guide in the help menu.  The quick reference is an html page in the Simbrain/doc
-     * directory.
+     * Shows the quick reference guide in the help menu. The quick reference is
+     * an html page in the Simbrain/doc directory.
+     *
      * @param helpPage Help page
      */
     public static void showQuickRef(final String helpPage) {
         String url = null;
 
         if (System.getProperty("os.name").startsWith("Windows")) {
-            url = new String(/*"file:" +*/
+            url = new String(/* "file:" + */
             System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
                     + helpPage);
         } else {
@@ -348,5 +353,22 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Convert a 2-d array of doubles to a string.
+     *
+     * @param matrix the matrix to print
+     * @return the formatted string
+     */
+    public static String doubleMatrixToString(double[][] matrix) {
+        String result = "";
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                result += matrix[i][j] + " ";
+            }
+            result += "\n";
+        }
+        return result;
     }
 }

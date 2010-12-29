@@ -446,7 +446,7 @@ public class SimbrainJTable extends JXTable {
          * {@inheritDoc}
          */
         public int getColumnCount() {
-            return data.getColumnCount()+1;
+            return data.getColumnCount() + 1;
         }
 
         /**

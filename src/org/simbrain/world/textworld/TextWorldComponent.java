@@ -80,16 +80,6 @@ public class TextWorldComponent extends WorkspaceComponent {
         // TODO Auto-generated method stub
     }
 
-    public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Producer> getProducers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     @Override
     public void update() {
         // TODO Auto-generated method stub

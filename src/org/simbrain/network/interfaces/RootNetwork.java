@@ -98,8 +98,8 @@ public class RootNetwork extends Network {
      * BUFFER: default update method; based on buffering
      *
      * PRIORITYBASED: user sets the priority for each neuron, sub-neuron and
-     * synapse. Default priority value is 0. Elements with smaller priority
-     * value are updated first.
+     * synapse (but currently just neurons). Default priority value is 0.
+     * Elements with smaller priority value are updated first.
      *
      */
     public enum UpdateMethod {
@@ -263,7 +263,7 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Resort the priorities in the priority list.
+     * Resort the neurons according to their update priorities.
      */
     void resortPriorities() {
         if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
@@ -744,6 +744,9 @@ public class RootNetwork extends Network {
      */
     public void setUpdateMethod(final UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
+        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
+            updatePriorityList();
+        }
         this.fireNetworkUpdateMethodChanged();
     }
 

@@ -42,7 +42,7 @@ public final class Coupling<E> {
     private Consumer<E> consumer;
 
     /** Value of buffer. */
-    private E buffer;
+    public E buffer;
 
     /**
      * Create a coupling between a specified consuming attribute, without yet
@@ -196,5 +196,25 @@ public final class Coupling<E> {
      */
     public int hashCode() {
         return producer.hashCode() + (ARBITRARY_PRIME * consumer.hashCode());
+    }
+
+    //TODO: Below should only occur when in priority update.
+
+    /**
+     * Update internal list of incoming / outgoing couplings used in priority
+     * based update.
+     */
+    protected void addCouplingsToComponentList() {
+        producer.getParentComponent().addOutgoingCoupling(this);
+        consumer.getParentComponent().addIncomingCoupling(this);
+    }
+
+    /**
+     * Update internal list of incoming / outgoing couplings used in priority
+     * based update.
+     */
+    protected void removeCouplingsFromComponentLists() {
+        producer.getParentComponent().removeOutgoingCoupling(this);
+        consumer.getParentComponent().removeIncomingCoupling(this);
     }
 }

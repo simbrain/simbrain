@@ -64,7 +64,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     public ComponentPanel(final SimbrainDesktop desktop) {
         super(new BorderLayout());
         desktop.getWorkspace().addListener(this);
-        desktop.getWorkspace().getWorkspaceUpdator().addUpdatorListener(this);
+        desktop.getWorkspace().getUpdator().addUpdatorListener(this);
         this.desktop = desktop;
         
 
@@ -169,6 +169,8 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
                 return data.get(row).getGuiOn();
             case 3:
                 return data.get(row).getUpdateOn();
+            case 4:
+                return data.get(row).getUpdatePriority();
             default:
                 return null;
             }
@@ -188,6 +190,10 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
                 return;
             case 3:
                 data.get(row).setUpdateOn((Boolean) value);
+                return;
+            case 4:
+                data.get(row).setUpdatePriority(
+                        Integer.valueOf((Integer) value));
                 return;
             }
             this.fireTableDataChanged();
@@ -267,7 +273,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     }
 
     public void changedUpdateController() {
-        updateLabel.setText("Current updater: " + desktop.getWorkspace().getWorkspaceUpdator().getCurrentUpdatorName());        
+        updateLabel.setText("Current updater: " + desktop.getWorkspace().getUpdator().getCurrentUpdatorName());        
     }
 
     public void updatedCouplings(int update) {

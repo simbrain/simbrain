@@ -30,6 +30,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
@@ -40,12 +41,10 @@ import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
  * data-tables, gauges, and scripts are examples of components in a Simbrain
  * workspace. Essentially, an instance of a workspace corresponds to a single
  * simulation (though at some point it will be possible to link multiple
- * workspaces on different machines together).
- *
- * A workspace can be visualized via a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
+ * workspaces on different machines together). A workspace can be visualized via
+ * a {@link org.simbrain.workspace.gui.SimbrainDesktop}.
  *
  * @see org.simbrain.workspace.Coupling
- *
  */
 public class Workspace {
 
@@ -60,7 +59,7 @@ public class Workspace {
 
     /** List of workspace components. */
     private List<WorkspaceComponent> componentList = Collections
-        .synchronizedList(new ArrayList<WorkspaceComponent>());
+            .synchronizedList(new ArrayList<WorkspaceComponent>());
 
     /** Sentinel for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
@@ -69,17 +68,17 @@ public class Workspace {
     private File currentFile = null;
 
     /**
-     * Current directory. So when re-opening this type of component the
-     * app remembers where to look.
+     * Current directory. So when re-opening this type of component the app
+     * remembers where to look.
      */
-    private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
+    private String currentDirectory = WorkspacePreferences
+            .getCurrentDirectory();
 
     /**
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
      * because writes to this list are uncommon.
      */
-    private CopyOnWriteArrayList<WorkspaceListener> listeners =
-        new CopyOnWriteArrayList<WorkspaceListener>();
+    private CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
 
     /**
      * Mapping from workspace component types to integers which show how many
@@ -108,7 +107,7 @@ public class Workspace {
      */
     public Workspace() {
         manager = new CouplingManager(this);
-        updator = new WorkspaceUpdator(this, manager);
+        updator = new WorkspaceUpdator(this);
     }
 
     /**
@@ -129,7 +128,6 @@ public class Workspace {
         listeners.remove(listener);
     }
 
-
     /**
      * Couple each source attribute to all target attributes.
      *
@@ -137,13 +135,13 @@ public class Workspace {
      * @param targetAttributes target consuming attributes
      */
     @SuppressWarnings("unchecked")
-    public void coupleOneToMany(
-            final List<PotentialProducer> sourceAttributes,
+    public void coupleOneToMany(final List<PotentialProducer> sourceAttributes,
             final List<PotentialConsumer> targetAttributes) {
         for (PotentialProducer producingAttribute : sourceAttributes) {
-            for (PotentialConsumer  consumingAttribute : targetAttributes) {
-                Coupling<?> coupling = new Coupling(producingAttribute
-                        .createProducer(), consumingAttribute.createConsumer());
+            for (PotentialConsumer consumingAttribute : targetAttributes) {
+                Coupling<?> coupling = new Coupling(
+                        producingAttribute.createProducer(),
+                        consumingAttribute.createConsumer());
                 try {
                     getCouplingManager().addCoupling(coupling);
                 } catch (UmatchedAttributesException e) {
@@ -161,12 +159,12 @@ public class Workspace {
      * @param targetAttributes target consuming attributes
      */
     @SuppressWarnings("unchecked")
-    public void coupleOneToOne(
-            final List<PotentialProducer> producerKeys, final List<PotentialConsumer> consumerKeys) {
+    public void coupleOneToOne(final List<PotentialProducer> producerKeys,
+            final List<PotentialConsumer> consumerKeys) {
 
         Iterator<PotentialConsumer> consumerIterator = consumerKeys.iterator();
 
-        for (PotentialProducer  producerID : producerKeys) {
+        for (PotentialProducer producerID : producerKeys) {
             if (consumerIterator.hasNext()) {
                 Producer<?> producer = producerID.createProducer();
                 Consumer<?> consumer = consumerIterator.next().createConsumer();
@@ -179,7 +177,6 @@ public class Workspace {
             }
         }
     }
-
 
     /**
      * Adds a workspace component to the workspace.
@@ -196,10 +193,9 @@ public class Workspace {
         /*
          * Handle component naming.
          *
-         * If the component has not yet been named, name as follows:
-         *      (ClassName - "Component") + index
-         * where index iterates as new components are added.
-         * e.g. Network 1, Network 2, etc.
+         * If the component has not yet been named, name as follows: (ClassName
+         * - "Component") + index where index iterates as new components are
+         * added. e.g. Network 1, Network 2, etc.
          */
         if (component.getName().equalsIgnoreCase("")) {
             if (componentNameIndices.get(component.getClass()) == null) {
@@ -215,6 +211,10 @@ public class Workspace {
         for (WorkspaceListener listener : listeners) {
             listener.componentAdded(component);
         }
+
+        // If priority based update, resort the component list by priorities
+        resortPriorities();
+
     }
 
     /**
@@ -337,7 +337,8 @@ public class Workspace {
             boolean hasChanged = false;
             synchronized (componentList) {
                 for (WorkspaceComponent component : componentList) {
-                    //System.out.println(component.getName() + ":" + component.hasChangedSinceLastSave());
+                    // System.out.println(component.getName() + ":" +
+                    // component.hasChangedSinceLastSave());
                     if (component.hasChangedSinceLastSave()) {
                         hasChanged = true;
                     }
@@ -383,7 +384,7 @@ public class Workspace {
      */
     public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
-        //WorkspacePreferences.setDefaultFile(currentFile.getAbsolutePath());
+        // WorkspacePreferences.setDefaultFile(currentFile.getAbsolutePath());
     }
 
     /**
@@ -394,7 +395,7 @@ public class Workspace {
     }
 
     /**
-     * Get a component using its name id.  Used in terminal mode.
+     * Get a component using its name id. Used in terminal mode.
      *
      * @param id name of component
      * @return Workspace Component
@@ -413,13 +414,14 @@ public class Workspace {
     /** The lock used to lock calls on syncAllComponents. */
     private final Object componentLock = new Object();
 
-    public void setTaskSynchronizationManager(final TaskSynchronizationManager manager) {
+    public void setTaskSynchronizationManager(
+            final TaskSynchronizationManager manager) {
         updator.setTaskSynchronizationManager(manager);
     }
 
     /**
-     * Synchronizes on all components and executes task, returning the
-     * result of that callable.
+     * Synchronizes on all components and executes task, returning the result of
+     * that callable.
      *
      * @param <E> The return type of task.
      * @param task The task to synchronize.
@@ -429,8 +431,8 @@ public class Workspace {
     public <E> E syncOnAllComponents(final Callable<E> task) throws Exception {
         synchronized (componentLock) {
             Iterator<Object> locks = new Iterator<Object>() {
-                Iterator<? extends WorkspaceComponent> components
-                    = getComponentList().iterator();
+                Iterator<? extends WorkspaceComponent> components = getComponentList()
+                        .iterator();
                 Iterator<? extends Object> current = null;
 
                 public boolean hasNext() {
@@ -463,17 +465,18 @@ public class Workspace {
     }
 
     /**
-     * Recursively synchronizes on the next component in the iterator and executes
-     * task if there are no more components.
+     * Recursively synchronizes on the next component in the iterator and
+     * executes task if there are no more components.
      *
      * @param <E> The return type of task.
-     * @param iterator The iterator of the remaining components to synchronize on.
+     * @param iterator The iterator of the remaining components to synchronize
+     *            on.
      * @param task The task to synchronize.
      * @return The result of task.
      * @throws Exception If an exception occurs.
      */
-    public static <E> E syncRest(final Iterator<? extends Object> iterator, final Callable<E> task)
-            throws Exception {
+    public static <E> E syncRest(final Iterator<? extends Object> iterator,
+            final Callable<E> task) throws Exception {
         if (iterator.hasNext()) {
             synchronized (iterator.next()) {
                 return syncRest(iterator, task);
@@ -496,12 +499,13 @@ public class Workspace {
      * {@inheritDoc}
      */
     public String toString() {
-        StringBuilder builder =
-               new StringBuilder("Number of components: " + componentList.size() + "\n");
+        StringBuilder builder = new StringBuilder("Number of components: "
+                + componentList.size() + "\n");
         int i = 0;
         synchronized (componentList) {
             for (WorkspaceComponent component : componentList) {
-                builder.append("Component " + ++i + ":" + component.getName() + "\n");
+                builder.append("Component " + ++i + ":" + component.getName()
+                        + "\n");
             }
         }
         return builder.toString();
@@ -531,27 +535,27 @@ public class Workspace {
 
     /**
      * By default, the workspace is updated as followed: 1) Update couplings 2)
-     * Call "update" on all workspacecomponents
-     *
-     * Sometimes this way of updating is not sufficient, and the user will want
-     * updates (in the GUI, presses of the iterate and play buttons) to update
-     * components and couplings in a different way.
-     *
-     * For an example, see the script in
+     * Call "update" on all workspacecomponents Sometimes this way of updating
+     * is not sufficient, and the user will want updates (in the GUI, presses of
+     * the iterate and play buttons) to update components and couplings in a
+     * different way. For an example, see the script in
      * {SimbrainDir}/scripts/scriptmenu/addBackpropSim.bsh
      *
      * @param controller The update controller to use.
      * @param threads The number of threads for the component updates.
      */
-    public void setCustomUpdateController(final UpdateController controller, final int threads) {
+    public void setUpdateController(final UpdateController controller,
+            final int threads) {
         synchronized (updatorLock) {
             if (updator.isRunning()) {
                 throw new RuntimeException(
                         "Cannot change updator while running.");
             }
-            WorkspaceUpdator updator = new WorkspaceUpdator(this, manager,
-                    controller, threads);
+            WorkspaceUpdator updator = new WorkspaceUpdator(this, controller,
+                    threads);
             swapUpdators(updator);
+            // If it's priority based update, be sure components are sorted
+            resortPriorities();
         }
     }
 
@@ -560,14 +564,15 @@ public class Workspace {
      *
      * @param controller The number of threads to use.
      */
-    public void setCustomUpdateController(final UpdateController controller) {
+    public void setUpdateController(final UpdateController controller) {
         synchronized (updatorLock) {
             if (updator.isRunning()) {
-                throw new RuntimeException(
-                        "Cannot change updator while running.");
+                throw new RuntimeException("Cannot change updator while running.");
             }
-            WorkspaceUpdator updator = new WorkspaceUpdator(this, manager, controller);
+            WorkspaceUpdator updator = new WorkspaceUpdator(this, controller);
             swapUpdators(updator);
+            // If it's priority based update, be sure components are sorted
+            resortPriorities(); 
         }
     }
 
@@ -579,22 +584,13 @@ public class Workspace {
     private void swapUpdators(final WorkspaceUpdator newUpdator) {
 
         // Move old listeners over to new updator
-        for(WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
+        for (WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
             newUpdator.addUpdatorListener(listener);
         }
         updator = newUpdator;
-        for(WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
+        for (WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
             listener.changedUpdateController();
         }
-    }
-
-    /**
-     * Sets a custom controller with the default number of threads.
-     *
-     * @param controller The number of threads to use.
-     */
-    public void resetUpdateController() {
-        setCustomUpdateController(WorkspaceUpdator.DEFAULT_CONTROLLER);
     }
 
     /**
@@ -614,7 +610,6 @@ public class Workspace {
         }
         return returnList;
     }
-
 
     /**
      * Returns global time.
@@ -637,7 +632,7 @@ public class Workspace {
      *
      * @return reference to workspace updator.
      */
-    public WorkspaceUpdator getWorkspaceUpdator() {
+    public WorkspaceUpdator getUpdator() {
         return updator;
     }
 
@@ -656,11 +651,9 @@ public class Workspace {
     }
 
     /**
-     * Actions required prior to proper serialization.
-     *
-     * TODO: A bit of a hack. Currently just moves trainer components to the
-     * back of the list, so they are serialized last, and hence deserialized
-     * last.
+     * Actions required prior to proper serialization. TODO: A bit of a hack.
+     * Currently just moves trainer components to the back of the list, so they
+     * are serialized last, and hence deserialized last.
      */
     void preSerializationInit() {
         Collections.sort(componentList, new Comparator<WorkspaceComponent>() {
@@ -670,5 +663,20 @@ public class Workspace {
             }
         });
     }
+
+    /**
+     * Resort the components according to update priorities
+     */
+    protected void resortPriorities() {
+        if (updator.getType() == WorkspaceUpdator.TYPE.PRIORITY) {
+            Collections.sort(componentList, new Comparator<WorkspaceComponent>() {
+                public int compare(WorkspaceComponent c1, WorkspaceComponent c2) {
+                    return Integer.valueOf(c1.getUpdatePriority()).compareTo(
+                            Integer.valueOf(c2.getUpdatePriority()));
+                }
+            });
+        }
+    }
+
 
 }

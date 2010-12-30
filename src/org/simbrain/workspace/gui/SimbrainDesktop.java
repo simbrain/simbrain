@@ -282,7 +282,7 @@ public class SimbrainDesktop {
         wsToolBar = createToolBar();
         createContextMenu();
         workspace.addListener(workspaceListener);
-        workspace.getWorkspaceUpdator().addUpdatorListener(updatorListener);
+        workspace.getUpdator().addUpdatorListener(updatorListener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET,
@@ -1116,7 +1116,7 @@ public class SimbrainDesktop {
      */
     public void updateTimeLabel() {
         timeLabel.setText("Time:" + workspace.getTime());
-        if (workspace.getWorkspaceUpdator().isRunning()) {
+        if (workspace.getUpdator().isRunning()) {
             runningLabel.setVisible(true);
             // SimbrainDesktop.this.desktop.setBackground(Color.red);
         } else {

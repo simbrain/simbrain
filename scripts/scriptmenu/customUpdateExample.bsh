@@ -23,7 +23,7 @@ import org.simbrain.workspace.updator.*;
     workspace.addWorkspaceComponent(networkComponent);
 
     // Set Custom Update Method
-    workspace.setCustomUpdateController(new CustomUpdate(network));
+    workspace.setUpdateController(new CustomUpdate(network));
 
     /**
      * Define the custom update method.

@@ -52,7 +52,7 @@ public final class GlobalUpdateAction extends WorkspaceAction {
 
         // Listen to workspace updator so that this button can be enabled or
         // disabled depending on whether the workspace is running or not.
-        workspace.getWorkspaceUpdator().addUpdatorListener(new WorkspaceUpdatorListener() {
+        workspace.getUpdator().addUpdatorListener(new WorkspaceUpdatorListener() {
 
             public void changeNumThreads() {
                 // TODO Auto-generated method stub

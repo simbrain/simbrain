@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -35,7 +36,10 @@ import javax.swing.JToolBar;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.updator.BufferedUpdator;
 import org.simbrain.workspace.updator.ComponentUpdateListener;
+import org.simbrain.workspace.updator.PriorityUpdator;
+import org.simbrain.workspace.updator.WorkspaceUpdator;
 import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 
 /**
@@ -52,18 +56,25 @@ public class ThreadViewerPanel extends JPanel {
     /** Thread viewer panel. */
 	private JToolBar topStatsPanel= new JToolBar();
 
+	/** Update types. */
+    private JComboBox updateType = new JComboBox(new Object[] {
+            WorkspaceUpdator.TYPE.BUFFERED, WorkspaceUpdator.TYPE.PRIORITY });
+
+    /**
+     * Memory of custom update type, if any; used for cleaning up the update
+     * combo box.
+     */
+    private String lastCustomUpdateName = "";
+
     /** List. */
     private JList list = new JList();
 
     /** List model. */
     private ThreadListModel<ListItem> listModel = new ThreadListModel<ListItem>();
 
-    /** Label for update method name. */
-    private JLabel updateName = new JLabel();
-
     /** Thread viewer scroll pane. */
     JScrollPane scrollPane = null;
-    
+
     /** Reference to parent workspace. */
     private Workspace workspace;
 
@@ -85,29 +96,33 @@ public class ThreadViewerPanel extends JPanel {
         scrollPane = new JScrollPane(list);
         threadViewer.add(scrollPane);
 
-        // Set up top statistics panel
-        topStatsPanel.add(updateName);
-        topStatsPanel.addSeparator();
-        JButton resetUpdateMethodButton = new JButton("Reset update method");
-        resetUpdateMethodButton.addActionListener(new ActionListener() {
+        // Update Type Selector
+        topStatsPanel.add(new JLabel("Update type:"));
+        topStatsPanel.add(updateType);
+        updateType.setMaximumSize(new Dimension(150,100));
+        updateType.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                workspace.resetUpdateController();
+                if (updateType.getSelectedItem() == WorkspaceUpdator.TYPE.BUFFERED) {
+                    workspace.setUpdateController(new BufferedUpdator());
+                } else if (updateType.getSelectedItem() == WorkspaceUpdator.TYPE.PRIORITY) {
+                    workspace.setUpdateController(new PriorityUpdator());
+                }
             }
         });
-        topStatsPanel.add(resetUpdateMethodButton);
-        topStatsPanel.addSeparator();        
+
+        topStatsPanel.addSeparator();
         topStatsPanel.add(new JLabel("Number of Threads: "));
         updatorNumThreads.setMaximumSize(new Dimension(100,100));
         topStatsPanel.add(updatorNumThreads);
         JButton setThreadsButton = new JButton("Set");
         setThreadsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-                workspace.getWorkspaceUpdator().setNumThreads(
+                workspace.getUpdator().setNumThreads(
                         Integer.parseInt(updatorNumThreads.getText()));
 			}
 
         });
-        topStatsPanel.add(setThreadsButton);        
+        topStatsPanel.add(setThreadsButton);
         topStatsPanel.addSeparator();
         topStatsPanel.add(new JLabel("Number of Processors: "
                 + Runtime.getRuntime().availableProcessors()));
@@ -118,7 +133,7 @@ public class ThreadViewerPanel extends JPanel {
         this.add("Center", threadViewer);
 
         // Add updator component listener
-        workspace.getWorkspaceUpdator().addComponentListener(
+        workspace.getUpdator().addComponentListener(
                 new ComponentUpdateListener() {
 
                 	/**
@@ -147,7 +162,7 @@ public class ThreadViewerPanel extends JPanel {
                 });
 
         // Add updator listener
-        workspace.getWorkspaceUpdator().addUpdatorListener(
+        workspace.getUpdator().addUpdatorListener(
                 new WorkspaceUpdatorListener() {
 
                     /**
@@ -190,26 +205,32 @@ public class ThreadViewerPanel extends JPanel {
     }
 
     /**
-     * Update thread viewer list. 
+     * Update thread viewer list.
      */
     private void updateList() {
     	listModel = new ThreadListModel<ListItem>();
-    	for (int i = 1; i <= workspace.getWorkspaceUpdator().getNumThreads(); i++) {
+    	for (int i = 1; i <= workspace.getUpdator().getNumThreads(); i++) {
             ListItem label = new ListItem("Thread " + i);
             listModel.add(label);
         }
         list.setModel(listModel);
-        updatorNumThreads.setText("" + workspace.getWorkspaceUpdator().getNumThreads());
+        updatorNumThreads.setText("" + workspace.getUpdator().getNumThreads());
     }
 
 	/**
-	 * Update the labels on the thread viewer panel, of which there is currently
-	 * just one.
+	 * Update various labels and components reflecting update stats.
 	 */
     private void updateStats() {
-        updateName.setText("Current update method: "
-                + workspace.getWorkspaceUpdator().getCurrentUpdatorName());    	
-        updatorNumThreads.setText("" + workspace.getWorkspaceUpdator().getNumThreads());
+        if (workspace.getUpdator().getType() == WorkspaceUpdator.TYPE.CUSTOM) {
+            String name = workspace.getUpdator().getCurrentUpdatorName();
+            updateType.addItem(name);
+            updateType.setSelectedItem(name);
+            lastCustomUpdateName = name;
+        } else {
+            updateType.removeItem(lastCustomUpdateName);
+            updateType.setSelectedItem(workspace.getUpdator().getType());
+        }
+        updatorNumThreads.setText("" + workspace.getUpdator().getNumThreads());
     }
 
     /**

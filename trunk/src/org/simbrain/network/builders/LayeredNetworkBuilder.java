@@ -121,6 +121,7 @@ public final class LayeredNetworkBuilder {
             for (int j = 0; j < nodesPerLayer[i]; j++) {
                 Neuron neuron = new Neuron(network, new SigmoidalNeuron());
                 neuron.setLowerBound(0);
+                neuron.setUpdatePriority(i);
                 network.addNeuron(neuron);
                 hiddenLayer.add(neuron);
             }

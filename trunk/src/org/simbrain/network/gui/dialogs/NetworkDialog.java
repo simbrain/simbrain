@@ -160,7 +160,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
     /**
      * This method is the default constructor.
-     * 
+     *
      * @param np reference to <code>NetworkPanel</code>.
      */
     public NetworkDialog(final NetworkPanel np) {
@@ -250,7 +250,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     /**
      * Respond to button pressing events with immediate changes to network
      * panel, where relevant.
-     * 
+     *
      * @param e action event
      */
     public void actionPerformed(final ActionEvent e) {
@@ -393,7 +393,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
     /**
      * Listens and responds to slider state changes.
-     * 
+     *
      * @param e change event
      */
     public void stateChanged(final ChangeEvent e) {
@@ -410,7 +410,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
     /**
      * Show the color pallette and get a color.
-     * 
+     *
      * @return selected color
      */
     public Color getColor() {

@@ -45,4 +45,22 @@ public interface UpdateControls {
      * @param signal The signal to call done on when complete.
      */
     void updateComponent(WorkspaceComponent component, CompletionSignal signal);
+
+    /**
+     * Update all incoming couplings (i.e. consumers) associated with this
+     * component. Used in priority based workspace update.
+     *
+     * @see {org.simbrain.workspace.updator.PriorityUpdator}
+     * @param component component whose consumers should be updated.
+     */
+    void updateIncomingCouplings(WorkspaceComponent component);
+
+    /**
+     * Update all outgoing couplings (i.e. producers) associated with this
+     * component. Used in priority based workspace update.
+     *
+     * @see {org.simbrain.workspace.updator.PriorityUpdator}
+     * @param component component whose producers should be updated.
+     */
+    void updateOutgoingCouplings(WorkspaceComponent component);
 }

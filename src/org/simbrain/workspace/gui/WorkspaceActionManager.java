@@ -48,6 +48,7 @@ import org.simbrain.workspace.actions.NewTrainerAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
 import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
+import org.simbrain.workspace.actions.OpenEditorAction;
 import org.simbrain.workspace.actions.OpenDataWorldAction;
 import org.simbrain.workspace.actions.OpenNetworkAction;
 import org.simbrain.workspace.actions.OpenOdorWorldAction;
@@ -280,6 +281,7 @@ public class WorkspaceActionManager {
         return Arrays.asList(new Action[] {
                 newDataWorldAction,
                 newOdorWorldAction,
+                //newTextWorldAction,
                 // newThreeDeeWorldAction,
                 newVisionWorldAction });
     }

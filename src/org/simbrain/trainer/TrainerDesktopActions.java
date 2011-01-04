@@ -26,8 +26,15 @@ import javax.swing.JOptionPane;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.builders.LayeredNetworkBuilder;
+import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.UmatchedAttributesException;
 import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.updator.PriorityUpdator;
+import org.simbrain.world.dataworld.DataWorldComponent;
 
 /**
  * Contains actions for use in the trainer GUI, when used in the Simbrain
@@ -140,6 +147,85 @@ public class TrainerDesktopActions {
                         .addWorkspaceComponent(network);
                 desktopComponnent.getTrainerPanel().getTrainer()
                         .setNetwork(network.getRootNetwork());
+            }
+
+        };
+    }
+
+    /**
+     * Adds a table to the desktop, with the training data, and coupled
+     * appropriately.
+     *
+     * @param desktopComponnent reference to desktop component
+     * @return the action
+     */
+    public static Action getAddTableAction(final TrainerDesktopComponent desktopComponnent) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON,
+                        ResourceManager.getImageIcon("Table.png"));
+                putValue(NAME, "Add table");
+                putValue(SHORT_DESCRIPTION, "Add table with input data.");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+
+                // Make sure workspace is set to priority update
+                // TODO: Check current update mode
+                desktopComponnent.getWorkspaceComponent().getWorkspace()
+                        .setUpdateController(new PriorityUpdator());
+
+                // Get Trainer reference
+                Trainer trainer = desktopComponnent.getTrainerPanel()
+                        .getTrainer();
+
+                // Create table
+                DataWorldComponent table = new DataWorldComponent("Data",
+                        trainer.getInputData());
+                desktopComponnent.getWorkspaceComponent().getWorkspace()
+                        .addWorkspaceComponent(table);
+                table.getDataModel().setIterationMode(true);
+
+                // Get reference to current network
+                String networkName = trainer.getNetworkName();
+                NetworkComponent network = (NetworkComponent) desktopComponnent
+                        .getWorkspaceComponent().getWorkspace()
+                        .getComponent(networkName);
+                if (network == null) {
+                    return;
+                }
+                network.getRootNetwork().setUpdateMethod(UpdateMethod.PRIORITYBASED);
+                // In workspace update, network should update _after_ the table
+                network.setUpdatePriority(1);
+
+                // Couple table to world
+                for (int i = 1; i <= trainer.getInputLayer().size(); i++) {
+                    Producer<?> columntAttribute = table.getAttributeManager()
+                            .createProducer(table.getColumnProducer(i-1),
+                                    "Value", double.class, "Column " + i);
+                    Consumer<?> neuronAttribute = network.getAttributeManager()
+                                .createConsumer(
+                                    network.getRootNetwork().getNeuron(
+                                            "Neuron_" + i), "InputValue",
+                                    double.class, "Neuron " + i);
+                    try {
+                        desktopComponnent
+                                .getWorkspaceComponent()
+                                .getWorkspace()
+                                .getCouplingManager()
+                                .addCoupling(
+                                        new Coupling(columntAttribute,
+                                                neuronAttribute));
+                    } catch (UmatchedAttributesException e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
 
         };

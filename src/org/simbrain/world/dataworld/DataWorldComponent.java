@@ -82,13 +82,24 @@ public class DataWorldComponent extends WorkspaceComponent {
     }
 
     /**
-     * Construct data world from a model. Used in deserializing.
+     * Construct a data world component from data.
+     * @param name name of component
+     * @param inputData data data to use to initialize the model
+     */
+    public DataWorldComponent(String name, double[][] data) {
+        this(name);
+        dataModel.setData(data);
+        init();
+    }
+
+    /**
+     * Construct data world from a model. Used (for example) in deserializing.
      *
      * @param name name of component
      * @param dataModel the model
      */
     @SuppressWarnings("unchecked")
-    private DataWorldComponent(final String name, final SimbrainDataTable dataModel) {
+    public DataWorldComponent(final String name, final SimbrainDataTable dataModel) {
         super(name);
         this.dataModel = (SimbrainDataTable) dataModel;
         init();
@@ -180,6 +191,32 @@ public class DataWorldComponent extends WorkspaceComponent {
         }
 
     };
+
+    /**
+     * Return the column producer with specified index, or null if none found.
+     *
+     * @param i index of setter
+     * @return the column attribute
+     */
+    public ColumnAttribute getColumnProducer(int i) {
+        if (i < producerList.size()) {
+            return producerList.get(i); 
+        }
+        return null;
+    }
+
+    /**
+     * Return the column consumer with specified index, or null if none found.
+     *
+     * @param i index of setter
+     * @return the column attribute
+     */
+    public ColumnAttribute getColumnConsumer(int i) {
+        if (i < consumerList.size()) {
+            return consumerList.get(i); 
+        }
+        return null;
+    }
 
     /**
      * Return the column attribute with specified index, or null if none found.

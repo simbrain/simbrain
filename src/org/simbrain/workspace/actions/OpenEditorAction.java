@@ -23,31 +23,43 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.world.textworld.TextWorldComponent;
+import org.simbrain.util.EditorPanel;
+import org.simbrain.workspace.gui.GenericJInternalFrame;
+import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 
 /**
- * Add text world to workspace.
+ * Add a script editor the current workspace.
  */
-public final class NewTextWorldAction extends WorkspaceAction {
+public final class OpenEditorAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
 
+    /** Reference to Simbrain desktop. */
+    private SimbrainDesktop desktop;
 
     /**
-     * Create a new text world action with the specified
-     * workspace.
+     * Create an editor.
      */
-    public NewTextWorldAction(Workspace workspace) {
-        super("TextWorld", workspace);
-        putValue(SHORT_DESCRIPTION, "New Text World");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
+    public OpenEditorAction(final SimbrainDesktop desktop) {
+        super("Script editor");
+        this.desktop = desktop;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Script.png"));
+        putValue(SHORT_DESCRIPTION, "Create a script editor");
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        TextWorldComponent world = new TextWorldComponent("");
-        workspace.addWorkspaceComponent(world);
+        GenericJInternalFrame frame = new GenericJInternalFrame();
+        desktop.addInternalFrame(frame);
+        EditorPanel panel = new EditorPanel();
+        frame.setTitle("Script Editor");
+        frame.setContentPane(panel);
+        frame.setResizable(true);
+        frame.setClosable(true);
+        frame.setMaximizable(true);
+        frame.setIconifiable(true);
+        frame.setVisible(true);
+        frame.pack();
     }
 }

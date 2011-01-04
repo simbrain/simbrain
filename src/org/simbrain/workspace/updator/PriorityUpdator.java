@@ -41,7 +41,14 @@ public class PriorityUpdator implements UpdateController {
             return;
         }
 
-        for (WorkspaceComponent component : controls.getComponents()) {
+        // Don't update incoming couplings for first component
+        WorkspaceComponent firstComponent = controls.getComponents().get(0);
+        firstComponent.update();
+        controls.updateOutgoingCouplings(firstComponent);
+
+        // Update everyone else
+        for (int i = 1; i <  controls.getComponents().size();i++) {
+            WorkspaceComponent component  = controls.getComponents().get(i);
             // System.out.println("Updating " + component.getName());
             // System.out.println("Updating incoming couplings");
             controls.updateIncomingCouplings(component);

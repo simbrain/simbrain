@@ -23,26 +23,42 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * <b>TextWorldComponent</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
- * data.  The main environment codes is in {@link TextWorld}.
+ * <b>TextWorldComponent</b> is the container for the world component. Handles
+ * toolbar buttons, and serializing of world data. The main environment codes is
+ * in {@link TextWorld}.
  */
-public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> implements ActionListener {
+public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> {
+
+    /** Script directory. */
+    private static final String SCRIPT_MENU_DIRECTORY = "."
+            + System.getProperty("file.separator") + "scripts"
+            + System.getProperty("file.separator") + "scriptmenu";
 
     private static final long serialVersionUID = 1L;
 
-    /** Instance of world of type TextWorld. */
-    private TextWorld world;
+    /** Default height. */
+    private static final int DEFAULT_HEIGHT = 450;
+
+    /** Default width. */
+    private static final int DEFAULT_WIDTH = 500;
 
     /** Menu Bar. */
     private JMenuBar menuBar = new JMenuBar();
@@ -77,60 +93,108 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
     /** Opens the help dialog for TextWorld. */
     private JMenu help = new JMenu("Help");
 
-    /** Instance of the TextWorld dictionary. */
-    private Dictionary theDictionary;
+    /** Current file. */
+    private File scriptFile;
+
+    /** The pane representing the text world. */
+    private TextWorldPanel panel;
 
     /**
      * Creates a new frame of type TextWorld.
-     * @param ws Workspace to add frame to
      */
-    public TextWorldDesktopComponent(GenericFrame frame, TextWorldComponent component) {
+    public TextWorldDesktopComponent(GenericFrame frame,
+            TextWorldComponent component) {
         super(frame, component);
-        this.setPreferredSize(new Dimension(450,400));
-        theDictionary = new Dictionary(this);
-        init();
+
+        panel = new TextWorldPanel(component.getWorld());
+        panel.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        addMenuBar();
+        add(panel);
+        frame.pack();
     }
 
-    /**
-     * Creates instance of text frame and sets parameters.
-     */
-    private void init() {
-        world = new TextWorld(this);
-        addMenuBar();
-        add(world);
-        getParentFrame().pack();
+    @Override
+    public void postAddInit() {
+        super.postAddInit();
+        this.getParentFrame().pack();
     }
 
     /**
      * Adds menu bar to the top of TextWorldComponent.
      */
     private void addMenuBar() {
-        open.addActionListener(this);
-        open.setActionCommand("open");
-        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        save.addActionListener(this);
+
+        // open.setActionCommand("open");
+        open.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                SFileChooser fileChooser = new SFileChooser(
+                        SCRIPT_MENU_DIRECTORY, "Open file");
+                scriptFile = fileChooser.showOpenDialog();
+                TextWorldDesktopComponent.this.getParentFrame().setTitle(
+                        scriptFile.getName());
+                StringBuffer fileData = new StringBuffer(1000);
+                BufferedReader reader;
+                try {
+                    reader = new BufferedReader(new FileReader(scriptFile));
+                    char[] buf = new char[1024];
+                    int numRead = 0;
+                    while ((numRead = reader.read(buf)) != -1) {
+                        String readData = String.valueOf(buf, 0, numRead);
+                        fileData.append(readData);
+                        buf = new char[1024];
+                    }
+                    reader.close();
+                    // textArea.setText(fileData.toString());
+                    panel.setInputText(fileData.toString());
+                } catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
+        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
         save.setActionCommand("save");
-        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveAs.addActionListener(this);
-        saveAs.setActionCommand("saveAs");
-        close.addActionListener(this);
-        close.setActionCommand("close");
-        close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        save.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                try {
+                    BufferedWriter out = new BufferedWriter(new FileWriter(
+                            scriptFile));
+                    // out.write(textArea.getText());
+                    out.close();
+                } catch (IOException exception) {
+                    System.out.println("Exception ");
+
+                }
+            }
+        });
+        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
+        close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
         menuBar.add(file);
         file.add(open);
         file.add(save);
         file.add(saveAs);
         file.add(close);
 
-        loadDictionary.addActionListener(this);
         loadDictionary.setActionCommand("loadDictionary");
         loadDictionary.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        preferences.addActionListener(this);
-        preferences.setActionCommand("prefs");
+        // preferences.setActionCommand("prefs");
+        preferences.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                panel.showTextWorldDialog();
+            }
+        });
+
         preferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuBar.add(edit);
@@ -143,32 +207,11 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
         getParentFrame().setJMenuBar(menuBar);
     }
 
-    /**
-     * Gets a particular instance of TextWorld.
-     * @return TextWorld
-     */
-    public TextWorld getWorld() {
-        return world;
-    }
-
-    /**
-     * Responds to action events.
-     * @param arg0 ActionEvent
-     */
-    public void actionPerformed(final ActionEvent arg0) {
-        Object o = arg0.getActionCommand();
-        if (o == "prefs") {
-            world.showTextWorldDialog();
-        }
-        if (o == "loadDictionary") {
-            theDictionary.loadDictionary();
-        }
-    }
 
     @Override
     public void closing() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

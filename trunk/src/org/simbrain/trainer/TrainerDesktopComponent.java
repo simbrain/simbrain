@@ -161,6 +161,9 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
         JMenuItem multiLayerItem = new JMenuItem(
                 TrainerDesktopActions.getBuildMultiLayerAction(this));
         buildMenu.add(multiLayerItem);
+        JMenuItem tableItem = new JMenuItem(
+                TrainerDesktopActions.getAddTableAction(this));
+        buildMenu.add(tableItem);
         menuBar.add(buildMenu);
 
         getParentFrame().setJMenuBar(menuBar);

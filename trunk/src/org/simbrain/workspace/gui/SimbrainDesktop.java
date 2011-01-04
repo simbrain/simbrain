@@ -91,6 +91,7 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.workspace.actions.OpenEditorAction;
 import org.simbrain.workspace.updator.InterceptingEventQueue;
 import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 import org.simbrain.world.dataworld.DataWorldComponent;
@@ -560,6 +561,7 @@ public class SimbrainDesktop {
     private JMenu createInsertMenu() {
         JMenu insertMenu = new JMenu("Insert");
         insertMenu.add(actionManager.getNewNetworkAction());
+        //insertMenu.add(new OpenEditorAction(this)); //TODO: Move this action manager
         insertMenu.add(actionManager.getNewTrainerAction());
         JMenu newGaugeSubMenu = new JMenu("New Plot");
         for (Action action : actionManager.getPlotActions()) {

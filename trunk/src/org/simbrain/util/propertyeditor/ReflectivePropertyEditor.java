@@ -223,8 +223,8 @@ public class ReflectivePropertyEditor extends JPanel {
                             itemPanel.addItem(formattedPropertyName, checkBox);
                         } else if (method.getReturnType() == boolean.class) {
                             JCheckBox checkBox = new JCheckBox();
-                            checkBox
-                                    .setSelected((Boolean) getGetterValue(method));
+//                            checkBox.setSelected(boolean.class.cast(
+//                                    getGetterValue(method)).booleanValue());
                             componentMap.put(propertyName, checkBox);
                             itemPanel.addItem(formattedPropertyName, checkBox);
                         }

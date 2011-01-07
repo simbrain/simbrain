@@ -211,7 +211,7 @@ public class TrainerDesktopActions {
                     Consumer<?> neuronAttribute = network.getAttributeManager()
                                 .createConsumer(
                                     network.getRootNetwork().getNeuron(
-                                            "Neuron_" + i), "InputValue",
+                                            "Neuron_" + i), "Activation",
                                     double.class, "Neuron " + i);
                     try {
                         desktopComponnent

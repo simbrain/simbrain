@@ -52,8 +52,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         super(name);
         model = new TimeSeriesModel();
         initializeAttributes();
-        model.defaultInit();
         addListener();
+        model.defaultInit();
     }
 
     /**

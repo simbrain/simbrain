@@ -18,9 +18,6 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.awt.EventQueue;
-import java.util.Iterator;
-
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;

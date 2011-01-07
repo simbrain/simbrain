@@ -115,7 +115,7 @@ public class WorkspaceUpdator {
     private final TYPE updateType;
 
     /** The default controller. */
-    public static final UpdateController DEFAULT_CONTROLLER = new PriorityUpdator();
+    public static final UpdateController DEFAULT_CONTROLLER = new BufferedUpdator();
 
     /**
      * Constructor for the updator that uses the provided controller and
@@ -250,6 +250,7 @@ public class WorkspaceUpdator {
     public void runOnce() {
         updates.submit(new Runnable() {
             public void run() {
+                notifyWorkspaceUpdateStarted();
                 snychManager.queueTasks();
 
                 try {
@@ -261,6 +262,9 @@ public class WorkspaceUpdator {
 
                 snychManager.releaseTasks();
                 snychManager.runTasks();
+                
+                notifyWorkspaceUpdateCompleted();
+
             }
         });
     }
@@ -399,7 +403,6 @@ public class WorkspaceUpdator {
      * Called when the workspace update begins.
      */
     private void notifyWorkspaceUpdateStarted() {
-
         events.submit(new Runnable() {
             public void run() {
                 for (WorkspaceUpdatorListener listener : updatorListeners) {
@@ -413,7 +416,6 @@ public class WorkspaceUpdator {
      * Called when workspace update finishes.
      */
     private void notifyWorkspaceUpdateCompleted() {
-
         events.submit(new Runnable() {
             public void run() {
                 for (WorkspaceUpdatorListener listener : updatorListeners) {
@@ -496,7 +498,7 @@ public class WorkspaceUpdator {
             }
         });
     }
-    
+
     /** A synch-manager where the methods do nothing. */
     private static final TaskSynchronizationManager NO_ACTION_SYNCH_MANAGER = new TaskSynchronizationManager() {
         public void queueTasks() {

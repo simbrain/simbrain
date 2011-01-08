@@ -25,10 +25,13 @@ import org.simbrain.network.interfaces.Neuron;
  */
 public class NeuronComparator implements java.util.Comparator<Neuron> {
 
+    /**
+     * Whether to compare via x or y position.
+     */
     public enum Type {
         COMPARE_X, COMPARE_Y
     }
-    
+
     /** How to compare the PNodes. */
     private Type comparisonType;
 
@@ -38,8 +41,9 @@ public class NeuronComparator implements java.util.Comparator<Neuron> {
      * @param comparison whether to compare by x or y dimension.
      */
     public NeuronComparator(final Type comparison) {
-        if (comparison != null) throw new RuntimeException("comparison type cannot be null");
-        
+        if (comparison == null) {
+            throw new RuntimeException("comparison type cannot be null");
+        }
         comparisonType = comparison;
     }
 
@@ -49,7 +53,7 @@ public class NeuronComparator implements java.util.Comparator<Neuron> {
     public int compare(final Neuron p1, final Neuron p2) {
         double d1;
         double d2;
-        
+
         switch (comparisonType) {
         case COMPARE_X:
             d1 = p1.getX();

@@ -193,6 +193,7 @@ public class RootNetwork extends Network {
         XStream xstream = new XStream(new DomDriver());
         xstream.omitField(RootNetwork.class, "logger");
         xstream.omitField(RootNetwork.class, "component");
+        xstream.omitField(RootNetwork.class, "customRule");
         xstream.omitField(RootNetwork.class, "groupListeners");
         xstream.omitField(RootNetwork.class, "neuronListeners");
         xstream.omitField(RootNetwork.class, "networkListeners");

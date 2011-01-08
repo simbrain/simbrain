@@ -302,7 +302,7 @@ public class NetworkPanel extends PCanvas  {
         getCamera().addChild(timeLabel);
         timeLabel.update();
 
-        // Format the updateScript Label
+        // Format the update method label
         updateStatusLabel = new UpdateStatusLabel(this);
         updateStatusLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight()
                 - UPDATE_LABEL_OFFSET);

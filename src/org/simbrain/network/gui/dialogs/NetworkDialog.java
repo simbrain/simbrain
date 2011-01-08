@@ -38,10 +38,12 @@ import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
+import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.updator.WorkspaceUpdator;
 
 /**
  * <b>NetworkDialog</b> is a dialog box for setting the properties of the
@@ -148,15 +150,13 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
 
-    /** List of update methods. */
-    private String[] updateMethodList = { "Standard", "Priority Based",
-            "Script Based" };
-
     /** Root network update method combo box. */
-    private JComboBox cbUpdateMethod = new JComboBox(updateMethodList);
+    private JComboBox cbUpdateMethod = new JComboBox(new Object[] {
+            RootNetwork.UpdateMethod.BUFFERED,
+            RootNetwork.UpdateMethod.PRIORITYBASED });
 
-    /** Set Script to be used for root network update method. */
-    private JButton scriptButton = new JButton("Set");
+    /** If true, then the user has manually changed the update method. */
+    private boolean updateMethodChanged = false;
 
     /**
      * This method is the default constructor.
@@ -176,7 +176,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         setTitle("Network Dialog");
         fillFieldValues();
         checkRounding();
-        checkScript();
         graphicsPanel.setBorder(BorderFactory.createEtchedBorder());
         precisionField.setColumns(3);
         nudgeAmountField.setColumns(3);
@@ -199,7 +198,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         cbChangeColor.addActionListener(this);
         cbChangeColor.setActionCommand("moveSelector");
         cbUpdateMethod.addActionListener(this);
-        scriptButton.addActionListener(this);
 
         // Set up color pane
         colorPanel.add(cbChangeColor);
@@ -219,7 +217,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
         logicPanel.addItem("Network Update Method", cbUpdateMethod);
-        logicPanel.addItem("Set Script", scriptButton);
+        //logicPanel.addItem("Set Script", scriptButton);
 
         // Set up Misc Panel
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
@@ -341,7 +339,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
             networkPanel
                     .setShowSubnetOutline(showSubnetOutlineBox.isSelected());
         } else if (o == cbUpdateMethod) {
-            checkScript();
+            updateMethodChanged = true;
         }
     }
 
@@ -359,13 +357,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
                 .getRoundingOff());
         weightSizeMaxSlider.setValue(NetworkGuiSettings.getMaxDiameter());
         weightSizeMinSlider.setValue(NetworkGuiSettings.getMinDiameter());
-        if (networkPanel.getRootNetwork().getUpdateMethod()
-                .equals(UpdateMethod.BUFFERED)) {
-            cbUpdateMethod.setSelectedIndex(0);
-        } else if (networkPanel.getRootNetwork().getUpdateMethod()
-                .equals(UpdateMethod.PRIORITYBASED)) {
-            cbUpdateMethod.setSelectedIndex(1);
-        }
+        cbUpdateMethod.setSelectedItem(networkPanel.getRootNetwork().getUpdateMethod());
     }
 
     /**
@@ -376,19 +368,13 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
                 .getText()));
         networkPanel.getRootNetwork().setPrecision(
                 Integer.parseInt(precisionField.getText()));
-        switch (cbUpdateMethod.getSelectedIndex()) {
-        case 0:
-            networkPanel.getRootNetwork()
-                    .setUpdateMethod(UpdateMethod.BUFFERED);
-            break;
-        case 1:
+
+        // Don't change the update method unless the user explicitly selected an
+        // update method (otherwise custom update overridden).
+        if (updateMethodChanged ) {
             networkPanel.getRootNetwork().setUpdateMethod(
-                    UpdateMethod.PRIORITYBASED);
-            break;
-        default:
-            break;
+                    (UpdateMethod) cbUpdateMethod.getSelectedItem());
         }
-        networkPanel.getUpdateStatusLabel().update();
     }
 
     /**
@@ -430,19 +416,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
             precisionField.setEnabled(false);
         } else {
             precisionField.setEnabled(true);
-        }
-    }
-
-    /**
-     * Enable or disable the set button depending on the update method
-     * selection.
-     */
-    private void checkScript() {
-        if (cbUpdateMethod.getSelectedItem().toString()
-                .equalsIgnoreCase("Script Based")) {
-            scriptButton.setEnabled(true);
-        } else {
-            scriptButton.setEnabled(false);
         }
     }
 

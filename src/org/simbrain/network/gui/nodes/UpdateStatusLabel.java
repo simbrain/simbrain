@@ -16,7 +16,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PText;
 
 /**
- * The label which shows whether an update script is being used.
+ * The label which shows how the network is being updated.
  */
 public class UpdateStatusLabel extends PText {
 
@@ -61,11 +61,7 @@ public class UpdateStatusLabel extends PText {
      * Update the custom script label.
      */
     public void update() {
-        if (networkPanel.getRootNetwork().getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-            setText("Update: Priority Based Update");
-        } else {
-            this.setText("Update: Standard Update");
-        }
+        setText("Update Method:" + networkPanel.getRootNetwork().getUpdateMethod());
     }
 
     /**

@@ -29,7 +29,6 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.RotationEffector;
 import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
@@ -56,10 +55,10 @@ public abstract class OdorWorldEntity {
     protected float y;
 
     /** X Velocity. */
-    protected float dx = .05f;
+    protected float dx;
 
     /** Y Velocity. */
-    protected float dy = .05f;
+    protected float dy;
 
     /** Back reference to parent parentWorld. */
     private OdorWorld parentWorld;

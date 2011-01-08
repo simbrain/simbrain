@@ -42,7 +42,9 @@ import org.simbrain.world.odorworld.actions.DeleteEntityAction;
 import org.simbrain.world.odorworld.actions.EditSmellSourceAction;
 import org.simbrain.world.odorworld.actions.ShowEntityDialogAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
+import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
  * <b>OdorWorldPanel</b> represent the OdorWorld. 
@@ -65,7 +67,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     private Point draggingPoint;
 
     /** Entity currently selected. */
-    private OdorWorldEntity selectedEntity = null;
+    private OdorWorldEntity selectedEntity;
 
     /** Selected point. */
     private Point selectedPoint;
@@ -85,15 +87,8 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
     /** World menu. */
     private OdorWorldMenu menu;
 
-    /** Whether world has been updated yet; used by thread. */
-    private boolean updateCompleted;
-
-    /**
-     * Default constructor.
-     */
-    public OdorWorldPanel() {
-        System.out.println("Here");
-    }
+    /** Renderer for this world. */
+    private OdorWorldRenderer renderer;
 
     /**
      * Construct a world, set its background color.
@@ -101,7 +96,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      * @param wf the frame in which this world is rendered
      */
     public OdorWorldPanel(final OdorWorld world) {
+
         this.world = world;
+
+        renderer = new OdorWorldRenderer();
 
         setBackground(backgroundColor);
         this.addMouseListener(mouseListener);
@@ -112,6 +110,37 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         menu = new OdorWorldMenu(this);
 
         menu.initMenu();
+        
+        world.addListener(new WorldListener() {
+
+            public void updated() {
+                repaint();
+            }
+
+            public void effectorAdded(Effector effector) {
+                repaint();
+            }
+
+            public void entityAdded(OdorWorldEntity entity) {
+                repaint();
+            }
+
+            public void sensorAdded(Sensor sensor) {
+                repaint();
+            }
+
+            public void entityRemoved(OdorWorldEntity entity) {
+                repaint();
+            }
+
+            public void sensorRemoved(Sensor sensor) {
+                repaint();
+            }
+
+            public void effectorRemoved(Effector effector) {
+                repaint();
+            }
+        });
     }
 
 //    final ActionListener copyListener = new ActionListener() {
@@ -327,33 +356,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         return temp;
     }
 
-    /**
-     * Paints graphical component.
-     * @param g Graphic to paint
-     */
     @Override
     public void paintComponent(final Graphics g) {
-        //super.paintComponent(g); // Does not seem to do anything.
-        paintWorld(g);
-        super.repaint(); // This fixes issues I was having, but is seems funny...
-    }
-
-    /**
-     * Paint all the objects in the world.
-     *
-     * @param g Reference to the world's graphics object
-     */
-    public void paintWorld(final Graphics g) {
-        world.draw((Graphics2D) g, this.getWidth(), this.getHeight());
-
-        //        // For editing walls.  TODO: Move to wall class.
-        //        if (drawingWalls && (draggingPoint != null)) {
-        //            final Point upperLeft = determineUpperLeft(getWallPoint1(), draggingPoint);
-        //            final int width = Math.abs(getWallPoint1().x - draggingPoint.x);
-        //            final int height = Math.abs(getWallPoint1().y - draggingPoint.y);
-        //            g.setColor(Color.BLACK);
-        //            g.drawRect(upperLeft.x, upperLeft.y, width, height);
-        //        }
+        renderer.draw((Graphics2D) g, getWorld(), this.getWidth(),
+                this.getHeight());
     }
 
     /**
@@ -453,26 +459,6 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
      */
     private Point getWallPoint2() {
         return wallPoint2;
-    }
-
-    /**
-     * Used by script thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @return whether the world has been updated or not
-     */
-    public boolean isUpdateCompleted() {
-        return updateCompleted;
-    }
-
-    /**
-     * Used by script thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @param b whether the world has been updated or not.
-     */
-    public void setUpdateCompleted(final boolean b) {
-        updateCompleted = b;
     }
 
     /**

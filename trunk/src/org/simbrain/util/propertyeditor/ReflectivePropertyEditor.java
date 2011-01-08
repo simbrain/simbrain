@@ -223,8 +223,7 @@ public class ReflectivePropertyEditor extends JPanel {
                             itemPanel.addItem(formattedPropertyName, checkBox);
                         } else if (method.getReturnType() == boolean.class) {
                             JCheckBox checkBox = new JCheckBox();
-//                            checkBox.setSelected(boolean.class.cast(
-//                                    getGetterValue(method)).booleanValue());
+                            checkBox.setSelected((Boolean) getGetterValue(method));
                             componentMap.put(propertyName, checkBox);
                             itemPanel.addItem(formattedPropertyName, checkBox);
                         }
@@ -420,8 +419,7 @@ public class ReflectivePropertyEditor extends JPanel {
             }
         }
 
-        // TODO: Remove once unit tests are int)
-        System.out.println(toEdit);
+        //System.out.println(toEdit);
     }
 
     /**
@@ -439,7 +437,7 @@ public class ReflectivePropertyEditor extends JPanel {
 
     /**
      * Returns a text field initialized to the corresponding getter's value.
-     * 
+     *
      * @param m
      * @return
      */

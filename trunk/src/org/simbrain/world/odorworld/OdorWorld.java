@@ -53,15 +53,6 @@ public class OdorWorld {
     /** Listeners on this odor world. */
     private List<WorldListener> listenerList = new ArrayList<WorldListener>();
 
-    /** Tile map. */
-    //private TileMap map;
-
-    /** Point cache used in collision detection. */
-    private Point pointCache = new Point();
-
-    /** Renderer for this world. */
-    private OdorWorldRenderer renderer;
-
     /** Sum of lengths of smell vectors for all smelly objects in the world. */
     private double totalSmellVectorLength;
 
@@ -87,13 +78,6 @@ public class OdorWorld {
      * Default constructor.
      */
     OdorWorld() {
-        renderer = new OdorWorldRenderer();
-        //map = new TileMap(10, 15);
-
-        //renderer.setBackground(ResourceManager.getImage("dirt.jpg"));
-        //map.setTile(1, 2, ResourceManager.getImage("Tulip.gif"));
-        //map.setTile(3, 3, ResourceManager.getImage("Tulip.gif"));
-        //map.setTile(5, 5, ResourceManager.getImage("Tulip.gif"));
     }
 
     /**
@@ -369,6 +353,15 @@ public class OdorWorld {
         // }
         // }
 
+        // Very simple motion
+        if (dx != 0) {
+            sprite.setX(sprite.getX() + dx);
+        }
+        if (dy != 0) {
+            sprite.setY(sprite.getY() + dy);
+        }
+        
+        
         // Handle sprite collisions
         sprite.setHasCollided(false);
         for (OdorWorldEntity entity : entityList) {
@@ -502,17 +495,6 @@ public class OdorWorld {
 
         // No collision found
         return null;
-    }
-
-    /**
-     * Render the world.  Forwarded to renderer.
-     *
-     * @param g graphics object.
-     * @param screenWidth width of screen
-     * @param screenHeight height of screen
-     */
-    public void draw(Graphics2D g, int screenWidth, int screenHeight) {
-        renderer.draw(g, this, screenWidth, screenHeight);
     }
 
     /**

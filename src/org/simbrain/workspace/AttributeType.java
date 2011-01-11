@@ -20,9 +20,8 @@ package org.simbrain.workspace;
 
 /**
  * Encapsulates type information about potential attribute. Used to determine
- * which potential attributes are visible in coupling creation GUI.
- *
- * Displayed as typename:method<datatype>
+ * which potential attributes are visible in coupling creation GUI. Displayed as
+ * typename:method<datatype>
  *
  * @author jyoshimi
  */
@@ -43,11 +42,11 @@ public class AttributeType {
     private final String typeName;
 
     /**
-     * The root name of a getter or setter; i.e. "X" in "getX" or "setX".
-     * Effectively serves as a "subtype" of a class of attributes associated
-     * with the base object.
+     * The name of the method to call on the base object for this type of
+     * attribute. Can be empty in cases where one type maps to multiple method
+     * calls.
      */
-    private final String methodBaseName;
+    private final String methodName;
 
     /** Class of this attribute. */
     private final Class<?> dataType;
@@ -61,17 +60,33 @@ public class AttributeType {
      * @param parent reference to parent component
      * @param typeName String identification of type id
      * @param methodName name of method
-     * @param dataType data type (return type for producers;
-     *        argument type for consumers)
+     * @param dataType data type (return type for producers; argument type for
+     *            consumers)
      * @param visible whether this attribute should be visible for a given
-     *        component.
+     *            component.
      */
-    public AttributeType(WorkspaceComponent parent, String typeName, String methodName, Class<?> dataType, boolean visible) {
+    public AttributeType(WorkspaceComponent parent, String typeName,
+            String methodName, Class<?> dataType, boolean visible) {
         this.parentComponent = parent;
         this.typeName = typeName;
-        this.methodBaseName = methodName;
+        this.methodName = methodName;
         this.dataType = dataType;
         this.visible = visible;
+    }
+
+    /**
+     * Construct an attribute type object with no method name.
+     *
+     * @param parent reference to parent component
+     * @param typeName String identification of type id
+     * @param dataType data type (return type for producers; argument type for
+     *            consumers)
+     * @param visible whether this attribute should be visible for a given
+     *            component.
+     */
+    public AttributeType(WorkspaceComponent parent, String typeName,
+             Class<?> dataType, boolean visible) {
+        this(parent, typeName, "", dataType, visible);
     }
 
     /**
@@ -82,7 +97,7 @@ public class AttributeType {
      * @return the formatted string.
      */
     public String getDescription(String baseName) {
-        return baseName + ":" + methodBaseName + typeClass();
+        return baseName + ":" + methodName + typeClass();
     }
 
     /**
@@ -103,7 +118,8 @@ public class AttributeType {
     }
 
     /**
-     * Returns a description of this type, including method base name and data type.
+     * Returns a description of this type, including method base name and data
+     * type.
      *
      * @return the formatted String
      */
@@ -111,14 +127,13 @@ public class AttributeType {
         return getBaseDescription() + typeClass();
     }
 
-
     /**
      * Like getDescription() but does not return method base name.
      *
      * @return the formatted String
      */
     public String getSimpleDescription() {
-        return  typeName + typeClass();
+        return typeName + typeClass();
     }
 
     /**
@@ -128,8 +143,8 @@ public class AttributeType {
      * @return the description
      */
     public String getBaseDescription() {
-        if (methodBaseName != null) {
-            return typeName + ":" + methodBaseName;
+        if (methodName != null) {
+            return typeName + ":" + methodName;
         } else {
             return typeName;
         }
@@ -166,7 +181,7 @@ public class AttributeType {
      * @return the subtype
      */
     public String getAttributeName() {
-        return methodBaseName;
+        return methodName;
     }
 
     /**
@@ -184,10 +199,10 @@ public class AttributeType {
     }
 
     /**
-     * @return the methodBaseName
+     * @return the methodName
      */
-    public String getMethodBaseName() {
-        return methodBaseName;
+    public String getMethodName() {
+        return methodName;
     }
 
 }

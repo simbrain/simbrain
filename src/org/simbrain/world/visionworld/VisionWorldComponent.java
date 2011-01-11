@@ -62,7 +62,7 @@ public final class VisionWorldComponent extends WorkspaceComponent {
      */
     private void initAttributes() {
         if (getProducerTypes().size() == 0) {
-            addProducerType(new AttributeType(this, "Sensor", "Value", double.class, true));
+            addProducerType(new AttributeType(this, "Sensor", "getValue", double.class, true));
         }
         visionWorld.getModel().addModelListener(new VisionWorldModelListener() {
 

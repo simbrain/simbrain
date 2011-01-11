@@ -91,7 +91,7 @@ public class BarChartComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        barChartConsumer = new AttributeType(this, "Dimension", "Value",
+        barChartConsumer = new AttributeType(this, "Dimension", "setValue",
                 double.class, true);
         addConsumerType(barChartConsumer);
 
@@ -225,8 +225,7 @@ public class BarChartComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (barChartConsumer.isVisible()) {
             for (BarChartSetter setter : setterList) {
-                String description = barChartConsumer.getSimpleDescription("Bar " + setter.getIndex());
-                PotentialConsumer consumer = getAttributeManager().createPotentialConsumer(setter, barChartConsumer, description);
+                PotentialConsumer consumer = getAttributeManager().createPotentialConsumer(setter, barChartConsumer);
                returnList.add(consumer);
             }
         }

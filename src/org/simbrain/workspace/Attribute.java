@@ -48,12 +48,10 @@ public interface Attribute {
     public Class<?> getDataType();
 
     /**
-     * Returns the base name of the method associated with this attribute (that
-     * is, the method name without "get" or "set").
-     *
+     * Returns the  name of the method associated with this attribute.
      * @return base method name
      */
-    public String getMethodBaseName();
+    public String getMethodName();
 
     /**
      * Returns the descriptive name of this attribute.

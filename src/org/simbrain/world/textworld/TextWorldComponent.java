@@ -55,7 +55,7 @@ public class TextWorldComponent extends WorkspaceComponent {
         super(name);
         world = new TextWorld();
         attributeList = new AttributeList<Double>(world.getInputCoding().length);
-        addProducerType(new AttributeType(this, "Text", "Value", double.class,
+        addProducerType(new AttributeType(this, "Text", "getValue", double.class,
                 true));
 
         world.addListener(new TextListener() {

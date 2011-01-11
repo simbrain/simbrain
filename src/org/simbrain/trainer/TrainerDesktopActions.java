@@ -207,11 +207,11 @@ public class TrainerDesktopActions {
                 for (int i = 1; i <= trainer.getInputLayer().size(); i++) {
                     Producer<?> columntAttribute = table.getAttributeManager()
                             .createProducer(table.getColumnProducer(i-1),
-                                    "Value", double.class, "Column " + i);
+                                    "getValue", double.class, "Column " + i);
                     Consumer<?> neuronAttribute = network.getAttributeManager()
                                 .createConsumer(
                                     network.getRootNetwork().getNeuron(
-                                            "Neuron_" + i), "Activation",
+                                            "Neuron_" + i), "setActivation",
                                     double.class, "Neuron " + i);
                     try {
                         desktopComponnent

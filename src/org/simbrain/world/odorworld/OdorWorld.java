@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,6 @@ import java.util.List;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.SimpleId;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.RotationEffector;
-import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.entities.Animation;
 import org.simbrain.world.odorworld.entities.BasicEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -118,12 +115,10 @@ public class OdorWorld {
      */
     public void addAgent(final OdorWorldEntity entity) {
         if (entity instanceof RotatingEntity) {
-            RotationEffector rightTurn = new RotationEffector((RotatingEntity) entity);
-            RotationEffector leftTurn = new RotationEffector((RotatingEntity) entity);
-            rightTurn.setScaleFactor(-1);
-            entity.addEffector(leftTurn);
-            entity.addEffector(rightTurn);
-            entity.addEffector(new StraightMovementEffector((RotatingEntity) entity));
+
+            // Add effectors (currently none)
+
+            // Add sensors
             entity.addSensor(new SmellSensor(entity, "Left", Math.PI/8, 50));
             entity.addSensor(new SmellSensor(entity, "Center", 0, 0));
             entity.addSensor(new SmellSensor(entity, "Right",-Math.PI/8, 50));

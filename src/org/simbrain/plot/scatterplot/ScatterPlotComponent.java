@@ -91,8 +91,8 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        xAttributeType = new AttributeType(this, "Point", "X", double.class, true);
-        yAttributeType = new AttributeType(this, "Point", "Y", double.class, true);
+        xAttributeType = new AttributeType(this, "Point", "setX", double.class, true);
+        yAttributeType = new AttributeType(this, "Point", "setY", double.class, true);
         addConsumerType(xAttributeType);
         addConsumerType(yAttributeType);
         // TODO: What if called more than once?

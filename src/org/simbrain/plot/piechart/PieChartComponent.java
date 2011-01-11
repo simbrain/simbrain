@@ -76,7 +76,7 @@ public class PieChartComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        pieChartConsumer = new AttributeType(this, "Slice", "Value",
+        pieChartConsumer = new AttributeType(this, "Slice", "setValue",
                 double.class, true);
         addConsumerType(pieChartConsumer);
         for (int i = 0; i < model.getDataset().getItemCount(); i++) {

@@ -90,7 +90,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        timeSeriesConsumerType = new AttributeType(this, "Series", "Value", double.class, true);
+        timeSeriesConsumerType = new AttributeType(this, "Series", "setValue", double.class, true);
         addConsumerType(timeSeriesConsumerType);
         for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
             addTimeSeriesSetter(i);

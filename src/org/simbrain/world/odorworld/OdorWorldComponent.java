@@ -21,7 +21,6 @@ package org.simbrain.world.odorworld;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.simbrain.workspace.AttributeType;
@@ -29,8 +28,6 @@ import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.RotationEffector;
-import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -48,12 +45,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
     private OdorWorld world = new OdorWorld();
 
     /** Attribute types. */
-    AttributeType xLocationType = (new AttributeType(this, "Location", "X", float.class, false));
-    AttributeType yLocationType = (new AttributeType(this, "Location", "Y", float.class, false));
-    AttributeType leftRotationType = (new AttributeType(this, "Left", "TurnAmount", double.class, true));
-    AttributeType rightRotationType = (new AttributeType(this, "Right", "TurnAmount", double.class, true));
-    AttributeType straightMovementType = (new AttributeType(this, "Straight", "MovementAmount", double.class, true));
-    AttributeType smellSensorType = (new AttributeType(this, "Smell-Sensor", "Value", double.class, true));
+    AttributeType xLocationType = (new AttributeType(this, "Location", "X", double.class, false));
+    AttributeType yLocationType = (new AttributeType(this, "Location", "Y", double.class, false));
+    AttributeType leftRotationType = (new AttributeType(this, "Left", double.class, true));
+    AttributeType rightRotationType = (new AttributeType(this, "Right", double.class, true));
+    AttributeType straightMovementType = (new AttributeType(this, "Straight", double.class, true));
+    AttributeType absoluteMovementType = (new AttributeType(this, "Absolute-movement", double.class, false));
+    AttributeType smellSensorType = (new AttributeType(this, "Smell-Sensor", "getValue", double.class, true));
 
     /**
      * Default constructor.
@@ -87,6 +85,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         addConsumerType(leftRotationType);
         addConsumerType(rightRotationType);
         addConsumerType(straightMovementType);
+        addConsumerType(absoluteMovementType);
 
         addProducerType(xLocationType);
         addProducerType(yLocationType);
@@ -110,28 +109,19 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 returnList.add(getAttributeManager().createPotentialConsumer(entity, yLocationType, description));
             }
 
+            // Absolute movement
+            if (absoluteMovementType.isVisible()) {
+                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveNorth", double.class, entity.getName() + ":goNorth"));
+                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveSouth", double.class, entity.getName() + ":goSouth"));
+                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveEast", double.class, entity.getName() + ":goEast"));
+                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveWest", double.class, entity.getName() + ":goWest"));
+            }
+
             // Turning and Going Straight
-            for (Effector effector : entity.getEffectors()) {
-                if (effector instanceof RotationEffector) {
-                    RotationEffector rotator = (RotationEffector) effector;
-                    if (rotator.getScaleFactor() < 0) {
-                        if (leftRotationType.isVisible()) {
-                            String description = entity.getName() + ":" + leftRotationType.getSimpleDescription();
-                            returnList.add(getAttributeManager().createPotentialConsumer(effector, leftRotationType, description));
-                        }
-                    }
-                    if (rotator.getScaleFactor() > 0) {
-                        if (rightRotationType.isVisible()) {
-                            String description = entity.getName() + ":" + rightRotationType.getSimpleDescription();
-                            returnList.add(getAttributeManager().createPotentialConsumer(effector, rightRotationType, description));
-                        }
-                    }
-                } else if (effector instanceof StraightMovementEffector) {
-                    if (straightMovementType.isVisible()) {
-                        String description = entity.getName() + ":" + straightMovementType.getSimpleDescription();
-                        returnList.add(getAttributeManager().createPotentialConsumer(effector, straightMovementType, description));
-                    }
-                }
+            if (entity instanceof RotatingEntity) {
+                returnList.add(getAttributeManager().createPotentialConsumer(entity, "turnLeft", double.class, entity.getName() + ":turnLeft"));
+                returnList.add(getAttributeManager().createPotentialConsumer(entity, "turnRight", double.class, entity.getName() + ":turnRight"));
+                returnList.add(getAttributeManager().createPotentialConsumer(entity, "goStraight", double.class, entity.getName() + ":goStraight"));
             }
         }
         return returnList;
@@ -147,11 +137,11 @@ public class OdorWorldComponent extends WorkspaceComponent {
             // X, Y Location of entities
             if (xLocationType.isVisible()) {
                 String description = entity.getName() + ":" + xLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialProducer(entity, xLocationType, description));
+                returnList.add(getAttributeManager().createPotentialProducer(entity, "DoubleX", double.class, description));
             }
             if (yLocationType.isVisible()) {
                 String description = entity.getName() + ":" + yLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialProducer(entity, yLocationType, description));
+                returnList.add(getAttributeManager().createPotentialProducer(entity, "DoubleY", double.class, description));
             }
 
             // Smell sensor

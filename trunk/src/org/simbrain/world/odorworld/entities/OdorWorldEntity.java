@@ -29,7 +29,6 @@ import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
@@ -43,7 +42,7 @@ public abstract class OdorWorldEntity {
      * Animation used to depict this object. If the animation has one frame this
      * is equivalent to just using a single image to represent it.
      */
-    private Animation animation;    
+    private Animation animation;
 
     /** Name of this entity. */
     private String name;
@@ -276,6 +275,7 @@ public abstract class OdorWorldEntity {
      * @param effector effector to add
      */
     public void addEffector(final Effector effector) {
+        //if (sensor.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
         effector.setId(effectorIDGenerator.getId());
         parentWorld.fireEffectorAdded(effector);
@@ -287,6 +287,7 @@ public abstract class OdorWorldEntity {
      * @param sensor sensor to add
      */
     public void addSensor(final Sensor sensor) {
+        //if (sensor.getApplicableTypes().contains(this.getClass()))...
         sensors.add(sensor);
         sensor.setId(sensorIDGenerator.getId());
         parentWorld.fireSensorAdded(sensor);
@@ -499,19 +500,83 @@ public abstract class OdorWorldEntity {
         this.behavior = behavior;
     }
 
+    //TODO: the methods below need not be double, but are double to accommodate the
+    //      coupling framework, which does  not currently handle casts between data types.
+
     /**
-     * Return straight movement effector, or null if none found.
-     * Convenience method for use in scripts.
+     * Move the object north by the specified amount in pixels.
      *
-     * @return straight effector if found
+     * @param amount amount to move by
      */
-    public Effector getStraightMovementEffector() {
-        for (Effector effector : getEffectors()) {
-            if (effector instanceof StraightMovementEffector) {
-                return effector;
-            }
+    public void moveNorth(double amount) {
+        if (!isBlocked()) {
+            setY(getY() - (float) amount);
         }
-        return null;
+    }
+
+    /**
+     * Move the object south by the specified amount in pixels.
+     *
+     * @param amount amount to move by
+     */
+    public void moveSouth(double amount) {
+        if (!isBlocked()) {
+            setY(getY() + (float) amount);
+        }
+    }
+
+    /**
+     * Move the object east by the specified amount in pixels.
+     *
+     * @param amount amount to move by
+     */
+    public void moveEast(double amount) {
+        if (!isBlocked()) {
+            setX(getX() + (float) amount);
+        }
+    }
+
+    /**
+     * Move the object west by the specified amount in pixels.
+     *
+     * @param amount amount to move by
+     */
+    public void moveWest(double amount) {
+        if (!isBlocked()) {
+            setX(getX() - (float) amount);
+        }
+    }
+
+    /**
+     * Get the X position as a double.
+     *
+     * @return the x position as a double.
+     */
+    public double getDoubleX() {
+        return (double) x;
+    }
+
+    /**
+     * Get the Y position as a double.
+     *
+     * @return the y position as a double.
+     */
+    public double getDoubleY() {
+        return (double) y;
+    }
+
+    /**
+     * @param x the x to set
+     */
+    public void setX(double x) {
+        this.x = (float) x;
+    }
+
+    /**
+     * @param y the y to set
+     */
+    public void setY(double y) {
+        this.y = (float) y;
     }
 
 }

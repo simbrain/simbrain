@@ -43,12 +43,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     /** Reference to root network, the main model network. */
     private RootNetwork rootNetwork = new RootNetwork();
 
-    /** Attribute type for activations. */
-    private AttributeType activationType = new AttributeType(this, "Neuron", "Activation", double.class, true);
-
-    /** Attribute type for input values. */
-    private AttributeType inputValueType = new AttributeType(this, "Neuron", "InputValue", double.class, true);
-
     /**
      * Create a new network component.
      */
@@ -75,18 +69,18 @@ public final class NetworkComponent extends WorkspaceComponent {
         rootNetwork.setId(super.getName());
 
         // Initialize attribute types and their default visibility
-        addProducerType(activationType);
-        addProducerType(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
-        addProducerType(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
-        addProducerType(new AttributeType(this, "Neuron", "Label", String.class, false));
-        addProducerType(new AttributeType(this, "Synapse", "Strength", double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "getActivation", double.class, true));
+        addProducerType(new AttributeType(this, "Neuron", "getUpperBound", double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "getLowerBound", double.class, false));
+        addProducerType(new AttributeType(this, "Neuron", "getLabel", String.class, false));
+        addProducerType(new AttributeType(this, "Synapse", "getStrength", double.class, false));
 
-        addConsumerType(inputValueType);
-        addConsumerType(new AttributeType(this, "Neuron", "Activation", double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "UpperBound", double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "LowerBound", double.class, false));
-        addConsumerType(new AttributeType(this, "Neuron", "Label", String.class, false));
-        addConsumerType(new AttributeType(this, "Synapse", "Strength", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setInputValue", double.class, true));
+        addConsumerType(new AttributeType(this, "Neuron", "setActivation", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setUpperBound", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setLowerBound", double.class, false));
+        addConsumerType(new AttributeType(this, "Neuron", "setLabel", String.class, false));
+        addConsumerType(new AttributeType(this, "Synapse", "setStrength", double.class, false));
 
         rootNetwork.addNeuronListener(new NeuronListener() {
             /**
@@ -235,20 +229,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public String getXML() {
         return RootNetwork.getXStream().toXML(rootNetwork);
-    }
-
-    /**
-     * @return the activationType
-     */
-    public AttributeType getActivationType() {
-        return activationType;
-    }
-
-    /**
-     * @return the inputValueType
-     */
-    public AttributeType getInputValueType() {
-        return inputValueType;
     }
 
     // TODO: Link to NetworkSettings.

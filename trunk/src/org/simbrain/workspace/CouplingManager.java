@@ -248,8 +248,8 @@ public class CouplingManager {
             Attribute attribute2) {
         boolean baseObjectMatches = (attribute1.getBaseObject() == attribute2
                 .getBaseObject());
-        boolean methodNameMatches = (attribute1.getMethodBaseName()
-                .equalsIgnoreCase(attribute2.getMethodBaseName()));
+        boolean methodNameMatches = (attribute1.getMethodName()
+                .equalsIgnoreCase(attribute2.getMethodName()));
         boolean typeMatches = (attribute1.getDataType() == attribute2
                 .getDataType());
         return (baseObjectMatches && methodNameMatches && typeMatches);

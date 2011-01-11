@@ -53,14 +53,14 @@ public class AttributeManager {
      * forward to it.
      *
      * @param parentObject parent object
-     * @param methodBaseName name of method
+     * @param methodName name of method
      * @param dataType type of data
      * @param description description
      * @return the resulting producer
      */
     public Producer<?> createProducer(
             final Object parentObject,
-            final String methodBaseName,
+            final String methodName,
             final Class<?> dataType,
             final String description) {
 
@@ -71,13 +71,12 @@ public class AttributeManager {
             // Static initializer
             {
                 try {
-                    theMethod = parentObject.getClass().getMethod(
-                            "get" + methodBaseName, null);
+                    theMethod = parentObject.getClass().getMethod(methodName, null);
                 } catch (SecurityException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchMethodException e1) {
                     System.err.println("Could not find method "
-                            + methodBaseName + " with return type of "
+                            + methodName + " with return type of "
                             + dataType.getCanonicalName());
                     e1.printStackTrace();
                 }
@@ -120,8 +119,8 @@ public class AttributeManager {
             /**
              * {@inheritDoc}
              */
-            public String getMethodBaseName() {
-                return methodBaseName;
+            public String getMethodName() {
+                return methodName;
             }
 
             /**
@@ -150,16 +149,16 @@ public class AttributeManager {
      *
      * @param baseObject
      *            base object
-     * @param methodBaseName
+     * @param methodName
      *            method name
      * @param dataType
      *            data type
      * @return created producer
      */
     public Producer<?> createProducer(final Object baseObject,
-            final String methodBaseName, final Class<?> dataType) {
-        String description = getDescriptionString(baseObject, methodBaseName, dataType);
-        return createProducer(baseObject, methodBaseName, dataType, description);
+            final String methodName, final Class<?> dataType) {
+        String description = getDescriptionString(baseObject, methodName, dataType);
+        return createProducer(baseObject, methodName, dataType, description);
     }
 
     /**
@@ -170,7 +169,7 @@ public class AttributeManager {
      */
     public Producer<?> createProducer(final PotentialAttribute potentialAttribute) {
         return createProducer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodBaseName(), potentialAttribute.getDataType(),
+                .getMethodName(), potentialAttribute.getDataType(),
                 potentialAttribute.getDescription());
     }
 
@@ -179,13 +178,13 @@ public class AttributeManager {
      * forward to it.
      *
      * @param parentObject parent object
-     * @param methodBaseName name of method
+     * @param methodName name of method
      * @param dataType type of data
      * @param description description
      * @return the resulting consumer
      */
     public Consumer<?> createConsumer(final Object parentObject,
-            final String methodBaseName, final Class<?> dataType,
+            final String methodName, final Class<?> dataType,
             final String description) {
 
         Consumer<?> consumer = new Consumer() {
@@ -195,13 +194,12 @@ public class AttributeManager {
             // Static initializer
             {
                 try {
-                    theMethod = parentObject.getClass().getMethod(
-                            "set" + methodBaseName, new Class[] { dataType });
+                    theMethod = parentObject.getClass().getMethod(methodName, new Class[] { dataType });
                 } catch (SecurityException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchMethodException e1) {
                     System.err.println("Could not find method "
-                            + methodBaseName + " with argument of type of "
+                            + methodName + " with argument of type of "
                             + dataType.getCanonicalName());
                     e1.printStackTrace();
                 }
@@ -242,8 +240,8 @@ public class AttributeManager {
             /**
              * {@inheritDoc}
              */
-            public String getMethodBaseName() {
-                return methodBaseName;
+            public String getMethodName() {
+                return methodName;
             }
 
             /**
@@ -273,9 +271,9 @@ public class AttributeManager {
      *  Description is automatically created.
      */
     public Consumer<?> createConsumer(final Object baseObject,
-            final String methodBaseName, final Class<?> dataType) {
-        String description = getDescriptionString(baseObject, methodBaseName, dataType);
-        return createConsumer(baseObject, methodBaseName, dataType, description);
+            final String methodName, final Class<?> dataType) {
+        String description = getDescriptionString(baseObject, methodName, dataType);
+        return createConsumer(baseObject, methodName, dataType, description);
     }
 
     /**
@@ -286,7 +284,7 @@ public class AttributeManager {
      */
     public Consumer<?> createConsumer(final PotentialAttribute potentialAttribute) {
         return createConsumer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodBaseName(), potentialAttribute.getDataType(),
+                .getMethodName(), potentialAttribute.getDataType(),
                 potentialAttribute.getDescription());
     }
 
@@ -294,17 +292,17 @@ public class AttributeManager {
      * Create a potential producer.  All information is provided.
      *
      * @param parentObject parent object
-     * @param methodBaseName name of method
+     * @param methodName name of method
      * @param dataType type of data
      * @param description custom description
      * @return the resulting producer
      */
     public PotentialProducer createPotentialProducer(
             final Object parentObject,
-            final String methodBaseName,
+            final String methodName,
             final Class<?> dataType,
             final String description) {
-        return new PotentialProducer(parentComponent, parentObject,  methodBaseName,
+        return new PotentialProducer(parentComponent, parentObject,  methodName,
                  dataType, description);
     }
 
@@ -312,13 +310,13 @@ public class AttributeManager {
      * Create a potential producer. The description is automatically generated.
      *
      * @param baseObject parent object
-     * @param methodBaseName name of method
+     * @param methodName name of method
      * @param dataType type of data
      * @return the resulting producer
      */
-    public PotentialProducer createPotentialProducer(final Object baseObject, final String methodBaseName, final Class<?> dataType) {
-        return createPotentialProducer(baseObject, methodBaseName, dataType,
-                getDescriptionString(baseObject, methodBaseName, dataType));
+    public PotentialProducer createPotentialProducer(final Object baseObject, final String methodName, final Class<?> dataType) {
+        return createPotentialProducer(baseObject, methodName, dataType,
+                getDescriptionString(baseObject, methodName, dataType));
     }
 
     /**
@@ -343,7 +341,7 @@ public class AttributeManager {
      * @return the potential producer
      */
     public PotentialProducer createPotentialProducer(final Object baseObject, final AttributeType type,  final String description) {
-        String methodName = type.getMethodBaseName();
+        String methodName = type.getMethodName();
         Class<?> dataType = type.getDataType();
         return createPotentialProducer(baseObject, methodName, dataType,
                 description);
@@ -353,17 +351,17 @@ public class AttributeManager {
      * Create a potential consumer.  All information is provided.
      *
      * @param parentObject parent object
-     * @param methodBaseName name of method
+     * @param methodName name of method
      * @param dataType type of data
      * @param description custom description
      * @return the resulting consumer
      */
     public PotentialConsumer createPotentialConsumer(
             final Object parentObject,
-            final String methodBaseName,
+            final String methodName,
             final Class<?> dataType,
             final String description) {
-        return new PotentialConsumer(parentComponent, parentObject,  methodBaseName,
+        return new PotentialConsumer(parentComponent, parentObject,  methodName,
                  dataType, description);
     }
 
@@ -371,13 +369,13 @@ public class AttributeManager {
      * Create a potential consumer. The description is automatically generated.
      *
      * @param baseObject parent object
-     * @param methodBaseName name of method
+     * @param methodName name of method
      * @param dataType type of data
      * @return the resulting consumer
      */
-    public PotentialConsumer createPotentialConsumer(final Object baseObject, final String methodBaseName, final Class<?> dataType) {
-        return createPotentialConsumer(baseObject, methodBaseName, dataType,
-                getDescriptionString(baseObject, methodBaseName, dataType));
+    public PotentialConsumer createPotentialConsumer(final Object baseObject, final String methodName, final Class<?> dataType) {
+        return createPotentialConsumer(baseObject, methodName, dataType,
+                getDescriptionString(baseObject, methodName, dataType));
     }
 
     /**
@@ -402,7 +400,7 @@ public class AttributeManager {
      * @return the potential consumer
      */
     public PotentialConsumer createPotentialConsumer(final Object baseObject, final AttributeType type,  final String description) {
-        String methodName = type.getMethodBaseName();
+        String methodName = type.getMethodName();
         Class<?> dataType = type.getDataType();
         return createPotentialConsumer(baseObject, methodName, dataType,
                 description);
@@ -413,12 +411,12 @@ public class AttributeManager {
      * Returns a formatted description string.  E.g "Neuron:activatoin<double>".
      *
      * @param baseObject base object
-     * @param methodBaseName base name of method
+     * @param methodName base name of method
      * @param dataType class of data
      * @return formatted string
      */
-    private String getDescriptionString(Object baseObject, String methodBaseName, Class<?> dataType) {
-        return baseObject.getClass().getSimpleName() + ":" + methodBaseName
+    private String getDescriptionString(Object baseObject, String methodName, Class<?> dataType) {
+        return baseObject.getClass().getSimpleName() + ":" + methodName
                 + "<" + dataType.getSimpleName() + ">";
     }
 }

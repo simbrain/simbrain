@@ -108,7 +108,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      * Initialize consumer.
      */
     private void initializeConsumers() {
-        projectionConsumerType = new AttributeType(this, "Dimension", "Value",
+        projectionConsumerType = new AttributeType(this, "Dimension", "setValue",
                 double.class, true);
         addConsumerType(projectionConsumerType);
         for (int i = 0; i < projectionModel.getProjector().getDimensions(); i++) {

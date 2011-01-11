@@ -268,19 +268,19 @@ import org.jgap.impl.*;
             String mouseId = mouse.getName();
             String leftSensorId = "Sensor_2";
             String rightSensorId = "Sensor_3"; //TODO: Check!            
-            Producer leftWhisker1 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,leftSensorId, 0), "Value", double.class, "Left 1"); 
-            Producer rightWhisker1 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,rightSensorId, 0), "Value", double.class, "Right 1"); 
-            Producer leftWhisker2 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,leftSensorId, 1), "Value", double.class, "Left 2"); 
-            Producer rightWhisker2 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,rightSensorId, 1), "Value", double.class, "Right 2"); 
-            Producer leftCheese = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,leftSensorId, 2), "Value", double.class, "Left Cheese"); 
-            Producer rightCheese = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,rightSensorId, 2), "Value", double.class, "Right Cheese"); 
+            Producer leftWhisker1 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,leftSensorId, 0), "getValue", double.class, "Left 1"); 
+            Producer rightWhisker1 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,rightSensorId, 0), "getValue", double.class, "Right 1"); 
+            Producer leftWhisker2 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,leftSensorId, 1), "getValue", double.class, "Left 2"); 
+            Producer rightWhisker2 = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,rightSensorId, 1), "getValue", double.class, "Right 2"); 
+            Producer leftCheese = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,leftSensorId, 2), "getValue", double.class, "Left Cheese"); 
+            Producer rightCheese = world2d.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,rightSensorId, 2), "getValue", double.class, "Right Cheese"); 
 
-            Consumer inputNeuron1 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_2"), "InputValue", double.class, "Input Neuron 1"); 
-            Consumer inputNeuron2 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_3"), "InputValue", double.class, "Input Neuron 2"); 
-            Consumer inputNeuron3 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_4"), "InputValue", double.class, "Input Neuron 3"); 
-            Consumer inputNeuron4 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_5"), "InputValue", double.class, "Input Neuron 4"); 
-            Consumer inputNeuron5 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_9"), "InputValue", double.class, "Input Neuron 5"); 
-            Consumer inputNeuron6 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_10"), "InputValue", double.class, "Input Neuron 6"); 
+            Consumer inputNeuron1 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_2"), "setInputValue", double.class, "Input Neuron 1"); 
+            Consumer inputNeuron2 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_3"), "setInputValue", double.class, "Input Neuron 2"); 
+            Consumer inputNeuron3 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_4"), "setInputValue", double.class, "Input Neuron 3"); 
+            Consumer inputNeuron4 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_5"), "setInputValue", double.class, "Input Neuron 4"); 
+            Consumer inputNeuron5 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_9"), "setInputValue", double.class, "Input Neuron 5"); 
+            Consumer inputNeuron6 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_10"), "setInputValue", double.class, "Input Neuron 6"); 
             
             theWorkspace.getCouplingManager().addCoupling(new Coupling(leftWhisker1, inputNeuron1));
             theWorkspace.getCouplingManager().addCoupling(new Coupling(rightWhisker1, inputNeuron2));
@@ -290,19 +290,19 @@ import org.jgap.impl.*;
             theWorkspace.getCouplingManager().addCoupling(new Coupling(rightCheese, inputNeuron6));
 
             //Couple Output Neurons to motion
-            Producer actor1 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_6"), "Activation", double.class, "Actor 1"); 
-            Producer actor2 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_7"), "Activation", double.class, "Actor 2"); 
-            Producer actor3 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_8"), "Activation", double.class, "Actor 3"); 
-            Consumer turnLeft = world2d.getAttributeManager().createConsumer(mouse.getRotationEffector("Left"), "TurnAmount", double.class, "Turn Left");
-            Consumer turnRight = world2d.getAttributeManager().createConsumer(mouse.getRotationEffector("Right"), "TurnAmount", double.class, "Turn Right");
-            Consumer goStraight = world2d.getAttributeManager().createConsumer(mouse.getStraightMovementEffector(), "MovementAmount", double.class, "Go Straight");
+            Producer actor1 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_6"), "getActivation", double.class, "Actor 1"); 
+            Producer actor2 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_7"), "getActivation", double.class, "Actor 2"); 
+            Producer actor3 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_8"), "getActivation", double.class, "Actor 3"); 
+            Consumer turnLeft = world2d.getAttributeManager().createConsumer(mouse, "turnLeft", double.class);
+            Consumer turnRight = world2d.getAttributeManager().createConsumer(mouse, "turnRight", double.class);
+            Consumer goStraight = world2d.getAttributeManager().createConsumer(mouse, "goStraight", double.class);
             theWorkspace.getCouplingManager().addCoupling(new Coupling(actor1, turnLeft));
             theWorkspace.getCouplingManager().addCoupling(new Coupling(actor2, goStraight));
             theWorkspace.getCouplingManager().addCoupling(new Coupling(actor3, turnRight));
 
             //Couple left and right Reward sensors to ... ?
             Neuron rewardNeuron = network.getNeuronByLabel("reward");
-            Consumer rewardNeuronAttribute = networkComponent.getAttributeManager().createConsumer(rewardNeuron, "Activation", double.class, "Reward neuron");
+            Consumer rewardNeuronAttribute = networkComponent.getAttributeManager().createConsumer(rewardNeuron, "setActivation", double.class, "Reward neuron");
             theWorkspace.getCouplingManager().addCoupling(new Coupling(leftWhisker1, rewardNeuronAttribute));
             theWorkspace.getCouplingManager().addCoupling(new Coupling(rightWhisker1, rewardNeuronAttribute));
         }

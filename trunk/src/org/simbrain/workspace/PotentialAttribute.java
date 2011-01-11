@@ -33,26 +33,27 @@ public class PotentialAttribute {
     /** Potential producing or consuming object. */
     private Object baseObject;
 
-    /** Base name of the method that sets or gets the attribute. */
-    private String methodBaseName;
+    /** Name of the method that sets or gets the attribute. */
+    private String methodName;
 
     /** The data type (double, string, etc) of a consumer or producer. */
     private Class<?> dataType;
-    
+
+    /** Description of this type of potential attribute. */
     private String description;
 
     /**
      * Construct a potential attribute.
      *
      * @param parent parent workspace component
-     * @param methodBaseName method name
+     * @param methodName method name
      * @param dataType class of data
      */
     protected PotentialAttribute(WorkspaceComponent parent, Object object, 
-            String methodBaseName, Class dataType, String description) {
+            String methodName, Class dataType, String description) {
         this.parent = parent;
         this.baseObject = object;
-        this.methodBaseName = methodBaseName;
+        this.methodName = methodName;
         this.dataType = dataType;
         this.description = description;
     }
@@ -94,8 +95,8 @@ public class PotentialAttribute {
     /**
      * @return the methodName
      */
-    public String getMethodBaseName() {
-        return methodBaseName;
+    public String getMethodName() {
+        return methodName;
     }
 
     /**

@@ -54,10 +54,10 @@ public class DataWorldComponent extends WorkspaceComponent {
     private List<ColumnAttribute> producerList = new ArrayList<ColumnAttribute>();
 
     /** Producing column attribute type. */
-    private final AttributeType producingColumnType = new AttributeType(this, "Column", "Value", double.class, true);
+    private final AttributeType producingColumnType = new AttributeType(this, "Column", "getValue", double.class, true);
 
     /** Consuming column attribute type. */
-    private final AttributeType consumingColumnType = new AttributeType(this, "Column", "Value", double.class, true);
+    private final AttributeType consumingColumnType = new AttributeType(this, "Column", "setValue", double.class, true);
 
     /**
      * This method is the default constructor.

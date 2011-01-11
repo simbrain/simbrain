@@ -24,9 +24,6 @@ import java.util.TreeMap;
 
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.effectors.RotationEffector;
-import org.simbrain.world.odorworld.effectors.StraightMovementEffector;
 
 /**
  * Represents an entity that can rotate.
@@ -175,11 +172,6 @@ public class RotatingEntity extends OdorWorldEntity {
             Double key = i.next();
             imageMap.get(key).initializeImages();
         }
-
-        //TODO: Check this against overall attribute policy
-        addEffector(new RotationEffector(this));
-        addEffector(new StraightMovementEffector(this));
-
     }
 
     /**
@@ -239,28 +231,46 @@ public class RotatingEntity extends OdorWorldEntity {
     }
 
     /**
-     * Convenience method to get "left" and "right" rotators.  For use in scripts.
+     * Rotate left by the specified amount.
      *
-     * TODO: Abstract left, right concept.
-     * @param name left or right
-     * @return matching effector, if any
+     * @param amount amount to turn left.
      */
-    public RotationEffector getRotationEffector(String name) {
-        for (Effector effector : getEffectors()) {
-            if (effector instanceof RotationEffector) {
-                RotationEffector rotator = (RotationEffector) effector;
-                if (name.equalsIgnoreCase("Right")) {
-                    if (rotator.getScaleFactor() < 0) {
-                        return rotator;
-                    }
-                } else if (name.equalsIgnoreCase("Left")) {
-                    if (rotator.getScaleFactor() > 0) {
-                        return rotator;
-                    }
-                }
-            }
+    public void turnLeft(double amount) {
+        if (amount == 0) {
+            return;
         }
-        return null;
+        if (!isBlocked()) {
+            heading += amount;
+        }
+    }
+
+    /**
+     * Rotate right by the specified amount.
+     *
+     * @param amount amount to turn right.
+     */
+    public void turnRight(double amount) {
+        if (amount == 0) {
+            return;
+        }
+        if (!isBlocked()) {
+            heading -= amount;
+        }
+    }
+
+    /**
+     *  Move the entity in a straight line relative to its current heading.
+     * @param amount
+     */
+    public void goStraight(double amount) {
+        if (amount == 0) {
+            return;
+        }
+        if (!isBlocked()) {
+            double radians = getHeadingRadians();
+            setX(getX() + (float) (amount * Math.cos(radians)));
+            setY(getY() - (float) (amount * Math.sin(radians)));
+        }
     }
 
 }

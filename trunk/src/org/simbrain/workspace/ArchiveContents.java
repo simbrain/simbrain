@@ -349,7 +349,7 @@ class ArchiveContents {
             this.parentComponentRef = parent.componentUris.get(comp);
             this.baseObjectKey = comp.getKeyFromObject(attribute
                     .getBaseObject());
-            this.methodBaseName = attribute.getMethodBaseName();
+            this.methodBaseName = attribute.getMethodName();
             this.dataType = attribute.getDataType();
             this.description = attribute.getDescription();
         }

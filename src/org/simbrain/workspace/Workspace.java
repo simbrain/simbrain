@@ -100,7 +100,7 @@ public class Workspace {
     /**
      * The updator used to manage component updates.
      */
-    private WorkspaceUpdator updator;
+    private final WorkspaceUpdator updator;
 
     /**
      * Construct a workspace.
@@ -533,6 +533,7 @@ public class Workspace {
         manager.removeCoupling(coupling);
     }
 
+
     /**
      * By default, the workspace is updated as followed: 1) Update couplings 2)
      * Call "update" on all workspacecomponents Sometimes this way of updating
@@ -541,55 +542,17 @@ public class Workspace {
      * different way. For an example, see the script in
      * {SimbrainDir}/scripts/scriptmenu/addBackpropSim.bsh
      *
-     * @param controller The update controller to use.
-     * @param threads The number of threads for the component updates.
-     */
-    public void setUpdateController(final UpdateController controller,
-            final int threads) {
-        synchronized (updatorLock) {
-            if (updator.isRunning()) {
-                throw new RuntimeException(
-                        "Cannot change updator while running.");
-            }
-            WorkspaceUpdator updator = new WorkspaceUpdator(this, controller,
-                    threads);
-            swapUpdators(updator);
-            // If it's priority based update, be sure components are sorted
-            resortPriorities();
-        }
-    }
-
-    /**
-     * Sets a custom controller with the default number of threads.
-     *
      * @param controller The number of threads to use.
      */
     public void setUpdateController(final UpdateController controller) {
         synchronized (updatorLock) {
             if (updator.isRunning()) {
-                throw new RuntimeException("Cannot change updator while running.");
+                throw new RuntimeException("Cannot change update controller while running.");
             }
-            WorkspaceUpdator updator = new WorkspaceUpdator(this, controller);
-            swapUpdators(updator);
-            // If it's priority based update, be sure components are sorted
-            resortPriorities(); 
-        }
-    }
-
-    /**
-     * Change out updator.
-     *
-     * @param newUpdator the new updator
-     */
-    private void swapUpdators(final WorkspaceUpdator newUpdator) {
-
-        // Move old listeners over to new updator
-        for (WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
-            newUpdator.addUpdatorListener(listener);
-        }
-        updator = newUpdator;
-        for (WorkspaceUpdatorListener listener : updator.getUpdatorListeners()) {
-            listener.changedUpdateController();
+            updator.setUpdateController(controller);
+            if (updator.getType() == WorkspaceUpdator.TYPE.PRIORITY) {
+                resortPriorities();
+            }
         }
     }
 
@@ -668,14 +631,12 @@ public class Workspace {
      * Resort the components according to update priorities
      */
     protected void resortPriorities() {
-        if (updator.getType() == WorkspaceUpdator.TYPE.PRIORITY) {
-            Collections.sort(componentList, new Comparator<WorkspaceComponent>() {
-                public int compare(WorkspaceComponent c1, WorkspaceComponent c2) {
-                    return Integer.valueOf(c1.getUpdatePriority()).compareTo(
-                            Integer.valueOf(c2.getUpdatePriority()));
-                }
-            });
-        }
+        Collections.sort(componentList, new Comparator<WorkspaceComponent>() {
+            public int compare(WorkspaceComponent c1, WorkspaceComponent c2) {
+                return Integer.valueOf(c1.getUpdatePriority()).compareTo(
+                        Integer.valueOf(c2.getUpdatePriority()));
+            }
+        });
     }
 
 

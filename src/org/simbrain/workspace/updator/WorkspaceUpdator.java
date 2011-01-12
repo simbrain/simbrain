@@ -54,9 +54,6 @@ public class WorkspaceUpdator {
     /** The parent workspace. */
     private final Workspace workspace;
 
-    /** The Update Controller. */
-    private final UpdateController controller;
-
     /** The executor service for managing updates. */
     private final ExecutorService updates;
 
@@ -87,6 +84,12 @@ public class WorkspaceUpdator {
     /** The default update controls. */
     private final DefaultUpdateControls controls;
 
+    /** The default controller. */
+    public static final UpdateController DEFAULT_CONTROLLER = new BufferedUpdator();
+
+    /** The Update Controller. */
+    private UpdateController updateController;
+
     /**
      * Types of update controller.
      */
@@ -111,12 +114,6 @@ public class WorkspaceUpdator {
         }
     }
 
-    /** Update type of this updator. */
-    private final TYPE updateType;
-
-    /** The default controller. */
-    public static final UpdateController DEFAULT_CONTROLLER = new BufferedUpdator();
-
     /**
      * Constructor for the updator that uses the provided controller and
      * threads.
@@ -128,7 +125,7 @@ public class WorkspaceUpdator {
     public WorkspaceUpdator(final Workspace workspace,
             final UpdateController controller, final int threads) {
         this.workspace = workspace;
-        this.controller = controller;
+        this.updateController = controller;
         this.updates = Executors.newSingleThreadExecutor();
         this.service = Executors.newFixedThreadPool(threads,
                 new UpdatorThreadFactory());
@@ -136,28 +133,6 @@ public class WorkspaceUpdator {
         this.numThreads = threads;
         controls = new DefaultUpdateControls(workspace, service);
 
-        // Set the type of this controller
-        if (controller instanceof BufferedUpdator) {
-            updateType = TYPE.BUFFERED;
-        } else if (controller instanceof PriorityUpdator) {
-            updateType = TYPE.PRIORITY;
-        } else {
-            updateType = TYPE.CUSTOM;
-        }
-    }
-
-    /**
-     * Sets the manager. Setting the manager to null clears the manager.
-     *
-     * @param manager the new manager.
-     */
-    public void setTaskSynchronizationManager(
-            final TaskSynchronizationManager manager) {
-        if (manager == null) {
-            snychManager = NO_ACTION_SYNCH_MANAGER;
-        } else {
-            snychManager = manager;
-        }
     }
 
     /**
@@ -180,6 +155,20 @@ public class WorkspaceUpdator {
     public WorkspaceUpdator(final Workspace workspace) {
         this(workspace, DEFAULT_CONTROLLER, Runtime.getRuntime()
                 .availableProcessors());
+    }
+
+    /**
+     * Sets the manager. Setting the manager to null clears the manager.
+     *
+     * @param manager the new manager.
+     */
+    public void setTaskSynchronizationManager(
+            final TaskSynchronizationManager manager) {
+        if (manager == null) {
+            snychManager = NO_ACTION_SYNCH_MANAGER;
+        } else {
+            snychManager = manager;
+        }
     }
 
     /**
@@ -283,7 +272,7 @@ public class WorkspaceUpdator {
             e.printStackTrace();
         }
 
-        controller.doUpdate(controls);
+        updateController.doUpdate(controls);
 
         snychManager.runTasks();
 
@@ -470,7 +459,7 @@ public class WorkspaceUpdator {
      * @return the name of the current update method.
      */
     public String getCurrentUpdatorName() {
-        return controller.getName();
+        return updateController.getName();
     }
 
     /**
@@ -514,7 +503,6 @@ public class WorkspaceUpdator {
         }
     };
 
-
     /** Creates the threads used in the ExecutorService. */
     private class UpdatorThreadFactory implements ThreadFactory {
         /** Numbers the threads sequentially. */
@@ -538,8 +526,28 @@ public class WorkspaceUpdator {
      * @return the updateType
      */
     public TYPE getType() {
-        return updateType;
+        // Set the type of this controller
+        if (updateController instanceof BufferedUpdator) {
+            return TYPE.BUFFERED;
+        } else if (updateController instanceof PriorityUpdator) {
+            return TYPE.PRIORITY;
+        } else {
+            return TYPE.CUSTOM;
+        }
     }
 
+    /**
+     * @return the updateController
+     */
+    public UpdateController getUpdateController() {
+        return updateController;
+    }
+
+    /**
+     * @param updateController the updateController to set
+     */
+    public void setUpdateController(final UpdateController updateController) {
+        this.updateController = updateController;
+    }
 
 }

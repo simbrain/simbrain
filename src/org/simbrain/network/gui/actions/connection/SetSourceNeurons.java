@@ -19,58 +19,40 @@
 package org.simbrain.network.gui.actions.connection;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.connections.*;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
- * Connect neurons action.  Connects a set of source neurons to a set of target neurons.
+ * Set source neurons.
  */
-public final class ConnectNeuronsAction
+public final class SetSourceNeurons
     extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-    /** Source neuron. */
-    private ArrayList sourceNeurons;
-
-    /** Target neuron. */
-    private ArrayList targetNeurons;
-
     /**
-     * Create a new connect neurons action.  Connects a set of source neurons to a set of target neurons.
+     * Construct action.
      *
-     * @param networkPanel network panel, must not be null
-     * @param sourceNeurons NeuronNodes to connect from
-     * @param targetNeurons NeuronNodes to connect to
+     * @param networkPanel networkPanel, must not be null
      */
-    public ConnectNeuronsAction(final NetworkPanel networkPanel,
-                                final ArrayList sourceNeurons,
-                                final ArrayList targetNeurons) {
+    public SetSourceNeurons(final NetworkPanel networkPanel) {
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
-        this.sourceNeurons = sourceNeurons;
-        this.targetNeurons = targetNeurons;
-
-        putValue(NAME, "Connect using \"" + ConnectNeurons.connectionType + "\"");
-
+        putValue(NAME, "Set Source Neurons");
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
-            return;
-        }
-        ConnectNeurons connection = ConnectNeurons.connectionType;
-        connection.connectNeurons(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+
+        // Perform action
+        networkPanel.setSourceNeurons();
+
     }
 }

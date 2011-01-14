@@ -22,26 +22,41 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
- * Show connect dialog action.
+ * Apply specified connection either from selected neurons to themselves
+ * ("self connect") or form source to target.
  */
-public final class ShowConnectDialogAction
-    extends AbstractAction {
+public final class ApplyConnectionAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
+    /** If true, connect selected neurons to themselves. */
+    private boolean isSelfConnect;
+
+    /** The connection to apply. */
+    private ConnectNeurons connection;
 
     /**
-     * Construct connection dialog action.
+     * Construct the action.
      *
      * @param networkPanel networkPanel, must not be null
+     * @param connection the connection to apply
+     * @param name the name of this action
+     * @param isSelfConnect whether to connect selected neurons to themselves or
+     *            not.
      */
-    public ShowConnectDialogAction(final NetworkPanel networkPanel) {
+    public ApplyConnectionAction(final NetworkPanel networkPanel,
+            ConnectNeurons connection, String name, boolean isSelfConnect) {
 
-        super("Set Connection Properties...");
+        super(name);
+
+        this.isSelfConnect = isSelfConnect;
+        this.connection = connection;
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -53,6 +68,14 @@ public final class ShowConnectDialogAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.showConnectProperties();
+        if (isSelfConnect) {
+            connection.connectNeurons(networkPanel.getRootNetwork(),
+                    networkPanel.getSelectedModelNeurons(),
+                    networkPanel.getSelectedModelNeurons());
+        } else {
+            connection.connectNeurons(networkPanel.getRootNetwork(),
+                    networkPanel.getSourceModelNeurons(),
+                    networkPanel.getSelectedModelNeurons());
+        }
     }
 }

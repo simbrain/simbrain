@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.actions;
+package org.simbrain.network.gui.actions.connection;
 
 import java.awt.event.ActionEvent;
 
@@ -25,9 +25,9 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
- * Select neurons action.
+ * Clear source neurons action.
  */
-public final class SetSourceNeuronsAction
+public final class ClearSourceNeurons
     extends AbstractAction {
 
     /** Network panel. */
@@ -35,34 +35,25 @@ public final class SetSourceNeuronsAction
 
 
     /**
-     * Create a new select neurons action with the specified
-     * network panel.
+     * Construct action.
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public SetSourceNeuronsAction(final NetworkPanel networkPanel) {
+    public ClearSourceNeurons(final NetworkPanel networkPanel) {
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
-
         putValue(NAME, "Clear Source Neurons");
-        if (networkPanel.getSelectedNeurons().size() == 0) {
-            if (networkPanel.getSourceNeurons().size() == 0) {
-                this.setEnabled(false);
-            }
-        } else {
-            putValue(NAME, "Set Source Neurons");
-        }
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-        networkPanel.setSourceNeurons();
+        networkPanel.clearSourceNeurons();
 
     }
 }

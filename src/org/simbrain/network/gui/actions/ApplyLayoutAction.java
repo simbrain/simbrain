@@ -16,43 +16,53 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.actions.connection;
+package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.layouts.Layout;
 
 /**
- * Show connect dialog action.
+ * Apply specified layout to selected neurons.
  */
-public final class ShowConnectDialogAction
-    extends AbstractAction {
+public final class ApplyLayoutAction extends AbstractAction {
 
     /** Network panel. */
-    private final NetworkPanel networkPanel;
+    private final NetworkPanel panel;
 
+    /** The connection to apply. */
+    private Layout layout;
 
     /**
-     * Construct connection dialog action.
+     * Construct the action.
      *
      * @param networkPanel networkPanel, must not be null
+     * @param layout the layout to apply
+     * @param name the name of this action
      */
-    public ShowConnectDialogAction(final NetworkPanel networkPanel) {
+    public ApplyLayoutAction(final NetworkPanel networkPanel,
+            Layout layout, String name) {
 
-        super("Set Connection Properties...");
+        super(name);
+
+        this.layout = layout;
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        this.networkPanel = networkPanel;
+        this.panel = networkPanel;
 
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.showConnectProperties();
+        layout.setInitialLocation(panel.getLastClickedPosition());
+        layout.layoutNeurons(panel.getSelectedModelNeurons());
+        panel.repaint();
     }
 }

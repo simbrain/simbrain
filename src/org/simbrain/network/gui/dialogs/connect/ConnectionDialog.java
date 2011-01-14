@@ -71,7 +71,7 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
         typePanel.addItem("Connection Type", cbConnectionType);
         cbConnectionType.setSelectedItem(connectionObjects[0]);
         initPanel();
-        ConnectNeurons.connectionType = (ConnectNeurons)cbConnectionType.getSelectedItem();
+        ConnectNeurons.currentConnectionType = (ConnectNeurons)cbConnectionType.getSelectedItem();
         mainPanel.add(typePanel);
         mainPanel.add(optionsPanel);
         setContentPane(mainPanel);
@@ -134,7 +134,7 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        ConnectNeurons.connectionType = (ConnectNeurons)cbConnectionType.getSelectedItem();
+        ConnectNeurons.currentConnectionType = (ConnectNeurons)cbConnectionType.getSelectedItem();
         optionsPanel.commitChanges();
     }
 }

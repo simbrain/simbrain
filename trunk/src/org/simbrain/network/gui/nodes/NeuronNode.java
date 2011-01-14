@@ -30,19 +30,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.FixedFanout;
-import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.connections.Radial;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -50,19 +43,13 @@ import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
-import org.simbrain.network.gui.actions.SetSourceNeuronsAction;
 import org.simbrain.network.gui.actions.connection.ConnectNeuronsSimpleAction;
-import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
-import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.PNode;
@@ -70,7 +57,8 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 
 /**
- * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
+ * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
+ * network model.
  */
 public class NeuronNode extends ScreenElement implements PropertyChangeListener {
 
@@ -331,17 +319,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 getNetworkPanel().getSelectedNeurons(), this));
         }
         contextMenu.addSeparator();
-
-        contextMenu.add(getConnections());
-        contextMenu.add(getQuickConnections());
-        // Set Source Action
-        contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
-        // Show Dialog Action
-        contextMenu.add(new ShowConnectDialogAction(getNetworkPanel()));
+        contextMenu.add(getNetworkPanel().getActionManager()
+                .getConnectionMenu());
         contextMenu.addSeparator();
 
-        contextMenu.add(getLayoutMenu());
-        contextMenu.add(new ShowLayoutDialogAction());
+        contextMenu.add(getNetworkPanel().getActionManager().getLayoutMenu());
 
         contextMenu.addSeparator();
 
@@ -373,236 +355,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         return contextMenu;
     }
 
-
-    /**
-     * Connection sub menu.
-     *
-     * @return Connection sub menu
-     */
-    private JMenu getConnections() {
-        JMenu menu = new JMenu("Connect");
-
-        JMenuItem allMenuItem = new JMenuItem("All to All");
-        allMenuItem.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
-                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new AllToAll();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSourceModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-
-        JMenuItem oneMenuItem = new JMenuItem("One to One");
-        oneMenuItem.addActionListener(new ActionListener(){
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
-                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new OneToOne();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSourceModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-
-        JMenuItem radialMenuItem = new JMenuItem("Radial");
-        radialMenuItem.addActionListener(new ActionListener(){
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
-                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new Radial();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSourceModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-
-        JMenuItem sparseMenuItem = new JMenuItem("Sparse");
-        sparseMenuItem.addActionListener(new ActionListener(){
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSourceModelNeurons().isEmpty()
-                        || getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new Sparse();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSourceModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-
-        menu.add(allMenuItem);
-        menu.add(oneMenuItem);
-        menu.add(radialMenuItem);
-        menu.add(sparseMenuItem);
-
-        return menu;
-    }
-
-    /**
-     * Quick connections sub menu item.
-     * @return quick connections
-     */
-    private JMenu getQuickConnections() {
-        
-        JMenu menu = new JMenu("Self Connect");
-
-        JMenuItem allMenuItem = new JMenuItem("All to All");
-        allMenuItem.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new AllToAll();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSelectedModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-        
-        JMenuItem fixedMenuItem = new JMenuItem("Fixed Fanout");
-        fixedMenuItem.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new FixedFanout();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSelectedModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-
-        JMenuItem oneMenuItem = new JMenuItem("One to One");
-        oneMenuItem.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new OneToOne();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSelectedModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-            
-        });
-
-        JMenuItem radialMenuItem = new JMenuItem("Radial");
-        radialMenuItem.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new Radial();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSelectedModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-        });
-
-        JMenuItem sparseMenuItem = new JMenuItem("Sparse");
-        sparseMenuItem.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                ConnectNeurons connection = new Sparse();
-                connection.connectNeurons(getNetworkPanel().getRootNetwork(),
-                        getNetworkPanel().getSelectedModelNeurons(),
-                        getNetworkPanel().getSelectedModelNeurons());
-            }
-
-        });
-
-        menu.add(allMenuItem);
-        menu.add(fixedMenuItem);
-        menu.add(oneMenuItem);
-        menu.add(radialMenuItem);
-        menu.add(sparseMenuItem);
-
-        return menu;
-    }
-
-    /**
-     * Layouts sub menu item.
-     * @return layout sub menu
-     */
-    private JMenu getLayoutMenu() {
-        JMenu menu = new JMenu("Layout");
-
-        JMenuItem lineMenuItem = new JMenuItem("Line");
-        lineMenuItem.addActionListener(new ActionListener(){
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                NetworkPanel panel = getNetworkPanel();
-                LineLayout layout = new LineLayout();
-                layout.setInitialLocation(panel.getLastClickedPosition());
-                layout.layoutNeurons(panel.getSelectedModelNeurons());
-                panel.repaint();
-            }
-        });
-
-        JMenuItem hexMenuItem = new JMenuItem("Grid");
-        hexMenuItem.addActionListener(new ActionListener(){
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                NetworkPanel panel = getNetworkPanel();
-                GridLayout layout = new GridLayout();
-                layout.setInitialLocation(panel.getLastClickedPosition());
-                layout.layoutNeurons(panel.getSelectedModelNeurons());
-                panel.repaint();
-            }
-        });
-
-        JMenuItem gridMenuItem = new JMenuItem("Hex");
-        gridMenuItem.addActionListener(new ActionListener(){
-
-            public void actionPerformed(ActionEvent e) {
-                if (getNetworkPanel().getSelectedModelElements().isEmpty()) {
-                    return;
-                }
-                NetworkPanel panel = getNetworkPanel();
-                HexagonalGridLayout layout = new HexagonalGridLayout();
-                layout.setInitialLocation(panel.getLastClickedPosition());
-                layout.layoutNeurons(panel.getSelectedModelNeurons());
-                panel.repaint();
-            }
-        });
-
-        menu.add(lineMenuItem);
-        menu.add(hexMenuItem);
-        menu.add(gridMenuItem);
-
-        return menu;
-    }
 
     /** @see ScreenElement */
     protected boolean hasPropertyDialog() {
@@ -1083,32 +835,4 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             synapseNode.setGrouped(isGrouped);
         }
     }
-}
-
-/**
- * Show layout dialog action.
- *
- */
-class ShowLayoutDialogAction extends AbstractAction {
-
-    /**
-     * Serial UID.
-     */
-    private static final long serialVersionUID = -3355422356278099294L;
-
-    /**
-     * Show layout dialog action.
-     */
-    public ShowLayoutDialogAction() {
-        super("Set Layout Properties...");
-    }
-
-    /** @see ActionEvent. */
-    public void actionPerformed(ActionEvent e) {
-        LayoutDialog dialog = new LayoutDialog();
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-    }
-
 }

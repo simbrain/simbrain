@@ -26,9 +26,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import org.simbrain.network.gui.actions.SelectIncomingWeightsAction;
-import org.simbrain.network.gui.actions.SelectOutgoingWeightsAction;
-import org.simbrain.network.gui.actions.connection.ConnectNeuronsAction;
+import org.simbrain.network.connections.ConnectNeurons;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -112,18 +110,17 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");
         panel.getActionMap().put("setSource", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                panel.setSourceNeurons(); //TODO: I could not do this from action manager
+                panel.setSourceNeurons(); 
+               //TODO: This does not work when I use the action manager's action.  Not sure why not.
             }
         });
 
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //TODO: It should be possible for this to be handled via action manager
-                ConnectNeuronsAction connectAction = new ConnectNeuronsAction(
-                        panel, panel.getSourceModelNeurons(), panel
-                                .getSelectedModelNeurons());
-                connectAction.actionPerformed(null);
+                ConnectNeurons connection = ConnectNeurons.currentConnectionType;
+                connection.connectNeurons(panel.getRootNetwork(), panel.getSourceModelNeurons(),
+                        panel.getSelectedModelNeurons());
             }
         });
 

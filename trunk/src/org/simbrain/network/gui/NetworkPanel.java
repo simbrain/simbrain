@@ -1920,14 +1920,20 @@ public class NetworkPanel extends PCanvas  {
         return clampToolBar;
     }
 
+    /**
+     * Clear all source neurons.
+     */
+    public void clearSourceNeurons() {
+        for (NeuronNode node : sourceNeurons) {
+            SourceHandle.removeSourceHandleFrom(node);
+        }
+    }
 
     /**
      * Set source neurons to selected neurons.
      */
     public void setSourceNeurons() {
-        for (NeuronNode node : sourceNeurons) {
-            SourceHandle.removeSourceHandleFrom(node);
-        }
+        clearSourceNeurons();
         sourceNeurons = this.getSelectedNeurons();
         for (NeuronNode node : sourceNeurons) {
             SourceHandle.addSourceHandleTo(node);

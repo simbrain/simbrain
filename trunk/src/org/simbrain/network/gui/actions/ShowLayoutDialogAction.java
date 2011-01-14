@@ -16,46 +16,38 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.layouts;
+package org.simbrain.network.gui.actions;
 
-import java.awt.geom.Point2D;
-import java.util.List;
+import java.awt.event.ActionEvent;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
+import javax.swing.AbstractAction;
+
+import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 
 /**
- * Interface for all neuron layout managers, which arrange a set of neurons in
- * different ways.
- * 
- * @author jyoshimi
+ * Show layout dialog action.
  */
-public interface Layout {
+public class ShowLayoutDialogAction extends AbstractAction {
 
     /**
-     * Layout a network.
-     * 
-     * @param network reference to network whose nodes should be laid out
+     * Serial UID.
      */
-    void layoutNeurons(Network network);
+    private static final long serialVersionUID = -3355422356278099294L;
 
     /**
-     * Layout a list of neurons.
-     * 
-     * @param neurons the list of neurons
+     * Show layout dialog action.
      */
-    void layoutNeurons(List<Neuron> neurons);
+    public ShowLayoutDialogAction() {
+        super("Set Layout Properties...");
+    }
 
-    /**
-     * @return the name of this layout type
-     */
-    String getLayoutName();
-
-    /**
-     * Set the initial position.
-     * 
-     * @param initialPoint initial position
-     */
-    void setInitialLocation(final Point2D initialPoint);
+    /** @see ActionEvent. */
+    public void actionPerformed(ActionEvent e) {
+        LayoutDialog dialog = new LayoutDialog();
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
 
 }

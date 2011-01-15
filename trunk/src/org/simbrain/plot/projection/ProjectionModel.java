@@ -40,14 +40,14 @@ public class ProjectionModel extends ChartModel {
     /** Scatter Plot Data. */
     private XYSeriesCollection dataset;
 
-    /** Flag which allows the user to start and stop iterative projection techniques.. */
+    /**
+     * Flag which allows the user to start and stop iterative projection
+     * techniques..
+     */
     private volatile boolean isRunning = true;
 
     /** Flag for checking that GUI update is completed. */
     private volatile boolean setUpdateCompleted;
-
-    /** Index of current item; used to paint it a different color. */
-	private int currentItemIndex = 0;
 
     /**
      * Default constructor.
@@ -60,8 +60,7 @@ public class ProjectionModel extends ChartModel {
     /**
      * Initialize the projection model with a certain number of data sources.
      *
-     * @param numDataSources
-     *            number of sources to initialize model with.
+     * @param numDataSources number of sources to initialize model with.
      */
     public void init(final int numDataSources) {
         dataset = new XYSeriesCollection();
@@ -76,8 +75,8 @@ public class ProjectionModel extends ChartModel {
      * data by one.
      */
     public void addSource() {
-    	int index = projector.getDimensions() + 1;
-    	projector.init(index);
+        int index = projector.getDimensions() + 1;
+        projector.init(index);
         fireDataSourceAdded(index);
     }
 
@@ -85,7 +84,7 @@ public class ProjectionModel extends ChartModel {
      * Removes a source from the dataset.
      */
     public void removeSource() {
-        int currentSize = projector.getDimensions()  - 1;
+        int currentSize = projector.getDimensions() - 1;
 
         if (currentSize > 0) {
             projector.init(currentSize);
@@ -104,11 +103,12 @@ public class ProjectionModel extends ChartModel {
 
     /**
      * Returns a properly initialized xstream object.
+     *
      * @return the XStream object
      */
     public static XStream getXStream() {
         XStream xstream = ChartModel.getXStream();
-        //xstream.omitField(ProjectionModel.class, "dataset");
+        // xstream.omitField(ProjectionModel.class, "dataset");
         xstream.omitField(Projector.class, "logger");
         xstream.omitField(Projector.class, "currentState");
         xstream.omitField(ProjectionMethod.class, "logger");
@@ -119,8 +119,7 @@ public class ProjectionModel extends ChartModel {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
+     * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
      *
@@ -132,56 +131,56 @@ public class ProjectionModel extends ChartModel {
         return this;
     }
 
-	/**
-	 * @return the dataset
-	 */
-	public XYSeriesCollection getDataset() {
-		return dataset;
-	}
-
-	/**
-	 * Convenience method for adding points to dataset.
-	 *
-	 * @param x x dimension of point to add
-	 * @param y y dimension of point to add
-	 */
-	public void addPoint(double x, double y) {
-		dataset.getSeries(0).add(x, y, true);
+    /**
+     * @return the dataset
+     */
+    public XYSeriesCollection getDataset() {
+        return dataset;
     }
 
-	/**
-	 * Resets the JFreeChart data and re-adds all the datapoint. Invoked when the projector must be
-	 * applied to an entire dataset.
-	 */
-	public void resetData() {
-		// TODO: Add a check to see whether the current projection algorithm
-		// resets all the data or simply involves adding a single new datapoint.
-		// Add a property to projectionMethods like
-		// newPointsAffectWholeDataset(). If true, then this should be called;
-		// otherwise it should not have to be.
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				// Add the data
-				dataset.getSeries(0).clear();
-				int size = projector.getNumPoints();
-				for (int i = 0; i < size - 2; i++) {
-					double[] point = projector.getProjectedPoint(i);
-					if (point != null) {
-						// No need to update the chart yet (hence the "false"
-						// parameter)
-						dataset.getSeries(0).add(point[0], point[1], false);
-					}
-				}				
-				// Notify chart when last datapoint is updated
-				double[] point = projector.getProjectedPoint(size - 1);
-				if (point != null) {
-					dataset.getSeries(0).add(point[0], point[1], true);
-				}
-				setUpdateCompleted(true);
-			}
-		});
+    /**
+     * Convenience method for adding points to dataset.
+     *
+     * @param x x dimension of point to add
+     * @param y y dimension of point to add
+     */
+    public void addPoint(double x, double y) {
+        dataset.getSeries(0).add(x, y, true);
+    }
 
-	}
+    /**
+     * Resets the JFreeChart data and re-adds all the datapoint. Invoked when
+     * the projector must be applied to an entire dataset.
+     */
+    public void resetData() {
+        // TODO: Add a check to see whether the current projection algorithm
+        // resets all the data or simply involves adding a single new datapoint.
+        // Add a property to projectionMethods like
+        // newPointsAffectWholeDataset(). If true, then this should be called;
+        // otherwise it should not have to be.
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                // Add the data
+                dataset.getSeries(0).clear();
+                int size = projector.getNumPoints();
+                for (int i = 0; i < size - 2; i++) {
+                    double[] point = projector.getProjectedPoint(i);
+                    if (point != null) {
+                        // No need to update the chart yet (hence the "false"
+                        // parameter)
+                        dataset.getSeries(0).add(point[0], point[1], false);
+                    }
+                }
+                // Notify chart when last datapoint is updated
+                double[] point = projector.getProjectedPoint(size - 1);
+                if (point != null) {
+                    dataset.getSeries(0).add(point[0], point[1], true);
+                }
+                setUpdateCompleted(true);
+            }
+        });
+
+    }
 
     /**
      * @return whether this component being updated by a thread or not.
@@ -202,7 +201,7 @@ public class ProjectionModel extends ChartModel {
 
     /**
      * Swing update flag.
-     * 
+     *
      * @param b whether updated is completed
      */
     public void setUpdateCompleted(final boolean b) {
@@ -211,25 +210,11 @@ public class ProjectionModel extends ChartModel {
 
     /**
      * Swing update flag.
-     * 
+     *
      * @return whether update is completed or not
      */
     public boolean isUpdateCompleted() {
         return setUpdateCompleted;
     }
-
-	/**
-	 * @return the currentItemIndex
-	 */
-	public int getCurrentItemIndex() {
-		return currentItemIndex;
-	}
-
-	/**
-	 * @param currentItemIndex the currentItemIndex to set
-	 */
-	public void setCurrentItemIndex(int currentItemIndex) {
-		this.currentItemIndex = currentItemIndex;
-	}
 
 }

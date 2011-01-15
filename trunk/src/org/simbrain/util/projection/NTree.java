@@ -20,43 +20,48 @@ import org.apache.log4j.Logger;
  * new leaves attached to a new branch that replaces the old leaf. In splitting
  * a leaf, a mid-point is determined which places approximately half of the
  * points from the old leaf elements in each new leaf.
- * 
+ *
  * <p>
  * In searching for an element, the mid-point of each branch is used to
  * determine the path through the tree. When the point to be searched is closer
  * than the given tolerance to the midpoint, the other branch is also followed
  * for correctness.
- * 
+ *
  * <p>
  * A couple of other standard collections are used to provide efficient
  * index-based access and for reverse lookups of leafs.
- * 
+ *
  * @author James Matthew Watson - July 2, 2007
  */
 public class NTree implements Iterable<double[]> {
 
     /** the number of elements to allow in a leaf before splitting */
     static final int MAX = 50; /* determined ad hoc testing and hand-waving optimization theories */
-    
+
     /** the static logger for this class */
     private static final Logger LOGGER = Logger.getLogger(NTree.class);
+
     /** an instance specific logger */
     private Logger logger = LOGGER;
     
     /** an enumeration for quick switching on the node type */
     private enum Type {branch, leaf};
+    
     /** the root node, initialized to a leaf */
     private Node root = new Leaf();
+    
     /** the number of dimensions this structure supports */
     public final int dimensions;
+    
     /** indexed list of all elements */
     private List<double[]> list = new ArrayList<double[]>();
+    
     /** map of all elements mapped to their leafs */
     private Map<double[], Leaf> all = new LinkedHashMap<double[], Leaf>();
     
     /**
      * Constructs an NTree with the given number of dimensions
-     * 
+     *
      * @param dimensions the number of dimensions
      */
     NTree(int dimensions) {
@@ -67,7 +72,7 @@ public class NTree implements Iterable<double[]> {
     
     /**
      * returns the number of points in the tree
-     * 
+     *
      * @return the number of points in the tree
      */
     public int size() {
@@ -76,7 +81,7 @@ public class NTree implements Iterable<double[]> {
     
     /**
      * Adds a point to the set
-     * 
+     *
      * @param point the point to add
      */
     public boolean add(double[] point) {
@@ -88,7 +93,7 @@ public class NTree implements Iterable<double[]> {
         /* keeps track of whether the current node is on the left or right of it's parent */
         boolean onLeft = true;
 
-        /* 
+        /*
          * Iterates as long as the current node is a branch setting current 
          * to left or right based on the midpoint of the branches split dimension.
          */
@@ -214,7 +219,7 @@ public class NTree implements Iterable<double[]> {
         
         /**
          * Constructs a new comparator on the given dimension
-         * 
+         *
          * @param dimension the dimension to compare on 
          */
         PointComparator(int dimension) {
@@ -237,7 +242,7 @@ public class NTree implements Iterable<double[]> {
     }
     
     /**
-     * 
+     *
      * @param index of element to return.
      * @return Array of element at index location
      */
@@ -248,7 +253,7 @@ public class NTree implements Iterable<double[]> {
     /**
      * checks whether the given point already exists in the tree
      * with the specified tolerance.
-     * 
+     *
      * @param point the point to search for
      * @param tolerance the tolerance for determining uniqueness
      * @return whether the point is unique
@@ -298,7 +303,7 @@ public class NTree implements Iterable<double[]> {
         /* cast to leaf */
         Leaf leaf = (Leaf) from;
         
-        /* 
+        /*
          * loop over the points.  if each of the elements in the point is
          * within a tolerance of the given point, check the distance.
          * otherwise, the point cannot be within a tolerance distance
@@ -317,7 +322,7 @@ public class NTree implements Iterable<double[]> {
             }
         }
 
-        /* 
+        /*
          * All possiblities in the current path have been exhausted
          * and no dupes were found.
          */
@@ -329,7 +334,7 @@ public class NTree implements Iterable<double[]> {
      *
      * @param a First point of distance
      * @param b Second point of distance
-     * 
+     *
      * @return the Euclidean distance between points 1 and 2
      */
     public static double getDistance(final double[] a, final double[] b) {
@@ -351,7 +356,7 @@ public class NTree implements Iterable<double[]> {
     /**
      * gets the closest points to the passed in point.  The amount
      * of points to determine is specified by the number argument
-     * 
+     *
      * @param number the number of points to collect
      * @param point the point to find points close to
      * @return the closest points
@@ -368,7 +373,7 @@ public class NTree implements Iterable<double[]> {
     /**
      * gets the closest points to the passed in point.  The amount
      * of points to determine is specified by the number argument
-     * 
+     *
      * @param from then node to start from
      * @param number the number of points to collect
      * @param point the point to find points close to
@@ -377,7 +382,7 @@ public class NTree implements Iterable<double[]> {
     private List<DistancePoint> getClosestPoints(Node from, int number, double[] point) {
         List<DistancePoint> points;
         
-        /* 
+        /*
          * if from is a branch, recurse otherwise get the closest points in the
          * leaf 
          */
@@ -392,7 +397,7 @@ public class NTree implements Iterable<double[]> {
             /* recurse on brach determined above */
             points = getClosestPoints(left ? branch.left : branch.right, number, point);
             
-            /* 
+            /*
              * determine whether to recurse on the other path.  if the farthest out 
              * point from the main branch is less than the distance to the split, 
              * get the n points from the other branch
@@ -450,22 +455,22 @@ public class NTree implements Iterable<double[]> {
         DistancePoint(final double distance, final double[] point) {
             this.distance = distance;
             this.point = point;
-        }   
+        }
     }
-    
+
     /**
-     * returns the closest point in the tree to the given point
-     * 
+     * Returns the closest point in the tree to the given point.
+     *
      * @param point
      * @return the point closest to the given point
      */
     public double[] getClosestPoint(final double[] point) {
         return getClosestPoints(1, point).get(0);
     }
-    
+
     /**
-     * returns the insdex for the given point
-     * 
+     * Returns the insdex for the given point.
+     *
      * @param point the point to lookup
      * @return the index of that point
      */
@@ -473,11 +478,11 @@ public class NTree implements Iterable<double[]> {
     {
         return list.indexOf(point);
     }
-    
+
     /**
      * returns the tree as an arraylist.  This
      * returned list is ordered by index
-     * 
+     *
      * @return the tree as an arraylist
      */
     public ArrayList<double[]> asArrayList() {
@@ -487,7 +492,7 @@ public class NTree implements Iterable<double[]> {
     /**
      * adds all the elements from the given tree
      * to this tree
-     * 
+     *
      * @param other the other tree
      */
     public void addAll(NTree other) {
@@ -505,7 +510,7 @@ public class NTree implements Iterable<double[]> {
     
     /**
      * replaces the point at the given index with the one provided
-     * 
+     *
      * @param index the index to set the point at
      * @param point the point to set
      */

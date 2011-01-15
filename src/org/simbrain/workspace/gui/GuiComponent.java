@@ -42,7 +42,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * A gui view on a {@link org.simbrain.workspace.WorkspaceComponent}.
- *
+ * 
  * @param <E> the type of the workspace component.
  */
 public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel {
@@ -56,7 +56,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     /** File Chooser. */
     private final SFileChooser chooser;
 
-    /** Reference to  parent frame. */
+    /** Reference to parent frame. */
     private GenericFrame parentFrame;
 
     /** Log4j logger. */
@@ -64,7 +64,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Construct a workspace component.
-     *
+     * 
      * @param frame the parent frame.
      * @param workspaceComponent the component to wrap.
      */
@@ -73,42 +73,43 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
         chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(),
-            workspaceComponent.getDescription());
+                workspaceComponent.getDescription());
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
         }
 
         // Add a default update listener
-        workspaceComponent.addWorkspaceComponentListener(new WorkspaceComponentListener() {
+        workspaceComponent
+                .addWorkspaceComponentListener(new WorkspaceComponentListener() {
 
-        	/**
-        	 * {@inheritDoc}
-        	 */
-        	public void componentUpdated() {
-                GuiComponent.this.update();
-            }
+                    /**
+                     * {@inheritDoc}
+                     */
+                    public void componentUpdated() {
+                        GuiComponent.this.update();
+                    }
 
-        	/**
-        	 * {@inheritDoc}
-        	 */
-			public void componentOnOffToggled() {
-				// No implementation.
-			}
+                    /**
+                     * {@inheritDoc}
+                     */
+                    public void componentOnOffToggled() {
+                        // No implementation.
+                    }
 
-        	/**
-        	 * {@inheritDoc}
-        	 */
-			public void guiToggled() {
-            	GuiComponent.this.getParentFrame().setVisible(workspaceComponent.getGuiOn());
-			}
-        });
+                    /**
+                     * {@inheritDoc}
+                     */
+                    public void guiToggled() {
+                        GuiComponent.this.getParentFrame().setVisible(
+                                workspaceComponent.getGuiOn());
+                    }
+                });
 
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
 
     /**
      * If any initialization is needed after adding this component to workspace.
-     *
      */
     public void postAddInit() {
         /* no implementation */
@@ -122,18 +123,20 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         workspaceComponent.close();
     }
 
-   /**
-    * Perform cleanup after closing.
-    * TODO: Move to model?
-    */
+    /**
+     * Perform cleanup after closing. TODO: Move to model?
+     */
     protected abstract void closing();
 
     /**
-     * Update that goes beyond updating couplings. Called when global workspace
-     * update is called.
+     * Optional gui update method, which can be overridden for custom GUI update
+     * needs. NOTE: This update method is _not_ automatically called when the
+     * workspace component is updated. A call to fireUpdateEvent() must happen
+     * in the workspace component.
      */
     protected void update() {
-        repaint();
+        repaint(); // TODO: Is this repaint needed here? Should only be in
+                   // subclasses.
     }
 
     /**
@@ -142,8 +145,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     @SuppressWarnings("unchecked")
     public void showOpenFileDialog() {
 
-        SFileChooser chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(),
-            workspaceComponent.getDescription());
+        SFileChooser chooser = new SFileChooser(
+                workspaceComponent.getCurrentDirectory(),
+                workspaceComponent.getDescription());
 
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
@@ -152,19 +156,24 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
             try {
-                Rectangle  bounds = this.getParentFrame().getBounds();
+                Rectangle bounds = this.getParentFrame().getBounds();
                 Workspace workspace = workspaceComponent.getWorkspace();
                 workspace.removeWorkspaceComponent(workspaceComponent);
                 workspaceComponent = (E) WorkspaceComponentDeserializer
-                    .deserializeWorkspaceComponent(
-                    workspaceComponent.getClass(), theFile.getName(),
-                    new FileInputStream(theFile), SFileChooser.getExtension(theFile));
+                        .deserializeWorkspaceComponent(
+                                workspaceComponent.getClass(),
+                                theFile.getName(),
+                                new FileInputStream(theFile),
+                                SFileChooser.getExtension(theFile));
                 workspace.addWorkspaceComponent(workspaceComponent);
                 workspaceComponent.setCurrentFile(theFile);
-                workspaceComponent.setCurrentDirectory(theFile.getParentFile().getAbsolutePath());
+                workspaceComponent.setCurrentDirectory(theFile.getParentFile()
+                        .getAbsolutePath());
                 SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
-                GuiComponent desktopComponent = desktop.getDesktopComponent(workspaceComponent);
-                desktop.registerComponentInstance(workspaceComponent, desktopComponent);
+                GuiComponent desktopComponent = desktop
+                        .getDesktopComponent(workspaceComponent);
+                desktop.registerComponentInstance(workspaceComponent,
+                        desktopComponent);
                 desktopComponent.getParentFrame().setBounds(bounds);
                 workspaceComponent.setName(theFile.getName());
                 getParentFrame().setTitle(workspaceComponent.getName());
@@ -199,22 +208,25 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                 throw new RuntimeException(e);
             }
 
-            workspaceComponent.setCurrentDirectory(theFile.getParentFile().getAbsolutePath());
+            workspaceComponent.setCurrentDirectory(theFile.getParentFile()
+                    .getAbsolutePath());
             workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
         }
     }
 
     /**
-     * Save vs. save-as.  Saves the currentfile.
+     * Save vs. save-as. Saves the currentfile.
      */
     public void save() {
-        //System.out.println("Network save:" + workspaceComponent.getCurrentFile());
+        // System.out.println("Network save:" +
+        // workspaceComponent.getCurrentFile());
         if (workspaceComponent.getCurrentFile() == null) {
             showSaveFileDialog();
         } else {
             try {
-                FileOutputStream stream = new FileOutputStream(workspaceComponent.getCurrentFile());
+                FileOutputStream stream = new FileOutputStream(
+                        workspaceComponent.getCurrentFile());
                 workspaceComponent.save(stream, null);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -224,17 +236,18 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Writes the bounds of this desktop component to the provided stream.
-     *
+     * 
      * @param ostream the stream to write to
      * @throws IOException if an IO error occurs
      */
     public void save(final OutputStream ostream) throws IOException {
-        new XStream(new DomDriver()).toXML(this.getParentFrame().getBounds(), ostream);
+        new XStream(new DomDriver()).toXML(this.getParentFrame().getBounds(),
+                ostream);
     }
 
     /**
      * Creates a new desktop component from the provided stream.
-     *
+     * 
      * @param component the component to create the desktop component for.
      * @param istream the inputstream containing the serialized data.
      * @param name the name of the desktop component.
@@ -243,9 +256,12 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     public static GuiComponent<?> open(final WorkspaceComponent component,
             final InputStream istream, final String name) {
 
-//        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(component.getWorkspace());
-        GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);
-        Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
+        // SimbrainDesktop desktop =
+        // SimbrainDesktop.getDesktop(component.getWorkspace());
+        GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null,
+                component);
+        Rectangle bounds = (Rectangle) new XStream(new DomDriver())
+                .fromXML(istream);
 
         dc.setTitle(name);
         dc.setBounds(bounds);
@@ -257,13 +273,12 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * Checks to see if anything has changed and then offers to save if true.
      */
     public void showHasChangedDialog() {
-        Object[] options = {"Save", "Don't Save", "Cancel" };
-        int s = JOptionPane
-                .showInternalOptionDialog(this,
-                 "This component has changed since last save,\n"
-               + "Would you like to save these changes?",
-                 "Component Has Changed", JOptionPane.YES_NO_OPTION,
-                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        Object[] options = { "Save", "Don't Save", "Cancel" };
+        int s = JOptionPane.showInternalOptionDialog(this,
+                "This component has changed since last save,\n"
+                        + "Would you like to save these changes?",
+                "Component Has Changed", JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == JOptionPane.OK_OPTION) {
             this.save();
@@ -281,7 +296,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @return the name of underlying component.
      */
     public String getName() {
-        return (workspaceComponent == null) ? "null" : workspaceComponent.getName();
+        return (workspaceComponent == null) ? "null" : workspaceComponent
+                .getName();
     }
 
     /**
@@ -292,9 +308,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     }
 
     /**
-     * Retrieves a simple version of a component name from its class,
-     * e.g. "Network" from "org.simbrain.network.NetworkComponent"/
-     *
+     * Retrieves a simple version of a component name from its class, e.g.
+     * "Network" from "org.simbrain.network.NetworkComponent"/
+     * 
      * @return the simple name.
      */
     public String getSimpleName() {
@@ -304,7 +320,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
         return simpleName;
     }
-    
+
     /**
      * Returns the workspace component wrapped by this instance.
      * 
@@ -313,7 +329,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     public E getWorkspaceComponent() {
         return workspaceComponent;
     }
-            
+
     /**
      * Sets the parent frame of this view.
      * 
@@ -322,7 +338,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     public void setParentFrame(final GenericFrame parentFrame) {
         this.parentFrame = parentFrame;
     }
-    
+
     /**
      * Returns the parent from of this view.
      * 

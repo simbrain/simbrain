@@ -251,29 +251,31 @@ public class ProjectionComponent extends WorkspaceComponent {
     }
 
     /**
-     * Get the current state of the dimension proxies, send this to the
+     * Get the current state of the dimension objects, send this to the
      * projection algorithm, and update the graphics.
      */
     @Override
     public void update() {
-        // System.out.println(setterList.size() + "  " + projectionModel.getProjector().getDimensions());
+        // System.out.println(setterList.size() + "  " +
+        // projectionModel.getProjector().getDimensions());
 
         // Create a new double array to be sent as a new "point" to the
         // projection dataset
-        double[] temp = new double[dimensionList.size()];
+        double[] point = new double[dimensionList.size()];
         int i = 0;
         for (Dimension dimension : dimensionList) {
-            temp[i] = dimension.getValue();
+            point[i] = dimension.getValue();
             i++;
         }
         // System.out.println(Arrays.toString(temp));
         boolean newDatapointWasAdded = projectionModel.getProjector()
-                .addDatapoint(temp);
+                .addDatapoint(point);
         if (newDatapointWasAdded) {
-            projectionModel.setCurrentItemIndex(projectionModel.getDataset()
-                    .getItemCount(0));
             resetChartDataset();
         }
+
+        // Notify Gui that this component was updated.
+        fireUpdateEvent();
     }
 
     /**

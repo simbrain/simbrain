@@ -161,13 +161,13 @@ public class Dataset {
      * @return true if point added, false otherwise
      */
     public boolean addPoint(final double[] point, final double tolerance) {
-            logger.debug("addPoint called with tolerance");
-            checkDimension(point);
-            if (isUniquePoint(point, tolerance)) {
-                return _addPoint(point);
-            } else {
-                return false;
-            }
+        logger.debug("addPoint called with tolerance");
+        checkDimension(point);
+        if (isUniquePoint(point, tolerance)) {
+            return _addPoint(point);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -196,7 +196,7 @@ public class Dataset {
 
     /**
      * Set a specified point in the dataset.
-     * 
+     *
      * @param i the point to set
      * @param point the new n-dimensional point
      */
@@ -233,7 +233,7 @@ public class Dataset {
     /**
      * calculates the index of the start index for distances
      * from the given point
-     * 
+     *
      * @param point the point to find the start index for
      * @return the index to the distances array for the given point
      */
@@ -252,7 +252,7 @@ public class Dataset {
     /**
      * Calculates the distances between pointA and pointB.
      * A must be greater than B
-     * 
+     *
      * @param pointA the first point
      * @param pointB the second point
      */
@@ -273,7 +273,7 @@ public class Dataset {
     /**
      * calculates and stores all the distances to all other points
      * with the given point
-     * 
+     *
      * @param point the point to calculate distances for
      */
     private void calculateDistances(int point) {
@@ -302,7 +302,7 @@ public class Dataset {
 
     /**
      * Randomize dataset to a value between 0 and upperBound.
-     * 
+     *
      * @param upperBound highest value to be used
      */
     public void randomize(final int upperBound) {
@@ -323,7 +323,7 @@ public class Dataset {
 
     /**
      * Get the minimum interpoint distance between points in the dataset.
-     * 
+     *
      * @return minimum distance between any two points in the low-d dataset
      */
     public double getMinimumDistance() {
@@ -341,7 +341,7 @@ public class Dataset {
 
     /**
      * Get the maximimum interpoint distance between points in the dataset.
-     * 
+     *
      * @return maximum distance between any two points in the low-d dataset
      */
     public double getMaximumDistance() {
@@ -359,7 +359,7 @@ public class Dataset {
 
     /**
      * Read in stored dataset file.
-     * 
+     *
      * @param file Name of file to read in
      * @throws FileNotFoundException 
      */
@@ -394,7 +394,7 @@ public class Dataset {
 
     /**
      * Save the current datast to a stored file.
-     * 
+     *
      * @param theFile the file where data should be saved
      */
     public void saveData(final File theFile) {
@@ -423,7 +423,7 @@ public class Dataset {
 
     /**
      * Find repeated points and perturb them slightly so they don't overlap.
-     * 
+     *
      * @param factor Distance to perturb
      */
     public void perturbOverlappingPoints(final double factor) {
@@ -484,10 +484,10 @@ public class Dataset {
      * Get a specific coordinate of a specific datapoint. Say, the second
      * component of the third datapoint in a 5-dimensional dataset with 50
      * points.
-     * 
+     *
      * @param datapointNumber index of the point to get
      * @param dimension dimension of the desired component
-     * 
+     *
      * @return the value of of n'th component of the specified datapoint
      */
     public double getComponent(final int datapointNumber, final int dimension) {
@@ -503,7 +503,7 @@ public class Dataset {
 
     /**
      * verifies that the point is compatible with this set
-     * 
+     *
      * @param point the point to check
      */
     private void checkDimension(double[] point) {
@@ -516,11 +516,11 @@ public class Dataset {
     /**
      * Check that a given point is "new", that is, that it is not already in the
      * dataset.
-     * 
+     *
      * @param point the point to check
      * @param tolerance distance within which a point is considered old, and
      *            outside of which it is considered new
-     * 
+     *
      * @return true if the point is new, false otherwise
      */
     private boolean isUniquePoint(final double[] toCheck, final double tolerance) {
@@ -566,10 +566,10 @@ public class Dataset {
 
     /**
      * Get the distance between two points.
-     * 
+     *
      * @param index1 index of point 1
      * @param index2 index of point 2
-     * 
+     *
      * @return distance between points 1 and 2
      */
     public double getDistance(int index1, int index2) {
@@ -606,10 +606,10 @@ public class Dataset {
 
     /**
      * Returns the euclidean distance between two points.
-     * 
+     *
      * @param point1 First point of distance
      * @param point2 Second point of distance
-     * 
+     *
      * @return the Euclidean distance between points 1 and 2
      */
     public double getDistance(final double[] point1, final double[] point2) {
@@ -626,7 +626,7 @@ public class Dataset {
     /**
      * Returns a matrix of interpoint distances, between the points in the
      * dataset. Note that the lower triangular duplicates the upper triangular
-     * 
+     *
      * @return a matrix of interpoint distances
      */
     public double[][] getDistances() {
@@ -662,9 +662,9 @@ public class Dataset {
 
     /**
      * Returns the mean of the dataset on a given dimension.
-     * 
+     *
      * @param d index of the dimension whose mean to get
-     * 
+     *
      * @return mean of dataset on dimension d
      */
     public double getMean(final int d) {
@@ -681,10 +681,10 @@ public class Dataset {
     /**
      * Returns the covariance of the ith component of the dataset with respect
      * to the jth component.
-     * 
+     *
      * @param i first dimension
      * @param j seconnd dimesion
-     * 
+     *
      * @return covariance of i with respect to j
      */
     public double getCovariance(final int i, final int j) {
@@ -705,7 +705,7 @@ public class Dataset {
 
     /**
      * Returns a covariance matrix for the dataset.
-     * 
+     *
      * @return covariance matrix which describes how the data covary along each
      *         dimension
      */
@@ -728,7 +728,7 @@ public class Dataset {
     /**
      * Returns the k'th most variant dimesion. For example, the most variant
      * dimension (k=1), or the least variant dimension (k=num_dimensions).
-     * 
+     *
      * @param k Number of variant dimension
      * @return the k'th most variant dimension
      */
@@ -786,7 +786,7 @@ public class Dataset {
 
     /**
      * Makes this dataset a copy of the passed in dataset
-     * 
+     *
      * @param other the the dataset
      */
     public void mirror(Dataset other) {
@@ -815,7 +815,7 @@ public class Dataset {
     /**
      * Returns a matrix of strings, one row for each datapoint, representing the
      * dataset.
-     * 
+     *
      * @return a matrix of strings representing the dataset
      */
     public String[][] getDoubleStrings() {

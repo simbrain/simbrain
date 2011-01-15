@@ -21,13 +21,9 @@ package org.simbrain.util.projection;
 import org.apache.log4j.Logger;
 
 /**
- * <b>Projector</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
- * initializing various projection algorithms.
- * 
- * TODO:
- * - Is error needed here?
- * - Changemore "projector" to "projectionmethod"
- * 
+ * <b>Projector</b> is the main class of the high dimensional visualizer, which
+ * provides methods for changing and initializing various projection algorithms.
+ * TODO: - Is error needed here?
  */
 public class Projector {
 
@@ -37,27 +33,30 @@ public class Projector {
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
 
-    /** References to projection objects.*/
+    /** References to projection objects. */
     private ProjectionMethod currentProjectionMethod;
 
     /** How the datasets will be displayed. */
-    private String defaultProjectionMethod = GaugePreferences.getDefaultProjector();
+    private String defaultProjectionMethod = GaugePreferences
+            .getDefaultProjector();
 
     /** Application parameters. */
     private double error = 0;
 
-    /** Current data point.  */
-    double[] currentState = null;
+    /** Current data point. */
+    double[] currentPoint = null;
 
+    // TODO Replace below with enum
     /** List of available projection algorithms. */
-    public static final String[] PROJECTION_METHOD_LIST = {
-            "Sammon", "PCA", "Coordinate" };
+    public static final String[] PROJECTION_METHOD_LIST = { "Sammon", "PCA",
+            "Coordinate" };
 
     /**
-     * Default constructor for gauge.
+     * Default constructor for projector.
      */
     public Projector() {
-        currentProjectionMethod = this.getProjectionMethodByName(defaultProjectionMethod);
+        currentProjectionMethod = this
+                .getProjectionMethodByName(defaultProjectionMethod);
     }
 
     /**
@@ -67,7 +66,7 @@ public class Projector {
      */
     public void init(final int dims) {
         currentProjectionMethod.init(dims);
-        currentState = org.simbrain.util.SimbrainMath.zeroVector(dims);
+        currentPoint = org.simbrain.util.SimbrainMath.zeroVector(dims);
     }
 
     /**
@@ -77,14 +76,15 @@ public class Projector {
      */
     public boolean addDatapoint(final double[] point) {
 
-        //TODO: Throw exception if point does not match
-        
+        // TODO: Throw exception if point does not match
+
         logger.debug("addDatapoint called");
         if ((currentProjectionMethod == null) || (getUpstairs() == null)) {
             return false;
         }
 
-        boolean ret = currentProjectionMethod.addDatapoint(point);
+        boolean newPointAdded = currentProjectionMethod.addDatapoint(point);
+        currentPoint = point;
 
         /* This is needed to invoke the current projector's init function */
         if (currentProjectionMethod.isIterable()) {
@@ -92,7 +92,7 @@ public class Projector {
         }
 
         error = 0;
-        return ret;
+        return newPointAdded;
     }
 
     /**
@@ -108,7 +108,8 @@ public class Projector {
         int iterations = 0;
 
         while (iterations < numTimes) {
-        	// TODO: Why should the current projector return an error when that is specific to Sammon? 
+            // TODO: Why should the current projector return an error when that
+            // is specific to Sammon?
             error = currentProjectionMethod.iterate();
             iterations++;
         }
@@ -129,7 +130,8 @@ public class Projector {
             return;
         }
         ProjectionMethod newProjector = getProjectionMethodByName(projName);
-        newProjector.init(currentProjectionMethod.getUpstairs(), currentProjectionMethod.getDownstairs());
+        newProjector.init(currentProjectionMethod.getUpstairs(),
+                currentProjectionMethod.getDownstairs());
         setCurrentProjectionMethod(newProjector);
     }
 
@@ -228,38 +230,52 @@ public class Projector {
     public void setDefaultProjectionMethod(final String defaultMethod) {
         this.defaultProjectionMethod = defaultMethod;
     }
-    
+
     /**
      * @return the currentState
      */
-    public double[] getCurrentState() {
-        return currentState;
+    public double[] getCurrentPoint() {
+        return currentPoint;
+    }
+
+    /**
+     * Returns the index of the current point in the underlying datasets. Useful
+     * for some GUI representations.
+     *
+     * @return the closest point in the underlying dataset.
+     */
+    public int getCurrentPointIndex() {
+        if (currentPoint != null) {
+            return currentProjectionMethod.getUpstairs().getClosestIndex(
+                    currentPoint);
+        } else {
+            return 0;
+        }
     }
 
     /**
      * @param currentState the currentState to set
      */
-    public void setCurrentState(double[] currentState) {
-        this.currentState = currentState;
+    public void setCurrentPoint(double[] currentState) {
+        this.currentPoint = currentState;
     }
-    
 
     @Override
     public String toString() {
-        return "High Dimensional Data \n" +
-            getCurrentProjectionMethod().getUpstairs().toString() +
-            "Projected Data \n" +
-            getCurrentProjectionMethod().getDownstairs().toString();
+        return "High Dimensional Data \n"
+                + getCurrentProjectionMethod().getUpstairs().toString()
+                + "Projected Data \n"
+                + getCurrentProjectionMethod().getDownstairs().toString();
     }
-    
+
     /**
-     * Reset the gauge.  Clear the underlying datasets.
+     * Reset the gauge. Clear the underlying datasets.
      */
     public void reset() {
         this.getUpstairs().clear();
         this.getDownstairs().clear();
     }
-    
+
     /**
      * Returns the size of the dataset.
      *
@@ -268,7 +284,7 @@ public class Projector {
     public int getNumPoints() {
         return getCurrentProjectionMethod().getDownstairs().getNumPoints();
     }
-    
+
     /**
      * Returns the current projected point.
      *
@@ -276,7 +292,8 @@ public class Projector {
      * @return the point.
      */
     public double[] getProjectedPoint(final int index) {
-        if (index < getCurrentProjectionMethod().getDownstairs().getNumPoints() && index > 0) {
+        if (index < getCurrentProjectionMethod().getDownstairs().getNumPoints()
+                && index > 0) {
             return getCurrentProjectionMethod().getDownstairs().getPoint(index);
         } else {
             // throw index out of range exception

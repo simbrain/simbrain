@@ -11,3 +11,4 @@ combo
 updator
 simbrain
 deselected
+synaptic

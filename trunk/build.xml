@@ -1,7 +1,7 @@
 <?xml  version="1.0" encoding="UTF-8"?>
 <project name="Simbrain" default="jar" basedir=".">
 
-	<property name="version" location="Simbrain3_alpha_1" />
+	<property name="version" location="Simbrain3_alpha_2" />
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="lib" location="lib" />
@@ -87,8 +87,8 @@
 			<fileset dir="scripts">
 			</fileset>
 		</copy>
-		<copy todir="${build.main}" file="${etc}/Readme.txt" />
-		<copy todir="${build.main}" file="${etc}/License.txt" />
+		<copy todir="${build.main}" file="${etc}/Readme.rtf" />
+		<copy todir="${build.main}" file="${etc}/License.rtf" />
 		<zip destfile="${version}.zip" basedir="${build.main}" />
 		<mkdir dir="${dist}"/>
 		<move todir="${dist}" file="${version}.zip" />

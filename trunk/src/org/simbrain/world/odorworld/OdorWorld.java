@@ -532,6 +532,17 @@ public class OdorWorld {
         }
     }
 
+    /**
+     * Fire entity changed event.
+     *
+     * @param entity entity that was changed
+     */
+    public void fireEntityChanged(final OdorWorldEntity entity) {
+        for (WorldListener listener : listenerList) {
+            listener.entityChanged(entity);
+        }
+    }
+
     /***
      * Fire sensor added event.
      *

@@ -379,6 +379,7 @@ public abstract class OdorWorldEntity {
      */
     public void setAnimation(final Animation animation) {
         this.animation = animation;
+        parentWorld.fireEntityChanged(this);
     }
 
     /**

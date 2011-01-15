@@ -140,6 +140,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             public void effectorRemoved(Effector effector) {
                 repaint();
             }
+
+            public void entityChanged(OdorWorldEntity entity) {
+                repaint();
+            }
         });
     }
 

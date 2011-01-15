@@ -202,6 +202,9 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 fireAttributeObjectRemoved(sensor); 
                 firePotentialAttributesChanged();
             }
+            public void entityChanged(OdorWorldEntity entity) {
+            }
+            
         });
     }
 

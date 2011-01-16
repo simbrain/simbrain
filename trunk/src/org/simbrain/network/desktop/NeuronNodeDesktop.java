@@ -40,11 +40,12 @@ public class NeuronNodeDesktop extends NeuronNode {
         Workspace workspace = component.getWorkspace();
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
             contextMenu.addSeparator();
-
+            String producerDescription = neuron.getId()  + ":getActivation <double>";
             PotentialProducer producer = component.getAttributeManager()
-                    .createPotentialProducer(neuron, "getActivation", double.class);
+                    .createPotentialProducer(neuron, "getActivation", double.class, producerDescription);
+            String consumerDescription = neuron.getId()  + ":setInputValue <double>";
             PotentialConsumer consumer = component.getAttributeManager()
-                    .createPotentialConsumer(neuron, "setInputValue", double.class);
+                    .createPotentialConsumer(neuron, "setInputValue", double.class, consumerDescription);
 
             JMenu producerMenu = new CouplingMenuProducer(
                     "Send coupling to", workspace, producer);

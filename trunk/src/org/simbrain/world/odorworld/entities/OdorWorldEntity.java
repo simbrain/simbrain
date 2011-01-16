@@ -289,7 +289,12 @@ public abstract class OdorWorldEntity {
     public void addSensor(final Sensor sensor) {
         //if (sensor.getApplicableTypes().contains(this.getClass()))...
         sensors.add(sensor);
-        sensor.setId(sensorIDGenerator.getId());
+
+        // Assign an id unless it already has one
+        if (sensor.getId() == null) {
+            sensor.setId(sensorIDGenerator.getId());
+        }
+
         parentWorld.fireSensorAdded(sensor);
     }
 

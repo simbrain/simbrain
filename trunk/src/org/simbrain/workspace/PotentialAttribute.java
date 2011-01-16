@@ -50,7 +50,7 @@ public class PotentialAttribute {
      * @param dataType class of data
      */
     protected PotentialAttribute(WorkspaceComponent parent, Object object, 
-            String methodName, Class dataType, String description) {
+            String methodName, Class<?> dataType, String description) {
         this.parent = parent;
         this.baseObject = object;
         this.methodName = methodName;

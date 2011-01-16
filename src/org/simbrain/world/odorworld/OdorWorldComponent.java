@@ -152,7 +152,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                         for (int i = 0; i < smell.getCurrentValue().length; i++) {
                             SmellSensorGetter getter =  smell.createGetter(i);
                             String description = smellSensorType.getSimpleDescription(entity
-                                    .getName() + ":" + smell.getId() + "[" + i + "]");
+                                    .getName() + ":" + smell.getId() + "-" + i );
                             returnList.add(getAttributeManager().createPotentialProducer(getter, smellSensorType, description));
                         }
                         // TODO: A way of indicating sensor location (relative

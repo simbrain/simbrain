@@ -45,7 +45,7 @@ public final class SetSourceNeurons
         }
 
         this.networkPanel = networkPanel;
-        putValue(NAME, "Set Source Neurons");
+        putValue(NAME, "Set Source Neuron(s)");
     }
 
     /** @see AbstractAction */

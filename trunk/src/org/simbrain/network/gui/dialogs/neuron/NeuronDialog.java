@@ -157,7 +157,7 @@ public class NeuronDialog extends StandardDialog {
         }
 
         //topPanel.addItem("Attribute type", cbNeuronType);
-        topPanel.addItem("Neuron type", cbNeuronType);
+        topPanel.addItem("Update rule", cbNeuronType);
 
         mainPanel.add(topPanel);
         mainPanel.add(neuronPanel);

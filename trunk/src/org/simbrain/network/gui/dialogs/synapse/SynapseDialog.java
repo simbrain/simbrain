@@ -141,7 +141,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         topPanel.addItemLabel(upperLabel, tfUpBound);
         topPanel.addItemLabel(lowerLabel, tfLowBound);
         topPanel.addItem("Delay", tfDelay);
-        topPanel.addItem("Synapse type", cbSynapseType);
+        topPanel.addItem("Learning rule", cbSynapseType);
 
         mainPanel.add(topPanel);
         mainPanel.add(synapsePanel);

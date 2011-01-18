@@ -46,7 +46,7 @@ public final class ClearSourceNeurons
         }
 
         this.networkPanel = networkPanel;
-        putValue(NAME, "Clear Source Neurons");
+        putValue(NAME, "Clear Source Neuron(s)");
     }
 
     /** @see AbstractAction */

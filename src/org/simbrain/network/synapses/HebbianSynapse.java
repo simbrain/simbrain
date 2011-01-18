@@ -29,7 +29,7 @@ import org.simbrain.network.interfaces.SynapseUpdateRule;
 public class HebbianSynapse extends SynapseUpdateRule {
 
     /** Default learning rate. */
-    public static final double DEFAULT_LEARNING_RATE = 1;
+    public static final double DEFAULT_LEARNING_RATE = .1;
 
     /** Learning rate. */
     private double learningRate = DEFAULT_LEARNING_RATE;

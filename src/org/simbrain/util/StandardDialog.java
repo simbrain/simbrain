@@ -41,16 +41,13 @@ import javax.swing.KeyStroke;
 /**
  * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and
  * "Cancel" buttons. Special functionality associated with Simbrain has also
- * been added.
- * 
- * Subclasses can override the isDataValid(), okButtonPressed(), and
+ * been added. Subclasses can override the isDataValid(), okButtonPressed(), and
  * cancelButtonPressed() methods to perform implementation specific processing.
- *
  * <P>
  * By default, the dialog is modal, and has a JPanel with a BorderLayout for its
  * content pane.
  * </p>
- *
+ * 
  * @author David Fraser
  * @author Michael Harris
  */
@@ -73,10 +70,10 @@ public class StandardDialog extends JDialog {
 
     /** Action listener. */
     ActionListener actionListener = new ActionListener() {
-            public void actionPerformed(final ActionEvent actionEvent) {
-                setVisible(false);
-            }
-        };
+        public void actionPerformed(final ActionEvent actionEvent) {
+            setVisible(false);
+        }
+    };
 
     /** The spacing between components in pixels. */
     private static final int COMPONENT_SPACING = 10;
@@ -97,7 +94,7 @@ public class StandardDialog extends JDialog {
     /**
      * This method creates a StandardDialog with the given parent frame and
      * title.
-     *
+     * 
      * @param parent The parent frame for the dialog.
      * @param title The title to display in the dialog.
      */
@@ -108,8 +105,9 @@ public class StandardDialog extends JDialog {
     }
 
     /**
-     * This method creates a StandardDialog with the given parent dialog and title.
-     *
+     * This method creates a StandardDialog with the given parent dialog and
+     * title.
+     * 
      * @param parent The parent dialog for the dialog.
      * @param title The title to display in the dialog.
      */
@@ -138,14 +136,18 @@ public class StandardDialog extends JDialog {
     }
 
     /**
-     * This method sets up the default attributes of the dialog and the content pane.
+     * This method sets up the default attributes of the dialog and the content
+     * pane.
      */
     private void init() {
 
         if (isRunning && USE_RUN_WARNINGS) {
-            JOptionPane.showMessageDialog( null,
+            JOptionPane
+                    .showMessageDialog(
+                            null,
                             "WARNING: You are modifying system parameters while a simulation is running. \n "
-                                    + "Some functions may not behave as they are supposed to.",
+                                    + "It is reccomended that you first stop the simulation using the stop button.\n" +
+                                        " Some functions may not behave as they are supposed to.",
                             "Warning!", JOptionPane.WARNING_MESSAGE);
         }
 
@@ -156,7 +158,8 @@ public class StandardDialog extends JDialog {
         // and the standard button panel
         JPanel internalContentPane = new JPanel();
 
-        internalContentPane.setLayout(new BorderLayout(COMPONENT_SPACING, COMPONENT_SPACING));
+        internalContentPane.setLayout(new BorderLayout(COMPONENT_SPACING,
+                COMPONENT_SPACING));
 
         internalContentPane.setBorder(BorderFactory.createEmptyBorder(
                 COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING,
@@ -164,21 +167,21 @@ public class StandardDialog extends JDialog {
 
         // Create the standard button panel with "Ok" and "Cancel"
         Action okAction = new AbstractAction("OK") {
-                public void actionPerformed(final ActionEvent actionEvent) {
-                    if (isValidData()) {
-                        myIsDialogCancelled = false;
-                        closeDialogOk();
-                    }
+            public void actionPerformed(final ActionEvent actionEvent) {
+                if (isValidData()) {
+                    myIsDialogCancelled = false;
+                    closeDialogOk();
                 }
-            };
+            }
+        };
 
         Action cancelAction = new AbstractAction("Cancel") {
-                public void actionPerformed(final ActionEvent actionEvent) {
-                    myIsDialogCancelled = true;
-                    closeDialogCancel();
-                    dispose();
-                }
-            };
+            public void actionPerformed(final ActionEvent actionEvent) {
+                myIsDialogCancelled = true;
+                closeDialogCancel();
+                dispose();
+            }
+        };
 
         JPanel buttonPanel = new JPanel();
 
@@ -201,11 +204,11 @@ public class StandardDialog extends JDialog {
         // Finally, add a listener for the window close button.
         // Process this event the same as the "Cancel" button.
         WindowAdapter windowAdapter = new WindowAdapter() {
-                public void windowClosing(final WindowEvent windowEvent) {
-                    myIsDialogCancelled = true;
-                    closeDialogCancel();
-                }
-            };
+            public void windowClosing(final WindowEvent windowEvent) {
+                myIsDialogCancelled = true;
+                closeDialogCancel();
+            }
+        };
 
         addWindowListener(windowAdapter);
 
@@ -214,7 +217,7 @@ public class StandardDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
                         .getDefaultToolkit().getMenuShortcutKeyMask()), 0);
 
-        //this.setAlwaysOnTop(true); //BREAKS SOME VERSIONS
+        // this.setAlwaysOnTop(true); //BREAKS SOME VERSIONS
         pack();
 
     }
@@ -246,9 +249,8 @@ public class StandardDialog extends JDialog {
     /**
      * This method sets the content pane for adding components. Components
      * should not be added directly to the dialog.
-     *
-     * @param contentPane
-     *            The content pane for the dialog.
+     * 
+     * @param contentPane The content pane for the dialog.
      */
     public void setContentPane(final Container contentPane) {
         myUserContentPane = contentPane;
@@ -272,7 +274,7 @@ public class StandardDialog extends JDialog {
      * This method is used to validate the current dialog box. This method
      * provides a default response of <code>true</code>. This method should be
      * implemented by each dialog that extends this class.
-     *
+     * 
      * @return a boolean indicating if the data is valid. <code>true</code>
      *         indicates that all of the fields were validated correctly and
      *         <code>false</code> indicates the validation failed
@@ -283,7 +285,7 @@ public class StandardDialog extends JDialog {
 
     /**
      * Adds a new button to the panel.
-     *
+     * 
      * @param theButton button to be added
      */
     public void addButton(final JButton theButton) {

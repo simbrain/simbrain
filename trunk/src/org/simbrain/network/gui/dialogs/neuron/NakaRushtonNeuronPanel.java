@@ -27,7 +27,6 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.NakaRushtonNeuron;

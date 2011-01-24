@@ -28,7 +28,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 

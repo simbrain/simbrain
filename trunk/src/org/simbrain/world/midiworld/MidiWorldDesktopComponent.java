@@ -2,8 +2,8 @@ package org.simbrain.world.midiworld;
 
 import java.awt.Dimension;
 
-import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * MIDI world desktop component.

@@ -24,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -36,10 +35,9 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.simbrain.workspace.Attribute;
+import org.simbrain.workspace.AttributeListener;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialAttribute;
-import org.simbrain.workspace.AttributeListener;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;

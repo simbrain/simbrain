@@ -245,7 +245,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     protected String getToolTipText() {
       String ret = new String();
       ret += neuron.getToolTipText();
-      ret += getCouplingText();
+      //ret += getCouplingText();
       return ret;
     }
 

@@ -18,12 +18,11 @@
  */
 package org.simbrain.world.visionworld.sensormatrix;
 
-import cern.colt.matrix.ObjectMatrix2D;
-
-import cern.colt.matrix.impl.SparseObjectMatrix2D;
-
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.Sensor;
+
+import cern.colt.matrix.ObjectMatrix2D;
+import cern.colt.matrix.impl.SparseObjectMatrix2D;
 
 /**
  * Sparse sensor matrix.

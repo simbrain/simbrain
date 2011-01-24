@@ -22,7 +22,6 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Model for saving pie charts.

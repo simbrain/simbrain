@@ -3,7 +3,6 @@ package org.simbrain.workspace.actions;
 import java.awt.event.ActionEvent;
 
 import org.simbrain.workspace.Workspace;
-
 import org.simbrain.world.oscworld.OscWorldComponent;
 
 /**

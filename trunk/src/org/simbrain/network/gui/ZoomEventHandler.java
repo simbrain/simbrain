@@ -18,19 +18,16 @@
  */
 package org.simbrain.network.gui;
 
+import java.awt.event.InputEvent;
 import java.awt.geom.Point2D;
 
-import java.awt.event.InputEvent;
+import org.simbrain.network.gui.nodes.SelectionMarquee;
 
 import edu.umd.cs.piccolo.PCamera;
-
-import edu.umd.cs.piccolo.util.PBounds;
-
+import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
-
-import org.simbrain.network.gui.nodes.SelectionMarquee;
+import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * Zoom event handler.

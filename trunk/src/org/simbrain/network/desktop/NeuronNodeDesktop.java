@@ -7,8 +7,11 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.workspace.*;
-import org.simbrain.workspace.gui.*;
+import org.simbrain.workspace.PotentialConsumer;
+import org.simbrain.workspace.PotentialProducer;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.CouplingMenuConsumer;
+import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * Version of a Neuron Node with a coupling menu.

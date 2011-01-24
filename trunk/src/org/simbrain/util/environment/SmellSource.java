@@ -21,7 +21,6 @@ package org.simbrain.util.environment;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-import org.simbrain.world.odorworld.entities.Animation;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can

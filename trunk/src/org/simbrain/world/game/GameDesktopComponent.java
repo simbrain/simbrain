@@ -7,8 +7,8 @@ import javax.swing.SwingUtilities;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.game.tictactoe.TicTacToeGui;
-import org.simbrain.world.game.tictactoe.TicTacToeModel;
 import org.simbrain.world.game.tictactoe.TicTacToeGui.Listener;
+import org.simbrain.world.game.tictactoe.TicTacToeModel;
 import org.simbrain.world.game.tictactoe.TicTacToeModel.State;
 
 /**

@@ -22,7 +22,6 @@ import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.CanvasHelper;
 import org.simbrain.world.threedee.ThreeDeeComponent;
-import org.simbrain.world.threedee.sensors.Sight;
 
 /**
  * The main panel from which the 3D environment can be controlled.

@@ -26,7 +26,6 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.EditorPanel;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 
 /**
  * Add a script editor the current workspace.

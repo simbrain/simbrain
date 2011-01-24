@@ -27,8 +27,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
-import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Sensor.
  */

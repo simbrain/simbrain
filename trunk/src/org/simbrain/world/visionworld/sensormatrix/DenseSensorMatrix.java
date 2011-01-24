@@ -18,13 +18,12 @@
  */
 package org.simbrain.world.visionworld.sensormatrix;
 
-import cern.colt.matrix.ObjectMatrix2D;
-
-import cern.colt.matrix.impl.DenseObjectMatrix2D;
-
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.ReceptiveField;
 import org.simbrain.world.visionworld.Sensor;
+
+import cern.colt.matrix.ObjectMatrix2D;
+import cern.colt.matrix.impl.DenseObjectMatrix2D;
 
 /**
  * Dense sensor matrix.

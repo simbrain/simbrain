@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.Layout;
 

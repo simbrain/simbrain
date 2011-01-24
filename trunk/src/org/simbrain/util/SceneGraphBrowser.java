@@ -2,28 +2,23 @@
 package org.simbrain.util;
 
 import java.awt.Component;
-
 import java.awt.event.ActionEvent;
-
-import java.text.NumberFormat;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
-import javax.swing.JTree;
-import javax.swing.JLabel;
-import javax.swing.Action;
 import javax.swing.AbstractAction;
-
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.DefaultTreeCellRenderer;
-
-import javax.swing.event.TreeModelEvent;
+import javax.swing.Action;
+import javax.swing.JLabel;
+import javax.swing.JTree;
 import javax.swing.event.EventListenerList;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PRoot;
-
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**

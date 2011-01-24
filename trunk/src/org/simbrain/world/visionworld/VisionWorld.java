@@ -36,7 +36,6 @@ import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
 import org.simbrain.world.visionworld.action.EditSensorsAction;
-import org.simbrain.world.visionworld.action.IsometricViewAction;
 import org.simbrain.world.visionworld.action.NormalViewAction;
 import org.simbrain.world.visionworld.action.OpenVisionWorldAction;
 import org.simbrain.world.visionworld.action.PaintViewAction;

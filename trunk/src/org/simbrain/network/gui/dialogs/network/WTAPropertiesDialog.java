@@ -18,13 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.WinnerTakeAll;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a winner take all network.

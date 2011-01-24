@@ -21,9 +21,6 @@ package org.simbrain.trainer;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**

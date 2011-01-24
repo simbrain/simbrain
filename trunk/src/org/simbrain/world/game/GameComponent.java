@@ -3,7 +3,6 @@ package org.simbrain.world.game;
 import java.io.OutputStream;
 
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.world.game.tictactoe.TicTacToeModel;
 
 /**

@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.synapses;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.interfaces.SynapseUpdateRule;
 

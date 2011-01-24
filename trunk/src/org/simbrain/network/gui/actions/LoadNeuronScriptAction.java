@@ -19,12 +19,10 @@
 package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.util.SFileChooser;
 
 /**
  * :oad custom update script. Obviously not done yet.

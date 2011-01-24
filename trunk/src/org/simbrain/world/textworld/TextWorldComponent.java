@@ -23,8 +23,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.workspace.AttributeList;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialProducer;

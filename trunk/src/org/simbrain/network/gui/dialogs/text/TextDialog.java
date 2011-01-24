@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.dialogs.text;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -8,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -19,7 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.Document;
 
 import org.simbrain.network.gui.nodes.TextObject;
 import org.simbrain.util.StandardDialog;

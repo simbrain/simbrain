@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -40,15 +39,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 import javax.swing.border.EmptyBorder;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
-
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditor;
-import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditors;
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditorException;
+import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditors;
 
 /**
  * Create pixel matrix dialog.

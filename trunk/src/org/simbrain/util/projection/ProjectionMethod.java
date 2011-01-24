@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import org.apache.log4j.Logger;
-import org.simbrain.util.projection.Settings.SammonAddMethod;
 
 import com.Ostermiller.util.CSVParser;
 

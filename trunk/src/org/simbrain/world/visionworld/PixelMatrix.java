@@ -20,7 +20,6 @@ package org.simbrain.world.visionworld;
 
 import java.awt.Color;
 import java.awt.Image;
-
 import java.beans.PropertyChangeListener;
 
 /**

@@ -21,10 +21,9 @@ package org.simbrain.world.visionworld.dialog;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -40,15 +39,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 import javax.swing.border.EmptyBorder;
 
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.Sensor;
-
 import org.simbrain.world.visionworld.filter.editor.FilterEditor;
-import org.simbrain.world.visionworld.filter.editor.FilterEditors;
 import org.simbrain.world.visionworld.filter.editor.FilterEditorException;
+import org.simbrain.world.visionworld.filter.editor.FilterEditors;
 
 /**
  * Edit sensor dialog.

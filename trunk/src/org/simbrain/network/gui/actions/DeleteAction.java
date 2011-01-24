@@ -25,7 +25,6 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.gui.NetworkPanel;
-
 import org.simbrain.resource.ResourceManager;
 
 /**

@@ -23,37 +23,15 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import java.awt.image.BufferedImage;
-
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import org.simbrain.util.ImagePreviewPanel;
-import org.simbrain.util.SFileChooser;
 import org.simbrain.world.visionworld.PixelMatrix;
-import org.simbrain.world.visionworld.VisionWorldPreferences;
-
 import org.simbrain.world.visionworld.pixelmatrix.ScreenCapturePixelMatrix;
 
 /**

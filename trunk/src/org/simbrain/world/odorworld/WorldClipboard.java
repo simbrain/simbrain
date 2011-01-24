@@ -20,8 +20,8 @@ package org.simbrain.world.odorworld;
 
 import java.awt.Point;
 
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.BasicEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 
 /**

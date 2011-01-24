@@ -159,7 +159,7 @@ public final class SynapseNode
     }
 
     /**
-     * Whether this synapse connets a neuron to itself or not.
+     * Whether this synapse connects a neuron to itself or not.
      *
      * @return true if this synapse connects a neuron to itself.
      */

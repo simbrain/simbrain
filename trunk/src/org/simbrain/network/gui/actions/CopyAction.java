@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.actions;
 
 import java.awt.Toolkit;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -29,7 +28,6 @@ import javax.swing.KeyStroke;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
-
 import org.simbrain.resource.ResourceManager;
 
 /**

@@ -21,9 +21,7 @@ package org.simbrain.network.gui.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 
 import org.simbrain.network.gui.NetworkPanel;

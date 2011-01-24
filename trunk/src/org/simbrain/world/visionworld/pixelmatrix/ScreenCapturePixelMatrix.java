@@ -21,12 +21,9 @@ package org.simbrain.world.visionworld.pixelmatrix;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Image;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Robot;
-
 import java.awt.image.BufferedImage;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 

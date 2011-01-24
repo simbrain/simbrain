@@ -26,8 +26,6 @@ import java.util.List;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
-import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.util.Comparators;
 
 /**

@@ -23,7 +23,6 @@ import java.awt.Component;
 import javax.swing.JPanel;
 
 import org.simbrain.world.visionworld.Filter;
-
 import org.simbrain.world.visionworld.filter.PixelAccumulator;
 
 /**

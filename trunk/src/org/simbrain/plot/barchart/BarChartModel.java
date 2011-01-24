@@ -23,10 +23,8 @@ import java.awt.EventQueue;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.simbrain.plot.ChartModel;
-import org.simbrain.util.projection.Projector;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Data for a JFreeChart pie chart.

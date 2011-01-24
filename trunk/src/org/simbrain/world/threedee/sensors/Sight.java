@@ -9,12 +9,8 @@ import java.util.concurrent.Semaphore;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.threedee.Sensor;
 import org.simbrain.world.threedee.gui.AgentView;
-import org.simbrain.world.visionworld.MutableVisionWorldModel;
-import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorldComponent;
-import org.simbrain.world.visionworld.VisionWorldModel;
-//import org.simbrain.world.visionworld.dialog.AbstractSensorMatrixDialog;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 public class Sight {

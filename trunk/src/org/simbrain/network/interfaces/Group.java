@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.simbrain.network.listeners.NetworkEvent;
-
 /**
  * <b>Group</b>: a logical group of neurons and synapses (and perhaps other
  * items later). In some cases this is useful for custom updating. In other

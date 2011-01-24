@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+
+import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.listeners.GroupListener;
@@ -227,9 +227,23 @@ public class RootNetwork extends Network {
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.postUnmarshallingInit();
         }
+
+        // Check for and remove corrupt synapses.
+        //  This should not happen but as of 1/24/11 I have not 
+        //  determined why it happens, so the check is needed.
         for (Synapse synapse : this.getFlatSynapseList()) {
-            synapse.getTarget().getFanIn().add(synapse);
-            synapse.getSource().getFanOut().add(synapse);
+            if (synapse.getTarget().getFanIn() != null) {
+                synapse.getTarget().getFanIn().add(synapse);
+            } else {
+                System.out.println("Warning:" + synapse.getId() + " has null fanIn");
+                deleteSynapse(synapse);
+            }
+            if (synapse.getSource().getFanOut() != null) {
+                synapse.getSource().getFanOut().add(synapse);
+            } else {
+                System.out.println("Warning:" + synapse.getId() + " has null fanOut");
+                deleteSynapse(synapse);
+            }
         }
         return this;
     }

@@ -1,7 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -9,7 +8,6 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
-import org.simbrain.util.SFileChooser;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;

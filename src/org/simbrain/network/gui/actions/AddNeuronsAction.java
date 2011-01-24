@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.actions;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
@@ -28,7 +27,6 @@ import javax.swing.JOptionPane;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 
 /**

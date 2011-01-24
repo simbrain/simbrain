@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-
 import org.simbrain.network.gui.NetworkPanel;
+
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
  * Input event handler for a network node that updates tool tip text

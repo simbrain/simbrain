@@ -32,8 +32,10 @@ import javax.swing.JScrollPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.util.table.*;
-import org.simbrain.workspace.gui.*;
+import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.workspace.gui.CouplingMenuComponent;
+import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.

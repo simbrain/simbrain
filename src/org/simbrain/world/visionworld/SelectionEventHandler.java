@@ -19,26 +19,22 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.geom.Point2D;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.simbrain.network.gui.nodes.SelectionMarquee;
+import org.simbrain.world.visionworld.node.SensorNode;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
-
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PNodeFilter;
-
-import org.simbrain.network.gui.nodes.SelectionMarquee;
-
-import org.simbrain.world.visionworld.node.SensorNode;
 
 /**
  * Sensor selection event handler.

@@ -24,8 +24,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.ComponentPanel;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Opens and displays a list of the current workspace components.

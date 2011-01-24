@@ -20,8 +20,6 @@ package org.simbrain.plot.scatterplot;
 
 import java.awt.Color;
 import java.awt.Paint;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +28,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Model for a JFreeChart Scatter plot.

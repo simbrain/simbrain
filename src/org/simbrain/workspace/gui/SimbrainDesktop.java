@@ -91,7 +91,6 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
-import org.simbrain.workspace.actions.OpenEditorAction;
 import org.simbrain.workspace.updator.InterceptingEventQueue;
 import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
 import org.simbrain.world.dataworld.DataWorldComponent;

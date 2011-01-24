@@ -2,10 +2,10 @@ package org.simbrain.world.threedee.sensors;
 
 import org.simbrain.world.threedee.Agent;
 import org.simbrain.world.threedee.Entity;
+import org.simbrain.world.threedee.Entity.Odor;
 import org.simbrain.world.threedee.Point;
 import org.simbrain.world.threedee.Sensor;
 import org.simbrain.world.threedee.Vector;
-import org.simbrain.world.threedee.Entity.Odor;
 
 /**
  * Instances of Smell are sensors for a specific odor.

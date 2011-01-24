@@ -23,7 +23,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.PointNeuron;
 import org.simbrain.network.neurons.PointNeuron.OutputFunction;

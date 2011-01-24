@@ -1,8 +1,6 @@
 package org.simbrain.world.threedee;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.simbrain.world.threedee.environment.Environment;

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -15,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 

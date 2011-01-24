@@ -40,8 +40,6 @@ import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
-import com.thoughtworks.xstream.XStream;
-
 /**
  * Backprop trainer.
  *

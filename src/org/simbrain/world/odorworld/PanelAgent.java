@@ -18,8 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.JTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 
 

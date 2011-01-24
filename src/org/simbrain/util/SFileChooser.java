@@ -20,8 +20,8 @@ package org.simbrain.util;
 
 import java.awt.FileDialog;
 import java.io.File;
-import java.io.IOException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;

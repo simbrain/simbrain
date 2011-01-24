@@ -21,13 +21,10 @@ package org.simbrain.world.odorworld.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.environment.SmellSource;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

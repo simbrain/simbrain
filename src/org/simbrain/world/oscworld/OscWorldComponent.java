@@ -19,27 +19,14 @@
 package org.simbrain.world.oscworld;
 
 import java.io.OutputStream;
-
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.GlazedLists;
-
-import ca.odell.glazedlists.event.ListEventListener;
+import org.simbrain.workspace.WorkspaceComponent;
 
 import com.illposed.osc.OSCPortIn;
 import com.illposed.osc.OSCPortOut;
-
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentListener;
 
 /**
  * OSC world component.

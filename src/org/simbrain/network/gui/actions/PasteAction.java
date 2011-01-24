@@ -28,6 +28,7 @@ import javax.swing.KeyStroke;
 import org.simbrain.network.gui.Clipboard;
 import org.simbrain.network.gui.ClipboardListener;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.resource.ResourceManager;
 
 /**

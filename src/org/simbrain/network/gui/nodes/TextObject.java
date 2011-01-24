@@ -29,9 +29,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
-import org.simbrain.network.gui.actions.GroupAction;
 import org.simbrain.network.gui.actions.PasteAction;
-import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 
 import edu.umd.cs.piccolox.nodes.PStyledText;

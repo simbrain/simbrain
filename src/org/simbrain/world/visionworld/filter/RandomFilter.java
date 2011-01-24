@@ -19,7 +19,6 @@
 package org.simbrain.world.visionworld.filter;
 
 import java.awt.image.BufferedImage;
-
 import java.util.Random;
 
 import org.simbrain.world.visionworld.Filter;

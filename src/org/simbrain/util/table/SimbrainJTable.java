@@ -38,8 +38,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
-import org.simbrain.workspace.gui.CouplingMenuConsumer;
-import org.simbrain.workspace.gui.CouplingMenuProducer;
 
 /**
  * <b>SimbrainJTable</b> is a version of a JTable which wraps a Simbrain data

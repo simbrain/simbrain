@@ -21,10 +21,7 @@ package org.simbrain.world.visionworld;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-
 import java.beans.PropertyChangeListener;
-
-import org.simbrain.world.visionworld.filter.UniformFilter;
 
 /**
  * Mutable implementation of VisionWorldModel.

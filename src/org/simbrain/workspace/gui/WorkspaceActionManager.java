@@ -28,7 +28,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JMenuItem;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
@@ -48,7 +47,6 @@ import org.simbrain.workspace.actions.NewTrainerAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
 import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
-import org.simbrain.workspace.actions.OpenEditorAction;
 import org.simbrain.workspace.actions.OpenDataWorldAction;
 import org.simbrain.workspace.actions.OpenNetworkAction;
 import org.simbrain.workspace.actions.OpenOdorWorldAction;

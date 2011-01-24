@@ -1,8 +1,8 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.Image;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

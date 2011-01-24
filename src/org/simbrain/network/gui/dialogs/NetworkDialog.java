@@ -43,7 +43,6 @@ import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.updator.WorkspaceUpdator;
 
 /**
  * <b>NetworkDialog</b> is a dialog box for setting the properties of the

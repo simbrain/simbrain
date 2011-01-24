@@ -18,10 +18,9 @@
  */
 package org.simbrain.network.gui;
 
-import java.util.Set;
 import java.util.Collections;
-
 import java.util.EventObject;
+import java.util.Set;
 
 import edu.umd.cs.piccolo.PNode;
 

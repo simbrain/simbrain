@@ -18,13 +18,13 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import javax.swing.JComboBox;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.Hopfield;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the properties of a discrete hopfield network.

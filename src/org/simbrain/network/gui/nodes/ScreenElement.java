@@ -19,20 +19,18 @@
 package org.simbrain.network.gui.nodes;
 
 import java.awt.event.InputEvent;
-
 import java.awt.geom.Point2D;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import edu.umd.cs.piccolo.PNode;
+import org.simbrain.network.gui.NetworkPanel;
 
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-
-import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip, and property dialog, and support.

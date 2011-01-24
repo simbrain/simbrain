@@ -19,7 +19,6 @@
 package org.simbrain.network.interfaces;
 
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
-import org.simbrain.network.neurons.SpikingThresholdNeuron;
 
 /**
  * <b>SpikingNeuron</b> is the superclass for spiking neuron types (e.g.

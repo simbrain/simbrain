@@ -22,8 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.simbrain.network.synapses.ClampedSynapse;
-import org.simbrain.network.synapses.HebbianSynapse;
 import org.simbrain.network.synapses.HebbianCPCASynapse;
+import org.simbrain.network.synapses.HebbianSynapse;
 import org.simbrain.network.synapses.HebbianThresholdSynapse;
 import org.simbrain.network.synapses.OjaSynapse;
 import org.simbrain.network.synapses.RandomSynapse;

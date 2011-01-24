@@ -21,13 +21,27 @@ package org.simbrain.network.interfaces;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
-import org.simbrain.network.neurons.*;
+import org.simbrain.network.neurons.AdditiveNeuron;
+import org.simbrain.network.neurons.BinaryNeuron;
+import org.simbrain.network.neurons.ClampedNeuron;
+import org.simbrain.network.neurons.DecayNeuron;
+import org.simbrain.network.neurons.IACNeuron;
+import org.simbrain.network.neurons.IntegrateAndFireNeuron;
+import org.simbrain.network.neurons.IzhikevichNeuron;
+import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neurons.LogisticNeuron;
+import org.simbrain.network.neurons.NakaRushtonNeuron;
+import org.simbrain.network.neurons.RandomNeuron;
+import org.simbrain.network.neurons.RunningAverageNeuron;
+import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.neurons.SinusoidalNeuron;
+import org.simbrain.network.neurons.SpikingThresholdNeuron;
+import org.simbrain.network.neurons.StochasticNeuron;
+import org.simbrain.network.neurons.ThreeValueNeuron;
 import org.simbrain.util.ClassDescriptionPair;
-import org.simbrain.util.Utils;
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic"
@@ -357,7 +371,9 @@ public class Neuron  {
      * @param target the connection between this neuron and a target neuron
      */
     void addTarget(final Synapse target) {
-        fanOut.add(target);
+        if (fanOut != null) {
+            fanOut.add(target);
+        }
     }
 
     /**
@@ -366,7 +382,9 @@ public class Neuron  {
      * @param target the connection between this neuron and a target neuron
      */
     void removeTarget(final Synapse target) {
-        fanOut.remove(target);
+        if (fanOut != null) {
+            fanOut.remove(target);
+        }
     }
 
     /**
@@ -375,7 +393,9 @@ public class Neuron  {
      * @param source the connection between this neuron and a source neuron
      */
     void addSource(final Synapse source) {
-        fanIn.add(source);
+        if (fanIn != null) {
+            fanIn.add(source);
+        }
     }
 
     /**
@@ -384,7 +404,9 @@ public class Neuron  {
      * @param source the connection between this neuron and a source neuron
      */
     void removeSource(final Synapse source) {
-        fanIn.remove(source);
+        if (fanIn != null) {
+            fanIn.remove(source);
+        }
     }
 
     /**

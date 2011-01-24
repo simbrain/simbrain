@@ -30,7 +30,6 @@ import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
@@ -135,7 +134,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     private Action setPropertiesAction;
 
     /** Set priority action. */
-    private Action setPriorityAction;
+    //private Action setPriorityAction;
 
     /**
      * Create a new abstract subnetwork node from the specified parameters.
@@ -218,8 +217,8 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         contextMenu.add(showOutlineAction);
         contextMenu.addSeparator();
         contextMenu.add(deleteSubnetAction);
-        contextMenu.addSeparator();
-        contextMenu.add(setPriorityAction);
+        //contextMenu.addSeparator();
+        //contextMenu.add(setPriorityAction);
         contextMenu.addSeparator();
         return contextMenu;
     }

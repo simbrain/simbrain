@@ -30,8 +30,11 @@ import org.simbrain.util.propertyeditor.ComboBoxWrapper;
  */
 public class SmellSource {
 
-	/** Vector of stimulus values associated to object. */
+    /** Vector of base stimulus values associated to object. */
     private double[] stimulusVector;
+
+    /** The vector returned.  Base stimulus vector + noise, if any. */
+    private double[] returnVector;
 
     /** Location of the distal stimulus. */
     private double[] location;
@@ -138,7 +141,7 @@ public class SmellSource {
     /**
      * Construct a smell source with a specified number of dimensions, randomly
      * initialized.
-     * 
+     *
      * @param numDimensions
      *            number of dimensions of the stimulus vector.
      */
@@ -202,15 +205,6 @@ public class SmellSource {
      */
     public boolean isAddNoise() {
         return addNoise;
-    }
-
-    /**
-     * Return the stimulus.
-     *
-     * @return the stimulus
-     */
-    public double[] getStimulus() {
-        return stimulusVector;
     }
 
     /**
@@ -281,17 +275,19 @@ public class SmellSource {
      * (input nodes) based on its distance from this object and its features
      * (whether it is a "noisy object", and how the stimulus decays). That is,
      * calculate the proximal stimulus this distal stimulus gives rise to.
-     * 
+     *
      * @param distance distance of creature from object
      * @return proximal stimulus to creature caused by this object
      */
     public double[] getStimulus(final double distance) {
         double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
-
+        if (returnVector == null) {
+            returnVector = stimulusVector;
+        }
         if (distance < stimulusDispersion) {
             if (decayFunction == DecayFunction.STEP) {
                 if (distance > peak) {
-                    ret = (double[]) (stimulusVector.clone());
+                    ret = (double[]) (returnVector.clone());
                 }
             } else if (decayFunction == DecayFunction.LINEAR) {
                 if (distance < peak) {
@@ -301,55 +297,54 @@ public class SmellSource {
                         scalingFactor = 0;
                     }
 
-                    ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
+                    ret = SimbrainMath.multVector(returnVector, scalingFactor);
                 } else {
                     double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
-                    ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
+                    ret = SimbrainMath.multVector(returnVector, scalingFactor);
                 }
             } else if (decayFunction == DecayFunction.GAUSSIAN) {
                 double temp = distance;
                 temp -= peak;
-
                 double sigma = .5 * (stimulusDispersion - peak);
                 double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
-                ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
+                ret = SimbrainMath.multVector(returnVector, scalingFactor);
             } else if (decayFunction == DecayFunction.QUADRATIC) {
                 double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
-
                 if (scalingFactor < 0) {
                     scalingFactor = 0;
                 }
-
-                ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
+                ret = SimbrainMath.multVector(returnVector, scalingFactor);
             }
         }
 
         return ret;
     }
-    
+
     /**
      * Update the source.
      */
     public void update() {
         //Add noise to object vector
         if (addNoise) {
-            SimbrainMath.addNoise(stimulusVector, noiseLevel);
+            returnVector = SimbrainMath.getNoisyVector(stimulusVector, noiseLevel);
+        } else {
+            returnVector = stimulusVector;
         }
     }
-    
+
     /**
      * Calculate what impact the object will have on the creature's receptors
      * (input nodes) based on its distance from this object and its features
      * (whether it is a "noisy object", and how the stimulus decays). That is,
      * calculate the proximal stimulus this distal stimulus gives rise to.
-     * 
+     *
      * @param distance distance of creature from object
      * @return proximal stimulus to creature caused by this object
      */
     public double getStimulus(final int dimension, final double distance) {
         double ret = 0;
-        double val = stimulusVector[dimension];
-        
+        double val = returnVector[dimension];
+
         if (distance < stimulusDispersion) {
             if (decayFunction == DecayFunction.STEP) {
                 if (distance > peak) {

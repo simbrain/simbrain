@@ -82,6 +82,7 @@ public class OdorWorld {
      */
     public void update() {
         for (OdorWorldEntity object : entityList) {
+            object.updateSmellSource();
             object.updateSensors();
             object.applyEffectors();
             updateSprite(object, 1); // time defaults to 1 now
@@ -220,7 +221,7 @@ public class OdorWorld {
         for (OdorWorldEntity entity : entityList) {
             if (entity.getSmellSource() != null) {
                 totalSmellVectorLength += SimbrainMath.getVectorNorm(entity
-                        .getSmellSource().getStimulus());
+                        .getSmellSource().getStimulusVector());
             }
         }
     }

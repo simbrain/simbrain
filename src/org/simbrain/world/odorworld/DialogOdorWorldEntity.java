@@ -31,19 +31,21 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-
 /**
- * <b>DialogWorldEntity</b> displays the dialog box for settable values of creatures and entities within a world
- * environment.
+ * <b>DialogWorldEntity</b> displays the dialog box for settable values of
+ * creatures and entities within a world environment.
  */
-public class DialogOdorWorldEntity extends StandardDialog implements ActionListener {
+public class DialogOdorWorldEntity extends StandardDialog implements
+        ActionListener {
 
     private static final long serialVersionUID = 1L;
 
     /** The dimension for the combobox renderer. */
     private final int cbRendererDimension = 35;
 
-    /** The panel containing the items that are not specific to any other panels. */
+    /**
+     * The panel containing the items that are not specific to any other panels.
+     */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 
     /** The entity for which this dialog is called. */
@@ -56,8 +58,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     private JTextField tfEntityName = new JTextField();
 
     /** The Combobox from which to choose the entity image. */
-    //private JComboBox cbImageName = new JComboBox(BasicEntity.imagesRenderer());
-    //private JComboBox cbImageName = new JComboBox(null);
+    // private JComboBox cbImageName = new
+    // JComboBox(BasicEntity.imagesRenderer());
+    // private JComboBox cbImageName = new JComboBox(null);
 
     /** The renderer to display the combobox. */
     private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
@@ -71,7 +74,10 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     /** The panel containing item-specific information not in other panels. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
 
-    /** The text field containing the number of bites until the item dies (absolute, not remaining). */
+    /**
+     * The text field containing the number of bites until the item dies
+     * (absolute, not remaining).
+     */
     private JTextField bitesToDie = new JTextField();
 
     /** The checkbox identifying whether or not the item is edible. */
@@ -83,7 +89,8 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     /**
      * Create and show the world entity dialog box.
      *
-     * @param we reference to the world entity whose smell signature is being adjusted
+     * @param we reference to the world entity whose smell signature is being
+     *            adjusted
      */
     public DialogOdorWorldEntity(final OdorWorldEntity we) {
         entityRef = we;
@@ -93,87 +100,92 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     }
 
     /**
-     * Create and initialise instances of panel componets.
+     * Create and initialize instances of panel components.
      */
     private void init() {
         this.fillFieldValues();
 
-//        topPanel.addItem("Image", cbImageName);
-//
-//        bitesToDie.setColumns(2);
-//        edible.addActionListener(this);
-//
-//        cbRenderer.setPreferredSize(new Dimension(cbRendererDimension, cbRendererDimension));
-//        cbImageName.setRenderer(cbRenderer);
+        // topPanel.addItem("Image", cbImageName);
+        //
+        // bitesToDie.setColumns(2);
+        // edible.addActionListener(this);
+        //
+        // cbRenderer.setPreferredSize(new Dimension(cbRendererDimension,
+        // cbRendererDimension));
+        // cbImageName.setRenderer(cbRenderer);
 
         // TODO!
-//        if (entityRef instanceof OdorWorldAgent) {
-//            setTitle("Entity Dialog - " + entityRef.getName());
-//            topPanel.addItem("Entity", tfEntityName);
-//            setStimPanel(new StimulusVectorPanel(entityRef));
-//            setAgentPanel(new PanelAgent((OdorWorldAgent) entityRef));
-//            getStimPanel().getTabbedPane().addTab("Agent", getAgentPanel());
-//            mainPanel.add(topPanel);
-//            mainPanel.add(getStimPanel());
-//            setContentPane(mainPanel);
-//        } else {
-//            setTitle("Entity Dialog");
-//            setStimPanel(new StimulusVectorPanel(entityRef));
-//            mainPanel.add(topPanel);
-//            mainPanel.add(getStimPanel());
-//            setContentPane(mainPanel);
-//        }
+        // if (entityRef instanceof OdorWorldAgent) {
+        // setTitle("Entity Dialog - " + entityRef.getName());
+        // topPanel.addItem("Entity", tfEntityName);
+        // setStimPanel(new StimulusVectorPanel(entityRef));
+        // setAgentPanel(new PanelAgent((OdorWorldAgent) entityRef));
+        // getStimPanel().getTabbedPane().addTab("Agent", getAgentPanel());
+        // mainPanel.add(topPanel);
+        // mainPanel.add(getStimPanel());
+        // setContentPane(mainPanel);
+        // } else {
+        // setTitle("Entity Dialog");
+        // setStimPanel(new StimulusVectorPanel(entityRef));
+        // mainPanel.add(topPanel);
+        // mainPanel.add(getStimPanel());
+        // setContentPane(mainPanel);
+        // }
 
         miscPanel.addItem("Edible", edible);
         miscPanel.addItem("Bites to die", bitesToDie);
         miscPanel.addItem("Resurrection Probability", resurrectionProb);
-        //getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
+        // getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
     }
 
     /**
      * Fills the values within the fields of the dialog.
      */
     private void fillFieldValues() {
-//        tfEntityName.setText(entityRef.getName());
-////        cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
-//        edible.setSelected(entityRef.getEdible());
-//        bitesToDie.setText((new Integer(entityRef.getBitesToDie())).toString());
-//        bitesToDie.setEnabled(entityRef.getEdible());
-//        resurrectionProb.setText("" + entityRef.getResurrectionProb());
+        // tfEntityName.setText(entityRef.getName());
+        // //
+        // cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
+        // edible.setSelected(entityRef.getEdible());
+        // bitesToDie.setText((new
+        // Integer(entityRef.getBitesToDie())).toString());
+        // bitesToDie.setEnabled(entityRef.getEdible());
+        // resurrectionProb.setText("" + entityRef.getResurrectionProb());
     }
 
     /**
      * Commits changes to the entity that are shown in the dialog.
      */
     public void commitChanges() {
-//        entityRef.setEdible(edible.isSelected());
-//
-//        if (!edible.isSelected()) {
-//            entityRef.setBites(0);
-//        }
-//
-//        entityRef.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
-//        entityRef.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
+        // entityRef.setEdible(edible.isSelected());
+        //
+        // if (!edible.isSelected()) {
+        // entityRef.setBites(0);
+        // }
+        //
+        // entityRef.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
+        // entityRef.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
 
-//        if (!entityRef.getName().equals(tfEntityName.getText())) {
-//            if (!Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText())) {
-//                entityRef.setName(tfEntityName.getText());
-//                ArrayList a = new ArrayList();
-//                a.add(entityRef);
-//                entityRef.getParent().getParentWorkspace().removeAgentsFromCouplings(a);
-//                entityRef.getParent().getParentWorkspace().attachAgentsToCouplings();
-//            } else {
-//                JOptionPane.showMessageDialog(
-//                                              null, "The name \"" + tfEntityName.getText() + "\" already exists.",
-//                                              "Warning", JOptionPane.ERROR_MESSAGE);
-//            }
-//        }
+        // if (!entityRef.getName().equals(tfEntityName.getText())) {
+        // if (!Utils.containsName(entityRef.getParent().getEntityNames(),
+        // tfEntityName.getText())) {
+        // entityRef.setName(tfEntityName.getText());
+        // ArrayList a = new ArrayList();
+        // a.add(entityRef);
+        // entityRef.getParent().getParentWorkspace().removeAgentsFromCouplings(a);
+        // entityRef.getParent().getParentWorkspace().attachAgentsToCouplings();
+        // } else {
+        // JOptionPane.showMessageDialog(
+        // null, "The name \"" + tfEntityName.getText() + "\" already exists.",
+        // "Warning", JOptionPane.ERROR_MESSAGE);
+        // }
+        // }
 
-//        entityRef.setImageName(cbImageName.getSelectedItem().toString());
+        // entityRef.setImageName(cbImageName.getSelectedItem().toString());
     }
 
     /**
      * Respond to button pressing events.
+     * 
      * @param e the ActionEvent triggering this method
      */
     public void actionPerformed(final ActionEvent e) {

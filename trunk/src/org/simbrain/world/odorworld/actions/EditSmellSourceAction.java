@@ -24,6 +24,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -61,10 +62,11 @@ public final class EditSmellSourceAction
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-
         ReflectivePropertyEditor editor = (new ReflectivePropertyEditor(entity
                 .getSmellSource()));
         JDialog dialog = editor.getDialog();
+        //JDialog dialog = new JDialog();
+        //dialog.setContentPane(new SmellSourcePanel(entity.getSmellSource()));
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

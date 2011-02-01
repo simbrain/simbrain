@@ -286,6 +286,26 @@ public class SimbrainMath {
     }
 
     /**
+     * Add noise to a vector and return the result.
+     *
+     * @param vector vector to which noise should be added
+     * @param noiselevel Noise level
+     * @return resuling vector
+     */
+    public static double[] getNoisyVector(final double[] vector, final double noiselevel) {
+        double randUniform;
+        double sigma = noiselevel * SimbrainMath.getMaximum(vector);
+        double sqrt2 = Math.sqrt(2);
+        double[] returnVector = new double[vector.length];
+
+        for (int i = 0; i < vector.length; i++) {
+            randUniform = Math.random();
+            returnVector[i] = vector[i] + (sigma * sqrt2 * SimbrainMath.inverf(randUniform));
+        }
+        return returnVector;
+    }
+
+    /**
      * Create a random vector with i components.
      *
      * @param i number of components in this vector.

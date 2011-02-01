@@ -585,4 +585,13 @@ public abstract class OdorWorldEntity {
         this.y = (float) y;
     }
 
+    /**
+     * Update this object's smell source, if any.
+     */
+    public void updateSmellSource() {
+        if (smellSource != null) {
+            smellSource.update();
+        }
+    }
+
 }

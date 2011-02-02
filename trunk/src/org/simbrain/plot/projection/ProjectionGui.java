@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
@@ -44,6 +45,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
+import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
@@ -145,15 +147,14 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
 
         @Override
         public Paint getItemPaint(int row, int column) {
-            // TODO: This method of painting the "hotpoint" a different color is suspect.  It 
+            // TODO: This method of painting the "hotpoint" a different color is somewhat suspect.  It 
             // relies on the indices of the point in XYSeriesCollection (in ProjectionModel.java)
-            // and in underlying projection object being aligned. 
-
-            // TODO: not sure how costly the call to getCurrentPointIndex is...
+            // and in the underlying projection object being aligned. 
+            // TODO: Also, not sure how costly the call to getCurrentPointIndex is...
             int currentProjectorIndex = getWorkspaceComponent()
                     .getProjectionModel().getProjector().getCurrentPointIndex();
             //System.out.println(column + "--" + currentProjectorIndex);
-            if (column == (currentProjectorIndex - 2)) {
+            if (column == currentProjectorIndex) {
                 return hotColor;
             } else {
                 return neutralColor;
@@ -275,6 +276,14 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
                         update();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    public void chartInitialized(int numSources) {
+                        update();
+                    }
+
+
                 });
 
         // Initializes labels
@@ -313,10 +322,24 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
+                // TODO: Reset chart data after changing settings.
             }
 
         });
         editMenu.add(preferences);
+        final JMenuItem dims = new JMenuItem("Set dimensions...");
+        dims.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                String dimensions = JOptionPane.showInputDialog("Dimensions:");
+                if (dimensions != null) {
+                    getWorkspaceComponent().getProjectionModel().init(
+                            Integer.parseInt(dimensions));
+                }
+
+            }
+
+        });
+        editMenu.add(dims);
         bar.add(fileMenu);
         bar.add(editMenu);
         getParentFrame().setJMenuBar(bar);

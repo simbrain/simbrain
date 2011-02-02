@@ -101,6 +101,20 @@ public class ChartModel {
     }
 
     /**
+     * Fire chart initialized.
+     *
+     * @param numSources number of sources
+     */
+    public void fireChartInitialized(final int numSources) {
+        if (listenerList == null) {
+            listenerList = new ArrayList<ChartListener>();
+        }
+        for (ChartListener listener : listenerList) {
+            listener.chartInitialized(numSources);
+        }
+    }
+
+    /**
      * Creates an xtream object with relevant fields omitted.
      * @return
      */

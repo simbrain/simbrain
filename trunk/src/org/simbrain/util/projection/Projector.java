@@ -19,6 +19,7 @@
 package org.simbrain.util.projection;
 
 import org.apache.log4j.Logger;
+import org.simbrain.util.SimbrainMath;
 
 /**
  * <b>Projector</b> is the main class of the high dimensional visualizer, which
@@ -66,7 +67,7 @@ public class Projector {
      */
     public void init(final int dims) {
         currentProjectionMethod.init(dims);
-        currentPoint = org.simbrain.util.SimbrainMath.zeroVector(dims);
+        currentPoint = null;
     }
 
     /**
@@ -293,7 +294,7 @@ public class Projector {
      */
     public double[] getProjectedPoint(final int index) {
         if (index < getCurrentProjectionMethod().getDownstairs().getNumPoints()
-                && index > 0) {
+                && index >= 0) {
             return getCurrentProjectionMethod().getDownstairs().getPoint(index);
         } else {
             // throw index out of range exception

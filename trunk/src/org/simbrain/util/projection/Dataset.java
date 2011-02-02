@@ -495,7 +495,7 @@ public class Dataset {
             throw new IllegalArgumentException(dimension 
             + " is not a valid dimesion for this dataset.");
         }
-        
+
         double[] point = getPoint(datapointNumber);
 
         return point[dimension];

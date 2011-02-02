@@ -105,9 +105,10 @@ public class ProjectionComponent extends WorkspaceComponent {
     }
 
     /**
-     * Initialize consumer.
+     * Initialize consumers.
      */
-    private void initializeConsumers() {
+    protected void initializeConsumers() {
+        dimensionList.clear();
         projectionConsumerType = new AttributeType(this, "Dimension", "setValue",
                 double.class, true);
         addConsumerType(projectionConsumerType);
@@ -138,13 +139,28 @@ public class ProjectionComponent extends WorkspaceComponent {
      *
      * @param i index of dimension object
      */
-    public void addDimension(int i) {
+    protected void addDimension(int i) {
         for (Dimension dimension : dimensionList) {
             if (dimension.getDimension() == i) {
                 return;
             }
         }
-       dimensionList.add(new Dimension(i));
+        dimensionList.add(new Dimension(i));
+    }
+
+    /**
+     * Set number of dimensions to specified amount.
+     *
+     * @param numDims number of dimensions.
+     */
+    protected void setDimensions(int numDims) {
+        for (Dimension dimension : dimensionList) {
+            fireAttributeObjectRemoved(dimension);
+        }
+        dimensionList.clear();
+        for (int i = 0; i < numDims; i++) {
+            addDimension(i);
+        }
     }
 
     /**
@@ -190,6 +206,15 @@ public class ProjectionComponent extends WorkspaceComponent {
                     ProjectionComponent.this.firePotentialAttributesChanged();
                 }
             }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void chartInitialized(int numSources) {
+                setDimensions(numSources);
+                ProjectionComponent.this.firePotentialAttributesChanged();
+            }
+
         });
 
     }
@@ -309,7 +334,7 @@ public class ProjectionComponent extends WorkspaceComponent {
      * changed.
      */
     public void resetChartDataset() {
-    	projectionModel.resetData();
+        projectionModel.resetData();
     }
 
     /**

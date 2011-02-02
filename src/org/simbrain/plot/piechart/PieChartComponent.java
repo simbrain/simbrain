@@ -154,6 +154,13 @@ public class PieChartComponent extends WorkspaceComponent {
                 firePotentialAttributesChanged();
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            public void chartInitialized(int numSources) {
+                // No implementation yet (not used in this component thus far).
+            }
+
         });
     }
 

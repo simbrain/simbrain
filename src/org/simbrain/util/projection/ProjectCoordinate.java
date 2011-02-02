@@ -19,9 +19,10 @@
 package org.simbrain.util.projection;
 
 /**
- * <b>Project Coordinate</b> is perhaps the simplest possible projection algorithm; It  simply takes two specificed
- * dimensions in the high dimensional space, and uses these as the basis for the low-dimensional space.  In effect it
- * just takes a 2-dimensional  subspace of the high-dimensional space.
+ * <b>Project Coordinate</b> is perhaps the simplest possible projection
+ * algorithm; It simply takes two specified dimensions in the high dimensional
+ * space, and uses these as the basis for the low-dimensional space. In effect
+ * it just takes a 2-dimensional subspace of the high-dimensional space.
  */
 public class ProjectCoordinate extends ProjectionMethod {
     /**
@@ -32,6 +33,7 @@ public class ProjectCoordinate extends ProjectionMethod {
 
     /**
      * ProjectionMethod coordinate constructor.
+     * 
      * @param set ProjectionMethod setting
      */
     public ProjectCoordinate(final Settings set) {
@@ -40,6 +42,7 @@ public class ProjectCoordinate extends ProjectionMethod {
 
     /**
      * Initializes the coordinage dataset.
+     * 
      * @param up Upper data set
      * @param down Lower data set
      */
@@ -66,19 +69,18 @@ public class ProjectCoordinate extends ProjectionMethod {
 
         for (int i = 0; i < upstairs.getNumPoints(); i++) {
             double[] newLowDPoint = {
-                                        upstairs.getComponent(i, theSettings.getHiD1()),
-                                        upstairs.getComponent(i, theSettings.getHiD2())
-                                    };
+                    upstairs.getComponent(i, theSettings.getHiD1()),
+                    upstairs.getComponent(i, theSettings.getHiD2()) };
             downstairs.setPoint(i, newLowDPoint);
         }
 
-        //System.out.println("-->" + hi_d1);
-        //System.out.println("-->" + hi_d2);
+        // System.out.println("-->" + hi_d1);
+        // System.out.println("-->" + hi_d2);
     }
 
     /**
-     * If the current coordinate axes are outside acceptable bounds, set them to  acceptable values (currently 0 and
-     * 1).
+     * If the current coordinate axes are outside acceptable bounds, set them to
+     * acceptable values (currently 0 and 1).
      */
     public void checkCoordinates() {
         if (theSettings.getHiD1() >= upstairs.getDimensions()) {
@@ -142,8 +144,9 @@ public class ProjectCoordinate extends ProjectionMethod {
     }
 
     /**
-     * In auto-find the projection automatically uses the most variant dimensions.
-     *
+     * In auto-find the projection automatically uses the most variant
+     * dimensions.
+     * 
      * @return true if in auto-find mode, false otherwise
      */
     public boolean isAutoFind() {
@@ -151,8 +154,9 @@ public class ProjectCoordinate extends ProjectionMethod {
     }
 
     /**
-     * In auto-find the projection automatically uses the most variant dimensions.
-     *
+     * In auto-find the projection automatically uses the most variant
+     * dimensions.
+     * 
      * @param b whether to use auto-find mode
      */
     public void setAutoFind(final boolean b) {

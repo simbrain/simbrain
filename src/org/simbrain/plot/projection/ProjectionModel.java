@@ -19,6 +19,7 @@
 package org.simbrain.plot.projection;
 
 import java.awt.EventQueue;
+import java.util.Arrays;
 
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -63,11 +64,13 @@ public class ProjectionModel extends ChartModel {
      * @param numDataSources number of sources to initialize model with.
      */
     public void init(final int numDataSources) {
-        dataset = new XYSeriesCollection();
-        dataset.addSeries(new XYSeries("Data", false, true));
-        for (int i = 0; i < numDataSources; i++) {
-            addSource();
+        if (dataset == null) {
+            dataset = new XYSeriesCollection();
+            dataset.addSeries(new XYSeries("Data", false, true));
         }
+        projector.init(numDataSources);
+        fireChartInitialized(numDataSources);
+        resetData();
     }
 
     /**
@@ -78,6 +81,7 @@ public class ProjectionModel extends ChartModel {
         int index = projector.getDimensions() + 1;
         projector.init(index);
         fireDataSourceAdded(index);
+        resetData();
     }
 
     /**
@@ -89,6 +93,7 @@ public class ProjectionModel extends ChartModel {
         if (currentSize > 0) {
             projector.init(currentSize);
             fireDataSourceRemoved(currentSize);
+            resetData();
         }
     }
 
@@ -163,18 +168,21 @@ public class ProjectionModel extends ChartModel {
                 // Add the data
                 dataset.getSeries(0).clear();
                 int size = projector.getNumPoints();
-                for (int i = 0; i < size - 2; i++) {
+                for (int i = 0; i < size; i++) {
                     double[] point = projector.getProjectedPoint(i);
-                    if (point != null) {
-                        // No need to update the chart yet (hence the "false"
-                        // parameter)
-                        dataset.getSeries(0).add(point[0], point[1], false);
+                    if (point == null) {
+                        //System.out.println(i + ":" + point);
+                    } else {
+                        //System.out.println(i + ":" + point[0] + "," + point[1]);
+                        if (i != (size-1)) {
+                            // No need to update the chart yet (hence the "false"
+                            // parameter)
+                            dataset.getSeries(0).add(point[0], point[1], false);
+                        } else {
+                            // Notify chart when last datapoint is updated
+                            dataset.getSeries(0).add(point[0], point[1], true);
+                        }
                     }
-                }
-                // Notify chart when last datapoint is updated
-                double[] point = projector.getProjectedPoint(size - 1);
-                if (point != null) {
-                    dataset.getSeries(0).add(point[0], point[1], true);
                 }
                 setUpdateCompleted(true);
             }

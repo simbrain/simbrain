@@ -21,7 +21,7 @@ package org.simbrain.plot.projection;
 import javax.swing.SwingUtilities;
 
 /**
- * Update iterable projection algorithms
+ * Update iterable projection algorithms.
  */
 public class ProjectionUpdater implements Runnable {
 

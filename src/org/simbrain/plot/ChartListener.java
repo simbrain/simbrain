@@ -38,5 +38,10 @@ public interface ChartListener {
      */
     void dataSourceRemoved(final int index);
 
-
+    /**
+     * The chart has been reinitialized to a new number of data sources.
+     *
+     * @param numSources the new number of data sources.
+     */
+    void chartInitialized(final int numSources);
 }

@@ -298,6 +298,7 @@ public class Workspace {
      * Remove all components (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
+        globalStop();
         removeAllComponents();
         resetTime();
         this.setWorkspaceChanged(false);

@@ -408,11 +408,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
         ret.add(new JMenuItem(new ShowEntityDialogAction(theEntity)));
 
-        // TODO: Fix this up; maybe add and delete and edit separate
-        ret.addSeparator();
-        ret.add(new JMenuItem(new AddSmellSourceAction(this, theEntity)));
-        if (theEntity.getSmellSource() != null) {
-            ret.add(new JMenuItem(new EditSmellSourceAction(this, theEntity)));
+        // TODO: Create a delete smell source action
+        if (theEntity.getSmellSource() == null) {
+            ret.addSeparator();
+            ret.add(new JMenuItem(new AddSmellSourceAction(this, theEntity)));
         }
 
         ret.addSeparator();

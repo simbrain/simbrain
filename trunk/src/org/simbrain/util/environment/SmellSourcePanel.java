@@ -135,8 +135,8 @@ public class SmellSourcePanel extends LabelledItemPanel implements
 
     /**
      * Create and populate the stimulus panel.
-     * 
-     * @param we reference to the world entity whoes smell signature is being
+     *
+     * @param we reference to the world entity whose smell signature is being
      *            adjusted.
      */
     public SmellSourcePanel(final SmellSource source) {
@@ -312,7 +312,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements
 
     /**
      * Changes size of array.
-     * 
+     *
      * @param num New size of array
      */
     private void changeStimulusDimension(final int num) {
@@ -364,7 +364,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements
 
     /**
      * Acton Listener.
-     * 
+     *
      * @param e the ActionEvent triggering this method
      */
     public void actionPerformed(final ActionEvent e) {
@@ -387,16 +387,17 @@ public class SmellSourcePanel extends LabelledItemPanel implements
     }
 
     /**
-     * @return Returns the tabbedPane.
+     * @return the valuesPanel
      */
-    public JTabbedPane getTabbedPane() {
-        return tabbedPane;
+    public LabelledItemPanel getValuesPanel() {
+        return valuesPanel;
     }
 
     /**
-     * @param tabbedPane The tabbedPane to set.
+     * @return the dispersionPanel
      */
-    public void setTabbedPane(final JTabbedPane tabbedPane) {
-        this.tabbedPane = tabbedPane;
+    public LabelledItemPanel getDispersionPanel() {
+        return dispersionPanel;
     }
+
 }

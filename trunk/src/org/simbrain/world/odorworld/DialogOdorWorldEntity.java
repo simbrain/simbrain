@@ -18,17 +18,20 @@
  */
 package org.simbrain.world.odorworld;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -43,36 +46,26 @@ public class DialogOdorWorldEntity extends StandardDialog implements
     /** The dimension for the combobox renderer. */
     private final int cbRendererDimension = 35;
 
-    /**
-     * The panel containing the items that are not specific to any other panels.
-     */
-    private LabelledItemPanel topPanel = new LabelledItemPanel();
-
     /** The entity for which this dialog is called. */
-    private OdorWorldEntity entityRef = null;
+    private OdorWorldEntity entityRef;
 
     /** The visual container for the sub panels. */
-    private Box mainPanel = Box.createVerticalBox();
+    private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** The text field containing the name of the entity. */
     private JTextField tfEntityName = new JTextField();
 
     /** The Combobox from which to choose the entity image. */
-    // private JComboBox cbImageName = new
-    // JComboBox(BasicEntity.imagesRenderer());
-    // private JComboBox cbImageName = new JComboBox(null);
+    private JComboBox cbImageName = new JComboBox();
 
     /** The renderer to display the combobox. */
     private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
 
-    /** The panel containing stimulus information. */
-    private SmellSourcePanel stimPanel = null;
-
-    /** The panel containing information pertaining to agents. */
-    private PanelAgent agentPanel = null;
-
     /** The panel containing item-specific information not in other panels. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
+
+    /** Property editor for main entity properties. */
+    private ReflectivePropertyEditor mainEditor;
 
     /**
      * The text field containing the number of bites until the item dies
@@ -85,6 +78,12 @@ public class DialogOdorWorldEntity extends StandardDialog implements
 
     /** The probability of a resurrection each turn. */
     private JTextField resurrectionProb = new JTextField();
+
+    /** Tabbed pane. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
+
+    /** Editor panel for smell source. */
+    SmellSourcePanel smellPanel;
 
     /**
      * Create and show the world entity dialog box.
@@ -103,59 +102,70 @@ public class DialogOdorWorldEntity extends StandardDialog implements
      * Create and initialize instances of panel components.
      */
     private void init() {
+
         this.fillFieldValues();
 
-        // topPanel.addItem("Image", cbImageName);
-        //
-        // bitesToDie.setColumns(2);
-        // edible.addActionListener(this);
-        //
-        // cbRenderer.setPreferredSize(new Dimension(cbRendererDimension,
-        // cbRendererDimension));
-        // cbImageName.setRenderer(cbRenderer);
+        // Main tab
+        //tabbedPane.addTab("Main", mainPanel);
+        mainEditor = new ReflectivePropertyEditor(entityRef);
+        tabbedPane.addTab("Main", mainEditor);
 
-        // TODO!
-        // if (entityRef instanceof OdorWorldAgent) {
-        // setTitle("Entity Dialog - " + entityRef.getName());
-        // topPanel.addItem("Entity", tfEntityName);
-        // setStimPanel(new StimulusVectorPanel(entityRef));
-        // setAgentPanel(new PanelAgent((OdorWorldAgent) entityRef));
-        // getStimPanel().getTabbedPane().addTab("Agent", getAgentPanel());
-        // mainPanel.add(topPanel);
-        // mainPanel.add(getStimPanel());
-        // setContentPane(mainPanel);
-        // } else {
-        // setTitle("Entity Dialog");
-        // setStimPanel(new StimulusVectorPanel(entityRef));
-        // mainPanel.add(topPanel);
-        // mainPanel.add(getStimPanel());
-        // setContentPane(mainPanel);
-        // }
+        // Smell tabs
+        if (entityRef.getSmellSource() != null) {
+            smellPanel = new SmellSourcePanel(entityRef.getSmellSource());
+            tabbedPane.addTab("Smell", smellPanel.getValuesPanel());
+            tabbedPane.addTab("Dispersion", smellPanel.getDispersionPanel());
+        }
 
+        cbRenderer.setPreferredSize(new Dimension(cbRendererDimension,
+                cbRendererDimension));
+        cbImageName.setRenderer(cbRenderer);
+        //mainPanel.addItem("Image", cbImageName);
+
+        // Misc. Tabs
+        bitesToDie.setColumns(2);
+        edible.addActionListener(this);
         miscPanel.addItem("Edible", edible);
         miscPanel.addItem("Bites to die", bitesToDie);
         miscPanel.addItem("Resurrection Probability", resurrectionProb);
-        // getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
+        //lifeCycleEditor =  new ReflectivePropertyEditor(entityRef.getLifeCycle());
+        //tabbedPane.addTab("LifeCycle", lifeCycleEditor);
+
+        setContentPane(tabbedPane);
+    }
+
+    @Override
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        commitChanges();
+    }
+
+    @Override
+    protected void closeDialogCancel() {
+        super.closeDialogCancel();
     }
 
     /**
      * Fills the values within the fields of the dialog.
      */
     private void fillFieldValues() {
-        // tfEntityName.setText(entityRef.getName());
-        // //
-        // cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
-        // edible.setSelected(entityRef.getEdible());
-        // bitesToDie.setText((new
-        // Integer(entityRef.getBitesToDie())).toString());
-        // bitesToDie.setEnabled(entityRef.getEdible());
-        // resurrectionProb.setText("" + entityRef.getResurrectionProb());
+         tfEntityName.setText(entityRef.getName());
+         //
+         //cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.));
+         //edible.setSelected(entityRef`);
+         //bitesToDie.setText((new
+         //Integer(entityRef.getBitesToDie())).toString());
+         //bitesToDie.setEnabled(entityRef.getEdible());
+         //resurrectionProb.setText("" + entityRef.getResurrectionProb());
     }
 
     /**
      * Commits changes to the entity that are shown in the dialog.
      */
     public void commitChanges() {
+        mainEditor.commit();
+        smellPanel.commitChanges();
+        //lifeCycleEditor.commit();
         // entityRef.setEdible(edible.isSelected());
         //
         // if (!edible.isSelected()) {
@@ -185,7 +195,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements
 
     /**
      * Respond to button pressing events.
-     * 
+     *
      * @param e the ActionEvent triggering this method
      */
     public void actionPerformed(final ActionEvent e) {
@@ -196,31 +206,4 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         }
     }
 
-    /**
-     * @param stimPanel The stimPanel to set.
-     */
-    public void setStimPanel(final SmellSourcePanel stimPanel) {
-        this.stimPanel = stimPanel;
-    }
-
-    /**
-     * @return Returns the stimPanel.
-     */
-    public SmellSourcePanel getStimPanel() {
-        return stimPanel;
-    }
-
-    /**
-     * @param agentPanel The agentPanel to set.
-     */
-    public void setAgentPanel(final PanelAgent agentPanel) {
-        this.agentPanel = agentPanel;
-    }
-
-    /**
-     * @return Returns the agentPanel.
-     */
-    public PanelAgent getAgentPanel() {
-        return agentPanel;
-    }
 }

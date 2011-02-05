@@ -25,18 +25,19 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
-
 /**
- * <b>DialogOdorWorld</b> is used to set the enivronment's parameters,  in particular, the way stimuli are constructed
- * to be sent the network, and the way  outputs from the network are expressed in the world.
+ * <b>DialogOdorWorld</b> is used to set the enivronment's parameters, in
+ * particular, the way stimuli are constructed to be sent the network, and the
+ * way outputs from the network are expressed in the world.
  */
 public class DialogOdorWorld extends StandardDialog implements ActionListener {
-    
+
     private static final long serialVersionUID = 1L;
 
     /** The inital value for world width field's number of columns. */
@@ -49,7 +50,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     private OdorWorldPanel worldPanel;
 
     /** The pane that holds the choices to set. */
-    private LabelledItemPanel myContentPane = new LabelledItemPanel();
+    private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** The text field containing the width of the world. */
     private JTextField worldWidth = new JTextField();
@@ -57,26 +58,42 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     /** The text field containing the height of the world. */
     private JTextField worldHeight = new JTextField();
 
-    /** The checkbox representing whether or not moving objects initiates an update of the world. */
+    /**
+     * The checkbox representing whether or not moving objects initiates an
+     * update of the world.
+     */
     private JCheckBox initiateMovement = new JCheckBox();
 
-    /** The checkbox representing whether or not objects inhibit the movement of creatures ("clipping"). */
+    /**
+     * The checkbox representing whether or not objects inhibit the movement of
+     * creatures ("clipping").
+     */
     private JCheckBox inhibitMovement = new JCheckBox();
 
-    /** The checkbox representing whether or not local boundaries are used ("wrap-around"). */
+    /**
+     * The checkbox representing whether or not local boundaries are used
+     * ("wrap-around").
+     */
     private JCheckBox useLocalBounds = new JCheckBox();
 
-    /** The checkbox representing whether or not the network is updated while dragging an entity. */
+    /**
+     * The checkbox representing whether or not the network is updated while
+     * dragging an entity.
+     */
     private JCheckBox updateDrag = new JCheckBox();
 
-    /** The Button that brings up a color chooser dialog for the world's background. */
+    /**
+     * The Button that brings up a color chooser dialog for the world's
+     * background.
+     */
     private JButton colorChoice = new JButton("Set");
 
     /** The color returned from the color chooser. */
     private Color theColor;
 
     /**
-     * Constructor initalizes a settings dialog for the odorworld from which it was called.
+     * Constructor initializes a settings dialog for the odorworld from which it
+     * was called.
      *
      * @param wp the odorworld calling the constructor
      */
@@ -95,15 +112,18 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
 
         worldWidth.setColumns(initialWorldWidth);
 
-        myContentPane.addItem("World Width", worldWidth);
-        myContentPane.addItem("World Height", worldHeight);
-        myContentPane.addItem("Moving objects initiates creature movement", initiateMovement);
-        myContentPane.addItem("Objects block movement", inhibitMovement);
-        myContentPane.addItem("Enable boundaries (if not, agents wrap around)", useLocalBounds);
-        myContentPane.addItem("Update network while dragging objects", updateDrag);
-        myContentPane.addItem("Set Background Color", colorChoice);
+        mainPanel.addItem("World Width", worldWidth);
+        mainPanel.addItem("World Height", worldHeight);
+        mainPanel.addItem("Moving objects initiates creature movement",
+                initiateMovement);
+        mainPanel.addItem("Objects block movement", inhibitMovement);
+        mainPanel.addItem("Enable boundaries (if not, agents wrap around)",
+                useLocalBounds);
+        mainPanel.addItem("Update network while dragging objects",
+                updateDrag);
+        mainPanel.addItem("Set Background Color", colorChoice);
 
-        setContentPane(myContentPane);
+        setContentPane(mainPanel);
 
         colorChoice.addActionListener(this);
         updateDrag.addActionListener(this);
@@ -113,19 +133,19 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-//        worldWidth.setText(Integer.toString(worldPanel.getWorld().getWorldWidth()));
-//        worldHeight.setText(Integer.toString(worldPanel.getWorld().getWorldHeight()));
-//        updateDrag.setSelected(theWorld.getUpdateWhileDragging());
-//        useLocalBounds.setSelected(theWorld.getUseLocalBounds());
+        // worldWidth.setText(Integer.toString(worldPanel.getWorld().getWorldWidth()));
+        // worldHeight.setText(Integer.toString(worldPanel.getWorld().getWorldHeight()));
+        // updateDrag.setSelected(theWorld.getUpdateWhileDragging());
+        // useLocalBounds.setSelected(theWorld.getUseLocalBounds());
 
         if (!updateDrag.isSelected()) {
             initiateMovement.setSelected(false);
             initiateMovement.setEnabled(false);
         } else {
-//            initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
+            // initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
         }
 
-//        inhibitMovement.setSelected(theWorld.getObjectInhibitsMovement());
+        // inhibitMovement.setSelected(theWorld.getObjectInhibitsMovement());
         theColor = new Color(worldPanel.getBackgroundColor());
     }
 
@@ -133,15 +153,15 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      * Set world values based on fields.
      */
     public void setValues() {
-//        worldPanel.getWorld().setWorldWidth(Integer.parseInt(worldWidth.getText()));
-//        worldPanel.getWorld().setWorldHeight(Integer.parseInt(worldHeight.getText()));
+        // worldPanel.getWorld().setWorldWidth(Integer.parseInt(worldWidth.getText()));
+        // worldPanel.getWorld().setWorldHeight(Integer.parseInt(worldHeight.getText()));
         worldPanel.setBackgroundColor(theColor.getRGB());
-        //worldPanel.getParentFrame().setMaxSize();
+        // worldPanel.getParentFrame().setMaxSize();
     }
 
     /**
      * Performs an appropriate action on the given event.
-     *
+     * 
      * @param e the parameter activating this method
      */
     public void actionPerformed(final ActionEvent e) {
@@ -153,7 +173,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
                 initiateMovement.setEnabled(false);
                 repaint();
             } else if (test.isSelected()) {
-//                initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
+                // initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
                 initiateMovement.setEnabled(true);
                 repaint();
             }
@@ -164,13 +184,18 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
 
     /**
      * Show the color pallette and get a color.
-     *
+     * 
      * @return selected color
      */
     public Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
-        colorChooser.setLocation(colorChooserIndent, colorChooserIndent); //Set location of color chooser
+        Color theColor = JColorChooser.showDialog(this, "Choose Color",
+                Color.BLACK);
+        colorChooser.setLocation(colorChooserIndent, colorChooserIndent); // Set
+                                                                          // location
+                                                                          // of
+                                                                          // color
+                                                                          // chooser
 
         return theColor;
     }

@@ -47,7 +47,7 @@ public final class AddSmellSourceAction extends AbstractAction {
      */
     public AddSmellSourceAction(final OdorWorldPanel component,
             OdorWorldEntity entity) {
-        super("Add / Change smell source...");
+        super("Add smell source...");
         this.entity = entity;
         if (component == null) {
             throw new IllegalArgumentException(

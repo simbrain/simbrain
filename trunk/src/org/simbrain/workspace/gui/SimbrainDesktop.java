@@ -310,8 +310,7 @@ public class SimbrainDesktop {
                 .getWorkspace()), "Simbrain thread viewer");
         // Set up the main panel
         horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        horizontalSplitter.setDividerLocation((int) (3 * (workspaceBounds
-                .getHeight() / 4)));
+        horizontalSplitter.setDividerLocation(getDividerLocation());
         horizontalSplitter.setTopComponent(desktop);
         horizontalSplitter.setBottomComponent(bottomDock);
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -1108,6 +1107,7 @@ public class SimbrainDesktop {
         } else {
             dockVisible = true;
             horizontalSplitter.getBottomComponent().setVisible(true);
+            horizontalSplitter.setDividerLocation(getDividerLocation());
         }
 
     }
@@ -1124,5 +1124,14 @@ public class SimbrainDesktop {
             runningLabel.setVisible(false);
             // SimbrainDesktop.this.desktop.setBackground(Color.blue);
         }
+    }
+
+    /**
+     * Helper method for determining where the bottom tab should be placed.
+     *
+     * @return the location
+     */
+    private int getDividerLocation() {
+        return (int) (3 * (workspaceBounds.getHeight() / 4));
     }
 }

@@ -231,14 +231,14 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         setContentPane(tabbedPane);
     }
 
-    /** @see StandardDialog */
+    @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         this.commitChanges();
         this.setAsDefault();
     }
 
-    /** @see StandardDialog */
+    @Override
     protected void closeDialogCancel() {
         super.closeDialogCancel();
         this.returnToCurrentPrefs();

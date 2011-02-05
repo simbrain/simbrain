@@ -21,10 +21,10 @@ package org.simbrain.world.odorworld.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDialog;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.world.odorworld.DialogOdorWorldEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -53,12 +53,11 @@ public final class ShowEntityDialogAction
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        //DialogOdorWorldEntity dialog = new DialogOdorWorldEntity(entity);
-        
+        DialogOdorWorldEntity dialog = new DialogOdorWorldEntity(entity);
+
         ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
         editor.setExcludeList(new String[] {"entityType"});
         editor.setObject(entity);
-        JDialog dialog = editor.getDialog();
         dialog.setTitle("Edit " + entity.getName());
         dialog.pack();
         dialog.setLocationRelativeTo(null);

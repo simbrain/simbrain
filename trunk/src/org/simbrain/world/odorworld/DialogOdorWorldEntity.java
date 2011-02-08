@@ -149,7 +149,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements
      * Fills the values within the fields of the dialog.
      */
     private void fillFieldValues() {
-         tfEntityName.setText(entityRef.getName());
+        if (entityRef != null) {
+            tfEntityName.setText(entityRef.getName());
+        }
          //
          //cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.));
          //edible.setSelected(entityRef`);

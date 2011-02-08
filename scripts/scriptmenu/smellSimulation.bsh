@@ -110,11 +110,11 @@ import org.simbrain.plot.projection.*;
 
     // Couple odor world to network
     String mouseId = mouse.getName();
-    Producer smell1 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Sensor_1", 0), "getValue", double.class, "Sensor 1"); 
-    Producer smell2 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Sensor_1", 1), "getValue", double.class, "Sensor 2"); 
-    Producer smell3 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Sensor_1", 2), "getValue", double.class, "Sensor 3"); 
-    Producer smell4 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Sensor_1", 3), "getValue", double.class, "Sensor 4"); 
-    Producer smell5 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Sensor_1", 4), "getValue", double.class, "Sensor 5");   
+    Producer smell1 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Center",0), "getValue", double.class, "Sensor 1"); 
+    Producer smell2 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Center",1), "getValue", double.class, "Sensor 2"); 
+    Producer smell3 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Center",2), "getValue", double.class, "Sensor 3"); 
+    Producer smell4 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Center",3), "getValue", double.class, "Sensor 4"); 
+    Producer smell5 = odorWorld.getAttributeManager().createProducer(world.getSmellSensorGetter(mouseId,"Center",4), "getValue", double.class, "Sensor 5");   
     Consumer inputNeuron1 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_26"), "setInputValue", double.class, "Output neuron 1"); 
     Consumer inputNeuron2 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_27"), "setInputValue", double.class, "Output neuron 2"); 
     Consumer inputNeuron3 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_28"), "setInputValue", double.class, "Output neuron 3"); 

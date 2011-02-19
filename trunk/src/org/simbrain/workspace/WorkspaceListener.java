@@ -30,6 +30,10 @@ public interface WorkspaceListener {
      */
     void workspaceCleared();
 
+    /**
+     * Called after a new workspace has been opened.
+     */
+    void newWorkspaceOpened();
 
     /**
      * Called when a component is added.

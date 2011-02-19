@@ -86,6 +86,9 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
                         .removeItem((NetworkComponent) workspaceComponent);
             }
         }
+
+        public void newWorkspaceOpened() {
+        }
     };
 
     /**

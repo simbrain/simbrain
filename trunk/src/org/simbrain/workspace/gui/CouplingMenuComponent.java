@@ -83,6 +83,13 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
         updateMenu();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void newWorkspaceOpened() {
+    }
+
+
 	/**
      * Update the menu.
      */
@@ -102,4 +109,5 @@ public class CouplingMenuComponent extends JMenu implements WorkspaceListener {
             this.add(componentMenuItem);
         }
     }
+
 }

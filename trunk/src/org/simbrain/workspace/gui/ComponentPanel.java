@@ -66,7 +66,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
         desktop.getWorkspace().addListener(this);
         desktop.getWorkspace().getUpdator().addUpdatorListener(this);
         this.desktop = desktop;
-        
 
         // Set up table
         model = new ComponentTableModel();
@@ -79,13 +78,13 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
         componentTable.setFocusable(false);
 
         JScrollPane scrollPane = new JScrollPane(componentTable);
-        
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add("Center", scrollPane);
-        
+
         changedUpdateController();
         panel.add("North", updateLabel);
-        
+
         add(panel);
     }
 
@@ -114,6 +113,12 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
      */
     public void workspaceCleared() {
         model.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void newWorkspaceOpened() {
     }
 
     /**
@@ -269,7 +274,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
 
     public void changeNumThreads() {
         // TODO Auto-generated method stub
-        
     }
 
     public void changedUpdateController() {
@@ -278,22 +282,18 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
 
     public void updatedCouplings(int update) {
         // TODO Auto-generated method stub
-        
     }
 
     public void updatingFinished() {
         // TODO Auto-generated method stub
-        
     }
 
     public void updatingStarted() {
         // TODO Auto-generated method stub
-        
     }
 
     public void workspaceUpdated() {
         // TODO Auto-generated method stub
-        
     }
 
 }

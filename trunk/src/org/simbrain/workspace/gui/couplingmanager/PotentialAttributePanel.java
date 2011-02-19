@@ -337,6 +337,12 @@ public class PotentialAttributePanel extends JPanel implements ActionListener,
             this.removeAllItems();
             PotentialAttributePanel.this.clearList();
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void newWorkspaceOpened() {
+        }
     }
 
 }

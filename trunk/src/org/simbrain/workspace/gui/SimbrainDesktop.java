@@ -986,8 +986,11 @@ public class SimbrainDesktop {
      * @param args currently not used
      */
     public static void main(final String[] args) {
+
         final Workspace workspace = new Workspace();
-        InterceptingEventQueue eventQueue = new InterceptingEventQueue(workspace);
+
+        InterceptingEventQueue eventQueue = new InterceptingEventQueue(
+                workspace);
 
         workspace.setTaskSynchronizationManager(eventQueue);
 
@@ -1073,7 +1076,7 @@ public class SimbrainDesktop {
          * @param arg0 Menu event
          */
         public void menuSelected(final MenuEvent arg0) {
-            if (workspace.changesExist()) { 
+            if (workspace.changesExist()) {
                 actionManager.getSaveWorkspaceAction().setEnabled(true);
             } else {
                 actionManager.getSaveWorkspaceAction().setEnabled(false);

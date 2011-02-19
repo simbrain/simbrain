@@ -8,9 +8,10 @@ import java.util.concurrent.CountDownLatch;
  * @author Matt Watson
  */
 public class LatchCompletionSignal implements CompletionSignal {
-    /** the underlying latch. */
+
+    /** The underlying latch. */
     private volatile CountDownLatch latch;
-    
+
     /**
      * Creates a new instance with the given latch.
      * 
@@ -19,7 +20,7 @@ public class LatchCompletionSignal implements CompletionSignal {
     public LatchCompletionSignal(final CountDownLatch latch) {
         this.latch = latch;
     }
-    
+
     /**
      * Creates a new instance which waits for a single done call.
      * 
@@ -28,23 +29,23 @@ public class LatchCompletionSignal implements CompletionSignal {
     public LatchCompletionSignal(final int signals) {
         this(new CountDownLatch(signals));
     }
-    
+
     /**
      * Creates a new instance which waits for a single done call.
      */
     public LatchCompletionSignal() {
         this(1);
     }
-    
+
     /**
      * Called when a task is done.
      */
     public void done() {
         CountDownLatch latch = this.latch;
-        
+
         latch.countDown();
     }
-    
+
     /**
      * Returns the latch underlying this signal.
      * 
@@ -53,14 +54,14 @@ public class LatchCompletionSignal implements CompletionSignal {
     public CountDownLatch getLatch() {
         return latch;
     }
-    
+
     /**
      * Calls await on the underlying latch.
      */
     public void await() {
         try {
             CountDownLatch latch = this.latch;
-            
+
             latch.await();
         } catch (InterruptedException e) {
             return;

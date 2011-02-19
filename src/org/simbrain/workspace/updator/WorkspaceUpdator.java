@@ -20,6 +20,7 @@ package org.simbrain.workspace.updator;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -250,7 +251,7 @@ public class WorkspaceUpdator {
 
                 snychManager.releaseTasks();
                 snychManager.runTasks();
-                
+
                 notifyWorkspaceUpdateCompleted();
 
             }
@@ -279,6 +280,7 @@ public class WorkspaceUpdator {
 
         LOGGER.trace("done: " + time);
     }
+
 
     /**
      * Adds a component listener to this instance.
@@ -460,7 +462,7 @@ public class WorkspaceUpdator {
     public String getCurrentUpdatorName() {
         return updateController.getName();
     }
-
+    
     /**
      * Iterate the updator for a specified number of iterations.
      *

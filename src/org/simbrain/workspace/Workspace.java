@@ -413,6 +413,11 @@ public class Workspace {
     /** The lock used to lock calls on syncAllComponents. */
     private final Object componentLock = new Object();
 
+    /**
+     * Set the task synchronization manager.
+     *
+     * @param manager
+     */
     public void setTaskSynchronizationManager(
             final TaskSynchronizationManager manager) {
         updator.setTaskSynchronizationManager(manager);
@@ -425,11 +430,13 @@ public class Workspace {
      * @param <E> The return type of task.
      * @param task The task to synchronize.
      * @return The result of task.
-     * @throws Exception If an exception occurs.
+     * @throws Exception if an exception occurs.
      */
     public <E> E syncOnAllComponents(final Callable<E> task) throws Exception {
         synchronized (componentLock) {
+
             Iterator<Object> locks = new Iterator<Object>() {
+
                 Iterator<? extends WorkspaceComponent> components = getComponentList()
                         .iterator();
                 Iterator<? extends Object> current = null;
@@ -464,15 +471,15 @@ public class Workspace {
     }
 
     /**
-     * Recursively synchronizes on the next component in the iterator and
-     * executes task if there are no more components.
+     * Recursively synchronizes on the components in the provided
+     * iterator and executes the provided task if there are no more components.
      *
      * @param <E> The return type of task.
      * @param iterator The iterator of the remaining components to synchronize
      *            on.
      * @param task The task to synchronize.
-     * @return The result of task.
-     * @throws Exception If an exception occurs.
+     * @return The result of the task.
+     * @throws Exception if an exception occurs.
      */
     public static <E> E syncRest(final Iterator<? extends Object> iterator,
             final Callable<E> task) throws Exception {
@@ -637,6 +644,5 @@ public class Workspace {
             }
         });
     }
-
 
 }

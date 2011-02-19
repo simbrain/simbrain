@@ -38,9 +38,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Core model class of Odor World, which contains a list of entities in the
- * world.
- *
- * Some code from Developing Games in Java, by David Brackeen.
+ * world. Some code from Developing Games in Java, by David Brackeen.
  */
 public class OdorWorld {
 
@@ -99,20 +97,22 @@ public class OdorWorld {
 
         entity.setName(entityIDGenerator.getId());
 
-        //centerSprite(sprite, tileX,tileY);
+        // centerSprite(sprite, tileX,tileY);
 
         recomputeMaxStimulusLength();
 
         // Add entity to the map
-        //map.addSprite(entity);
+        // map.addSprite(entity);
         entityList.add(entity);
 
         // Fire entity added event
         fireEntityAdded(entity);
     }
 
-    /*
+    /**
      * Adds an agent and by default adds several sensors and effectors to it.
+     *
+     * @param entity the entity  corresponding to the agent
      */
     public void addAgent(final OdorWorldEntity entity) {
         if (entity instanceof RotatingEntity) {
@@ -120,9 +120,9 @@ public class OdorWorld {
             // Add effectors (currently none)
 
             // Add sensors
-            entity.addSensor(new SmellSensor(entity, "Left", Math.PI/8, 50));
+            entity.addSensor(new SmellSensor(entity, "Left", Math.PI / 8, 50));
             entity.addSensor(new SmellSensor(entity, "Center", 0, 0));
-            entity.addSensor(new SmellSensor(entity, "Right",-Math.PI/8, 50));
+            entity.addSensor(new SmellSensor(entity, "Right", -Math.PI / 8, 50));
         }
         addEntity(entity);
     }
@@ -131,9 +131,9 @@ public class OdorWorld {
      * Returns the entity with the given id, or null if none is found.
      *
      * @param id name of entity
-     * @return matching entity
+     * @return matching entity, if any
      */
-    public OdorWorldEntity getEntityFromKey(final String id ) {
+    public OdorWorldEntity getEntity(final String id) {
         for (OdorWorldEntity entity : entityList) {
             if (entity.getName().equalsIgnoreCase(id)) {
                 return entity;
@@ -142,16 +142,15 @@ public class OdorWorld {
         return null;
     }
 
-
     /**
      * Returns the sensor with the given id, or null if none is found.
      *
-     * @param entityId entity to search
-     * @param sensorId sensor to search
+     * @param entityId entity id
+     * @param sensorId sensor id
      * @return sensor if found
      */
-    public Sensor getSensorFromKeys(final String entityId, final String sensorId ) {
-        OdorWorldEntity entity = getEntityFromKey(entityId);
+    public Sensor getSensor(final String entityId, final String sensorId) {
+        OdorWorldEntity entity = getEntity(entityId);
         if (entity == null) {
             return null;
         }
@@ -166,12 +165,12 @@ public class OdorWorld {
     /**
      * Returns the effector with the given id, or null if none is found.
      *
-     * @param entityId entity to search
-     * @param effectorId sensor to search
+     * @param entityId entity id
+     * @param effectorId sensor id
      * @return effector if found
      */
-    public Effector getEffectorFromKeys(final String entityId, final String effectorId ) {
-        OdorWorldEntity entity = getEntityFromKey(entityId);
+    public Effector getEffector(final String entityId, final String effectorId) {
+        OdorWorldEntity entity = getEntity(entityId);
         if (entity == null) {
             return null;
         }
@@ -191,14 +190,14 @@ public class OdorWorld {
      * @param sensorId sensor to search
      * @return sensor if found
      */
-    public SmellSensorGetter getSmellSensorGetter(final String entityId, final String sensorId, final int stimulusIndex ) {
-        Sensor sensor = getSensorFromKeys(entityId, sensorId);
+    public SmellSensorGetter getSmellSensorGetter(final String entityId,
+            final String sensorId, final int stimulusIndex) {
+        Sensor sensor = getSensor(entityId, sensorId);
         if ((sensor == null) || !(sensor instanceof SmellSensor)) {
             return null;
         }
-        return ((SmellSensor)sensor).createGetter(stimulusIndex);
+        return ((SmellSensor) sensor).createGetter(stimulusIndex);
     }
-
 
     /**
      * Delete entity.
@@ -206,10 +205,12 @@ public class OdorWorld {
      * @param entity the entity to delete
      */
     public void deleteEntity(OdorWorldEntity entity) {
-        //map.removeSprite(entity);
-        entityList.remove(entity);
-        recomputeMaxStimulusLength();
-        fireEntityRemoved(entity);
+        // map.removeSprite(entity);
+        if (entityList.contains(entity)) {
+            entityList.remove(entity);
+            recomputeMaxStimulusLength();
+            fireEntityRemoved(entity);
+        }
     }
 
     /**
@@ -226,56 +227,57 @@ public class OdorWorld {
         }
     }
 
-//    /**
-//     * Add an odor world entity.
-//     * 
-//     * @param entity entity to add
-//     * @param tileX x position of entity
-//     * @param tileY y position of entity
-//     */
-//    private void addEntity(final OdorWorldEntity entity, final int tileX, final int tileY) {
-//
-//            entity.setX(tileX);
-//            entity.setY(tileY);
-//            entity.setVelocityX( -1 + (float) Math.random() * 2);
-//            entity.setVelocityY(-1 + (float) Math.random() * 2);
-//            addEntity(entity);
-//    }
-    
-//    //TODO: way to add an entity with an animation
-//
-//    /**
-//     * Add a basic entity at specified point.
-//     * 
-//     * @param p the location where the object should be added
-//     */
-//    public void addBasicEntity(final int x, final int y, final String imageName) {
-//        
-//        Animation anim = new Animation(imageName);
-//        //animation.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
-//        //animation.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
-//
-//        BasicEntity entity = new BasicEntity(this, anim);
-//        addEntity(entity, x, y);
-//        fireUpdateEvent();
-//    }
-//    
-//    /**
-//     * Currently mouse is the only option!
-//     */
-//    public void addRotatingEntity(final double[] p) {
-//        RotatingEntity entity = new RotatingEntity(this);
-//        entity.addEffector(new RotationEffector(entity));
-//        entity.addSensor(new SmellSensor(entity));
-//        addEntity(entity, (int) p[0], (int) p[1]);
-//        fireUpdateEvent();
-//    }
+    // /**
+    // * Add an odor world entity.
+    // *
+    // * @param entity entity to add
+    // * @param tileX x position of entity
+    // * @param tileY y position of entity
+    // */
+    // private void addEntity(final OdorWorldEntity entity, final int tileX,
+    // final int tileY) {
+    //
+    // entity.setX(tileX);
+    // entity.setY(tileY);
+    // entity.setVelocityX( -1 + (float) Math.random() * 2);
+    // entity.setVelocityY(-1 + (float) Math.random() * 2);
+    // addEntity(entity);
+    // }
+
+    // //TODO: way to add an entity with an animation
+    //
+    // /**
+    // * Add a basic entity at specified point.
+    // *
+    // * @param p the location where the object should be added
+    // */
+    // public void addBasicEntity(final int x, final int y, final String
+    // imageName) {
+    //
+    // Animation anim = new Animation(imageName);
+    // //animation.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
+    // //animation.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
+    //
+    // BasicEntity entity = new BasicEntity(this, anim);
+    // addEntity(entity, x, y);
+    // fireUpdateEvent();
+    // }
+    //
+    // /**
+    // * Currently mouse is the only option!
+    // */
+    // public void addRotatingEntity(final double[] p) {
+    // RotatingEntity entity = new RotatingEntity(this);
+    // entity.addEffector(new RotationEffector(entity));
+    // entity.addSensor(new SmellSensor(entity));
+    // addEntity(entity, (int) p[0], (int) p[1]);
+    // fireUpdateEvent();
+    // }
 
     /**
      * Returns a properly initialized xstream object.
-     * @return the XStream object
-     *
-     * TODO: There is more to remove!
+     * 
+     * @return the XStream object TODO: There is more to remove!
      */
     static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
@@ -289,11 +291,10 @@ public class OdorWorld {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
+     * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     *
+     * 
      * @return Initialized object.
      */
     private Object readResolve() {
@@ -306,9 +307,7 @@ public class OdorWorld {
     }
 
     /**
-     * Updates the creature.
-     *
-     * TODO: to be rewritten
+     * Updates the creature. TODO: to be rewritten
      */
     private void updateSprite(final OdorWorldEntity sprite,
             final long elapsedTime) {
@@ -356,8 +355,7 @@ public class OdorWorld {
         if (dy != 0) {
             sprite.setY(sprite.getY() + dy);
         }
-        
-        
+
         // Handle sprite collisions
         sprite.setHasCollided(false);
         for (OdorWorldEntity entity : entityList) {
@@ -369,18 +367,18 @@ public class OdorWorld {
             }
         }
 
-        // TODO: Refactor below!  Needed for behaviors...
+        // TODO: Refactor below! Needed for behaviors...
         // Handle sprite collisions
-        //        if (xCollission(sprite, newX)) {
-        //            sprite.collideHorizontal();
-        //        } else {
-        //            // sprite.setX(newX);
-        //        }
-        //        if (yCollission(sprite, newY)) {
-        //            sprite.collideVertical();
-        //        } else {
-        //            // sprite.setY(newY);
-        //        }
+        // if (xCollission(sprite, newX)) {
+        // sprite.collideHorizontal();
+        // } else {
+        // // sprite.setX(newX);
+        // }
+        // if (yCollission(sprite, newY)) {
+        // sprite.collideVertical();
+        // } else {
+        // // sprite.setY(newY);
+        // }
 
         if (wrapAround) {
 
@@ -407,7 +405,7 @@ public class OdorWorld {
 
     /**
      * Handle collisions in x directions.
-     *
+     * 
      * @param entityToCheck
      * @param xCheck position to check
      * @return whether or not a collision occurred.
@@ -415,17 +413,19 @@ public class OdorWorld {
     private boolean xCollission(OdorWorldEntity entityToCheck, float xCheck) {
 
         // Hit a wall
-        //        if ((entityToCheck.getX() < 0) || (entityToCheck.getX() > getWidth())) {
-        //            return true;
-        //        }
+        // if ((entityToCheck.getX() < 0) || (entityToCheck.getX() >
+        // getWidth())) {
+        // return true;
+        // }
 
         // Check for collisions with sprites
         for (OdorWorldEntity entity : entityList) {
             if (entity == entityToCheck) {
                 continue;
             }
-            if ((entityToCheck.getX() > entity.getX()) &&
-                    (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
+            if ((entityToCheck.getX() > entity.getX())
+                    && (entityToCheck.getX() < (entity.getX() + entity
+                            .getWidth()))) {
                 return true;
             }
         }
@@ -434,16 +434,17 @@ public class OdorWorld {
 
     /**
      * Handle collisions in y directions.
-     *
+     * 
      * @param entityToCheck
      * @param yCheck position to check
      * @return whether or not a collision occurred.
      */
     private boolean yCollission(OdorWorldEntity entityToCheck, float yCheck) {
         // Hit a wall
-        //        if ((entityToCheck.getY() < 0) || (entityToCheck.getY() > getHeight())) {
-        //            return true;
-        //        }
+        // if ((entityToCheck.getY() < 0) || (entityToCheck.getY() >
+        // getHeight())) {
+        // return true;
+        // }
 
         // Check for collisions with sprites
         for (OdorWorldEntity sprite : entityList) {
@@ -452,8 +453,9 @@ public class OdorWorld {
                 continue;
             }
 
-            if ((entityToCheck.getY() > sprite.getY()) &&
-                    (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
+            if ((entityToCheck.getY() > sprite.getY())
+                    && (entityToCheck.getY() < (sprite.getY() + sprite
+                            .getHeight()))) {
                 return true;
             }
         }
@@ -461,8 +463,9 @@ public class OdorWorld {
     }
 
     /**
-     * Gets the tile that a Sprites collides with. Only the OdorWorldEntity's X or Y
-     * should be changed, not both. Returns null if no collision is detected.
+     * Gets the tile that a Sprites collides with. Only the OdorWorldEntity's X
+     * or Y should be changed, not both. Returns null if no collision is
+     * detected.
      */
     public Point getTileCollision(OdorWorldEntity sprite, float newX, float newY) {
         float fromX = Math.min(sprite.getX(), newX);
@@ -473,21 +476,21 @@ public class OdorWorld {
         // Get the tile locations
         int fromTileX = OdorWorldRenderer.pixelsToTiles(fromX);
         int fromTileY = OdorWorldRenderer.pixelsToTiles(fromY);
-        int toTileX = OdorWorldRenderer
-                .pixelsToTiles(toX + sprite.getWidth() - 1);
+        int toTileX = OdorWorldRenderer.pixelsToTiles(toX + sprite.getWidth()
+                - 1);
         int toTileY = OdorWorldRenderer.pixelsToTiles(toY + sprite.getHeight()
                 - 1);
 
         // Check each tile for a collision
-//        for (int x = fromTileX; x <= toTileX; x++) {
-//            for (int y = fromTileY; y <= toTileY; y++) {
-//                if (x < 0 || x >= map.getWidth() || map.getTile(x, y) != null) {
-//                    // collision found, return the tile
-//                    pointCache.setLocation(x, y);
-//                    return pointCache;
-//                }
-//            }
-//        }
+        // for (int x = fromTileX; x <= toTileX; x++) {
+        // for (int y = fromTileY; y <= toTileY; y++) {
+        // if (x < 0 || x >= map.getWidth() || map.getTile(x, y) != null) {
+        // // collision found, return the tile
+        // pointCache.setLocation(x, y);
+        // return pointCache;
+        // }
+        // }
+        // }
 
         // No collision found
         return null;
@@ -495,7 +498,7 @@ public class OdorWorld {
 
     /**
      * Add a world listener.
-     *
+     * 
      * @param listener listener to add.
      */
     public void addListener(WorldListener listener) {
@@ -504,7 +507,7 @@ public class OdorWorld {
 
     /**
      * Returns the list of entities.
-     *
+     * 
      * @return the entity list
      */
     public List<OdorWorldEntity> getObjectList() {
@@ -513,7 +516,7 @@ public class OdorWorld {
 
     /**
      * Fire entity added event.
-     *
+     * 
      * @param entity entity that was added
      */
     public void fireEntityAdded(final OdorWorldEntity entity) {
@@ -524,7 +527,7 @@ public class OdorWorld {
 
     /**
      * Fire entity removed event.
-     *
+     * 
      * @param entity entity that was removed
      */
     public void fireEntityRemoved(final OdorWorldEntity entity) {
@@ -535,7 +538,7 @@ public class OdorWorld {
 
     /**
      * Fire entity changed event.
-     *
+     * 
      * @param entity entity that was changed
      */
     public void fireEntityChanged(final OdorWorldEntity entity) {
@@ -546,7 +549,7 @@ public class OdorWorld {
 
     /***
      * Fire sensor added event.
-     *
+     * 
      * @param sensor sensor that was added
      */
     public void fireSensorAdded(final Sensor sensor) {
@@ -557,7 +560,7 @@ public class OdorWorld {
 
     /**
      * Fire sensor removed event.
-     *
+     * 
      * @param sensor sensor that was removed
      */
     public void fireSensorRemoved(final Sensor sensor) {
@@ -568,7 +571,7 @@ public class OdorWorld {
 
     /**
      * Fire effector added event.
-     *
+     * 
      * @param effector effector that was added
      */
     public void fireEffectorAdded(final Effector effector) {
@@ -579,7 +582,7 @@ public class OdorWorld {
 
     /**
      * Fire effector removed event.
-     *
+     * 
      * @param effector effector that was removed
      */
     public void fireEffectorRemoved(final Effector effector) {
@@ -627,7 +630,7 @@ public class OdorWorld {
 
     /**
      * Returns width of world in pixels.
-     *
+     * 
      * @return width in pixels.
      */
     public int getWidth() {
@@ -636,7 +639,7 @@ public class OdorWorld {
 
     /**
      * Returns height of world in pixels.
-     *
+     * 
      * @return height of world
      */
     public int getHeight() {

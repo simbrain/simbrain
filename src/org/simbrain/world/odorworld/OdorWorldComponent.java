@@ -287,13 +287,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
         String[] parsedKey  = objectKey.split(":");
         String entityName = parsedKey[0];
         if (parsedKey.length == 1) {
-            return getWorld().getEntityFromKey(entityName);
+            return getWorld().getEntity(entityName);
         } else {
             String secondString = parsedKey[1];
             if (secondString.equalsIgnoreCase("sensor")) {
-                return getWorld().getSensorFromKeys(entityName, parsedKey[2]);
+                return getWorld().getSensor(entityName, parsedKey[2]);
             } else if (secondString.equalsIgnoreCase("effector")) {
-                return getWorld().getEffectorFromKeys(entityName, parsedKey[2]);
+                return getWorld().getEffector(entityName, parsedKey[2]);
             } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
                 int index = Integer.parseInt(parsedKey[3]);
                 return getWorld().getSmellSensorGetter(entityName,

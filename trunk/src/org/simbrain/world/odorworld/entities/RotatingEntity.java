@@ -51,7 +51,8 @@ public class RotatingEntity extends OdorWorldEntity {
     /** Default type. */
     private static final String DEFAULT_TYPE = "Mouse";
 
-    /** Type; used to load images. */
+    // TODO: Poorly named. Image or image-set name.
+    /** Type; used to load images. */  
     private String entityType = DEFAULT_TYPE;
 
     /** Obvious... */

@@ -216,6 +216,13 @@ public class SimbrainDesktop {
             component.getParentFrame().dispose();
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        public void newWorkspaceOpened() {
+            frame.setTitle(workspace.getCurrentFile().getName());
+        }
+
     };
 
     /** Listens for workspace updator events. */
@@ -841,27 +848,7 @@ public class SimbrainDesktop {
             workspace.getCurrentDirectory(), "Zip Archive", "zip");
         File simFile = simulationChooser.showOpenDialog();
         if (simFile != null) {
-            openWorkspace(simFile);
-            workspace.setCurrentDirectory(simulationChooser.getCurrentLocation());
-        }
-    }
-
-    /**
-     * Open a workspace from a file.
-     *
-     * @param file the file to use.
-     */
-    private void openWorkspace(final File file) {
-        WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
-        try {
-            workspace.clearWorkspace();
-            serializer.deserialize(new FileInputStream(file));
-            //System.out.println("Open -->" + file);
-            workspace.setCurrentFile(file);
-            frame.setTitle(file.getName());
-            workspace.setWorkspaceChanged(false);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            workspace.openWorkspace(simFile);
         }
     }
 

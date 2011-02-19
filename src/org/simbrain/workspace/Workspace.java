@@ -19,6 +19,8 @@
 package org.simbrain.workspace;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,6 +129,46 @@ public class Workspace {
     }
 
     /**
+     * Fire a new workspace opened event.
+     */
+    private void fireNewWorkspaceOpened() {
+        for (WorkspaceListener listener : listeners) {
+            listener.newWorkspaceOpened();
+        }
+    }
+
+    /**
+     * Fire a workspace cleared event
+     */
+    private void fireWorkspaceCleared() {
+        for (WorkspaceListener listener : listeners) {
+            listener.workspaceCleared();
+        }
+    }
+
+    /**
+     * Fire a component added event.
+     *
+     * @param component the component added
+     */
+    private void fireWorkspaceComponentAdded(WorkspaceComponent component) {
+        for (WorkspaceListener listener : listeners) {
+            listener.componentAdded(component);
+        }
+    }
+
+   /**
+     * Fire a component removed event.
+     *
+     * @param component the component added
+     */
+    private void fireWorkspaceComponentRemoved(WorkspaceComponent component) {
+        for (WorkspaceListener listener : listeners) {
+            listener.componentRemoved(component);
+        }
+    }
+
+    /**
      * Couple each source attribute to all target attributes.
      *
      * @param sourceAttributes source producing attributes
@@ -206,9 +248,7 @@ public class Workspace {
                     + componentNameIndices.get(component.getClass()));
         }
 
-        for (WorkspaceListener listener : listeners) {
-            listener.componentAdded(component);
-        }
+        fireWorkspaceComponentAdded(component);
 
         // If priority based update, resort the component list by priorities
         resortPriorities();
@@ -222,9 +262,9 @@ public class Workspace {
      */
     public void removeWorkspaceComponent(final WorkspaceComponent component) {
         LOGGER.debug("removing component: " + component);
-        for (WorkspaceListener listener : listeners) {
-            listener.componentRemoved(component);
-        }
+
+        fireWorkspaceComponentRemoved(component);
+
         /* Remove all couplings associated with this component */
         this.getCouplingManager().removeCouplings(component);
         componentList.remove(component);
@@ -303,9 +343,7 @@ public class Workspace {
         resetTime();
         this.setWorkspaceChanged(false);
         currentFile = null;
-        for (WorkspaceListener listener : listeners) {
-            listener.workspaceCleared();
-        }
+        fireWorkspaceCleared();
         manager.clearCouplings();
     }
 
@@ -631,6 +669,26 @@ public class Workspace {
                         Integer.valueOf(c2.getSerializePriority()));
             }
         });
+    }
+
+    /**
+     * Open a workspace from a file.
+     *
+     * @param file the file to try to open
+     */
+    public void openWorkspace(final File theFile) {
+        WorkspaceSerializer serializer = new WorkspaceSerializer(this);
+        try {
+            if (theFile != null) {
+                clearWorkspace();
+                serializer.deserialize(new FileInputStream(theFile));
+                setCurrentFile(theFile);
+                setWorkspaceChanged(false);
+                fireNewWorkspaceOpened();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

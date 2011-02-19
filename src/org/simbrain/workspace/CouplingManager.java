@@ -131,6 +131,12 @@ public class CouplingManager {
             public void workspaceCleared() {
             }
 
+            /**
+             * {@ineritDoc}
+             */
+            public void newWorkspaceOpened() {
+            }
+
         });
     }
 

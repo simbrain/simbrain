@@ -234,8 +234,10 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
             // Handle Double clicks
             else if (mouseEvent.getClickCount() == 2) { 
-                ShowEntityDialogAction action = new ShowEntityDialogAction(selectedEntity);
-                action.actionPerformed(null);
+                if(selectedEntity != null) {
+                    ShowEntityDialogAction action = new ShowEntityDialogAction(selectedEntity);
+                    action.actionPerformed(null);
+                }
             }
 
         }

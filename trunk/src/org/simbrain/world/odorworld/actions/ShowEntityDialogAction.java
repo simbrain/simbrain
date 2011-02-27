@@ -54,10 +54,6 @@ public final class ShowEntityDialogAction
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
         DialogOdorWorldEntity dialog = new DialogOdorWorldEntity(entity);
-
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
-        editor.setExcludeList(new String[] {"entityType"});
-        editor.setObject(entity);
         dialog.setTitle("Edit " + entity.getName());
         dialog.pack();
         dialog.setLocationRelativeTo(null);

@@ -193,10 +193,11 @@ public class SmellSourcePanel extends LabelledItemPanel implements
         this.add(tabbedPane);
         dispersionPanel.addItem("Decay function", cbDecayFunction);
         dispersionPanel.addItem("Dispersion", tfDispersion);
-        dispersionPanel.addItem("Peak value", tfPeak);
+        tfPeak.setToolTipText("How far (in pixels) the smell disperses.");
+        dispersionPanel.addItem("Peak distance", tfPeak);
+        tfPeak.setToolTipText("Distance at which smell has peak value.");
         dispersionPanel.addItem("Add noise", rbAddNoise);
         dispersionPanel.addItem("Noise level", jsNoiseLevel);
-
         valuesPanel.addItem("Stimulus dimensions", addStimulusPanel);
         valuesPanel.addItem("Stimulus values", stimScroller);
         valuesPanel.addItem("Randomize stimulus", randomMainPanel);
@@ -215,19 +216,15 @@ public class SmellSourcePanel extends LabelledItemPanel implements
         updateStimulusPanel();
 
         rbAddNoise.setSelected(smellSource.isAddNoise());
-
+        jsNoiseLevel.setValue((int) (smellSource.getNoiseLevel() * 100));
         if (smellSource.isAddNoise()) {
             jsNoiseLevel.setEnabled(true);
-            final int magicNumber = 100;
-            jsNoiseLevel
-                    .setValue((int) (smellSource.getNoiseLevel() * magicNumber));
         } else {
             jsNoiseLevel.setEnabled(false);
         }
 
         // Sets initial upper and lower randomizer bounds to current rounded max
-        // and min
-        // values in the stimulus vector
+        // and min values in the stimulus vector
         randomUpper = Double.parseDouble(stimulusVals[0].getText());
         randomLower = Double.parseDouble(stimulusVals[0].getText());
 
@@ -267,9 +264,8 @@ public class SmellSourcePanel extends LabelledItemPanel implements
         smellSource.setAddNoise(rbAddNoise.isSelected());
 
         if (rbAddNoise.isSelected()) {
-            final int magicNumber = 100;
             smellSource.setNoiseLevel((double) jsNoiseLevel.getValue()
-                    / magicNumber);
+                    / 100);
         }
     }
 

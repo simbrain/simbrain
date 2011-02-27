@@ -108,6 +108,8 @@ public class RotatingEntity extends OdorWorldEntity {
     public void setHeading(final double d) {
         //System.out.println("setOrientation:" + d);
         heading = d;
+        updateImageBasedOnHeading();
+        getParentWorld().fireEntityChanged(this);
     }
 
     /**
@@ -149,16 +151,22 @@ public class RotatingEntity extends OdorWorldEntity {
         if  (!isBlocked()) {
             heading =  computeAngle(heading);
             //System.out.println("heading:" + heading);
-
             //TODO: only do this if heading has changed
-            for (Entry<Double, Animation> entry : imageMap.entrySet()) {
-                //System.out.println("" + heading + "-" + entry.getKey());
-                if (heading < entry.getKey()) {
-                    setAnimation(entry.getValue());
-                    break;
-                }
-            }
+            updateImageBasedOnHeading();
             getAnimation().update(elapsedTime);
+        }
+    }
+
+    /**
+     * The method name says it all...
+     */
+    private void updateImageBasedOnHeading() {
+        for (Entry<Double, Animation> entry : imageMap.entrySet()) {
+            //System.out.println("" + heading + "-" + entry.getKey());
+            if (heading < entry.getKey()) {
+                setAnimation(entry.getValue());
+                break;
+            }
         }
     }
 

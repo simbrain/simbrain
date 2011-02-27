@@ -18,8 +18,10 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.plot.barchart.BarChartComponent.BarChartSetter;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -27,7 +29,7 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
  * A sensor which is updated based on the presence of SmellSources near it.
- *
+ * 
  * @see org.simbrain.util.environment.SmellSource
  */
 public class SmellSensor implements Sensor {
@@ -53,6 +55,9 @@ public class SmellSensor implements Sensor {
     /** The name of this smell sensor.. */
     private String id;
 
+    /** List of smell sensor for particular components of the smell sensor. */
+    private List<Smeller> smellerList = new ArrayList<Smeller>();
+
     /**
      * Construct a sensor.
      *
@@ -60,7 +65,8 @@ public class SmellSensor implements Sensor {
      * @param sensorName name
      * @param dim stimulus dimension
      */
-    public SmellSensor(final OdorWorldEntity parent, final String id, double theta, double radius) {
+    public SmellSensor(final OdorWorldEntity parent, final String id,
+            double theta, double radius) {
         this.parent = parent;
         this.theta = theta;
         this.id = id;
@@ -71,8 +77,9 @@ public class SmellSensor implements Sensor {
      * @return the location
      */
     public double[] getLocation() {
-        //TODO: Formalize rule that this sensor applies to rotating entity only,
-        //      or relax the code so that it will work for non-rotating entities
+        // TODO: Formalize rule that this sensor applies to rotating entity
+        // only,
+        // or relax the code so that it will work for non-rotating entities
         RotatingEntity parent = (RotatingEntity) this.getParent();
         double x = parent.getCenterLocation()[0]
                 + (radius * Math.cos(parent.getHeadingRadians() + theta));
@@ -165,20 +172,46 @@ public class SmellSensor implements Sensor {
     }
 
     /**
-     * Return smell sensor getter with specified index.
+     * Return smeller with specified index.
      *
      * @param i index
-     * @return the getter
+     * @return the smeller
      */
-    public SmellSensorGetter createGetter(int i) {
-        return new SmellSensorGetter(i);
+    public Smeller getSmeller(int i) {
+
+        // Needed to read simulations created before 2/11; remove before beta release
+        if (smellerList == null) {
+            smellerList = new ArrayList<Smeller>();
+        }
+
+        for (Smeller smeller : smellerList) {
+            if (smeller.getIndex() == i) {
+                return smeller;
+            }
+        }
+        // If the getter does not exist, create it
+        Smeller smeller = new Smeller(i);
+        smellerList.add(smeller);
+        return smeller;
     }
 
     /**
-     * Helper object for use with couplings. An object of this class is
-     * associated with one dimension of a smell sensor.
+     * @return the smellerList
      */
-    public class SmellSensorGetter {
+    public List<Smeller> getSmellerList() {
+
+        // Needed to read simulations created before 2/11; remove before beta release
+        if (smellerList == null) {
+            smellerList = new ArrayList<Smeller>();
+        }
+        return smellerList;
+    }
+
+    /**
+     * Helper object which "smells" for one component of the associated smell
+     * vector.
+     */
+    public class Smeller {
 
         /** Index. */
         private int index;
@@ -188,7 +221,7 @@ public class SmellSensor implements Sensor {
          *
          * @param index index of the bar to set
          */
-        public SmellSensorGetter(final int index) {
+        public Smeller(final int index) {
             this.index = index;
         }
 
@@ -217,6 +250,17 @@ public class SmellSensor implements Sensor {
          */
         public SmellSensor getParent() {
             return SmellSensor.this;
+        }
+
+        /**
+         * Return a formatted description of this smeller, with its location and
+         * stimulus value, offset by 1 for readability.
+         *
+         * @return formatted string
+         */
+        public String getDescription() {
+            return parent.getName() + ":" + getId() + "-" + (index + 1);
+
         }
     }
 }

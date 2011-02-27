@@ -47,6 +47,9 @@ public abstract class OdorWorldEntity {
     /** Name of this entity. */
     private String name;
 
+    /** Id of this entity. */
+    private String id;
+
     /** X Position. */
     protected float x;
 
@@ -227,7 +230,11 @@ public abstract class OdorWorldEntity {
      * @return entity's name.
      */
     public String getName() {
-        return name;
+        if (name == null) {
+            return id; // For backwards compatibility as of 2/11
+        } else {
+            return name;
+        }
     }
 
     /**
@@ -237,6 +244,24 @@ public abstract class OdorWorldEntity {
      */
     public void setName(final String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        if (id == null) {
+            return name; // For backwards compatibility as of 2/11
+        } else {
+            return id;
+        }
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

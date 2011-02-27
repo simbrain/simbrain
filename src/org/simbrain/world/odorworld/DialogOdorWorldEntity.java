@@ -107,7 +107,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements
 
         // Main tab
         //tabbedPane.addTab("Main", mainPanel);
-        mainEditor = new ReflectivePropertyEditor(entityRef);
+        mainEditor = new ReflectivePropertyEditor();
+        mainEditor.setExcludeList(new String[]{"entityType", "id"});
+        mainEditor.setObject(entityRef);
         tabbedPane.addTab("Main", mainEditor);
 
         // Smell tabs
@@ -166,7 +168,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements
      */
     public void commitChanges() {
         mainEditor.commit();
-        smellPanel.commitChanges();
+        if (smellPanel != null) {
+            smellPanel.commitChanges();
+        }
         //lifeCycleEditor.commit();
         // entityRef.setEdible(edible.isSelected());
         //

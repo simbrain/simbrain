@@ -32,7 +32,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor.SmellSensorGetter;
+import org.simbrain.world.odorworld.sensors.SmellSensor.Smeller;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
@@ -150,10 +150,11 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     if (sensor instanceof SmellSensor) {
                         SmellSensor smell = (SmellSensor) sensor;
                         for (int i = 0; i < smell.getCurrentValue().length; i++) {
-                            SmellSensorGetter getter =  smell.createGetter(i);
-                            String description = smellSensorType.getSimpleDescription(entity
-                                    .getName() + ":" + smell.getId() + "-" + i );
-                            returnList.add(getAttributeManager().createPotentialProducer(getter, smellSensorType, description));
+                            Smeller smeller =  smell.getSmeller(i);
+                            returnList.add(getAttributeManager()
+                                    .createPotentialProducer(smeller,
+                                            smellSensorType,
+                                            smeller.getDescription()));
                         }
                         // TODO: A way of indicating sensor location (relative
                         // location in polar coordinates)
@@ -197,41 +198,18 @@ public class OdorWorldComponent extends WorkspaceComponent {
             }
 
             public void sensorRemoved(Sensor sensor) {
-                // TODO: Go through all smell sensor getters, and if any refer to this, 
-                //  then remove that getter
-                fireAttributeObjectRemoved(sensor); 
+                if (sensor instanceof SmellSensor) {
+                    for (Smeller smeller : ((SmellSensor) sensor)
+                            .getSmellerList()) {
+                        fireAttributeObjectRemoved(smeller);
+                    }
+                }
+                fireAttributeObjectRemoved(sensor);
                 firePotentialAttributesChanged();
             }
             public void entityChanged(OdorWorldEntity entity) {
             }
-            
         });
-    }
-
-    /**
-     * Return a smell sensor getter, or null if there is no matching object.
-     * Helper method for scripts.
-     *
-     * @param rotatingEntity entity to match
-     * @param name name of sensor (left, right, center) to match
-     * @param i index of smell vector
-     *
-     * @return smell sensor getter wrapping this sensor
-     */
-    public SmellSensorGetter createSmellSensor(RotatingEntity rotatingEntity, String name, int i) {
-        for (OdorWorldEntity entity : world.getObjectList()) {
-            if (entity == rotatingEntity) {
-                for (Sensor sensor : rotatingEntity.getSensors()) {
-                    if (sensor instanceof SmellSensor) {
-                        SmellSensor smellSensor = (SmellSensor) sensor;
-                        if (smellSensor.getId().equalsIgnoreCase(name)) {
-                            return smellSensor.createGetter(i);
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -263,7 +241,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     @Override
     public String getKeyFromObject(Object object) {
         if (object instanceof OdorWorldEntity) {
-            return ((OdorWorldEntity) object).getName();
+            return ((OdorWorldEntity) object).getId();
         } else if (object instanceof Sensor) {
             String entityName = ((Sensor) object).getParent().getName();
             String sensorName = ((Sensor) object).getId();
@@ -272,11 +250,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
             String entityName = ((Effector) object).getParent().getName();
             String effectorName = ((Effector) object).getId();
             return entityName + ":effector:" + effectorName;
-        } else if (object instanceof SmellSensorGetter) {
-            String entityName = ((SmellSensorGetter) object).getParent().getParent().getName();
-            String sensorName = ((SmellSensorGetter) object).getParent().getId();
-            String index = "" + ((SmellSensorGetter) object).getIndex();
-            return entityName + ":smellSensorGetter:" + sensorName + ":" + index; 
+        } else if (object instanceof Smeller) {
+            // Need to handle smell sensors in a special way, since they are not directly
+            //  used as producers, but rather specific objects they contain are used.
+            String entityName = ((Smeller) object).getParent().getParent().getName();
+            String sensorName = ((Smeller) object).getParent().getId();
+            String index = "" + ((Smeller) object).getIndex();
+            return entityName + ":smeller:" + sensorName + ":" + index;
         }
 
         return null;
@@ -295,8 +275,13 @@ public class OdorWorldComponent extends WorkspaceComponent {
             } else if (secondString.equalsIgnoreCase("effector")) {
                 return getWorld().getEffector(entityName, parsedKey[2]);
             } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
+                // Needed to read simulations created before 2/11; remove before beta release
                 int index = Integer.parseInt(parsedKey[3]);
-                return getWorld().getSmellSensorGetter(entityName,
+                return getWorld().getSmeller(entityName,
+                        parsedKey[2], index);
+            } else if (secondString.equalsIgnoreCase("smeller")) {
+                int index = Integer.parseInt(parsedKey[3]);
+                return getWorld().getSmeller(entityName,
                         parsedKey[2], index);
             }
         }

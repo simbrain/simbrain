@@ -132,24 +132,29 @@ public class OdorWorldRenderer {
         // Draw entities
         Iterator<OdorWorldEntity> i = world.getObjectList().iterator();
         while (i.hasNext()) {
-            OdorWorldEntity sprite = i.next();
-            int x = Math.round(sprite.getX());
-            int y = Math.round(sprite.getY());
+            OdorWorldEntity entity = i.next();
+            int x = Math.round(entity.getX());
+            int y = Math.round(entity.getY());
             //  Below: Was thinking about some sort of indication that entities collided.
             //if (sprite.hasCollided()) {
             //    g.drawRect((int) sprite.getX(), (int) sprite.getY(),sprite.getWidth(), sprite.getHeight());
             //}
-            g.drawImage(sprite.getImage(), x, y, null);
-            if (sprite.isShowSensors()) {
+            while (g.drawImage(entity.getImage(), x, y, null) == false) {
+                ; // keep trying to draw the image until you can.   Dangerous?
+            }
+            if (entity.isShowSensors()) {
                 // g.drawRect((int) sprite.getX(), (int) sprite.getY(),
                 // sprite.getWidth(), sprite.getHeight());
-                for (Sensor sensor : sprite.getSensors()) {
+                for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof SmellSensor) {
                         double val = SimbrainMath
                                 .getVectorNorm(((SmellSensor) sensor)
                                         .getCurrentValue());
-                        float saturation = checkValid((float) Math.abs(val
-                                / (1 * world.getTotalSmellVectorLength())));
+                        float saturation = 0;
+                        if (world.getTotalSmellVectorLength() > 0) {
+                            saturation = checkValid((float) Math.abs(val
+                                    / (1 * world.getTotalSmellVectorLength())));                            
+                        }
                         g.setPaint(Color.getHSBColor(sensorColor, saturation,
                                 (float) 1));
                         // System.out.println(val + "--" + world.getTotalSmellVectorLength());

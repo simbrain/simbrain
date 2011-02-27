@@ -31,7 +31,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor.SmellSensorGetter;
+import org.simbrain.world.odorworld.sensors.SmellSensor.Smeller;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -69,6 +69,9 @@ public class OdorWorld {
     /** Entity Id generator. */
     private SimpleId entityIDGenerator = new SimpleId("Entity", 1);
 
+    /** Agent Name generator. */
+    private SimpleId agentNameGenerator = new SimpleId("Agent", 1);
+
     /**
      * Default constructor.
      */
@@ -95,11 +98,8 @@ public class OdorWorld {
      */
     public void addEntity(final OdorWorldEntity entity) {
 
-        entity.setName(entityIDGenerator.getId());
-
-        // centerSprite(sprite, tileX,tileY);
-
-        recomputeMaxStimulusLength();
+       // Set the entity's id
+        entity.setId(entityIDGenerator.getId());
 
         // Add entity to the map
         // map.addSprite(entity);
@@ -107,6 +107,10 @@ public class OdorWorld {
 
         // Fire entity added event
         fireEntityAdded(entity);
+
+        // Recompute max stimulus length
+        recomputeMaxStimulusLength();
+
     }
 
     /**
@@ -124,6 +128,7 @@ public class OdorWorld {
             entity.addSensor(new SmellSensor(entity, "Center", 0, 0));
             entity.addSensor(new SmellSensor(entity, "Right", -Math.PI / 8, 50));
         }
+        entity.setName(agentNameGenerator.getId());
         addEntity(entity);
     }
 
@@ -135,7 +140,7 @@ public class OdorWorld {
      */
     public OdorWorldEntity getEntity(final String id) {
         for (OdorWorldEntity entity : entityList) {
-            if (entity.getName().equalsIgnoreCase(id)) {
+            if (entity.getId().equalsIgnoreCase(id)) {
                 return entity;
             }
         }
@@ -184,19 +189,23 @@ public class OdorWorld {
     }
 
     /**
-     * Returns the sensor with the given id, or null if none is found.
+     * Returns the smeller associated with the specific smell sensor, or null if
+     * none is found.
+     *
+     * Note that the stimulus indices range from 0...n, but that
+     * these indices are offset by 1 in the GUI so that it ranges from 1...n+1.
      *
      * @param entityId entity to search
      * @param sensorId sensor to search
      * @return sensor if found
      */
-    public SmellSensorGetter getSmellSensorGetter(final String entityId,
+    public Smeller getSmeller(final String entityId,
             final String sensorId, final int stimulusIndex) {
         Sensor sensor = getSensor(entityId, sensorId);
         if ((sensor == null) || !(sensor instanceof SmellSensor)) {
             return null;
         }
-        return ((SmellSensor) sensor).createGetter(stimulusIndex);
+        return ((SmellSensor) sensor).getSmeller(stimulusIndex);
     }
 
     /**
@@ -208,6 +217,12 @@ public class OdorWorld {
         // map.removeSprite(entity);
         if (entityList.contains(entity)) {
             entityList.remove(entity);
+            for(Sensor sensor : entity.getSensors()) {
+                fireSensorRemoved(sensor);
+            }
+            for(Effector effector : entity.getEffectors()) {
+                fireEffectorRemoved(effector);
+            }
             recomputeMaxStimulusLength();
             fireEntityRemoved(entity);
         }
@@ -294,11 +309,15 @@ public class OdorWorld {
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
         listenerList = new ArrayList<WorldListener>();
+        if (agentNameGenerator == null) {
+            agentNameGenerator = new SimpleId("Agent" , 1);
+        }
+
         for (OdorWorldEntity entity : entityList) {
             entity.postSerializationInit();
         }

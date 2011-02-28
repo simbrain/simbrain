@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.desktop;
+package org.simbrain.workspace.actions;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -25,31 +25,33 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.simbrain.workspace.WorkspaceComponent;
+
 /**
- * Close network action.
+ * Close component action.  For use in individual component menus.
  */
-public final class CloseNetworkAction
+public final class CloseComponentAction
     extends AbstractAction {
 
-    /** Network panel. */
-    private final NetworkDesktopComponent networkDesktopComponent;
+    /** Parent component. */
+    private final WorkspaceComponent workspaceComponent;
 
 
     /**
-     * Create a new close network action with the specified
+     * Create a new close network action with the specified.
      * network panel.
      *
-     * @param networkDesktopComponent networkPanel, must not be null
+     * @param workspaceComponent component, must not be null
      */
-    public CloseNetworkAction(final NetworkDesktopComponent networkDesktopComponent) {
+    public CloseComponentAction(final WorkspaceComponent workspaceComponent) {
 
         super("Close");
 
-        if (networkDesktopComponent == null) {
+        if (workspaceComponent == null) {
             throw new IllegalArgumentException("networkDesktopComponent must not be null");
         }
 
-        this.networkDesktopComponent = networkDesktopComponent;
+        this.workspaceComponent = workspaceComponent;
 
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -59,6 +61,6 @@ public final class CloseNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkDesktopComponent.getParentFrame().dispose();
+        workspaceComponent.close();
     }
 }

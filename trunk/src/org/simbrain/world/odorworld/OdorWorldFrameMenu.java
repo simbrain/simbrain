@@ -18,19 +18,16 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.actions.CloseComponentAction;
 import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.world.odorworld.actions.OpenWorldAction;
 import org.simbrain.world.odorworld.actions.SaveWorldAction;
@@ -41,7 +38,7 @@ import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 /**
  * <b>OdorWorldFrameMenu</b>.
  */
-public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
+public class OdorWorldFrameMenu extends JMenuBar {
 
     private static final long serialVersionUID = 1L;
 
@@ -124,13 +121,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getFileMenu().add(new SaveWorldAsAction(parent));
         getFileMenu().addSeparator();
         getFileMenu().add(new ShowWorldPrefsAction(parent.getWorldPanel()));
-        getFileMenu().add(getClose());
-        getFileMenu().addMenuListener(this);
-
-//        getClose().addActionListener(closeListener);
-        getClose().setAccelerator(
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
-                        .getDefaultToolkit().getMenuShortcutKeyMask()));
+        getFileMenu().add(new CloseComponentAction(parent.getWorkspaceComponent()));
     }
 
     /**
@@ -201,20 +192,6 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      */
     public JMenuItem getClearAllItem() {
         return clearAllItem;
-    }
-
-    /**
-     * @param close The close to set.
-     */
-    public void setClose(final JMenuItem close) {
-        this.close = close;
-    }
-
-    /**
-     * @return Returns the close.
-     */
-    public JMenuItem getClose() {
-        return close;
     }
 
     /**

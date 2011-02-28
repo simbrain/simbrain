@@ -263,12 +263,11 @@ public class Workspace {
     public void removeWorkspaceComponent(final WorkspaceComponent component) {
         LOGGER.debug("removing component: " + component);
 
-        fireWorkspaceComponentRemoved(component);
-
-        /* Remove all couplings associated with this component */
+        // Remove all couplings associated with this component 
         this.getCouplingManager().removeCouplings(component);
         componentList.remove(component);
         this.setWorkspaceChanged(true);
+        fireWorkspaceComponentRemoved(component);
     }
 
     /**

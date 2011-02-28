@@ -63,7 +63,7 @@ public abstract class WorkspaceComponent {
     /**
      * List of couplings which attach to this component (i.e. have a consumer
      * whose parent is this component). Used in priority based update.
-     * 
+     *
      * @see {org.simbrain.workspace.updator.PriorityUpdator}
      */
     private final List<Coupling<?>> incomingCouplingList = new ArrayList<Coupling<?>>();
@@ -71,7 +71,7 @@ public abstract class WorkspaceComponent {
     /**
      * List of couplings which originate in this component (i.e. have a producer
      * whose parent is this component).Used in priority based update.
-     * 
+     *
      * @see {org.simbrain.workspace.updator.PriorityUpdator}
      */
     private final List<Coupling<?>> outgoingCouplingList = new ArrayList<Coupling<?>>();
@@ -134,7 +134,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Construct a workspace component.
-     * 
+     *
      * @param name The name of the component.
      */
     public WorkspaceComponent(final String name) {
@@ -146,7 +146,7 @@ public abstract class WorkspaceComponent {
     /**
      * Used when saving a workspace. All changed workspace components are saved
      * using this method.
-     * 
+     *
      * @param output the stream of data to write the data to.
      * @param format a key used to define the requested format.
      */
@@ -157,7 +157,7 @@ public abstract class WorkspaceComponent {
      * <p>
      * The default behavior is to return an empty list. This means that there is
      * one format.
-     * 
+     *
      * @return a list of the formats that this component supports.
      */
     public List<? extends String> getFormats() {
@@ -187,7 +187,7 @@ public abstract class WorkspaceComponent {
     /**
      * Return the potential consumers associated with this component. Subclasses
      * should override this to make their consumers available.
-     * 
+     *
      * @return the consumer list.
      */
     public List<PotentialConsumer> getPotentialConsumers() {
@@ -197,7 +197,7 @@ public abstract class WorkspaceComponent {
     /**
      * Return the potential producers associated with this component. Subclasses
      * should override this to make their producers available.
-     * 
+     *
      * @return the producer list.
      */
     public List<PotentialProducer> getPotentialProducers() {
@@ -207,7 +207,7 @@ public abstract class WorkspaceComponent {
     /**
      * Fire attribute object removed event (when the base object of an attribute
      * is removed).
-     * 
+     *
      * @param object the object which was removed
      */
     public void fireAttributeObjectRemoved(Object object) {
@@ -227,7 +227,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Fire attribute type visibility changed event.
-     * 
+     *
      * @param type the type whose visibility changed.
      */
     public void fireAttributeTypeVisibilityChanged(AttributeType type) {
@@ -239,7 +239,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Adds a AttributeListener to this component.
-     * 
+     *
      * @param listener the AttributeListener to add.
      */
     public void addAttributeListener(final AttributeListener listener) {
@@ -248,7 +248,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Removes an AttributeListener from this component.
-     * 
+     *
      * @param listener the AttributeListener to remove.
      */
     public void removeAttributeListener(AttributeListener listener) {
@@ -257,7 +257,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Add a new type of producer.
-     * 
+     *
      * @param type type to add
      */
     public void addProducerType(AttributeType type) {
@@ -266,7 +266,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Add a new type of consumer.
-     * 
+     *
      * @param type type to add
      */
     public void addConsumerType(AttributeType type) {
@@ -276,7 +276,7 @@ public abstract class WorkspaceComponent {
     /**
      * Finds objects based on a key. Used in deserializing attributes. Any class
      * that produces attributes should override this for serialization.
-     * 
+     *
      * @param objectKey String key
      * @return the corresponding object
      */
@@ -288,7 +288,7 @@ public abstract class WorkspaceComponent {
      * Returns a unique key associated with an object. Used in serializing
      * attributes. Any class that produces attributes should override this for
      * serialization.
-     * 
+     *
      * @param object object which should be associated with a key
      * @return the key
      */
@@ -298,7 +298,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the collection of update parts for this component.
-     * 
+     *
      * @return The collection of update parts for this component.
      */
     public Collection<ComponentUpdatePart> getUpdateParts() {
@@ -316,7 +316,7 @@ public abstract class WorkspaceComponent {
      * Returns the locks for the update parts. There should be one lock per
      * part. These locks need to be the same ones used to lock the update of
      * each part.
-     * 
+     *
      * @return The locks for the update parts.
      */
     public Collection<? extends Object> getLocks() {
@@ -368,7 +368,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the WorkspaceComponentListeners on this component.
-     * 
+     *
      * @return The WorkspaceComponentListeners on this component.
      */
     public Collection<WorkspaceComponentListener> getWorkspaceComponentListeners() {
@@ -377,7 +377,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Adds a WorkspaceComponentListener to this component.
-     * 
+     *
      * @param listener the WorkspaceComponentListener to add.
      */
     public void addWorkspaceComponentListener(
@@ -387,7 +387,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Adds a WorkspaceComponentListener to this component.
-     * 
+     *
      * @param listener the WorkspaceComponentListener to add.
      */
     public void removeWorkspaceComponentListener(
@@ -397,7 +397,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the name of this component.
-     * 
+     *
      * @return The name of this component.
      */
     public String getName() {
@@ -427,7 +427,7 @@ public abstract class WorkspaceComponent {
     /**
      * Retrieves a simple version of a component name from its class, e.g.
      * "Network" from "org.simbrain.network.NetworkComponent"/
-     * 
+     *
      * @return the simple name.
      */
     public String getSimpleName() {
@@ -440,7 +440,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Override for use with open service.
-     * 
+     *
      * @return xml string representing stored file.
      */
     public String getXML() {
@@ -450,7 +450,7 @@ public abstract class WorkspaceComponent {
     /**
      * Sets the workspace for this component. Called by the workspace right
      * after this component is created.
-     * 
+     *
      * @param workspace The workspace for this component.
      */
     public void setWorkspace(final Workspace workspace) {
@@ -459,7 +459,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns the workspace associated with this component.
-     * 
+     *
      * @return The workspace associated with this component.
      */
     public Workspace getWorkspace() {
@@ -470,7 +470,7 @@ public abstract class WorkspaceComponent {
      * Called when a coupling that this workspace owns the target or source of
      * is removed from the workspace. This method will only be called once if
      * the workspace owns both the source and the target.
-     * 
+     *
      * @param coupling The coupling that has been removed.
      */
     protected void couplingRemoved(final Coupling<?> coupling) {
@@ -479,7 +479,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * The overall name for the set of supported formats.
-     * 
+     *
      * @return the description
      */
     public String getDescription() {
@@ -488,7 +488,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * The file extension for a component type, e.g. By default, "xml".
-     * 
+     *
      * @return the file extension
      */
     public String getDefaultFormat() {
@@ -498,7 +498,7 @@ public abstract class WorkspaceComponent {
     /**
      * Set to true when a component changes, set to false after a component is
      * saved.
-     * 
+     *
      * @param changedSinceLastSave whether this component has changed since the
      *            last save.
      */
@@ -509,7 +509,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Returns true if it's changed since the last save.
-     * 
+     *
      * @return the changedSinceLastSave
      */
     public boolean hasChangedSinceLastSave() {
@@ -518,7 +518,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * This should be overridden if there are user preferences to get.
-     * 
+     *
      * @return the currentDirectory
      */
     public String getCurrentDirectory() {
@@ -527,7 +527,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * This should be overridden if there are user preferences to set.
-     * 
+     *
      * @param currentDirectory the currentDirectory to set
      */
     public void setCurrentDirectory(final String currentDirectory) {
@@ -608,7 +608,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Return visible producer types.
-     * 
+     *
      * @return the visible producerTypes
      */
     public List<AttributeType> getVisibleProducerTypes() {
@@ -623,7 +623,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Return visible consumer types.
-     * 
+     *
      * @return the visible consumerTypes
      */
     public List<AttributeType> getVisibleConsumerTypes() {

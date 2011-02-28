@@ -60,6 +60,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
@@ -705,6 +706,7 @@ public class SimbrainDesktop {
             setMaximizable(true);
             setIconifiable(true);
             setClosable(true);
+            setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             addInternalFrameListener(new WindowFrameListener());
         }
 
@@ -724,7 +726,10 @@ public class SimbrainDesktop {
             /** @see InternalFrameAdapter */
             public void internalFrameClosing(final InternalFrameEvent e) {
                 if (workspaceComponent.hasChangedSinceLastSave()) {
-                    guiComponent.showHasChangedDialog();
+                    boolean hasCancelled = guiComponent.showHasChangedDialog();
+                    if (hasCancelled) {
+                        return;
+                    }
                 }
                 guiComponent.close();
             }

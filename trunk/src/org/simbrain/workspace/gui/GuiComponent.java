@@ -42,7 +42,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * A gui view on a {@link org.simbrain.workspace.WorkspaceComponent}.
- * 
+ *
  * @param <E> the type of the workspace component.
  */
 public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel {
@@ -64,7 +64,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Construct a workspace component.
-     * 
+     *
      * @param frame the parent frame.
      * @param workspaceComponent the component to wrap.
      */
@@ -236,7 +236,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Writes the bounds of this desktop component to the provided stream.
-     * 
+     *
      * @param ostream the stream to write to
      * @throws IOException if an IO error occurs
      */
@@ -247,7 +247,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Creates a new desktop component from the provided stream.
-     * 
+     *
      * @param component the component to create the desktop component for.
      * @param istream the inputstream containing the serialized data.
      * @param name the name of the desktop component.
@@ -271,8 +271,10 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Checks to see if anything has changed and then offers to save if true.
+     *
+     * @return true if user cancels
      */
-    public void showHasChangedDialog() {
+    public boolean showHasChangedDialog() {
         Object[] options = { "Save", "Don't Save", "Cancel" };
         int s = JOptionPane.showInternalOptionDialog(this,
                 "This component has changed since last save,\n"
@@ -283,16 +285,19 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         if (s == JOptionPane.OK_OPTION) {
             this.save();
             workspaceComponent.close();
+            return false;
         } else if (s == JOptionPane.NO_OPTION) {
             workspaceComponent.close();
+            return false;
         } else if (s == JOptionPane.CANCEL_OPTION) {
-            return;
+            return true;
         }
+        return false;
     }
 
     /**
      * Return name of underlying component.
-     * 
+     *
      * @return the name of underlying component.
      */
     public String getName() {
@@ -310,7 +315,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     /**
      * Retrieves a simple version of a component name from its class, e.g.
      * "Network" from "org.simbrain.network.NetworkComponent"/
-     * 
+     *
      * @return the simple name.
      */
     public String getSimpleName() {
@@ -323,7 +328,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Returns the workspace component wrapped by this instance.
-     * 
+     *
      * @return the workspace component wrapped by this instance.
      */
     public E getWorkspaceComponent() {
@@ -332,7 +337,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Sets the parent frame of this view.
-     * 
+     *
      * @param parentFrame the new parent.
      */
     public void setParentFrame(final GenericFrame parentFrame) {
@@ -341,7 +346,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
     /**
      * Returns the parent from of this view.
-     * 
+     *
      * @return the parent from of this view.
      */
     public GenericFrame getParentFrame() {

@@ -33,6 +33,10 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.workspace.component_actions.CloseAction;
+import org.simbrain.workspace.component_actions.OpenAction;
+import org.simbrain.workspace.component_actions.SaveAction;
+import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -90,9 +94,9 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         // Add toolbars
         JPanel toolbarPanel = new JPanel();
-        toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        toolbarPanel.add(table.getToolbarCSV()); //TODO: Use regular open / close
+        toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));        
         toolbarPanel.add(table.getToolbarEditTable());
+        toolbarPanel.add(table.getToolbarRandomize());
         add(toolbarPanel, BorderLayout.NORTH);
 
         addMenuBar(table);
@@ -110,31 +114,13 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         // Add file menu
         mb.add(fileMenu);
-        JMenuItem openItem = new JMenuItem("Open...");
-        openItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showOpenFileDialog();
-            }
-        });
-        fileMenu.add(openItem);
-
-        saveItem = new JMenuItem("Save");
-        saveItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                save();
-            }
-        });
-        fileMenu.add(saveItem);
-
-        JMenuItem saveAsItem = new JMenuItem("Save As...");
-        saveAsItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showSaveFileDialog();
-            }
-        });
-        fileMenu.add(saveAsItem);
-
-        // TODO : add import / export
+        fileMenu.add(new OpenAction(this));
+        fileMenu.add(new SaveAction(this));
+        fileMenu.add(new SaveAsAction(this));
+        fileMenu.addSeparator();
+        fileMenu.add(table.getMenuCSV());
+        fileMenu.addSeparator();
+        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
 
         // Edit menu
         JMenu editMenu = table.getMenuEdit();
@@ -142,10 +128,14 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
             public void actionPerformed(final ActionEvent e) {
                 component.getDataModel().setIterationMode(
                         iterationMode.getState());
-             }
+            }
         });
+        editMenu.add(table.getMenuFill());
+        editMenu.add(table.getMenuRandomize());
+        editMenu.add(table.getMenuNormalize());
         editMenu.addSeparator();
         editMenu.add(iterationMode);
+
         mb.add(editMenu);
 
         // Add coupling menu

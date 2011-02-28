@@ -18,7 +18,9 @@
  */
 package org.simbrain.util.table;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
@@ -27,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
@@ -52,7 +55,7 @@ public class TableActionManager {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-                putValue(NAME, "Open (.csv)");
+                putValue(NAME, "Import (.csv)");
                 putValue(SHORT_DESCRIPTION, "Import table from .csv");
             }
 
@@ -82,8 +85,8 @@ public class TableActionManager {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
-                putValue(NAME, "Save (.csv)");
-                putValue(SHORT_DESCRIPTION, "Save table to .csv");
+                putValue(NAME, "Export (.csv)");
+                putValue(SHORT_DESCRIPTION, "Export table to .csv");
             }
 
             /**
@@ -106,7 +109,7 @@ public class TableActionManager {
      * @param table table to randomize
      * @return the action
      */
-    public static Action getRandomizeAction(final SimbrainDataTable table) {
+    public static Action getRandomizeAction(final SimbrainJTable jtable) {
         return new AbstractAction() {
 
             // Initialize
@@ -114,13 +117,16 @@ public class TableActionManager {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Randomize");
                 putValue(SHORT_DESCRIPTION, "Randomize Table");
+                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R,
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                putValue(ACCELERATOR_KEY, keyStroke);
             }
 
             /**
              * {@ineritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                table.randomize();
+                jtable.getData().randomize();
             }
 
         };
@@ -166,6 +172,9 @@ public class TableActionManager {
                 //putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Normalize table");
                 putValue(SHORT_DESCRIPTION, "Normalize table");
+                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                putValue(ACCELERATOR_KEY, keyStroke);
             }
 
             /**
@@ -496,6 +505,9 @@ public class TableActionManager {
                 //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Zero fill table");
                 putValue(SHORT_DESCRIPTION, "Zero fill table");
+                KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                putValue(ACCELERATOR_KEY, keyStroke);
             }
 
             /**

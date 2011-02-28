@@ -27,7 +27,7 @@ import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.actions.CloseComponentAction;
+import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.world.odorworld.actions.OpenWorldAction;
 import org.simbrain.world.odorworld.actions.SaveWorldAction;
@@ -121,7 +121,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
         getFileMenu().add(new SaveWorldAsAction(parent));
         getFileMenu().addSeparator();
         getFileMenu().add(new ShowWorldPrefsAction(parent.getWorldPanel()));
-        getFileMenu().add(new CloseComponentAction(parent.getWorkspaceComponent()));
+        getFileMenu().add(new CloseAction(parent.getWorkspaceComponent()));
     }
 
     /**

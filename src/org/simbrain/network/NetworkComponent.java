@@ -87,6 +87,7 @@ public final class NetworkComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void neuronAdded(NetworkEvent<Neuron> e) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
             }
 
@@ -94,41 +95,49 @@ public final class NetworkComponent extends WorkspaceComponent {
              * {@inheritDoc}
              */
             public void neuronTypeChanged(NetworkEvent<NeuronUpdateRule> e) {
+                setChangedSinceLastSave(true);
             }
 
             /**
              * {@inheritDoc}
              */
             public void neuronMoved(NetworkEvent<Neuron> e) {
+                setChangedSinceLastSave(true);
             }
 
             /**
              * {@inheritDoc}
              */
             public void neuronRemoved(NetworkEvent<Neuron> e) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
                 fireAttributeObjectRemoved(e.getObject());
             }
 
             public void neuronChanged(NetworkEvent<Neuron> e) {
-            }
+                setChangedSinceLastSave(true);
+           }
         });
 
         rootNetwork.addSynapseListener(new SynapseListener() {
 
             public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
             }
 
             public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
             }
 
             public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
             }
 
             public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
+                setChangedSinceLastSave(true);
             }
 
         });

@@ -133,17 +133,26 @@ public class OdorWorld {
     }
 
     /**
-     * Returns the entity with the given id, or null if none is found.
+     * Returns the entity with the given id, or, failing that, a given name.  If
+     * no entity is found return null.
      *
      * @param id name of entity
      * @return matching entity, if any
      */
     public OdorWorldEntity getEntity(final String id) {
+        // Search by id
         for (OdorWorldEntity entity : entityList) {
             if (entity.getId().equalsIgnoreCase(id)) {
                 return entity;
             }
         }
+        // Search for label if no matching id found
+        for (OdorWorldEntity entity : entityList) {
+            if (entity.getName().equalsIgnoreCase(id)) {
+                return entity;
+            }
+        }
+        // Matching entity not found
         return null;
     }
 

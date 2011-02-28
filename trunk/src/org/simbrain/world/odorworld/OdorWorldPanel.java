@@ -110,7 +110,7 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
         menu = new OdorWorldMenu(this);
 
         menu.initMenu();
-        
+
         world.addListener(new WorldListener() {
 
             public void updated() {

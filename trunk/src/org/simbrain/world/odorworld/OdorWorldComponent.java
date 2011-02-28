@@ -176,28 +176,34 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 fireUpdateEvent();
             }
             public void effectorAdded(final Effector effector) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
             }
 
             public void effectorRemoved(final Effector effector) {
+                setChangedSinceLastSave(true);
                 fireAttributeObjectRemoved(effector);
                 firePotentialAttributesChanged();
             }
 
             public void entityAdded(final OdorWorldEntity entity) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
             }
 
             public void entityRemoved(final OdorWorldEntity entity) {
+                setChangedSinceLastSave(true);
                 fireAttributeObjectRemoved(entity);
                 firePotentialAttributesChanged();
             }
 
             public void sensorAdded(final Sensor sensor) {
+                setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
             }
 
             public void sensorRemoved(Sensor sensor) {
+                setChangedSinceLastSave(true);
                 if (sensor instanceof SmellSensor) {
                     for (Smeller smeller : ((SmellSensor) sensor)
                             .getSmellerList()) {
@@ -208,6 +214,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 firePotentialAttributesChanged();
             }
             public void entityChanged(OdorWorldEntity entity) {
+                setChangedSinceLastSave(true);
             }
         });
     }

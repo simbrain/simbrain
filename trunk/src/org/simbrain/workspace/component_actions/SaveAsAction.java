@@ -16,44 +16,48 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.desktop;
+package org.simbrain.workspace.component_actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Save as network action.
+ * Save as action.
  */
-public final class SaveAsNetworkAction
-    extends AbstractAction {
+public final class SaveAsAction extends AbstractAction {
 
     /** Network panel. */
-    private final NetworkDesktopComponent networkComponent;
+    private final GuiComponent guiComponent;
 
 
     /**
-     * Create a new save as network action with the specified network panel.
+     * Create a new save component action with the specified.
      *
-     * @param networkComponent networkComponent, must not be null
+     * @param guiComponent networkPanel, must not be null
      */
-    public SaveAsNetworkAction(final NetworkDesktopComponent networkComponent) {
+    public SaveAsAction(final GuiComponent guiComponent) {
 
-        super("Save As...");
+        super("Save as...");
 
-        if (networkComponent == null) {
-            throw new IllegalArgumentException("networkComponent must not be null");
+        if (guiComponent == null) {
+            throw new IllegalArgumentException("component must not be null");
         }
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
 
-        this.networkComponent = networkComponent;
+        this.guiComponent = guiComponent;
     }
+
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkComponent.showSaveFileDialog();
+        guiComponent.showSaveFileDialog();
     }
 }

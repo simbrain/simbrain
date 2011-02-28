@@ -203,7 +203,7 @@ public class SimbrainJTable extends JXTable {
      */
     public JToolBar getToolbarRandomize() {
         JToolBar toolbar = new JToolBar();
-        toolbar.add(TableActionManager.getRandomizeAction(getData()));
+        toolbar.add(TableActionManager.getRandomizeAction(this));
         toolbar.add(TableActionManager.getSetTableBoundsAction(getData()));
         return toolbar;
     }
@@ -214,7 +214,7 @@ public class SimbrainJTable extends JXTable {
      * @return the csv menu
      */
     public JMenu getMenuCSV() {
-        JMenu menu = new JMenu("File (.csv)");
+        JMenu menu = new JMenu("Import / Export .csv");
         menu.add(new JMenuItem(TableActionManager.getOpenCSVAction(getData())));
         menu.add(new JMenuItem(TableActionManager.getSaveCSVAction(getData())));
         return menu;
@@ -227,7 +227,7 @@ public class SimbrainJTable extends JXTable {
      */
     public JMenu getMenuRandomize() {
         JMenu menu = new JMenu("Randomize");
-        menu.add(TableActionManager.getRandomizeAction(getData()));
+        menu.add(TableActionManager.getRandomizeAction(this));
         menu.add(TableActionManager.getSetTableBoundsAction(getData()));
         return menu;
     }

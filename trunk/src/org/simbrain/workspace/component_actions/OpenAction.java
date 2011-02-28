@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.actions;
+package org.simbrain.workspace.component_actions;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -25,42 +25,43 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Close component action.  For use in individual component menus.
+ * Open component action.
  */
-public final class CloseComponentAction
-    extends AbstractAction {
+public final class OpenAction extends AbstractAction {
 
-    /** Parent component. */
-    private final WorkspaceComponent workspaceComponent;
+    /** Network panel. */
+    private final GuiComponent guiComponent;
 
 
     /**
-     * Create a new close network action with the specified.
-     * network panel.
+     * Create a new open component action with the specified.
      *
-     * @param workspaceComponent component, must not be null
+     * @param guiComponent networkPanel, must not be null
      */
-    public CloseComponentAction(final WorkspaceComponent workspaceComponent) {
+    public OpenAction(final GuiComponent guiComponent) {
 
-        super("Close");
+        super("Open...");
 
-        if (workspaceComponent == null) {
-            throw new IllegalArgumentException("networkDesktopComponent must not be null");
+        if (guiComponent == null) {
+            throw new IllegalArgumentException("component must not be null");
         }
 
-        this.workspaceComponent = workspaceComponent;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W,
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
+
+        this.guiComponent = guiComponent;
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspaceComponent.close();
+        guiComponent.showOpenFileDialog();
     }
 }

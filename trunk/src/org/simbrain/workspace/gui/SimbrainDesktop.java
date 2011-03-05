@@ -36,8 +36,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -367,10 +365,23 @@ public class SimbrainDesktop {
         /**
          * Responds to component moved events.
          *
-         * @param arg0 SimbrainComponent event
+         * @param event SimbrainComponent event
          */
-        public void componentMoved(final ComponentEvent arg0) {
-            // System.out.println("Component moved");
+        public void componentMoved(final ComponentEvent event) {
+
+            // Prevent window from being moved outside of visible area
+            int x = (int) event.getComponent().getBounds().getX();
+            int y = (int) event.getComponent().getBounds().getY();
+            int width = (int) event.getComponent().getBounds().getWidth();
+            int height = (int) event.getComponent().getBounds().getHeight();
+            if (x < desktop.getVisibleRect().getX()) {
+                event.getComponent().setBounds(0, y, width, height);
+            }
+            if (y < desktop.getVisibleRect().getY()) {
+                event.getComponent().setBounds(x, 0, width, height);
+            }
+
+            // Workspace has changed
             workspace.setWorkspaceChanged(true);
         }
 

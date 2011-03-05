@@ -33,7 +33,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>TextWorldComponent</b> is the container for the world component. Handles
- * toolbar buttons, and serializing of world data. The main environment codes is
+ * toolbar buttons, and serializing of world data. The main environment code is
  * in {@link TextWorld}.
  */
 public class TextWorldComponent extends WorkspaceComponent {
@@ -53,7 +53,7 @@ public class TextWorldComponent extends WorkspaceComponent {
         super(name);
         world = new TextWorld();
         attributeList = new AttributeList<Double>(world.getInputCoding().length);
-        addProducerType(new AttributeType(this, "Text", "getValue", double.class,
+        addProducerType(new AttributeType(this, "Text", "getValue", Double.class,
                 true));
 
         world.addListener(new TextListener() {
@@ -75,7 +75,7 @@ public class TextWorldComponent extends WorkspaceComponent {
                 for (int i = 0; i < world.getInputCoding().length; i++) {
                     returnList.add(getAttributeManager()
                             .createPotentialProducer(
-                                    attributeList.getGetterSetter(i), "Value",
+                                    attributeList.getGetterSetter(i), "getValue",
                                     double.class, "Text Component " + i));
                 }
             }

@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.workspace.AttributeList;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -41,9 +40,6 @@ public class TextWorldComponent extends WorkspaceComponent {
     /** Instance of world of type TextWorld. */
     private final TextWorld world;
 
-    /** List of getters. */
-    private AttributeList<Double> attributeList;
-
     /**
      * Creates a new frame of type TextWorld.
      *
@@ -52,32 +48,27 @@ public class TextWorldComponent extends WorkspaceComponent {
     public TextWorldComponent(String name) {
         super(name);
         world = new TextWorld();
-        attributeList = new AttributeList<Double>(world.getInputCoding().length);
-        addProducerType(new AttributeType(this, "Text", "getValue", Double.class,
-                true));
-
-        world.addListener(new TextListener() {
-            /** {@inheritDoc} .*/
-            public void textChanged() {
-                for (int i = 0; i < world.getInputCoding().length; i++) {
-                    attributeList.setVal(i, world.getInputCoding()[i]);
-                }
-            }
-
-        });
+        addProducerType(new AttributeType(this, "Letters", double.class, true));
+        addProducerType(new AttributeType(this, "Words", double.class, false));
     }
 
     @Override
     public List<PotentialProducer> getPotentialProducers() {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
-            if (type.getTypeName().equalsIgnoreCase("Text")) {
-                for (int i = 0; i < world.getInputCoding().length; i++) {
-                    returnList.add(getAttributeManager()
-                            .createPotentialProducer(
-                                    attributeList.getGetterSetter(i), "getValue",
-                                    double.class, "Text Component " + i));
+            if (type.getTypeName().equalsIgnoreCase("Letters")) {
+                char letter;
+                for (letter = 'a'; letter <= 'z'; letter++) {
+                    returnList.add(new PotentialProducer(this, world,
+                            "currentItemContainsLetter", double.class,
+                            char.class, letter, "Letter " + letter));
                 }
+            }
+            if (type.getTypeName().equalsIgnoreCase("Words")) {
+                for (String word : world.getWordList())
+                    returnList.add(new PotentialProducer(this, world,
+                            "currentItemContainsWord", double.class,
+                            String.class, word, "Word " + word));
             }
         }
         return returnList;
@@ -94,13 +85,9 @@ public class TextWorldComponent extends WorkspaceComponent {
         return xstream;
     }
 
+
     /**
-     * Recreates an instance of this class from a saved component.
-     *
-     * @param input
-     * @param name
-     * @param format
-     * @return
+     * {@inheritDoc}
      */
     public static TextWorldComponent open(InputStream input, String name,
             String format) {

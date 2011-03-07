@@ -298,14 +298,14 @@ public class TextWorldPanel extends JPanel implements KeyListener,
 
     /**
      * Responds to action events.
-     * 
+     *
      * @param e ActionEvent
      */
     public void actionPerformed(final ActionEvent e) {
 
         Object o = e.getSource();
         if (o == sendButton) {
-            parseText(getCurrentLine());
+            parseText(getCurrentLine()); //If sentence then different...
         } else if (o == "prefs") {
             // showTextWorldDialog();
         }
@@ -445,14 +445,19 @@ public class TextWorldPanel extends JPanel implements KeyListener,
                     System.out.println("Exception in parseWord: " + e);
                 }
                 int begin = lineBegin;
-                if (world.getTheParseStyle() == TextWorld.ParseStyle.CHARACTER) {
+                if (world.getTheParseStyle() == TextWorld.ParseStyle.SENTENCE) {
+                    highlightText(begin, charArray.length);
+                    sleep(world.getPauseTime());
+                } else if (world.getTheParseStyle() == TextWorld.ParseStyle.CHARACTER) {
                     for (int i = 0; i < charArray.length; i++) {
                         begin = lineBegin + i + 1;
                         highlightText(begin, begin + 1);
-                        world.encodeCharacter(charArray[i]);
+                        world.setCurrentChar(charArray[i]);
+                        //world.encodeCharacter(charArray[i]);
                         sleep(world.getPauseTime());
                     }
-                } else if (world.getTheParseStyle() == TextWorld.ParseStyle.WORD) {
+                }
+                else if (world.getTheParseStyle() == TextWorld.ParseStyle.WORD) {
                     // Parse Words
                     String word = "";
                     int charCounter = 0;
@@ -464,7 +469,8 @@ public class TextWorldPanel extends JPanel implements KeyListener,
                                 continue;
                             }
                             highlightText(begin, lineBegin + charCounter);
-                            world.encodeWord(word);
+                            world.setCurrentWord(word);
+                            //world.encodeWord(word);
                             sleep(world.getPauseTime());
                             begin = lineBegin + charCounter + 1;
                             word = "";

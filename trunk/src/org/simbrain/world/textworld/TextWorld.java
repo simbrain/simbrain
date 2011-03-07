@@ -22,7 +22,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 /**
@@ -55,8 +54,17 @@ public class TextWorld {
     /** The current parsing styles. */
     private ParseStyle parseStyle = ParseStyle.WORD;
 
-    /** The current input coding. */
-    private double[] inputCoding;
+    /** Input coding for distributed coding schemes (not yet supported). */
+    private double[] inputCoding; //TODO: Once supported will have to be initialized.
+
+    /** The current character. */
+    private char currentChar;
+
+    /** The current word. */
+    private String currentWord = "";
+
+    /** Word list for word parsing. */
+    private List<String> wordList = new ArrayList<String>();
 
     /** List of listeners on this world. */
     private List<TextListener> listenerList = new ArrayList<TextListener>();
@@ -66,15 +74,6 @@ public class TextWorld {
      */
     public TextWorld() {
 
-        // TODO: 10 is just arbitrary for now.  When the design if fleshed out more it can be set
-        //      and changed in some principled way.
-        inputCoding = SimbrainMath.zeroVector(10);
-
-        // For Testing
-        // dictionary.put("this", new double[] { .1, .2, -1, 0 });
-        // dictionary.put("is", new double[] { .2, 0, 0, 4 });
-        // dictionary.put("a", new double[] { .3, 1, 5, 4 });
-        // dictionary.put("test", new double[] { .4, .5, -.9, 1 });
     }
 
     /**
@@ -200,14 +199,14 @@ public class TextWorld {
 
     /**
      * Code a character numerically. Convert a given character to an array of
-     * doubles.
+     * doubles.  For distributed representations of letters (not yet supported).
      *
      * @param c the character to be coded.
      */
     public void encodeCharacter(char c) {
 
         // This is just a quick temporary method to generate a
-        //  vector from a character
+        // vector from a character
         String binaryRep = Integer.toBinaryString(c);
         for (int i = 0; i < inputCoding.length - 1; i++) {
             if (i < binaryRep.length()) {
@@ -220,7 +219,8 @@ public class TextWorld {
 
     /**
      * Code a word numerically. Convert a given string representation of a word
-     * to an array of doubles.
+     * to an array of doubles. For distributed representations of words (not yet
+     * supported).
      *
      * @param word the word to be coded
      */
@@ -232,6 +232,91 @@ public class TextWorld {
             }
         }
         fireTextChangedEvent();
+    }
+
+    /**
+     * Returns 1 if the current item (letter, word, sentence) contains this
+     * character, or 0 otherwise. Used for localist representations of letters.
+     *
+     * @param letter the letter to search for
+     * @return 1 if the letter is contained, 0 otherwise.
+     */
+    public int currentItemContainsLetter(char letter) {
+        if (parseStyle == ParseStyle.CHARACTER) {
+            if (getCurrentChar() == letter) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else if (parseStyle == ParseStyle.WORD) {
+            if (getCurrentWord().contains("" + letter)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Returns 1 if the current item is this word (or if the current sentence
+     * contains this word), or 0 otherwise. Used for localist representations of
+     * words.
+     *
+     * @param word the word to search for
+     * @return 1 if the word is contained, 0 otherwise.
+     */
+    public int currentItemContainsWord(String word) {
+        if (parseStyle == ParseStyle.WORD) {
+            if (getCurrentWord().equalsIgnoreCase(word)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * @return the currentChar
+     */
+    public char getCurrentChar() {
+        return currentChar;
+    }
+
+    /**
+     * @param currentChar the currentChar to set
+     */
+    public void setCurrentChar(char currentChar) {
+        this.currentChar = currentChar;
+    }
+
+    /**
+     * @return the currentWord
+     */
+    public String getCurrentWord() {
+        return currentWord;
+    }
+
+    /**
+     * @param currentWord the currentWord to set
+     */
+    public void setCurrentWord(String currentWord) {
+        this.currentWord = currentWord;
+    }
+
+    /**
+     * @return the wordList
+     */
+    public List<String> getWordList() {
+        return wordList;
+    }
+
+    /**
+     * @param wordList the wordList to set
+     */
+    public void setWordList(List<String> wordList) {
+        this.wordList = wordList;
     }
 
 }

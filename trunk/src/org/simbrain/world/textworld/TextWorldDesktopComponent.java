@@ -37,6 +37,7 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
 import org.simbrain.util.SFileChooser;
+import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
@@ -201,6 +202,9 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
         dictionary.add(loadDictionary);
         edit.add(dictionary);
         edit.add(preferences);
+
+        menuBar.add(new CouplingMenuComponent("Couple", this.getWorkspaceComponent()
+                .getWorkspace(), this.getWorkspaceComponent()));
 
         menuBar.add(help);
 

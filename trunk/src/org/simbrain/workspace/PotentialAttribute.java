@@ -36,8 +36,23 @@ public class PotentialAttribute {
     /** Name of the method that sets or gets the attribute. */
     private String methodName;
 
-    /** The data type (double, string, etc) of a consumer or producer. */
+    /**
+     * The data type (double, string, etc) consumed by a consumer or produced by
+     * a producer.
+     */
     private Class<?> dataType;
+
+    /**
+     * Data types of arguments to the method that gets or sets the attribute.
+     * Set to null for the no-argument case.
+     */
+    private Class<?>[] argumentDataTypes;
+
+    /**
+     * Value of the arguments to the the method that gets or sets the attribute.
+     * Set to null for the no argument case.
+     */
+    private Object[] argumentValues;
 
     /** Description of this type of potential attribute. */
     private String description;
@@ -46,15 +61,41 @@ public class PotentialAttribute {
      * Construct a potential attribute.
      *
      * @param parent parent workspace component
-     * @param methodName method name
-     * @param dataType class of data
+     * @param object base object containing method to call
+     * @param methodName name of method to call
+     * @param dataType return type of method
+     * @param description description of the attribute
      */
-    protected PotentialAttribute(WorkspaceComponent parent, Object object, 
+    protected PotentialAttribute(WorkspaceComponent parent, Object object,
             String methodName, Class<?> dataType, String description) {
         this.parent = parent;
         this.baseObject = object;
         this.methodName = methodName;
         this.dataType = dataType;
+        this.description = description;
+    }
+
+    /**
+     * Construct a potential attribute for the case where the method has
+     * arguments.
+     *
+     * @param parent parent workspace component
+     * @param object base object containing method to call
+     * @param methodName name of method to call
+     * @param dataType return type of method
+     * @param argDataTypes datatype of argument to method
+     * @param argValues values of argument to method
+     * @param description description of the attribute
+     */
+    protected PotentialAttribute(WorkspaceComponent parent, Object object,
+            String methodName, Class<?> dataType, Class<?>[] argDataTypes,
+            Object[] argValues, String description) {
+        this.parent = parent;
+        this.baseObject = object;
+        this.methodName = methodName;
+        this.dataType = dataType;
+        this.argumentDataTypes = argDataTypes;
+        this.argumentValues = argValues;
         this.description = description;
     }
 
@@ -111,6 +152,20 @@ public class PotentialAttribute {
      */
     public Object getBaseObject() {
         return baseObject;
+    }
+
+    /**
+     * @return the argumentDataTypes
+     */
+    public Class<?>[] getArgumentDataTypes() {
+        return argumentDataTypes;
+    }
+
+    /**
+     * @return the argumentValues
+     */
+    public Object[] getArgumentValues() {
+        return argumentValues;
     }
 
 }

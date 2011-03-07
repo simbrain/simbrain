@@ -47,21 +47,24 @@ public class AttributeManager {
         this.parentComponent = parentComponent;
     }
 
-
     /**
-     * Create a producer. This version of the method does the real work; others
-     * forward to it.
+     * Create a producer based on an argument. This version of the method does
+     * the real work; others forward to it.
      *
      * @param parentObject parent object
      * @param methodName name of method
      * @param dataType type of data
-     * @param description description
+     * @param argumentDataTypes data types of arguments to the method
+     * @param argumentValues arguments to the method
+     * @param description description of the producer
      * @return the resulting producer
      */
     public Producer<?> createProducer(
             final Object parentObject,
             final String methodName,
             final Class<?> dataType,
+            final Class<?>[] argumentDataTypes,
+            final Object[] argumentValues,
             final String description) {
 
         Producer<?> producer = new Producer() {
@@ -71,7 +74,7 @@ public class AttributeManager {
             // Static initializer
             {
                 try {
-                    theMethod = parentObject.getClass().getMethod(methodName, null);
+                    theMethod = parentObject.getClass().getMethod(methodName, argumentDataTypes);
                 } catch (SecurityException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchMethodException e1) {
@@ -88,7 +91,7 @@ public class AttributeManager {
              */
             public Object getValue() {
                 try {
-                    return theMethod.invoke(parentObject, null);
+                    return theMethod.invoke(parentObject, argumentValues );
                 } catch (IllegalArgumentException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -141,18 +144,33 @@ public class AttributeManager {
         return producer;
 
     }
+    
+    /**
+     * Create a producer based on a method with no arguments.
+     *
+     * @param parentObject parent object
+     * @param methodName name of method
+     * @param dataType type of data
+     * @param description description
+     * @return the resulting producer
+     */
+    public Producer<?> createProducer(
+            final Object parentObject,
+            final String methodName,
+            final Class<?> dataType,
+            final String description) {
 
+        return createProducer(parentObject, methodName, dataType, null, null,
+                description);
+    }
 
     /**
      * Create a producer without specifying a custom description (the
      * description is created automatically).
      *
-     * @param baseObject
-     *            base object
-     * @param methodName
-     *            method name
-     * @param dataType
-     *            data type
+     * @param baseObject base object
+     * @param methodName method name
+     * @param dataType data type
      * @return created producer
      */
     public Producer<?> createProducer(final Object baseObject,
@@ -168,9 +186,18 @@ public class AttributeManager {
      * @return the resulting producer
      */
     public Producer<?> createProducer(final PotentialAttribute potentialAttribute) {
-        return createProducer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodName(), potentialAttribute.getDataType(),
-                potentialAttribute.getDescription());
+        
+        if (potentialAttribute.getArgumentDataTypes() != null) {
+            return createProducer(potentialAttribute.getBaseObject(), potentialAttribute
+                    .getMethodName(), potentialAttribute.getDataType(), potentialAttribute.getArgumentDataTypes(),
+                    potentialAttribute.getArgumentValues(),
+                    potentialAttribute.getDescription());            
+        } else {
+            return createProducer(potentialAttribute.getBaseObject(), potentialAttribute
+                    .getMethodName(), potentialAttribute.getDataType(),
+                    potentialAttribute.getDescription());
+        }
+        
     }
 
     /**

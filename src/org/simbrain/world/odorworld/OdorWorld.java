@@ -31,7 +31,6 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor.Smeller;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -61,10 +60,10 @@ public class OdorWorld {
     private boolean objectsBlockMovement = true;
 
     /** Height of world. */
-    private int height;
+    private int height = 450;
 
     /** Width of world. */
-    private int width;
+    private int width = 450;
 
     /** Entity Id generator. */
     private SimpleId entityIDGenerator = new SimpleId("Entity", 1);
@@ -119,6 +118,9 @@ public class OdorWorld {
      * @param entity the entity  corresponding to the agent
      */
     public void addAgent(final OdorWorldEntity entity) {
+
+        entity.setName(agentNameGenerator.getId());
+
         if (entity instanceof RotatingEntity) {
 
             // Add effectors (currently none)
@@ -127,8 +129,9 @@ public class OdorWorld {
             entity.addSensor(new SmellSensor(entity, "Left", Math.PI / 8, 50));
             entity.addSensor(new SmellSensor(entity, "Center", 0, 0));
             entity.addSensor(new SmellSensor(entity, "Right", -Math.PI / 8, 50));
+            entity.addTileSensors(10, 10);
+            entity.addTileSensors(10, 10, 2);
         }
-        entity.setName(agentNameGenerator.getId());
         addEntity(entity);
     }
 
@@ -195,26 +198,6 @@ public class OdorWorld {
         }
         return null;
 
-    }
-
-    /**
-     * Returns the smeller associated with the specific smell sensor, or null if
-     * none is found.
-     *
-     * Note that the stimulus indices range from 0...n, but that
-     * these indices are offset by 1 in the GUI so that it ranges from 1...n+1.
-     *
-     * @param entityId entity to search
-     * @param sensorId sensor to search
-     * @return sensor if found
-     */
-    public Smeller getSmeller(final String entityId,
-            final String sensorId, final int stimulusIndex) {
-        Sensor sensor = getSensor(entityId, sensorId);
-        if ((sensor == null) || !(sensor instanceof SmellSensor)) {
-            return null;
-        }
-        return ((SmellSensor) sensor).getSmeller(stimulusIndex);
     }
 
     /**

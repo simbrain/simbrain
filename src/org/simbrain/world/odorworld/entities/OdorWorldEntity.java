@@ -30,11 +30,11 @@ import org.simbrain.world.odorworld.behaviors.Behavior;
 import org.simbrain.world.odorworld.behaviors.StationaryBehavior;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.TileSensor;
 
 /**
- * Parent class for all Odor World objects.
- *
- * Adapted and extended from From Developing Games in Java, by David Brackeen.
+ * Parent class for all Odor World objects. Adapted and extended from From
+ * Developing Games in Java, by David Brackeen.
  */
 public abstract class OdorWorldEntity {
 
@@ -66,7 +66,7 @@ public abstract class OdorWorldEntity {
     private OdorWorld parentWorld;
 
     /** Sensors. */
-    private List<Sensor> sensors= new ArrayList<Sensor>();
+    private List<Sensor> sensors = new ArrayList<Sensor>();
 
     /** Effectors. */
     private List<Effector> effectors = new ArrayList<Effector>();
@@ -83,7 +83,7 @@ public abstract class OdorWorldEntity {
     /** Enable sensors. If not the agent is "blind." */
     private boolean sensorsEnabled = true;
 
-    /** Enable effectors.  If not the agent is "paralyzed. */
+    /** Enable effectors. If not the agent is "paralyzed. */
     private boolean effectorsEnabled = true;
 
     /** If true, show sensors. */
@@ -148,6 +148,7 @@ public abstract class OdorWorldEntity {
         this.parentWorld = world;
     }
 
+    // TODO: Say in docs if this is upper right or not (but not center).
     /**
      * Gets this OdorWorldEntity's current x position.
      */
@@ -282,9 +283,8 @@ public abstract class OdorWorldEntity {
 
     /**
      * Reduced bounds used for some entities, to improve the look of collisions
-     * and blocking.
-     *
-     * TODO: This may not work well when shapes (not pixel images) are used.
+     * and blocking. TODO: This may not work well when shapes (not pixel images)
+     * are used.
      *
      * @return reduced bounds.
      */
@@ -300,7 +300,7 @@ public abstract class OdorWorldEntity {
      * @param effector effector to add
      */
     public void addEffector(final Effector effector) {
-        //if (sensor.getApplicableTypes().contains(this.getClass()))...
+        // if (sensor.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
         effector.setId(effectorIDGenerator.getId());
         parentWorld.fireEffectorAdded(effector);
@@ -312,7 +312,7 @@ public abstract class OdorWorldEntity {
      * @param sensor sensor to add
      */
     public void addSensor(final Sensor sensor) {
-        //if (sensor.getApplicableTypes().contains(this.getClass()))...
+        // if (sensor.getApplicableTypes().contains(this.getClass()))...
         sensors.add(sensor);
 
         // Assign an id unless it already has one
@@ -346,6 +346,38 @@ public abstract class OdorWorldEntity {
     }
 
     /**
+     * Add a grid of tile sensors.
+     *
+     * @param numTilesX number of rows in grid
+     * @param numTilesY number of columns in grid
+     */
+    public void addTileSensors(final int numTilesX, final int numTilesY) {
+        addTileSensors(numTilesX, numTilesY, 1);
+    }
+
+    /**
+     * Add a grid of tile sensors, offset by some fraction of a tile's length.
+     *
+     * @param numTilesX number of rows in grid
+     * @param numTilesY number of columns in grid
+     * @param offset offset amount; e.g 2 offsets the grid but 1/2 of a tile
+     *            height and width
+     */
+    public void addTileSensors(final int numTilesX, final int numTilesY,
+            final int offset) {
+        int tileWidth = parentWorld.getWidth() / numTilesX;
+        int tileHeight = parentWorld.getHeight() / numTilesY;
+        int xoffset = tileWidth / offset;
+        int yoffset = tileHeight / offset;
+        for (int i = 0; i < numTilesX; i++) {
+            for (int j = 0; j < numTilesY; j++) {
+                addSensor(new TileSensor(this, (i * tileWidth + xoffset), (j
+                        * tileHeight + yoffset), tileWidth, tileHeight));
+            }
+        }
+    }
+
+    /**
      * @return the smellSource
      */
     public SmellSource getSmellSource() {
@@ -373,11 +405,10 @@ public abstract class OdorWorldEntity {
      * @return center location of the entity.
      */
     public double[] getCenterLocation() {
-        return new double[] { x + getWidth()/2, y + getHeight()/2 };
+        return new double[] { x + getWidth() / 2, y + getHeight() / 2 };
     }
 
-
-	/**
+    /**
      * Returns the location of the entity as a double array.
      *
      * @return location of the entity.
@@ -416,7 +447,7 @@ public abstract class OdorWorldEntity {
      * Initialize the animation from stored image location(s).
      */
     public void postSerializationInit() {
-        getAnimation().initializeImages(); //TODO
+        getAnimation().initializeImages(); // TODO
     }
 
     /**
@@ -531,8 +562,10 @@ public abstract class OdorWorldEntity {
         this.behavior = behavior;
     }
 
-    //TODO: the methods below need not be double, but are double to accommodate the
-    //      coupling framework, which does  not currently handle casts between data types.
+    // TODO: the methods below need not be double, but are double to accommodate
+    // the
+    // coupling framework, which does not currently handle casts between data
+    // types.
 
     /**
      * Move the object north by the specified amount in pixels.

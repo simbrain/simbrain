@@ -25,39 +25,64 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 /**
  * Interface for 2d world sensors.
  */
-public interface Sensor {
+public abstract class Sensor {
+
+    /** Reference to parent entity. */
+    protected OdorWorldEntity parent;
+
+    /** The id of this smell sensor.. */
+    protected String id;
+
+    /** Public label of this sensor. */
+    private String label;
 
     /**
      * Update the sensor.
      */
-    void update();
+    public abstract void update();
 
     /**
      * Return a list of entity types which can use this type of sensor.
      *
      * @return list of applicable types.
      */
-    List<Class<?>> getApplicableTypes();
+    public List<Class<?>> getApplicableTypes() {
+        return null;
+    }
 
     /**
-     * Reference to parent entity.
-     *
-     * @return parent entity
+     * @return the parent
      */
-    OdorWorldEntity getParent();
+    public OdorWorldEntity getParent() {
+        return parent;
+    }
 
     /**
-     * Returns an identifying string.
-     *
-     * @return the id.
+     * @return the name
      */
-    String getId();
+    public String getId() {
+        return id;
+    }
 
     /**
-     * Set the id.  Should be unique in the parent entity.
-     *
-     * @param id the id.
+     * @param name the name to set
      */
-    void setId(String id);
+    public void setId(String name) {
+        this.id = name;
+    }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label the label to set
+     */
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
 }

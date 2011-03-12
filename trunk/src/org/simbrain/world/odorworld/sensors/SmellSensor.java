@@ -29,10 +29,10 @@ import org.simbrain.world.odorworld.entities.RotatingEntity;
 
 /**
  * A sensor which is updated based on the presence of SmellSources near it.
- * 
+ *
  * @see org.simbrain.util.environment.SmellSource
  */
-public class SmellSensor implements Sensor {
+public class SmellSensor extends Sensor {
 
     /** Angle of whisker in radians. */
     public static double DEFAULT_THETA = Math.PI / 4;
@@ -46,31 +46,24 @@ public class SmellSensor implements Sensor {
     /** Relative location of the sensor in polar coordinates. */
     private double radius = DEFAULT_RADIUS;
 
-    /** Reference to parent entity. */
-    private OdorWorldEntity parent;
-
     /** Current value of this sensor, as an array of doubles. */
     private double[] currentValue = new double[5];
 
-    /** The name of this smell sensor.. */
-    private String id;
-
-    /** List of smell sensor for particular components of the smell sensor. */
-    private List<Smeller> smellerList = new ArrayList<Smeller>();
-
     /**
-     * Construct a sensor.
+     * Construct a smell sensor.
      *
-     * @param parent reference
-     * @param sensorName name
-     * @param dim stimulus dimension
+     * @param parent parent
+     * @param id id
+     * @param theta offset from straight in degrees radians
+     * @param radius length of "whisker"
      */
     public SmellSensor(final OdorWorldEntity parent, final String id,
             double theta, double radius) {
         this.parent = parent;
-        this.theta = theta;
         this.id = id;
+        this.theta = theta;
         this.radius = radius;
+        setLabel(parent.getName() + ":" + getId());
     }
 
     /**
@@ -109,13 +102,6 @@ public class SmellSensor implements Sensor {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public List<Class<?>> getApplicableTypes() {
-        return null;
-    }
-
-    /**
      * @return the currentValue
      */
     public double[] getCurrentValue() {
@@ -123,10 +109,12 @@ public class SmellSensor implements Sensor {
     }
 
     /**
-     * @return the parent
+     * The current value at an index.
+     *
+     * @return the currentValue
      */
-    public OdorWorldEntity getParent() {
-        return parent;
+    public double getCurrentValue(int index) {
+        return currentValue[index];
     }
 
     /**
@@ -157,110 +145,4 @@ public class SmellSensor implements Sensor {
         this.radius = radius;
     }
 
-    /**
-     * @return the name
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setId(String name) {
-        this.id = name;
-    }
-
-    /**
-     * Return smeller with specified index.
-     *
-     * @param i index
-     * @return the smeller
-     */
-    public Smeller getSmeller(int i) {
-
-        // Needed to read simulations created before 2/11; remove before beta release
-        if (smellerList == null) {
-            smellerList = new ArrayList<Smeller>();
-        }
-
-        for (Smeller smeller : smellerList) {
-            if (smeller.getIndex() == i) {
-                return smeller;
-            }
-        }
-        // If the getter does not exist, create it
-        Smeller smeller = new Smeller(i);
-        smellerList.add(smeller);
-        return smeller;
-    }
-
-    /**
-     * @return the smellerList
-     */
-    public List<Smeller> getSmellerList() {
-
-        // Needed to read simulations created before 2/11; remove before beta release
-        if (smellerList == null) {
-            smellerList = new ArrayList<Smeller>();
-        }
-        return smellerList;
-    }
-
-    /**
-     * Helper object which "smells" for one component of the associated smell
-     * vector.
-     */
-    public class Smeller {
-
-        /** Index. */
-        private int index;
-
-        /**
-         * Construct a setter object.
-         *
-         * @param index index of the bar to set
-         */
-        public Smeller(final int index) {
-            this.index = index;
-        }
-
-        /**
-         * Return the current value of the sensor for the given index.
-         *
-         * @return current value.
-         */
-        public double getValue() {
-            return getCurrentValue()[index];
-        }
-
-        /**
-         * Return the index number.
-         *
-         * @return the index
-         */
-        public int getIndex() {
-            return index;
-        }
-
-        /**
-         * Returns parent smell sensor.
-         *
-         * @return parent sensor.
-         */
-        public SmellSensor getParent() {
-            return SmellSensor.this;
-        }
-
-        /**
-         * Return a formatted description of this smeller, with its location and
-         * stimulus value, offset by 1 for readability.
-         *
-         * @return formatted string
-         */
-        public String getDescription() {
-            return parent.getName() + ":" + getId() + "-" + (index + 1);
-
-        }
-    }
 }

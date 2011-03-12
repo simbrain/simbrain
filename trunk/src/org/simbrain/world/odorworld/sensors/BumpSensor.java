@@ -25,23 +25,17 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 /**
  * Very simple bump sensor. Holding off on more sophisticated "touch" sensors in
  * case an existing¯ library can provide it.
- * 
+ *
  * TODO: - Not tested yet Possible extensions: - location of bump sensor -
  * return vector represent impact on agent
  */
-public class BumpSensor implements Sensor {
+public class BumpSensor extends Sensor {
 
     /** Whether it was bumped. */
     private boolean wasBumped = false;
 
     /** Value to produce when bumped. */
     private double bumpValue = 0;
-
-    /** Parent agent. */
-    private OdorWorldEntity parent;
-
-    /** Id for this sensor. */
-    private String id;
 
     /**
      * Construct bump sensor.
@@ -79,31 +73,6 @@ public class BumpSensor implements Sensor {
      */
     public void setBumped(boolean wasBumped) {
         this.wasBumped = wasBumped;
-    }
-
-    public List<Class<?>> getApplicableTypes() {
-        return null;
-    }
-
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * @return the parent
-     */
-    public OdorWorldEntity getParent() {
-        return parent;
     }
 
 }

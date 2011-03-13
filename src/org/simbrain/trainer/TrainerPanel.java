@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -118,7 +119,8 @@ public class TrainerPanel extends JPanel {
          * {@inheritDoc}
          */
         public void groupChanged(NetworkEvent<Group> networkEvent) {
-            updateGroupComboBoxes();
+            // No need to change anything, since this currently
+            // just makes the group smaller, so no change needed table.
         }
 
         /**
@@ -135,7 +137,6 @@ public class TrainerPanel extends JPanel {
             // No implementation
         }
     };
-
 
     /**
      * Construct a trainer panel around a trainer object.
@@ -154,13 +155,13 @@ public class TrainerPanel extends JPanel {
         // Top Panel
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
-        // topPanel.setPreferredSize(new Dimension(800, 200));
 
         // Top items
         topItems = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topItems.setBorder(BorderFactory.createEtchedBorder());
+        topItems.setPreferredSize(new Dimension(550, 45));
 
-        topItems.add(new JLabel("Training Algorithm"));
+        topItems.add(new JLabel("Learning rule"));
         JComboBox cbTrainingAlgorithm = new JComboBox(trainingAlgorithms);
         topItems.add(cbTrainingAlgorithm);
         JButton properties = new JButton(
@@ -221,7 +222,6 @@ public class TrainerPanel extends JPanel {
         }
     }
 
-
     /**
      * Initialize the trainer listener. Update the panel based on changes that
      * occur in the trainer.
@@ -249,7 +249,8 @@ public class TrainerPanel extends JPanel {
 
                 // Remove group listener from old network
                 if (oldNetwork != null) {
-                    oldNetwork.getRootNetwork().removeGroupListener(groupListener);
+                    oldNetwork.getRootNetwork().removeGroupListener(
+                            groupListener);
                 }
 
                 if (newNetwork == null) {
@@ -259,7 +260,7 @@ public class TrainerPanel extends JPanel {
                     return;
                 }
 
-                 //Listen for group change events
+                // Listen for group change events
                 newNetwork.getRootNetwork().addGroupListener(groupListener);
 
                 // Update the input and output tables in the GUI
@@ -268,9 +269,9 @@ public class TrainerPanel extends JPanel {
                 trainingDataWindow.initializeSelectedGroup();
             }
 
-            //TODO: Currently data and layers are only changed from this panel, so 
-            //      no need to respond to these events.  But should check that new
-            //      data is different from existing data and then update if needed.
+            // TODO: Currently data and layers are only changed from this panel,
+            // so no need to respond to these events. But should check that new
+            // data is different from existing data and then update if needed.
 
             /*
              * {@inheritDoc}
@@ -447,9 +448,11 @@ public class TrainerPanel extends JPanel {
     }
 
     /**
-     * Check to see whether the provided table has as many columns as there are
-     * neurons in the provided neuron layer. If not, modify the table so that it
-     * has as many columns as there are neurons in the layer.
+     * When the group or table is changed, check to see that they are
+     * consistent, using the following rule: (1) if the layer has more neurons
+     * than the table has columns, then expand the table accordingly. (2) if the
+     * layer has fewer neurons than the table has columns, then leave the table
+     * as is.
      *
      * @param dataTable the table to check
      * @param group the neuron layer to check
@@ -458,40 +461,48 @@ public class TrainerPanel extends JPanel {
             final NeuronGroup group) {
 
         // Size of group (number of neurons)
-        int layerSize = group.getNeuronList().size();
+        int layerSize;
+
+        // Initialize layer size and neuron iterator to 0 if group is null
+        Iterator<Neuron> neuronIterator;
+        if (group != null) {
+            layerSize = group.getNeuronList().size();
+            neuronIterator = group.getNeuronList().iterator();
+        } else {
+            layerSize = 0;
+            neuronIterator = Collections.EMPTY_LIST.iterator();
+        }
 
         // Size of column (First column is "#" sign so it's disregarded)
         int tableSize = dataTable.getColumnCount() - 1;
 
-        // If group size no the same as table size, modify the table
-        if (layerSize != tableSize) {
+        // If layer size is greater than table size, expand the table
+        if (layerSize > tableSize) {
 
             // Notify user about what's happening
             System.out.println("Table / Layer conflict.  Layer has "
                     + layerSize + " neurons, table has " + tableSize
                     + " columns. Modifying table to have " + layerSize
                     + " columns.");
-            // JOptionPane.showMessageDialog((Component) parentFrame,
-            // "The table and current layer are incompatible and so the data in this table "
-            // + "is being modified to match the layer.", "Warning",
-            // JOptionPane.WARNING_MESSAGE);
 
             // Modify the table
             dataTable.getData().modifyRowsColumns(
                     dataTable.getData().getRowCount(), layerSize, 0);
 
-            // Rename column headings
-            // Note the for loop starts at column 1 (column 0 shows the row
-            // number)
-            Iterator<Neuron> neuronIterator = group.getNeuronList().iterator();
-            for (int i = 1; i < dataTable.getColumnCount(); i++) {
-                if (neuronIterator.hasNext()) {
-                    dataTable.getColumnModel().getColumn(i)
-                            .setHeaderValue(neuronIterator.next().getId());
-                }
-            }
-            dataTable.getTableHeader().resizeAndRepaint();
         }
+
+        // Rename column headings
+        // Note that the loop starts at column 1 (column 0 shows the row
+        // number)
+        for (int i = 1; i < dataTable.getColumnCount(); i++) {
+            if (neuronIterator.hasNext()) {
+                dataTable.getColumnModel().getColumn(i)
+                        .setHeaderValue(neuronIterator.next().getId());
+            } else {
+                dataTable.getColumnModel().getColumn(i).setHeaderValue("" + i);
+            }
+        }
+        dataTable.getTableHeader().resizeAndRepaint();
 
     }
 
@@ -521,7 +532,8 @@ public class TrainerPanel extends JPanel {
         TrainerDataWindow(final WindowType type) {
             this.type = type;
             setLayout(new BorderLayout());
-            dataTable = new SimbrainJTable(new SimbrainDataTable(5, 4));
+            setPreferredSize(new Dimension(350,200));
+            dataTable = new SimbrainJTable(new SimbrainDataTable(10, 4));
             scrollPane = new JScrollPane(dataTable);
             scrollPane.setPreferredSize(new Dimension(100, 100));
             setBorder(BorderFactory.createTitledBorder("" + type.name()
@@ -602,7 +614,7 @@ public class TrainerPanel extends JPanel {
          * @param layer the item to select
          */
         public void setLayer(List<Neuron> layer) {
-            //TODO: Check whether the box contains this item
+            // TODO: Check whether the box contains this item
             groupComboBox.setSelectedItem(layer);
         }
 
@@ -644,8 +656,8 @@ public class TrainerPanel extends JPanel {
         private void updateTrainerLayer() {
             if (trainer != null) {
                 NeuronGroup group = getCurrentNeuronGroup();
+                reconcileTableWithLayer(dataTable, group);
                 if (group != null) {
-                    reconcileTableWithLayer(dataTable, group);
                     if (type == WindowType.Input) {
                         trainer.setInputLayer(group);
                     } else if (type == WindowType.Trainer) {
@@ -765,7 +777,6 @@ public class TrainerPanel extends JPanel {
         public void setData(double[][] data) {
             dataTable.getData().setData(data);
         }
-
 
     }
 

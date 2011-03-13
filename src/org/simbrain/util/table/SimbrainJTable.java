@@ -87,7 +87,7 @@ public class SimbrainJTable extends JXTable {
 
         // Below initially forces first column to specific width; but has other side effects
         //setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        //getColumnModel().getColumn(0).setPreferredWidth(30);
+        getColumnModel().getColumn(0).setPreferredWidth(30);
 
     }
 
@@ -464,7 +464,6 @@ public class SimbrainJTable extends JXTable {
                 return data.get(row, column - 1);
             }
         }
-
     }
 
 

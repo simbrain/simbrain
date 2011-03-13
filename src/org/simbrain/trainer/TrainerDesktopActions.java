@@ -82,6 +82,9 @@ public class TrainerDesktopActions {
                         .getTrainingData().getColumnCount() - 1;
                 int[] nodesPerLayer = new int[] { numInputs, numHidden,
                         numOutputs };
+                if ((numInputs == 0) || numOutputs == 0) {
+                    return;
+                }
                 builder.setNodesPerLayer(nodesPerLayer);
                 NetworkComponent network = new NetworkComponent(
                         "Backprop network");

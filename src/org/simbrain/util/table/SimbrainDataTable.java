@@ -254,7 +254,7 @@ public final class SimbrainDataTable {
      * @param row row index
      * @param column column index
      * @param value value to add
-     * @param boolean true if an event should be fired, false otherwise.
+     * @param fireEvent true if an event should be fired, false otherwise.
      */
     public void setValue(final int row, final int column, final double value,
             final boolean fireEvent) {
@@ -296,17 +296,30 @@ public final class SimbrainDataTable {
     }
 
     /**
-     * Add a new row at the bottom of the table.
+     * Add a new row.
      *
-     * @param value value for new row
+     * @param value value for cells of new row
      */
-    public void addNewRow(final double value) {
+    public void addRow(final double value) {
+        addRow(value, true);
+    }
+
+    /**
+     * Add a new row.
+     *
+     * @param value value for cells of new row
+     * @param fireEvent whether to fire an update event or not
+     */
+    private void addRow(double value, boolean fireEvent) {
         numRows++;
         rowData.add(getNewRow(value));
-        for (SimbrainTableListener listener : listeners) {
-            listener.rowAdded(numRows - 1);
+        if (fireEvent) {
+            for (SimbrainTableListener listener : listeners) {
+                listener.rowAdded(numRows - 1);
+            }
         }
     }
+
 
     /**
      * Insert a new row at the specified position.
@@ -314,7 +327,7 @@ public final class SimbrainDataTable {
      * @param at row index for where to put the new row
      * @param value value for new row cells
      */
-    public void insertNewRow(final int at, final double value) {
+    public void insertRow(final int at, final double value) {
         numRows++;
         rowData.add(at, getNewRow(value));
         for (SimbrainTableListener listener : listeners) {
@@ -323,18 +336,29 @@ public final class SimbrainDataTable {
     }
 
     /**
-     * Add a new column at the far right of the table.
+     * Add a new column.
      *
-     * @param value value to add
+     * @param value value for cells of new column
+     * @param fireEvent whether to fire an update event or not
      */
-    public void addNewColumn(final double value) {
+    private void addColumn(double value, boolean fireEvent) {
         numColumns++;
         for (List<Double> row : rowData) {
             row.add(value);
         }
-        for (SimbrainTableListener listener : listeners) {
-            listener.columnAdded(numColumns - 1);
+        if (fireEvent) {
+            for (SimbrainTableListener listener : listeners) {
+                listener.columnAdded(numColumns - 1);
+            }
         }
+    }
+    /**
+     * Add a new column at the far right of the table.
+     *
+     * @param value value to add
+     */
+    public void addColumn(final double value) {
+        addColumn(value, true);
     }
 
     /**
@@ -362,23 +386,24 @@ public final class SimbrainDataTable {
         int currentRowNum = numRows;
         if (col > currentColNum) {
             for (int i = 0; i < col - currentColNum; ++i) {
-                addNewColumn(value);
+                addColumn(value, false);
             }
         } else if (col < currentColNum) {
             for (int i = 0; i < currentColNum - col; ++i) {
-                removeLastColumn();
+                removeColumn(numColumns - 1, false);
             }
         }
 
         if (row > currentRowNum) {
             for (int i = 0; i < row - currentRowNum; ++i) {
-                addNewRow(value);
+                addRow(value, false);
             }
         } else if (row < currentRowNum) {
             for (int i = 0; i < currentRowNum - row; ++i) {
-                removeLastRow();
+                removeRow(numRows - 1, false);
             }
         }
+        fireTableStructureChanged();
     }
 
     /**
@@ -407,7 +432,7 @@ public final class SimbrainDataTable {
      * @param at column index where column should be added
      * @param value value for cells of new column
      */
-    public void insertNewColumn(final int at, final double value) {
+    public void insertColumn(final int at, final double value) {
         numColumns++;
         for (List<Double> row : rowData) {
             row.add(at, value);
@@ -417,16 +442,6 @@ public final class SimbrainDataTable {
         }
     }
 
-    /**
-     * Remove last row.
-     */
-    public void removeLastRow() {
-        numRows--;
-        rowData.remove(numRows);
-        for (SimbrainTableListener listener : listeners) {
-            listener.rowRemoved(numRows);
-        }
-    }
 
     /**
      * Remove a specified row.
@@ -434,26 +449,45 @@ public final class SimbrainDataTable {
      * @param rowToRemoveIndex index of row to remove.
      */
     public void removeRow(final int rowToRemoveIndex) {
+        removeRow(rowToRemoveIndex, true);
+    }
+
+    /**
+     * Remove a specified row.
+     *
+     * @param rowToRemoveIndex index of row to remove
+     * @param fireEvent whether to fire a row removal event
+     */
+    public void removeRow(final int rowToRemoveIndex, boolean fireEvent) {
         numRows--;
         if (currentRow >= numRows) {
             currentRow = numRows - 1;
         }
         rowData.remove(rowToRemoveIndex);
-        for (SimbrainTableListener listener : listeners) {
-            listener.rowRemoved(rowToRemoveIndex);
+        if (fireEvent) {
+            for (SimbrainTableListener listener : listeners) {
+                listener.rowRemoved(rowToRemoveIndex);
+            }
         }
     }
 
     /**
-     * Remove last column.
+     * Remove column at specified index.
+     *
+     * @param columnToRemoveIndex index of column to remove
      */
-    public void removeLastColumn() {
+    public void removeColumn(final int columnToRemoveIndex, boolean fireEvent) {
         numColumns--;
-        for (List<Double> row : rowData) {
-            row.remove(numColumns);
+        if (numColumns < 0) {
+            return;
         }
-        for (SimbrainTableListener listener : listeners) {
-            listener.columnRemoved(numColumns);
+        for (List<Double> row : rowData) {
+            row.remove(columnToRemoveIndex);
+        }
+        if (fireEvent) {
+            for (SimbrainTableListener listener : listeners) {
+                listener.columnRemoved(columnToRemoveIndex);
+            }
         }
     }
 
@@ -463,13 +497,7 @@ public final class SimbrainDataTable {
      * @param columnToRemoveIndex index of column to remove
      */
     public void removeColumn(final int columnToRemoveIndex) {
-        numColumns--;
-        for (List<Double> row : rowData) {
-            row.remove(columnToRemoveIndex);
-        }
-        for (SimbrainTableListener listener : listeners) {
-            listener.columnRemoved(columnToRemoveIndex);
-        }
+        removeColumn(columnToRemoveIndex, true);
     }
 
     /**

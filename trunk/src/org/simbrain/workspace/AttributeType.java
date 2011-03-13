@@ -86,7 +86,7 @@ public class AttributeType {
      */
     public AttributeType(WorkspaceComponent parent, String typeName,
              Class<?> dataType, boolean visible) {
-        this(parent, typeName, "", dataType, visible);
+        this(parent, typeName, null, dataType, visible);
     }
 
     /**
@@ -97,7 +97,11 @@ public class AttributeType {
      * @return the formatted string.
      */
     public String getDescription(String baseName) {
-        return baseName + ":" + methodName + typeClass();
+        if (methodName != null) {
+            return baseName + ":" + methodName + typeClass();
+        } else {
+            return baseName + " " + typeClass();
+        }
     }
 
     /**

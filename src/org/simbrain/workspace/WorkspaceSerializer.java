@@ -219,31 +219,48 @@ public class WorkspaceSerializer {
         if (contents.getArchivedCouplings() != null) {
             for (ArchiveContents.ArchivedCoupling couplingRef : contents
                     .getArchivedCouplings()) {
-                if (exclude.contains(couplingRef.getArchivedProducer().getParentRef())
-                        || exclude.contains(couplingRef.getArchivedProducer().getParentRef())) {
+                if (exclude.contains(couplingRef.getArchivedProducer()
+                        .getParentRef())
+                        || exclude.contains(couplingRef.getArchivedProducer()
+                                .getParentRef())) {
                     continue;
                 }
 
                 // Get workspace components from references
                 WorkspaceComponent sourceComponent = componentDeserializer
-                        .getComponent(couplingRef.getArchivedProducer().getParentRef());
+                        .getComponent(couplingRef.getArchivedProducer()
+                                .getParentRef());
                 WorkspaceComponent targetComponent = componentDeserializer
-                        .getComponent(couplingRef.getArchivedConsumer().getParentRef());
-
+                        .getComponent(couplingRef.getArchivedConsumer()
+                                .getParentRef());
 
                 // Get attributes from references
-                Producer<?> producer =
-                    (Producer<?>) sourceComponent.getAttributeManager().createProducer(
-                                sourceComponent.getObjectFromKey(couplingRef.getArchivedProducer().getBaseObjectKey()),
-                                couplingRef.getArchivedProducer().getMethodBaseName(),
+                Producer<?> producer = (Producer<?>) sourceComponent
+                        .getAttributeManager()
+                        .createProducer(
+                                sourceComponent.getObjectFromKey(couplingRef
+                                        .getArchivedProducer()
+                                        .getBaseObjectKey()),
+                                couplingRef.getArchivedProducer()
+                                        .getMethodBaseName(),
                                 couplingRef.getArchivedProducer().getDataType(),
-                                couplingRef.getArchivedProducer().getDescription());
-                Consumer<?> consumer =
-                    (Consumer<?>) targetComponent.getAttributeManager().createConsumer(
-                        targetComponent.getObjectFromKey(couplingRef.getArchivedConsumer().getBaseObjectKey()),
-                        couplingRef.getArchivedConsumer().getMethodBaseName(),
-                        couplingRef.getArchivedConsumer().getDataType(),
-                        couplingRef.getArchivedConsumer().getDescription());
+                                couplingRef.getArchivedProducer()
+                                        .getArgumentDataTypes(),
+                                couplingRef.getArchivedProducer()
+                                        .getArgumentValues(),
+                                couplingRef.getArchivedProducer()
+                                        .getDescription());
+                Consumer<?> consumer = (Consumer<?>) targetComponent
+                        .getAttributeManager()
+                        .createConsumer(
+                                targetComponent.getObjectFromKey(couplingRef
+                                        .getArchivedConsumer()
+                                        .getBaseObjectKey()),
+                                couplingRef.getArchivedConsumer()
+                                        .getMethodBaseName(),
+                                couplingRef.getArchivedConsumer().getDataType(),
+                                couplingRef.getArchivedConsumer()
+                                        .getDescription());
                 workspace.addCoupling(new Coupling(producer, consumer));
 
             }

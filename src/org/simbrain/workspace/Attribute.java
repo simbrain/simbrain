@@ -33,7 +33,7 @@ public interface Attribute {
      */
     public WorkspaceComponent getParentComponent();
 
-    /*
+    /**
      * Returns the base object associated with this attribute.
      *
      * @return the base object.
@@ -52,6 +52,22 @@ public interface Attribute {
      * @return base method name
      */
     public String getMethodName();
+
+    /**
+     * Returns the argument types for the method this attribute is based on.
+     * Null if not used.  Currently only used in producers.
+     *
+     * @return the argumentDataTypes
+     */
+    public Class<?>[] getArgumentDataTypes();
+
+    /**
+     * Returns the argument values for the method this attribute is based on.
+     * Null if not used.  Currently only used in producers.
+     *
+     * @return the argumentValues
+     */
+    public Object[] getArgumentValues();
 
     /**
      * Returns the descriptive name of this attribute.

@@ -318,6 +318,7 @@ class ArchiveContents {
      * The class used to represent an attribute in the archive.
      *
      * @author Matt Watson
+     * @author Jeff Yoshimi
      */
     public static final class ArchivedAttribute {
 
@@ -332,6 +333,12 @@ class ArchiveContents {
 
         /** Key for data type. */
         private final Class<?> dataType;
+
+        /** Argument data types. */
+        private Class<?>[] argumentDataTypes;
+
+        /** Argument values. */
+        private Object[] argumentValues;
 
         /** Description. */
         private final String description;
@@ -350,6 +357,8 @@ class ArchiveContents {
             this.baseObjectKey = comp.getKeyFromObject(attribute
                     .getBaseObject());
             this.methodBaseName = attribute.getMethodName();
+            this.argumentDataTypes = attribute.getArgumentDataTypes();
+            this.argumentValues = attribute.getArgumentValues();
             this.dataType = attribute.getDataType();
             this.description = attribute.getDescription();
         }
@@ -394,6 +403,20 @@ class ArchiveContents {
          */
         public String getDescription() {
             return description;
+        }
+
+        /**
+         * @return the argumentDataTypes
+         */
+        public Class<?>[] getArgumentDataTypes() {
+            return argumentDataTypes;
+        }
+
+        /**
+         * @return the argumentValues
+         */
+        public Object[] getArgumentValues() {
+            return argumentValues;
         }
     }
 

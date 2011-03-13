@@ -147,6 +147,12 @@
 		</java>
 	</target>
 
+	<target name="jconsole" depends="jar" description="Run so jconsole can monitor the app">
+		<java jar="${jarfile}" fork="yes">
+			<jvmarg value="-Dcom.sun.management.jmxremote" />
+		</java>
+	</target>
+
 	<target name="profile" depends="jar" description="Run using profiler">
 		<java jar="${jarfile}" fork="yes">
 			<jvmarg value="-Xprof " />

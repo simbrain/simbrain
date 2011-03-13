@@ -138,12 +138,16 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
             // X, Y Location of entities
             if (xLocationType.isVisible()) {
-                String description = entity.getName() + ":" + xLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialProducer(entity, "DoubleX", double.class, description));
+                String description = entity.getName() + ":"
+                        + xLocationType.getDescription();
+                returnList.add(getAttributeManager().createPotentialProducer(
+                        entity, "DoubleX", double.class, description));
             }
             if (yLocationType.isVisible()) {
-                String description = entity.getName() + ":" + yLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialProducer(entity, "DoubleY", double.class, description));
+                String description = entity.getName() + ":"
+                        + yLocationType.getDescription();
+                returnList.add(getAttributeManager().createPotentialProducer(
+                        entity, "DoubleY", double.class, description));
             }
 
             // Smell sensor
@@ -152,8 +156,9 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     if (sensor instanceof SmellSensor) {
                         SmellSensor smell = (SmellSensor) sensor;
                         for (int i = 0; i < smell.getCurrentValue().length; i++) {
-                            returnList.add(new PotentialProducer(this, smell, "getCurrentValue",
-                                            double.class, int.class, i, sensor.getLabel() + "-" + (i + 1)));
+                            returnList.add(new PotentialProducer(this, smell,
+                                    "getCurrentValue", double.class, int.class,
+                                    i, sensor.getLabel() + "-" + (i + 1)));
                         }
                         // TODO: A way of indicating sensor location (relative
                         // location in polar coordinates)
@@ -263,14 +268,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
             String effectorName = ((Effector) object).getId();
             return entityName + ":effector:" + effectorName;
         }
-//        } else if (object instanceof Smeller) {
-//            // Need to handle smell sensors in a special way, since they are not directly
-//            //  used as producers, but rather specific objects they contain are used.
-//            String entityName = ((Smeller) object).getParent().getParent().getName();
-//            String sensorName = ((Smeller) object).getParent().getId();
-//            String index = "" + ((Smeller) object).getIndex();
-//            return entityName + ":smeller:" + sensorName + ":" + index;
-//        }
 
         return null;
     }
@@ -287,17 +284,15 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 return getWorld().getSensor(entityName, parsedKey[2]);
             } else if (secondString.equalsIgnoreCase("effector")) {
                 return getWorld().getEffector(entityName, parsedKey[2]);
-            } 
-//            else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
-//                // Needed to read simulations created before 2/11; remove before beta release
-//                int index = Integer.parseInt(parsedKey[3]);
-//                return getWorld().getSmeller(entityName,
-//                        parsedKey[2], index);
-//            } else if (secondString.equalsIgnoreCase("smeller")) {
-//                int index = Integer.parseInt(parsedKey[3]);
-//                return getWorld().getSmeller(entityName,
-//                        parsedKey[2], index);
-//            }
+            } else if (secondString.equalsIgnoreCase("smellSensorGetter")) {
+                // Needed to read simulations created before 2/11; remove before
+                // beta release
+                int index = Integer.parseInt(parsedKey[3]);
+                return getWorld().getSensor(entityName, parsedKey[2]);
+            } else if (secondString.equalsIgnoreCase("smeller")) {
+                int index = Integer.parseInt(parsedKey[3]);
+                return getWorld().getSensor(entityName, parsedKey[2]);
+            }
         }
         return null;
     }

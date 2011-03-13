@@ -52,7 +52,7 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
     private static final int DEFAULT_HEIGHT = 550;
 
     /** Default width. */
-    private static final int DEFAULT_WIDTH = 600;
+    private static final int DEFAULT_WIDTH = 770;
 
     /** Network selection combo box. */
     private JComboBox cbNetworkChooser = new JComboBox();
@@ -82,8 +82,7 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
                 if (((NetworkComponent) workspaceComponent).getRootNetwork() == currentNetwork) {
                     trainerPanel.getTrainer().setNetwork(null);
                 }
-                cbNetworkChooser
-                        .removeItem((NetworkComponent) workspaceComponent);
+                cbNetworkChooser.removeItem((NetworkComponent) workspaceComponent);
             }
         }
 
@@ -127,7 +126,7 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
             }
         });
         trainerPanel.addTopItem(cbNetworkChooser);
-        JLabel netSelectLabel = new JLabel("Select Root Network");
+        JLabel netSelectLabel = new JLabel("Network");
         trainerPanel.addTopItem(netSelectLabel);
 
         // Initialize selection box with existing components, if any
@@ -141,6 +140,7 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
                         (Network) cbNetworkChooser.getSelectedItem());
             }
         }
+        this.getParentFrame().pack();
     }
 
     /**

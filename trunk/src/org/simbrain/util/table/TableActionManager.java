@@ -347,7 +347,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().insertNewRow(jtable.getSelectedRow(),
+                jtable.getData().insertRow(jtable.getSelectedRow(),
                         new Double(0));
             }
 
@@ -374,7 +374,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().insertNewColumn(jtable.getSelectedColumn(),
+                jtable.getData().insertColumn(jtable.getSelectedColumn(),
                         new Double(0));
             }
 

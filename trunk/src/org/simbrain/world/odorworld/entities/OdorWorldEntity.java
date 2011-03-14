@@ -360,19 +360,16 @@ public abstract class OdorWorldEntity {
      *
      * @param numTilesX number of rows in grid
      * @param numTilesY number of columns in grid
-     * @param offset offset amount; e.g 2 offsets the grid but 1/2 of a tile
-     *            height and width
+     * @param offset offset amount in pixels
      */
     public void addTileSensors(final int numTilesX, final int numTilesY,
             final int offset) {
         int tileWidth = parentWorld.getWidth() / numTilesX;
         int tileHeight = parentWorld.getHeight() / numTilesY;
-        int xoffset = tileWidth / offset;
-        int yoffset = tileHeight / offset;
         for (int i = 0; i < numTilesX; i++) {
             for (int j = 0; j < numTilesY; j++) {
-                addSensor(new TileSensor(this, (i * tileWidth + xoffset), (j
-                        * tileHeight + yoffset), tileWidth, tileHeight));
+                addSensor(new TileSensor(this, (i * tileWidth + offset), (j
+                        * tileHeight + offset), tileWidth, tileHeight));
             }
         }
     }

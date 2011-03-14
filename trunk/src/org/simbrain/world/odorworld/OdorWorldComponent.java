@@ -156,9 +156,12 @@ public class OdorWorldComponent extends WorkspaceComponent {
                     if (sensor instanceof SmellSensor) {
                         SmellSensor smell = (SmellSensor) sensor;
                         for (int i = 0; i < smell.getCurrentValue().length; i++) {
-                            returnList.add(new PotentialProducer(this, smell,
-                                    "getCurrentValue", double.class, int.class,
-                                    i, sensor.getLabel() + "-" + (i + 1)));
+                            returnList
+                                    .add(new PotentialProducer(this, smell,
+                                            "getCurrentValue", double.class,
+                                            int.class, i, entity.getName()
+                                                    + ":" + sensor.getLabel()
+                                                    + "-" + (i + 1)));
                         }
                         // TODO: A way of indicating sensor location (relative
                         // location in polar coordinates)
@@ -171,9 +174,10 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof TileSensor) {
                         returnList.add(getAttributeManager()
-                                .createPotentialProducer(sensor, "isActivated",
+                                .createPotentialProducer(sensor,
+                                        "isActivated",
                                         double.class,
-                                        ((TileSensor) sensor).getLabel()));
+                                        entity.getName() + ":" + ((TileSensor) sensor).getLabel()));
                     }
                 }
             }

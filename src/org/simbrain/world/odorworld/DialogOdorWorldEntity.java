@@ -119,6 +119,12 @@ public class DialogOdorWorldEntity extends StandardDialog implements
             tabbedPane.addTab("Dispersion", smellPanel.getDispersionPanel());
         }
 
+        // Sensor display
+        if (entityRef.getSensors().size() > 0) {
+            tabbedPane.addTab("Sensors", new SensorPanel(entityRef));
+        }
+
+        // [Below not currently used]
         cbRenderer.setPreferredSize(new Dimension(cbRendererDimension,
                 cbRendererDimension));
         cbImageName.setRenderer(cbRenderer);

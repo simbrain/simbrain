@@ -18,10 +18,6 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.simbrain.plot.barchart.BarChartComponent.BarChartSetter;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -53,17 +49,16 @@ public class SmellSensor extends Sensor {
      * Construct a smell sensor.
      *
      * @param parent parent
-     * @param id id
+     * @param label label for this sensor (entity name will be added)
      * @param theta offset from straight in degrees radians
      * @param radius length of "whisker"
      */
-    public SmellSensor(final OdorWorldEntity parent, final String id,
+    public SmellSensor(final OdorWorldEntity parent, final String label,
             double theta, double radius) {
         this.parent = parent;
-        this.id = id;
         this.theta = theta;
         this.radius = radius;
-        setLabel(parent.getName() + ":" + getId());
+        setLabel(label);
     }
 
     /**

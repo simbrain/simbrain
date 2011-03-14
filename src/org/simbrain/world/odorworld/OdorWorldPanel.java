@@ -38,8 +38,8 @@ import javax.swing.JPopupMenu;
 import org.simbrain.world.odorworld.actions.AddAgentAction;
 import org.simbrain.world.odorworld.actions.AddEntityAction;
 import org.simbrain.world.odorworld.actions.AddSmellSourceAction;
+import org.simbrain.world.odorworld.actions.AddTileSensorsAction;
 import org.simbrain.world.odorworld.actions.DeleteEntityAction;
-import org.simbrain.world.odorworld.actions.EditSmellSourceAction;
 import org.simbrain.world.odorworld.actions.ShowEntityDialogAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 import org.simbrain.world.odorworld.effectors.Effector;
@@ -415,6 +415,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
             ret.addSeparator();
             ret.add(new JMenuItem(new AddSmellSourceAction(this, theEntity)));
         }
+        
+        ret.addSeparator();
+        ret.add(new JMenuItem(new AddTileSensorsAction(theEntity)));
 
         ret.addSeparator();
         ret.add(new JMenuItem(new DeleteEntityAction(this, theEntity)));

@@ -126,11 +126,9 @@ public class OdorWorld {
             // Add effectors (currently none)
 
             // Add sensors
-            entity.addSensor(new SmellSensor(entity, "Left", Math.PI / 8, 50));
-            entity.addSensor(new SmellSensor(entity, "Center", 0, 0));
-            entity.addSensor(new SmellSensor(entity, "Right", -Math.PI / 8, 50));
-            entity.addTileSensors(10, 10);
-            entity.addTileSensors(10, 10, 2);
+            entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8, 50));
+            entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
+            entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
         }
         addEntity(entity);
     }

@@ -24,7 +24,7 @@ import java.util.prefs.Preferences;
 /**
  * <b>WorkspacePreferences</b> handles storage and retrieval of user
  * preferences, e.g. current directory.
- * 
+ *
  * TODO: May need to be re-implemented for compatibility with applet jars.
  */
 public final class WorkspacePreferences {
@@ -90,7 +90,7 @@ public final class WorkspacePreferences {
      * @return default current directory
      */
     public static String getDefaultCurrentDirectory() {
-        return "." + System.getProperty("file.separator");
+        return "." + FS + "simulations" + FS + "workspaces";
     }
 
     /**

@@ -66,22 +66,24 @@ final class SelectionEventHandler
     /** Prior selection, if any.  Required for shift-lasso selection. */
     private Collection priorSelection = Collections.EMPTY_LIST;
 
+    /** Network Panel. */
+    private final NetworkPanel networkPanel;
 
     /**
      * Create a new selection event handler.
+     * @param networkPanel 
      */
-    public SelectionEventHandler() {
+    public SelectionEventHandler(NetworkPanel networkPanel) {
         super();
-
         boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
+        this.networkPanel = networkPanel;
     }
 
 
     /** @see PDragSequenceEventHandler */
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         networkPanel.setLastClickedPosition(event.getPosition());
         if (event.getPath().getPickedNode() instanceof PCamera) {
             networkPanel.setBeginPosition(event.getPosition());
@@ -98,7 +100,6 @@ final class SelectionEventHandler
         }
 
         PNode node = event.getPath().getPickedNode();
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
         if (node instanceof PCamera) {
             if (!event.isShiftDown()) {
@@ -114,7 +115,6 @@ final class SelectionEventHandler
 
         marqueeStartPosition = event.getPosition();
         pickedNode = event.getPath().getPickedNode();
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
         if (pickedNode instanceof PCamera) {
             pickedNode = null;
@@ -139,7 +139,7 @@ final class SelectionEventHandler
                                            (float) marqueeStartPosition.getY());
 
             // add marquee as child of the network panel's layer
-            networkPanel.getLayer().addChild(marquee);
+            networkPanel.getCanvas().getLayer().addChild(marquee);
         } else {
             if (pickedNode instanceof NeuronNode) {
                 networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
@@ -167,8 +167,6 @@ final class SelectionEventHandler
 
         super.drag(event);
 
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-
         if (pickedNode == null) {
 
             // continue marquee selection
@@ -184,7 +182,7 @@ final class SelectionEventHandler
 
             boundsFilter.setBounds(rect);
 
-            Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
+            Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot().getAllNodes(boundsFilter, null);
 
             if (event.isShiftDown()) {
                 Collection selection = SimbrainUtils.union(priorSelection, highlightedNodes);
@@ -221,8 +219,7 @@ final class SelectionEventHandler
     protected void endDrag(final PInputEvent event) {
 
         super.endDrag(event);
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-
+        
         // Nothing was being dragged
         if (pickedNode == null) {
             // end marquee selection
@@ -330,7 +327,6 @@ final class SelectionEventHandler
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
 
             if (editMode.isSelection() && super.acceptsEvent(event, type)) {

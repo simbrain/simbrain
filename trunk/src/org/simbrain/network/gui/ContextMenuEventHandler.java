@@ -31,6 +31,18 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 final class ContextMenuEventHandler
     extends PBasicInputEventHandler {
 
+    /** Network Panel. */
+    private final NetworkPanel networkPanel;
+
+    /**
+     * Construct with a network panel.
+     *
+     * @param networkPanel reference to panel
+     */
+    public ContextMenuEventHandler(NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+    }
+
     /**
      * Show the context menu.
      *
@@ -43,7 +55,7 @@ final class ContextMenuEventHandler
         JPopupMenu contextMenu = networkPanel.getContextMenu();
         Point2D canvasPosition = event.getCanvasPosition();
         contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
-        networkPanel.getCamera().localToView(canvasPosition);
+        networkPanel.getCanvas().getCamera().localToView(canvasPosition);
         networkPanel.setLastClickedPosition(canvasPosition);
     }
 
@@ -59,7 +71,6 @@ final class ContextMenuEventHandler
     /** @see PBasicInputEventHandler */
     public void mouseReleased(final PInputEvent event) {
         if (event.isPopupTrigger()) {
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             networkPanel.createContextMenu();
             showContextMenu(event);
         }

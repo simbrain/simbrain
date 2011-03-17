@@ -48,7 +48,6 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
     public TextEventHandler(final PCanvas canvas) {
         super(canvas);
         this.setEventFilter(new TextEventFilter());
-        net = (NetworkPanel) canvas;
     }
 
     /** Builds a TextObject on mouse clicks. */

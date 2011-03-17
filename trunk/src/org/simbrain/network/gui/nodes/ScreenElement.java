@@ -100,7 +100,7 @@ public abstract class ScreenElement
         }
 
         if (hasToolTipText()) {
-            addInputEventListener(new ToolTipTextUpdater() {
+            addInputEventListener(new ToolTipTextUpdater(networkPanel) {
 
                     /** @see ToolTipTextUpdater */
                     protected String getToolTipText() {

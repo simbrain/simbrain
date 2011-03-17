@@ -30,13 +30,18 @@ import edu.umd.cs.piccolo.event.PPanEventHandler;
 final class PanEventHandler
     extends PPanEventHandler {
 
+    /** Network Panel. */
+    private final NetworkPanel networkPanel;
+
     /**
      * Create a new pan event handler.
      */
-    public PanEventHandler() {
+    public PanEventHandler(NetworkPanel networkPanel) {
         super();
         setEventFilter(new PanEventFilter());
+        this.networkPanel = networkPanel;
     }
+
 
 
     /**
@@ -57,7 +62,6 @@ final class PanEventHandler
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
 
             if (editMode.isPan() && super.acceptsEvent(event, type)) {

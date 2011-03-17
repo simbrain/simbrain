@@ -24,7 +24,9 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -108,7 +110,10 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Network panel.
  */
-public class NetworkPanel extends PCanvas  {
+public class NetworkPanel extends JPanel  {
+
+    /** The Piccolo PCanvas. */ 
+    private final PCanvas canvas;
 
     /** The model neural-rootNetwork object. */
     private RootNetwork rootNetwork;
@@ -228,7 +233,7 @@ public class NetworkPanel extends PCanvas  {
     private boolean prioritiesVisible = false;
 
     /** Text object event handler. */
-    private TextEventHandler textHandle = new TextEventHandler(this);
+    private TextEventHandler textHandle;
 
     /** Groups nodes together for ease of use. */
     private ViewGroupNode vgn;
@@ -246,11 +251,12 @@ public class NetworkPanel extends PCanvas  {
         super();
 
         this.rootNetwork = rootNetwork;
+        canvas = new PCanvas();
 
-        // always render in high quality
-        setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
-        setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
-        setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+        // Always render in high quality
+        canvas.setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+        canvas.setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+        canvas.setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
 
         editMode = DEFAULT_BUILD_MODE;
         selectionModel = new NetworkSelectionModel(this);
@@ -259,13 +265,12 @@ public class NetworkPanel extends PCanvas  {
         createContextMenu();
         // createContextMenuAlt();
 
-        //initialize toolbars
+        //Toolbars
         toolbars = new JPanel(new BorderLayout());
         mainToolBar = this.createMainToolBar();
         runToolBar = this.createRunToolBar();
         editToolBar = this.createEditToolBar();
         clampToolBar = this.createClampToolBar();
-        // Construct toolbar pane
         FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
         flow.setHgap(0);
         flow.setVgap(0);
@@ -277,14 +282,16 @@ public class NetworkPanel extends PCanvas  {
         toolbars.add("Center", internalToolbar);
         super.setLayout(new BorderLayout());
         this.add("North", toolbars);
+        this.add("Center", canvas);
 
+        // Event listeners
         removeDefaultEventListeners();
-        addInputEventListener(new PanEventHandler());
-        addInputEventListener(new ZoomEventHandler());
-        addInputEventListener(new SelectionEventHandler());
-        addInputEventListener(new WandEventHandler());
-        addInputEventListener(textHandle);
-        addInputEventListener(new ContextMenuEventHandler());
+        canvas.addInputEventListener(new PanEventHandler(this));
+        canvas.addInputEventListener(new ZoomEventHandler(this));
+        canvas.addInputEventListener(new SelectionEventHandler(this));
+        canvas.addInputEventListener(new WandEventHandler(this));
+        canvas.addInputEventListener(textHandle);
+        canvas.addInputEventListener(new ContextMenuEventHandler(this));
 
         addNetworkListeners();
 
@@ -298,20 +305,25 @@ public class NetworkPanel extends PCanvas  {
 
         // Format the time Label
         timeLabel = new TimeLabel(this);
-        timeLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight() - TIME_LABEL_V_OFFSET);
-        getCamera().addChild(timeLabel);
+        timeLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - TIME_LABEL_V_OFFSET);
+        canvas.getCamera().addChild(timeLabel);
         timeLabel.update();
+
 
         // Format the update method label
         updateStatusLabel = new UpdateStatusLabel(this);
-        updateStatusLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight()
+        updateStatusLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight()
                 - UPDATE_LABEL_OFFSET);
-        getCamera().addChild(updateStatusLabel);
+        canvas.getCamera().addChild(updateStatusLabel);
         //getCamera().setScale(.8); // Cheating to offset the toolbar
         updateStatusLabel.update();
         if (rootNetwork.getUpdateMethod() == RootNetwork.UpdateMethod.PRIORITYBASED) {
             setPrioritiesVisible(true);
         }
+
+        // Initialize text handle
+        textHandle = new TextEventHandler(canvas);
+
 
         // Register support for tool tips
         // TODO: might be a memory leak, if not unregistered when the parent
@@ -435,7 +447,7 @@ public class NetworkPanel extends PCanvas  {
                             .remove(toDelete);
                     toDelete.getSource().getConnectedSynapses()
                             .remove(toDelete);
-                    getLayer().removeChild(toDelete);
+                    canvas.getLayer().removeChild(toDelete);
                 }
             }
         });
@@ -450,7 +462,7 @@ public class NetworkPanel extends PCanvas  {
             public void subnetRemoved(final NetworkEvent<Network> e) {
                 SubnetworkNode subnet = findSubnetworkNode(e.getObject());
                 if (subnet != null) {
-                    NetworkPanel.this.getLayer().removeChild(subnet);
+                    canvas.getLayer().removeChild(subnet);
                 }
                 centerCamera();
             }
@@ -482,7 +494,7 @@ public class NetworkPanel extends PCanvas  {
                 for (PNode node : nodes) {
                     neuronGroup.addReference(node);
                 }
-                getLayer().addChild(neuronGroup);
+                canvas.getLayer().addChild(neuronGroup);
                 neuronGroup.updateBounds();
             }
 
@@ -741,10 +753,10 @@ public class NetworkPanel extends PCanvas  {
      * Remove the default event listeners.
      */
     private void removeDefaultEventListeners() {
-        PInputEventListener panEventHandler = getPanEventHandler();
-        PInputEventListener zoomEventHandler = getZoomEventHandler();
-        removeInputEventListener(panEventHandler);
-        removeInputEventListener(zoomEventHandler);
+        PInputEventListener panEventHandler = canvas.getPanEventHandler();
+        PInputEventListener zoomEventHandler = canvas.getZoomEventHandler();
+        canvas.removeInputEventListener(panEventHandler);
+        canvas.removeInputEventListener(zoomEventHandler);
     }
 
 
@@ -792,7 +804,7 @@ public class NetworkPanel extends PCanvas  {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 rootNetwork.deleteSynapse(selectedSynapseNode.getSynapse());
             } else if (selectedNode instanceof TextObject) {
-                getLayer().removeChild(selectedNode);
+                canvas.getLayer().removeChild(selectedNode);
             } else if (selectedNode instanceof SubnetworkNode) {
                 SubnetworkNode selectedSubnet = (SubnetworkNode) selectedNode;
                 rootNetwork.deleteNetwork(selectedSubnet.getSubnetwork());
@@ -1157,7 +1169,7 @@ public class NetworkPanel extends PCanvas  {
      * @return a collection of all neuron nodes
      */
     public Collection<GroupNode> getModelGroupNodes() {
-        return getLayer().getAllNodes(Filters.getModelGroupNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getModelGroupNodeFilter(), null);
     }
 
     /**
@@ -1166,7 +1178,7 @@ public class NetworkPanel extends PCanvas  {
      * @return a collection of all neuron nodes
      */
     public Collection<NeuronNode> getNeuronNodes() {
-        return getLayer().getAllNodes(Filters.getNeuronNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getNeuronNodeFilter(), null);
     }
 
     /**
@@ -1175,7 +1187,7 @@ public class NetworkPanel extends PCanvas  {
      * @return a collection of all synapse nodes
      */
     public Collection<SynapseNode> getSynapseNodes() {
-        return getLayer().getAllNodes(Filters.getSynapseNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getSynapseNodeFilter(), null);
     }
 
     /**
@@ -1184,7 +1196,7 @@ public class NetworkPanel extends PCanvas  {
      * @return a collection of all subnet nodes
      */
     public Collection getSubnetNodes() {
-        return getLayer().getAllNodes(Filters.getSubnetworkNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getSubnetworkNodeFilter(), null);
     }
 
     
@@ -1194,7 +1206,7 @@ public class NetworkPanel extends PCanvas  {
      * @return a collection of all p nodes
      */
     public Collection getParentNodes() {
-        return getLayer().getAllNodes(Filters.getParentNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getParentNodeFilter(), null);
     }
 
     /**
@@ -1204,7 +1216,7 @@ public class NetworkPanel extends PCanvas  {
      * @return a collection of all persistent nodes
      */
     public Collection<PNode> getPersistentNodes() {
-        return getLayer().getAllNodes(Filters.getNeuronOrSynapseNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getNeuronOrSynapseNodeFilter(), null);
     }
 
     /**
@@ -1214,7 +1226,7 @@ public class NetworkPanel extends PCanvas  {
      * @return a collection of all persistent nodes
      */
     public Collection<ScreenElement> getSelectableNodes() {
-        return getLayer().getAllNodes(Filters.getSelectableFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getSelectableFilter(), null);
     }
 
     /**
@@ -1233,7 +1245,7 @@ public class NetworkPanel extends PCanvas  {
      */
     public void resetColors() {
         setBackground(NetworkGuiSettings.getBackgroundColor());
-        for (Object obj : getLayer().getChildrenReference()) {
+        for (Object obj : canvas.getLayer().getChildrenReference()) {
             if (obj instanceof ScreenElement) {
                 ((ScreenElement) obj).resetColors();
             }
@@ -1295,15 +1307,15 @@ public class NetworkPanel extends PCanvas  {
      * Centers the neural rootNetwork in the middle of the PCanvas.
      */
     public void centerCamera() {
-        PCamera camera = getCamera();
+        PCamera camera = canvas.getCamera();
 
         // TODO: Add a check to see if network is running
         if (autoZoomMode && editMode.isSelection()) {
-            PBounds filtered = getLayer().getFullBounds();
-            PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 60,
-                    filtered.getWidth() + 40, filtered.getHeight() + 120);
-
-            camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
+            PBounds filtered = canvas.getLayer().getFullBounds();
+            PBounds adjustedFiltered = new PBounds(filtered.getX() - 10,
+                    filtered.getY() - 10, filtered.getWidth() + 20,
+                    filtered.getHeight() + 20);
+            camera.setViewBounds(adjustedFiltered);
         }
     }
 
@@ -1363,7 +1375,7 @@ public class NetworkPanel extends PCanvas  {
             return;
         }
         NeuronNode node = getNeuronNode(this, neuron);
-        getLayer().addChild(node);
+        canvas.getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
     }
 
@@ -1383,7 +1395,7 @@ public class NetworkPanel extends PCanvas  {
 
         SynapseNode node = new SynapseNode(NetworkPanel.this, source,
                 target, synapse);
-        getLayer().addChild(node);
+        canvas.getLayer().addChild(node);
         node.moveToBack();
     }
 
@@ -1422,7 +1434,7 @@ public class NetworkPanel extends PCanvas  {
             // node.pushViewPositionToModel();
             subnetwork.addChild(node);
         }
-        this.getLayer().addChild(subnetwork);
+        canvas.getLayer().addChild(subnetwork);
         subnetwork.init();
 
         // Add synapses
@@ -1430,7 +1442,7 @@ public class NetworkPanel extends PCanvas  {
             addSynapse(synapse);
             SynapseNode node = findSynapseNode(synapse);
             if (node != null) {
-                this.getLayer().addChild(node);
+                canvas.getLayer().addChild(node);
                 node.moveToBack();
             }
         }
@@ -1464,7 +1476,7 @@ public class NetworkPanel extends PCanvas  {
             }
         }
         // TODO: Take care of subnetworks
-        getLayer().addChild(modelGroup);
+        canvas.getLayer().addChild(modelGroup);
     }
 
     /**
@@ -1689,7 +1701,7 @@ public class NetworkPanel extends PCanvas  {
         }
 
         vgn = new ViewGroupNode(this, elements);
-        this.getLayer().addChild(vgn);
+        canvas.getLayer().addChild(vgn);
         this.setSelection(Collections.singleton(vgn));
     }
 
@@ -1723,18 +1735,17 @@ public class NetworkPanel extends PCanvas  {
     /** @see PCanvas */
     public void repaint() {
         super.repaint();
-
         if (timeLabel != null) {
-            timeLabel.setBounds(TIME_LABEL_H_OFFSET, getCamera().getHeight() - getToolbarOffset(),
+            timeLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
                                 timeLabel.getHeight(), timeLabel.getWidth());
         }
 
         if (updateStatusLabel != null) {
-            updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET, getCamera().getHeight() - getToolbarOffset(),
+            updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
                     updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
         }
 
-        if ((rootNetwork != null) && (getLayer().getChildrenCount() > 0)
+        if ((rootNetwork != null) && (canvas.getLayer().getChildrenCount() > 0)
                 && (!editMode.isPan())) {
             centerCamera();
         }
@@ -2105,12 +2116,12 @@ public class NetworkPanel extends PCanvas  {
     public void setGuiOn(final boolean guiOn) {
         actionManager.getShowGUIAction().setState(guiOn);
         if (guiOn) {
-            for (Iterator iter = this.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
+            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
                 PNode pnode = (PNode) iter.next();
                 pnode.setTransparency((float)1);
             }
         } else {
-            for (Iterator iter = this.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
+            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
                 PNode pnode = (PNode) iter.next();
                 pnode.setTransparency((float).6);
             }
@@ -2204,7 +2215,7 @@ public class NetworkPanel extends PCanvas  {
      * Remove all nodes from panel.
      */
     public void clearPanel() {
-        getLayer().removeAllChildren();
+        canvas.getLayer().removeAllChildren();
     }
 
     /**
@@ -2241,4 +2252,10 @@ public class NetworkPanel extends PCanvas  {
         clearSelection();
     }
 
+    /**
+     * @return the canvas
+     */
+    public PCanvas getCanvas() {
+        return canvas;
+    }
 }

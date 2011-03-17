@@ -493,6 +493,15 @@ public class SimbrainDesktop {
 
         // Initialize time label
         timeLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        timeLabel.addMouseListener(new MouseAdapter() {
+            // Reset time if user double clicks on label.
+            public void mousePressed(final MouseEvent event) {
+                if (event.getClickCount() == 2) {
+                    workspace.getUpdator().resetTime();
+                    updateTimeLabel();
+                }
+            }
+        });
         runningLabel.setIcon(ResourceManager.getImageIcon("Throbber.gif"));
         runningLabel.setVisible(false);
         updateTimeLabel();
@@ -1027,7 +1036,8 @@ public class SimbrainDesktop {
      */
     public void quit(final boolean forceQuit) {
 
-        if (workspace.changesExist() && (!forceQuit)) {
+        if (workspace.changesExist() && (!forceQuit)
+                && (workspace.getComponentList().size() > 0)) {
             int s = showHasChangedDialog();
             if (s == JOptionPane.OK_OPTION) {
                 this.save();

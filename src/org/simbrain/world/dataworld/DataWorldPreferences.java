@@ -30,7 +30,7 @@ public final class DataWorldPreferences {
     public static final String FS = System.getProperty("file.separator");
 
     /** The main user preference object. */
-    private static final Preferences PREFERENCES = Preferences.userRoot().node("/org/simbrain/world/odorworld");
+    private static final Preferences PREFERENCES = Preferences.userRoot().node("/org/simbrain/world/dataworld");
 
 
     /**
@@ -84,6 +84,6 @@ public final class DataWorldPreferences {
      * @return the default current directory
      */
     public static String getDefaultCurrentDirectory() {
-        return "." + FS + "simulations" + FS + "worlds";
+        return "." + FS + "simulations" + FS + "tables";
     }
 }

@@ -23,12 +23,12 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
+import org.simbrain.world.dataworld.DataWorldPreferences;
 
 /**
  * Open data world in current workspace.
@@ -49,7 +49,7 @@ public final class OpenDataWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SFileChooser chooser = new SFileChooser(NetworkGuiPreferences
+        SFileChooser chooser = new SFileChooser(DataWorldPreferences
                 .getCurrentDirectory(), "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {

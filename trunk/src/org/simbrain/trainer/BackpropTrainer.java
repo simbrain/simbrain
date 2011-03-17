@@ -109,7 +109,7 @@ public class BackpropTrainer extends Trainer {
         //System.out.println("Building network representation...");
         //System.out.println("Adding layer " + layers.size());
 
-        if (this.getOutputLayer() == null) {
+        if ((this.getNetwork() == null) || this.getOutputLayer() == null) {
             return;
         }
         NeuronGroup outputLayer = new NeuronGroup(this.getNetwork()

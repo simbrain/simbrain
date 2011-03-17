@@ -41,5 +41,8 @@ import javax.swing.*;
     builder.setInitialPosition(lastClicked);
     builder.setNodesPerLayer(topology);
     builder.buildNetwork(networkPanel.getRootNetwork());
+    
+    // Ensures network will display properly
+    networkPanel.repaint();
 
 }

@@ -43,6 +43,11 @@ import org.simbrain.util.Utils;
  */
 public class TableActionManager {
 
+    /** Directory where tables are stored. */
+    private static String CSV_DIRECTORY = "."
+            + System.getProperty("file.separator") + "simulations"
+            + System.getProperty("file.separator") + "tables";
+
     /**
      * Action for opening from comma separate value file.
      *
@@ -63,7 +68,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser("", "");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     table.readData(theFile);
@@ -93,7 +98,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser("", "");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
                     Utils.writeMatrix(table.asStringArray(), theFile);

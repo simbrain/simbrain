@@ -874,6 +874,7 @@ public class SimbrainDesktop {
         File simFile = simulationChooser.showOpenDialog();
         if (simFile != null) {
             workspace.openWorkspace(simFile);
+            workspace.setCurrentDirectory(simulationChooser.getCurrentLocation());
         }
     }
 

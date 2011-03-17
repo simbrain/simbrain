@@ -68,13 +68,6 @@ public class Workspace {
     private File currentFile = null;
 
     /**
-     * Current directory. So when re-opening this type of component the app
-     * remembers where to look.
-     */
-    private String currentDirectory = WorkspacePreferences
-            .getCurrentDirectory();
-
-    /**
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
      * because writes to this list are uncommon.
      */
@@ -397,14 +390,13 @@ public class Workspace {
      * @return the currentDirectory
      */
     public String getCurrentDirectory() {
-        return currentDirectory;
+        return  WorkspacePreferences.getCurrentDirectory();
     }
 
     /**
      * @param currentDirectory the currentDirectory to set
      */
     public void setCurrentDirectory(final String currentDirectory) {
-        this.currentDirectory = currentDirectory;
         WorkspacePreferences.setCurrentDirectory(currentDirectory);
     }
 

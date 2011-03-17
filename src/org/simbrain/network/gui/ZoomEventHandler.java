@@ -56,13 +56,17 @@ final class ZoomEventHandler
     /** Marquee selection start position. */
     private Point2D marqueeStartPosition;
 
+    /** Network Panel. */
+    private final NetworkPanel networkPanel;
 
     /**
      * Create a new zoom event handler.
+     * @param networkPanel 
      */
-    public ZoomEventHandler() {
+    public ZoomEventHandler(NetworkPanel networkPanel) {
         super();
         setEventFilter(new ZoomEventFilter());
+        this.networkPanel = networkPanel;
     }
 
 
@@ -70,7 +74,7 @@ final class ZoomEventHandler
     public void mouseClicked(final PInputEvent event) {
 
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-        PCamera camera = networkPanel.getCamera();
+        PCamera camera = networkPanel.getCanvas().getCamera();
 
         double zoom = event.isAltDown() ? ZOOM_OUT_FACTOR : ZOOM_IN_FACTOR;
 
@@ -94,7 +98,7 @@ final class ZoomEventHandler
         marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
                                        (float) marqueeStartPosition.getY());
 
-        networkPanel.getLayer().addChild(marquee);
+        networkPanel.getCanvas().getLayer().addChild(marquee);
     }
 
     /** @see PDragSequenceEventHandler */
@@ -123,7 +127,7 @@ final class ZoomEventHandler
         PBounds zoomRect = marquee.getGlobalBounds();
         if ((zoomRect.getWidth() >= DRAG_WIDTH_THRESHOLD) || (zoomRect.getHeight() >= DRAG_HEIGHT_THRESHOLD)) {
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-            PCamera camera = networkPanel.getCamera();
+            PCamera camera = networkPanel.getCanvas().getCamera();
             camera.animateViewToCenterBounds(zoomRect, true, ZOOM_ANIMATION_DURATION);
         }
 
@@ -151,7 +155,6 @@ final class ZoomEventHandler
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
 
             if (editMode.isZoom() && super.acceptsEvent(event, type)) {

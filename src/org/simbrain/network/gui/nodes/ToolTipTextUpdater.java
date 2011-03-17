@@ -24,11 +24,10 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
- * Input event handler for a network node that updates tool tip text
- * for its NetworkPanel as the mouse enters and exits that node.
- *
- * <p>Usage:
- * <code>
+ * Input event handler for a network node that updates tool tip text for its
+ * NetworkPanel as the mouse enters and exits that node.
+ * <p>
+ * Usage: <code>
  * final PNode node = ...;
  * node.addInputEventListener(new ToolTipTextUpdater() {
  *     protected String getToolTipText() {
@@ -38,8 +37,20 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * </code>
  * </p>
  */
-abstract class ToolTipTextUpdater
-    extends PBasicInputEventHandler {
+abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
+
+    /** Network Panel. */
+    private final NetworkPanel networkPanel;
+
+    /**
+     * Construct a new tool tip text updater with a reference to a network
+     * panel.
+     *
+     * @param networkPanel reference to network panel.
+     */
+    public ToolTipTextUpdater(NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+    }
 
     /**
      * Return a string to use as tool tip text.
@@ -48,24 +59,21 @@ abstract class ToolTipTextUpdater
      */
     protected abstract String getToolTipText();
 
-
     /** @see PBasicInputEventHandler */
     public final void mouseEntered(final PInputEvent event) {
 
         event.setHandled(true);
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-        //if (!networkPanel.isThreadRunning()) {
-        networkPanel.setToolTipText(getToolTipText());
-        //}
+        // if (!networkPanel.isThreadRunning()) {
+        networkPanel.getCanvas().setToolTipText(getToolTipText());
+        // }
     }
 
     /** @see PBasicInputEventHandler */
     public final void mouseExited(final PInputEvent event) {
 
         event.setHandled(true);
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-        //if (!networkPanel.isThreadRunning()) {
-        networkPanel.setToolTipText(null);
-        //}
+        // if (!networkPanel.isThreadRunning()) {
+        networkPanel.getCanvas().setToolTipText(null);
+        // }
     }
 }

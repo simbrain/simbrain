@@ -27,6 +27,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
 
 import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
@@ -42,13 +43,17 @@ final class WandEventHandler extends PDragSequenceEventHandler {
     /** Bounds filter. */
     private final BoundsFilter boundsFilter;
 
+    /** Network Panel. */
+    private final NetworkPanel networkPanel;
+
     /**
      * Create a new selection event handler.
      */
-    public WandEventHandler() {
+    public WandEventHandler(NetworkPanel networkPanel) {
         super();
         boundsFilter = new BoundsFilter();
         setEventFilter(new ZoomEventFilter());
+        this.networkPanel = networkPanel;
     }
 
     /** @see PDragSequenceEventHandler */
@@ -102,7 +107,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
                 - radius / 2, position.getY() - radius / 2, radius, radius);
         boundsFilter.setEllipse(ellipse);
 
-        Collection highlightedNodes = networkPanel.getLayer().getRoot()
+        Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot()
                 .getAllNodes(boundsFilter, null);
 
         // Auto-higlighter mode
@@ -187,7 +192,6 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
 
             if (editMode.isWand() && super.acceptsEvent(event, type)) {

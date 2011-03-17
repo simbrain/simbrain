@@ -59,7 +59,6 @@ final class WandEventHandler extends PDragSequenceEventHandler {
     /** @see PDragSequenceEventHandler */
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         networkPanel.setLastClickedPosition(event.getPosition());
         if (event.getPath().getPickedNode() instanceof PCamera) {
             networkPanel.setBeginPosition(event.getPosition());
@@ -96,8 +95,6 @@ final class WandEventHandler extends PDragSequenceEventHandler {
     protected void drag(final PInputEvent event) {
 
         super.drag(event);
-
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
         int radius = networkPanel.getEditMode().getWandRadius();
 

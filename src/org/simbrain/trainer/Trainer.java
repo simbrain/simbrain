@@ -234,7 +234,9 @@ public abstract class Trainer {
      */
     public void setNetwork(Network newNetwork) {
         this.network = newNetwork;
-        networkName = network.getId();
+        if (network != null) {
+            networkName = network.getId();
+        }
         fireNetworkChanged(network, newNetwork);
         init();
     }

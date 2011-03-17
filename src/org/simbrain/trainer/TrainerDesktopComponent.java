@@ -45,9 +45,6 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
     /** Trainer panel. */
     private final TrainerPanel trainerPanel;
 
-    /** Current network. */
-    private RootNetwork currentNetwork;
-
     /** Default height. */
     private static final int DEFAULT_HEIGHT = 550;
 
@@ -79,8 +76,10 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
         @SuppressWarnings("unchecked")
         public void componentRemoved(final WorkspaceComponent workspaceComponent) {
             if (workspaceComponent instanceof NetworkComponent) {
-                if (((NetworkComponent) workspaceComponent).getRootNetwork() == currentNetwork) {
+                if (((NetworkComponent) workspaceComponent).getRootNetwork() == trainerPanel
+                        .getTrainer().getNetwork()) {
                     trainerPanel.getTrainer().setNetwork(null);
+                    trainerPanel.updateGroupComboBoxes();
                 }
                 cbNetworkChooser.removeItem((NetworkComponent) workspaceComponent);
             }
@@ -91,7 +90,7 @@ public class TrainerDesktopComponent extends GuiComponent<TrainerComponent> {
     };
 
     /**
-     * Construct the GUI Bar Chart.
+     * Construct the trainer desktop component.
      *
      * @param frame Generic frame
      * @param component Bar chart component

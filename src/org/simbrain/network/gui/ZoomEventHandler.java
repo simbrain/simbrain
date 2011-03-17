@@ -73,7 +73,6 @@ final class ZoomEventHandler
     /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
 
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         PCamera camera = networkPanel.getCanvas().getCamera();
 
         double zoom = event.isAltDown() ? ZOOM_OUT_FACTOR : ZOOM_IN_FACTOR;
@@ -93,7 +92,6 @@ final class ZoomEventHandler
         super.startDrag(event);
 
         marqueeStartPosition = event.getPosition();
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
         marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
                                        (float) marqueeStartPosition.getY());
@@ -126,7 +124,6 @@ final class ZoomEventHandler
         // and not of a click and drag to create a marquee
         PBounds zoomRect = marquee.getGlobalBounds();
         if ((zoomRect.getWidth() >= DRAG_WIDTH_THRESHOLD) || (zoomRect.getHeight() >= DRAG_HEIGHT_THRESHOLD)) {
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             PCamera camera = networkPanel.getCanvas().getCamera();
             camera.animateViewToCenterBounds(zoomRect, true, ZOOM_ANIMATION_DURATION);
         }

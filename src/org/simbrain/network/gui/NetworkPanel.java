@@ -19,14 +19,13 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +41,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
@@ -65,8 +65,6 @@ import org.simbrain.network.gui.nodes.SourceHandle;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextObject;
-import org.simbrain.network.gui.nodes.TimeLabel;
-import org.simbrain.network.gui.nodes.UpdateStatusLabel;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.modelgroups.GeneRecNode;
 import org.simbrain.network.gui.nodes.subnetworks.CompetitiveNetworkNode;
@@ -282,6 +280,7 @@ public class NetworkPanel extends JPanel  {
         toolbars.add("Center", internalToolbar);
         super.setLayout(new BorderLayout());
         this.add("North", toolbars);
+
         this.add("Center", canvas);
 
         // Event listeners
@@ -290,6 +289,7 @@ public class NetworkPanel extends JPanel  {
         canvas.addInputEventListener(new ZoomEventHandler(this));
         canvas.addInputEventListener(new SelectionEventHandler(this));
         canvas.addInputEventListener(new WandEventHandler(this));
+        textHandle = new TextEventHandler(this);
         canvas.addInputEventListener(textHandle);
         canvas.addInputEventListener(new ContextMenuEventHandler(this));
 
@@ -305,25 +305,26 @@ public class NetworkPanel extends JPanel  {
 
         // Format the time Label
         timeLabel = new TimeLabel(this);
-        timeLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - TIME_LABEL_V_OFFSET);
-        canvas.getCamera().addChild(timeLabel);
+        //timeLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - TIME_LABEL_V_OFFSET);
+        //canvas.getCamera().addChild(timeLabel);
         timeLabel.update();
 
 
         // Format the update method label
         updateStatusLabel = new UpdateStatusLabel(this);
-        updateStatusLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight()
-                - UPDATE_LABEL_OFFSET);
-        canvas.getCamera().addChild(updateStatusLabel);
+        //updateStatusLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight()
+        //        - UPDATE_LABEL_OFFSET);
+        //canvas.getCamera().addChild(updateStatusLabel);
         //getCamera().setScale(.8); // Cheating to offset the toolbar
         updateStatusLabel.update();
         if (rootNetwork.getUpdateMethod() == RootNetwork.UpdateMethod.PRIORITYBASED) {
             setPrioritiesVisible(true);
         }
-
-        // Initialize text handle
-        textHandle = new TextEventHandler(canvas);
-
+        JToolBar statusBar = new JToolBar();
+        statusBar.add(timeLabel);
+        statusBar.addSeparator(new Dimension(20,20));
+        statusBar.add(updateStatusLabel);
+        this.add("South", statusBar);
 
         // Register support for tool tips
         // TODO: might be a memory leak, if not unregistered when the parent
@@ -1735,15 +1736,15 @@ public class NetworkPanel extends JPanel  {
     /** @see PCanvas */
     public void repaint() {
         super.repaint();
-        if (timeLabel != null) {
-            timeLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
-                                timeLabel.getHeight(), timeLabel.getWidth());
-        }
-
-        if (updateStatusLabel != null) {
-            updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
-                    updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
-        }
+//        if (timeLabel != null) {
+//            timeLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
+//                                timeLabel.getHeight(), timeLabel.getWidth());
+//        }
+//
+//        if (updateStatusLabel != null) {
+//            updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
+//                    updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
+//        }
 
         if ((rootNetwork != null) && (canvas.getLayer().getChildrenCount() > 0)
                 && (!editMode.isPan())) {

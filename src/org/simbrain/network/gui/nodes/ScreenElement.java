@@ -275,11 +275,10 @@ public abstract class ScreenElement
         private void showContextMenu(final PInputEvent event) {
 
             event.setHandled(true);
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
             networkPanel.setLastClickedPosition(canvasPosition);
-            contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
+            contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 
         /** @see PBasicInputEventHandler */

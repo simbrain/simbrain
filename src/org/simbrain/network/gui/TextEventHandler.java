@@ -39,19 +39,21 @@ import edu.umd.cs.piccolox.nodes.PStyledText;
 public class TextEventHandler extends PStyledTextEventHandler implements ActionListener {
 
     /** Reference to parent network. */
-    private NetworkPanel net;
+    private NetworkPanel networkPanel;
 
     /**
      *  Constructor.
      * @param canvas reference to network panel.
      */
-    public TextEventHandler(final PCanvas canvas) {
-        super(canvas);
+    public TextEventHandler(final NetworkPanel networkPanel) {
+        super(networkPanel.getCanvas());
+        this.networkPanel = networkPanel;
         this.setEventFilter(new TextEventFilter());
     }
 
     /** Builds a TextObject on mouse clicks. */
     public void mousePressed(final PInputEvent inputEvent) {
+
         PNode pickedNode = inputEvent.getPickedNode();
         stopEditing();
         if (pickedNode instanceof PStyledText) {
@@ -61,7 +63,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
         else if (pickedNode instanceof PCamera) {
 
             PStyledText newText = createText();
-            TextObject textObj = new TextObject(net, newText);
+            TextObject textObj = new TextObject(networkPanel, newText);
             Insets pInsets = newText.getInsets();
             canvas.getLayer().addChild(textObj);
             textObj.translate(inputEvent.getPosition().getX() - pInsets.left,
@@ -109,18 +111,13 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
 
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
-
-            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
-
             return (editMode.isText() && super.acceptsEvent(event, type));
         }
     }
 
     /** @Override */
     public void actionPerformed(ActionEvent arg0) {
-        // TODO Auto-generated method stub
-        
     }
 
 }

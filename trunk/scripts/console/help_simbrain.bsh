@@ -6,9 +6,9 @@ help_simbrain() {
     print("---- SOME SAMPLE COMMANDS ----");
     print("print(workspace);");
     print("Neuron neuron = new Neuron();");
-    print("workspace.globalUpdate();");
-    print("workspace.globalRun();");
-    print("workspace.globalStop();");
+    print("workspace.iterate(100);");
+    print("workspace.run();");
+    print("workspace.stop();");
     print("getNetwork(NAME).randomizeNeurons()");
     print("addNetwork(\"Network 1\");");
     print("LinearNeuron neuron = new LinearNeuron();");

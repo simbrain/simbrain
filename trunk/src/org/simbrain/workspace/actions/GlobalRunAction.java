@@ -46,6 +46,6 @@ public final class GlobalRunAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.globalRun();
+        workspace.run();
     }
 }

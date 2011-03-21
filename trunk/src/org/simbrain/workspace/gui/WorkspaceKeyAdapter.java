@@ -24,16 +24,22 @@ import java.awt.event.KeyEvent;
 import org.simbrain.workspace.Workspace;
 
 /**
- * Network key adapter.
+ * Workspace key adapter.
  */
 class WorkspaceKeyAdapter extends KeyAdapter {
 
+    /** Reference to workspace. */
     private final Workspace workspace;
-    
+
+    /**
+     * Construct the key adapter.
+     *
+     * @param workspace
+     */
     WorkspaceKeyAdapter(Workspace workspace) {
         this.workspace = workspace;
     }
-    
+
     /**
      * Responds to key pressed events.
      *
@@ -43,7 +49,7 @@ class WorkspaceKeyAdapter extends KeyAdapter {
         int keycode = e.getKeyCode();
         switch (keycode) {
         case KeyEvent.VK_U:
-            workspace.singleUpdate();
+            workspace.iterate();
             break;
         default:
             break;

@@ -234,6 +234,33 @@ public class WorkspaceUpdator {
     }
 
     /**
+     * Submits a single task to the queue, and counts down a latch when done.
+     *
+     * @param latch the latch to count down.
+     */
+    public void runOnce(final CountDownLatch latch) {
+        updates.submit(new Runnable() {
+            public void run() {
+                notifyWorkspaceUpdateStarted();
+                snychManager.queueTasks();
+
+                try {
+                    doUpdate();
+                } catch (Exception e) {
+                    // TODO exception handler
+                    e.printStackTrace();
+                }
+
+                snychManager.releaseTasks();
+                snychManager.runTasks();
+                notifyWorkspaceUpdateCompleted();
+                latch.countDown();
+
+            }
+        });
+    }
+
+    /**
      * Submits a single task to the queue.
      */
     public void runOnce() {
@@ -274,7 +301,7 @@ public class WorkspaceUpdator {
 
         updateController.doUpdate(controls);
 
-        snychManager.runTasks();
+        snychManager.runTasks(); 
 
         notifyWorkspaceUpdated();
 
@@ -550,5 +577,6 @@ public class WorkspaceUpdator {
     public void setUpdateController(final UpdateController updateController) {
         this.updateController = updateController;
     }
+
 
 }

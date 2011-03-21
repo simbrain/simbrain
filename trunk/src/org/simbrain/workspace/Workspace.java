@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
@@ -275,43 +276,47 @@ public class Workspace {
     }
 
     /**
-     * Convenience method (with an easily-recognized name) forwarded to
-     * singleUpdate.
+     * Update the workspace a single time.
      */
     public void iterate() {
-        singleUpdate();
+        synchronized (updatorLock) {
+            updator.runOnce();
+        }
+        updateStopped();
     }
 
     /**
      * Iterate for a specified number of steps.
      *
-     * @param numIterations
+     * @param numIterations number of times to iterate the workspace.
      */
     public void iterate(final int numIterations) {
         updator.iterate(numIterations);
-    }
-
-    /**
-     * Update all couplings on all components once.
-     */
-    public void singleUpdate() {
-        globalUpdate();
         updateStopped();
     }
 
+
     /**
-     * Update all couplings on all components. Currently use a buffering method.
+     * Iterate using a latch, which is counted down after the iteration
+     * completes. Use this in applications where it is important to perform
+     * additional operations after each workspace update.
+     *
+     * NOTE-1: The latch must be initialized with a count of 1.
+     * NOTE-2: This function should be called from a separate thread.
+     *
+     * @param latch the latch to count down after successful iteration.
      */
-    public void globalUpdate() {
+    public void iterate(CountDownLatch latch) {
         synchronized (updatorLock) {
-            updator.runOnce();
+            updator.runOnce(latch);
         }
+        updateStopped();
     }
 
     /**
      * Iterates all couplings on all components until halted by user.
      */
-    public void globalRun() {
+    public void run() {
         synchronized (updatorLock) {
             updator.run();
         }
@@ -320,17 +325,18 @@ public class Workspace {
     /**
      * Stops iteration of all couplings on all components.
      */
-    public void globalStop() {
+    public void stop() {
         synchronized (updatorLock) {
             updator.stop();
         }
+        updateStopped();
     }
 
     /**
      * Remove all components (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
-        globalStop();
+        stop();
         removeAllComponents();
         resetTime();
         this.setWorkspaceChanged(false);

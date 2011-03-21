@@ -45,6 +45,6 @@ public final class GlobalStopAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.globalStop();
+        workspace.stop();
     }
 }

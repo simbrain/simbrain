@@ -34,6 +34,7 @@ import org.simbrain.network.neurons.IzhikevichNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.LogisticNeuron;
 import org.simbrain.network.neurons.NakaRushtonNeuron;
+import org.simbrain.network.neurons.PointNeuron;
 import org.simbrain.network.neurons.RandomNeuron;
 import org.simbrain.network.neurons.RunningAverageNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
@@ -121,6 +122,7 @@ public class Neuron  {
         new ClassDescriptionPair(LinearNeuron.class, new LinearNeuron().getDescription()),
         new ClassDescriptionPair(LogisticNeuron.class, new LogisticNeuron().getDescription()),
         new ClassDescriptionPair(NakaRushtonNeuron.class, new NakaRushtonNeuron().getDescription()),
+        new ClassDescriptionPair(PointNeuron.class, new PointNeuron().getDescription()),
         new ClassDescriptionPair(RandomNeuron.class, new RandomNeuron().getDescription()),
         new ClassDescriptionPair(RunningAverageNeuron.class, new RunningAverageNeuron().getDescription()),
         new ClassDescriptionPair(SigmoidalNeuron.class, new SigmoidalNeuron().getDescription()),

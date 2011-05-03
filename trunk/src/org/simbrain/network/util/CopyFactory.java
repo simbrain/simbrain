@@ -72,11 +72,10 @@ public class CopyFactory {
 
         // Copy synapses
         for (Synapse synapse : synapses) {
-//            Synapse newSynapse = synapse.duplicate();
             Synapse newSynapse = new Synapse(
                     (Neuron) neuronMappings.get(synapse.getSource()),
                     (Neuron) neuronMappings.get(synapse.getTarget()), synapse
-                            .getLearningRule().deepCopy());
+                            .getLearningRule().deepCopy(), synapse);
             ret.add(newSynapse);
         }
 

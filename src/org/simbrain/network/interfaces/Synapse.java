@@ -148,6 +148,27 @@ public class Synapse {
 
     /**
      * Construct a synapse using a source and target neuron, and a specified
+     * learning rule. Assumes the parent network is the same as the parent
+     * network of the provided source neuron.
+     *
+     * @param source source neuron
+     * @param target target neuron
+     * @param learningRule update rule for this synapse
+     * @param templateSynapse synapse with parameters to copy
+     */
+    public Synapse(Neuron source, Neuron target,
+            SynapseUpdateRule learningRule, Synapse templateSynapse) {
+        this(templateSynapse); // invoke the copy constructor
+        setSource(source);
+        setTarget(target);
+        setLearningRule(learningRule);
+        if (source != null) {
+            parentNetwork = source.getParentNetwork();
+        }
+    }
+
+    /**
+     * Construct a synapse using a source and target neuron, and a specified
      * learning rule.
      *
      * @param source source neuron
@@ -166,7 +187,7 @@ public class Synapse {
     /**
      * Copy constructor.
      *
-     * @param s Synapse to be created from another
+     * @param s Synapse to used as a template for constructing a new synapse.
      */
     public Synapse(final Synapse s) {
         this(s.source, s.target, s.getLearningRule().deepCopy());
@@ -176,6 +197,7 @@ public class Synapse {
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
         setSendWeightedInput(s.isSendWeightedInput());
+        setDelay(s.getDelay());
     }
 
     /**
@@ -197,22 +219,6 @@ public class Synapse {
      */
     public void update() {
         learningRule.update(this);
-    }
-
-    /**
-     * Create duplicate weights. Used in copy/paste.
-     *
-     * @param s weight to duplicate
-     * @return duplicate weight
-     */
-    public Synapse duplicate(final Synapse s) {
-        s.setStrength(this.getStrength());
-        s.setIncrement(this.getIncrement());
-        s.setUpperBound(this.getUpperBound());
-        s.setLowerBound(this.getLowerBound());
-        s.setSpikeResponder(this.getSpikeResponder());
-        s.setSendWeightedInput(this.isSendWeightedInput());
-        return s;
     }
 
     /**
@@ -367,6 +373,7 @@ public class Synapse {
         if (strength < upperBound) {
             strength += increment;
         }
+        //target.weightChanged(this); // Maybe?
         getRootNetwork().fireSynapseChanged(this);
     }
 
@@ -672,7 +679,7 @@ public class Synapse {
      * @see instantiateTemplateSynapse
      */
     public static Synapse getTemplateSynapse() {
-        return new Synapse(null, null, new ClampedSynapse(), null);
+        return new Synapse(null, null, new ClampedSynapse(), (Network) null);
     }
 
     /**

@@ -34,7 +34,7 @@ import org.simbrain.network.neurons.LinearNeuron;
 public class WinnerTakeAll extends Network {
 
     /** Default initial number of units. */
-    private static final int DEFAULT_NUM_UNITS = 3;
+    private static final int DEFAULT_NUM_UNITS = 5;
 
     /** Number of neurons. */
     private int numUnits = DEFAULT_NUM_UNITS;
@@ -62,7 +62,7 @@ public class WinnerTakeAll extends Network {
         super();
         setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new Neuron(root, new LinearNeuron()));
+            this.addNeuron(new Neuron(this, new LinearNeuron())); //TODO: Prevent invalid states like this?
         }
         layout.layoutNeurons(this);
     }

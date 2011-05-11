@@ -135,7 +135,8 @@ public class Neuron  {
     /**
      * Construct a specific type of neuron from a string description.
      *
-     * @param parent parent network
+     * @param parent The parent network. Be careful not to set this to root
+     *            network if the root network is not the parent.
      * @param updateRule the update method
      */
     public Neuron(final Network parent, final String updateRule) {
@@ -146,7 +147,8 @@ public class Neuron  {
     /**
      * Construct a specific type of neuron.
      *
-     * @param parent parent network
+     * @param parent The parent network. Be careful not to set this to root
+     *            network if the root network is not the parent.
      * @param updateRule the update method
      */
     public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
@@ -157,7 +159,8 @@ public class Neuron  {
     /**
      * Copy constructor.
      *
-     * @param parent parent network
+     * @param parent The parent network. Be careful not to set this to root
+     *            network if the root network is not the parent.
      * @param n Neuron
      */
     public Neuron(final Network parent, final Neuron n) {

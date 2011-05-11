@@ -56,10 +56,14 @@ public class SOM extends Network {
 
     /** Learning rate. */
     private double alpha = DEFAULT_ALPHA;
+
     /** The total epochs the SOM has iterated through since last reset. */
     private int epochs = 0;
 
-    /** Current Neighborhood Size. With a circular neighborhood, neighborhoodSize connotes radius.*/
+    /**
+     * Current Neighborhood Size. With a circular neighborhood, neighborhoodSize
+     * connotes radius.
+     */
     private double neighborhoodSize = 0;
 
     /** The initial neighborhoodSize.
@@ -74,7 +78,7 @@ public class SOM extends Network {
     private int numInputVectors = DEFAULT_INPUT_VECTORS;
 
     /** Number of neurons. */
-    private int numNeurons = 2;
+    private int numNeurons = 16;
 
     /** Number of vectors seen by the SOM since last full iteration. */
     private int vectorNumber = 0;
@@ -82,7 +86,7 @@ public class SOM extends Network {
     /** Winner index. */
     private int winner;
 
-    /** Input training file for persistance. */
+    /** Input training file for persistence. */
     private File trainingINFile = null;
 
     /** Input portion of training corpus. */
@@ -98,7 +102,7 @@ public class SOM extends Network {
     private int neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
     /**
-     * Default constructor used by Castor.
+     * Default constructor.
      */
     public SOM() {
     }

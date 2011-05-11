@@ -191,6 +191,7 @@ public class Hopfield extends Network {
     public Network duplicate() {
         Hopfield net = new Hopfield();
         net = (Hopfield) super.duplicate(net);
+        net.setUpdateOrder(updateOrder);
         return net;
     }
 }

@@ -33,8 +33,11 @@ import org.simbrain.network.neurons.LinearNeuron;
  */
 public class WinnerTakeAll extends Network {
 
+    /** Default initial number of units. */
+    private static final int DEFAULT_NUM_UNITS = 3;
+
     /** Number of neurons. */
-    private int numUnits = 3;
+    private int numUnits = DEFAULT_NUM_UNITS;
 
     /** Winning value. */
     private double winValue = 1;
@@ -68,26 +71,26 @@ public class WinnerTakeAll extends Network {
      * Update network.
      */
     public void update() {
+
         if (getRootNetwork().getClampNeurons()) {
             return;
         }
 
         updateAllNeurons();
 
-        double max = 0;
-        int winner = 0;
+        double max = Double.NEGATIVE_INFINITY;
+        int winnerIndex = 0;
 
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron n = (Neuron) getNeuronList().get(i);
-
             if (n.getActivation() > max) {
                 max = n.getActivation();
-                winner = i;
+                winnerIndex = i;
             }
         }
 
         for (int i = 0; i < getNeuronList().size(); i++) {
-            if (i == winner) {
+            if (i == winnerIndex) {
                 ((Neuron) getNeuronList().get(i)).setActivation(winValue);
             } else {
                 ((Neuron) getNeuronList().get(i)).setActivation(loseValue);
@@ -133,6 +136,8 @@ public class WinnerTakeAll extends Network {
     @Override
     public Network duplicate() {
         WinnerTakeAll net = new WinnerTakeAll();
+        net.setLoseValue(loseValue);
+        net.setWinValue(winValue);
         net = (WinnerTakeAll) super.duplicate(net);
         return net;
     }

@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.networks;
 
 import java.util.Iterator;
@@ -26,7 +44,7 @@ public class Competitive extends Network {
     private double loseValue = 0;
 
     /** Number of neurons. */
-    private int numNeurons = 3;
+    private int numNeurons = 5;
 
     /** Normalize inputs boolean. */
     private boolean normalizeInputs = true;
@@ -44,7 +62,7 @@ public class Competitive extends Network {
     private int winner;
 
     /**
-     * Default constructor used by Castor.
+     * Default constructor.
      */
     public Competitive() {
     }
@@ -60,7 +78,7 @@ public class Competitive extends Network {
         super();
         this.setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new Neuron(root, new LinearNeuron()));
+            this.addNeuron(new Neuron(this, new LinearNeuron()));
         }
         layout.layoutNeurons(this);
     }
@@ -87,7 +105,10 @@ public class Competitive extends Network {
         // Update weights on winning neuron
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron neuron = ((Neuron) getNeuronList().get(i));
-            // Don't update weights if no incoming lines have greater than zero activation
+            double sumOfInputs = neuron.getTotalInput();
+
+            // Don't update weights if no incoming lines have greater than zero
+            // activation
             if (neuron.getNumberOfActiveInputs(0) == 0) {
                 return;
             }
@@ -96,30 +117,34 @@ public class Competitive extends Network {
                     neuron.setActivation(winValue);
                 }
                 if (!getRootNetwork().getClampWeights()) {
+
                     // Apply learning rule
                     for (Synapse incoming : neuron.getFanIn()) {
-                      activation = incoming.getSource().getActivation();
+                        activation = incoming.getSource().getActivation();
 
-                      if (normalizeInputs) {
-                          activation /= neuron.getTotalInput();
-                      }
+                        // Normalize the input values
+                        if (normalizeInputs) {
+                            activation /= sumOfInputs;
+                        }
 
-                      val =  incoming.getStrength() + epsilon * (activation - incoming.getStrength());
-                      incoming.setStrength(val);
+                        val = incoming.getStrength() + epsilon
+                                * (activation - incoming.getStrength());
+                        incoming.setStrength(val);
+                    }
                 }
-              }
             } else {
                 if (!getRootNetwork().getClampNeurons()) {
                     neuron.setActivation(loseValue);
                 }
                 if ((useLeakyLearning) & (!getRootNetwork().getClampWeights())) {
                     for (Synapse incoming : neuron.getFanIn()) {
-                      activation = incoming.getSource().getActivation();
-                      if (normalizeInputs) {
-                          activation /= neuron.getTotalInput();
-                      }
-                      val = incoming.getStrength() + leakyEpsilon * (activation - incoming.getStrength());
-                      incoming.setStrength(val);
+                        activation = incoming.getSource().getActivation();
+                        if (normalizeInputs) {
+                            activation /= sumOfInputs;
+                        }
+                        val = incoming.getStrength() + leakyEpsilon
+                                * (activation - incoming.getStrength());
+                        incoming.setStrength(val);
                     }
                 }
             }
@@ -309,6 +334,11 @@ public class Competitive extends Network {
     public Network duplicate() {
         Competitive net = new Competitive();
         net = (Competitive) super.duplicate(net);
+        net.setEpsilon(epsilon);
+        net.setLeakyEpsilon(leakyEpsilon);
+        net.setLoseValue(loseValue);
+        net.setWinValue(winValue);
+        net.setNormalizeInputs(normalizeInputs);
         return net;
     }
 

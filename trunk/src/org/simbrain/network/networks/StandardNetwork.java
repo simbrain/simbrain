@@ -25,18 +25,18 @@ import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
 
-
 /**
- * <b>StandardNetwork</b> serves as a high-level container for other networks and neurons.   It
- * contains a list of neurons as well as a list of networks.  When  building simulations in which multiple
- * networks interact, this should be the top-level network which contains the rest.
+ * <b>StandardNetwork</b> serves as a high-level container for other networks
+ * and neurons. It contains a list of neurons as well as a list of networks.
+ * When building simulations in which multiple networks interact, this should be
+ * the top-level network which contains the rest.
  *
  * @author yoshimi
  */
 public class StandardNetwork extends Network {
 
     /** Initial number of neurons. */
-    private int numNeurons = 3;
+    private int numNeurons = 5;
 
     /**
      * Default connstructor.
@@ -46,7 +46,7 @@ public class StandardNetwork extends Network {
     }
 
     /**
-     * Construct with root network
+     * Construct with root network.
      *
      * @param root root network.
      */
@@ -61,13 +61,14 @@ public class StandardNetwork extends Network {
      * @param layout how the units should be layed out.
      * @param root reference to RootNetwork.
      */
-    public StandardNetwork(final RootNetwork root, final int nUnits, final Layout layout) {
+    public StandardNetwork(final RootNetwork root, final int nUnits,
+            final Layout layout) {
         super();
         this.setRootNetwork(root);
 
         numNeurons = nUnits;
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new Neuron(root, new LinearNeuron()));
+            this.addNeuron(new Neuron(this, new LinearNeuron()));
         }
         layout.layoutNeurons(this);
     }
@@ -88,7 +89,7 @@ public class StandardNetwork extends Network {
      */
     public void setDelays(final int newDelay) {
         for (int i = 0; i < this.getNeuronCount(); i++) {
-             for (Synapse syn : this.getNeuron(i).getFanIn()) {
+            for (Synapse syn : this.getNeuron(i).getFanIn()) {
                 syn.setDelay(newDelay);
             }
         }

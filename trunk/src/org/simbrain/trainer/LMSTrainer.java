@@ -111,7 +111,7 @@ public class LMSTrainer extends Trainer {
                 }
 
                 // Update bias of target neuron (TODO: Use interface?)
-                ((BiasedNeuron)target).setBias(learningRate * error);
+                ((BiasedNeuron)target.getUpdateRule()).setBias(learningRate * error);
             }
             rmsError = Math.sqrt(rmsError / (numInputs * numOutputs));
         }
@@ -146,7 +146,7 @@ public class LMSTrainer extends Trainer {
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
             Neuron neuron = new Neuron(network, new LinearNeuron());
-            ((BiasedNeuron)neuron).setBias(0);
+            ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);
@@ -185,7 +185,7 @@ public class LMSTrainer extends Trainer {
             System.out.println("Epoch " + i + ", error = " + error);
         }
     }
-    
+
     public static void test() {
 
         double inputData[][] = { { 1, 0}};
@@ -209,7 +209,7 @@ public class LMSTrainer extends Trainer {
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
             Neuron neuron = new Neuron(network, new LinearNeuron()); 
-            ((BiasedNeuron)neuron).setBias(0);
+            ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);
@@ -218,7 +218,7 @@ public class LMSTrainer extends Trainer {
         }
 
         // Connect input layer to output layer
-        Synapse synapse = new Synapse(null, null, null);
+        Synapse synapse = new Synapse(null, null,  new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
         AllToAll.setBaseSynapse(synapse);
@@ -240,7 +240,7 @@ public class LMSTrainer extends Trainer {
         trainer.setTrainingData(trainingData);
         int epochs = 1;
         for (int i = 0; i < epochs; i++) {
-            double error = trainer.train(1);
+            double error = trainer.train(500);
             System.out.println(network);
             System.out.println("Epoch " + i + ", error = " + error);
         }

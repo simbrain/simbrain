@@ -25,6 +25,8 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -334,6 +336,13 @@ public class NetworkPanel extends JPanel  {
         // Register key support
         KeyBindings.addBindings(this);
         addKeyListener(new NetworkKeyAdapter(this));
+
+        // Repaint whenever window is opened or changed.
+        this.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent arg0) {
+                repaint();
+            }
+        });
 
     }
 

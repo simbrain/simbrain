@@ -28,13 +28,15 @@ import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.util.SimbrainMath;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations in
  * Cognitive Neuroscience, chapter 2. All page references below are are to this
  * book.
  */
-public class PointNeuron extends NeuronUpdateRule implements SynapseListener, BiasedNeuron {
+public class PointNeuron extends NeuronUpdateRule implements SynapseListener,
+        BiasedNeuron {
 
     /** Excitatory inputs for connected Synapses. */
     private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
@@ -63,13 +65,13 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
     /** Default value for membrane potential. */
     private static final double DEFAULT_MEMBRANE_POTENTIAL = .15;
 
-    /** Membrane potential field. (p. 45)*/
+    /** Membrane potential field. (p. 45) */
     private double membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
 
-    /** Excitatory reversal potential field. (p. 45)*/
+    /** Excitatory reversal potential field. (p. 45) */
     private double excitatoryReversal = 1;
 
-    /** Leak reversal potential field. (p. 45)*/
+    /** Leak reversal potential field. (p. 45) */
     private double leakReversal = 0.15;
 
     /**
@@ -77,7 +79,7 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
      */
     private double leakMaxConductance = 2.8;
 
-    /** Leak Conductance field. Proportion of channels open. (p. 49)*/
+    /** Leak Conductance field. Proportion of channels open. (p. 49) */
     private double leakConductance = 1;
 
     /** Net current field. Sum of all currents. */
@@ -101,6 +103,30 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
     /** Inhibitory reversal field. */
     private double inhibitoryReversal = 0.15;
 
+    /** Current output function. */
+    private OutputFunction outputFunction = OutputFunction.DISCRETE_SPIKING;
+
+    /** Gain factor for output function. (p. 46) */
+    private double gain = 600;
+
+    /** Threshold of excitation field. (p. 45) */
+    private double thresholdPotential = 0.25;
+
+    /**
+     * Duration of spike for DISCRETE_SPIKING output function. Used to extend
+     * spike across multiple cycles (p. 46).
+     */
+    private int duration = 1; // TODO: Implement and verify against Emergent
+
+    /**
+     * Membrane potential after spike for DISCRETE_SPIKING output function. (p.
+     * 46)
+     */
+    private double refractoryPotential;
+
+    /** Bias term. */
+    private double bias;
+
     /** Output functions. (p. 45-48) */
     public enum OutputFunction {
         DISCRETE_SPIKING {
@@ -122,38 +148,13 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
             public String toString() {
                 return "Noisy Rate Code";
             }
-        }, 
+        },
         NONE {
             public String toString() {
                 return "None (activation = membrane potential)";
             }
         }
     };
-
-    /** Current output function. */
-    private OutputFunction outputFunction = OutputFunction.DISCRETE_SPIKING;
-
-    /** Gain factor for output function. (p. 46)*/
-    private double gain = 600;
-
-    /** Threshold of excitation field. (p. 45)*/
-    private double thresholdPotential = 0.25;
-
-    /**
-     * Duration of spike for DISCRETE_SPIKING output function. Used to extend
-     * spike across multiple cycles (p. 46).
-     */
-    private int duration = 1; //TODO: Implement and verify against Emergent
-
-    /**
-     * Membrane potential after spike for DISCRETE_SPIKING output function. (p.
-     * 46)
-     */
-    private double refractoryPotential;
-
-    /** Bias term. */
-    private double bias;
-
 
     /**
      * {@inheritDoc}
@@ -166,6 +167,7 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
         }
 
     }
+
     /**
      * Update the lists of excitatory and inhibitory currents based on synapse
      * values.
@@ -210,7 +212,8 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
      */
     public PointNeuron deepCopy() {
         PointNeuron cn = new PointNeuron();
-        //TODO
+        cn.setBias(bias);
+        // TODO
         return cn;
     }
 
@@ -226,6 +229,7 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
         leakCurrent = 0;
         inhibitoryCurrent = 0;
         netCurrent = 0;
+        setInputLists(neuron); // Temporary hack to allow input lists to be updated by pressing "clear"
     }
 
     /**
@@ -233,46 +237,33 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
      */
     public void update(Neuron neuron) {
 
-        /**
-         * Calculate the excitatory conductance using time averaging constant.
-         * (p. 44 Eq. 2.16)
-         */
+        // Calculate the excitatory conductance (p. 44, eq. 2.16)
         excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance
                 + netTimeConstant * (getExcitatoryInputs());
-        // TODO: Add scaling parameters and bias term (when adding update kwta)
-        
-        // TODO: Add a method to update inhibitory conductance analogously to
-        // excitatory, using any inhibitory synapses.
-//        inhibitoryConductance = (1 - netTimeConstant) * inhibitoryConductance
-//            + netTimeConstant * (getInhibitoryInputs());
 
-        /**
-         * Calculate the excitatory current given the time averaged excitatory
-         * conductance. (p. 37 equation 2.5)
-         */
+        // Calculate the excitatory current (p. 37 equation 2.5)
         excitatoryCurrent = excitatoryConductance * excitatoryMaxConductance
                 * (membranePotential - excitatoryReversal);
+
+        // Calculate the excitatory conductance using time averaging constant.
+        inhibitoryConductance = (1 - netTimeConstant) * inhibitoryConductance
+                + netTimeConstant * (getInhibitoryInputs());
 
         // Calculate the inhibitory current.
         inhibitoryCurrent = inhibitoryConductance * inhibitoryMaxConductance
                 * (membranePotential - inhibitoryReversal);
 
-
-
-        /** Calculate the leak current.(p. 37 eq. 2.5) */
+        // Calculate the leak current (p. 37 eq. 2.5)
         leakCurrent = leakConductance * leakMaxConductance
                 * (membranePotential - leakReversal);
 
-        /** Calculate the net current. (p. 37 eq. 2.6) */
+        // Calculate the net current (p. 37 eq. 2.6)
         netCurrent = leakCurrent + excitatoryCurrent + inhibitoryCurrent;
 
-        /**
-         * Calculate the time averaged membrane potential given net current. (p.
-         * 37 eq. 2.7)
-         */
+        // Calculate the membrane potential given net current. (p.37 eq. 2.7)
         membranePotential += -potentialTimeConstant * netCurrent;
 
-        /** Apply output function. (p. 45-48) */
+        // Apply output function. (p. 45-48)
         if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
             if (membranePotential > thresholdPotential) {
                 neuron.setBuffer(1);
@@ -281,12 +272,16 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
                 neuron.setBuffer(0);
             }
         } else if (outputFunction == OutputFunction.RATE_CODE) {
-            double val = 
-                    (gain * getPositiveComponent(membranePotential - thresholdPotential))
-                    / (gain * getPositiveComponent(membranePotential - thresholdPotential) + 1);
+            double val = (gain * getPositiveComponent(membranePotential
+                    - thresholdPotential))
+                    / (gain
+                            * getPositiveComponent(membranePotential
+                                    - thresholdPotential) + 1);
             neuron.setBuffer(neuron.clip(val));
         } else if (outputFunction == OutputFunction.LINEAR) {
-            double val = gain * getPositiveComponent(membranePotential - thresholdPotential);
+            double val = gain
+                    * getPositiveComponent(membranePotential
+                            - thresholdPotential);
             neuron.setBuffer(neuron.clip(val));
         } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
             neuron.setBuffer(1); // TODO: Complete this implementation
@@ -294,15 +289,13 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
             neuron.setBuffer(membranePotential);
         }
 
-        /** Display current values of variables for diagnostics. */
-        //printState();
+        // Display current values of variables for diagnostics.
+        //printState(neuron);
     }
 
     /**
      * Returns the inhibitory conductance that would set this point neuron's
-     * voltage at its threshold potential.
-     *
-     * See M/R p. 101, equation 3.2
+     * voltage at its threshold potential. See M/R p. 101, equation 3.2
      *
      * @return the value of that equation
      */
@@ -317,39 +310,32 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
                 / (thresholdPotential - inhibitoryReversal);
     }
 
-
     @Override
     public String getToolTipText(final Neuron neuron) {
-        return "Activation: " + neuron.getActivation() + "\nMembrane Potential: "
-                + membranePotential + "\nNet Current: " + netCurrent
-                + "\nExcitatory current:  " + excitatoryCurrent
-                + "\nLeak current: " + leakCurrent;
+        return "Activation: " + neuron.getActivation() +
+                "\n\nMembrane Potential: " +  SimbrainMath.roundDouble(membranePotential, 2) +
+                "\n\nNet Current: " +  SimbrainMath.roundDouble(netCurrent, 2) + 
+                "\n\nExcitatory current:  "  +SimbrainMath.roundDouble(excitatoryCurrent, 2) +   
+                "\n \nLeak current: " + SimbrainMath.roundDouble(leakCurrent, 2);
     }
 
     /**
      * Print debugging information.
      */
     private void printState(Neuron neuron) {
-        //System.out.println("getExcitatoryInputs:" + getExcitatoryInputs());
-        //System.out.println("excitatoryConductance:" + excitatoryConductance);
-        // System.out.println("excitatoryMaxConductance:" +
-        // excitatoryMaxConductance);
-        //System.out.println("excitatoryReversal:" + excitatoryReversal);
-        //System.out.println("leakConductance:" + leakConductance);
-        //System.out.println("leakMaxConductance:" + leakMaxConductance);
-        //System.out.println("leakReversal" + leakReversal);
-        //System.out.println("Number of excitatory inputs: "
-        //        + excitatoryInputs.size());
-        //System.out.println("Number of inhibitory inputs:"
-        //        + inhibitoryInputs.size());
-
-        //System.out.println("\nNeuron: " + this.getId());
-        System.out.println("excitatoryCurrent:" + excitatoryCurrent);
-        System.out.println("inhibitoryCurrent:" + inhibitoryCurrent);
-        System.out.println("inhibitoryConductance:" + inhibitoryConductance);
-        System.out.println("leakCurrent:" + leakCurrent);
-        System.out.println("netCurrent:" + netCurrent);
-        System.out.println("membranePotential:" + membranePotential);
+        // System.out.println("\nNeuron: " + this.getId());
+        System.out.println("excitatoryConductance:"
+                + SimbrainMath.roundDouble(excitatoryConductance, 2));
+        System.out.println("excitatoryCurrent:"
+                + SimbrainMath.roundDouble(excitatoryCurrent, 2));
+        System.out.println("inhibitoryCurrent:"
+                + SimbrainMath.roundDouble(inhibitoryCurrent, 2));
+        System.out.println("leakCurrent:"
+                + SimbrainMath.roundDouble(leakCurrent, 2));
+        System.out.println("netCurrent:"
+                + SimbrainMath.roundDouble(netCurrent, 2));
+        System.out.println("membranePotential:"
+                + SimbrainMath.roundDouble(membranePotential, 2));
         System.out.println("output:" + neuron.getActivation());
     }
 
@@ -373,6 +359,25 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
     }
 
     /**
+     * Returns net input to this neuron (source activations times weights), from
+     * inhibitory sources only.
+     *
+     * @return net input
+     */
+    private double getInhibitoryInputs() {
+
+        double retVal = 0;
+        if (inhibitoryInputs.size() > 0) {
+            for (Synapse synapse : inhibitoryInputs) {
+                Neuron source = synapse.getSource();
+                // Will not work with spiking, or negative activations?
+                retVal += source.getActivation() * synapse.getStrength();
+            }
+        }
+        return retVal;
+    }
+
+    /**
      * Returns the positive component of a number.
      *
      * @param val value to consider
@@ -385,20 +390,6 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
         } else {
             return 0;
         }
-    }
-
-    /**
-     * @return the inhibitoryInputs
-     */
-    public ArrayList<Synapse> getInhibitoryInputs() {
-        return inhibitoryInputs;
-    }
-
-    /**
-     * @param inhibitoryInputs the inhibitoryInputs to set
-     */
-    public void setInhibitoryInputs(ArrayList<Synapse> inhibitoryInputs) {
-        this.inhibitoryInputs = inhibitoryInputs;
     }
 
     /**
@@ -720,5 +711,6 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener, Bi
     public String getDescription() {
         return "Point neuron (Leabra)";
     }
+
 
 }

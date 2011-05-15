@@ -75,13 +75,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         }
 
         PNode node = event.getPath().getPickedNode();
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-
-        if (node instanceof PCamera) {
-            if (!event.isShiftDown()) {
-                networkPanel.clearSelection();
-            }
-        } else if (node instanceof NeuronNode) {
+        if (node instanceof NeuronNode) {
             modifyNode((NeuronNode) node);
         }
     }
@@ -107,7 +101,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot()
                 .getAllNodes(boundsFilter, null);
 
-        // Auto-higlighter mode
+        // Auto-highlighter mode
         for (Object node : highlightedNodes) {
             if (node instanceof NeuronNode) {
                 modifyNode((NeuronNode)node);
@@ -129,7 +123,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
      */
     private void modifyNode(NeuronNode node) {
         Neuron neuron = node.getNeuron();
-        neuron.setActivation(neuron.getUpperBound()); 
+        neuron.setActivation(neuron.getUpperBound());
         node.update();
     }
 

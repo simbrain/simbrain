@@ -381,7 +381,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private void updateColor() {
         double activation = neuron.getActivation();
 
-        // Force to blank if 0
+        // Force to blank if 0 (or close to it)
         if ((activation > -.1) && (activation < .1)) {
             circle.setPaint(Color.white);
         } else if (activation > 0) {
@@ -545,8 +545,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         }
 
         // 0 (or close to it) is a special case--a black font
-        if ((act == 0)) {
-            //text.setPaint(Color.black);
+        if ((act > -.01) && (act < .01)) {    //text.setPaint(Color.black);
             activationText.setFont(NEURON_FONT);
             activationText.setText("0");
             // In all other cases the background color of the neuron is white
@@ -555,7 +554,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             //text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
             activationText.setText(String.valueOf(Utils.round(act, 4)).substring(1, 3));
-        } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
+        } else if ((act < 0) && (act > -1)) { // Between 0 and -1
             //text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
             activationText.setText("-" + String.valueOf(Utils.round(act, 4)).substring(2, 4));

@@ -363,7 +363,7 @@ public class NetworkGuiPreferences {
      * @return Default minimum node radius
      */
     public static int getDefaultMinDiameter() {
-        return 15;
+        return 7;
     }
 
     /**

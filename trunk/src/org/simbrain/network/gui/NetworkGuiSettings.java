@@ -23,11 +23,11 @@ import java.awt.Color;
 /**
  * This class stores the settings for the network GUI. They are set to default
  * values which can be modified by the user. This class is used in two ways:
- * 
+ *
  * 1) By itself: When the network is run as an applet, or separately from the
  * desktop environment, this class is used by itself. Settings last as long as
  * the application is open.
- * 
+ *
  * 2) In conjunction with user preferences. When the network is run in the
  * simbrain desktop, these settings are overwritten by
  * org.simbrain.network.desktop.NetworkGuiPreferences, which uses the java user
@@ -66,9 +66,9 @@ public class NetworkGuiSettings {
     /** Maximum diameter of the circle representing the synapse. */
     private static int maxDiameter = 20;
 
-    /** Maximum diameter of the circle representing the synapse. */
-    private static int minDiameter = 5;
-    
+    /** Minimum diameter of the circle representing the synapse. */
+    private static int minDiameter = 7;
+
     /**
      * @return Returns the lineColor.
      */

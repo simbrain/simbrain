@@ -64,7 +64,7 @@ public class KeyBindings {
             }
         });
 
-        // Nudge things
+        // Nudge objects
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP,
                 ActionEvent.SHIFT_MASK), "up");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,
@@ -73,7 +73,6 @@ public class KeyBindings {
                 ActionEvent.SHIFT_MASK), "down");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,
                 ActionEvent.SHIFT_MASK), "left");
-
         panel.getActionMap().put("up", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.nudge(0, -1);
@@ -92,6 +91,15 @@ public class KeyBindings {
         panel.getActionMap().put("left", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.nudge(-1, 0);
+            }
+        });
+
+        // Print debug info
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D,
+                ActionEvent.SHIFT_MASK), "debug");
+        panel.getActionMap().put("debug", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(panel.getRootNetwork().toString());
             }
         });
 

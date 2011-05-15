@@ -20,6 +20,7 @@ package org.simbrain.network.networks;
 
 import java.util.Collections;
 
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -30,9 +31,11 @@ import org.simbrain.network.synapses.ClampedSynapse;
 
 
 /**
- * <b>Hopfield</b>.
+ * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
  */
 public class Hopfield extends Network {
+
+    //TODO: Generalize to capture a greater variety of Hopfield type networks.
 
     /** Random update. */
     public static final int RANDOM_UPDATE = 1;
@@ -43,8 +46,11 @@ public class Hopfield extends Network {
     /** Update order. */
     private int updateOrder = SEQUENTIAL_UPDATE;
 
+    /** Default number of neurons. */
+    private static final int DEFAULT_NUM_UNITS = 9;
+
     /** Number of neurons. */
-    private int numUnits = 9;
+    private int numUnits = DEFAULT_NUM_UNITS;
 
     /**
      * Default constructor.
@@ -54,9 +60,10 @@ public class Hopfield extends Network {
     }
 
     /**
-     * Creates a new hopfield network.
+     * Creates a new Hopfield network.
+     *
      * @param numNeurons Number of neurons in new network
-     * @param layout Neuron layout patern
+     * @param layout Neuron layout pattern
      * @param root reference to RootNetwork.
      */
     public Hopfield(final RootNetwork root, final int numNeurons, final Layout layout) {
@@ -70,35 +77,23 @@ public class Hopfield extends Network {
             binary.setThreshold(0);
             Neuron n = new Neuron(this, binary);
             n.setUpperBound(1);
-            n.setLowerBound(-1);
+            n.setLowerBound(0);
             n.setIncrement(1);
             addNeuron(n);
         }
+
+        // Layout the neurons
         layout.layoutNeurons(this);
-        createConnections();
-    }
 
-
-    /**
-     * Create full symmetric connections without self-connections.
-     */
-    public void createConnections() {
-        for (int i = 0; i < this.getNeuronCount(); i++) {
-            for (int j = 0; j < i; j++) {
-                Synapse w = new Synapse(this.getNeuron(i), this.getNeuron(j), new ClampedSynapse());
-                addSynapse(w);
-                w.setUpperBound(1);
-                w.setLowerBound(-1);
-                w.randomize();
-                w.setStrength(Math.round(w.getStrength()));
-
-                Synapse w2 = new Synapse(this.getNeuron(i), this.getNeuron(j), new ClampedSynapse());
-                addSynapse(w2);
-                w2.setUpperBound(1);
-                w2.setLowerBound(-1);
-                w2.setStrength(w.getStrength());
-            }
-        }
+        // Add the synapses
+        AllToAll connection = new AllToAll(this, getNeuronList(),
+                getNeuronList());
+        AllToAll.setAllowSelfConnection(false);
+        Synapse templateSynapse = Synapse
+                .getTemplateSynapse(new ClampedSynapse());
+        templateSynapse.setStrength(0);
+        AllToAll.setBaseSynapse(templateSynapse);
+        connection.connectNeurons();
     }
 
     /**
@@ -122,7 +117,7 @@ public class Hopfield extends Network {
     }
 
     /**
-     * Apply hopfield training rule to current activation pattern.
+     * Apply Hopfield training rule to current activation pattern.
      */
     public void train() {
         //Assumes all neurons have the same upper and lower values
@@ -130,13 +125,12 @@ public class Hopfield extends Network {
         double hi = getNeuron(0).getUpperBound();
 
         for (int i = 0; i < this.getSynapseCount(); i++) {
-            //Must use buffer
             Synapse w = this.getSynapse(i);
             Neuron src = w.getSource();
             Neuron tar = w.getTarget();
             w.setStrength(w.getStrength()
-                          + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar.getActivation()) - hi
-                          - low) / (hi - low))));
+                    + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar
+                            .getActivation()) - hi - low) / (hi - low))));
         }
         getRootNetwork().fireNetworkChanged();
     }

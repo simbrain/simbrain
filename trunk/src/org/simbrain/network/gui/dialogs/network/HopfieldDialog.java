@@ -25,23 +25,19 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
-import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
-import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
-
 /**
- * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete hopfield networks.
+ * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete Hopfield
+ * networks.
  */
 public class HopfieldDialog extends StandardDialog {
 
-    /** File system seperator. */
+    /** File system separator. */
     private static final String FS = System.getProperty("file.separator");
 
     /** Sequential network update order. */
@@ -69,7 +65,8 @@ public class HopfieldDialog extends StandardDialog {
     private JTextField numberOfUnits = new JTextField();
 
     /** Network type combo box. */
-    private JComboBox cbUpdateOrder = new JComboBox(new String[] {"Sequential", "Random" });
+    private JComboBox cbUpdateOrder = new JComboBox(new String[] {
+            "Sequential", "Random" });
 
     /** Open training file button. */
     private JButton trainingFile = new JButton("Set");
@@ -78,14 +75,15 @@ public class HopfieldDialog extends StandardDialog {
     private NetworkPanel networkPanel;
 
     /**
-     * This method is the default constructor.
+     * Default constructor.
      *
      * @param net Network panel
      */
     public HopfieldDialog(final NetworkPanel net) {
         networkPanel = net;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new GridLayoutPanel(),
-                            new HexagonalGridLayoutPanel(), new LineLayoutPanel()});
+        // layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
+        // new GridLayoutPanel(), new HexagonalGridLayoutPanel(),
+        // new LineLayoutPanel() });
         init();
     }
 
@@ -93,34 +91,39 @@ public class HopfieldDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        Layout layout = layoutPanel.getNeuronLayout();
+
+        int numUnits = Integer.parseInt(numberOfUnits.getText());
+        // Layout layout = layoutPanel.getNeuronLayout();
+        GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numUnits));
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Hopfield hop = new Hopfield(networkPanel.getRootNetwork(), Integer.parseInt(numberOfUnits.getText()), layout);
+        Hopfield hop = new Hopfield(networkPanel.getRootNetwork(), numUnits,
+                layout);
         networkPanel.getRootNetwork().addNetwork(hop);
         networkPanel.repaint();
         super.closeDialogOk();
     }
 
     /**
-     * This method initialises the components on the panel.
+     * Initializes the panel.
      */
     private void init() {
-        //Initialize Dialog
+        // Initialize Dialog
         setTitle("New Hopfield Network");
 
         fillFieldValues();
 
-        //Set up grapics panel
+        // Set up graphics panel
         logicPanel.addItem("Update order", cbUpdateOrder);
         logicPanel.addItem("Number of Units", numberOfUnits);
-        //logicPanel.addItem("Set training file", trainingFile);
+        // logicPanel.addItem("Set training file", trainingFile);
 
-        //Set up tab panel
-        tabLogic.add(logicPanel);
-        tabLayout.add(layoutPanel);
-        tabbedPane.addTab("Logic", logicPanel);
-        tabbedPane.addTab("Layout", layoutPanel);
-        setContentPane(tabbedPane);
+        // Set up tab panel
+        // tabLogic.add(logicPanel);
+        // tabLayout.add(layoutPanel);
+        // tabbedPane.addTab("Logic", logicPanel);
+        // tabbedPane.addTab("Layout", layoutPanel);
+        setContentPane(logicPanel);
+
     }
 
     /**

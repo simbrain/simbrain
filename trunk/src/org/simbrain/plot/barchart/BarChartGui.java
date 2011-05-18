@@ -95,11 +95,11 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
 
         // Generate the graph
         chart = ChartFactory.createBarChart("Bar Chart", // chart title
-                "Category", // domain axis label
+                "Bar", // domain axis label
                 "Value", // range axis label
                 this.getWorkspaceComponent().getModel().getDataset(), // data
                 PlotOrientation.VERTICAL, // orientation
-                true, // include legend
+                false, // include legend
                 true, // tooltips?
                 false // URLs?
 

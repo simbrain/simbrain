@@ -1,21 +1,21 @@
 /*
-* Part of Simbrain--a java-based neural network kit
-* Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
@@ -66,7 +66,7 @@ import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SourceHandle;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.network.gui.nodes.TextObject;
+import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.modelgroups.GeneRecNode;
 import org.simbrain.network.gui.nodes.subnetworks.CompetitiveNetworkNode;
@@ -77,6 +77,7 @@ import org.simbrain.network.gui.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.NetworkTextObject;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -88,6 +89,7 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.networks.Competitive;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.networks.KwtaNetwork;
@@ -110,9 +112,9 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Network panel.
  */
-public class NetworkPanel extends JPanel  {
+public class NetworkPanel extends JPanel {
 
-    /** The Piccolo PCanvas. */ 
+    /** The Piccolo PCanvas. */
     private final PCanvas canvas;
 
     /** The model neural-rootNetwork object. */
@@ -199,7 +201,7 @@ public class NetworkPanel extends JPanel  {
     /** Source neurons. */
     private Collection<NeuronNode> sourceNeurons = new ArrayList<NeuronNode>();
 
-     /** Toggle button for neuron clamping. */
+    /** Toggle button for neuron clamping. */
     protected JToggleButton neuronClampButton = new JToggleButton();
 
     /** Toggle button for weight clamping. */
@@ -265,7 +267,7 @@ public class NetworkPanel extends JPanel  {
         createContextMenu();
         // createContextMenuAlt();
 
-        //Toolbars
+        // Toolbars
         toolbars = new JPanel(new BorderLayout());
         mainToolBar = this.createMainToolBar();
         runToolBar = this.createRunToolBar();
@@ -297,34 +299,34 @@ public class NetworkPanel extends JPanel  {
 
         addNetworkListeners();
 
-        selectionModel.addSelectionListener(new NetworkSelectionListener()
-            {
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent e) {
-                    updateSelectionHandles(e);
-                }
-            });
+        selectionModel.addSelectionListener(new NetworkSelectionListener() {
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent e) {
+                updateSelectionHandles(e);
+            }
+        });
 
         // Format the time Label
         timeLabel = new TimeLabel(this);
-        //timeLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - TIME_LABEL_V_OFFSET);
-        //canvas.getCamera().addChild(timeLabel);
+        // timeLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight()
+        // - TIME_LABEL_V_OFFSET);
+        // canvas.getCamera().addChild(timeLabel);
         timeLabel.update();
-
 
         // Format the update method label
         updateStatusLabel = new UpdateStatusLabel(this);
-        //updateStatusLabel.offset(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight()
-        //        - UPDATE_LABEL_OFFSET);
-        //canvas.getCamera().addChild(updateStatusLabel);
-        //getCamera().setScale(.8); // Cheating to offset the toolbar
+        // updateStatusLabel.offset(TIME_LABEL_H_OFFSET,
+        // canvas.getCamera().getHeight()
+        // - UPDATE_LABEL_OFFSET);
+        // canvas.getCamera().addChild(updateStatusLabel);
+        // getCamera().setScale(.8); // Cheating to offset the toolbar
         updateStatusLabel.update();
         if (rootNetwork.getUpdateMethod() == RootNetwork.UpdateMethod.PRIORITYBASED) {
             setPrioritiesVisible(true);
         }
         JToolBar statusBar = new JToolBar();
         statusBar.add(timeLabel);
-        statusBar.addSeparator(new Dimension(20,20));
+        statusBar.addSeparator(new Dimension(20, 20));
         statusBar.add(updateStatusLabel);
         this.add("South", statusBar);
 
@@ -399,7 +401,7 @@ public class NetworkPanel extends JPanel  {
                 } else {
                     setPrioritiesVisible(false);
                 }
-           }
+            }
 
         });
 
@@ -443,7 +445,8 @@ public class NetworkPanel extends JPanel  {
                 synapseNode.updateDiameter();
             }
 
-            public void synapseTypeChanged(final NetworkEvent<SynapseUpdateRule> e) {
+            public void synapseTypeChanged(
+                    final NetworkEvent<SynapseUpdateRule> e) {
             }
 
             public void synapseAdded(final NetworkEvent<Synapse> e) {
@@ -460,6 +463,25 @@ public class NetworkPanel extends JPanel  {
                     canvas.getLayer().removeChild(toDelete);
                 }
             }
+        });
+
+        // Handle Text Events
+        rootNetwork.addTextListener(new TextListener() {
+
+            public void textRemoved(NetworkTextObject removedText) {
+                TextNode node = findTextNode(removedText);
+                canvas.getLayer().removeChild(node);
+            }
+
+            public void textAdded(NetworkTextObject newText) {
+                NetworkPanel.this.addTextObject(newText);
+            }
+
+            public void textChanged(NetworkTextObject changedText) {
+                TextNode node = findTextNode(changedText);
+                node.update();
+            }
+
         });
 
         // Handle Subnetwork Events
@@ -550,12 +572,11 @@ public class NetworkPanel extends JPanel  {
             public void groupParameterChanged(NetworkEvent<Group> event) {
                 GroupNode node = findModelGroupNode(event.getObject());
                 if (node != null) {
-                    node.updateText();                    
+                    node.updateText();
                 }
             }
 
         });
-
 
     }
 
@@ -612,13 +633,12 @@ public class NetworkPanel extends JPanel  {
 
     /**
      * Return the context menu for this rootNetwork panel.
-     *
      * <p>
      * This context menu should return actions that are appropriate for the
-     * rootNetwork panel as a whole, e.g. actions that change modes, actions that
-     * operate on the selection, actions that add new components, etc.  Actions
-     * specific to a node of interest should be built into a node-specific context
-     * menu.
+     * rootNetwork panel as a whole, e.g. actions that change modes, actions
+     * that operate on the selection, actions that add new components, etc.
+     * Actions specific to a node of interest should be built into a
+     * node-specific context menu.
      * </p>
      *
      * @return the context menu for this rootNetwork panel
@@ -629,6 +649,7 @@ public class NetworkPanel extends JPanel  {
 
     /**
      * Creates a menu item for setting layout properties.
+     *
      * @return layout menu properties menu item
      */
     private JMenuItem getLayoutMenu() {
@@ -769,7 +790,6 @@ public class NetworkPanel extends JPanel  {
         canvas.removeInputEventListener(zoomEventHandler);
     }
 
-
     //
     // bound properties
 
@@ -783,9 +803,11 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
-     * Set the current edit mode for this rootNetwork panel to <code>editMode</code>.
-     *
-     * <p>This is a bound property.</p>
+     * Set the current edit mode for this rootNetwork panel to
+     * <code>editMode</code>.
+     * <p>
+     * This is a bound property.
+     * </p>
      *
      * @param newEditMode edit mode for this rootNetwork panel, must not be null
      */
@@ -813,8 +835,9 @@ public class NetworkPanel extends JPanel  {
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 rootNetwork.deleteSynapse(selectedSynapseNode.getSynapse());
-            } else if (selectedNode instanceof TextObject) {
-                canvas.getLayer().removeChild(selectedNode);
+            } else if (selectedNode instanceof TextNode) {
+                TextNode selectedTextNode = (TextNode) selectedNode;
+                rootNetwork.deleteText(selectedTextNode.getTextObject());
             } else if (selectedNode instanceof SubnetworkNode) {
                 SubnetworkNode selectedSubnet = (SubnetworkNode) selectedNode;
                 rootNetwork.deleteNetwork(selectedSubnet.getSubnetwork());
@@ -828,10 +851,10 @@ public class NetworkPanel extends JPanel  {
     public void copy() {
         Clipboard.clear();
         setNumberOfPastes(0);
-        setBeginPosition(SimnetUtils.getUpperLeft((ArrayList) getSelectedModelElements()));
+        setBeginPosition(SimnetUtils
+                .getUpperLeft((ArrayList) getSelectedModelElements()));
         Clipboard.add((ArrayList) this.getSelectedModelElements());
     }
-
 
     /**
      * Cut to the clipboard.
@@ -883,16 +906,16 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
-     * TODO: Push this and related methods to model?
-     *
-     * Spaces neurons horizontally.
+     * TODO: Push this and related methods to model? Spaces neurons
+     * horizontally.
      */
     public void spaceHorizontal() {
         if (getSelectedNeurons().size() <= 1) {
             return;
         }
         ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
-        Collections.sort(sortedNeurons, new NeuronComparator(NeuronComparator.Type.COMPARE_X));
+        Collections.sort(sortedNeurons, new NeuronComparator(
+                NeuronComparator.Type.COMPARE_X));
 
         double min = sortedNeurons.get(0).getX();
         double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getX();
@@ -915,7 +938,8 @@ public class NetworkPanel extends JPanel  {
             return;
         }
         ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
-        Collections.sort(sortedNeurons, new NeuronComparator(NeuronComparator.Type.COMPARE_Y));
+        Collections.sort(sortedNeurons, new NeuronComparator(
+                NeuronComparator.Type.COMPARE_Y));
 
         double min = sortedNeurons.get(0).getY();
         double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getY();
@@ -945,7 +969,8 @@ public class NetworkPanel extends JPanel  {
      * Creates and displays the synapse properties dialog.
      */
     public void showSelectedSynapseProperties() {
-        SynapseDialog dialog = new SynapseDialog(this.getSelectedModelSynapses());
+        SynapseDialog dialog = new SynapseDialog(
+                this.getSelectedModelSynapses());
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -976,7 +1001,7 @@ public class NetworkPanel extends JPanel  {
      */
     public void clearSelection() {
         selectionModel.clear();
-        //TODO: Fire rootNetwork changed
+        // TODO: Fire rootNetwork changed
     }
 
     /**
@@ -1024,9 +1049,9 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
-     * Toggle the selected state of the specified element; if
-     * it is selected, remove it from the selection, if it is
-     * not selected, add it to the selection.
+     * Toggle the selected state of the specified element; if it is selected,
+     * remove it from the selection, if it is not selected, add it to the
+     * selection.
      *
      * @param element element
      */
@@ -1088,7 +1113,8 @@ public class NetworkPanel extends JPanel  {
      * @return list of selectedNeurons
      */
     public Collection<NeuronNode> getSelectedNeurons() {
-        return SimbrainUtils.select(getSelection(), Filters.getNeuronNodeFilter());
+        return SimbrainUtils.select(getSelection(),
+                Filters.getNeuronNodeFilter());
     }
 
     /**
@@ -1097,7 +1123,8 @@ public class NetworkPanel extends JPanel  {
      * @return list of selected Synapses
      */
     public Collection<SynapseNode> getSelectedSynapses() {
-        return SimbrainUtils.select(getSelection(), Filters.getSynapseNodeFilter());
+        return SimbrainUtils.select(getSelection(),
+                Filters.getSynapseNodeFilter());
     }
 
     /**
@@ -1105,8 +1132,9 @@ public class NetworkPanel extends JPanel  {
      *
      * @return list of selected Text objects
      */
-    public ArrayList<TextObject> getSelectedText() {
-        return new ArrayList(SimbrainUtils.select(getSelection(), Filters.getTextObjectFilter()));
+    public ArrayList<TextNode> getSelectedText() {
+        return new ArrayList(SimbrainUtils.select(getSelection(),
+                Filters.getTextNodeFilter()));
     }
 
     /**
@@ -1140,9 +1168,10 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
-     * Returns model rootNetwork elements corresponding to selected screen elements.
+     * Returns model rootNetwork elements corresponding to selected screen
+     * elements.
      *
-     * @return list of selected  model elements
+     * @return list of selected model elements
      */
     public Collection getSelectedModelElements() {
         Collection ret = new ArrayList();
@@ -1151,7 +1180,8 @@ public class NetworkPanel extends JPanel  {
                 ret.add(((NeuronNode) e).getNeuron());
             } else if (e instanceof SynapseNode) {
                 ret.add(((SynapseNode) e).getSynapse());
-            } if (e instanceof SubnetworkNode) {
+            }
+            if (e instanceof SubnetworkNode) {
                 ret.add(((SubnetworkNode) e).getSubnetwork());
             }
         }
@@ -1159,9 +1189,10 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
-     * Returns model rootNetwork elements corresponding to selected screen elements.
+     * Returns model rootNetwork elements corresponding to selected screen
+     * elements.
      *
-     * @return list of selected  model elements
+     * @return list of selected model elements
      */
     public Collection getCoupledNodes() {
         Collection ret = new ArrayList();
@@ -1179,7 +1210,8 @@ public class NetworkPanel extends JPanel  {
      * @return a collection of all neuron nodes
      */
     public Collection<GroupNode> getModelGroupNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getModelGroupNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getModelGroupNodeFilter(),
+                null);
     }
 
     /**
@@ -1188,7 +1220,8 @@ public class NetworkPanel extends JPanel  {
      * @return a collection of all neuron nodes
      */
     public Collection<NeuronNode> getNeuronNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getNeuronNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getNeuronNodeFilter(),
+                null);
     }
 
     /**
@@ -1197,7 +1230,17 @@ public class NetworkPanel extends JPanel  {
      * @return a collection of all synapse nodes
      */
     public Collection<SynapseNode> getSynapseNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getSynapseNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getSynapseNodeFilter(),
+                null);
+    }
+
+    /**
+     * Return a collection of all text nodes.
+     *
+     * @return a collection of all text nodes
+     */
+    public Collection<TextNode> getTextNodes() {
+        return canvas.getLayer().getAllNodes(Filters.getTextNodeFilter(), null);
     }
 
     /**
@@ -1206,47 +1249,51 @@ public class NetworkPanel extends JPanel  {
      * @return a collection of all subnet nodes
      */
     public Collection getSubnetNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getSubnetworkNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getSubnetworkNodeFilter(),
+                null);
     }
 
-    
     /**
      * Return a collection of all parent nodes.
      *
      * @return a collection of all p nodes
      */
     public Collection getParentNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getParentNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getParentNodeFilter(),
+                null);
     }
 
     /**
-     * Return a collection of all persistent nodes, that is all neuron
-     * nodes and all synapse nodes.
+     * Return a collection of all persistent nodes, that is all neuron nodes and
+     * all synapse nodes.
      *
      * @return a collection of all persistent nodes
      */
     public Collection<PNode> getPersistentNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getNeuronOrSynapseNodeFilter(), null);
+        return canvas.getLayer().getAllNodes(
+                Filters.getNeuronOrSynapseNodeFilter(), null);
     }
 
     /**
-     * Return a collection of all persistent nodes, that is all neuron
-     * nodes and all synapse nodes.
+     * Return a collection of all persistent nodes, that is all neuron nodes and
+     * all synapse nodes.
      *
      * @return a collection of all persistent nodes
      */
     public Collection<ScreenElement> getSelectableNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getSelectableFilter(), null);
+        return canvas.getLayer().getAllNodes(Filters.getSelectableFilter(),
+                null);
     }
 
     /**
-     * Return a collection of all persistent nodes, that is all neuron
-     * nodes and all synapse nodes.
+     * Return a collection of all persistent nodes, that is all neuron nodes and
+     * all synapse nodes.
      *
      * @return a collection of all persistent nodes
      */
     public Collection<ScreenElement> getSelectedScreenElements() {
-        return new ArrayList<ScreenElement>(SimbrainUtils.select(getSelection(), Filters.getSelectableFilter()));
+        return new ArrayList<ScreenElement>(SimbrainUtils.select(
+                getSelection(), Filters.getSelectableFilter()));
     }
 
     /**
@@ -1308,7 +1355,8 @@ public class NetworkPanel extends JPanel  {
      */
     public Point2D getLastClickedPosition() {
         if (lastClickedPosition == null) {
-            lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
+            lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET,
+                    DEFAULT_NEWPOINT_OFFSET);
         }
         return lastClickedPosition;
     }
@@ -1335,16 +1383,19 @@ public class NetworkPanel extends JPanel  {
      * @param lastLeftClicked The lastClickedPosition to set.
      */
     public void setLastClickedPosition(final Point2D lastLeftClicked) {
-        // If left clicking somewhere assume not multiple pasting, except after the first paste,
-        //    when one is setting the offset for a string of pastes
+        // If left clicking somewhere assume not multiple pasting, except after
+        // the first paste,
+        // when one is setting the offset for a string of pastes
         if (this.getNumberOfPastes() != 1) {
             this.setNumberOfPastes(0);
         }
         this.lastClickedPosition = lastLeftClicked;
     }
-    // (Above?) Needed because when resetting num pastes, must rest begin at end of 
+
+    // (Above?) Needed because when resetting num pastes, must rest begin at end
+    // of
     // click, but condition not fulfilled....
-    //public boolean resetPasteTrail = false;
+    // public boolean resetPasteTrail = false;
 
     /** @see NetworkListener */
     public void modelCleared(final NetworkEvent e) {
@@ -1360,7 +1411,8 @@ public class NetworkPanel extends JPanel  {
         // If a neuron is selected, put this neuron to its left
         if (getSelectedNeurons().size() == 1) {
             NeuronNode node = (NeuronNode) getSelectedNeurons().toArray()[0];
-            p = new Point((int) node.getNeuron().getX() + DEFAULT_SPACING, (int) node.getNeuron().getY());
+            p = new Point((int) node.getNeuron().getX() + DEFAULT_SPACING,
+                    (int) node.getNeuron().getY());
         } else {
             p = getLastClickedPosition();
             // Put nodes at last left clicked position, if any
@@ -1369,7 +1421,7 @@ public class NetworkPanel extends JPanel  {
             }
         }
 
-        Neuron neuron = new Neuron(getRootNetwork(), new LinearNeuron()); 
+        Neuron neuron = new Neuron(getRootNetwork(), new LinearNeuron());
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.setActivation(0);
@@ -1390,6 +1442,18 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
+     * Add representation of specified text to network panel.
+     */
+    private void addTextObject(final NetworkTextObject text) {
+        if (this.findTextNode(text) != null) {
+            return;
+        }
+        TextNode node = new TextNode(NetworkPanel.this, text);
+        node.getPStyledText().syncWithDocument();
+        canvas.getLayer().addChild(node);
+    }
+
+    /**
      * Add representation of specified synapse to network panel.
      */
     private void addSynapse(final Synapse synapse) {
@@ -1403,8 +1467,8 @@ public class NetworkPanel extends JPanel  {
             return;
         }
 
-        SynapseNode node = new SynapseNode(NetworkPanel.this, source,
-                target, synapse);
+        SynapseNode node = new SynapseNode(NetworkPanel.this, source, target,
+                synapse);
         canvas.getLayer().addChild(node);
         node.moveToBack();
     }
@@ -1414,8 +1478,9 @@ public class NetworkPanel extends JPanel  {
      */
     private void addSubnetwork(final Network network) {
 
-        // Only top-level subnets are added.  Special graphical representation
-        //   for subnetworks of subnets is contained in org.simbrain.network.nodes.subnetworks
+        // Only top-level subnets are added. Special graphical representation
+        // for subnetworks of subnets is contained in
+        // org.simbrain.network.nodes.subnetworks
         if (network.getDepth() > 1) {
             return;
         }
@@ -1490,33 +1555,37 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
-     * Convert a subnetwork into a subnetwork node.
+     * Convert a subnetwork into a subnetwork node. TODO: Cheesy design!
      *
-     * TODO: Cheesy design!
      * @param upperLeft for intializing location of subnetworknode
      * @param subnetwork the subnetwork itself
      * @return the subnetworknode
      */
-    private SubnetworkNode getSubnetworkNodeFromSubnetwork(final Point2D upperLeft, final Network subnetwork) {
+    private SubnetworkNode getSubnetworkNodeFromSubnetwork(
+            final Point2D upperLeft, final Network subnetwork) {
         SubnetworkNode ret = null;
 
         if (subnetwork instanceof Competitive) {
-            ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork, upperLeft.getX(), upperLeft.getY());
+            ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork,
+                    upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof SOM) {
-            ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(), upperLeft.getY());
+            ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(),
+                    upperLeft.getY());
         } else if (subnetwork instanceof Hopfield) {
-            ret = new HopfieldNetworkNode(this, (Hopfield) subnetwork, upperLeft.getX(), upperLeft.getY());
+            ret = new HopfieldNetworkNode(this, (Hopfield) subnetwork,
+                    upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof WinnerTakeAll) {
-            ret = new WTANetworkNode(this, (WinnerTakeAll) subnetwork, upperLeft.getX(), upperLeft.getY());
+            ret = new WTANetworkNode(this, (WinnerTakeAll) subnetwork,
+                    upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof StandardNetwork) {
-            ret = new StandardNetworkNode(this, (StandardNetwork) subnetwork, upperLeft.getX(), upperLeft.getY());
+            ret = new StandardNetworkNode(this, (StandardNetwork) subnetwork,
+                    upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof KwtaNetwork) {
-            ret = new KwtaNetworkNode(this, (KwtaNetwork) subnetwork, upperLeft.getX(), upperLeft.getY());
+            ret = new KwtaNetworkNode(this, (KwtaNetwork) subnetwork,
+                    upperLeft.getX(), upperLeft.getY());
         }
         return ret;
     }
-
-
 
     /**
      * Returns the appropriate ModelGroupNode.
@@ -1556,8 +1625,11 @@ public class NetworkPanel extends JPanel  {
         for (Synapse synapse : rootNetwork.getSynapseList()) {
             addSynapse(synapse);
         }
-        for (Group group: rootNetwork.getGroupList()) {
+        for (Group group : rootNetwork.getGroupList()) {
             addGroup(group);
+        }
+        for (NetworkTextObject text : rootNetwork.getTextList()) {
+            addTextObject(text);
         }
         syncSynapseClampState();
         syncNeuronClampState();
@@ -1579,7 +1651,6 @@ public class NetworkPanel extends JPanel  {
         synapseClampMenuItem.setSelected(rootNetwork.getClampWeights());
     }
 
-
     /**
      * Find the upper left corner of the subnet nodes.
      *
@@ -1589,7 +1660,7 @@ public class NetworkPanel extends JPanel  {
     private Point2D getUpperLeft(final ArrayList neuronList) {
         double x = Double.MAX_VALUE;
         double y = Double.MAX_VALUE;
-        for (Iterator neurons = neuronList.iterator(); neurons.hasNext(); ) {
+        for (Iterator neurons = neuronList.iterator(); neurons.hasNext();) {
             NeuronNode neuronNode = (NeuronNode) neurons.next();
             if (neuronNode.getNeuron().getX() < x) {
                 x = neuronNode.getNeuron().getX();
@@ -1618,13 +1689,29 @@ public class NetworkPanel extends JPanel  {
     }
 
     /**
+     * Find the TextNode corresponding to a given network text object.
+     *
+     * @param textObject the underlying network text object
+     * @return the corresponding text node.
+     */
+    public TextNode findTextNode(final NetworkTextObject textObject) {
+        for (Iterator<TextNode> i = getTextNodes().iterator(); i.hasNext();) {
+            TextNode node = i.next();
+            if (node.getTextObject() == textObject) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Find the NeuronNode corresponding to a given model Neuron.
      *
      * @param n the model neuron.
-     * @return the correonding NeuronNode.
+     * @return the corresponding NeuronNode.
      */
     public NeuronNode findNeuronNode(final Neuron n) {
-        for (Iterator i = getNeuronNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = ((NeuronNode) i.next());
             if (n == node.getNeuron()) {
                 return node;
@@ -1640,7 +1727,8 @@ public class NetworkPanel extends JPanel  {
      * @return the corresponding SynapseNode.
      */
     public SynapseNode findSynapseNode(final Synapse s) {
-        for (Iterator<SynapseNode> i = getSynapseNodes().iterator(); i.hasNext(); ) {
+        for (Iterator<SynapseNode> i = getSynapseNodes().iterator(); i
+                .hasNext();) {
             SynapseNode node = i.next();
             if (s == node.getSynapse()) {
                 return node;
@@ -1656,7 +1744,7 @@ public class NetworkPanel extends JPanel  {
      * @return the corresponding subnetwork nodes, null otherwise.
      */
     public SubnetworkNode findSubnetworkNode(final Network net) {
-        for (Iterator i = this.getSubnetNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = this.getSubnetNodes().iterator(); i.hasNext();) {
             SubnetworkNode node = ((SubnetworkNode) i.next());
             if (node.getSubnetwork().getId().equalsIgnoreCase(net.getId())) {
                 return node;
@@ -1671,7 +1759,8 @@ public class NetworkPanel extends JPanel  {
      * @param vgn the group to remove.
      * @param selectConstituents whether to select the grouped items or not.
      */
-    public void unGroup(final ViewGroupNode vgn , final boolean selectConstituents) {
+    public void unGroup(final ViewGroupNode vgn,
+            final boolean selectConstituents) {
         for (ScreenElement element : vgn.getGroupedObjects()) {
             element.setPickable(true);
             if (selectConstituents) {
@@ -1694,13 +1783,13 @@ public class NetworkPanel extends JPanel  {
         for (PNode node : this.getSelection()) {
             if (node instanceof ViewGroupNode) {
                 unGroup((ViewGroupNode) node, false);
-                elements.addAll(((ViewGroupNode)node).getGroupedObjects());
+                elements.addAll(((ViewGroupNode) node).getGroupedObjects());
             } else {
                 if (node instanceof ScreenElement) {
                     toSearch.add((ScreenElement) node);
                 }
             }
-         }
+        }
 
         // Now group all elements.
         for (ScreenElement element : toSearch) {
@@ -1729,7 +1818,6 @@ public class NetworkPanel extends JPanel  {
         return lastSelectedNeuron;
     }
 
-
     /**
      * Return height bottom toolbar is taking up.
      *
@@ -1745,15 +1833,17 @@ public class NetworkPanel extends JPanel  {
     /** @see PCanvas */
     public void repaint() {
         super.repaint();
-//        if (timeLabel != null) {
-//            timeLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
-//                                timeLabel.getHeight(), timeLabel.getWidth());
-//        }
-//
-//        if (updateStatusLabel != null) {
-//            updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET, canvas.getCamera().getHeight() - getToolbarOffset(),
-//                    updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
-//        }
+        // if (timeLabel != null) {
+        // timeLabel.setBounds(TIME_LABEL_H_OFFSET,
+        // canvas.getCamera().getHeight() - getToolbarOffset(),
+        // timeLabel.getHeight(), timeLabel.getWidth());
+        // }
+        //
+        // if (updateStatusLabel != null) {
+        // updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET,
+        // canvas.getCamera().getHeight() - getToolbarOffset(),
+        // updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
+        // }
 
         if ((rootNetwork != null) && (canvas.getLayer().getChildrenCount() > 0)
                 && (!editMode.isPan())) {
@@ -1826,40 +1916,39 @@ public class NetworkPanel extends JPanel  {
         timeLabel.setVisible(showTime);
     }
 
-
-//    /**
-//     * Update clamp toolbar buttons and menu items.
-//     */
-//    public void clampBarChanged() {
-//        for (Iterator j = toggleButton.iterator(); j.hasNext(); ) {
-//            JToggleButton box = (JToggleButton) j.next();
-//            if (box.getAction() instanceof ClampWeightsAction) {
-//                box.setSelected(rootNetwork.getClampWeights());
-//            } else if (box.getAction() instanceof ClampNeuronsAction) {
-//                box.setSelected(rootNetwork.getClampNeurons());
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Update clamp toolbar buttons and menu items.
-//     */
-//    public void clampMenuChanged() {
-//        for (Iterator j = checkBoxes.iterator(); j.hasNext(); ) {
-//            JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
-//            if (box.getAction() instanceof ClampWeightsAction) {
-//                box.setSelected(rootNetwork.getClampWeights());
-//            } else if (box.getAction() instanceof ClampNeuronsAction) {
-//                box.setSelected(rootNetwork.getClampNeurons());
-//            }
-//        }
-//    }
+    // /**
+    // * Update clamp toolbar buttons and menu items.
+    // */
+    // public void clampBarChanged() {
+    // for (Iterator j = toggleButton.iterator(); j.hasNext(); ) {
+    // JToggleButton box = (JToggleButton) j.next();
+    // if (box.getAction() instanceof ClampWeightsAction) {
+    // box.setSelected(rootNetwork.getClampWeights());
+    // } else if (box.getAction() instanceof ClampNeuronsAction) {
+    // box.setSelected(rootNetwork.getClampNeurons());
+    // }
+    // }
+    // }
+    //
+    // /**
+    // * Update clamp toolbar buttons and menu items.
+    // */
+    // public void clampMenuChanged() {
+    // for (Iterator j = checkBoxes.iterator(); j.hasNext(); ) {
+    // JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
+    // if (box.getAction() instanceof ClampWeightsAction) {
+    // box.setSelected(rootNetwork.getClampWeights());
+    // } else if (box.getAction() instanceof ClampNeuronsAction) {
+    // box.setSelected(rootNetwork.getClampNeurons());
+    // }
+    // }
+    // }
 
     /**
      * Increases neuron and synapse activation levels.
      */
     public void incrementSelectedObjects() {
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -1875,7 +1964,7 @@ public class NetworkPanel extends JPanel  {
      * Decreases neuron and synapse activation levels.
      */
     public void decrementSelectedObjects() {
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -1893,16 +1982,21 @@ public class NetworkPanel extends JPanel  {
     /**
      * Nudge selected object.
      *
-     * @param offsetX amount to nudge in the x direction (multipled by nudgeAmount)
-     * @param offsetY amount to nudge in the y direction (multipled by nudgeAmount)
+     * @param offsetX amount to nudge in the x direction (multipled by
+     *            nudgeAmount)
+     * @param offsetY amount to nudge in the y direction (multipled by
+     *            nudgeAmount)
      */
     protected void nudge(final int offsetX, final int offsetY) {
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
-            node.getNeuron().setX(node.getNeuron().getX() + (offsetX
-                    * NetworkGuiSettings.getNudgeAmount()));
-            node.getNeuron().setY(node.getNeuron().getY() + (offsetY
-                    * NetworkGuiSettings.getNudgeAmount()));        }
+            node.getNeuron().setX(
+                    node.getNeuron().getX()
+                            + (offsetX * NetworkGuiSettings.getNudgeAmount()));
+            node.getNeuron().setY(
+                    node.getNeuron().getY()
+                            + (offsetY * NetworkGuiSettings.getNudgeAmount()));
+        }
         repaint();
     }
 
@@ -1925,7 +2019,6 @@ public class NetworkPanel extends JPanel  {
     public CustomToolBar getRunToolBar() {
         return runToolBar;
     }
-
 
     /**
      * @return Returns the main tool bar.
@@ -2033,14 +2126,14 @@ public class NetworkPanel extends JPanel  {
         return ret;
     }
 
-     /**
+    /**
      * Set the offset used in multiple pastes.
      */
     public void setPasteDelta() {
         if ((beginPosition != null) && (endPosition != null)) {
             setPasteX(beginPosition.getX() - endPosition.getX());
             setPasteY(beginPosition.getY() - endPosition.getY());
-            //System.out.println("-->" + getPasteX() + " , " + getPasteY());
+            // System.out.println("-->" + getPasteX() + " , " + getPasteY());
         }
     }
 
@@ -2055,10 +2148,9 @@ public class NetworkPanel extends JPanel  {
      * @param beginPosition The beginPosition to set.
      */
     public void setBeginPosition(final Point2D beginPosition) {
-        //System.out.println("Begin position: " + beginPosition);
+        // System.out.println("Begin position: " + beginPosition);
         this.beginPosition = beginPosition;
     }
-
 
     /**
      * @return Returns the endPosition.
@@ -2067,18 +2159,16 @@ public class NetworkPanel extends JPanel  {
         return endPosition;
     }
 
-
     /**
      * @param endPosition The endPosition to set.
      */
     public void setEndPosition(final Point2D endPosition) {
-        //System.out.println("End position: " + endPosition);
+        // System.out.println("End position: " + endPosition);
         this.endPosition = endPosition;
         if (this.getNumberOfPastes() == 1) {
             setPasteDelta();
         }
     }
-
 
     /**
      * @param pasteX pasteX to set.
@@ -2087,14 +2177,12 @@ public class NetworkPanel extends JPanel  {
         this.pasteX = pasteX;
     }
 
-
     /**
      * @return pasteX. pasteX.
      */
     public double getPasteX() {
         return pasteX;
     }
-
 
     /**
      * @param pasteY paste_y to set.
@@ -2103,14 +2191,12 @@ public class NetworkPanel extends JPanel  {
         this.pasteY = pasteY;
     }
 
-
     /**
      * @return pasteY pasteY;
      */
     public double getPasteY() {
         return pasteY;
     }
-
 
     /**
      * @return Returns the guiOn.
@@ -2119,21 +2205,22 @@ public class NetworkPanel extends JPanel  {
         return guiOn;
     }
 
-
     /**
      * @param guiOn The guiOn to set.
      */
     public void setGuiOn(final boolean guiOn) {
         actionManager.getShowGUIAction().setState(guiOn);
         if (guiOn) {
-            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
+            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
+                    .hasNext();) {
                 PNode pnode = (PNode) iter.next();
-                pnode.setTransparency((float)1);
+                pnode.setTransparency((float) 1);
             }
         } else {
-            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
+            for (Iterator iter = canvas.getLayer().getAllNodes().iterator(); iter
+                    .hasNext();) {
                 PNode pnode = (PNode) iter.next();
-                pnode.setTransparency((float).6);
+                pnode.setTransparency((float) .6);
             }
 
         }
@@ -2168,7 +2255,6 @@ public class NetworkPanel extends JPanel  {
         return updateStatusLabel;
     }
 
-
     /**
      * @return the textHandle.
      */
@@ -2189,7 +2275,6 @@ public class NetworkPanel extends JPanel  {
     public void componentUpdated() {
         /* no implementation */
     }
-
 
     /**
      * {@inheritDoc}
@@ -2230,10 +2315,11 @@ public class NetworkPanel extends JPanel  {
 
     /**
      * Adds an internal menu bar; used in applets.
+     *
      * @param applet
      */
     public void addInternalMenuBar() {
-       toolbars.add("North", NetworkMenuBar.getAppletMenuBar(this));
+        toolbars.add("North", NetworkMenuBar.getAppletMenuBar(this));
     }
 
     /**

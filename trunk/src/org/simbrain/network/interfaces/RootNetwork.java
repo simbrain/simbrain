@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
@@ -32,6 +30,7 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
+import org.simbrain.network.listeners.TextListener;
 import org.simbrain.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
@@ -41,13 +40,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * <b>RootNetwork</b> is the top level of the network hierarchy. All networks
  * are instances are Network.java. But a network can itself have sub-networks.
  * This is the root node in the network-subnetwork hierarchy. Acts as a
- * "container" for all subsequent networks.
- *
- * Gui networks and NetworkComponents (workspace level wrappers for networks)
- * always have a single unique root networks.
- *
- * Most network related event notifications are broadcast from here. Time is
- * kept track of here.
+ * "container" for all subsequent networks. Gui networks and NetworkComponents
+ * (workspace level wrappers for networks) always have a single unique root
+ * networks. Most network related event notifications are broadcast from here.
+ * Time is kept track of here.
  */
 public class RootNetwork extends Network {
 
@@ -78,12 +74,9 @@ public class RootNetwork extends Network {
     private boolean usingTabs = true;
 
     /**
-     * Two types of time used in simulations.
-     *
-     * DISCRETE: Network update iterations are time-steps
-     *
-     * CONTINUOUS: Simulation of real time. Each updates advances time by length
-     * {@link timeStep}
+     * Two types of time used in simulations. DISCRETE: Network update
+     * iterations are time-steps CONTINUOUS: Simulation of real time. Each
+     * updates advances time by length {@link timeStep}
      */
     public enum TimeType {
         DISCRETE, CONTINUOUS
@@ -93,16 +86,11 @@ public class RootNetwork extends Network {
     private TimeType timeType = TimeType.DISCRETE;
 
     /**
-     * Enumeration for the update methods.
-     *
-     * BUFFER: Default update method; based on buffering
-     *
-     * PRIORITYBASED: User sets the priority for each neuron, sub-neuron and
-     * synapse (but currently just neurons). Default priority value is 0.
-     * Elements with smaller priority value are updated first.
-     *
+     * Enumeration for the update methods. BUFFER: Default update method; based
+     * on buffering PRIORITYBASED: User sets the priority for each neuron,
+     * sub-neuron and synapse (but currently just neurons). Default priority
+     * value is 0. Elements with smaller priority value are updated first.
      * CUSTOM: User has provided a custom update script.
-     *
      */
     public enum UpdateMethod {
         BUFFERED {
@@ -127,6 +115,9 @@ public class RootNetwork extends Network {
 
     /** Current update method. */
     private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
+
+    /** Text objects. */
+    private final List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
     /**
      * List of neurons sorted by their update priority. Used in priority based
@@ -167,6 +158,9 @@ public class RootNetwork extends Network {
     /** List of objects registered to observe group-related network events. */
     private List<GroupListener> groupListeners = new ArrayList<GroupListener>();
 
+    /** List of objects registered to observe text-related network events. */
+    private List<TextListener> textListeners = new ArrayList<TextListener>();
+
     /**
      * When using from a console.
      *
@@ -199,6 +193,7 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "networkListeners");
         xstream.omitField(RootNetwork.class, "subnetworkListeners");
         xstream.omitField(RootNetwork.class, "synapseListeners");
+        xstream.omitField(RootNetwork.class, "textListeners");
         xstream.omitField(RootNetwork.class, "updateCompleted");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
@@ -222,6 +217,7 @@ public class RootNetwork extends Network {
         neuronListeners = new ArrayList<NeuronListener>();
         synapseListeners = new ArrayList<SynapseListener>();
         subnetworkListeners = new ArrayList<SubnetworkListener>();
+        textListeners = new ArrayList<TextListener>();
         groupListeners = new ArrayList<GroupListener>();
 
         for (Neuron neuron : this.getFlatNeuronList()) {
@@ -229,19 +225,21 @@ public class RootNetwork extends Network {
         }
 
         // Check for and remove corrupt synapses.
-        //  This should not happen but as of 1/24/11 I have not 
-        //  determined why it happens, so the check is needed.
+        // This should not happen but as of 1/24/11 I have not
+        // determined why it happens, so the check is needed.
         for (Synapse synapse : this.getFlatSynapseList()) {
             if (synapse.getTarget().getFanIn() != null) {
                 synapse.getTarget().getFanIn().add(synapse);
             } else {
-                System.out.println("Warning:" + synapse.getId() + " has null fanIn");
+                System.out.println("Warning:" + synapse.getId()
+                        + " has null fanIn");
                 deleteSynapse(synapse);
             }
             if (synapse.getSource().getFanOut() != null) {
                 synapse.getSource().getFanOut().add(synapse);
             } else {
-                System.out.println("Warning:" + synapse.getId() + " has null fanOut");
+                System.out.println("Warning:" + synapse.getId()
+                        + " has null fanOut");
                 deleteSynapse(synapse);
             }
         }
@@ -347,7 +345,7 @@ public class RootNetwork extends Network {
         for (Neuron neuron : prioritySortedNeuronList) {
             neuron.update();
             neuron.setActivation(neuron.getBuffer());
-            //System.out.println("Priority:" + neuron.getUpdatePriority());
+            // System.out.println("Priority:" + neuron.getUpdatePriority());
         }
     }
 
@@ -649,6 +647,40 @@ public class RootNetwork extends Network {
     }
 
     /**
+     * Fire a text added event to all registered model listeners.
+     *
+     * @param added text which was deleted
+     */
+    public void fireTextAdded(final NetworkTextObject added) {
+        for (TextListener listener : textListeners) {
+            listener.textAdded(added);
+        }
+    }
+
+    /**
+     * Fire a text deleted event to all registered model listeners.
+     *
+     * @param deleted text which was deleted
+     */
+    public void fireTextDeleted(final NetworkTextObject deleted) {
+        for (TextListener listener : textListeners) {
+            listener.textRemoved(deleted);
+        }
+    }
+
+    /**
+     * Fire a text changed event to all registered model listeners.
+     *
+     * @param changed text which was changed
+     */
+    public void fireTextChanged(final NetworkTextObject changed) {
+        for (TextListener listener : textListeners) {
+            listener.textRemoved(changed);
+        }
+    }
+
+
+    /**
      * Used by Network thread to ensure that an update cycle is complete before
      * updating again.
      *
@@ -859,6 +891,11 @@ public class RootNetwork extends Network {
             ret += (getIndents() + "--------------------------------\n");
             ret += group.toString();
         }
+        
+        for (NetworkTextObject text : textList) {
+            ret += (getIndents() + text + "\n");
+        }
+        
         return ret;
     }
 
@@ -914,6 +951,16 @@ public class RootNetwork extends Network {
      */
     public void addSynapseListener(final SynapseListener listener) {
         synapseListeners.add(listener);
+    }
+
+
+    /**
+     * Register a text listener.
+     *
+     * @param listener the observer to register
+     */
+    public void addTextListener(final TextListener listener) {
+        textListeners.add(listener);
     }
 
     /**
@@ -1006,4 +1053,30 @@ public class RootNetwork extends Network {
         }
     }
 
+    /**
+     * Add a network text object.
+     *
+     * @param text text object to add.
+     */
+    public void addText(final NetworkTextObject text) {
+        textList.add(text);
+        this.fireTextAdded(text);
+    }
+
+    /**
+     * Delete a network text object.
+     *
+     * @param text text object to add
+     */
+    public void deleteText(final NetworkTextObject text) {
+        textList.remove(text);
+        this.fireTextDeleted(text);
+    }
+
+    /**
+     * @return the textList
+     */
+    public List<NetworkTextObject> getTextList() {
+        return textList;
+    }
 }

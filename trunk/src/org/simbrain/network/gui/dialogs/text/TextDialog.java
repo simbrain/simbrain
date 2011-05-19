@@ -18,7 +18,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.simbrain.network.gui.nodes.TextObject;
+import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.util.StandardDialog;
 
 import edu.umd.cs.piccolox.nodes.PStyledText;
@@ -26,7 +26,7 @@ import edu.umd.cs.piccolox.nodes.PStyledText;
 public class TextDialog extends StandardDialog implements ActionListener, ListSelectionListener {
 
     /** Selection list. */
-    private ArrayList<TextObject> selectionList = new ArrayList<TextObject>();
+    private ArrayList<TextNode> selectionList = new ArrayList<TextNode>();
 
     /** Text objects being modified. */
     private ArrayList<PStyledText> textObjectList;
@@ -102,25 +102,13 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
     Container container = getContentPane();
     JPanel panel = new JPanel();
 
-    public TextDialog(final ArrayList<TextObject> selectedText) {
+    public TextDialog(final ArrayList<TextNode> selectedText) {
         selectionList = selectedText;
 //        setTextObjectSelection();
         setFont(new Font("Courier New", Font.PLAIN, 12));
         init();
         fillFieldValues();
     }
-
-    /**
-     * Get the text settings.
-     */
-    private void setTextObjectSelection() {
-        textObjectList.clear();
-
-        for (TextObject t : selectionList) {
-            textObjectList.add(t.getPtext());
-        }
-    }
-
 
     /**
      * Initializes font chooser dialog.

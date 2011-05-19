@@ -23,7 +23,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.network.gui.nodes.TextObject;
+import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 
 import edu.umd.cs.piccolo.PNode;
@@ -66,10 +66,10 @@ public final class Filters {
      };
 
      /** Text object filter. */
-     private static final AbstractFilter TEXT_OBJECT_FILTER = new AbstractFilter() {
+     private static final AbstractFilter TEXT_NODE_FILTER = new AbstractFilter() {
          /** @see AbstractFilter */
          public boolean accept(final PNode node) {
-             return (node instanceof TextObject);
+             return (node instanceof TextNode);
          }
      };
 
@@ -92,7 +92,7 @@ public final class Filters {
         public boolean accept(final PNode node) {
                 return (((node instanceof NeuronNode) && (!isGrouped(node)))
                         || ((node instanceof SynapseNode) && (!isGrouped(node)))
-                        || ((node instanceof TextObject) && (!isGrouped(node)))
+                        || ((node instanceof TextNode) && (!isGrouped(node)))
                         || ((node instanceof SubnetworkNode) && (!isGrouped(node)))
                         || (node instanceof ViewGroupNode));
             }
@@ -187,11 +187,11 @@ public final class Filters {
     }
 
     /**
-     * Return the text object filter.
+     * Return the text node filter.
      *
-     * @return the text object filter
+     * @return the text node filter
      */
-    public static AbstractFilter getTextObjectFilter() {
-        return TEXT_OBJECT_FILTER;
+    public static AbstractFilter getTextNodeFilter() {
+        return TEXT_NODE_FILTER;
     }
 }

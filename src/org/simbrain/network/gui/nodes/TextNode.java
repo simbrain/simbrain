@@ -19,72 +19,78 @@
 
 package org.simbrain.network.gui.nodes;
 
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
-import org.simbrain.network.gui.actions.SetTextPropertiesAction;
+import org.simbrain.network.interfaces.NetworkTextObject;
 
 import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
- * An editable text object.
+ * An editable text element, which wraps a PStyledText object.
  */
-public class TextObject extends ScreenElement implements PropertyChangeListener {
+public class TextNode extends ScreenElement implements PropertyChangeListener {
 
     /** The text object. */
-    private PStyledText ptext;
+    private final PStyledText pStyledText;
+
+    /** Underlying model text object. */
+    private final NetworkTextObject textObject;
 
     /**
      * Construct text object at specified location.
      *
      * @param netPanel reference to networkPanel
-     * @param ptext the styled text
+     * @param text the network text object
      */
-    public TextObject(final NetworkPanel netPanel, final PStyledText ptext) {
+    public TextNode(final NetworkPanel netPanel, final NetworkTextObject text) {
         super(netPanel);
-        this.ptext = ptext;
-        //ptext.setPickable(false); // otherwise the child rather than the parent is picked
-        this.addChild(ptext);
-        this.setBounds(ptext.getBounds());
-
+        this.textObject = text;
+        pStyledText = new PStyledText();
+        pStyledText.setDocument(new DefaultStyledDocument());
+        try {
+            pStyledText.getDocument().insertString(0, text.getText(), null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        this.addChild(pStyledText);
+        this.setBounds(pStyledText.getBounds());
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
     }
 
     /** @Override. */
     public boolean isSelectable() {
-        // TODO Auto-generated method stub
         return true;
     }
 
     /** @Override. */
     public boolean showSelectionHandle() {
-        // TODO Auto-generated method stub
         return true;
     }
 
     /** @Override. */
     public boolean isDraggable() {
-        // TODO Auto-generated method stub
         return true;
     }
 
     /** @Override. */
     protected boolean hasToolTipText() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     /** @Override. */
     protected String getToolTipText() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -109,11 +115,11 @@ public class TextObject extends ScreenElement implements PropertyChangeListener 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
+        // TODO: Re-implement functionality
+        // contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
 
         return contextMenu;
-
-  }
+    }
 
     /** @Override. */
     protected boolean hasPropertyDialog() {
@@ -122,30 +128,53 @@ public class TextObject extends ScreenElement implements PropertyChangeListener 
 
     /** @Override. */
     protected JDialog getPropertyDialog() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     /** @Override. */
     public void resetColors() {
-        // TODO Auto-generated method stub
     }
 
+    /** @Override. */
     public void propertyChange(PropertyChangeEvent arg0) {
-        setBounds(ptext.getBounds());
+        setBounds(pStyledText.getBounds());
     }
 
     /**
-     * @return the ptext
+     * @return the pStyledText
      */
-    public PStyledText getPtext() {
-        return ptext;
+    public PStyledText getPStyledText() {
+        return pStyledText;
     }
 
     /**
-     * @param ptext the ptext to set
+     * Update the styled text object.
      */
-    public void setPtext(PStyledText ptext) {
-        this.ptext = ptext;
+    public void update() {
+        try {
+            pStyledText.getDocument().insertString(0, textObject.getText(),
+                    null);
+            pStyledText.syncWithDocument();
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
+
+    /**
+     * @return the textObject
+     */
+    public NetworkTextObject getTextObject() {
+        return textObject;
+    }
+
+    /**
+     * Update the position of the model text object based on the global
+     * coordinates of this pnode.
+     */
+    public void pushViewPositionToModel() {
+        Point2D p = this.getGlobalTranslation();
+        getTextObject().setX(p.getX());
+        getTextObject().setY(p.getY());
+    }
+
 }

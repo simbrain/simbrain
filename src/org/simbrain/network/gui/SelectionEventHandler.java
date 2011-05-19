@@ -31,6 +31,7 @@ import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.SimbrainUtils;
 
@@ -95,11 +96,15 @@ final class SelectionEventHandler
 
         super.mouseClicked(event);
 
+        PNode node = event.getPath().getPickedNode();
+
         if (event.getClickCount() != 1) {
+            if (node instanceof PStyledText) {
+                networkPanel.getTextHandle().startEditing(event,
+                        ((PStyledText) node));
+            }
             return;
         }
-
-        PNode node = event.getPath().getPickedNode();
 
         if (node instanceof PCamera) {
             if (!event.isShiftDown()) {
@@ -193,7 +198,7 @@ final class SelectionEventHandler
             }
 
         } else {
-            
+
             // continue to drag selected node(s)
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
@@ -203,6 +208,8 @@ final class SelectionEventHandler
 
                     if (pickedNode instanceof NeuronNode) {
                         ((NeuronNode)pickedNode).pushViewPositionToModel();
+                    } else if (pickedNode instanceof NeuronNode) {
+                        ((TextNode)pickedNode).pushViewPositionToModel();
                     }
 
                     ScreenElement screenElement = (ScreenElement) node;
@@ -219,7 +226,7 @@ final class SelectionEventHandler
     protected void endDrag(final PInputEvent event) {
 
         super.endDrag(event);
-        
+
         // Nothing was being dragged
         if (pickedNode == null) {
             // end marquee selection
@@ -235,6 +242,8 @@ final class SelectionEventHandler
                 if (node instanceof NeuronNode) {
                     ((NeuronNode)node).setMoving(false);
                     ((NeuronNode)node).pushViewPositionToModel();
+                } else if (node instanceof TextNode) {
+                    ((TextNode)node).pushViewPositionToModel();
                 } else if (node instanceof SubnetworkNode) {
                     for (Object object : (ArrayList) node.getAllNodes()) {
                       if (object instanceof NeuronNode) {

@@ -23,10 +23,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 
-import org.simbrain.network.gui.nodes.TextObject;
+import javax.swing.text.BadLocationException;
+
+import org.simbrain.network.gui.nodes.TextNode;
+import org.simbrain.network.interfaces.NetworkTextObject;
 
 import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventFilter;
@@ -34,16 +36,19 @@ import edu.umd.cs.piccolox.event.PStyledTextEventHandler;
 import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
- * Text Event Handler.
+ * Event handler for text nodes, so that they can be edited directly on the
+ * screen.
  */
-public class TextEventHandler extends PStyledTextEventHandler implements ActionListener {
+public class TextEventHandler extends PStyledTextEventHandler implements
+        ActionListener {
 
     /** Reference to parent network. */
     private NetworkPanel networkPanel;
 
     /**
-     *  Constructor.
-     * @param canvas reference to network panel.
+     * Construct text event handler.
+     *
+     * @param networkPanel reference to network panel.
      */
     public TextEventHandler(final NetworkPanel networkPanel) {
         super(networkPanel.getCanvas());
@@ -51,7 +56,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
         this.setEventFilter(new TextEventFilter());
     }
 
-    /** Builds a TextObject on mouse clicks. */
+    @Override
     public void mousePressed(final PInputEvent inputEvent) {
 
         PNode pickedNode = inputEvent.getPickedNode();
@@ -62,29 +67,41 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
 
         else if (pickedNode instanceof PCamera) {
 
-            PStyledText newText = createText();
-            TextObject textObj = new TextObject(networkPanel, newText);
-            Insets pInsets = newText.getInsets();
-            canvas.getLayer().addChild(textObj);
-            textObj.translate(inputEvent.getPosition().getX() - pInsets.left,
-                    inputEvent.getPosition().getY() - pInsets.top);
-            startEditing(inputEvent, newText);
-
+            // Make a new text object and then edit it
+            NetworkTextObject text = new NetworkTextObject(
+                    networkPanel.getRootNetwork(), inputEvent.getPosition()
+                            .getX(), inputEvent.getPosition().getY());
+            networkPanel.getRootNetwork().addText(text);
+            TextNode node = networkPanel.findTextNode(text);
+            if (node != null) {
+                Insets pInsets = node.getPStyledText().getInsets();
+                node.translate(inputEvent.getPosition().getX() - pInsets.left,
+                        inputEvent.getPosition().getY() - pInsets.top);
+                startEditing(inputEvent, node.getPStyledText());
+            }
         }
     }
 
-    /** Removes empty text objects. */
-    public void stopEditing() {
+    /**
+     * Removes empty text objects.
+     */
+    void stopEditing() {
         if (editedText != null) {
+            TextNode node = (TextNode) editedText.getParent();
             editedText.getDocument().removeDocumentListener(docListener);
             editedText.setEditing(false);
             if (editedText.getDocument().getLength() == 0) {
-                if (editedText.getParent() != null) {
-                    editedText.getParent().removeFromParent();
-                }
+                networkPanel.getRootNetwork().deleteText(node.getTextObject());
                 editedText.removeFromParent();
             } else {
                 editedText.syncWithDocument();
+                try {
+                    node.getTextObject().setText(
+                            editedText.getDocument().getText(0,
+                                    editedText.getDocument().getLength()));
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
             }
             editor.setVisible(false);
             canvas.repaint();
@@ -97,9 +114,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
      * Text event filter, accepts left mouse clicks, but only when the network
      * panel's edit mode is <code>EditMode.TEXT</code>.
      */
-    private class TextEventFilter
-        extends PInputEventFilter {
-
+    private class TextEventFilter extends PInputEventFilter {
 
         /**
          * Create a new zoom event filter.
@@ -107,7 +122,6 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
         public TextEventFilter() {
             super(InputEvent.BUTTON1_MASK);
         }
-
 
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {

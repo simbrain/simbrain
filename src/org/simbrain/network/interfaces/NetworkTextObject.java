@@ -20,7 +20,8 @@ package org.simbrain.network.interfaces;
 
 /**
  * <b>NetworkTextObject</b> is a string of text in a neural network, typically
- * used to label elements of a neural network simulation.
+ * used to label elements of a neural network simulation.  Contains basic text
+ * properties as well.
  */
 public class NetworkTextObject {
 
@@ -33,10 +34,20 @@ public class NetworkTextObject {
     /** y-coordinate of this object in 2-space. */
     private double y;
 
-    /** The main data */
+    /** The main text data. */
     private String text = "";
 
-    //TODO: Add formatting info
+    /** Name of Font for this text. */
+    private String fontName = "Helvetica";
+
+    /** Font size. */
+    private int fontSize = 12;
+
+    /** Is this text italic or not. */
+    private boolean italic;
+
+    /** Is this text bold or not. */
+    private boolean bold;
 
     /**
      * Construct the text object.
@@ -99,6 +110,62 @@ public class NetworkTextObject {
      */
     public void setText(String text) {
         this.text = text;
+    }
+
+    /**
+     * @return the fontName
+     */
+    public String getFontName() {
+        return fontName;
+    }
+
+    /**
+     * @param fontName the fontName to set
+     */
+    public void setFontName(String fontName) {
+        this.fontName = fontName;
+    }
+
+    /**
+     * @return the fontSize
+     */
+    public int getFontSize() {
+        return fontSize;
+    }
+
+    /**
+     * @param fontSize the fontSize to set
+     */
+    public void setFontSize(int fontSize) {
+        this.fontSize = fontSize;
+    }
+
+    /**
+     * @return the italic
+     */
+    public boolean isItalic() {
+        return italic;
+    }
+
+    /**
+     * @param italic the italic to set
+     */
+    public void setItalic(boolean italic) {
+        this.italic = italic;
+    }
+
+    /**
+     * @return the bold
+     */
+    public boolean isBold() {
+        return bold;
+    }
+
+    /**
+     * @param bold the bold to set
+     */
+    public void setBold(boolean bold) {
+        this.bold = bold;
     }
 
 

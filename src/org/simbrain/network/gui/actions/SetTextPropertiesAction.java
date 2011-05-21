@@ -73,7 +73,7 @@ public final class SetTextPropertiesAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        networkPanel.showSelectedTextProperties();
+        networkPanel.showTextPropertyDialog();
 
     }
 }

@@ -117,7 +117,7 @@ public class RootNetwork extends Network {
     private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
 
     /** Text objects. */
-    private final List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
+    private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
     /**
      * List of neurons sorted by their update priority. Used in priority based
@@ -163,7 +163,7 @@ public class RootNetwork extends Network {
 
     /**
      * When using from a console.
-     *
+     * 
      * @param id String id of this network
      */
     public RootNetwork() {
@@ -180,7 +180,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns a properly initialized xstream object.
-     *
+     * 
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -208,7 +208,7 @@ public class RootNetwork extends Network {
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     *
+     * 
      * @return Initialized object.
      */
     private Object readResolve() {
@@ -352,7 +352,7 @@ public class RootNetwork extends Network {
     /**
      * Loads a new custom update rule in. Called from network scripts, which are
      * used to create these rules.
-     *
+     * 
      * @param newRule new rule to set
      */
     public void setCustomUpdateRule(CustomUpdateRule newRule) {
@@ -362,7 +362,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns the group, if any, a specified object is contained in.
-     *
+     * 
      * @param object the object to check
      * @return the group, if any, containing that object
      */
@@ -397,7 +397,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns the current time.
-     *
+     * 
      * @return the current time
      */
     public double getTime() {
@@ -406,7 +406,7 @@ public class RootNetwork extends Network {
 
     /**
      * Set the current time.
-     *
+     * 
      * @param i the current time
      */
     public void setTime(final double i) {
@@ -427,7 +427,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns the precision of the current time step.
-     *
+     * 
      * @return the precision of the current time step.
      */
     private int getTimeStepPrecision() {
@@ -504,7 +504,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a neuron deleted event to all registered model listeners.
-     *
+     * 
      * @param deleted neuron which has been deleted
      */
     public void fireNeuronDeleted(final Neuron deleted) {
@@ -554,7 +554,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a network changed event to all registered model listeners.
-     *
+     * 
      * @param moved Neuron that has been moved
      */
     public void fireNeuronMoved(final Neuron moved) {
@@ -565,7 +565,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a neuron added event to all registered model listeners.
-     *
+     * 
      * @param added neuron which was added
      */
     public void fireNeuronAdded(final Neuron added) {
@@ -576,7 +576,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a neuron type changed event to all registered model listeners.
-     *
+     * 
      * @param old the old update rule
      * @param changed the new update rule
      */
@@ -590,7 +590,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a neuron changed event to all registered model listeners.
-     *
+     * 
      * @param changed new, changed neuron
      */
     public void fireNeuronChanged(final Neuron changed) {
@@ -601,7 +601,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a neuron added event to all registered model listeners.
-     *
+     * 
      * @param added synapse which was added
      */
     public void fireSynapseAdded(final Synapse added) {
@@ -612,7 +612,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a neuron deleted event to all registered model listeners.
-     *
+     * 
      * @param deleted synapse which was deleted
      */
     public void fireSynapseDeleted(final Synapse deleted) {
@@ -623,7 +623,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a synapse changed event to all registered model listeners.
-     *
+     * 
      * @param changed new, changed synapse
      */
     public void fireSynapseChanged(final Synapse changed) {
@@ -634,7 +634,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a synapse type changed event to all registered model listeners.
-     *
+     * 
      * @param oldRule old synapse, before the change
      * @param learningRule new, changed synapse
      */
@@ -648,7 +648,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a text added event to all registered model listeners.
-     *
+     * 
      * @param added text which was deleted
      */
     public void fireTextAdded(final NetworkTextObject added) {
@@ -659,7 +659,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a text deleted event to all registered model listeners.
-     *
+     * 
      * @param deleted text which was deleted
      */
     public void fireTextDeleted(final NetworkTextObject deleted) {
@@ -671,6 +671,8 @@ public class RootNetwork extends Network {
     /**
      * Fire a text changed event to all registered model listeners.
      *
+     * TODO: Not currently used.
+     *
      * @param changed text which was changed
      */
     public void fireTextChanged(final NetworkTextObject changed) {
@@ -678,7 +680,6 @@ public class RootNetwork extends Network {
             listener.textRemoved(changed);
         }
     }
-
 
     /**
      * Used by Network thread to ensure that an update cycle is complete before
@@ -702,7 +703,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a subnetwork added event to all registered model listeners.
-     *
+     * 
      * @param added synapse which was added
      */
     public void fireSubnetAdded(final RootNetwork added) {
@@ -713,7 +714,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a subnetwork deleted event to all registered model listeners.
-     *
+     * 
      * @param deleted synapse which was deleted
      */
     public void fireSubnetDeleted(final Network deleted) {
@@ -724,7 +725,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a subnetwork added event to all registered model listeners.
-     *
+     * 
      * @param added synapse which was added
      */
     public void fireSubnetAdded(final Network added) {
@@ -735,7 +736,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a group added event to all registered model listeners.
-     *
+     * 
      * @param added Group that has been added
      */
     public void fireGroupAdded(final Group added) {
@@ -746,7 +747,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a group deleted event to all registered model listeners.
-     *
+     * 
      * @param deleted Group to be deleted
      */
     public void fireGroupDeleted(final Group deleted) {
@@ -758,7 +759,7 @@ public class RootNetwork extends Network {
     /**
      * Fire a group changed event to all registered model listeners. TODO:
      * Change to grouptype changed?
-     *
+     * 
      * @param old Old group
      * @param changed New changed group
      */
@@ -771,7 +772,7 @@ public class RootNetwork extends Network {
 
     /**
      * Fire a group parameters changed event.
-     *
+     * 
      * @param group reference to group whose parameters changed
      */
     public void fireGroupParametersChanged(final Group group) {
@@ -790,7 +791,7 @@ public class RootNetwork extends Network {
 
     /**
      * Sets weights to clamped values.
-     *
+     * 
      * @param clampWeights Weights to set
      */
     public void setClampWeights(final boolean clampWeights) {
@@ -807,7 +808,7 @@ public class RootNetwork extends Network {
 
     /**
      * Sets neurons to clamped values.
-     *
+     * 
      * @param clampNeurons Neurons to set
      */
     public void setClampNeurons(final boolean clampNeurons) {
@@ -891,17 +892,17 @@ public class RootNetwork extends Network {
             ret += (getIndents() + "--------------------------------\n");
             ret += group.toString();
         }
-        
+
         for (NetworkTextObject text : textList) {
             ret += (getIndents() + text + "\n");
         }
-        
+
         return ret;
     }
 
     /**
      * Return the generator for neuron ids.
-     *
+     * 
      * @return the generator
      */
     public SimpleId getNeuronIdGenerator() {
@@ -910,7 +911,7 @@ public class RootNetwork extends Network {
 
     /**
      * Return the generator for network ids.
-     *
+     * 
      * @return the generator.
      */
     public SimpleId getNetworkIdGenerator() {
@@ -919,7 +920,7 @@ public class RootNetwork extends Network {
 
     /**
      * Return the generator for synapse ids.
-     *
+     * 
      * @return the generator.
      */
     public SimpleId getSynapseIdGenerator() {
@@ -928,7 +929,7 @@ public class RootNetwork extends Network {
 
     /**
      * Register a network listener.
-     *
+     * 
      * @param listener the observer to register
      */
     public void addNetworkListener(final NetworkListener listener) {
@@ -937,7 +938,7 @@ public class RootNetwork extends Network {
 
     /**
      * Register a neuron listener.
-     *
+     * 
      * @param listener the observer to register
      */
     public void addNeuronListener(final NeuronListener listener) {
@@ -946,17 +947,16 @@ public class RootNetwork extends Network {
 
     /**
      * Register a synapse listener.
-     *
+     * 
      * @param listener the observer to register
      */
     public void addSynapseListener(final SynapseListener listener) {
         synapseListeners.add(listener);
     }
 
-
     /**
      * Register a text listener.
-     *
+     * 
      * @param listener the observer to register
      */
     public void addTextListener(final TextListener listener) {
@@ -965,7 +965,7 @@ public class RootNetwork extends Network {
 
     /**
      * Remove a synapse listener.
-     *
+     * 
      * @param synapseListener the observer to remove
      */
     public void removeSynapseListener(SynapseListener synapseListener) {
@@ -974,7 +974,7 @@ public class RootNetwork extends Network {
 
     /**
      * Register a subnetwork listener.
-     *
+     * 
      * @param listener the observer to register
      */
     public void addSubnetworkListener(final SubnetworkListener listener) {
@@ -983,7 +983,7 @@ public class RootNetwork extends Network {
 
     /**
      * Register a group listener.
-     *
+     * 
      * @param listener the observer to register
      */
     public void addGroupListener(final GroupListener listener) {
@@ -992,7 +992,7 @@ public class RootNetwork extends Network {
 
     /**
      * Remove a group listener.
-     *
+     * 
      * @param listener the observer to remove
      */
     public void removeGroupListener(final GroupListener listener) {
@@ -1002,7 +1002,7 @@ public class RootNetwork extends Network {
     /**
      * Search for a neuron by label. If there are more than one with the same
      * label only the first one found is returned.
-     *
+     * 
      * @param inputString label of neuron to search for
      * @return list of matched neurons, or null if none are found
      */
@@ -1022,7 +1022,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns the first neuron in the array returned by getNeuronsByLabel.
-     *
+     * 
      * @param inputString label of neuron to search for
      * @return matched Neuron, if any
      */
@@ -1077,6 +1077,9 @@ public class RootNetwork extends Network {
      * @return the textList
      */
     public List<NetworkTextObject> getTextList() {
+        if (textList == null) {
+            textList = new ArrayList<NetworkTextObject>();
+        }
         return textList;
     }
 }

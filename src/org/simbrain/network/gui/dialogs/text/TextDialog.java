@@ -17,19 +17,21 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.SimpleAttributeSet;
 
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.util.StandardDialog;
 
-import edu.umd.cs.piccolox.nodes.PStyledText;
-
-public class TextDialog extends StandardDialog implements ActionListener, ListSelectionListener {
+/**
+ * Font dialog.  Adapted from a post on website from a long time ago...
+ *
+ * @author jyoshimi
+ */
+public class TextDialog extends StandardDialog implements ActionListener,
+        ListSelectionListener {
 
     /** Selection list. */
     private ArrayList<TextNode> selectionList = new ArrayList<TextNode>();
-
-    /** Text objects being modified. */
-    private ArrayList<PStyledText> textObjectList;
 
     /** Tabbed pane for font and color effects. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -42,15 +44,12 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
             .getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
     /** Font style list. */
-    private static String[] style = {"Regular", "Bold", "Italic",
-            "Bold Italic"};
+    private static String[] style = { "Regular", "Bold", "Italic",
+            "Bold Italic" };
 
     /** Font size list. */
-    private static String[] size = {"8", "9", "10", "11", "12", "14", "16",
-            "18", "20", "22", "24", "26", "28", "36", "48", "72"};
-
-    /** Font. */
-    private Font font;
+    private static String[] size = { "8", "9", "10", "11", "12", "14", "16",
+            "18", "20", "22", "24", "26", "28", "36", "48", "72" };
 
     /** Font text type. */
     private String textType;
@@ -60,6 +59,12 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
 
     /** Font text size. */
     private int textSize;
+
+    /** Is font italic. */
+    private boolean italic;
+
+    /** Is font bold. */
+    private boolean bold;
 
     /** Font list. */
     private JList fList = new JList(fonts);
@@ -99,13 +104,21 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
 
     /** Text field for selected font. */
     private JTextField jtfTest = new JTextField("AaBbYyZz");
+
+    /** Main container. */
     Container container = getContentPane();
+
+    /** Main panel. */
     JPanel panel = new JPanel();
 
-    public TextDialog(final ArrayList<TextNode> selectedText) {
-        selectionList = selectedText;
-//        setTextObjectSelection();
-        setFont(new Font("Courier New", Font.PLAIN, 12));
+    /**
+     * Construct text dialog.
+     *
+     * @param selectedTextNodes currently selected text nodes in the network
+     *            panel.
+     */
+    public TextDialog(final ArrayList<TextNode> selectedTextNodes) {
+        selectionList = selectedTextNodes;
         init();
         fillFieldValues();
     }
@@ -162,9 +175,9 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
         setResizable(false);
         setModal(true);
 
-//        tabbedPane.addTab("Font", container);
-//        tabbedPane.addTab("Color", colorTab);
-//        setContentPane(tabbedPane);
+        // tabbedPane.addTab("Font", container);
+        // tabbedPane.addTab("Color", colorTab);
+        // setContentPane(tabbedPane);
         setContentPane(container);
 
         jtfFonts.addActionListener(this);
@@ -179,21 +192,28 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
      * Sets the fields to the current values.
      */
     private void fillFieldValues() {
+
         boolean found = false;
 
-        textType = font.getFontName();
-        textStyle = font.getStyle();
-        textSize = font.getSize();
+        TextNode firstNode = selectionList.get(0);
+
+        String theTextType = firstNode.getTextObject().getFontName();
+        int theTextSize = firstNode.getTextObject().getFontSize();
+        int theTextStyle = 0;
+        if (firstNode.getTextObject().isBold()) {
+            theTextStyle = Font.BOLD;
+        }
+        if (firstNode.getTextObject().isItalic()) {
+            theTextStyle += Font.ITALIC;
+        }
 
         jtfTest.setFont(new Font(textType, textStyle, textSize));
 
         for (int i = 0; i < fList.getModel().getSize(); i++) {
             fList.setSelectedIndex(i);
-
-            if (font.getName().equals((String) fList.getSelectedValue())) {
+            if (theTextType.equalsIgnoreCase((String) fList.getSelectedValue())) {
                 found = true;
                 setScrollPos(jspFont, fList, i);
-
                 break;
             }
         }
@@ -202,14 +222,13 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
             fList.clearSelection();
         }
 
-        stList.setSelectedIndex(font.getStyle());
+        stList.setSelectedIndex(theTextStyle);
 
         found = false;
 
         for (int i = 0; i < sizeList.getModel().getSize(); i++) {
             sizeList.setSelectedIndex(i);
-
-            if (font.getSize() == Integer.parseInt((String) sizeList
+            if (theTextSize == Integer.parseInt((String) sizeList
                     .getSelectedValue())) {
                 found = true;
                 setScrollPos(jspSize, sizeList, i);
@@ -223,54 +242,10 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
         }
     }
 
+    @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
-    }
-
-    /**
-     * Sets the current font of the font chooser.
-     *
-     * @param aFont font to be set.
-     */
-    public void setFont(final Font aFont) {
-        font = aFont;
-    }
-
-    /**
-     * Gets the current font of the font chooser.
-     *
-     * @return the current font chooser.
-     */
-    public Font getFont() {
-        return font;
-    }
-
-    /**
-     * Gets the name of the font chooser's current font.
-     *
-     * @return the name of the font chooser's current font
-     */
-    public String getFontName() {
-        return font.getFontName();
-    }
-
-    /**
-     * Gets the style of the font chooser's current font.
-     *
-     * @return current font
-     */
-    public int getFontStyle() {
-        return font.getStyle();
-    }
-
-    /**
-     * Gets the size of the font chooser's current font.
-     *
-     * @return font size
-     */
-    public int getFontSize() {
-        return font.getSize();
     }
 
     /**
@@ -278,7 +253,6 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
      */
     public void actionPerformed(final ActionEvent e) {
         boolean found = false;
-
         if (e.getSource() == jtfFonts) {
             textType = jtfFonts.getText();
 
@@ -305,8 +279,8 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
             jtfTest.setFont(new Font(textType, textStyle, textSize));
 
             for (int i = 0; i < sizeList.getModel().getSize(); i++) {
-                if (jtfSize.getText().trim().equals(
-                        (String) sizeList.getModel().getElementAt(i))) {
+                if (jtfSize.getText().trim()
+                        .equals((String) sizeList.getModel().getElementAt(i))) {
                     sizeList.setSelectedIndex(i);
                     setScrollPos(jspSize, sizeList, i);
                     found = true;
@@ -337,6 +311,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
         }
     }
 
+
     /**
      * @see AbstractAction.
      */
@@ -353,12 +328,20 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
 
             if (jtfStyle.getText().equals("Regular")) {
                 textStyle = 0;
+                italic = false;
+                bold = false;
             } else if (jtfStyle.getText().equals("Bold")) {
                 textStyle = 1;
+                italic = false;
+                bold = true;
             } else if (jtfStyle.getText().equals("Italic")) {
                 textStyle = 2;
+                italic = true;
+                bold = false;
             } else if (jtfStyle.getText().equals("Bold Italic")) {
                 textStyle = 3;
+                italic = true;
+                bold = true;
             }
 
             jtfTest.setFont(new Font(textType, textStyle, textSize));
@@ -373,24 +356,32 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
     }
 
     /**
-     * Takes a scrollPane, a JList and an index in the JList and sets the scrollPane's
-     * scrollbar so that the selected item in the JList is in about the middle of the
-     * scrollPane.
+     * Takes a scrollPane, a JList and an index in the JList and sets the
+     * scrollPane's scrollbar so that the selected item in the JList is in about
+     * the middle of the scrollPane.
+     *
      * @param sp scroll pane
      * @param list list of items
      * @param index of item
      */
-    private void setScrollPos(final JScrollPane sp, final JList list, final int index) {
+    private void setScrollPos(final JScrollPane sp, final JList list,
+            final int index) {
         int unitSize = sp.getVerticalScrollBar().getMaximum()
                 / list.getModel().getSize();
 
         sp.getVerticalScrollBar().setValue((index - 2) * unitSize);
     }
 
-    public void commitChanges() {
-        for (int i = 0; i < textObjectList.size(); i++) {
-            PStyledText textRef = textObjectList.get(i);
-//            textRef.getParent().set
+    /**
+     * Commit changes to underlying nodes.
+     */
+    private void commitChanges() {
+        for (TextNode node : selectionList) {
+            node.getTextObject().setFontName(textType);
+            node.getTextObject().setFontSize(textSize);
+            node.getTextObject().setItalic(italic);
+            node.getTextObject().setBold(bold);
+            node.update();
         }
     }
 }

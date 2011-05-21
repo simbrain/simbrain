@@ -980,7 +980,7 @@ public class NetworkPanel extends JPanel {
     /**
      * Creates and displays the text properties dialog.
      */
-    public void showSelectedTextProperties() {
+    public void showTextPropertyDialog() {
         TextDialog dialog = new TextDialog(getSelectedText());
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -1449,8 +1449,9 @@ public class NetworkPanel extends JPanel {
             return;
         }
         TextNode node = new TextNode(NetworkPanel.this, text);
-        node.getPStyledText().syncWithDocument();
+        //node.getPStyledText().syncWithDocument();
         canvas.getLayer().addChild(node);
+        //node.update();
     }
 
     /**

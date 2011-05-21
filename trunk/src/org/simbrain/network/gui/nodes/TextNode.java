@@ -25,14 +25,18 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
+import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.network.interfaces.NetworkTextObject;
 
 import edu.umd.cs.piccolox.nodes.PStyledText;
@@ -59,14 +63,10 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         this.textObject = text;
         pStyledText = new PStyledText();
         pStyledText.setDocument(new DefaultStyledDocument());
-        try {
-            pStyledText.getDocument().insertString(0, text.getText(), null);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
         this.addChild(pStyledText);
         this.setBounds(pStyledText.getBounds());
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+        update();
     }
 
     /** @Override. */
@@ -113,10 +113,11 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         contextMenu.addSeparator();
 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
-        contextMenu.addSeparator();
 
-        // TODO: Re-implement functionality
-        // contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
+        if (getNetworkPanel().getSelectedText().size() > 0) {
+            contextMenu.addSeparator();
+            contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
+        }
 
         return contextMenu;
     }
@@ -148,13 +149,19 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     }
 
     /**
-     * Update the styled text object.
+     * Update the styled text object based on the model object.
      */
     public void update() {
         try {
+            AttributeSet as = TextNode.createAttributeSet(
+                    textObject.getFontName(), textObject.getFontSize(),
+                    textObject.isItalic(), textObject.isBold());
+            pStyledText.getDocument().remove(0,
+                    pStyledText.getDocument().getLength());
             pStyledText.getDocument().insertString(0, textObject.getText(),
-                    null);
+                    as);
             pStyledText.syncWithDocument();
+            pullViewPositionFromModel();
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -176,5 +183,35 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         getTextObject().setX(p.getX());
         getTextObject().setY(p.getY());
     }
+
+    /**
+     * Updates the position of the view text based on the position of the model
+     * text object.
+     */
+    private void pullViewPositionFromModel() {
+        Point2D p = new Point2D.Double(getTextObject().getX(), getTextObject()
+                .getY());
+        this.setGlobalTranslation(p);
+    }
+
+    /**
+     * Creates an attribute set of the specified kind.
+     *
+     * @author Aaron Dixon
+     *
+     * @param fontSize size of font in attribute set
+     * @param italic italic or not
+     * @return the resulting attriube set
+     */
+    public static SimpleAttributeSet createAttributeSet(String fontName, int fontSize, boolean italic, boolean bold) {
+        SimpleAttributeSet as = new SimpleAttributeSet();
+        as.addAttribute(StyleConstants.CharacterConstants.FontFamily, fontName);
+        as.addAttribute(StyleConstants.CharacterConstants.FontSize, fontSize);
+        as.addAttribute(StyleConstants.CharacterConstants.Italic, italic);
+        as.addAttribute(StyleConstants.CharacterConstants.Bold, bold);
+        as.addAttribute(StyleConstants.ALIGN_RIGHT, true);
+        return as;
+    }
+
 
 }

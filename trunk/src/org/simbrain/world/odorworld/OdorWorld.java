@@ -281,7 +281,7 @@ public class OdorWorld {
 
     /**
      * Returns a properly initialized xstream object.
-     * 
+     *
      * @return the XStream object TODO: There is more to remove!
      */
     static XStream getXStream() {
@@ -414,7 +414,7 @@ public class OdorWorld {
 
     /**
      * Handle collisions in x directions.
-     * 
+     *
      * @param entityToCheck
      * @param xCheck position to check
      * @return whether or not a collision occurred.
@@ -443,7 +443,7 @@ public class OdorWorld {
 
     /**
      * Handle collisions in y directions.
-     * 
+     *
      * @param entityToCheck
      * @param yCheck position to check
      * @return whether or not a collision occurred.
@@ -507,7 +507,7 @@ public class OdorWorld {
 
     /**
      * Add a world listener.
-     * 
+     *
      * @param listener listener to add.
      */
     public void addListener(WorldListener listener) {
@@ -516,7 +516,7 @@ public class OdorWorld {
 
     /**
      * Returns the list of entities.
-     * 
+     *
      * @return the entity list
      */
     public List<OdorWorldEntity> getObjectList() {
@@ -525,7 +525,7 @@ public class OdorWorld {
 
     /**
      * Fire entity added event.
-     * 
+     *
      * @param entity entity that was added
      */
     public void fireEntityAdded(final OdorWorldEntity entity) {
@@ -536,7 +536,7 @@ public class OdorWorld {
 
     /**
      * Fire entity removed event.
-     * 
+     *
      * @param entity entity that was removed
      */
     public void fireEntityRemoved(final OdorWorldEntity entity) {
@@ -547,7 +547,7 @@ public class OdorWorld {
 
     /**
      * Fire entity changed event.
-     * 
+     *
      * @param entity entity that was changed
      */
     public void fireEntityChanged(final OdorWorldEntity entity) {
@@ -558,7 +558,7 @@ public class OdorWorld {
 
     /***
      * Fire sensor added event.
-     * 
+     *
      * @param sensor sensor that was added
      */
     public void fireSensorAdded(final Sensor sensor) {
@@ -569,7 +569,7 @@ public class OdorWorld {
 
     /**
      * Fire sensor removed event.
-     * 
+     *
      * @param sensor sensor that was removed
      */
     public void fireSensorRemoved(final Sensor sensor) {
@@ -580,7 +580,7 @@ public class OdorWorld {
 
     /**
      * Fire effector added event.
-     * 
+     *
      * @param effector effector that was added
      */
     public void fireEffectorAdded(final Effector effector) {
@@ -591,7 +591,7 @@ public class OdorWorld {
 
     /**
      * Fire effector removed event.
-     * 
+     *
      * @param effector effector that was removed
      */
     public void fireEffectorRemoved(final Effector effector) {
@@ -639,7 +639,7 @@ public class OdorWorld {
 
     /**
      * Returns width of world in pixels.
-     * 
+     *
      * @return width in pixels.
      */
     public int getWidth() {
@@ -648,7 +648,7 @@ public class OdorWorld {
 
     /**
      * Returns height of world in pixels.
-     * 
+     *
      * @return height of world
      */
     public int getHeight() {

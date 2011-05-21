@@ -76,16 +76,16 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private static final int ARROW_LINE = 20;
 
     /** Arrow associated with output node. */
-    //private PPath outArrow;
+    // private PPath outArrow;
 
     /** Arrow associated with input node. */
-    //private PPath inArrow;
+    // private PPath inArrow;
 
     /** Text showing sensory coupling information. */
-    //private PText inLabel = new PText();
+    // private PText inLabel = new PText();
 
     /** Text showing motor coupling information. */
-    //private PText outLabel = new PText();
+    // private PText outLabel = new PText();
 
     /** Font for input and output labels. */
     public static final Font IN_OUT_FONT = new Font("Arial", Font.PLAIN, 9);
@@ -120,20 +120,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** Priority Font. */
     public static final Font PRIORITY_FONT = new Font("Courier", Font.PLAIN, 9);
 
-    //TODO: These should be replaced with actual scaling of the text object.
+    // TODO: These should be replaced with actual scaling of the text object.
 
     /** Neuron font bold. */
     public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD, 11);
 
     /** Neuron font small. */
-    public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN, 9);
+    public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN,
+            9);
 
     /** Neuron font very small. */
-    public static final Font NEURON_FONT_VERYSMALL = new Font("Arial", Font.PLAIN, 7);
+    public static final Font NEURON_FONT_VERYSMALL = new Font("Arial",
+            Font.PLAIN, 7);
 
     /**
      * Create a new neuron node.
-     *
+     * 
      * @param net Reference to NetworkPanel
      * @param neuron reference to model neuron
      */
@@ -153,19 +155,19 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         addChild(circle);
 
         // Handle input and output arrows
-//        outArrow = createOutArrow();
-//        inArrow = createInArrow();
-//        inLabel = createInputLabel();
-//        outLabel = createOutputLabel();
-//        addChild(outArrow);
-//        addChild(inArrow);
-//        addChild(inLabel);
-//        addChild(outLabel); 
-//        updateOutArrow();
-//        updateInArrow();
-//        updateInLabel();
-//        updateOutLabel();
-        
+        // outArrow = createOutArrow();
+        // inArrow = createInArrow();
+        // inLabel = createInputLabel();
+        // outLabel = createOutputLabel();
+        // addChild(outArrow);
+        // addChild(inArrow);
+        // addChild(inLabel);
+        // addChild(outLabel);
+        // updateOutArrow();
+        // updateInArrow();
+        // updateInLabel();
+        // updateOutLabel();
+
         setPriorityView(getNetworkPanel().getPrioritiesVisible());
 
         activationText = new PText(String.valueOf((int) Math.round(neuron
@@ -195,7 +197,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Toggles the visibility of the priority view text label.
-     *
+     * 
      * @param visibility whether the priority text label should be visible
      */
     public void setPriorityView(boolean visibility) {
@@ -218,7 +220,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (priorityText == null) {
             return;
         }
-        priorityText.setOffset(getX() + DIAMETER + 2, getY() + DIAMETER  - 4);
+        priorityText.setOffset(getX() + DIAMETER + 2, getY() + DIAMETER - 4);
     }
 
     /** @see ScreenElement */
@@ -243,37 +245,43 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** @see ScreenElement */
     protected String getToolTipText() {
-      String ret = new String();
-      ret += neuron.getToolTipText();
-      //ret += getCouplingText();
-      return ret;
+        String ret = new String();
+        ret += neuron.getToolTipText();
+        // ret += getCouplingText();
+        return ret;
     }
 
     /**
      * Returns information about couplings.
-     *
+     * 
      * @return coupling information.
      */
     private String getCouplingText() {
         String ret = new String("");
-//        if (neuron.isInput()) {
-//            ret += " \n Sensory Coupling  ";
-//            if (neuron.getSensoryCoupling().getAgent() == null) {
-//                ret += " ** unattached ** ";
-//            }
-//            ret += "\n   World: " + neuron.getSensoryCoupling().getWorldName() + " ";
-//            ret += "\n   Agent: " + neuron.getSensoryCoupling().getAgentName() + " ";
-//            ret += "\n   Sensor: " + neuron.getSensoryCoupling().getShortLabel() + " ";
-//        }
-//        if (neuron.isOutput()) {
-//            ret += " \n Motor Coupling ";
-//            if (neuron.getMotorCoupling().getAgent() == null) {
-//                ret += " ** unattaached ** ";
-//            }
-//            ret += "\n   World: " + neuron.getMotorCoupling().getWorldName() + " ";
-//            ret += "\n   Agent: " + neuron.getMotorCoupling().getAgentName() + " ";
-//            ret += "\n   Command: " + neuron.getMotorCoupling().getShortLabel()  + " ";
-//        }
+        // if (neuron.isInput()) {
+        // ret += " \n Sensory Coupling  ";
+        // if (neuron.getSensoryCoupling().getAgent() == null) {
+        // ret += " ** unattached ** ";
+        // }
+        // ret += "\n   World: " + neuron.getSensoryCoupling().getWorldName() +
+        // " ";
+        // ret += "\n   Agent: " + neuron.getSensoryCoupling().getAgentName() +
+        // " ";
+        // ret += "\n   Sensor: " + neuron.getSensoryCoupling().getShortLabel()
+        // + " ";
+        // }
+        // if (neuron.isOutput()) {
+        // ret += " \n Motor Coupling ";
+        // if (neuron.getMotorCoupling().getAgent() == null) {
+        // ret += " ** unattaached ** ";
+        // }
+        // ret += "\n   World: " + neuron.getMotorCoupling().getWorldName() +
+        // " ";
+        // ret += "\n   Agent: " + neuron.getMotorCoupling().getAgentName() +
+        // " ";
+        // ret += "\n   Command: " + neuron.getMotorCoupling().getShortLabel() +
+        // " ";
+        // }
         return ret;
     }
 
@@ -284,6 +292,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Return the center of this node (the circle) in global coordinates.
+     * 
      * @return the center point of this node.
      */
     public Point2D getCenter() {
@@ -306,7 +315,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
         contextMenu.addSeparator();
 
-        //Model Group Action
+        // Model Group Action
         JMenu groupMenu = new JMenu("Groups");
         groupMenu.add(new NewNeuronGroupAction(getNetworkPanel()));
         groupMenu.add(new NewSynapseGroupAction(getNetworkPanel()));
@@ -316,7 +325,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         // Add Connect Actions
         if (getNetworkPanel().getSelectedNeurons() != null) {
             contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(),
-                getNetworkPanel().getSelectedNeurons(), this));
+                    getNetworkPanel().getSelectedNeurons(), this));
         }
         contextMenu.addSeparator();
         contextMenu.add(getNetworkPanel().getActionManager()
@@ -355,7 +364,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         return contextMenu;
     }
 
-
     /** @see ScreenElement */
     protected boolean hasPropertyDialog() {
         return true;
@@ -363,7 +371,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /** @see ScreenElement */
     protected JDialog getPropertyDialog() {
-        NeuronDialog dialog = new NeuronDialog(this.getNetworkPanel().getSelectedNeurons());
+        NeuronDialog dialog = new NeuronDialog(this.getNetworkPanel()
+                .getSelectedNeurons());
         return dialog;
     }
 
@@ -395,24 +404,23 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             float saturation = checkValid((float) Math.abs(activation
                     / neuron.getLowerBound()));
             float coolColor = NetworkGuiSettings.getCoolColor();
-            circle.setPaint(Color.getHSBColor(coolColor, saturation,
-                            (float) 1));
+            circle.setPaint(Color.getHSBColor(coolColor, saturation, (float) 1));
         }
 
         if (neuron.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             if (((SpikingNeuronUpdateRule) neuron.getUpdateRule()).hasSpiked()) {
                 circle.setStrokePaint(NetworkGuiSettings.getSpikingColor());
-                //outArrow.setStrokePaint(NetworkGuiSettings.getSpikingColor());
+                // outArrow.setStrokePaint(NetworkGuiSettings.getSpikingColor());
             } else {
                 circle.setStrokePaint(NetworkGuiSettings.getLineColor());
-                //outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+                // outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
             }
         }
     }
 
     /**
      * Check whether the specified saturation is valid or not.
-     *
+     * 
      * @param val the saturation value to check.
      * @return whether it is valid or not.
      */
@@ -431,11 +439,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     /**
-     * Creates an arrow which designates an on-screen neuron as an output node, which sends signals to an external
-     * environment (the world object).
-     *
+     * Creates an arrow which designates an on-screen neuron as an output node,
+     * which sends signals to an external environment (the world object).
+     * 
      * @return an object representing the input arrow of a PNodeNeuron
-     *
      * @see org.simbrain.sim.world
      */
     private PPath createOutArrow() {
@@ -460,26 +467,26 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Create the input label.
-     *
+     * 
      * @return the input label.
      */
     private PText createInputLabel() {
         PText ret = new PText();
         ret.setFont(IN_OUT_FONT);
-        //ret.setPaint(getNetworkPanel().getLineColor());
+        // ret.setPaint(getNetworkPanel().getLineColor());
         ret.translate(this.getX(), this.getY() + DIAMETER / 2 + ARROW_LINE + 15);
         return ret;
     }
 
     /**
      * Create the output label.
-     *
+     * 
      * @return the output label.
      */
     private PText createOutputLabel() {
         PText ret = new PText();
         ret.setFont(IN_OUT_FONT);
-        //ret.setPaint(getNetworkPanel().getLineColor());
+        // ret.setPaint(getNetworkPanel().getLineColor());
         ret.translate(this.getX(), this.getY() - DIAMETER / 2 - ARROW_LINE - 5);
         return ret;
     }
@@ -489,7 +496,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * which receives signals from an external environment (the world object).
      * 
      * @return an object representing the input arrow of a PNodeNeuron
-     * 
      * @see org.simbrain.sim.world
      */
     private PPath createInArrow() {
@@ -504,25 +510,26 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         arrow.lineTo(cx, top + ARROW_LINE);
 
         arrow.moveTo(cx, top);
-        arrow.lineTo(cx - DIAMETER / 4 , cy + DIAMETER / 2 + DIAMETER / 4);
+        arrow.lineTo(cx - DIAMETER / 4, cy + DIAMETER / 2 + DIAMETER / 4);
 
         arrow.moveTo(cx, top);
-        arrow.lineTo(cx + DIAMETER / 4 , top + DIAMETER / 4);
+        arrow.lineTo(cx + DIAMETER / 4, top + DIAMETER / 4);
 
         path.append(arrow, true);
 
-//        path.addInputEventListener(new ToolTipTextUpdater() {
-//
-//            /** @see ToolTipTextUpdater */
-//            protected String getToolTipText() {
-//                return getCouplingText();
-//            }
-//        });
+        // path.addInputEventListener(new ToolTipTextUpdater() {
+        //
+        // /** @see ToolTipTextUpdater */
+        // protected String getToolTipText() {
+        // return getCouplingText();
+        // }
+        // });
         return path;
     }
 
     /**
-     * Determine what color and and font to use for this neuron based in its activation level.
+     * Determine what color and and font to use for this neuron based in its
+     * activation level.
      */
     private void updateText() {
         double act = neuron.getActivation();
@@ -531,35 +538,39 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         priorityText.setScale(1);
         setPriorityTextPosition();
-        priorityText.setText("" + neuron.getUpdatePriority()); // todo: respond to listener
+        priorityText.setText("" + neuron.getUpdatePriority()); // todo: respond
+                                                               // to listener
 
         // Set label text
         if ((!neuron.getLabel().equalsIgnoreCase(""))
-                || (!neuron.getLabel().equalsIgnoreCase(NeuronDialog.NULL_STRING))) {
+                || (!neuron.getLabel().equalsIgnoreCase(
+                        NeuronDialog.NULL_STRING))) {
             labelText.setFont(NEURON_FONT);
             labelText.setText("" + neuron.getLabel());
-            labelText.setOffset(getX() - labelText.getWidth() / 2 + DIAMETER/2,
-                    getY() - DIAMETER/2 - 1);
+            labelText.setOffset(getX() - labelText.getWidth() / 2 + DIAMETER
+                    / 2, getY() - DIAMETER / 2 - 1);
             labelBackground.setBounds(labelText.getFullBounds());
             // TODO: Make background bigger than label text
         }
 
         // 0 (or close to it) is a special case--a black font
-        if ((act > -.01) && (act < .01)) {    //text.setPaint(Color.black);
+        if ((act > -.01) && (act < .01)) { // text.setPaint(Color.black);
             activationText.setFont(NEURON_FONT);
             activationText.setText("0");
             // In all other cases the background color of the neuron is white
             // Between 0 and 1
         } else if ((act > 0) && (neuron.getActivation() < 1)) {
-            //text.setPaint(Color.white);
+            // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
-            activationText.setText(String.valueOf(Utils.round(act, 4)).substring(1, 3));
+            activationText.setText(String.valueOf(Utils.round(act, 4))
+                    .substring(1, 3));
         } else if ((act < 0) && (act > -1)) { // Between 0 and -1
-            //text.setPaint(Color.white);
+            // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
-            activationText.setText("-" + String.valueOf(Utils.round(act, 4)).substring(2, 4));
+            activationText.setText("-"
+                    + String.valueOf(Utils.round(act, 4)).substring(2, 4));
         } else { // greater than 1 or less than -1
-            //text.setPaint(Color.white);
+            // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
             if (Math.abs(act) < 10) {
                 activationText.scale(.9);
@@ -582,77 +593,79 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         if (activationText == null) {
             return;
         }
-        activationText.setOffset(getX() + DIAMETER / 4 + 2, getY() + DIAMETER / 4 + 1);
+        activationText.setOffset(getX() + DIAMETER / 4 + 2, getY() + DIAMETER
+                / 4 + 1);
     }
 
-//    /**
-//     * Updates graphics depending on whether this is an input node or not.
-//     */
-//    public void updateInArrow() {
-//        if (neuron.isInput()) {
-//            inArrow.setVisible(true);
-//        } else {
-//            inArrow.setVisible(false);
-//        }
-//    }
-//
-//    /**
-//     * Updates graphics depending on whether this is an output node or not.
-//     */
-//    public void updateOutArrow() {
-//        if (neuron.isOutput()) {
-//            outArrow.setVisible(true);
-//        } else {
-//            outArrow.setVisible(false);
-//        }
-//    }
-//
-//    /**
-//     * Update the label showing sensory coupling information.
-//     */
-//    public void updateInLabel() {
-//        if (getNetworkPanel().getInOutMode()) {
-//            if (getNeuron().isInput()) {
-//               // inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
-//                inLabel.setVisible(true);
-//            } else {
-//                inLabel.setVisible(false);
-//            }
-//        } else {
-//            inLabel.setVisible(false);
-//        }
-//    }
-//
-//    /**
-//     * Update the label showing sensory coupling information.
-//     */
-//    public void updateOutLabel() {
-//        if (getNetworkPanel().getInOutMode()) {
-//            if (getNeuron().isOutput()) {
-//               // outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
-//                outLabel.setVisible(true);
-//            } else {
-//                outLabel.setVisible(false);
-//            }
-//        } else {
-//            outLabel.setVisible(false);
-//        }
-//    }
+    // /**
+    // * Updates graphics depending on whether this is an input node or not.
+    // */
+    // public void updateInArrow() {
+    // if (neuron.isInput()) {
+    // inArrow.setVisible(true);
+    // } else {
+    // inArrow.setVisible(false);
+    // }
+    // }
+    //
+    // /**
+    // * Updates graphics depending on whether this is an output node or not.
+    // */
+    // public void updateOutArrow() {
+    // if (neuron.isOutput()) {
+    // outArrow.setVisible(true);
+    // } else {
+    // outArrow.setVisible(false);
+    // }
+    // }
+    //
+    // /**
+    // * Update the label showing sensory coupling information.
+    // */
+    // public void updateInLabel() {
+    // if (getNetworkPanel().getInOutMode()) {
+    // if (getNeuron().isInput()) {
+    // // inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
+    // inLabel.setVisible(true);
+    // } else {
+    // inLabel.setVisible(false);
+    // }
+    // } else {
+    // inLabel.setVisible(false);
+    // }
+    // }
+    //
+    // /**
+    // * Update the label showing sensory coupling information.
+    // */
+    // public void updateOutLabel() {
+    // if (getNetworkPanel().getInOutMode()) {
+    // if (getNeuron().isOutput()) {
+    // // outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
+    // outLabel.setVisible(true);
+    // } else {
+    // outLabel.setVisible(false);
+    // }
+    // } else {
+    // outLabel.setVisible(false);
+    // }
+    // }
 
     /**
      * Returns String representation of this NeuronNode.
-     *
+     * 
      * @return String representation of this node.
      */
     public String toString() {
         String ret = new String();
-        ret += "NeuronNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
+        ret += "NeuronNode: (" + this.getGlobalFullBounds().x + ")("
+                + getGlobalFullBounds().y + ")\n";
         return ret;
     }
 
     /**
      * Return the neuron for this neuron node.
-     *
+     * 
      * @return the neuron for this neuron node
      */
     public Neuron getNeuron() {
@@ -661,16 +674,17 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Set the neuron for this neuron node to <code>neuron</code>.
-     *
-     * <p>This is a bound property.</p>
-     *
+     * <p>
+     * This is a bound property.
+     * </p>
+     * 
      * @param neuron neuron for this neuron node
      */
     public void setNeuron(final Neuron neuron) {
 
         Neuron oldNeuron = this.neuron;
         this.neuron = neuron;
-        firePropertyChange(-1,"neuron", oldNeuron, neuron);
+        firePropertyChange(-1, "neuron", oldNeuron, neuron);
     }
 
     /** @see ScreenElement */
@@ -684,21 +698,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     /**
-     * Update the position of the model neuron based on the global coordinates of this pnode.
+     * Update the position of the model neuron based on the global coordinates
+     * of this pnode.
      */
     public void pushViewPositionToModel() {
-        //System.out.println("model neuron updated");
+        // System.out.println("model neuron updated");
         Point2D p = this.getGlobalTranslation();
         getNeuron().setX(p.getX());
         getNeuron().setY(p.getY());
     }
 
-
     /**
-     * Updates the position of the view neuron based on the position of the model neuron.
+     * Updates the position of the view neuron based on the position of the
+     * model neuron.
      */
     public void pullViewPositionFromModel() {
-        //System.out.println("view neuron updated");
+        // System.out.println("view neuron updated");
         Point2D p = new Point2D.Double(getNeuron().getX(), getNeuron().getY());
         this.setGlobalTranslation(p);
     }
@@ -724,18 +739,17 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     public void updateSynapseNodePositions() {
 
-        for (Iterator i = connectedSynapses.iterator(); i.hasNext(); ) {
+        for (Iterator i = connectedSynapses.iterator(); i.hasNext();) {
             SynapseNode synapseNode = (SynapseNode) i.next();
             synapseNode.updatePosition();
         }
     }
 
     /**
-     * Synapse node position updater, called in response
-     * to changes in this neuron node's fullBounds property.
+     * Synapse node position updater, called in response to changes in this
+     * neuron node's fullBounds property.
      */
-    private class SynapseNodePositionUpdater
-        implements PropertyChangeListener {
+    private class SynapseNodePositionUpdater implements PropertyChangeListener {
 
         /** @see PropertyChangeListener */
         public void propertyChange(final PropertyChangeEvent event) {
@@ -783,32 +797,33 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     /**
-     * Change the color of input and output nodes to reflect whether they are 'attached' to an agent in a world.
+     * Change the color of input and output nodes to reflect whether they are
+     * 'attached' to an agent in a world.
      */
     public void updateAttachmentStatus() {
-//        if (neuron.getSensoryCoupling() != null) {
-//            if (neuron.getSensoryCoupling().isAttached()) {
-//                inArrow.setStrokePaint(getNetworkPanel().getLineColor());
-//            } else {
-//                inArrow.setStrokePaint(Color.GRAY);
-//            }
-//        }
-//
-//        if (neuron.getMotorCoupling() != null) {
-//            if (neuron.getMotorCoupling().isAttached()) {
-//                outArrow.setStrokePaint(getNetworkPanel().getLineColor());
-//            } else {
-//                outArrow.setStrokePaint(Color.GRAY);
-//            }
-//        }
+        // if (neuron.getSensoryCoupling() != null) {
+        // if (neuron.getSensoryCoupling().isAttached()) {
+        // inArrow.setStrokePaint(getNetworkPanel().getLineColor());
+        // } else {
+        // inArrow.setStrokePaint(Color.GRAY);
+        // }
+        // }
+        //
+        // if (neuron.getMotorCoupling() != null) {
+        // if (neuron.getMotorCoupling().isAttached()) {
+        // outArrow.setStrokePaint(getNetworkPanel().getLineColor());
+        // } else {
+        // outArrow.setStrokePaint(Color.GRAY);
+        // }
+        // }
     }
 
     /** @see ScreenElement */
     public void resetColors() {
         circle.setStrokePaint(NetworkGuiSettings.getLineColor());
         labelBackground.setPaint(NetworkGuiSettings.getBackgroundColor());
-//        inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
-//        outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+        // inArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
+        // outArrow.setStrokePaint(NetworkGuiSettings.getLineColor());
         updateColor();
     }
 
@@ -829,7 +844,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /** @see ScreenElement. */
     public void setGrouped(final boolean isGrouped) {
         super.setGrouped(isGrouped);
-        for (Iterator i = connectedSynapses.iterator(); i.hasNext(); ) {
+        for (Iterator i = connectedSynapses.iterator(); i.hasNext();) {
             SynapseNode synapseNode = (SynapseNode) i.next();
             synapseNode.setGrouped(isGrouped);
         }

@@ -100,6 +100,8 @@ final class SelectionEventHandler
 
         if (event.getClickCount() != 1) {
             if (node instanceof PStyledText) {
+                // For now, since the editor has a different size
+                networkPanel.clearSelection();
                 networkPanel.getTextHandle().startEditing(event,
                         ((PStyledText) node));
             }
@@ -148,8 +150,9 @@ final class SelectionEventHandler
         } else {
             if (pickedNode instanceof NeuronNode) {
                 networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
-                // To ensure fire neuron moving events don't affect these neurons
-                ((NeuronNode)pickedNode).setMoving(true);
+                // To ensure fire neuron moving events don't affect these
+                // neurons
+                ((NeuronNode) pickedNode).setMoving(true);
             }
 
             // start dragging selected node(s)

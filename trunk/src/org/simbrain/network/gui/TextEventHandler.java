@@ -24,6 +24,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 
 import javax.swing.text.BadLocationException;
+import javax.swing.text.StyleConstants;
 
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.interfaces.NetworkTextObject;
@@ -61,7 +62,10 @@ public class TextEventHandler extends PStyledTextEventHandler implements
 
         PNode pickedNode = inputEvent.getPickedNode();
         stopEditing();
+
+        // Start editing if this a text object
         if (pickedNode instanceof PStyledText) {
+            this.reshapeEditorLater();
             startEditing(inputEvent, (PStyledText) pickedNode);
         }
 
@@ -74,9 +78,6 @@ public class TextEventHandler extends PStyledTextEventHandler implements
             networkPanel.getRootNetwork().addText(text);
             TextNode node = networkPanel.findTextNode(text);
             if (node != null) {
-                Insets pInsets = node.getPStyledText().getInsets();
-                node.translate(inputEvent.getPosition().getX() - pInsets.left,
-                        inputEvent.getPosition().getY() - pInsets.top);
                 startEditing(inputEvent, node.getPStyledText());
             }
         }
@@ -94,7 +95,6 @@ public class TextEventHandler extends PStyledTextEventHandler implements
                 networkPanel.getRootNetwork().deleteText(node.getTextObject());
                 editedText.removeFromParent();
             } else {
-                editedText.syncWithDocument();
                 try {
                     node.getTextObject().setText(
                             editedText.getDocument().getText(0,
@@ -102,6 +102,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
+                node.update();
             }
             editor.setVisible(false);
             canvas.repaint();

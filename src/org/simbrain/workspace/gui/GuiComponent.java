@@ -36,6 +36,7 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentDeserializer;
 import org.simbrain.workspace.WorkspaceComponentListener;
+import org.simbrain.workspace.WorkspacePreferences;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -72,7 +73,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         super();
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
-        chooser = new SFileChooser(workspaceComponent.getCurrentDirectory(),
+        chooser = new SFileChooser(WorkspacePreferences.getCurrentDirectory(workspaceComponent.getClass()),
                 workspaceComponent.getDescription());
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
@@ -146,8 +147,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     public void showOpenFileDialog() {
 
         SFileChooser chooser = new SFileChooser(
-                workspaceComponent.getCurrentDirectory(),
-                workspaceComponent.getDescription());
+                WorkspacePreferences.getCurrentDirectory(workspaceComponent
+                        .getClass()), workspaceComponent.getDescription());
 
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
@@ -167,8 +168,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                                 SFileChooser.getExtension(theFile));
                 workspace.addWorkspaceComponent(workspaceComponent);
                 workspaceComponent.setCurrentFile(theFile);
-                workspaceComponent.setCurrentDirectory(theFile.getParentFile()
-                        .getAbsolutePath());
+                WorkspacePreferences.setCurrentDirectory(workspaceComponent
+                        .getClass(), theFile.getParentFile().getAbsolutePath());
                 SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
                 GuiComponent desktopComponent = desktop
                         .getDesktopComponent(workspaceComponent);
@@ -208,8 +209,10 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                 throw new RuntimeException(e);
             }
 
-            workspaceComponent.setCurrentDirectory(theFile.getParentFile()
-                    .getAbsolutePath());
+//            workspaceComponent.setCurrentDirectory(theFile.getParentFile()
+//                    .getAbsolutePath());
+            WorkspacePreferences.setCurrentDirectory(workspaceComponent
+                    .getClass(), theFile.getParentFile().getAbsolutePath());
             workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
         }

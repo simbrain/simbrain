@@ -240,18 +240,4 @@ public final class NetworkComponent extends WorkspaceComponent {
         return RootNetwork.getXStream().toXML(rootNetwork);
     }
 
-    // TODO: Link to NetworkSettings.
-//    @Override
-//    public void setCurrentDirectory(final String currentDirectory) {
-//        super.setCurrentDirectory(currentDirectory);
-////        NetworkPreferences.setCurrentDirectory(currentDirectory);
-//    }
-//
-//    @Override
-//    public String getCurrentDirectory() {
-////       return NetworkPreferences.getCurrentDirectory();
-//        return null;
-//    }
-
-
 }

@@ -69,7 +69,6 @@ public class NetworkGuiPreferences {
         setTimeStep(getDefaultTimeStep());
         setPrecision(getDefaultPrecision());
         setWeightValues(getDefaultWeightValues());
-        setCurrentDirectory(getDefaultCurrentDirectory());
 
     }
 
@@ -460,30 +459,6 @@ public class NetworkGuiPreferences {
      */
     public static double getDefaultNudgeAmount() {
         return 2;
-    }
-
-    /**
-     * Current network files directory.
-     * @param dir Current directory
-     */
-    public static void setCurrentDirectory(final String dir) {
-        NETWORK_PREFERENCES.put("CurrentDirectory", dir);
-    }
-
-    /**
-     * Current network files directory.
-     * @return Current directory
-     */
-    public static String getCurrentDirectory() {
-        return NETWORK_PREFERENCES.get("CurrentDirectory", getDefaultCurrentDirectory());
-    }
-
-    /**
-     * Current network files directory.
-     * @return Default current directory
-     */
-    public static String getDefaultCurrentDirectory() {
-        return "." + FS + "simulations" + FS + "networks";
     }
 
     /**

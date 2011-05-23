@@ -61,6 +61,7 @@ public final class DataWorldPreferences {
 
     /**
      * Set the current directory preference setting to <code>dir</code>.
+     * (Not used now but to be used for imports...)
      *
      * @param dir current directory preference setting
      */

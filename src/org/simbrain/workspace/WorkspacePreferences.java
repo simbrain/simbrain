@@ -21,19 +21,23 @@ package org.simbrain.workspace;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.world.dataworld.DataWorldComponent;
+import org.simbrain.world.odorworld.OdorWorldComponent;
+
 /**
  * <b>WorkspacePreferences</b> handles storage and retrieval of user
- * preferences, e.g. current directory.
- *
- * TODO: May need to be re-implemented for compatibility with applet jars.
+ * preferences, e.g. current directory. TODO: May need to be re-implemented for
+ * compatibility with applet jars.
  */
 public final class WorkspacePreferences {
+
     /** File system property. */
     private static final String FS = System.getProperty("file.separator");
 
     /** The main user preference object. */
     private static final Preferences THE_PREFS = Preferences.userRoot().node(
-        "org/simbrain/workspace");
+            "org/simbrain/workspace");
 
     /**
      * This class should not be instantiated.
@@ -61,11 +65,11 @@ public final class WorkspacePreferences {
         setDefaultFile(getDefaultDefaultFile());
     }
 
-    //////////////////////////////////////////////////////////////////
-    // Getters and setters for user preferences                     //
-    // Note that default values for preferences are stored in the   //
-    // second argument of the getter method                         //
-    //////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////
+    // Getters and setters for user preferences //
+    // Note that default values for preferences are stored in the //
+    // second argument of the getter method //
+    // ////////////////////////////////////////////////////////////////
     /**
      * Sets the current workspace directory.
      *
@@ -119,4 +123,52 @@ public final class WorkspacePreferences {
     public static String getDefaultDefaultFile() {
         return "." + FS + "workspace.zip";
     }
+
+    /**
+     * Returns the default directory for specific component types.
+     *
+     * @param componentType the component type
+     * @return the directory
+     */
+    private static String getDefaultDirectory(
+            Class<? extends WorkspaceComponent> componentType) {
+
+        if (componentType == OdorWorldComponent.class) {
+            return "." + FS + "simulations" + FS + "worlds";
+        } else if (componentType == DataWorldComponent.class) {
+            return "." + FS + "simulations" + FS + "tables";
+        } else if (componentType == NetworkComponent.class) {
+            return "." + FS + "simulations" + FS + "networks";
+        } else {
+            return "." + FS + "simulations";
+        }
+    }
+
+    /**
+     * Set the current directory (for saving and opening files) for a given
+     * component type (network, data world, etc).
+     *
+     * @param componentType the WorkspaceComponent's class
+     * @param directoryPath the directory, as a string
+     */
+    public static void setCurrentDirectory(
+            Class<? extends WorkspaceComponent> componentType,
+            String directoryPath) {
+        THE_PREFS.put(componentType.getSimpleName(), directoryPath);
+
+    }
+
+    /**
+     * Get the current directory (for saving and opening files) for a given
+     * component type (network, data world, etc).
+     *
+     * @param componentType the WorkspaceComponent's class
+     * @return the current directory, as a string
+     */
+    public static String getCurrentDirectory(
+            Class<? extends WorkspaceComponent> componentType) {
+        return THE_PREFS.get(componentType.getSimpleName(),
+                getDefaultDirectory(componentType));
+    }
+
 }

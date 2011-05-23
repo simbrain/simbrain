@@ -311,17 +311,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
         world.update();
     }
 
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) { 
-        super.setCurrentDirectory(currentDirectory);
-        OdorWorldPreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    @Override
-    public String getCurrentDirectory() {
-       return OdorWorldPreferences.getCurrentDirectory();
-    }
-
     /**
      * Returns a reference to the odor world.
      *

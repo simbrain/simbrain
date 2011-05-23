@@ -4,11 +4,12 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * <b>OdorWorldPreferences</b> handles storage and retrieval of user preferences,
- * e.g. the current directory.
+ * <b>OdorWorldPreferences</b> handles storage and retrieval of user
+ * preferences. Currently not used.
  */
 public final class OdorWorldPreferences {
-    /** System specific file system seperator. */
+
+    /** System specific file system separator. */
     public static final String FS = System.getProperty("file.separator");
 
     /**
@@ -21,7 +22,8 @@ public final class OdorWorldPreferences {
     /**
      * The main user preference object.
      */
-    private static final Preferences THEPREFS = Preferences.userRoot().node("/org/simbrain/world/odorworld");
+    private static final Preferences THEPREFS = Preferences.userRoot().node(
+            "/org/simbrain/world/odorworld");
 
     /**
      * Save all user preferences.
@@ -32,45 +34,5 @@ public final class OdorWorldPreferences {
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Restore defaults.
-     */
-    public static void restoreDefaults() {
-        setCurrentDirectory(getDefaultCurrentDirectory());
-    }
-
-    //////////////////////////////////////////////////////////////////
-    // Getters and setters for user preferences                     //
-    // Note that default values for preferences are stored in the   //
-    // second argument of the getter method                         //
-    //////////////////////////////////////////////////////////////////
-
-    /**
-     * Sets the current directory where worlds are saved.
-     *
-     * @param dir Location to save worlds
-     */
-    public static void setCurrentDirectory(final String dir) {
-        THEPREFS.put("CurrentDirectory", dir);
-    }
-
-    /**
-     * Return the current directory.
-     *
-     * @return the current directory
-     */
-    public static String getCurrentDirectory() {
-        return THEPREFS.get("CurrentDirectory", getDefaultCurrentDirectory());
-    }
-
-    /**
-     * Return the default current directory.
-     *
-     * @return the default current directory
-     */
-    public static String getDefaultCurrentDirectory() {
-        return "." + FS + "simulations" + FS + "worlds";
     }
 }

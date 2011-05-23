@@ -24,10 +24,10 @@ import java.io.File;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.desktop.NetworkGuiPreferences;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspacePreferences;
 import org.simbrain.workspace.WorkspaceSerializer;
 
 /**
@@ -38,8 +38,7 @@ public final class OpenNetworkAction extends WorkspaceAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create an open network action with the specified
-     * workspace.
+     * Create an open network action with the specified workspace.
      *
      * @param workspace workspace, must not be null
      */
@@ -51,8 +50,10 @@ public final class OpenNetworkAction extends WorkspaceAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        SFileChooser chooser = new SFileChooser(NetworkGuiPreferences
-                .getCurrentDirectory(), "xml file", "xml");
+        SFileChooser chooser = new SFileChooser(
+                WorkspacePreferences
+                        .getCurrentDirectory(NetworkComponent.class),
+                "xml file", "xml");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
             NetworkComponent networkComponent = (NetworkComponent) WorkspaceSerializer

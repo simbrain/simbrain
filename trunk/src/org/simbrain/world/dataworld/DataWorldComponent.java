@@ -263,17 +263,6 @@ public class DataWorldComponent extends WorkspaceComponent {
         return new  DataWorldComponent(name,  model);
     }
 
-    @Override
-    public void setCurrentDirectory(final String currentDirectory) {
-        super.setCurrentDirectory(currentDirectory);
-        DataWorldPreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    @Override
-    public String getCurrentDirectory() {
-        return DataWorldPreferences.getCurrentDirectory();
-    }
-
     /**
      * Returns the data model for this component.
      *

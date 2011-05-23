@@ -28,19 +28,21 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
- * <b>CopyFactory</b> provides utilities for creating copies of arbitrary collections
- * of network objects (neurons, synapses, networks, groups, text objects, etc.)
+ * <b>CopyFactory</b> provides utilities for creating copies of arbitrary
+ * collections of network objects (neurons, synapses, networks, groups, text
+ * objects, etc.).
  */
 public class CopyFactory {
 
     /**
-     * Creates a copy of a list of network model elements:
-     *  neurons, synapses, networks, etc.
+     * Creates a copy of a list of network model elements: neurons, synapses,
+     * networks, etc.
      *
      * @param items the list of items to copy.
      * @return an arraylist of model elements.
      */
-    public static ArrayList<Object> getCopy(final RootNetwork newRoot, final ArrayList<Object> items) {
+    public static ArrayList<Object> getCopy(final RootNetwork newRoot,
+            final ArrayList<Object> items) {
         ArrayList<Object> ret = new ArrayList<Object>();
         // Match new to old neurons for synapse adding
         Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
@@ -63,9 +65,11 @@ public class CopyFactory {
                 Network oldNet = (Network) item;
                 Network newNet = oldNet.duplicate();
                 ret.add(newNet);
-                Iterator oldNeuronIterator = oldNet.getFlatNeuronList().iterator();
+                Iterator oldNeuronIterator = oldNet.getFlatNeuronList()
+                        .iterator();
                 for (Neuron newNeuron : newNet.getFlatNeuronList()) {
-                    neuronMappings.put((Neuron) oldNeuronIterator.next(), newNeuron);
+                    neuronMappings.put((Neuron) oldNeuronIterator.next(),
+                            newNeuron);
                 }
             }
         }
@@ -74,8 +78,9 @@ public class CopyFactory {
         for (Synapse synapse : synapses) {
             Synapse newSynapse = new Synapse(
                     (Neuron) neuronMappings.get(synapse.getSource()),
-                    (Neuron) neuronMappings.get(synapse.getTarget()), synapse
-                            .getLearningRule().deepCopy(), synapse);
+                    (Neuron) neuronMappings.get(synapse.getTarget()), 
+                    synapse.getLearningRule().deepCopy(), 
+                    synapse);
             ret.add(newSynapse);
         }
 
@@ -83,13 +88,14 @@ public class CopyFactory {
     }
 
     /**
-     * Reurns true if the neuron is contained in one of the listed networks.
+     * Returns true if the neuron is contained in one of the listed networks.
      *
      * @param allItems objects to check
      * @param toCheck neuron to check
      * @return true if the neuron to check is in the list of items
      */
-    private static boolean isPartOfNetwork(final ArrayList allItems, final Neuron toCheck) {
+    private static boolean isPartOfNetwork(final ArrayList allItems,
+            final Neuron toCheck) {
         for (Object object : allItems) {
             if (object instanceof Network) {
                 if (((Network) object).getFlatNeuronList().contains(toCheck)) {
@@ -101,14 +107,15 @@ public class CopyFactory {
     }
 
     /**
-     * Returns true if this synapse is not connected to two neurons
-     * (i.e. is "stranded"), false otherwise.
+     * Returns true if this synapse is not connected to two neurons (i.e. is
+     * "stranded"), false otherwise.
      *
      * @param allItems includes neurons to check
      * @param synapse synapse to check
      * @return true if this synapse is stranded, false otherwise
      */
-    private static boolean isStranded(final ArrayList allItems, final Synapse synapse) {
+    private static boolean isStranded(final ArrayList allItems,
+            final Synapse synapse) {
 
         // The list of checked neurons should include neurons in the list
         // as well as all neurons contained in networks in the list
@@ -121,7 +128,8 @@ public class CopyFactory {
             }
         }
 
-        if (check.contains(synapse.getSource()) && (check.contains(synapse.getTarget()))) {
+        if (check.contains(synapse.getSource())
+                && (check.contains(synapse.getTarget()))) {
             return false;
         }
         return true;

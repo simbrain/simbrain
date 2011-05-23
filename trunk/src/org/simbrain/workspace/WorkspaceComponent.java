@@ -88,18 +88,6 @@ public abstract class WorkspaceComponent {
     /** The name of this component. Used in the title, in saving, etc. */
     private String name = "";
 
-    /** Default current directory if it is not set elsewhere. */
-    private static final String DEFAULT_CURRENT_DIRECTORY = "."
-            + System.getProperty("file.separator");
-
-    /**
-     * Current directory. So when re-opening this type of component the app
-     * remembers where to look.
-     * <p>
-     * Subclasses can provide a default value using User Preferences.
-     */
-    private String currentDirectory = DEFAULT_CURRENT_DIRECTORY;
-
     /**
      * Current file. Used when "saving" a component. Subclasses can provide a
      * default value using User Preferences.
@@ -514,24 +502,6 @@ public abstract class WorkspaceComponent {
      */
     public boolean hasChangedSinceLastSave() {
         return changedSinceLastSave;
-    }
-
-    /**
-     * This should be overridden if there are user preferences to get.
-     *
-     * @return the currentDirectory
-     */
-    public String getCurrentDirectory() {
-        return currentDirectory;
-    }
-
-    /**
-     * This should be overridden if there are user preferences to set.
-     *
-     * @param currentDirectory the currentDirectory to set
-     */
-    public void setCurrentDirectory(final String currentDirectory) {
-        this.currentDirectory = currentDirectory;
     }
 
     /**

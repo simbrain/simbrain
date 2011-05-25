@@ -33,16 +33,26 @@ import org.simbrain.network.neurons.LinearNeuron;
  *
  * @author yoshimi
  */
-public class StandardNetwork extends Network {
+public class Standard extends Network {
 
     /** Initial number of neurons. */
     private int numNeurons = 5;
 
     /**
-     * Default connstructor.
+     * Default constructor.
      */
-    public StandardNetwork() {
+    public Standard() {
         super();
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param newRoot new root network
+     * @param oldNet old network.
+     */
+    public  Standard(RootNetwork newRoot,  Standard oldNet) {
+        super(newRoot, oldNet);
     }
 
     /**
@@ -50,7 +60,7 @@ public class StandardNetwork extends Network {
      *
      * @param root root network.
      */
-    public StandardNetwork(RootNetwork root) {
+    public Standard(RootNetwork root) {
         setRootNetwork(root);
     }
 
@@ -61,7 +71,7 @@ public class StandardNetwork extends Network {
      * @param layout how the units should be layed out.
      * @param root reference to RootNetwork.
      */
-    public StandardNetwork(final RootNetwork root, final int nUnits,
+    public Standard(final RootNetwork root, final int nUnits,
             final Layout layout) {
         super();
         this.setRootNetwork(root);
@@ -85,6 +95,8 @@ public class StandardNetwork extends Network {
     /**
      * Set delays on all synapses to this network.
      *
+     * TODO: Move to network?
+     *
      * @param newDelay the delay to set.
      */
     public void setDelays(final int newDelay) {
@@ -104,10 +116,4 @@ public class StandardNetwork extends Network {
         return numNeurons;
     }
 
-    @Override
-    public Network duplicate() {
-        StandardNetwork net = new StandardNetwork();
-        net = (StandardNetwork) super.duplicate(net);
-        return net;
-    }
 }

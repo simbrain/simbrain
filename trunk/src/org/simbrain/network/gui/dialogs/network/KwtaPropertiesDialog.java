@@ -22,7 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.actions.ShowHelpAction;
-import org.simbrain.network.networks.KwtaNetwork;
+import org.simbrain.network.networks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -38,7 +38,7 @@ public class KwtaPropertiesDialog extends StandardDialog {
     private JTextField kValue = new JTextField();
 
     /** The model subnetwork. */
-    private KwtaNetwork wta;
+    private KWTA wta;
 
     /** Help Button. */
     private JButton helpButton = new JButton("Help");
@@ -51,7 +51,7 @@ public class KwtaPropertiesDialog extends StandardDialog {
      *
      * @param wta WinnerTakeAll network being modified.
      */
-    public KwtaPropertiesDialog(final KwtaNetwork wta) {
+    public KwtaPropertiesDialog(final KWTA wta) {
         this.wta = wta;
         setTitle("Set KWta Properties");
         fillFieldValues();

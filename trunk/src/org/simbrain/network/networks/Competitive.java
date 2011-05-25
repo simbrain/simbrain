@@ -68,6 +68,21 @@ public class Competitive extends Network {
     }
 
     /**
+     * Copy constructor.
+     *
+     * @param newParent new root network
+     * @param oldNet old network.
+     */
+    public Competitive(RootNetwork newRoot, Competitive oldNet) {
+        super(newRoot, oldNet);
+        setEpsilon(oldNet.getEpsilon());
+        setLeakyEpsilon(oldNet.getLeakyEpsilon());
+        setLoseValue(oldNet.getLoseValue());
+        setWinValue(oldNet.getWinValue());
+        setNormalizeInputs(oldNet.getNormalizeInputs());
+    }
+
+    /**
      * Constructs a competitive network with specified number of neurons.
      *
      * @param numNeurons size of this network in neurons
@@ -328,18 +343,6 @@ public class Competitive extends Network {
      */
     public void setUseLeakyLearning(final boolean useLeakyLearning) {
         this.useLeakyLearning = useLeakyLearning;
-    }
-
-    /** @Override. */
-    public Network duplicate() {
-        Competitive net = new Competitive();
-        net = (Competitive) super.duplicate(net);
-        net.setEpsilon(epsilon);
-        net.setLeakyEpsilon(leakyEpsilon);
-        net.setLoseValue(loseValue);
-        net.setWinValue(winValue);
-        net.setNormalizeInputs(normalizeInputs);
-        return net;
     }
 
 }

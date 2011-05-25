@@ -6,7 +6,7 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.KwtaPropertiesDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.networks.KwtaNetwork;
+import org.simbrain.network.networks.KWTA;
 
 /**
  * <b>KwtaNetworkNode</b> takes care of initialization of a Kwta network.
@@ -23,7 +23,7 @@ public class KwtaNetworkNode extends SubnetworkNode {
      * @param y initial y position
      */
     public KwtaNetworkNode(final NetworkPanel networkPanel,
-                                     final KwtaNetwork network,
+                                     final KWTA network,
                                      final double x,
                                      final double y) {
 
@@ -59,8 +59,8 @@ public class KwtaNetworkNode extends SubnetworkNode {
     }
 
     /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
-    public KwtaNetwork getKwtaSubnetwork() {
-        return ((KwtaNetwork) getSubnetwork());
+    public KWTA getKwtaSubnetwork() {
+        return ((KWTA) getSubnetwork());
     }
 
     /** @inheritDoc org.simbrain.network.nodes.ScreenElement */

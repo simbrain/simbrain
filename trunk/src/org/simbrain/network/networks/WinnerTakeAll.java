@@ -53,6 +53,18 @@ public class WinnerTakeAll extends Network {
     }
 
     /**
+     * Copy constructor.
+     *
+     * @param newRoot new root net
+     * @param oldNet old network
+     */
+    public WinnerTakeAll(RootNetwork newRoot,  WinnerTakeAll oldNet) {
+        super(newRoot, oldNet);
+        setLoseValue(oldNet.getLoseValue());
+        setWinValue(oldNet.getWinValue());
+    }
+
+    /**
      * Creates a new winner take all network.
      *
      * @param numNeurons Number of neurons in new network
@@ -131,14 +143,5 @@ public class WinnerTakeAll extends Network {
      */
     public int getNumUnits() {
         return numUnits;
-    }
-
-    @Override
-    public Network duplicate() {
-        WinnerTakeAll net = new WinnerTakeAll();
-        net.setLoseValue(loseValue);
-        net.setWinValue(winValue);
-        net = (WinnerTakeAll) super.duplicate(net);
-        return net;
     }
 }

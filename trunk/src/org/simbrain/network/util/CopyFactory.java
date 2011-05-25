@@ -24,7 +24,6 @@ import java.util.Iterator;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
@@ -34,41 +33,50 @@ import org.simbrain.network.interfaces.Synapse;
  */
 public class CopyFactory {
 
+    // TODO: Add groups, text objects
+
     /**
      * Creates a copy of a list of network model elements: neurons, synapses,
-     * networks, etc.
+     * networks, and groups.
      *
+     * @param newParent parent network for these objects. May be a root network
+     *            or a subnetwork.
      * @param items the list of items to copy.
-     * @return an arraylist of model elements.
+     * @return the list of copied items.
      */
-    public static ArrayList<Object> getCopy(final RootNetwork newRoot,
-            final ArrayList<Object> items) {
+    public static ArrayList<?> getCopy(final Network newParent,
+            final ArrayList<?> items) {
+
         ArrayList<Object> ret = new ArrayList<Object>();
         // Match new to old neurons for synapse adding
-        Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
+        Hashtable<Neuron, Neuron> neuronMappings =
+            new Hashtable<Neuron, Neuron>();
         ArrayList<Synapse> synapses = new ArrayList<Synapse>();
 
-        // Copy neurons first
         for (Object item : items) {
             if (item instanceof Neuron) {
                 Neuron oldNeuron = ((Neuron) item);
-                if (!isPartOfNetwork(items, oldNeuron)) {
-                    Neuron newNeuron = new Neuron(newRoot, oldNeuron);
+                // Don't make direct copies of neurons inside a subnetwork. They
+                // will be copied (with the correct parent network) in the
+                // Network copy constructor.
+                if (!isContainedInANetwork(oldNeuron, items)) {
+                    Neuron newNeuron = new Neuron(newParent, oldNeuron);
                     ret.add(newNeuron);
                     neuronMappings.put(oldNeuron, newNeuron);
                 }
             } else if (item instanceof Synapse) {
-                if (!isStranded(items, (Synapse) item)) {
+                if (!isStranded((Synapse) item, items)) {
                     synapses.add((Synapse) item);
                 }
             } else if (item instanceof Network) {
                 Network oldNet = (Network) item;
-                Network newNet = oldNet.duplicate();
+                Network newNet = Network.newInstance(
+                        newParent.getRootNetwork(), oldNet);
                 ret.add(newNet);
-                Iterator oldNeuronIterator = oldNet.getFlatNeuronList()
+                Iterator<Neuron> oldNeuronIterator = oldNet.getFlatNeuronList()
                         .iterator();
                 for (Neuron newNeuron : newNet.getFlatNeuronList()) {
-                    neuronMappings.put((Neuron) oldNeuronIterator.next(),
+                    neuronMappings.put(oldNeuronIterator.next(),
                             newNeuron);
                 }
             }
@@ -76,11 +84,11 @@ public class CopyFactory {
 
         // Copy synapses
         for (Synapse synapse : synapses) {
+            // Parent network for the new synapses inherited from neurons
             Synapse newSynapse = new Synapse(
-                    (Neuron) neuronMappings.get(synapse.getSource()),
-                    (Neuron) neuronMappings.get(synapse.getTarget()), 
-                    synapse.getLearningRule().deepCopy(), 
-                    synapse);
+                    neuronMappings.get(synapse.getSource()),
+                    neuronMappings.get(synapse.getTarget()),
+                    synapse.getLearningRule().deepCopy(), synapse);
             ret.add(newSynapse);
         }
 
@@ -88,14 +96,15 @@ public class CopyFactory {
     }
 
     /**
-     * Returns true if the neuron is contained in one of the listed networks.
+     * Returns true if the neuron is contained in some subnetwork included in
+     * the list.
      *
-     * @param allItems objects to check
      * @param toCheck neuron to check
+     * @param allItems list of items, whose subnetworks should be checked
      * @return true if the neuron to check is in the list of items
      */
-    private static boolean isPartOfNetwork(final ArrayList allItems,
-            final Neuron toCheck) {
+    private static boolean isContainedInANetwork(final Neuron toCheck, 
+            final ArrayList<?> allItems) {
         for (Object object : allItems) {
             if (object instanceof Network) {
                 if (((Network) object).getFlatNeuronList().contains(toCheck)) {
@@ -110,12 +119,12 @@ public class CopyFactory {
      * Returns true if this synapse is not connected to two neurons (i.e. is
      * "stranded"), false otherwise.
      *
-     * @param allItems includes neurons to check
      * @param synapse synapse to check
+     * @param allItems includes neurons to check
      * @return true if this synapse is stranded, false otherwise
      */
-    private static boolean isStranded(final ArrayList allItems,
-            final Synapse synapse) {
+    private static boolean isStranded(final Synapse synapse,
+            final ArrayList<?> allItems) {
 
         // The list of checked neurons should include neurons in the list
         // as well as all neurons contained in networks in the list

@@ -29,7 +29,6 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.BinaryNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
-
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
  */
@@ -57,6 +56,17 @@ public class Hopfield extends Network {
      */
     public Hopfield() {
         super();
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param newRoot new root network
+     * @param oldNet old network.
+     */
+    public Hopfield(RootNetwork newRoot, Hopfield oldNet) {
+        super(newRoot, oldNet);
+        this.setUpdateOrder(oldNet.getUpdateOrder());
     }
 
     /**
@@ -181,11 +191,4 @@ public class Hopfield extends Network {
         this.updateOrder = updateOrder;
     }
 
-    @Override
-    public Network duplicate() {
-        Hopfield net = new Hopfield();
-        net = (Hopfield) super.duplicate(net);
-        net.setUpdateOrder(updateOrder);
-        return net;
-    }
 }

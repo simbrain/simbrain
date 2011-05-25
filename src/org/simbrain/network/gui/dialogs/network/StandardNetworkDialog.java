@@ -29,7 +29,7 @@ import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.networks.StandardNetwork;
+import org.simbrain.network.networks.Standard;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -77,7 +77,7 @@ public class StandardNetworkDialog extends StandardDialog {
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        StandardNetwork standard = new StandardNetwork(networkPanel.getRootNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
+        Standard standard = new Standard(networkPanel.getRootNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
         networkPanel.getRootNetwork().addNetwork(standard);
         networkPanel.repaint();
         super.closeDialogOk();
@@ -110,7 +110,7 @@ public class StandardNetworkDialog extends StandardDialog {
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        StandardNetwork st = new StandardNetwork();
+        Standard st = new Standard();
         tfNumNeurons.setText(Integer.toString(st.getNumNeurons()));
 
     }

@@ -5,7 +5,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.networks.StandardNetwork;
+import org.simbrain.network.networks.Standard;
 
 /**
  * <b>StandardNetworkNode</b> is the graphical representation of a standard network.
@@ -22,7 +22,7 @@ public class StandardNetworkNode extends SubnetworkNode {
      * @param y initial y position
      */
     public StandardNetworkNode(final NetworkPanel networkPanel,
-                                     final StandardNetwork subnetwork,
+                                     final Standard subnetwork,
                                      final double x,
                                      final double y) {
 

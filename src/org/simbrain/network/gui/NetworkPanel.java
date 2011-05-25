@@ -92,9 +92,9 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.networks.Competitive;
 import org.simbrain.network.networks.Hopfield;
-import org.simbrain.network.networks.KwtaNetwork;
+import org.simbrain.network.networks.KWTA;
 import org.simbrain.network.networks.SOM;
-import org.simbrain.network.networks.StandardNetwork;
+import org.simbrain.network.networks.Standard;
 import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.SimnetUtils;
@@ -1578,11 +1578,11 @@ public class NetworkPanel extends JPanel {
         } else if (subnetwork instanceof WinnerTakeAll) {
             ret = new WTANetworkNode(this, (WinnerTakeAll) subnetwork,
                     upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof StandardNetwork) {
-            ret = new StandardNetworkNode(this, (StandardNetwork) subnetwork,
+        } else if (subnetwork instanceof Standard) {
+            ret = new StandardNetworkNode(this, (Standard) subnetwork,
                     upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof KwtaNetwork) {
-            ret = new KwtaNetworkNode(this, (KwtaNetwork) subnetwork,
+        } else if (subnetwork instanceof KWTA) {
+            ret = new KwtaNetworkNode(this, (KWTA) subnetwork,
                     upperLeft.getX(), upperLeft.getY());
         }
         return ret;

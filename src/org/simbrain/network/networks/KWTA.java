@@ -36,7 +36,7 @@ import org.simbrain.network.neurons.PointNeuron;
  * Computational Explorations in Cognitive Neuroscience, p. 110. All page
  * references below are are to this book.
  */
-public class KwtaNetwork extends Network {
+public class KWTA extends Network {
 
     //TODO: Make q settable
     //      Add average based version 
@@ -59,7 +59,18 @@ public class KwtaNetwork extends Network {
     /**
      * Default constructor.
      */
-    public KwtaNetwork() {
+    public KWTA() {
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param newRoot new root network
+     * @param oldNet old network.
+     */
+    public KWTA(RootNetwork newRoot, KWTA oldNet) {
+        super(newRoot, oldNet);
+        setK(oldNet.getK());
     }
 
     /**
@@ -69,7 +80,7 @@ public class KwtaNetwork extends Network {
      * @param k for the number of Neurons in the Kwta Network.
      * @param root reference to RootNetwork.
      */
-    public KwtaNetwork(final RootNetwork root, final int k, final Layout layout) {
+    public KWTA(final RootNetwork root, final int k, final Layout layout) {
         super();
         this.setRootNetwork(root);
         for (int i = 0; i < k; i++) {
@@ -158,13 +169,5 @@ public class KwtaNetwork extends Network {
         } else {
             this.k = k;
         }
-    }
-
-    @Override
-    public Network duplicate() {
-        KwtaNetwork net = new KwtaNetwork();
-        net = (KwtaNetwork) super.duplicate(net);
-        net.setK(this.getK());
-        return net;
     }
 }

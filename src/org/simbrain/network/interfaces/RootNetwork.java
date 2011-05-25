@@ -808,18 +808,12 @@ public class RootNetwork extends Network {
 
     /**
      * Sets neurons to clamped values.
-     * 
+     *
      * @param clampNeurons Neurons to set
      */
     public void setClampNeurons(final boolean clampNeurons) {
         this.clampNeurons = clampNeurons;
         this.fireNeuronClampToggle();
-    }
-
-    @Override
-    public Network duplicate() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /**

@@ -23,6 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.networks.Competitive;
+import org.simbrain.network.networks.Hopfield;
+import org.simbrain.network.networks.KWTA;
+import org.simbrain.network.networks.SOM;
+import org.simbrain.network.networks.Standard;
+import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.network.util.CopyFactory;
 
 /**
@@ -84,6 +90,42 @@ public abstract class Network {
     }
 
     /**
+     * Copy the old network, using the supplied root network.
+     */
+    protected Network(final RootNetwork newRoot, final Network oldNetwork) {
+        this.rootNetwork = newRoot;
+        List<?> copy = CopyFactory.getCopy(this, oldNetwork.getObjectList());
+        addObjects(copy);
+    }
+
+    /**
+     * Make a copy of the provided network, using the provided root network as
+     * its root.
+     *
+     * @param newRoot the new root network
+     * @param oldNetwork the old network to copy
+     * @return the new copy of the network
+     */
+    public static Network newInstance(final RootNetwork newRoot,
+            final Network oldNetwork) {
+
+        if (oldNetwork instanceof Competitive) {
+            return new Competitive(newRoot, (Competitive) oldNetwork);
+        } else if (oldNetwork instanceof Hopfield) {
+            return new Hopfield(newRoot, (Hopfield) oldNetwork);
+        } else if (oldNetwork instanceof KWTA) {
+            return new KWTA(newRoot, (KWTA) oldNetwork);
+        } else if (oldNetwork instanceof SOM) {
+            return new SOM(newRoot, (SOM) oldNetwork);
+        } else if (oldNetwork instanceof Standard) {
+            return new Standard(newRoot, (Standard) oldNetwork);
+        } else if (oldNetwork instanceof WinnerTakeAll) {
+            return new WinnerTakeAll(newRoot, (WinnerTakeAll) oldNetwork);
+        }
+        return null;
+    }
+
+    /**
      * Update the network.
      */
     public abstract void update();
@@ -99,26 +141,6 @@ public abstract class Network {
   //          logger.debug("updating network: " + network);
             network.update();
         }
-    }
-
-    /**
-     * @return a duplicate network.
-     */
-    public abstract Network duplicate();
-
-
-    /**
-     * Finish creating a duplicate network.  This copies over most of the
-     * objects.  The subclass method takes care of type specific parameters.
-     *
-     * @param newNetwork the new network to finish duplicating.
-     * @return the new network to finish copying.
-     */
-    public Network duplicate(final Network newNetwork) {
-        newNetwork.setRootNetwork(this.getRootNetwork());
-        List<?> copy = CopyFactory.getCopy(this.getRootNetwork(), getObjectList());
-        newNetwork.addObjects(copy);
-        return newNetwork;
     }
 
     /**
@@ -766,7 +788,7 @@ public abstract class Network {
      *
      * @param src source neuron
      * @param tar target neuron
-     * 
+     *
      * @return synapse from source to target
      */
     public static Synapse getSynapse(final Neuron src, final Neuron tar) {

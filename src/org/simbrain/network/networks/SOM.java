@@ -124,6 +124,20 @@ public class SOM extends Network {
     }
 
     /**
+     * Copy constructor.
+     *
+     * @param newRoot new root net
+     * @param oldNet old network
+     */
+    public SOM(RootNetwork newRoot, SOM oldNet) {
+        super(newRoot, oldNet);
+        this.setAlphaDecayRate(oldNet.getAlphaDecayRate());
+        this.setInitAlpha(oldNet.getInitAlpha());
+        this.setNeighborhoodDecayAmount(oldNet.getNeighborhoodDecayAmount());
+        this.setInitNeighborhoodSize(oldNet.getInitNeighborhoodSize());
+    }
+
+    /**
      * Discovers the current index of the SOM neuron which is closest to the input vector.
      * @return winner
      */
@@ -583,12 +597,4 @@ public class SOM extends Network {
     public void setTrainingInputs(final double[][] trainingInputs) {
         this.trainingInputs = trainingInputs;
         }
-
-    @Override
-    public Network duplicate() {
-        SOM net = new SOM();
-        net = (SOM) super.duplicate(net);
-        return net;
-    }
-
 }

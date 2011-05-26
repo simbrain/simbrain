@@ -58,8 +58,8 @@ public final class AddTileSensorsAction
         if (resultString != null) {
             String[] parsedString = resultString.split(",");
             int rows = Integer.parseInt(parsedString[0]);
-            int cols = Integer.parseInt(parsedString[0]);
-            int offset = Integer.parseInt(parsedString[0]);
+            int cols = Integer.parseInt(parsedString[1]);
+            int offset = Integer.parseInt(parsedString[2]);
             entity.addTileSensors(rows, cols, offset);
         } else {
             return; // User pressed cancel

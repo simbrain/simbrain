@@ -368,8 +368,8 @@ public abstract class OdorWorldEntity {
         int tileHeight = parentWorld.getHeight() / numTilesY;
         for (int i = 0; i < numTilesX; i++) {
             for (int j = 0; j < numTilesY; j++) {
-                addSensor(new TileSensor(this, (i * tileWidth + offset), (j
-                        * tileHeight + offset), tileWidth, tileHeight));
+                addSensor(new TileSensor(this, ((i * tileWidth) + offset), 
+                        ((j * tileHeight) + offset), tileWidth, tileHeight));
             }
         }
     }

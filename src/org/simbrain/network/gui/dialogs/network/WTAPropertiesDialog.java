@@ -18,7 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.actions.ShowHelpAction;
@@ -27,7 +31,8 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a winner take all network.
+ * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a
+ * winner take all network.
  */
 public class WTAPropertiesDialog extends StandardDialog {
 
@@ -39,6 +44,12 @@ public class WTAPropertiesDialog extends StandardDialog {
 
     /** Loser value field. */
     private JTextField loserValue = new JTextField();
+
+    /** Checkbox for using random method. */
+    private JCheckBox useRandomBox = new JCheckBox();
+
+    /** Probability of using random field. */
+    private JTextField randomProb = new JTextField();
 
     /** The model subnetwork. */
     private WinnerTakeAll wta;
@@ -58,31 +69,46 @@ public class WTAPropertiesDialog extends StandardDialog {
         this.wta = wta;
         setTitle("Set WTA Properties");
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
+        this.setLocation(500, 0); // Sets location of network dialog
         helpAction.setTheURL("Network/network/winnerTakeAll.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);
         mainPanel.addItem("Winner Value", winnerValue);
         mainPanel.addItem("Loser Value", loserValue);
+        mainPanel.addItem("Set winner randomly (with some probability)", useRandomBox);
+        mainPanel.addItem("Probability of choosing a random winner", randomProb);
         setContentPane(mainPanel);
+
+        // Enable / disable random prob box based on state of use random
+        // checkbox
+        randomProb.setEnabled(useRandomBox.isSelected());
+        useRandomBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                randomProb.setEnabled(useRandomBox.isSelected());
+            }
+        });
     }
 
     /**
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      wta.setWinValue(Double.parseDouble(winnerValue.getText()));
-      wta.setLoseValue(Double.parseDouble(loserValue.getText()));
-      super.closeDialogOk();
+        wta.setWinValue(Double.parseDouble(winnerValue.getText()));
+        wta.setLoseValue(Double.parseDouble(loserValue.getText()));
+        wta.setUseRandom(useRandomBox.isSelected());
+        wta.setRandomProb(Double.parseDouble(randomProb.getText()));
+        super.closeDialogOk();
     }
 
     /**
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        loserValue = new JTextField("" + wta.getLoseValue());
-        winnerValue = new JTextField("" + wta.getWinValue());
+        loserValue.setText("" + wta.getLoseValue());
+        winnerValue.setText("" + wta.getWinValue());
+        useRandomBox.setSelected(wta.isUseRandom());
+        randomProb.setText("" + wta.getRandomProb());
     }
 
 }

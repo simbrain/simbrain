@@ -18,10 +18,13 @@
  */
 package org.simbrain.network.networks;
 
+import java.util.Random;
+
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.neurons.DecayNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 
 
@@ -44,6 +47,12 @@ public class WinnerTakeAll extends Network {
 
     /** Losing value. */
     private double loseValue = 0;
+
+    /** If true, sometimes set the winner randomly. */
+    private boolean useRandom;
+
+    /** Probability of setting the winner randomly, when useRandom is true. */
+    private double randomProb = .2;
 
     /**
      * Default constructor.
@@ -88,19 +97,19 @@ public class WinnerTakeAll extends Network {
             return;
         }
 
-        updateAllNeurons();
-
-        double max = Double.NEGATIVE_INFINITY;
-        int winnerIndex = 0;
-
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = (Neuron) getNeuronList().get(i);
-            if (n.getActivation() > max) {
-                max = n.getActivation();
-                winnerIndex = i;
+        // Determine the winning neuron
+        int winnerIndex;
+        if (useRandom) {
+            if (Math.random() < randomProb) {
+                winnerIndex = new Random().nextInt(getNeuronList().size());
+            } else {
+                winnerIndex = getWinningIndex();
             }
+        } else {
+            winnerIndex = getWinningIndex();
         }
 
+        // Set neuron values
         for (int i = 0; i < getNeuronList().size(); i++) {
             if (i == winnerIndex) {
                 ((Neuron) getNeuronList().get(i)).setActivation(winValue);
@@ -108,6 +117,23 @@ public class WinnerTakeAll extends Network {
                 ((Neuron) getNeuronList().get(i)).setActivation(loseValue);
             }
         }
+    }
+
+    /**
+     * Returns the index of the input node with the greatest net input.
+     *
+     * @return winning node's index
+     */
+    private int getWinningIndex() {
+        int winnerIndex = 0;
+        double max = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = (Neuron) getNeuronList().get(i);
+            if (n.getWeightedInputs() > max) {
+                winnerIndex = i;
+            }
+        }
+        return winnerIndex;
     }
 
     /**
@@ -143,5 +169,33 @@ public class WinnerTakeAll extends Network {
      */
     public int getNumUnits() {
         return numUnits;
+    }
+
+    /**
+     * @return the useRandom
+     */
+    public boolean isUseRandom() {
+        return useRandom;
+    }
+
+    /**
+     * @param useRandom the useRandom to set
+     */
+    public void setUseRandom(boolean useRandom) {
+        this.useRandom = useRandom;
+    }
+
+    /**
+     * @return the randomProb
+     */
+    public double getRandomProb() {
+        return randomProb;
+    }
+
+    /**
+     * @param randomProb the randomProb to set
+     */
+    public void setRandomProb(double randomProb) {
+        this.randomProb = randomProb;
     }
 }

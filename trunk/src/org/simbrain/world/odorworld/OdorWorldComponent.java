@@ -103,27 +103,55 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
             // X, Y Locations
             if (xLocationType.isVisible()) {
-                String description = entity.getName() + ":" + xLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, xLocationType, description));
+                String description = entity.getName() + ":"
+                        + xLocationType.getDescription();
+                returnList.add(getAttributeManager().createPotentialConsumer(
+                        entity, xLocationType, description));
             }
             if (yLocationType.isVisible()) {
-                String description = entity.getName() + ":" + yLocationType.getDescription();
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, yLocationType, description));
+                String description = entity.getName() + ":"
+                        + yLocationType.getDescription();
+                returnList.add(getAttributeManager().createPotentialConsumer(
+                        entity, yLocationType, description));
             }
 
             // Absolute movement
             if (absoluteMovementType.isVisible()) {
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveNorth", double.class, entity.getName() + ":goNorth"));
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveSouth", double.class, entity.getName() + ":goSouth"));
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveEast", double.class, entity.getName() + ":goEast"));
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, "moveWest", double.class, entity.getName() + ":goWest"));
+                returnList.add(getAttributeManager().createPotentialConsumer(
+                        entity, "moveNorth", double.class,
+                        entity.getName() + ":goNorth"));
+                returnList.add(getAttributeManager().createPotentialConsumer(
+                        entity, "moveSouth", double.class,
+                        entity.getName() + ":goSouth"));
+                returnList.add(getAttributeManager().createPotentialConsumer(
+                        entity, "moveEast", double.class,
+                        entity.getName() + ":goEast"));
+                returnList.add(getAttributeManager().createPotentialConsumer(
+                        entity, "moveWest", double.class,
+                        entity.getName() + ":goWest"));
             }
 
             // Turning and Going Straight
             if (entity instanceof RotatingEntity) {
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, "turnLeft", double.class, entity.getName() + ":turnLeft"));
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, "turnRight", double.class, entity.getName() + ":turnRight"));
-                returnList.add(getAttributeManager().createPotentialConsumer(entity, "goStraight", double.class, entity.getName() + ":goStraight"));
+                if (leftRotationType.isVisible()) {
+                    returnList.add(getAttributeManager()
+                            .createPotentialConsumer(entity, "turnLeft",
+                                    double.class,
+                                    entity.getName() + ":turnLeft"));
+                }
+                if (rightRotationType.isVisible()) {
+                    returnList.add(getAttributeManager()
+                            .createPotentialConsumer(entity, "turnRight",
+                                    double.class,
+                                    entity.getName() + ":turnRight"));
+                }
+                if (straightMovementType.isVisible()) {
+                    returnList.add(getAttributeManager()
+                            .createPotentialConsumer(entity, "goStraight",
+                                    double.class,
+                                    entity.getName() + ":goStraight"));
+                }
+
             }
         }
         return returnList;

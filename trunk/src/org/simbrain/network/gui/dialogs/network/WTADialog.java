@@ -18,6 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -63,6 +67,12 @@ public class WTADialog extends StandardDialog {
     /** Loser value field. */
     private JTextField loserValue = new JTextField();
 
+    /** Checkbox for using random method. */
+    private JCheckBox useRandomBox = new JCheckBox();
+
+    /** Probability of using random field. */
+    private JTextField randomProb = new JTextField();
+
     /** Network panel. */
     private NetworkPanel networkPanel;
 
@@ -86,6 +96,8 @@ public class WTADialog extends StandardDialog {
       WinnerTakeAll wta = new WinnerTakeAll(networkPanel.getRootNetwork(), Integer.parseInt(numberOfUnits.getText()), layout);
       wta.setWinValue(Double.parseDouble(winnerValue.getText()));
       wta.setLoseValue(Double.parseDouble(loserValue.getText()));
+      wta.setUseRandom(useRandomBox.isSelected());
+      wta.setRandomProb(Double.parseDouble(randomProb.getText()));
       networkPanel.getRootNetwork().addNetwork(wta);
       networkPanel.repaint();
       super.closeDialogOk();
@@ -104,6 +116,16 @@ public class WTADialog extends StandardDialog {
         logicPanel.addItem("Number of Units", numberOfUnits);
         logicPanel.addItem("Winner Value", winnerValue);
         logicPanel.addItem("Loser Value", loserValue);
+        logicPanel.addItem("Set winner randomly (with some probability)", useRandomBox);
+        logicPanel.addItem("Probability of choosing a random winner", randomProb);
+        // Enable / disable random prob box based on state of use random
+        // checkbox
+        randomProb.setEnabled(useRandomBox.isSelected());
+        useRandomBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                randomProb.setEnabled(useRandomBox.isSelected());
+            }
+        });
 
         //Set up tab panels
         tabLogic.add(logicPanel);
@@ -121,5 +143,7 @@ public class WTADialog extends StandardDialog {
         loserValue.setText(Double.toString(wta.getLoseValue()));
         numberOfUnits.setText(Integer.toString(wta.getNumUnits()));
         winnerValue.setText(Double.toString(wta.getWinValue()));
+        useRandomBox.setSelected(wta.isUseRandom());
+        randomProb.setText("" + wta.getRandomProb());
     }
 }

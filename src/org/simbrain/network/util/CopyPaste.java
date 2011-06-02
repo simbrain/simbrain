@@ -1,5 +1,5 @@
 /*
- * Part of Simbrain--a java-based neural network kit
+e * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,17 +23,16 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.NetworkTextObject;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
- * <b>CopyFactory</b> provides utilities for creating copies of arbitrary
+ * <b>CopyPaste</b> provides utilities for creating copies of arbitrary
  * collections of network objects (neurons, synapses, networks, groups, text
  * objects, etc.).
  */
-public class CopyFactory {
-
-    // TODO: Add groups, text objects
+public class CopyPaste {
 
     /**
      * Creates a copy of a list of network model elements: neurons, synapses,
@@ -79,6 +78,11 @@ public class CopyFactory {
                     neuronMappings.put(oldNeuronIterator.next(),
                             newNeuron);
                 }
+            } else if (item instanceof NetworkTextObject) {
+                NetworkTextObject text = ((NetworkTextObject) item);
+                NetworkTextObject newText = new NetworkTextObject(
+                        newParent.getRootNetwork(), text);
+                ret.add(newText);
             }
         }
 

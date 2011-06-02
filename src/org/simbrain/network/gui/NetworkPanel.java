@@ -1180,8 +1180,9 @@ public class NetworkPanel extends JPanel {
                 ret.add(((NeuronNode) e).getNeuron());
             } else if (e instanceof SynapseNode) {
                 ret.add(((SynapseNode) e).getSynapse());
-            }
-            if (e instanceof SubnetworkNode) {
+            } else if (e instanceof TextNode) {
+                ret.add(((TextNode)e).getTextObject());
+            } else if (e instanceof SubnetworkNode) {
                 ret.add(((SubnetworkNode) e).getSubnetwork());
             }
         }

@@ -22,6 +22,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.NetworkTextObject;
 import org.simbrain.network.interfaces.Neuron;
 
 /**
@@ -68,26 +69,4 @@ public class SimnetUtils {
         return new Point2D.Double(x, y);
     }
 
-    /**
-     * Translate a set of objects.
-     *
-     * @param objects list of network objects to translate
-     * @param offsetX x offset for translation.
-     * @param offsetY y offset for translation.
-     */
-    public static void translate(final ArrayList objects, final double offsetX, final double offsetY) {
-        for (Object object : objects) {
-            if (object instanceof Neuron) {
-                Neuron neuron = (Neuron) object;
-                neuron.setX(neuron.getX() + offsetX);
-                neuron.setY(neuron.getY() + offsetY);
-            }
-            if (object instanceof Network) {
-                for (Neuron neuron : ((Network) object).getFlatNeuronList()) {
-                    neuron.setX(neuron.getX() + offsetX);
-                    neuron.setY(neuron.getY() + offsetY);
-                }
-            }
-        }
-    }
 }

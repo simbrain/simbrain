@@ -45,7 +45,7 @@ public final class NewNeuronGroupAction
      */
     public NewNeuronGroupAction(final NetworkPanel networkPanel) {
 
-        super("New neuron group");
+        super("Neuron group");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("NetworkPanel must not be null");

@@ -85,6 +85,8 @@ import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
+import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
+import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -227,6 +229,12 @@ public final class NetworkActionManager {
 
     /** Show the connect neurons dialog. */
     private final Action showConnectDialogAction;
+
+    /** Create a neuron group. */
+    private final Action neuronGroupAction;
+
+    /** Create a synapse group. */
+    private final Action synapseGroupAction;
 
     /** Connection types. */
     private Action allToAll, allToAllSelf, fixedFanout, fixedFanoutSelf,
@@ -384,6 +392,9 @@ public final class NetworkActionManager {
         groupAction = new GroupAction(networkPanel);
         ungroupAction = new UngroupAction(networkPanel,
                 networkPanel.getViewGroupNode());
+
+        neuronGroupAction = new NewNeuronGroupAction(networkPanel);
+        synapseGroupAction = new NewSynapseGroupAction(networkPanel);
     }
 
     /**
@@ -459,6 +470,18 @@ public final class NetworkActionManager {
     public List<Action> getLayoutActions() {
         return Arrays.asList(new Action[] { gridLayout, hexagonalLayout,
                 lineLayout });
+    }
+
+    /**
+     * Returns a menu of model group actions.
+     *
+     * @return the group menu
+     */
+    public JMenu getGroupMenu() {
+        JMenu groupMenu = new JMenu("Group");
+        groupMenu.add(neuronGroupAction);
+        groupMenu.add(synapseGroupAction);
+        return groupMenu;
     }
 
     /**

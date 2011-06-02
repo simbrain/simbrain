@@ -312,14 +312,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.addSeparator();
 
         // Group action
-        contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
-        contextMenu.addSeparator();
+        //contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
+        //contextMenu.addSeparator();
 
-        // Model Group Action
-        JMenu groupMenu = new JMenu("Groups");
-        groupMenu.add(new NewNeuronGroupAction(getNetworkPanel()));
-        groupMenu.add(new NewSynapseGroupAction(getNetworkPanel()));
-        contextMenu.add(groupMenu);
+        // Model Group Actions
+        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
         contextMenu.addSeparator();
 
         // Add Connect Actions

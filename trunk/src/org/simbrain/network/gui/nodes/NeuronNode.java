@@ -344,20 +344,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        // View incoming weight action (TODO: Migrate to actions).
-        JMenuItem viewIncomingItem = new JMenuItem("View incoming weight(s)");
-        viewIncomingItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                for (Synapse synapse : neuron.getFanIn()) {
-                    Neuron sourceNeuron = synapse.getSource();
-                    sourceNeuron.setActivation(synapse.getStrength());
-                    neuron.getParentNetwork().getRootNetwork()
-                            .fireNeuronChanged(sourceNeuron);
-                }
-            }
-        });
-        contextMenu.add(viewIncomingItem);
-
+        // Selection options
+        JMenu nodeSelectionMenu = new JMenu("Select");
+        nodeSelectionMenu.add(getNetworkPanel().getActionManager()
+                .getSelectIncomingWeightsAction());
+        nodeSelectionMenu.add(getNetworkPanel().getActionManager()
+                .getSelectOutgoingWeightsAction());
+        contextMenu.add(nodeSelectionMenu);
         return contextMenu;
     }
 

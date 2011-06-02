@@ -133,6 +133,7 @@ public class WinnerTakeAll extends Network {
             Neuron n = (Neuron) getNeuronList().get(i);
             if (n.getWeightedInputs() > max) {
                 winnerIndex = i;
+                max = n.getWeightedInputs();
             }
         }
         return winnerIndex;

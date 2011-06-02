@@ -63,6 +63,22 @@ public class NetworkTextObject {
     }
 
     /**
+     * Copy constructor.
+     *
+     * @param newParent parent network for this text object
+     * @param text text object to copy
+     */
+    public NetworkTextObject(RootNetwork parent, NetworkTextObject text) {
+        this.parent = parent;
+        this.text = text.getText();
+        this.x = text.getX();
+        this.y = text.getY();
+        this.fontName = text.getFontName();
+        this.bold = text.isBold();
+        this.italic = text.isItalic();
+    }
+
+    /**
      * @return the x
      */
     public double getX() {

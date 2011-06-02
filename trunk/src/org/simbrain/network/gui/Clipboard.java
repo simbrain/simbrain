@@ -24,8 +24,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.interfaces.NetworkTextObject;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.util.CopyFactory;
+import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
 
 
@@ -73,11 +74,11 @@ public class Clipboard {
         }
 
         // Create a copy of the clipboard objects.
-        ArrayList copy = CopyFactory.getCopy(net.getRootNetwork(), clipboard);
+        ArrayList copy = CopyPaste.getCopy(net.getRootNetwork(), clipboard);
 
         // Gather data for translating the object then add the objects to the network.
         Point2D upperLeft = SimnetUtils.getUpperLeft(clipboard);
-        SimnetUtils.translate(copy, getPasteOffset(net, upperLeft,  "X"), getPasteOffset(net, upperLeft, "Y"));
+        translate(copy, getPasteOffset(net, upperLeft,  "X"), getPasteOffset(net, upperLeft, "Y"));
         net.getRootNetwork().addObjects(copy);
 
         // Select pasted items
@@ -99,6 +100,8 @@ public class Clipboard {
                 ret.add(net.findNeuronNode((Neuron) object));
             } else if (object instanceof Network) {
                 ret.add(net.findSubnetworkNode((Network) object));
+            } else if (object instanceof NetworkTextObject) {
+                ret.add(net.findTextNode((NetworkTextObject) object));
             }
         }
         return ret;
@@ -180,6 +183,32 @@ public class Clipboard {
         for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
             ClipboardListener listener = (ClipboardListener) i.next();
             listener.clipboardChanged();
+        }
+    }
+
+    /**
+     * Translate a set of objects.
+     *
+     * @param objects list of network objects to translate
+     * @param offsetX x offset for translation.
+     * @param offsetY y offset for translation.
+     */
+    public static void translate(final ArrayList objects, final double offsetX, final double offsetY) {
+        for (Object object : objects) {
+            if (object instanceof Neuron) {
+                Neuron neuron = (Neuron) object;
+                neuron.setX(neuron.getX() + offsetX);
+                neuron.setY(neuron.getY() + offsetY);
+            } else if (object instanceof Network) {
+                for (Neuron neuron : ((Network) object).getFlatNeuronList()) {
+                    neuron.setX(neuron.getX() + offsetX);
+                    neuron.setY(neuron.getY() + offsetY);
+                }
+            } else if (object instanceof NetworkTextObject) {
+                NetworkTextObject text = (NetworkTextObject) object;
+                text.setX(text.getX() + offsetX);
+                text.setY(text.getY() + offsetY);
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ import org.simbrain.network.networks.KWTA;
 import org.simbrain.network.networks.SOM;
 import org.simbrain.network.networks.Standard;
 import org.simbrain.network.networks.WinnerTakeAll;
-import org.simbrain.network.util.CopyFactory;
+import org.simbrain.network.util.CopyPaste;
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the main
@@ -94,7 +94,7 @@ public abstract class Network {
      */
     protected Network(final RootNetwork newRoot, final Network oldNetwork) {
         this.rootNetwork = newRoot;
-        List<?> copy = CopyFactory.getCopy(this, oldNetwork.getObjectList());
+        List<?> copy = CopyPaste.getCopy(this, oldNetwork.getObjectList());
         addObjects(copy);
     }
 
@@ -145,7 +145,7 @@ public abstract class Network {
 
     /**
      * Adds a list of network elements to this network.
-     * Used in copy paste and tuned to that usage.
+     * Used in copy paste.
      *
      * @param toAdd list of objects to add.
      */
@@ -160,6 +160,8 @@ public abstract class Network {
             } else if (object instanceof Network) {
                 Network net = (Network) object;
                 addNetwork(net);
+            } else if (object instanceof NetworkTextObject) {
+                this.getRootNetwork().addText((NetworkTextObject) object);
             }
         }
     }

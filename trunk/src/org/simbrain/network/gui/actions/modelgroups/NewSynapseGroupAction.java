@@ -45,7 +45,7 @@ public final class NewSynapseGroupAction
      */
     public NewSynapseGroupAction(final NetworkPanel networkPanel) {
 
-        super("New synapse group");
+        super("Synapse group");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("NetworkPanel must not be null");

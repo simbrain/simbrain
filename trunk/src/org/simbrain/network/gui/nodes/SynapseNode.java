@@ -332,6 +332,9 @@ public final class SynapseNode
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
+        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
+        contextMenu.addSeparator();
+
 //        Workspace workspace = getNetworkPanel().getWorkspace();
 //        if (workspace.getGaugeList().size() > 0) {
 //            contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));

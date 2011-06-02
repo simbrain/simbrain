@@ -52,7 +52,7 @@ public class WinnerTakeAll extends Network {
     private boolean useRandom;
 
     /** Probability of setting the winner randomly, when useRandom is true. */
-    private double randomProb = .2;
+    private double randomProb = .1;
 
     /**
      * Default constructor.
@@ -71,6 +71,8 @@ public class WinnerTakeAll extends Network {
         super(newRoot, oldNet);
         setLoseValue(oldNet.getLoseValue());
         setWinValue(oldNet.getWinValue());
+        setUseRandom(oldNet.isUseRandom());
+        setRandomProb(oldNet.getRandomProb());
     }
 
     /**

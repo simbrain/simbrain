@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
@@ -73,10 +72,10 @@ public class Sparse extends ConnectNeurons {
 
     /** @inheritDoc */
     public void connectNeurons() {
-        for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
-            Neuron source = (Neuron) i.next();
-            for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
-                Neuron target = (Neuron) j.next();
+        for (Neuron source : sourceNeurons) {
+
+            for (Neuron target : targetNeurons) {
+               
 
                 // Don't add a connection if there is already one present
                 //  TODO: Add option to turn this off?

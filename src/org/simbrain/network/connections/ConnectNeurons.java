@@ -49,7 +49,7 @@ public abstract class ConnectNeurons {
      * Holds "current" connection object. Used in Gui so that users can set a
      * current type (see parameter-free constructor below)then simply apply it.
      */
-    public static ConnectNeurons currentConnectionType = new AllToAll();
+    public static ConnectNeurons currentConnectionType = new Sparse();
 
     /**
      * Default constructor.

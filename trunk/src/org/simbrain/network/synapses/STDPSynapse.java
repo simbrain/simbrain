@@ -33,29 +33,41 @@ import org.simbrain.network.interfaces.SynapseUpdateRule;
  */
 public class STDPSynapse extends SynapseUpdateRule {
 
-    // TODO: Check all below.  I made this up! And elaborate..
-    // TODO: explain / code relation to time constant.
+    /** Default tau plus. */
+    private static final double TAU_PLUS_DEFAULT = 30;
+
+    /** Default tau minus. */
+    private static final double TAU_MINUS_DEFAULT = 60;
+
+    /** Default W plus. */
+    private static final double W_PLUS_DEFAULT = 10;
+
+    /** Default W - . */
+    private static final double W_MINUS_DEFAULT = 100;
+
+    /** Default Learning rate. */
+    private static final double LEARNING_RATE_DEFAULT = .01;
 
     /** Time constant for LTP case.*/
-    private double tau_plus = 30;
+    private double tau_plus = TAU_PLUS_DEFAULT;
 
     /** Time constant for LTD case. */
-    private double tau_minus = 60;
+    private double tau_minus = TAU_MINUS_DEFAULT;
 
     /**
      * Learning rate for LTP case. Can tweak this separately from W_minus to
      * allow more LTP than LTD
      */
-    private double W_plus = 10;
+    private double W_plus = W_PLUS_DEFAULT;
 
     /**
      * Learning rate for LTP case. Can tweak this separately from W_minus to
      * allow more LTP than LTD.   Default in paper is 100.
      */
-    private double W_minus = 100;
+    private double W_minus = W_MINUS_DEFAULT;
 
     /** General learning rate. */
-    private double learningRate = .001;
+    private double learningRate = LEARNING_RATE_DEFAULT;
 
 
     @Override
@@ -80,6 +92,7 @@ public class STDPSynapse extends SynapseUpdateRule {
 
     @Override
     public void update(Synapse synapse) {
+
         double delta_t, delta_w;
 
         boolean sourceSpiking = synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule;

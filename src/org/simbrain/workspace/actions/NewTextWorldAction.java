@@ -39,7 +39,7 @@ public final class NewTextWorldAction extends WorkspaceAction {
      * workspace.
      */
     public NewTextWorldAction(Workspace workspace) {
-        super("TextWorld", workspace);
+        super("TextWorld (Beta)", workspace);
         putValue(SHORT_DESCRIPTION, "New Text World");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }

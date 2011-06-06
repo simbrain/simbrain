@@ -403,6 +403,20 @@ public class OdorWorld {
             if (sprite.getY() < 0) {
                 sprite.setY(sprite.getY() + getHeight());
             }
+        } else {
+            // Not wrap-around
+            if (sprite.getX() >= getWidth()) {
+                sprite.setX(sprite.getX() - sprite.getWidth()/2);
+            }
+            if (sprite.getX() < 0) {
+                sprite.setX(sprite.getX() + sprite.getWidth()/2);
+            }
+            if (sprite.getY() >= getHeight()) {
+                sprite.setY(sprite.getY() - sprite.getHeight()/2);
+            }
+            if (sprite.getY() < 0) {
+                sprite.setY(sprite.getY() + sprite.getHeight()/2);
+            }
         }
 
         // Update creature

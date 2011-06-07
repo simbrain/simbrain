@@ -1,1 +1,137 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd"><html><head><title>Simbrain Documentation</title><link href="../Styles.css" rel="stylesheet" type="text/css" /><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head><body><a href='../SimbrainDocs.html'><div class="logo">	<p><span></span></p></div></a><div id="main_docs">	<div class="navi">	<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Network</p>	</div>	<div id="menu">		<p class="menubold">Contents</p>		  <blockquote>		    Basics <br />                <p>	            <a href="Network/quickref.html"> Quick reference</a>                <br>	            <a href="Network/buildingnets.html"> Build networks</a></p>		  Main Logical Elements<br />              <p>		    <a href="Network/neuron.html">Neurons</a><br />	          <a href="Network/network_op.html"> Network Operation</a><br />                <a href="Network/couplings.html"></a><a href="Network/couplings.html"></a><a href="Network/subnetwork.html">Subnetworks</a><br />                <a href="Network/synapse.html">Synapses</a>              </p>		  Other Logical Elements<br />		  <p>              <a href="Network/couplings.html">Couplings</a><br />              <a href="Network/noisegenerator.html">Noise Generator</a><br />              <a href="Network/common.html">Other Topics </a> <br />              <a href="Network/spikingnetworks.html">Spiking Networks</a><br />              <a href="Network/timing.html">Timing</a> <br />              <a href="Network/subnetwork.html"></a>            </p>		  GUI Elements<br />              <p>                <a href="Network/buildingnets.html">Building / Editing </a><br />                <a href="Network/menu.html">Keyboard & Menus</a><br />                <a href="Network/network_prefs.html">Preferences </a><br />                <a href="Network/toolbar.html">Toolbar</a>            </p>	  </blockquote>	</div>	<p>	<h1>Network</h1>		<p>Networks are built by creating neurons and connecting them with synapses. They are run by pressing the &quot;play&quot; or &quot;step&quot; buttons. (See the <a href="Network/quickref.html">quick reference</a>).</p>	<p>TODO: Describe new layout and connection functions, smart copy and paste, wand tool, scripting, update options, etc. </p>	<p>There are many varieties of <a href="Network/neuron.html">neurons</a> and <a href="Network/synapse.html">synapses</a>, each with their own rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called &quot;<a href="Network/subnetwork.html">subnetworks</a>&quot; which can be added to a simulation. Different subnetworks can be linked together, leading to even more complex and powerful simulations.</p>	<p>Shown below is a simple neural network. The colored circles with numbers in the middle represent simplified neurons or &quot;nodes.&quot; The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections. </p>	<p align="left"><img src="../Images/simple_net.gif" width="259" height="175"></p>	<p align="left">&nbsp;</p>	<p align="left"><a name="RunningNet"></a>When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user &quot;runs&quot; the network it comes to life--an <a href="Network/network_op.html">update algorithm</a> is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run by pressing pressing the   play button <img src="../Images/Play.gif" width="18" height="18"> in the tool-bar to repeatedly iterate the network. Note that the image on the button becomes that of a &quot;stop&quot; button <img src="../Images/Stop.gif" width="18" height="18">. Pressing this button will stop the network. Thus the play/stop button acts as a toggle switch. You can also press the step button <img src="../Images/Step.gif" width="18" height="18"> (or press &quot;space&quot;)  to iterate the network a single time. Sometimes repeatedly hitting the space bar is useful way to test a network.</p>  <blockquote>&nbsp;</blockquote>	  <p>&nbsp;</p></div></body></html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+<link href="../Styles.css" rel="stylesheet" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head><body>
+<a href="../SimbrainDocs.html">
+<div class="logo">
+	<p><span></span></p>
+</div></a>
+<div id="main_docs">
+	<div class="navi">
+	<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Network</p>
+	</div>
+	<div id="menu">
+		<p class="menubold">Contents</p>
+		  <blockquote>
+		    Main <br>
+                
+  <p>
+	            <a href="Network/quickref.html"> Quick reference</a>
+                <br>
+
+	          <a href="Network/network_op.html"> Network Updating</a><a href="Network/buildingnets.html"><br>
+Building / Editing </a><br>
+                <a href="Network/menu.html">Keyboard &amp; Menus</a><br>
+                <a href="Network/network_prefs.html">Preferences </a><br>
+                <a href="Network/toolbar.html">Toolbar</a>
+            </p>
+
+		  Main Components<br>
+              
+  <p>
+		    <a href="Network/neuron.html">Neurons</a><a href="Network/network_op.html"></a><a href="Network/subnetwork.html"></a><br>
+                <a href="Network/synapse.html">Synapses<br>
+
+                </a><a href="Network/subnetwork.html">Subnetworks</a><br>
+Groups<a href="Network/synapse.html"><br>
+  </a>
+              </p>
+
+		  Other Topics<br>
+		  <p>
+              <a href="Network/couplings.html">Couplings</a><br>
+              <a href="Network/noisegenerator.html">Noise Generator</a><br>
+              <a href="Network/common.html">Other Topics </a> <br>
+              <a href="Network/spikingnetworks.html">Spiking Networks</a><br>
+              <a href="Network/timing.html">Timing</a> 
+            </p>
+		  </blockquote>
+	</div>
+	<p>
+	</p><h1>Network</h1>
+	
+	<p>Networks
+are built by creating neurons and connecting them with synapses. They
+are run by pressing the "play" or "step" buttons. (See the <a href="Network/quickref.html">quick reference</a>).</p>
+	
+	<p>There are many varieties of <a href="Network/neuron.html">neurons</a> and <a href="Network/synapse.html">synapses</a>,
+each with their own rules and parameters. By combining these together
+you can create indefinitely many different kinds of networks. There are
+also special types of networks called "<a href="Network/subnetwork.html">subnetworks</a>"
+which can be added to a simulation. Different subnetworks can be linked
+together, leading to even more complex and powerful simulations.</p>
+	<p>Shown
+below is a simple neural network. The colored circles with numbers in
+the middle represent simplified neurons or "nodes." The lines between
+nodes represent synaptic connections between neurons which direct the
+flow of activity in the network. The smaller blue and red discs at the
+ends of these lines represent synaptic connections. </p>
+	<p align="left"><img src="../Images/simple_net.gif" height="175" width="259"></p>
+	<p align="left">&nbsp;</p>
+	<p align="left"><a name="RunningNet"></a>When
+Simbrain is first opened nothing happens. A sample network sits
+passively before the user. When the user "runs" the network it comes to
+life--an <a href="Network/network_op.html">update algorithm</a> is
+repeatedly called, which is visible in the form of spreading activity
+in network's nodes and (if learning is activated) changing weight
+sizes. The network can be run by pressing pressing the play button <img src="../Images/Play.gif" height="18" width="18"> in the tool-bar to repeatedly iterate the network. Note that the image on the button becomes that of a "stop" button <img src="../Images/Stop.gif" height="18" width="18">.
+Pressing this button will stop the network. Thus the play/stop button
+acts as a toggle switch. You can also press the step button <img src="../Images/Step.gif" height="18" width="18">
+(or press "space") to iterate the network a single time. Sometimes
+repeatedly hitting the space bar is useful way to test a network.</p>
+  <blockquote>
+    <p>Quick reference for meanings of colors, etc. </p>
+    <p>&nbsp;</p>
+    <p><strong>Zero neuron </strong>: a neuron with a value of 0 represents a <em>non-</em>active
+neuron, which is either not firing or is firing at a very low rate. In
+terms of voltages, this can be thought of as a neuron which is at its <em>resting potential</em>,
+that is, which has its baseline electrical charge, which is actually
+typically around -70mV (millivolts). In Simbrain this corresponds to
+the color 0. </p>
+    <p><strong>Positive activation</strong>: a
+neuron with positive activation can be thought of as firing at above
+its normal rate. In terms of voltages, this can be thought of as a
+neuron which is <em>above</em> its resting potential, e.g. -50mV. Such
+a neuron is sometimes said to be "excited" or "depolarized." In
+Simbrain this corresponds to a shade of red by default. </p>
+    <p><strong>Negative activation</strong>:
+it is hard to say what a neuron with negative activation corresponds to
+in terms of firing rates. In terms of voltages, this can be thought of
+as a neuron which is <em>below</em> its resting potential, e.g. -50mV.
+Such a neuron is sometimes said to be "inhibited" or "hyperpolarized."
+In Simbrain this corresponds to a shade of blue by default. </p>
+    <p><strong>Excitatory synapse</strong>:
+a weight with a positive value corresponds to an excitatory synapse.
+When these synapses are activated the post-synaptic neuron is <em>more</em>
+likely to fire, they "heat things up," as it were. An excitatory
+synapse is one which releases excitatory neurotransmitters, which bind
+to channels post-synaptically which cause currents that lead to an
+increase in the post-synaptic voltage potential. AMPA synapses are a
+common type of excitatory synapse. Excitatory synapses are shown as red
+discs in Simbrain. </p>
+    <p><strong>Inhibitory synapse</strong>: a
+weight with a negative value corresponds to an inhibitory synapse. When
+these synapses are activated the post-synaptic neuron is <em>less</em>
+likely to fire, they "cool things down," as it were. An inhibitory
+synapse is one which releases inhibitory neurotransmitters, which bind
+to channels post-synaptically which cause currents that lead to a
+decrease in the post-synaptic voltage potential. GABA synapses are a
+common type of inhibitory synapse. Inhibitory synapses are shown as
+blue discs in Simbrain.</p>
+    <p><strong>Zero synapse</strong>: a weight with a value of 0 is a way of mathematically representing the <em>absence of</em> a connection. In Simbrain this is currently represented as blue, inhibitory. </p>
+    <p><strong>Net input </strong>:
+the net input to a neuron represents, roughly, the summation of
+excitatory and inhibitory signals, from excitatory and inhibitory
+synapses, at the cell body. </p>
+    <p><strong>Bias</strong>: the bias of a neuron can be thought as its base-line firing rate or its resting potential.</p>
+    <p><strong>Clipping / Upper and Lower Bounds</strong>: There are upper and lower limits on the firing rate (in hertz) or voltage potential (in mV) of a neuron.</p>
+    <p>&nbsp; </p>
+  </blockquote>
+	  <p>&nbsp;</p>
+</div>
+</body></html>

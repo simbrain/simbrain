@@ -1,1 +1,108 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd"><html><head><title>Simbrain Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><link href="../Styles.css" rel="stylesheet" type="text/css"></head><body><a href="../SimbrainDocs.html"><div class="logo">  <p><span></span></p></div></a><div id="main_docs">  <div class="navi">    <p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Workspace</p>  </div>  <div id="menu">	  <p class="menubold">Contents</p>	    <blockquote>		  <p>		    Bottom  Pane <br />		    Command line<br />		    Coupling Manager <br />		    Menus<br />	      Toolbar<br>	      Scripts		  		  <p>&nbsp;</p>	    </blockquote>  </div> <P> <h1>Workspace</h1> <P>The Simbrain workspace is the framework within which a simulation is run. It contains components which are coupled to one another, and tools for managing these interactions.</P> <P>In the GUI, the workspace is visible as the Simbrain desktop. </P> <P>The overall design is (1) a list of components, (2) a list of couplings and a coupling manager for managing interactions between componetns, (3) an updator for managing simulation update. </P> <P>Most windows in Simbrain and workspace components, which are wrappers around other objects, which are designed to exist in a workspace. For you the user, this mainly means attributes (for couplings). Couplings tie these objects together via attributes. Attributes are the &quot;hooks&quot; or &quot;anchor points&quot; that make up couplings. Attributes produce data, and consume data. A coupling consists of one producer and one consumer. For example, a simulation might involve coupling neurons whose neurons are producers to a bar chart whose bars are consumers (to see this, try bar chart test in the script menu). </P> <P><img src="../Images/WorkspaceLarge.png" width="600" height="370"></P> <h2 class="heading"> Components </h2><p>&nbsp;</p><p>Adding components: To add components press the relevant button on the toolbar, or use the Insert menu.</p><p>Saving / Opening: Use the save, open buttons and the File menu. </p><p>All open components are shown in the  Components tab of the bottom information pane. </p><h2 class="heading">Adding Couplings </h2> <p>&nbsp;</p><p>A coupling is a link from an object in one component to an object in another component (or the same component). A producer produces values that are read by a consumer.</p><p>A list of all current couplings is shown in the Coupligns tab of the bottom information pane. </p><p>To create couplings:</p><ol>  <li>Use the coupling manager window. </li>  <li>Use the general coupling menu item </li>  <li>Use the coupling popup menus </li></ol><h2 class="heading">Running a simulation </h2> <p>&nbsp;</p> <p>Press the iterate and play buttons in the main toolbar. </p> <p>In a terminal component, or in the terminal tab of the bottom information pane, use workspace.iterate(N), where N is the number of iterations to iterate. </p> <h2 class="heading">&nbsp;</h2></div></body></html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Workspace</p>
+  </div>
+  <div id="menu">
+	  <p class="menubold">Contents</p>
+	    <blockquote>
+		  <p>
+		    Bottom  Pane <br>
+		    Command line<br>
+		    Coupling Manager <br>
+		    Menus<br>
+	      Toolbar<br>
+	      Scripts
+		  
+		  </p><p>&nbsp;</p>
+	    </blockquote>
+  </div>
+ <p>
+ </p><h1>Workspace</h1>
+ 
+ <p>The Simbrain <span style="font-weight: bold;">workspace</span>
+is the framework within which a simulation is run. It contains
+components which are coupled to one another, and tools for managing
+these interactions.&nbsp; In the GUI, the workspace is visible as the
+Simbrain <span style="font-weight: bold;">desktop</span>. </p>
+ <p>The
+workspace&nbsp; is responsible for (1) maintaining a list of
+components, (2) a list of couplings and a coupling manager for managing
+interactions between componetns, (3) an updator for managing simulation
+update. </p><br>
+<p><img src="../Images/WorkspaceLarge.png" height="370" width="600"></p>
+ <h2 class="heading"> Components </h2>
+<p>&nbsp;</p>
+<p>Adding components: To add components press the relevant button on the toolbar, or use the Insert menu.</p>
+<p>Saving / Opening: Use the save, open buttons and the File menu. </p>
+<p>All open components are shown in the  Components tab of the bottom information pane. </p>
+<h2 class="heading">Adding Couplings </h2>
+ <p>&nbsp;</p>
+<p>A coupling is a link from an object in an <span style="font-weight: bold;">attribute</span> of an object in another component (or the same component). A producer produces values that are read by a consumer.</p>
+<p>A list of all current couplings is shown in the Coupligns tab of the bottom information pane. </p>
+<p>To create couplings:</p>
+<ol>
+  <li>Use the coupling manager window. </li>
+  <li>Use the general coupling menu item </li>
+  <li>Use the right click popup menus within components (Network, Dataworld)<br>
+ </li>
+</ol>
+<h2 class="heading">Running a simulation </h2>
+ <p>&nbsp;</p>
+ <p>Press the iterate and play buttons in the main toolbar. </p>
+ <p>In
+a terminal component, or in the terminal tab of the bottom information
+pane, use workspace.iterate(N), where N is the number of iterations to
+iterate. <br>
+</p>
+<h2 class="heading">Menus </h2>
+
+ 
+<p>&nbsp;</p>
+<span style="font-weight: bold;">File<br>
+</span>
+<p>Open workspace: open a workspace from a stored .zip file.<br>
+</p>
+<p>Save workspace: save the current workspace.<br>
+</p>
+<p>Save workspace as: save the current workspace and specify a name for the file.<br>
+</p>
+<p>Clear workspace: remove all components and couplings from current workspace, and remove any additional windows from the desktop.<br>
+</p>
+<p>Open network:Open a stored network from an .xml file.<br>
+</p>
+<p>Open world &gt; Data world: Open a stored table ("data world") from an .xml file.</p>
+<p>Open world &gt; Odor world:Open a stored "odor" world from an .xml file.</p>
+<p>Workspace Properties: open workspace properties dialog.&nbsp; <br>
+</p>
+<span style="font-weight: bold;"></span><span style="font-weight: bold;">View<br>
+Insert<br>
+Scripts<br>
+Couplings</span><span style="font-weight: bold;"><br>
+Help<br>
+</span>
+<p>Open this help page.<span style="font-weight: bold;"> </span></p>
+
+
+<h2><span style="font-weight: bold;"><span class="heading">Dialogs</span></span></h2>
+<h2><span style="font-weight: bold;"></span></h2>
+<span style="font-weight: bold;">Workspace Properties Dialog<br>
+</span>
+<p>Simulation delay: use this to slow down a simulation, by specifying
+a number of milliseconds to sleep between workspace iterations.&nbsp;
+The default is 0, so that the workspace runs at its maximum speed.&nbsp;<span style="font-weight: bold;"> </span></p>
+<p><span style="font-weight: bold;"></span></p>
+<br>
+
+</div>
+</body></html>

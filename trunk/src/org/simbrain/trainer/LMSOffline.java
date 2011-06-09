@@ -28,6 +28,7 @@ import java.util.List;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.util.Matrices;
 
 import Jama.Matrix;
 
@@ -56,7 +57,7 @@ public class LMSOffline extends Trainer {
      */
     private double[][] stateMatrix;
 
-    public LMSOffline(RootNetwork network, List inputList) {
+    public LMSOffline(RootNetwork network, List<? extends Neuron> inputList) {
         super(network);
         inputLayers = new ArrayList<List<? extends Neuron>>();
         inputLayers.add(inputList); //Curently bypassing superclass getInputLayer()
@@ -65,11 +66,20 @@ public class LMSOffline extends Trainer {
     @Override
     public double train(int iteration) {
         stateCollection();
-        // TODO: Create option to use moore-penrose pseudoinverse instead of
-        // weiner-hopf
-        setWOut(weinerHopfSolution());
         // TODO: return rmsError. Create separate testing set?
         return 0.0;
+    }
+    
+    public void train(String solutionType){
+    	train(1);
+    	if(solutionType.matches("WeinerHopf")){
+    		setWOut(weinerHopfSolution());
+    	}else if(solutionType.matches("MoorePenrose")){
+    		setWOut(moorePenroseSolution());
+    	}else{
+    		throw new IllegalArgumentException("Solution type must be " +
+    				"'MoorePenrose' or 'WeinerHopf'.");
+    	}
     }
 
     @Override
@@ -191,6 +201,20 @@ public class LMSOffline extends Trainer {
 
         return wOut;
     }
+    
+    public double [][] moorePenroseSolution(){
+    	Matrix S = new Matrix(stateMatrix);
+    	Matrix D = new Matrix(getTrainingData());
+    	
+    	//Computes Moore-Penrose Pseudoinverse
+    	S = Matrices.pinv(S);
+    	
+    	double [][] wOut = S.times(D).transpose().getArray();
+    	S = null;
+    	D = null;
+    	
+    	return wOut;
+    }
 
     /**
      * @param wOut
@@ -261,12 +285,12 @@ public class LMSOffline extends Trainer {
         trainer.setTrainingData(trainingData);
         trainer.setInputLayer(inputList);
         trainer.setOutputLayer(outputList);
-        trainer.train(1);
+        trainer.train("MoorePenrose");
 
         //System.out.println(network);
 
         // Write to file
-        String FILE_OUTPUT_LOCATION = "./";
+        String FILE_OUTPUT_LOCATION = "~";
         File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
         try {
             RootNetwork.getXStream().toXML(network,

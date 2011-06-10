@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+  
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Scripting</p>
+</div>
+<p> </p>
+<h1>Scripting</h1>
+<br>
+<p>To produce custom simulations or behaviors not possible using the Simbrain GUI, you can
+either create scripts.</p>
+<p>All scripts are currently <a href="http://www.beanshell.org/docs.html">beanshell</a>
+scripts (there is nothing to prevent other scripting languages, but
+none have been implemented yet). See http://www.beanshell.org/docs.html</p>
+
+<p>The best way to get a feel for scripting is to have a look at a few
+scripts.&nbsp;&nbsp; Try opening a few in the scriptmenu directory, and
+also running them, to see how to do things.&nbsp;&nbsp; Try modifying
+them in simple ways (e.g. modifying the paramters at the top) and
+re-running them.&nbsp; An example is sample-barchart.bsh.<br>
+</p>
+<p>All public objects in the Simbrain code can be accessed via these
+scripts.&nbsp;&nbsp; In most cases, the scripts by default have access
+to two variables:</p>
+
+<p style="margin-left: 40px;"><span style="text-decoration: underline;">workspace</span>: the underlying model of all components in simbrain</p>
+<p style="margin-left: 40px;"><span style="text-decoration: underline;">desktop</span>: the graphical object which displays a workspace.</p>
+<p>Often you will provide some code get access to an object and themodify those objects.<br>
+</p>
+<p>
+The syntax for these scripts is java (with some modifications).&nbsp;
+In each case some base object is made available that you can modify
+using java commands. The best way to learn how to write these scripts
+is probably to just look (and modify)&nbsp; existing scripts. <br>
+</p>
+
+<p>You can interact with scripts in different ways.</p>
+
+<p><span class="heading">From Menus</span></p>
+<p>One way to use a script is to edit it directly with a&nbsp; text
+editor (Eclipse and other editors can have java syntax coloring
+enabled), and then to invoke the script from the Simbrain
+Gui.&nbsp;&nbsp; In most cases there are <br>
+</p>
+<p>The {Simbrain}/script directory and its subdirectories contains
+beanshell scripts.&nbsp; You are encouraged to add your own
+scripts.&nbsp; This is your entry point for customizing Simbrain.<br>
+<br>
+</p>
+<div style="margin-left: 40px;"><span class="heading2">Scriptmenu</span>:
+Scripts in ./scriptmenu automatically appear in the "scripts" menu of
+the Simbrain workspace.&nbsp;&nbsp; Use this directory to create
+actions that run custom simulations.&nbsp; The two objects available
+here are "<span style="font-weight: bold;">workspace</span>" and "<span style="font-weight: bold;">desktop</span>", which give access to the
+current org.simbrain.workspace.Workspace object, and the gui
+representation via an org.simbrain.workspace.gui.SimbrainDesktop object.<br>
+<br>
+<span class="heading2">Network</span>: Scripts in ./network&nbsp;
+automatically appear in the "scripts" menu of Simbrain network
+components&nbsp;&nbsp; Use this directory to create custom actions that
+can be applied to a current network (e.g., methods of adding neurons,
+modifying neurons or synapses, etc.)&nbsp; The two objects available
+here are "network" and "networkPanel."&nbsp; These give access to the
+current org.simbrain.network.interfaces.Rootnetwork and its gui
+representation via an org.simbrain.network.gui.NetworkPanel.<br>
+<br>
+<span class="heading2">Console</span>: scripts in ./console are
+available from the Simbrain console (from which command line arguments
+can be issued) or terminal components. The objects available here are
+the same as with scriptmenu.</div>
+<p><span class="heading"><br>
+</span></p>
+<p><span class="heading">In the Console</span></p>
+<p>Beanshell commands can also be invoked in real-time from the command
+line, which is available in special console windows or in a tab of the command window at the bottom of the simbrain desktop.</p>
+<p>The console can be useful to quickly test or debug Simbrain. For a
+sense of some things you can do in the console enter "help(); or
+"tips();".<br>
+</p>
+<p>The console is similar to a UNIX or DOS terminal window.&nbsp; You
+can navigate around the file system using commands like "cd();"</p>
+<p>To run a script from the console, using the source command, e.g.&nbsp;<span class="command">source("sparseNetwork.bsh");&nbsp;  </span> <br>
+</p>
+<p><br>
+</p>
+<p><span class="heading">Problems in Beanshell<br>
+</span></p><br>
+<p>Can't use 2d arrays<br>
+Can't use generics.</p>
+<p><br>
+</p>
+<p><span class="heading">Editing Beanshell Scripts</span></p>
+<p>In Eclipse, to get the syntax coloring, try Prefs &gt; Editors &gt; File associations &gt; add .bsh &gt; java editor<br>
+</p>
+<br>
+<p><span class="heading">Example</span></p>
+
+<p>Here is an example of a simpel script to create a few neurons conneted by a synapse.&nbsp;&nbsp; Again, have a look <br>
+</p>
+<p style="margin-left: 40px;" class="command"><br>
+</p>
+<p style="margin-left: 40px;" class="command">import org.simbrain.network.NetworkComponent;<br>
+import org.simbrain.network.connections.*;<br>
+import org.simbrain.network.interfaces.*;<br>
+import org.simbrain.network.layouts.*;<br>
+import org.simbrain.network.networks.*;<br>
+import org.simbrain.network.neurons.*;<br>
+import org.simbrain.network.synapses.*;<br>
+import org.simbrain.workspace.*;<br>
+<br>
+{<br>
+&nbsp;&nbsp;&nbsp; NetworkComponent networkComponent = new NetworkComponent("Test Network");<br>
+&nbsp;&nbsp;&nbsp; workspace.addWorkspaceComponent(networkComponent);<br>
+&nbsp;&nbsp;&nbsp; RootNetwork network = networkComponent.getRootNetwork();<br>
+<br>
+&nbsp;&nbsp;&nbsp; Neuron neuron1 = new Neuron(network, "SpikingThresholdNeuron");<br>
+&nbsp;&nbsp;&nbsp; neuron1.setLocation(2,2);<br>
+&nbsp;&nbsp;&nbsp; network.addNeuron(neuron1);<br>
+<br>
+&nbsp;&nbsp;&nbsp; Neuron neuron2 = new Neuron(network, "SpikingThresholdNeuron");<br>
+&nbsp;&nbsp;&nbsp; neuron2.setLocation(50,2);<br>
+&nbsp;&nbsp;&nbsp; network.addNeuron(neuron2);<br>
+<br>
+&nbsp;&nbsp;&nbsp; network.addSynapse(new ClampedSynapse(neuron1, neuron2));<br>
+<br>
+&nbsp;&nbsp;&nbsp; // Make sure the neurons lay out correct<br>
+&nbsp;&nbsp;&nbsp; desktop.getDesktopComponent(networkComponent).postAddInit();<br>
+<br>
+}<br>
+</p>
+
+
+<span style="font-weight: bold;"></span>
+</div>
+
+</body></html>

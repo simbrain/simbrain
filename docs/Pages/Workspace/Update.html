@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Workspace.html">Workspace</a> &gt; Update</p>
+  </div>
+  <p>
+  </p><h1>Update</h1><br>
+<p>Simbrain update is complex.&nbsp; Under the hood, there is an
+updator that manages workspace updates.&nbsp; The updator allows you to
+configure the system in various ways, and automatically takes advantage
+of multiple processors. </p>
+
+<p>The default update updates each component, then couplings.&nbsp; This in turn can happen in several ways.</p>
+
+<p style="margin-left: 40px;"><span class="heading2">Buffered:</span>&nbsp;update order does not matter. The default sequence of events is: <br>
+&nbsp;&nbsp;&nbsp; - update component 1 <br>
+
+&nbsp;&nbsp;&nbsp; - update component 2, ...<br>
+&nbsp;&nbsp;&nbsp; - update component n<br>
+&nbsp;&nbsp;&nbsp; - update couplings (uses a buffer so that update order does not matter)<br>
+
+
+</p>
+
+
+<p style="margin-left: 40px;"><span class="heading2">Priority:</span>&nbsp;update order does matter.&nbsp; When you need things updated in a particular sequence.</p>
+
+<p>One thing you can do is customize how the workspace is updated.
+&nbsp; This can&nbsp; be done by running a script which installs a
+custom "updater".&nbsp;&nbsp;&nbsp; I have added an example which shows
+how this is done in the&nbsp; scriptmenu.&nbsp;&nbsp; If you run the
+script "customUpdateExample.bsh", you will notice that the network's
+synapses are randomized every time the workspace is updated. <br>
+</p>
+
+<p><br>
+<span style="text-decoration: underline;">Updator tab</span>: Can specify one or more threads.&nbsp; It defaults to the number of available processors which can be changed.<br>
+<br>
+<span style="text-decoration: underline;">Custom update</span>: users
+can create their own updators.&nbsp; In a script, just create an instance of
+the ... and call workspace.setUpdator.&nbsp; See scripting.</p>
+</div>
+</body></html>

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Workspace.html">Workspace</a> &gt; Couplings</p>
+  </div>
+  <p>
+  </p><h1>Couplings</h1><br>
+<p>A coupling is a link from an object in an attribute of an object in
+another component (or the same component). A producer produces values
+that are read by a consumer.</p>
+
+<p>A list of all current couplings is shown in the Coupligns tab of the bottom information pane.</p>
+<p>Most windows in Simbrain and workspace components, which are
+wrappers around other objects, which are designed to exist in a
+workspace.&nbsp; This mainly means attributes (for couplings).
+Couplings tie these objects together via attributes. Attributes are the
+"hooks" or "anchor points" that make up couplings. There are two kinds,
+producing and consuming, which spit out and gobble up numbers
+(currently; may be abstracted to more general datatypes).&nbsp; So, the
+workspace can be thought of as a bunch of things that spit out numbers
+and read them in. Making a simulation amounts to making number
+spitter-outers and number-readers.&nbsp; For example, a simulation
+might involve coupling neurons whose neurons are producers to a bar
+chart whose bars are consumers (to see this, try bar chart test in the
+script menu).</p>
+<p><br>
+</p>
+
+
+
+
+<p><span class="heading"><a name="Attributes"></a>Attributes</span></p>
+<p>An attribute is generic term for a producer or consumer, something that produces values or consumes values.</p>
+<p>Examples are neuron activations, weight strengths, or bars on a bar chart, or sensor values for an agent in a virtual world.</p>
+<p>They are the parts of a coupling, attachments points in the
+simulation environment that can be connected together in the broader
+simulation.</p>
+<p><br>
+</p>
+<p><span class="heading">Coupling Creation</span><br>
+</p>
+<p>There are a few different ways to create couplings.<br>
+</p>
+<p>1. Use the coupling manager. To open this press the coupling manager
+button on the Simbrain toolbar. This allows you to view every coupling
+in the workspace. Here is a screenshot of the current coupling manager.
+The current design is based on a mode where each component has its own
+list of &#8220;bound couplings.&#8221; &nbsp;That will change, however. &nbsp;(We
+should discuss this &#8230;)</p>
+<p>2. &nbsp;Via context menus inside specific components. &nbsp;E.g. if
+you right click on a neuron in a neural network a context menu will
+point you to all other potential consuming and producing attributes in
+the whole workspace. &nbsp;These context menus are built at the
+workspace menu by polling all current workspacecomponents.<br>
+</p>
+<p>3. Via "coupling" commands in some menus. &nbsp;Quick and easy!&nbsp;&nbsp; <br>
+</p>
+<p>4. Using a script.<span class="heading"><br>
+</span></p>
+<p><br>
+<span class="heading"></span></p>
+<p><span class="heading">Confusions</span><br>
+</p>
+<p>Sometimes the terminology can be confusing. For example, in order
+world, sensors seem to consume (info) and motors seem to produce
+(motion). &nbsp;&nbsp;But in the context of the workspace it&#8217;s the
+opposite. &nbsp;&nbsp;consumed info is produced or sent elsewhere...
+produced motion is based on consumed info from elsewhere.]<br>
+</p>
+<br>
+<br>
+</div>
+</body></html>

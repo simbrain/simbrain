@@ -5,6 +5,9 @@
 
 
 
+
+
+
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../SimbrainDocs.html"><div class="logo">
@@ -19,17 +22,15 @@
 	    <blockquote>
 		  
   <p>
-		    Bottom  Pane <br>
-		    Command line<br>
-		    Coupling Manager <br>
+		    Bottom  Pane <br><a href="Workspace/Couplings.html">
+		    Couplings</a><br>
   <a href="Workspace/Examples.html">Examples</a><br>
 		    <a href="Workspace/Menus.html">Menus</a><br>
   <a href="Workspace/Preferences.html">Preferences</a><br>
-	      Toolbar<br>
-	      Scripts
-		  
-		  </p>
-<p>&nbsp;</p>
+	      <a href="Scripting.html">Scripts<br>
+  </a>Toolbar<br>
+  <a href="Workspace/Update.html">Update</a><br>
+&nbsp;</p>
 	    </blockquote>
   </div>
  <p>
@@ -40,41 +41,62 @@ is the framework within which a simulation is run. It contains
 components which are coupled to one another, and tools for managing
 these interactions.&nbsp; In the GUI, the workspace is visible as the
 Simbrain <span style="font-weight: bold;">desktop</span>. </p>
- <p>The
+ 
+<p>The
 workspace&nbsp; is responsible for (1) maintaining a list of
 components, (2) a list of couplings and a coupling manager for managing
 interactions between componetns, (3) an updator for managing simulation
-update. </p><br>
+update.<br>
+<br>
+Most windows in Simbrain and workspace components, which are wrappers
+around other objects, which are designed to exist in a workspace.
+Couplings tie these components together via attributes.&nbsp;&nbsp; For
+example, a simulation might involve coupling neurons whose neurons are
+producers to a bar chart whose bars are consumers (to see this, try bar
+chart test in the script menu).<br>
+ </p>
+<br>
 <p><img src="../Images/WorkspaceLarge.png" height="370" width="600"></p>
  <h2 class="heading"> Components </h2>
-<p>&nbsp;</p>
+<p><br>
+</p>
 <p>Adding components: To add components press the relevant button on the toolbar, or use the Insert menu.</p>
+
 <p>Saving / Opening: Use the save, open buttons and the File menu. </p>
-<p>All open components are shown in the  Components tab of the bottom information pane. </p>
-<h2 class="heading">Adding Couplings </h2>
- <p>&nbsp;</p>
-<p>A coupling is a link from an object in an <span style="font-weight: bold;">attribute</span> of an object in another component (or the same component). A producer produces values that are read by a consumer.</p>
-<p>A list of all current couplings is shown in the Coupligns tab of the bottom information pane. </p>
-<p>To create couplings:</p>
-<ol>
-  <li>Use the coupling manager window. </li>
-  <li>Use the general coupling menu item </li>
-  <li>Use the right click popup menus within components (Network, Dataworld)<br>
- </li>
-</ol>
-<h2 class="heading">Running a simulation </h2>
+<p>All open components are shown in the  Components tab of the bottom information pane. </p><h2 class="heading">Running a simulation </h2>
  <p>&nbsp;</p>
  <p>Press the iterate and play buttons in the main toolbar. </p>
  <p>In
 a terminal component, or in the terminal tab of the bottom information
 pane, use workspace.iterate(N), where N is the number of iterations to
 iterate. <br>
-</p><span style="font-weight: bold;">
-</span>
-<p><br>
-<span style="font-weight: bold;"> </span></p>
-<p><span style="font-weight: bold;"></span></p>
+</p><span class="heading">Overview</span><br>
 <br>
+The main things you need to do to make a simulation are:<br>
+<br>
+<div style="margin-left: 40px;">1) Add components<br>
+- Use the buttons<br>
+- Add from a script<br>
+<br>
+2) Connect together components<br>
+- Use the coupling manager<br>
+- Use the menus (single or group)<br>
+- Make them in a program script (and then, for GUI, save)<br>
+<br>
+3) Run the simulation<br>
+- Use the built in method (buffering based)<br>
+- Create your own update method</div>
+<p><br>
+<br>
+<br>
+</p>
+
+<span style="font-weight: bold;">
+</span>
+
+<p><span style="font-weight: bold;"><br>
+</span></p>
+
 
 </div>
 </body></html>

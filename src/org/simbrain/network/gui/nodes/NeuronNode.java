@@ -197,7 +197,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Toggles the visibility of the priority view text label.
-     * 
+     *
      * @param visibility whether the priority text label should be visible
      */
     public void setPriorityView(boolean visibility) {
@@ -292,7 +292,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Return the center of this node (the circle) in global coordinates.
-     * 
+     *
      * @return the center point of this node.
      */
     public Point2D getCenter() {
@@ -329,8 +329,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 .getConnectionMenu());
         contextMenu.addSeparator();
 
+        // Layout actions
         contextMenu.add(getNetworkPanel().getActionManager().getLayoutMenu());
-
         contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected
@@ -342,6 +342,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // Add property set item
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
+        contextMenu.addSeparator();
+
+        // Show weight matrix action
+        contextMenu.add(getNetworkPanel().getActionManager()
+                .getShowWeightMatrixAction());
         contextMenu.addSeparator();
 
         // Selection options

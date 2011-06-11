@@ -20,15 +20,68 @@ package org.simbrain.network.util;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.NetworkTextObject;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.Synapse;
 
 /**
- * <b>SimnetUtils</b> provides utility classes.
+ * <b>SimnetUtils</b> provides utility classes relating to simbrain networks.
  */
 public class SimnetUtils {
+
+    /**
+     * Returns the weights connecting two lists of neurons as an NxM matrix of
+     * doubles, where N is the number of source neurons, and M is the number of
+     * target neurons. That is, each row of the matrix corresponds to a source
+     * neuron's fan-out weight vector.
+     *
+     * @param srcLayer source layer
+     * @param targetLayer target layer
+     * @return weight matrix
+     */
+    public static double[][] getWeights(List<Neuron> srcLayer,
+            List<Neuron> targetLayer) {
+
+        double[][] ret = new double[srcLayer.size()][targetLayer.size()];
+
+        for (int i = 0; i < srcLayer.size(); i++) {
+            for (int j = 0; j < targetLayer.size(); j++) {
+                Synapse s = Network.getSynapse(srcLayer.get(i), targetLayer
+                        .get(j));
+
+                if (s != null) {
+                    ret[i][j] = s.getStrength();
+                } else {
+                    ret[i][j] = 0;
+                }
+                //System.out.println("[" + i + "][" + j + "]" + ret[i][j]);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Set the weights connecting two lists of neurons using a weight matrix.
+     * Assumes that each row of the matrix corresponds to a source neuron's
+     * fan-out weight vector, as above.
+     *
+     * @param src the list of source neurons
+     * @param tar the list of target neurons
+     * @param w the new weight values for the network.
+     */
+    public static void setWeights(final List<Neuron> src,
+            final List<Neuron> tar, final double[][] w) {
+        for (int i = 0; i < src.size(); i++) {
+            for (int j = 0; j < tar.size(); j++) {
+                Synapse s = Network.getSynapse(src.get(i), tar.get(j));
+                if (s != null) {
+                    s.setStrength(w[j][i]);
+                }
+            }
+        }
+    }
 
     /**
      * Return the upper left corner of a list of objects, based on neurons.

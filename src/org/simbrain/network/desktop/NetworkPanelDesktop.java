@@ -19,8 +19,11 @@
 package org.simbrain.network.desktop;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
@@ -28,8 +31,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.actions.ShowHelpAction;
-import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
-import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
@@ -93,7 +94,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getConnectionMenu());
         editMenu.addSeparator();
         editMenu.add(actionManager.getLayoutMenu());
-//        editMenu.addSeparator();
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getShowWeightMatrixAction());
+        editMenu.addSeparator();
 //        editMenu.add(actionManager.getGroupAction());
 //        editMenu.add(actionManager.getUngroupAction());
         editMenu.add(actionManager.getGroupMenu());

@@ -27,6 +27,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -48,10 +49,23 @@ import org.jdesktop.swingx.JXTable;
  */
 public class SimbrainJTable extends JXTable {
 
-    private static final long serialVersionUID = 1L;
+    /** The data to be displayed in the jtable. */
+    private SimbrainDataTable data;
 
-    /** Underlying data. */
-    private SimbrainTableModel tableModel;
+    /** Underlying Java table model. */
+    private TableModel tableModel;
+
+    /**
+     * Row headings. Only used if set, otherwise default row headings (1...n)
+     * used.
+     */
+    private List<String> rowHeadings;
+
+    /**
+     * Column headings. Only used if set, otherwise default column headings
+     * (1...n) used.
+     */
+    private List<String> columnHeadings;
 
     /** Point selected. */
     private Point selectedPoint;
@@ -59,8 +73,16 @@ public class SimbrainJTable extends JXTable {
     /** Grid Color. */
     private Color gridColor = Color.LIGHT_GRAY;
 
-    /** Data model. */
-    private SimbrainDataTable data;
+    /**
+     * Construct the table with specified number of rows and columns.
+     *
+     * @param rows number of rows of data
+     * @param cols number of columns of data
+     */
+    public SimbrainJTable(int rows, int cols) {
+        data = new SimbrainDataTable(rows, cols);
+        initJTable();
+    }
 
     /**
      * Creates a new instance of the data world.
@@ -68,9 +90,15 @@ public class SimbrainJTable extends JXTable {
      * @param dataModel
      */
     public SimbrainJTable(SimbrainDataTable dataModel) {
-
         data = dataModel;
-        this.setModel(new SimbrainTableModel());
+        initJTable();
+    }
+
+    /**
+     * Initialize the table.
+     */
+    private void initJTable() {
+        this.setModel(new TableModel());
         addKeyListener(keyListener);
         addMouseListener(mouseListener);
         setColumnSelectionAllowed(true);
@@ -82,12 +110,15 @@ public class SimbrainJTable extends JXTable {
         // First column displays row numbers
         this.setDefaultRenderer(Double.class, new  CustomCellRenderer());
 
-        // Sorting is not helpful in datatable contexts (possibly add an option to put it back in)
+        // Sorting is not helpful in datatable contexts (possibly add an option
+        // to put it back in)
         this.setSortable(false);
 
-        // Below initially forces first column to specific width; but has other side effects
-        //setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        // Below initially forces first column to specific width; but has other
+        // side effects
+        // setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         getColumnModel().getColumn(0).setPreferredWidth(30);
+        // TODO: Make preferred width for first column settable
 
     }
 
@@ -311,7 +342,7 @@ public class SimbrainJTable extends JXTable {
      *
      * @return the tableModel
      */
-    public SimbrainTableModel getTableModel() {
+    public TableModel getTableModel() {
         return tableModel;
     }
 
@@ -330,7 +361,14 @@ public class SimbrainJTable extends JXTable {
             if (column == 0) {
                 JLabel label = new JLabel();
                 label.setOpaque(true);
-                label.setText("" + (int) (row + 1));
+                if (column == 0) {
+                    if (rowHeadings != null) {
+                        label.setText(rowHeadings.get(row));
+                    } else {
+                     // First column displays the row number.
+                     label.setText("" + (int) (row + 1));
+                    }
+                }
                 return label;
             } else {
                 return super.getTableCellRendererComponent(table, value,
@@ -343,7 +381,7 @@ public class SimbrainJTable extends JXTable {
      * <b>TableModel</b> extends DefaultTableModel so that the addRow and
      * addColumn commands are available.
      */
-    private class SimbrainTableModel extends AbstractTableModel {
+    private class TableModel extends AbstractTableModel {
 
         /** Listener. */
         private final SimbrainTableListener listener = new SimbrainTableListener() {
@@ -406,7 +444,8 @@ public class SimbrainJTable extends JXTable {
          *
          * @param model reference to underlying data.
          */
-        public SimbrainTableModel() {
+        public TableModel() {
+            super();
             data.addListener(listener);
         }
 
@@ -427,16 +466,20 @@ public class SimbrainJTable extends JXTable {
         @Override
         public void setValueAt(Object value, int row, int column) {
             if (column > 0) {
-                data.setValue(row, column-1, (Double) value);
+                data.setValue(row, column - 1, (Double) value);
             }
         }
 
         @Override
         public String getColumnName(int columnIndex) {
             if (columnIndex > 0) {
-                return "" + (columnIndex);
+                if (columnHeadings != null) {
+                    return columnHeadings.get(columnIndex-1);
+                } else {
+                    return "" + (columnIndex);
+                }
             } else {
-                return "#";
+                return "#"; //TODO: Make this settable
             }
         }
 
@@ -459,12 +502,42 @@ public class SimbrainJTable extends JXTable {
          */
         public Object getValueAt(int row, int column) {
             if (column == 0) {
-                return (row + 1); // First column displays the row number.
+                // This is taken care of by the CustomCellRenderer.
+                return null;
             } else {
                 return data.get(row, column - 1);
             }
         }
     }
+
+    /**
+     * @return the rowHeadings
+     */
+    public List<String> getRowHeadings() {
+        return rowHeadings;
+    }
+
+    /**
+     * @param rowHeadings the rowHeadings to set
+     */
+    public void setRowHeadings(List<String> rowHeadings) {
+        this.rowHeadings = rowHeadings;
+    }
+
+    /**
+     * @return the columnHeadings
+     */
+    public List<String> getColumnHeadings() {
+        return columnHeadings;
+    }
+
+    /**
+     * @param columnHeadings the columnHeadings to set
+     */
+    public void setColumnHeadings(List<String> columnHeadings) {
+        this.columnHeadings = columnHeadings;
+    }
+
 
 
 }

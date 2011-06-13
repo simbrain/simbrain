@@ -1,84 +1,145 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<title>Simbrain Documentation</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../Styles.css" rel="stylesheet" type="text/css">
-</head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+  <title>Simbrain Documentation</title>
 
-<body>
-<a href="../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div></a>
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../../Styles.css" rel="stylesheet" type="text/css">
+
+</head><body>
+<a href="../../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
 <div id="main_docs">
-  <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Toolbar</p>
-  </div>  <p><h1>Toolbar</h1></p>
-  <div align="center">
-  <table border="0">
+<div class="navi">
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Toolbars</p>
+</div>
+<h1>ToolbarS</h1>
+<p>
+Toolbars can be turned off using the <a href="menu.html#View">network view</a> menu.&nbsp;&nbsp; <br>
+</p>
+<p><span class="heading">Main Toolbar</span></p>
+<p>This toolbar allows you to set the edit mode for the network, visible as the cursor graphic.<br>
+</p>
+
+<table style="margin-left: 40px;" border="0">
+  <tbody>
     <tr>
-      <td width="6%"><img src="../../Images/ZoomIn.gif" width="18" height="18"></td>
-      <td width="94%">Zoom in on the network. <em>Note: </em>Zooming and panning are only effective if <a href="menu.html#Autozoom">autozoom</a> is turned off. </td>
+      <td width="6%"><img src="../../Images/ZoomIn.gif" height="18" width="18"></td>
+      <td width="94%">Zoom
+in on the network.&nbsp; Key (TODO) can be used to change it zoom out
+mode.&nbsp; Clicking zooms in or out. &nbsp; Clicking and lassoing a
+region of the screen can be used to zoom in to that region of the
+screen .&nbsp; <span style="font-style: italic;"></span><em>Note: </em>Zooming
+and panning are only effective if <a href="menu.html#Autozoom">autozoom</a>
+is turned off.&nbsp; <br>
+
+      </td>
     </tr>
     <tr>
-      <td><img src="../../Images/ZoomOut.gif" width="18" height="18"></td>
-      <td>Zoom out.</td>
+      <td><img src="../../Images/Pan.gif" height="18" width="18"></td>
+      <td>Pan Mode. Move the view of the network around (to actually
+move the network select all and drag the network). <em>Note: </em>Zooming
+and panning are only functional if autozoom is turned off. </td>
     </tr>
     <tr>
-      <td><img src="../../Images/Arrow.gif" width="18" height="18"></td>
-      <td>Selection mode. Select nodes and weights by lassoing or left-clicking.</td>
+      <td style="vertical-align: top;"><img src="../../Images/Arrow.gif" height="18" width="18"></td>
+      <td style="vertical-align: top;">Selection mode. Select nodes and
+weights by lassoing or
+left-clicking.</td>
     </tr>
     <tr>
-      <td><img src="../../Images/Pan.gif" width="18" height="18"></td>
-      <td>Pan Mode. Move the view of the network around (to actually move the network select all and drag the network). <em>Note: </em>Zooming and panning are only effective if autozoom is turned off. </td>
+      <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="Text mode" src="../../Images/Text.png"></td>
+      <td style="vertical-align: top;">Text mode.&nbsp; In this mode
+text can be added to the simulation.<br>
+      </td>
     </tr>
     <tr>
-      <td><img src="../../Images/Play.gif" width="18" height="18"></td>
-      <td>Run network . Repeatedly iterates the network. Note that the image on the button becomes that of a &quot;stop&quot; button <img src="../../Images/Stop.gif" width="18" height="18">. Pressing this button will stop the network. Thus the play/stop button acts as a toggle switch. </td>
+      <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="Wand" src="../../Images/Wand.png"></td>
+      <td style="vertical-align: top;">Wand mode.&nbsp; Inject
+activation to nodes quickly for testing.&nbsp; See wand tool.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><span class="heading">Run Toolbar</span>&nbsp;<br>
+</p>
+<p>This toolbar is for running the network, independently of the
+workspace.&nbsp;&nbsp; It is hidden by default (because it can be
+easily confused with workspace run / step) and must be turned on using
+the view menu.&nbsp;&nbsp; <br>
+
+</p>
+<table style="margin-left: 40px;" border="0">
+  <tbody>
+    <tr>
+      <td><img style="width: 18px; height: 18px;" alt="Play" src="../../Images/Play.png"></td>
+      <td>Run network . Repeatedly iterates the network. Note that the
+image on the button becomes that of a "stop" button <img style="width: 18px; height: 18px;" alt="Stop" src="../../Images/Stop.png">. Pressing this
+button will stop the network. Thus the play/stop button acts as a
+toggle switch. </td>
     </tr>
     <tr>
-      <td><img src="../../Images/Step.gif" width="18" height="18"></td>
-      <td>Step through one update cycle (Also keyboard space and S, depending on <a href="couplings.html#InteractionMode">interaction mode</a>).</td>
+      <td><img style="width: 18px; height: 18px;" alt="Step" src="../../Images/Step.png"></td>
+      <td>Step through one update cycle (Also keyboard space and S,
+depending on <a href="couplings.html#InteractionMode">interaction mode</a>).</td>
+    </tr>
+  </tbody>
+</table>
+<p><span class="heading">Edit Toolbar</span>&nbsp;<br>
+</p>
+<p>This toolbar allows you to create and delete neurons, and change their state.<br>
+
+</p>
+<table style="margin-left: 40px;" border="0">
+  <tbody>
+    <tr>
+      <td><img style="width: 18px; height: 18px;" alt="Rand" src="../../Images/Rand.png"></td>
+      <td>Set
+all selected nodes (weights and or nodes) to a random value (Also
+keyboard R). Randomization is a uniform distribution between the upper
+and lower bounds set for each neuron or weights. </td>
     </tr>
     <tr>
-      <td><img src="../../Images/Rand.gif" width="18" height="18"></td>
-      <td>Set all selected nodes (weights and or nodes) to a random value (Also keyboard R). Randomization is a uniform distribution between the upper and lower bounds set for each neuron or weights. </td>
+      <td><img style="width: 18px; height: 18px;" alt="Eraser" src="../../Images/Eraser.png"></td>
+      <td>Set all selected neurons to 0. Weights are ignored. (Also
+keyboard C)</td>
     </tr>
     <tr>
-      <td><img src="../../Images/Eraser.gif" width="18" height="18"></td>
-      <td>Set all selected neurons to 0. Weights are ignored. (Also keyboard C)</td>
+      <td><img style="width: 18px; height: 18px;" alt="Add neuron" src="../../Images/AddNeuron.png"></td>
+      <td>Create a neuron at last position clicked on screen. (Also
+keyboard N) </td>
     </tr>
     <tr>
-      <td><img src="../../Images/Build.gif" width="18" height="18"></td>
-      <td>Bring the network building tools into and out of sight</td>
+      <td><img style="width: 18px; height: 18px;" alt="Delete Neuron" src="../../Images/DeleteNeuron.png"></td>
+      <td>Delete currently selected neurons. (Also keyboard delete or
+backspace). </td>
+    </tr>
+  </tbody>
+</table>
+<p><span class="heading">Clamp Toolbar</span>&nbsp;<br>
+</p>
+<p>These are toolbar buttons, which can be on or off, to control whether clamping is enabled for neurons and weights. &nbsp;  <br>
+
+</p>
+<table style="margin-left: 40px;" border="0">
+  <tbody>
+    <tr>
+      <td><img style="width: 18px; height: 18px;" alt="Clamp Neuron" src="../../Images/Clamp_N.png"></td>
+      <td>Clamp neurons. See <a href="common.html#clamping">clamping</a>.
+      </td>
     </tr>
     <tr>
-      <td><img src="../../Images/Gauge.gif" width="18" height="18"></td>
-      <td>Add a gauge to the simulation environment. See <a href="../Gauge.html">gauge</a> page. </td>
-    </tr>
-    <tr>
-      <td><img src="../../Images/BothWays.gif" width="18" height="18"></td>
-      <td>Change the network /environment interaction mode. See <a href="couplings.html#InteractionMode">component interactions.</a></td>
-    </tr>
-    <tr>
-      <td><img src="../../Images/New.gif" width="18" height="18"></td>
-      <td>Create a neuron at last position clicked on screen. (Also keyboard N) </td>
-    </tr>
-    <tr>
-      <td><img src="../../Images/Delete.gif" width="18" height="18"></td>
-      <td>Delete currently selected neurons. (Also keyboard delete or backspace). </td>
-    </tr>
-    <tr>
-      <td><img src="../../Images/Clamp_N.gif" width="18" height="18"></td>
-      <td>Clamp neurons. See <a href="common.html#clamping">clamping</a>. </td>
-    </tr>
-    <tr>
-      <td><img src="../../Images/Clamp_W.gif" width="18" height="18"></td>
+      <td><img style="width: 18px; height: 18px;" alt="Clamp Weight" src="../../Images/Clamp_W.png"></td>
       <td>Clamp weights. See <a href="common.html#clamping">clamping</a>.</td>
     </tr>
-  </table>
+  </tbody>
+</table>
 </div>
-</div>
-</body>
-</html>
+
+</body></html>

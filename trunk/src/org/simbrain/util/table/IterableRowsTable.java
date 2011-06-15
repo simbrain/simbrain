@@ -16,37 +16,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.util.table;
 
 /**
- * Class which can be used to create a consumer.
+ * Interface for tables (subclasses of SimbrainJTable) that have concept of
+ * "current row" implemented which allows the table to iterated from row to
+ * row when updated.
  *
  * @author jyoshimi
+ *
  */
-public class PotentialConsumer extends PotentialAttribute {
+public interface IterableRowsTable {
 
     /**
-     * Construct a potential consumer.
+     * Returns the current row.
      *
-     * @param parent parent workspace component
-     * @param object object on which to invoke method
-     * @param methodBaseName method name
-     * @param dataType class of data
-     * @param description description associated with potential consumer
+     * @return current row
      */
-    public PotentialConsumer(WorkspaceComponent parent, Object object,
-            String methodBaseName, Class dataType, String description) {
-        super(parent, object, methodBaseName, dataType, description);
-    }
+    int getCurrentRow();
 
     /**
-     * Actualize this potential attribute into a consumer.
+     * Sets the current row.
      *
-     * @return the consumer corresponding to this potential attribute.
+     * @param currentRow current row to set
      */
-    public Consumer<?> createConsumer() {
-        return getParent().getAttributeManager().createConsumer(this);
-    }
+    void setCurrentRow(int currentRow);
 
+    /**
+     * Increment the current row.
+     */
+    void updateCurrentRow();
 
 }

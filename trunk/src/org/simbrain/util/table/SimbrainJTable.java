@@ -41,9 +41,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.jdesktop.swingx.JXTable;
 
 /**
- * <b>SimbrainJTable</b> is a version of a JTable which wraps a Simbrain data
- * table object. Also provides sets of menus and buttons that can be used by
- * components which use this table.
+ * <b>SimbrainJTable</b> is a version of a JXTable (itself an improved JTable
+ * from SwingLabs) which provides GUI access to a Simbrain data table. Provides
+ * various features that are useful in simbrain, e.g. ability to set row and
+ * column headings. (Note that JTables have their own tablemodels, which are
+ * used here under the hood, but can be ignored when using this class. Just
+ * instantiate some subclass of SimbrainJTable and pass it to an instance of
+ * this class, and the data will display).
  *
  * @author jyoshimi
  */
@@ -51,9 +55,6 @@ public class SimbrainJTable extends JXTable {
 
     /** The data to be displayed in the jtable. */
     private SimbrainDataTable data;
-
-    /** Underlying Java table model. */
-    private TableModel tableModel;
 
     /**
      * Row headings. Only used if set, otherwise default row headings (1...n)
@@ -73,20 +74,23 @@ public class SimbrainJTable extends JXTable {
     /** Grid Color. */
     private Color gridColor = Color.LIGHT_GRAY;
 
+    /** Underlying Java table model. */
+    private TableModel tableModel;
+
     /**
      * Construct the table with specified number of rows and columns.
-     *
+     * 
      * @param rows number of rows of data
      * @param cols number of columns of data
      */
     public SimbrainJTable(int rows, int cols) {
-        data = new SimbrainDataTable(rows, cols);
+        data = new DefaultNumericTable(rows, cols);
         initJTable();
     }
 
     /**
      * Creates a new instance of the data world.
-     *
+     * 
      * @param dataModel
      */
     public SimbrainJTable(SimbrainDataTable dataModel) {
@@ -108,7 +112,7 @@ public class SimbrainJTable extends JXTable {
         updateRowSelection();
 
         // First column displays row numbers
-        this.setDefaultRenderer(Double.class, new  CustomCellRenderer());
+        this.setDefaultRenderer(Double.class, new CustomCellRenderer());
 
         // Sorting is not helpful in datatable contexts (possibly add an option
         // to put it back in)
@@ -124,7 +128,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Returns the currently selected column.
-     *
+     * 
      * @return the currently selected column
      */
     public int getSelectedColumn() {
@@ -137,11 +141,15 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Returns the currently selected row.
-     *
+     * 
      * @return the currently selected row
      */
     public int getSelectedRow() {
-        return rowAtPoint(selectedPoint);
+        if (selectedPoint != null) {
+            return rowAtPoint(selectedPoint);
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -161,7 +169,10 @@ public class SimbrainJTable extends JXTable {
          */
         public void mousePressed(final MouseEvent e) {
             selectedPoint = e.getPoint();
-            data.setCurrentRow(getSelectedRow());
+
+            if (data instanceof IterableRowsTable) {
+                ((IterableRowsTable) data).setCurrentRow(getSelectedRow());
+            }
             // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
             boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
             if (isRightClick) {
@@ -174,19 +185,21 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Build the context menu for the table.
-     *
+     * 
      * @return The context menu.
      */
     protected JPopupMenu buildPopupMenu() {
 
         JPopupMenu ret = new JPopupMenu();
-        ret.add(TableActionManager.getInsertRowAction(this));
-        if (getSelectedColumn() >= 0) {
-            ret.add(TableActionManager.getInsertColumnAction(this));
-        }
-        ret.add(TableActionManager.getDeleteRowAction(this));
-        if (getSelectedColumn() != 0) {
-            ret.add(TableActionManager.getDeleteColumnAction(this));
+        if (getData() instanceof MutableTable) {
+            ret.add(TableActionManager.getInsertRowAction(this));
+            if (getSelectedColumn() >= 0) {
+                ret.add(TableActionManager.getInsertColumnAction(this));
+            }
+            ret.add(TableActionManager.getDeleteRowAction(this));
+            if (getSelectedColumn() != 0) {
+                ret.add(TableActionManager.getDeleteColumnAction(this));
+            }
         }
         ret.addSeparator();
         ret.add(getMenuEdit());
@@ -203,98 +216,135 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a toolbar with buttons for opening from and saving to .csv files.
-     *
+     * 
      * @return the csv toolbar
      */
     public JToolBar getToolbarCSV() {
-        JToolBar toolbar = new JToolBar();
-        toolbar.add(TableActionManager.getOpenCSVAction(getData()));
-        toolbar.add(TableActionManager.getSaveCSVAction(getData()));
-        return toolbar;
+        if (getData() instanceof NumericTable) {
+            JToolBar toolbar = new JToolBar();
+            toolbar.add(TableActionManager
+                    .getOpenCSVAction((NumericTable) getData()));
+            toolbar.add(TableActionManager
+                    .getSaveCSVAction((NumericTable) getData()));
+            return toolbar;
+        }
+        return null;
     }
 
     /**
-     * Return a toolbar with buttons for randomzing the table cells.
-     *
-     * @return the randomization toolbar
+     * Return a toolbar with buttons for editing the table cells.
+     * 
+     * @return the edit toolbar
      */
     public JToolBar getToolbarEditTable() {
-        JToolBar toolbar = new JToolBar();
-        toolbar.add(TableActionManager.getInsertColumnAction(this));
-        toolbar.add(TableActionManager.getDeleteColumnAction(this));
-        toolbar.add(TableActionManager.getInsertRowAction(this));
-        toolbar.add(TableActionManager.getDeleteRowAction(this));
-        return toolbar;
+        if (getData() instanceof MutableTable) {
+            JToolBar toolbar = new JToolBar();
+            toolbar.add(TableActionManager.getInsertRowAction(this));
+            if (getSelectedColumn() >= 0) {
+                toolbar.add(TableActionManager.getInsertColumnAction(this));
+            }
+            toolbar.add(TableActionManager.getDeleteRowAction(this));
+            if (getSelectedColumn() != 0) {
+                toolbar.add(TableActionManager.getDeleteColumnAction(this));
+            }
+            return toolbar;
+        }
+        return null;
     }
 
     /**
-     * Return a toolbar with buttons for randomzing the table cells.
-     *
      * @return the randomization toolbar
      */
     public JToolBar getToolbarRandomize() {
-        JToolBar toolbar = new JToolBar();
-        toolbar.add(TableActionManager.getRandomizeAction(this));
-        toolbar.add(TableActionManager.getSetTableBoundsAction(getData()));
-        return toolbar;
+        if (getData() instanceof NumericTable) {
+            JToolBar toolbar = new JToolBar();
+            toolbar.add(TableActionManager
+                    .getRandomizeAction((NumericTable) getData()));
+            toolbar.add(TableActionManager
+                    .getSetTableBoundsAction((NumericTable) getData()));
+            return toolbar;
+        }
+        return null;
     }
 
     /**
      * Return a menu with items for opening from and saving to .csv files.
-     *
+     * 
      * @return the csv menu
      */
     public JMenu getMenuCSV() {
-        JMenu menu = new JMenu("Import / Export .csv");
-        menu.add(new JMenuItem(TableActionManager.getOpenCSVAction(getData())));
-        menu.add(new JMenuItem(TableActionManager.getSaveCSVAction(getData())));
-        return menu;
+        if (getData() instanceof NumericTable) {
+            JMenu menu = new JMenu("Import / Export .csv");
+            menu.add(new JMenuItem(TableActionManager
+                    .getOpenCSVAction((NumericTable) getData())));
+            menu.add(new JMenuItem(TableActionManager
+                    .getSaveCSVAction((NumericTable) getData())));
+            return menu;
+        }
+        return null;
     }
 
     /**
      * Return a menu with items for randomizing table values.
-     *
+     * 
      * @return the randomize menu
      */
     public JMenu getMenuRandomize() {
-        JMenu menu = new JMenu("Randomize");
-        menu.add(TableActionManager.getRandomizeAction(this));
-        menu.add(TableActionManager.getSetTableBoundsAction(getData()));
-        return menu;
+        if (getData() instanceof NumericTable) {
+            JMenu menu = new JMenu("Randomize");
+            menu.add(TableActionManager
+                    .getRandomizeAction((NumericTable) getData()));
+            menu.add(TableActionManager
+                    .getSetTableBoundsAction((NumericTable) getData()));
+            return menu;
+        }
+        return null;
     }
 
     /**
      * Return a menu with items for normalizing the data in a table.
-     *
+     * 
      * @return the normalize menu
      */
     public JMenu getMenuNormalize() {
-        JMenu menu = new JMenu("Normalize");
-        menu.add(TableActionManager.getNormalizeColumnAction(this));
-        menu.add(TableActionManager.getNormalizeAction(this));
-        return menu;
+        if (getData() instanceof NumericTable) {
+            JMenu menu = new JMenu("Normalize");
+            menu.add(TableActionManager.getNormalizeColumnAction(
+                    (NumericTable) getData(), this.getSelectedColumn() - 1));
+            menu.add(TableActionManager
+                    .getNormalizeAction((NumericTable) getData()));
+            return menu;
+        }
+        return null;
     }
 
     /**
      * Return a menu with items for filling table values.
-     *
+     * 
      * @return the fill menu
      */
     public JMenu getMenuFill() {
-        JMenu menu = new JMenu("Fill values");
-        menu.add(new JMenuItem(TableActionManager.getFillAction(getData())));
-        menu.add(new JMenuItem(TableActionManager.getZeroFillAction(getData())));
-        return menu;
+        if (getData() instanceof NumericTable) {
+            JMenu menu = new JMenu("Fill values");
+            menu.add(new JMenuItem(TableActionManager
+                    .getFillAction((NumericTable) getData())));
+            menu.add(new JMenuItem(TableActionManager
+                    .getZeroFillAction((NumericTable) getData())));
+            return menu;
+        }
+        return null;
     }
 
     /**
      * Return a menu with items for changing the table structure.
-     *
+     * 
      * @return the edit menu
      */
     public JMenu getMenuEdit() {
         JMenu menu = new JMenu("Edit");
-        menu.add(new JMenuItem(TableActionManager.changeRowsColumns(getData())));
+        if (getData() instanceof MutableTable) {
+            menu.add(new JMenuItem(TableActionManager.changeRowsColumns(this)));
+        }
         return menu;
     }
 
@@ -302,9 +352,13 @@ public class SimbrainJTable extends JXTable {
      * Select current row.
      */
     public void updateRowSelection() {
-     // TODO: If I don't call this, the line below does not work. Not sure why.
+        // TODO: If I don't call this, the line below does not work. Not sure
+        // why.
         selectAll();
-        setRowSelectionInterval(data.getCurrentRow(), data.getCurrentRow());
+        if (getData() instanceof IterableRowsTable) {
+            int currentRow = ((IterableRowsTable) data).getCurrentRow();
+            setRowSelectionInterval(currentRow, currentRow);
+        }
     }
 
     /**
@@ -316,7 +370,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Sets the selected point.
-     *
+     * 
      * @param selectedPoint the selected point
      */
     public void setSelectedPoint(final Point selectedPoint) {
@@ -329,17 +383,17 @@ public class SimbrainJTable extends JXTable {
     private KeyListener keyListener = new KeyAdapter() {
         /**
          * Responds to key typed events.
-         *
+         * 
          * @param arg0 Key event
          */
         public void keyTyped(final KeyEvent arg0) {
-            //System.out.println("Key typed");
+            // System.out.println("Key typed");
         }
     };
 
     /**
      * Returns a copy of the underlying table model.
-     *
+     * 
      * @return the tableModel
      */
     public TableModel getTableModel() {
@@ -347,7 +401,8 @@ public class SimbrainJTable extends JXTable {
     }
 
     /**
-     * Renderer for table.  Paints first column differently.
+     * Renderer for table. If custom row headings are used, treats first column
+     * as a set of headings.
      */
     private class CustomCellRenderer extends DefaultTableCellRenderer {
 
@@ -365,8 +420,8 @@ public class SimbrainJTable extends JXTable {
                     if (rowHeadings != null) {
                         label.setText(rowHeadings.get(row));
                     } else {
-                     // First column displays the row number.
-                     label.setText("" + (int) (row + 1));
+                        // First column displays the row number.
+                        label.setText("" + (int) (row + 1));
                     }
                 }
                 return label;
@@ -378,8 +433,11 @@ public class SimbrainJTable extends JXTable {
     }
 
     /**
-     * <b>TableModel</b> extends DefaultTableModel so that the addRow and
-     * addColumn commands are available.
+     * <b>TableModel</b> extends DefaultTableModel (the standard model for
+     * JTables), and passes data from the SimbrainDataTable in to it, so that it
+     * can be presented in the JTable. This hides the tablemodel from the
+     * client, who only has to use this class and some subclass of
+     * SimbrainDataTable.
      */
     private class TableModel extends AbstractTableModel {
 
@@ -441,7 +499,7 @@ public class SimbrainJTable extends JXTable {
 
         /**
          * Construct the table model.
-         *
+         * 
          * @param model reference to underlying data.
          */
         public TableModel() {
@@ -474,12 +532,12 @@ public class SimbrainJTable extends JXTable {
         public String getColumnName(int columnIndex) {
             if (columnIndex > 0) {
                 if (columnHeadings != null) {
-                    return columnHeadings.get(columnIndex-1);
+                    return columnHeadings.get(columnIndex - 1);
                 } else {
                     return "" + (columnIndex);
                 }
             } else {
-                return "#"; //TODO: Make this settable
+                return "#"; // TODO: Make this settable
             }
         }
 
@@ -505,7 +563,7 @@ public class SimbrainJTable extends JXTable {
                 // This is taken care of by the CustomCellRenderer.
                 return null;
             } else {
-                return data.get(row, column - 1);
+                return data.getValue(row, column - 1);
             }
         }
     }
@@ -537,7 +595,5 @@ public class SimbrainJTable extends JXTable {
     public void setColumnHeadings(List<String> columnHeadings) {
         this.columnHeadings = columnHeadings;
     }
-
-
 
 }

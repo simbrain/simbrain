@@ -27,9 +27,13 @@ import org.simbrain.network.interfaces.SynapseUpdateRule;
  *
  * Only works if source and target neurons are spiking neurons.
  *
- * Default parameter values and equations inspired by Jean-Philippe Thivierge
+ * Drew on: Jean-Philippe Thivierge
  * and Paul Cisek (2008), Journal of Neuroscience. Nonperiodic Synchronization
  * in Heterogeneous Networks of Spiking Neurons
+ * 
+ * Also scholarpedia article
+ * 
+ * TODO: there are multiple ways to implement. Triple rule.  Decay param.  Implement?
  */
 public class STDPSynapse extends SynapseUpdateRule {
 
@@ -43,7 +47,7 @@ public class STDPSynapse extends SynapseUpdateRule {
     private static final double W_PLUS_DEFAULT = 10;
 
     /** Default W - . */
-    private static final double W_MINUS_DEFAULT = 100;
+    private static final double W_MINUS_DEFAULT = 10;
 
     /** Default Learning rate. */
     private static final double LEARNING_RATE_DEFAULT = .01;
@@ -103,16 +107,28 @@ public class STDPSynapse extends SynapseUpdateRule {
                     .getSource().getUpdateRule();
             SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
                     .getTarget().getUpdateRule();
-            delta_t = src.getLastSpikeTime() - tar.getLastSpikeTime();
-            double timeStep = synapse.getRootNetwork().getTimeStep();
-            if (delta_t > 0) {
-                delta_w = W_plus * Math.exp(-delta_t / (tau_plus / timeStep));
-            } else {
-                delta_w = -W_minus * Math.exp(delta_t / (tau_minus / timeStep));
+            if (tar.hasSpiked()) {
+                delta_t = tar.getLastSpikeTime() - src.getLastSpikeTime();
+                if (delta_t > 0) {
+                    double timeStep = synapse.getRootNetwork().getTimeStep();
+                    delta_w = W_plus * Math.exp(-delta_t / tau_plus);
+                    delta_w *= learningRate;
+                    System.out.println("LTP: " + delta_t + "/" + delta_w);
+                    synapse.setStrength(synapse.clip(synapse.getStrength()
+                            + delta_w));
+                }
             }
-            delta_w *= learningRate;
-            // System.out.println(delta_t + "/" + delta_w);
-            synapse.setStrength(synapse.getStrength() + delta_w);
+            if (src.hasSpiked()) {
+                delta_t = tar.getLastSpikeTime() - src.getLastSpikeTime();
+                if (delta_t < 0) {
+                    double timeStep = synapse.getRootNetwork().getTimeStep();
+                    delta_w = -W_minus * Math.exp(delta_t / tau_minus);
+                    delta_w *= learningRate;
+                    System.out.println("LTD: " + delta_t + "/" + delta_w);
+                    synapse.setStrength(synapse.clip(synapse.getStrength()
+                            + delta_w));
+                }
+            }
         }
 
     }

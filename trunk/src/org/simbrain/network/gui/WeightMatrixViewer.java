@@ -18,13 +18,20 @@
  */
 package org.simbrain.network.gui;
 
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JPanel;
+
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.util.Comparators;
 import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 
@@ -35,6 +42,25 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
  * @author jyoshimi
  */
 public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
+
+    /** JTable contained in scroller. */
+    private SimbrainJTable table;
+
+   /**
+     * Embed the scrollpanel in a widget with a toolbar.
+     *
+     * @param scroller the scroller to embed
+     * @return the formatted jpanel.
+     */
+    public static JPanel getWeightMatrixPanel(WeightMatrixViewer scroller) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add("Center", scroller);
+        JPanel toolbar = new JPanel();
+        toolbar.add(scroller.getTable().getToolbarRandomize());
+        toolbar.add(scroller.getTable().getToolbarCSV());
+        panel.add("North", toolbar);
+        return panel;
+    }
 
     /**
      * Create a panel for viewing the matrices connecting a set of source and
@@ -55,14 +81,10 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         Collections.sort(targetList, Comparators.X_ORDER);
 
         // Populate data in simbrain table
-        double[][] matrix = SimnetUtils.getWeights(sourceList, targetList);
-        SimbrainJTable table = new SimbrainJTable(matrix.length,
-                matrix[0].length);
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                table.getData().setValue(i, j, matrix[i][j]);
-            }
-        }
+        Synapse[][] weights = SimnetUtils.getWeightMatrix(sourceList,
+                targetList);
+        WeightMatrix weightMatrix = new WeightMatrix(weights);
+        table = new SimbrainJTable(weightMatrix);
 
         // Create names for row headings
         List<String> rowHeaders = new ArrayList<String>();
@@ -86,6 +108,87 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         // Set the table
         this.setTable(table);
 
+        // Add network listener
+        panel.getRootNetwork().addNetworkListener(new NetworkListener() {
+
+            public void networkChanged() {
+                repaint();
+            }
+
+            public void networkUpdateMethodChanged() {
+            }
+
+            public void neuronClampToggled() {
+            }
+
+            public void synapseClampToggled() {
+            }
+
+        });
+    }
+
+    /**
+     * Matrix of synapses to be viewed in a SimbrainJTable.
+     */
+    private class WeightMatrix extends NumericTable {
+
+        /** Underlying data. */
+        private Synapse[][] weights;
+
+        /** Reference to root network. */
+        private RootNetwork parentNetwork;
+
+        /**
+         * @param weights the weights to set
+         */
+        public WeightMatrix(Synapse[][] weights) {
+            this.weights = weights;
+        }
+
+        @Override
+        public void setValue(int row, int col, double value) {
+            if (weights[row][col] != null) {
+                weights[row][col].setStrength(value);
+                /**
+                 * Save reference when a non-null is found (important for
+                 * networks with null vals)
+                 */
+                parentNetwork = weights[row][col].getRootNetwork();
+            }
+            //TODO: Below ok with large changes?
+            if (parentNetwork != null) {
+                parentNetwork.fireNetworkChanged();
+            }
+        }
+
+        @Override
+        public double getValue(int row, int col) {
+            // TODO: For null case render cell in some special way.
+            // Other null handling also needed.
+            if (weights[row][col] != null) {
+                return weights[row][col].getStrength();
+            } else {
+                return 0;
+            }
+        }
+
+        @Override
+        public int getRowCount() {
+            return weights.length;
+        }
+
+        @Override
+        public int getColumnCount() {
+            return weights[0].length;
+        }
+
+    }
+
+    /**
+     * @return the table
+     */
+    public SimbrainJTable getTable() {
+        return table;
     }
 
 }

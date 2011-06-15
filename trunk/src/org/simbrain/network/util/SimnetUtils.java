@@ -32,7 +32,7 @@ import org.simbrain.network.interfaces.Synapse;
 public class SimnetUtils {
 
     /**
-     * Returns the weights connecting two lists of neurons as an NxM matrix of
+     * Returns the weights connecting two lists of neurons as an N x M matrix of
      * doubles, where N is the number of source neurons, and M is the number of
      * target neurons. That is, each row of the matrix corresponds to a source
      * neuron's fan-out weight vector.
@@ -77,10 +77,64 @@ public class SimnetUtils {
             for (int j = 0; j < tar.size(); j++) {
                 Synapse s = Network.getSynapse(src.get(i), tar.get(j));
                 if (s != null) {
-                    s.setStrength(w[j][i]);
+                    s.setStrength(w[i][j]);
                 }
             }
         }
+    }
+
+    /**
+     * Gets a matrix of Synapse objects, formatted like the getWeights method.
+     * Non-existence synapses are given a null value.
+     *
+     * @param srcLayer source neurons
+     * @param targetLayer target neurons
+     * @return the matrix of synapses.
+     */
+    public static Synapse[][] getWeightMatrix(List<Neuron> srcLayer,
+            List<Neuron> targetLayer) {
+
+        Synapse[][] ret = new Synapse[srcLayer.size()][targetLayer.size()];
+
+        for (int i = 0; i < srcLayer.size(); i++) {
+            for (int j = 0; j < targetLayer.size(); j++) {
+                Synapse s = Network.getSynapse(srcLayer.get(i),
+                        targetLayer.get(j));
+
+                if (s != null) {
+                    ret[i][j] = s;
+                    // System.out.println("[" + i + "][" + j + "]" +
+                    // ret[i][j].getStrength());
+                } else {
+                    ret[i][j] = null;
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Sets the weight strengths for the weights connecting two layers of
+     * neurons. Nulls are ignored. Only the strengths are passed along.
+     *
+     * TODO: Untested and unused.
+     *
+     * @param src source neurons
+     * @param tar target neurons
+     * @param weights weight matrix to set.
+     */
+    public static void setWeightMatrix(List<Neuron> src,
+            List<Neuron> tar,  final Synapse[][] weights) {
+
+        for (int i = 0; i < src.size(); i++) {
+            for (int j = 0; j < tar.size(); j++) {
+                Synapse s = Network.getSynapse(src.get(i), tar.get(j));
+                if (s != null) {
+                    s.setStrength(weights[i][j].getStrength());
+                }
+            }
+        }
+
     }
 
     /**

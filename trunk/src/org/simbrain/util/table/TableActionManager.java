@@ -54,7 +54,7 @@ public class TableActionManager {
      * @param table table to load data in to
      * @return the action
      */
-    public static Action getOpenCSVAction(final SimbrainDataTable table) {
+    public static Action getOpenCSVAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
@@ -68,7 +68,8 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
+                        "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     table.readData(theFile);
@@ -84,7 +85,7 @@ public class TableActionManager {
      * @param table table to load data in to
      * @return the action
      */
-    public static Action getSaveCSVAction(final SimbrainDataTable table) {
+    public static Action getSaveCSVAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
@@ -98,7 +99,8 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
+                SFileChooser chooser = new SFileChooser(CSV_DIRECTORY,
+                        "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
                     Utils.writeMatrix(table.asStringArray(), theFile);
@@ -108,13 +110,14 @@ public class TableActionManager {
         };
     }
 
+
     /**
      * Action for randomizing table.
      *
      * @param table table to randomize
      * @return the action
      */
-    public static Action getRandomizeAction(final SimbrainJTable jtable) {
+    public static Action getRandomizeAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
@@ -131,7 +134,7 @@ public class TableActionManager {
              * {@ineritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().randomize();
+                table.randomize();
             }
 
         };
@@ -143,12 +146,14 @@ public class TableActionManager {
      * @param jtable table to normalize
      * @return the action
      */
-    public static Action getNormalizeColumnAction(final SimbrainJTable jtable) {
+    public static Action getNormalizeColumnAction(final NumericTable table,
+            final int columnIndex) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Normalize column");
                 putValue(SHORT_DESCRIPTION, "Normalize column");
             }
@@ -157,7 +162,7 @@ public class TableActionManager {
              * {@ineritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().normalizeColumn(jtable.getSelectedColumn()-1);
+                table.normalizeColumn(columnIndex);
             }
 
         };
@@ -169,12 +174,13 @@ public class TableActionManager {
      * @param jtable table to normalize
      * @return the action
      */
-    public static Action getNormalizeAction(final SimbrainJTable jtable) {
+    public static Action getNormalizeAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Rand.png"));
                 putValue(NAME, "Normalize table");
                 putValue(SHORT_DESCRIPTION, "Normalize table");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N,
@@ -186,7 +192,7 @@ public class TableActionManager {
              * {@ineritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().normalizeTable();
+                table.normalizeTable();
             }
 
         };
@@ -198,7 +204,7 @@ public class TableActionManager {
      * @param table table to adjust bounds on
      * @return the action
      */
-    public static Action getSetTableBoundsAction(final SimbrainDataTable table) {
+    public static Action getSetTableBoundsAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
@@ -230,10 +236,8 @@ public class TableActionManager {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 if (!dialog.hasUserCancelled()) {
-                    table.setLowerBound(
-                            Integer.parseInt(lower.getText()));
-                    table.setUpperBound(
-                            Integer.parseInt(upper.getText()));
+                    table.setLowerBound(Integer.parseInt(lower.getText()));
+                    table.setUpperBound(Integer.parseInt(upper.getText()));
                 }
             }
 
@@ -246,14 +250,18 @@ public class TableActionManager {
      * @param table table to change structure of
      * @return the action
      */
-    public static Action getChangeTableStructureAction(final SimbrainDataTable table) {
+    public static Action getChangeTableStructureAction(
+            final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.gif"));
+                // TODO: Throw exception if jtable.getData() is not mutable
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Prefs.gif"));
                 putValue(NAME, "Reset table");
-                putValue(SHORT_DESCRIPTION, "Set number of rows and columns (cells are zeroed out)");
+                putValue(SHORT_DESCRIPTION,
+                        "Set number of rows and columns (cells are zeroed out)");
             }
 
             /**
@@ -278,8 +286,9 @@ public class TableActionManager {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 if (!dialog.hasUserCancelled()) {
-                    table.reset(Integer.parseInt(rows.getText()), Integer
-                            .parseInt(columns.getText()));
+                    ((MutableTable) table.getData()).reset(
+                            Integer.parseInt(rows.getText()),
+                            Integer.parseInt(columns.getText()));
                 }
             }
 
@@ -292,14 +301,16 @@ public class TableActionManager {
      * @param table table to change structure of
      * @return the action
      */
-    public static Action changeRowsColumns(final SimbrainDataTable table) {
+    public static Action changeRowsColumns(final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.gif"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Prefs.gif"));
                 putValue(NAME, "Set rows / columns");
-                putValue(SHORT_DESCRIPTION, "Set number of rows and columns (cells are zeroed out)");
+                putValue(SHORT_DESCRIPTION,
+                        "Set number of rows and columns (cells are zeroed out)");
             }
 
             /**
@@ -324,7 +335,8 @@ public class TableActionManager {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 if (!dialog.hasUserCancelled()) {
-                    table.modifyRowsColumns(Integer.parseInt(rows.getText()),
+                    ((MutableTable) table.getData()).modifyRowsColumns(
+                            Integer.parseInt(rows.getText()),
                             Integer.parseInt(columns.getText()), 0);
                 }
             }
@@ -338,12 +350,14 @@ public class TableActionManager {
      * @param jtable table to insert row into
      * @return the action
      */
-    public static Action getInsertRowAction(final SimbrainJTable jtable) {
+    public static Action getInsertRowAction(final SimbrainJTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                putValue(SMALL_ICON,ResourceManager.getImageIcon("AddTableRow.png"));
+                // TODO: Throw exception if jtable.getData() is not mutable
+                putValue(SMALL_ICON,
+                        ResourceManager.getImageIcon("AddTableRow.png"));
                 putValue(NAME, "Insert row");
                 putValue(SHORT_DESCRIPTION, "Insert row (above)");
             }
@@ -352,15 +366,16 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().insertRow(jtable.getSelectedRow(),
-                        new Double(0));
+                ((MutableTable) table.getData()).insertRow(
+                        table.getSelectedRow(), new Double(0));
             }
 
         };
     }
 
     /**
-     * Action for inserting a column in to a jtable.
+     * Action for inserting a column in to a jtable. Assumes the table is
+     * mutable.
      *
      * @param jtable table to insert column into
      * @return the action
@@ -370,7 +385,9 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON,ResourceManager.getImageIcon("AddTableColumn.png"));
+                // TODO: Throw exception if jtable.getData() is not mutable
+                putValue(SMALL_ICON,
+                        ResourceManager.getImageIcon("AddTableColumn.png"));
                 putValue(NAME, "Insert column");
                 putValue(SHORT_DESCRIPTION, "Insert column (to right)");
             }
@@ -379,8 +396,8 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().insertColumn(jtable.getSelectedColumn(),
-                        new Double(0));
+                ((MutableTable) jtable.getData()).insertColumn(
+                        jtable.getSelectedColumn(), new Double(0));
             }
 
         };
@@ -397,7 +414,9 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteRowTable.png"));
+                // TODO: Throw exception if jtable.getData() is not mutable
+                putValue(SMALL_ICON,
+                        ResourceManager.getImageIcon("DeleteRowTable.png"));
                 putValue(NAME, "Delete row");
                 putValue(SHORT_DESCRIPTION, "Delete row");
             }
@@ -406,7 +425,8 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().removeRow(jtable.getSelectedRow());
+                ((MutableTable) jtable.getData()).removeRow(jtable
+                        .getSelectedRow());
             }
 
         };
@@ -423,7 +443,9 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteColumnTable.png"));
+                // TODO: Throw exception if jtable.getData() is not mutable
+                putValue(SMALL_ICON,
+                        ResourceManager.getImageIcon("DeleteColumnTable.png"));
                 putValue(NAME, "Delete column");
                 putValue(SHORT_DESCRIPTION, "Delete column");
             }
@@ -432,7 +454,8 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                jtable.getData().removeColumn(jtable.getSelectedColumn()-1);
+                ((MutableTable) jtable.getData()).removeColumn(jtable
+                        .getSelectedColumn() - 1);
             }
 
         };
@@ -444,12 +467,13 @@ public class TableActionManager {
      * @param table table to add rows to
      * @return the action
      */
-    public static Action getAddRowsAction(final SimbrainDataTable table) {
+    public static Action getAddRowsAction(final MutableTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Add rows");
                 putValue(SHORT_DESCRIPTION, "Add rows");
             }
@@ -458,11 +482,10 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String numRows = (String)JOptionPane.showInputDialog(
-                        null,
+                String numRows = (String) JOptionPane.showInputDialog(null,
                         "Number of rows to add:", "5");
                 table.addRows(Integer.parseInt(numRows), 0);
-           }
+            }
 
         };
     }
@@ -473,12 +496,13 @@ public class TableActionManager {
      * @param table table to insert column into
      * @return the action
      */
-    public static Action getAddColumnsAction(final SimbrainDataTable table) {
+    public static Action getAddColumnsAction(final MutableTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Add columns");
                 putValue(SHORT_DESCRIPTION, "Add columns");
             }
@@ -487,11 +511,10 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String numCols= (String)JOptionPane.showInputDialog(
-                        null,
+                String numCols = (String) JOptionPane.showInputDialog(null,
                         "Number of columns to add:", "5");
                 table.addColumns(Integer.parseInt(numCols), 0);
-           }
+            }
 
         };
     }
@@ -502,12 +525,13 @@ public class TableActionManager {
      * @param table table to zero out
      * @return the action
      */
-    public static Action getZeroFillAction(final SimbrainDataTable table) {
+    public static Action getZeroFillAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Zero fill table");
                 putValue(SHORT_DESCRIPTION, "Zero fill table");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z,
@@ -520,7 +544,7 @@ public class TableActionManager {
              */
             public void actionPerformed(ActionEvent arg0) {
                 table.fill(0);
-           }
+            }
 
         };
     }
@@ -531,12 +555,13 @@ public class TableActionManager {
      * @param table table to fill
      * @return the action
      */
-    public static Action getFillAction(final SimbrainDataTable table) {
+    public static Action getFillAction(final NumericTable table) {
         return new AbstractAction() {
 
             // Initialize
             {
-                //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                // putValue(SMALL_ICON,
+                // ResourceManager.getImageIcon("Eraser.png"));
                 putValue(NAME, "Fill table...");
                 putValue(SHORT_DESCRIPTION, "Fill table with specified value");
             }
@@ -545,12 +570,10 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String val= (String)JOptionPane.showInputDialog(
-                        null,
-                        "Value:",
-                        "0");
+                String val = (String) JOptionPane.showInputDialog(null,
+                        "Value:", "0");
                 table.fill(Double.parseDouble(val));
-           }
+            }
 
         };
     }

@@ -566,6 +566,7 @@ public abstract class Network {
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.setActivation(value);
         }
+        getRootNetwork().fireNetworkChanged();
     }
 
     /**

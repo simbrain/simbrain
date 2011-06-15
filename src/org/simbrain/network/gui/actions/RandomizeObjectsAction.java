@@ -67,13 +67,12 @@ public final class RandomizeObjectsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
+        for (NeuronNode node : networkPanel.getSelectedNeurons()) {
             node.getNeuron().randomize();
         }
-        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext(); ) {
-            SynapseNode node = (SynapseNode) i.next();
+        for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().randomize();
         }
-   }
+        networkPanel.getRootNetwork().fireNetworkChanged();
+    }
 }

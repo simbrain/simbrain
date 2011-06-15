@@ -34,7 +34,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
@@ -51,8 +50,9 @@ import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel;
 import org.simbrain.util.Utils;
-import org.simbrain.util.table.SimbrainDataTable;
+import org.simbrain.util.table.DefaultNumericTable;
 import org.simbrain.util.table.SimbrainJTable;
+import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.SimbrainTableListener;
 
 /**
@@ -199,7 +199,6 @@ public class TrainerPanel extends JPanel {
 
         // Add trainer listener
         initializeTrainerListener();
-
     }
 
     /**
@@ -359,7 +358,7 @@ public class TrainerPanel extends JPanel {
         // Error
         graphPanel.getButtonPanel().add(rmsError);
 
-        // Randomize
+        // Randomize (de-activate depending...)
         graphPanel.getButtonPanel().add(
                 new JButton(TrainerGuiActions.getRandomizeNetworkAction(this)));
 
@@ -486,7 +485,7 @@ public class TrainerPanel extends JPanel {
                     + " columns.");
 
             // Modify the table
-            dataTable.getData().modifyRowsColumns(
+            ((DefaultNumericTable) dataTable.getData()).modifyRowsColumns(
                     dataTable.getData().getRowCount(), layerSize, 0);
 
         }
@@ -518,8 +517,11 @@ public class TrainerPanel extends JPanel {
         /** Table displaying input data. */
         private SimbrainJTable dataTable;
 
+        /** Underlying data. */
+        private DefaultNumericTable data;
+
         /** Scroll pane. */
-        private JScrollPane scrollPane;
+        private SimbrainJTableScrollPanel scrollPane;
 
         /** Trainer vs. Input window. */
         private WindowType type;
@@ -532,12 +534,12 @@ public class TrainerPanel extends JPanel {
         TrainerDataWindow(final WindowType type) {
             this.type = type;
             setLayout(new BorderLayout());
-            setPreferredSize(new Dimension(350,200));
-            dataTable = new SimbrainJTable(new SimbrainDataTable(10, 4));
-            scrollPane = new JScrollPane(dataTable);
-            scrollPane.setPreferredSize(new Dimension(100, 100));
+            setPreferredSize(new Dimension(350, 200));
+            data = new DefaultNumericTable(10, 4);
+            dataTable = new SimbrainJTable(data);
+            scrollPane = new SimbrainJTableScrollPanel(dataTable);
             setBorder(BorderFactory.createTitledBorder("" + type.name()
-                    + " Table"));
+                    + ""));
             JPanel menuPanel = new JPanel();
             menuPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
             menuPanel.add(new JLabel(type.name() + " Layer:"));
@@ -642,9 +644,9 @@ public class TrainerPanel extends JPanel {
                     reconcileTableWithLayer(dataTable, getCurrentNeuronGroup());
                 }
                 if (type == WindowType.Input) {
-                    trainer.setInputData(dataTable.getData().asArray());
+                    trainer.setInputData(data.asArray());
                 } else if (type == WindowType.Trainer) {
-                    trainer.setTrainingData(dataTable.getData().asArray());
+                    trainer.setTrainingData(data.asArray());
                 }
             }
         }
@@ -766,7 +768,7 @@ public class TrainerPanel extends JPanel {
          * @return the table data
          */
         double[][] getData() {
-            return dataTable.getData().asArray();
+            return data.asArray();
         }
 
         /**
@@ -774,8 +776,8 @@ public class TrainerPanel extends JPanel {
          *
          * @param data
          */
-        public void setData(double[][] data) {
-            dataTable.getData().setData(data);
+        public void setData(double[][] newData) {
+            data.setData(newData);
         }
 
     }

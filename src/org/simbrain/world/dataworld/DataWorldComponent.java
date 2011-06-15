@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.util.table.SimbrainDataTable;
+import org.simbrain.util.table.DefaultNumericTable;
 import org.simbrain.util.table.SimbrainTableListener;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialConsumer;
@@ -41,7 +41,7 @@ public class DataWorldComponent extends WorkspaceComponent {
     private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
 
     /** Table model. */
-    private SimbrainDataTable dataModel;
+    private DefaultNumericTable dataModel;
 
     /**
      * Objects which can be used to get or set column values in the current row.
@@ -64,7 +64,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public DataWorldComponent(final String name) {
         super(name);
-        dataModel = new SimbrainDataTable();
+        dataModel = new DefaultNumericTable();
         init();
     }
 
@@ -77,7 +77,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public DataWorldComponent(final String name, int rows, int columns) {
         super(name);
-        dataModel = new SimbrainDataTable(rows, columns);
+        dataModel = new DefaultNumericTable(rows, columns);
         init();
     }
 
@@ -99,9 +99,9 @@ public class DataWorldComponent extends WorkspaceComponent {
      * @param dataModel the model
      */
     @SuppressWarnings("unchecked")
-    public DataWorldComponent(final String name, final SimbrainDataTable dataModel) {
+    public DataWorldComponent(final String name, final DefaultNumericTable dataModel) {
         super(name);
-        this.dataModel = (SimbrainDataTable) dataModel;
+        this.dataModel = (DefaultNumericTable) dataModel;
         init();
     }
 
@@ -200,7 +200,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public ColumnAttribute getColumnProducer(int i) {
         if (i < producerList.size()) {
-            return producerList.get(i); 
+            return producerList.get(i);
         }
         return null;
     }
@@ -213,7 +213,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public ColumnAttribute getColumnConsumer(int i) {
         if (i < consumerList.size()) {
-            return consumerList.get(i); 
+            return consumerList.get(i);
         }
         return null;
     }
@@ -259,7 +259,8 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     public static DataWorldComponent open(InputStream input, String name, String format) {
         // TODO: Use format  to determine how to open this.
-        SimbrainDataTable model = (SimbrainDataTable) SimbrainDataTable.getXStream().fromXML(input);
+        DefaultNumericTable model = (DefaultNumericTable) DefaultNumericTable
+                .getXStream().fromXML(input);
         return new  DataWorldComponent(name,  model);
     }
 
@@ -268,7 +269,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      *
      * @return The data model for this component.
      */
-    public SimbrainDataTable getDataModel() {
+    public DefaultNumericTable getDataModel() {
         return dataModel;
     }
 
@@ -277,7 +278,7 @@ public class DataWorldComponent extends WorkspaceComponent {
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        SimbrainDataTable.getXStream().toXML(dataModel, output);
+        DefaultNumericTable.getXStream().toXML(dataModel, output);
     }
 
     @Override
@@ -312,7 +313,7 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        dataModel.update();
+        dataModel.updateCurrentRow();
         this.fireUpdateEvent();
     }
 
@@ -322,7 +323,7 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return SimbrainDataTable.getXStream().toXML(dataModel);
+        return DefaultNumericTable.getXStream().toXML(dataModel);
     }
 
     /**

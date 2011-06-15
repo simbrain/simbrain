@@ -18,238 +18,56 @@
  */
 package org.simbrain.util.table;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.simbrain.util.Utils;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 /**
- * A table of data, with convenience methods and functions useful in neural
- * network and other Simbrain applications. An optional concept of "current row"
- * is implemented which allows the table to iterated from row to row when
- * updated.
+ * Superclass for tables that can be viewed by a SimbrainJTable, and saved in a
+ * reasonable, readable way with XStream. Currently numerical table and a
+ * default implementation are subclasses.
+ *
+ * @author jyoshimi
  */
-public final class SimbrainDataTable {
+public abstract class SimbrainDataTable {
 
-    /** Default initial number of rows. */
-    private static final int DEFAULT_ROW_COUNT = 30;
-
-    /** Default initial number of columns. */
-    private static final int DEFAULT_COLUMN_COUNT = 5;
-
-    /** The data. */
-    private List<List<Double>> rowData = new ArrayList<List<Double>>();
-
-    /** Number of columns. */
-    private int numColumns = DEFAULT_COLUMN_COUNT;
-
-    /** Number of rows. */
-    private int numRows = DEFAULT_ROW_COUNT;
-
-    /** Iteration mode. */
-    private boolean iterationMode = false;
-
-    /** Randomization upper bound. */
-    private int upperBound = 1;
-
-    /** Randomization lower bound. */
-    private int lowerBound = 0;
-
-    /** Current row. */
-    private int currentRow = 0;
+    // The intention is that this be a generic table for display in
+    // SimbrainJTable, and that subclasses can contain
+    // any kind of data. However, there is kruft here, and this (and
+    // MutableTable) assume double values.
 
     /** Listeners. */
     private List<SimbrainTableListener> listeners;
 
-    // TODO: Document this.
-    boolean initialized = false;
 
-    /**
-     * Construct a dataworld model of a specified number of rows and columns.
-     *
-     * @param numRows number of rows.
-     * @param numColumns number of columns.
-     */
-    public SimbrainDataTable(final int numRows, final int numColumns) {
-        this.numRows = numRows;
-        this.numColumns = numColumns;
-        init();
-    }
-
-    /**
-     * Default constructor.
-     */
-    public SimbrainDataTable() {
-        init();
-    }
-
-    /**
-     * Initialize listeners.
-     */
-    private void init() {
-        for (int i = 0; i < numRows; i++) {
-            rowData.add((List<Double>) getNewRow(0));
-        }
+    // Initialize listener list
+    {
         listeners = new ArrayList<SimbrainTableListener>();
-    }
-
-    /**
-     * Reset the table structure.
-     *
-     * @param rows number of rows
-     * @param cols number of columns
-     */
-    public void reset(int rows, int cols) {
-        rowData.clear();
-
-        numRows = rows;
-        numColumns = cols;
-
-        for (int i = 0; i < rows; i++) {
-            rowData.add((List<Double>) getNewRow(0));
-        }
-
-        fireTableStructureChanged();
-    }
-
-    /**
-     * Reset the table structure, and use a specified fill value.
-     *
-     * @param rows number of rows
-     * @param cols number of columns
-     * @param val new fill value
-     */
-    public void reset(int rows, int cols, double val) {
-        reset(rows, cols);
-        fill(val);
-    }
-
-    /**
-     * Initialize table with specified value.
-     *
-     * @param value value to initialize table with.
-     */
-    public void initValues(final double value) {
-        if (!initialized) {
-            fill(value);
-            initialized = true;
-        }
-    }
-
-    /**
-     * Fills the table with the given value.
-     */
-    public void fill(final double value) {
-        for (List<Double> row : rowData) {
-            Collections.fill(row, value);
-        }
-        this.fireTableDataChanged();
-    }
-
-    /**
-     * Normalize data in selected column. TODO: Use bounds.
-     *
-     * @param columnIndex column to normalize.
-     */
-    public void normalizeColumn(final int columnIndex) {
-        double max = 0;
-        for (List<Double> row : rowData) {
-            if (row.get(columnIndex) > max) {
-                max = row.get(columnIndex);
-            }
-        }
-        for (List<Double> row : rowData) {
-            row.set(columnIndex, row.get(columnIndex) / max);
-        }
-        this.fireTableDataChanged();
-    }
-
-    /**
-     * Normalize the whole table.
-     */
-    public void normalizeTable() {
-        for (int i = 0; i < this.getColumnCount(); i++) {
-            normalizeColumn(i);
-        }
-    }
-
-    /**
-     * Randomize neurons within specified bounds.
-     */
-    public void randomize() {
-        Random rand = new Random();
-        int range = getUpperBound() - getLowerBound();
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                double value = (rand.nextDouble() * range) + getLowerBound();
-                setValue(i, j, value, false);
-            }
-        }
-        fireTableDataChanged();
-    }
-
-    /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    public static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-
-        xstream.omitField(SimbrainDataTable.class, "listeners");
-        xstream.omitField(SimbrainDataTable.class, "parent");
-        xstream.omitField(SimbrainDataTable.class, "initialized");
-
-        return xstream;
-    }
-
-    /**
-     * Standard method call made to objects after they are deserialized. See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     *
-     * @return Initialized object.
-     */
-    private Object readResolve() {
-        init();
-        initialized = true;
-        return this;
-    }
-
-    /**
-     * Create a new row for the table, with a specified value.
-     *
-     * @param value value for columns of new row
-     * @return the new row
-     */
-    private List<Double> getNewRow(final double value) {
-        ArrayList<Double> row = new ArrayList<Double>();
-
-        for (int i = 0; i < numColumns; i++) {
-            row.add(value);
-        }
-        return row;
     }
 
     /**
      * Set the value at specific position in the table.
      *
      * @param row row index
-     * @param column column index
+     * @param col column index
      * @param value value to add
      */
-    public void setValue(final int row, final int column, final double value) {
-        setValue(row, column, value, true);
-    }
+    public abstract void setValue(int row, int col, double value);
 
     /**
-     * Set the value at specific position in the table.
+     * Get the value of a specific cell in the table.
+     *
+     * @param row the row index
+     * @param col the column index
+     * @return the value at that cell
+     */
+    public abstract double getValue(int row, int col);
+
+    /**
+     * Set the value at specific position in the table, and specify whether to
+     * fire a changed event (false useful when a lot of values need to be
+     * changed at once and it would waste time to update the GUI for every such
+     * change).
      *
      * @param row row index
      * @param column column index
@@ -258,433 +76,97 @@ public final class SimbrainDataTable {
      */
     public void setValue(final int row, final int column, final double value,
             final boolean fireEvent) {
-        rowData.get(row).set(column, value);
+
+        setValue(row, column, value);
         if (fireEvent) {
             fireCellDataChanged(row, column);
         }
     }
 
     /**
-     * Get the value at a specific location in the table.
+     * Returns the number of columns in the dataset. Note the same as columns in
+     * the simbrainjtable, which has an extra row and column for headers.
      *
-     * @param row row index
-     * @param column column index
-     * @return value to get
+     * @return the columns in the dataset.
      */
-    public double get(final int row, final int column) {
-        return rowData.get(row).get(column);
-    }
+    public abstract int getColumnCount();
 
     /**
-     * Set the values of the specified column in the current row.
+     * Returns the number of row in the dataset. Note the same as columns in
+     * the simbrainjtable, which has an extra row and column for headers.
      *
-     * @param column column index
-     * @param value value to set
+     * @return the columns in the dataset.
      */
-    public void setValueCurrentRow(final int column, final double value) {
-        setValue(currentRow, column, value);
-    }
+    public abstract int getRowCount();
 
     /**
-     * Get the value of the specified column in the current row.
+     * Add a table listener.
      *
-     * @param column column index
-     * @return value of this column in current row
+     * @param listener listener to add
      */
-    public double getValueCurrentRow(final int column) {
-        return get(currentRow, column);
-    }
-
-    /**
-     * Add a new row.
-     *
-     * @param value value for cells of new row
-     */
-    public void addRow(final double value) {
-        addRow(value, true);
-    }
-
-    /**
-     * Add a new row.
-     *
-     * @param value value for cells of new row
-     * @param fireEvent whether to fire an update event or not
-     */
-    private void addRow(double value, boolean fireEvent) {
-        numRows++;
-        rowData.add(getNewRow(value));
-        if (fireEvent) {
-            for (SimbrainTableListener listener : listeners) {
-                listener.rowAdded(numRows - 1);
-            }
+    public void addListener(SimbrainTableListener listener) {
+        if (listeners == null) {
+            listeners = new ArrayList<SimbrainTableListener>();
         }
+        listeners.add(listener);
     }
 
+    /**
+     * Remove a table listener.
+     *
+     * @param listener listener to remove
+     */
+    public void removeListener(SimbrainTableListener listener) {
+        listeners.remove(listener);
+    }
 
     /**
-     * Insert a new row at the specified position.
+     * Fire column added event.
      *
-     * @param at row index for where to put the new row
-     * @param value value for new row cells
+     * @param index index of column to add
      */
-    public void insertRow(final int at, final double value) {
-        numRows++;
-        rowData.add(at, getNewRow(value));
+    public void fireColumnAdded(final int index) {
         for (SimbrainTableListener listener : listeners) {
-            listener.rowAdded(at);
+            listener.columnAdded(index);
         }
     }
 
     /**
-     * Add a new column.
+     * Fire row added event.
      *
-     * @param value value for cells of new column
-     * @param fireEvent whether to fire an update event or not
+     * @param index index of column to add
      */
-    private void addColumn(double value, boolean fireEvent) {
-        numColumns++;
-        for (List<Double> row : rowData) {
-            row.add(value);
-        }
-        if (fireEvent) {
-            for (SimbrainTableListener listener : listeners) {
-                listener.columnAdded(numColumns - 1);
-            }
-        }
-    }
-    /**
-     * Add a new column at the far right of the table.
-     *
-     * @param value value to add
-     */
-    public void addColumn(final double value) {
-        addColumn(value, true);
-    }
-
-    /**
-     * Adds rows or columns.
-     *
-     * @param row number of rows to add.
-     * @param col number of columns to add.
-     * @param value to be added to the table.
-     */
-    public void addRowsColumns(final int row, final int col, final double value) {
-        modifyRowsColumns(row + numRows, col + numColumns, value);
-    }
-
-    /**
-     * Adds or removes rows and columns. Does not change value of existing
-     * cells. Sets new cells to a specified value.
-     *
-     * @param row Number of rows in table.
-     * @param col Number of columns in table.
-     * @param value to be used for any new columns or rows added to the table.
-     */
-    public void modifyRowsColumns(final int row, final int col,
-            final double value) {
-        int currentColNum = numColumns;
-        int currentRowNum = numRows;
-        if (col > currentColNum) {
-            for (int i = 0; i < col - currentColNum; ++i) {
-                addColumn(value, false);
-            }
-        } else if (col < currentColNum) {
-            for (int i = 0; i < currentColNum - col; ++i) {
-                removeColumn(numColumns - 1, false);
-            }
-        }
-
-        if (row > currentRowNum) {
-            for (int i = 0; i < row - currentRowNum; ++i) {
-                addRow(value, false);
-            }
-        } else if (row < currentRowNum) {
-            for (int i = 0; i < currentRowNum - row; ++i) {
-                removeRow(numRows - 1, false);
-            }
-        }
-        fireTableStructureChanged();
-    }
-
-    /**
-     * Add a specified number of rows to the bottom of the table.
-     *
-     * @param rowsToAdd number of rows to add
-     * @param number value for cells of new rows
-     */
-    public void addRows(final int rowsToAdd, final double number) {
-        addRowsColumns(rowsToAdd, 0, number);
-    }
-
-    /**
-     * Adds a specified number of columns to the right of the table.
-     *
-     * @param colsToAdd number of columns to add.
-     * @param defaultValue value for cells of new columns
-     */
-    public void addColumns(final int colsToAdd, final double defaultValue) {
-        addRowsColumns(0, colsToAdd, defaultValue);
-    }
-
-    /**
-     * Insert a new column at the specified position.
-     *
-     * @param at column index where column should be added
-     * @param value value for cells of new column
-     */
-    public void insertColumn(final int at, final double value) {
-        numColumns++;
-        for (List<Double> row : rowData) {
-            row.add(at, value);
-        }
+    public void fireRowAdded(final int index) {
         for (SimbrainTableListener listener : listeners) {
-            listener.columnAdded(at);
-        }
-    }
-
-
-    /**
-     * Remove a specified row.
-     *
-     * @param rowToRemoveIndex index of row to remove.
-     */
-    public void removeRow(final int rowToRemoveIndex) {
-        removeRow(rowToRemoveIndex, true);
-    }
-
-    /**
-     * Remove a specified row.
-     *
-     * @param rowToRemoveIndex index of row to remove
-     * @param fireEvent whether to fire a row removal event
-     */
-    public void removeRow(final int rowToRemoveIndex, boolean fireEvent) {
-        numRows--;
-        if (currentRow >= numRows) {
-            currentRow = numRows - 1;
-        }
-        rowData.remove(rowToRemoveIndex);
-        if (fireEvent) {
-            for (SimbrainTableListener listener : listeners) {
-                listener.rowRemoved(rowToRemoveIndex);
-            }
+            listener.rowAdded(index);
         }
     }
 
     /**
-     * Remove column at specified index.
+     * Fire column removed event.
      *
-     * @param columnToRemoveIndex index of column to remove
+     * @param index index of column to remove
      */
-    public void removeColumn(final int columnToRemoveIndex, boolean fireEvent) {
-        numColumns--;
-        if (numColumns < 0) {
-            return;
-        }
-        for (List<Double> row : rowData) {
-            row.remove(columnToRemoveIndex);
-        }
-        if (fireEvent) {
-            for (SimbrainTableListener listener : listeners) {
-                listener.columnRemoved(columnToRemoveIndex);
-            }
+    public void fireColumnRemoved(final int index) {
+        for (SimbrainTableListener listener : listeners) {
+            listener.columnRemoved(index);
         }
     }
 
     /**
-     * Remove column at specified index.
+     * Fire row removed event.
      *
-     * @param columnToRemoveIndex index of column to remove
+     * @param index index of row to remove
      */
-    public void removeColumn(final int columnToRemoveIndex) {
-        removeColumn(columnToRemoveIndex, true);
-    }
-
-    /**
-     * Lower bound for (e.g.) randomization.
-     *
-     * @return The lower bound.
-     */
-    public int getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * Sets the lower bound .
-     *
-     * @param lowerBound value to set
-     */
-    public void setLowerBound(final int lowerBound) {
-        this.lowerBound = lowerBound;
-    }
-
-    /**
-     * Upper bound for (e.g.) randomization.
-     *
-     * @return The upper bound value.
-     */
-    public int getUpperBound() {
-        return upperBound;
-    }
-
-    /**
-     * Sets the upper bound value.
-     *
-     * @param upperBound Value to set
-     */
-    public void setUpperBound(final int upperBound) {
-        this.upperBound = upperBound;
-    }
-
-    /**
-     * Returns the current row.
-     *
-     * @return current row
-     */
-    public int getCurrentRow() {
-        return currentRow;
-    }
-
-    /**
-     * Whether the table is in iteration mode (where update increments the
-     * current row).
-     *
-     * @return true if in iteration mode
-     */
-    public boolean isIterationMode() {
-        return iterationMode;
-    }
-
-    /**
-     * Set iteration mode.
-     *
-     * @param iterationMode iteration mode to set
-     */
-    public void setIterationMode(boolean iterationMode) {
-        this.iterationMode = iterationMode;
-    }
-
-    /**
-     * Sets the current row.
-     *
-     * @param currentRow current row to set
-     */
-    public void setCurrentRow(int currentRow) {
-        this.currentRow = currentRow;
-    }
-
-    /**
-     * Returns number of columns.
-     *
-     * @return number of columns.
-     */
-    public int getColumnCount() {
-        return numColumns;
-    }
-
-    /**
-     * Returns number of rows.
-     *
-     * @return number of rows.
-     */
-    public int getRowCount() {
-        return numRows;
-    }
-
-    /**
-     * Update the table, by increment the row. If the row is the bottom row,
-     * loop back to first row.
-     */
-    public void update() {
-        if (isIterationMode()) {
-            if (getCurrentRow() >= (getRowCount() - 1)) {
-                setCurrentRow(0);
-            } else {
-                setCurrentRow(getCurrentRow() + 1);
-            }
+    public void fireRowRemoved(final int index) {
+        for (SimbrainTableListener listener : listeners) {
+            listener.rowRemoved(index);
         }
     }
-
-    /**
-     * Returns an array representation of the table.
-     *
-     * @return representation of table as double arroy
-     */
-    public double[][] asArray() {
-
-        double returnList[][] = new double[getRowCount()][getColumnCount()];
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                returnList[i][j] = (Double) this.get(i, j);
-            }
-        }
-        return returnList;
-    }
-
-    /**
-     * Returns a string array representation of the table, useful in csv
-     * parsing.
-     *
-     * @return string array version of table
-     */
-    public String[][] asStringArray() {
-        double doubleArray[][] = asArray();
-        String stringArray[][] = new String[getRowCount()][getColumnCount()];
-        for (int i = 0; i < getRowCount(); i++) {
-            for (int j = 0; j < getColumnCount(); j++) {
-                stringArray[i][j] = "" + doubleArray[i][j];
-            }
-        }
-        return stringArray;
-    }
-
-    /**
-     * Read in stored dataset file as CVS File.
-     *
-     * @param file the CSV file
-     */
-    public void readData(final File file) {
-
-        String[][] values = Utils.getStringMatrix(file);
-        reset(values.length, values[0].length, 0);
-        for (int i = 0; i < values.length; i++) {
-            for (int j = 0; j < values[0].length; j++) {
-                if (((String) (values[i][j])).length() > 0) {
-                    Double num = new Double(0);
-                    try {
-                        num = Double.valueOf(values[i][j]);
-                    } catch (NumberFormatException exception) {
-                    } finally {
-                        setValue(i, j, num, false);
-                    }
-                }
-            }
-        }
-        fireTableStructureChanged();
-
-    }
-
-    /**
-     * Reset data using a 2-d array of doubles.
-     *
-     * @param data the new data
-     */
-    public void setData(double[][] data) {
-        reset(data.length, data[0].length, 0);
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data[0].length; j++) {
-                setValue(i, j, data[i][j], false);
-            }
-        }
-        fireTableStructureChanged();
-    }
-
-    // TODO: Add other fire event methods. Currently they are buried in the
-    // code.
 
     /**
      * Fire table data changed event. Only call when all data has changed. When
-     * a specific bit of data has changed call itemChanged.
+     * a specific bit of data has changed call celldata changed.
      */
     public void fireTableDataChanged() {
         for (SimbrainTableListener listener : listeners) {
@@ -692,8 +174,12 @@ public final class SimbrainDataTable {
         }
     }
 
+
     /**
      * Fire cell data changed event.
+     *
+     * @param row row index
+     * @param column column index
      */
     public void fireCellDataChanged(int row, int column) {
         for (SimbrainTableListener listener : listeners) {
@@ -710,21 +196,6 @@ public final class SimbrainDataTable {
         }
     }
 
-    /**
-     * Add a table listener.
-     *
-     * @param listener listener to add
-     */
-    public void addListener(SimbrainTableListener listener) {
-        listeners.add(listener);
-    }
 
-    /**
-     * Remove a table listener.
-     *
-     * @param listener listener to remove
-     */
-    public void removeListener(SimbrainTableListener listener) {
-        listeners.remove(listener);
-    }
+
 }

@@ -94,7 +94,7 @@ public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> 
 
         // Add toolbars
         JPanel toolbarPanel = new JPanel();
-        toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));        
+        toolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         toolbarPanel.add(table.getToolbarEditTable());
         toolbarPanel.add(table.getToolbarRandomize());
         add(toolbarPanel, BorderLayout.NORTH);

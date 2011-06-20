@@ -366,8 +366,10 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                ((MutableTable) table.getData()).insertRow(
-                        table.getSelectedRow(), new Double(0));
+                if (table.getSelectedRow() != -1) {
+                    ((MutableTable) table.getData()).insertRow(
+                            table.getSelectedRow(), new Double(0));                    
+                }
             }
 
         };
@@ -396,8 +398,10 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                ((MutableTable) jtable.getData()).insertColumn(
-                        jtable.getSelectedColumn(), new Double(0));
+                if (jtable.getSelectedColumn() != -1) {
+                    ((MutableTable) jtable.getData()).insertColumn(
+                            jtable.getSelectedColumn(), new Double(0));
+                }
             }
 
         };
@@ -425,8 +429,12 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                ((MutableTable) jtable.getData()).removeRow(jtable
-                        .getSelectedRow());
+                // TODO: For this and others, if not use a sensible value (for not selected case)
+                // selection = getSelectedRow or else it = 
+                if (jtable.getSelectedRow() != -1) {
+                    ((MutableTable) jtable.getData()).removeRow(jtable
+                            .getSelectedRow());
+                }
             }
 
         };
@@ -454,8 +462,10 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                ((MutableTable) jtable.getData()).removeColumn(jtable
-                        .getSelectedColumn() - 1);
+                if (jtable.getSelectedColumn() != -1) {
+                    ((MutableTable) jtable.getData()).removeColumn(jtable
+                            .getSelectedColumn() - 1);
+                }
             }
 
         };

@@ -290,7 +290,7 @@ public final class DefaultNumericTable extends NumericTable implements
      */
     public void removeRow(final int rowToRemoveIndex, boolean fireEvent) {
         // Don't allow numrows to go to 0
-        if (numRows == 1) {
+        if (numRows <= 1) {
             return;
         }
         numRows--;
@@ -312,7 +312,7 @@ public final class DefaultNumericTable extends NumericTable implements
      */
     public void removeColumn(final int columnToRemoveIndex, boolean fireEvent) {
         // Don't allow no columns
-        if (numColumns == 1) {
+        if (numColumns <= 1) {
             return;
         }
         numColumns--;

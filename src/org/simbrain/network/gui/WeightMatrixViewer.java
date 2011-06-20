@@ -19,6 +19,7 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +56,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
     public static JPanel getWeightMatrixPanel(WeightMatrixViewer scroller) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add("Center", scroller);
-        JPanel toolbar = new JPanel();
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         toolbar.add(scroller.getTable().getToolbarRandomize());
         toolbar.add(scroller.getTable().getToolbarCSV());
         panel.add("North", toolbar);

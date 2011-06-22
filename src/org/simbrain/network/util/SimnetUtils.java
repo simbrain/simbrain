@@ -21,6 +21,8 @@ package org.simbrain.network.util;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import Jama.Matrix;
+import Jama.EigenvalueDecomposition;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -28,6 +30,8 @@ import org.simbrain.network.interfaces.Synapse;
 
 /**
  * <b>SimnetUtils</b> provides utility classes relating to simbrain networks.
+ * @author jyoshimi
+ * @author ztosi
  */
 public class SimnetUtils {
 
@@ -136,6 +140,64 @@ public class SimnetUtils {
         }
 
     }
+
+    /**
+     * Scales all the weights.
+     * @param src source neurons
+     * @param tar target neurons
+     * @param scalar scalar value which is multiplied by the weight matrix
+     */
+    public static void scaleWeights(List<Neuron> src, List<Neuron> tar,
+            double scalar) {
+        for (Neuron source : src) {
+            for (Neuron target : tar) {
+                double wt = Network.getSynapse(source, target).getStrength();
+                Network.getSynapse(source, target).setStrength(wt * scalar);
+            }
+        }
+    }
+
+    /**
+     * @param weightMatrix
+     *            : a matrix representation of the weights for use in linear
+     *            algebraic operations
+     * @return the largest eigenvalue of this matrix by absolute value
+     */
+    public static double findMaxEig(double[][] weightMatrix) {
+        // get reservoir weight matrix
+        Matrix resWeights = new Matrix(weightMatrix);
+
+        // get an array of all the matrix's eigenvalues
+        double[] eigs = new EigenvalueDecomposition(resWeights)
+                .getRealEigenvalues();
+
+        // lowest possible absolute value
+        double maxEig = 0.0;
+
+        // find largest eigenvalue by absolute value
+        for (int i = 0; i < eigs.length; i++) {
+            if (Math.abs(eigs[i]) > maxEig) {
+                maxEig = Math.abs(eigs[i]);
+            }
+        }
+
+        return maxEig;
+    }
+
+    /**
+     * @param src
+     *            : list of source neurons
+     * @param tar
+     *            : list of target neurons
+     * @param desiredEigen
+     *            : the new max eig or spectral radius for the weight matrix
+     */
+    public static void scaleEigenValue(List<Neuron> src, List<Neuron> tar,
+            double desiredEigen) {
+        double maxEigen = findMaxEig(getWeights(src, tar));
+        scaleWeights(src, tar, desiredEigen / maxEigen);
+    }
+
 
     /**
      * Return the upper left corner of a list of objects, based on neurons.

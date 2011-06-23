@@ -16,7 +16,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package org.simbrain.trainer;
 
 import java.io.File;
@@ -25,217 +24,150 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.neurons.ClampedNeuron;
+import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Matrices;
 
 import Jama.Matrix;
 
 /**
- * Offline/Batch Learning with least mean sqaures
+ * Offline/Batch Learning with least mean squares.
  *
- * @ Author ztosi, jyoshimi
+ * @author ztosi
+ * @author jyoshimi
  */
-
 public class LMSOffline extends Trainer {
 
-    /** Current Error. */
-    //	TODO: create separate testing set, calculate rmsError. 
-    // private double rmsError;
-
     /**
-     * Accommodates multiple input layers (where input layer in this context
-     * means connected to the output layer.
-     **/
-    private List<List<? extends Neuron>> inputLayers;
-
-    /**
-     * State Collecting Matrix. Each row is a concatenation of activation
-     * vectors across the networ. More specifically , each row =
-     * {input_i,...hidden_j,...,output}
+     * Solution methods for offline LMS.
      */
-    private double[][] stateMatrix;
+    public enum SolutionType {
+        /**
+         * Wiener-Hopf solution.
+         */
+        WIENER_HOPF,
 
-    public LMSOffline(RootNetwork network, List<? extends Neuron> inputList) {
+        /**
+         * Moore-Penrose Solution.
+         */
+        MOORE_PENROSE
+    };
+
+    /** Current solution type. */
+    private SolutionType solutionType = SolutionType.WIENER_HOPF;
+
+    /**
+     * Default constructor.
+     *
+     * @param network parent network
+     */
+    public LMSOffline(RootNetwork network) {
         super(network);
-        inputLayers = new ArrayList<List<? extends Neuron>>();
-        inputLayers.add(inputList); //Curently bypassing superclass getInputLayer()
     }
 
+    // TODO: At superclass some notion of iteratable or not. Cf. gauge.
     @Override
     public double train(int iteration) {
-        stateCollection();
-        // TODO: return rmsError. Create separate testing set?
+        if (solutionType == SolutionType.WIENER_HOPF) {
+            weinerHopfSolution();
+        } else if (solutionType == SolutionType.MOORE_PENROSE) {
+            moorePenroseSolution();
+        } else {
+            throw new IllegalArgumentException("Solution type must be "
+                    + "'MoorePenrose' or 'WeinerHopf'.");
+        }
         return 0.0;
     }
-    
-    public void train(String solutionType){
-    	train(1);
-    	if(solutionType.matches("WeinerHopf")){
-    		setWOut(weinerHopfSolution());
-    	}else if(solutionType.matches("MoorePenrose")){
-    		setWOut(moorePenroseSolution());
-    	}else{
-    		throw new IllegalArgumentException("Solution type must be " +
-    				"'MoorePenrose' or 'WeinerHopf'.");
-    	}
-    }
+
 
     @Override
     public void init() {
     }
 
     /**
-     * Adds another input layer.
+     * Implements the Wiener-Hopf solution to LMS linear regression.
+     */
+    public void weinerHopfSolution() {
+        Matrix inputMatrix = new Matrix(getInputData());
+        Matrix trainingMatrix = new Matrix(getTrainingData());
+
+        trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
+        inputMatrix = inputMatrix.transpose().times(inputMatrix);
+
+        inputMatrix = inputMatrix.inverse();
+
+        double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
+        SimnetUtils.setWeightsFillBlanks(this.getNetwork(), getInputLayer(),
+                getOutputLayer(), wOut);
+
+        trainingMatrix = null;
+        inputMatrix = null;
+    }
+
+    /**
+     * Moore penrose.
+     */
+    public void moorePenroseSolution() {
+        Matrix inputMatrix = new Matrix(getInputData());
+        Matrix trainingMatrix = new Matrix(getTrainingData());
+
+        // Computes Moore-Penrose Pseudoinverse
+        inputMatrix = Matrices.pinv(inputMatrix);
+
+        double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
+        SimnetUtils.setWeightsFillBlanks(this.getNetwork(), getInputLayer(),
+                getOutputLayer(), wOut);
+        inputMatrix = null;
+        trainingMatrix = null;
+    }
+
+    /**
+     * @return the solutionType
+     */
+    public SolutionType getSolutionType() {
+        return solutionType;
+    }
+
+    /**
+     * @param solutionType the solutionType to set
+     */
+    public void setSolutionType(SolutionType solutionType) {
+        this.solutionType = solutionType;
+    }
+
+    /**
+     * Testing method.
      *
-     * @param Layers MUST be added in order of activation flow
-     **/
-    public void addInputLayer(List<? extends Neuron> newInputLayer) {
-        inputLayers.add(newInputLayer);
-    }
-
-    /**
-     * Takes in the states of each input layer and concatenates them into a
-     * single 1-D array for state harvesting
-     * 
-     * @param _layerStates: 2-array where row index corresponds to index in the
-     *            list of input layers and each array likewise stored is the
-     *            state of that layer
-     * @param _sNumColumns: column length of the state collecting matrix
-     * @return: the appropriate state array for statMatrix
+     * @param args not used
      */
-    public double[] concactStates(double[][] _layerStates, int _sNumColumns) {
-        double[] Srow = new double[_sNumColumns];
-        int counter = 0;
-        for (int i = 0; i < _layerStates.length; i++) {
-            for (int j = 0; j < _layerStates[i].length; j++) {
-                Srow[counter] = _layerStates[i][j];
-                counter++;
-            }
-        }
-        return Srow;
-    }
-
-    /**
-     * Given a matrix of input data and teacher, data collects states of the
-     * input layers in a matrix wherein rows correspond to the concatenation of
-     * the states of each layer at a time index equal to their row number in
-     * stateMatrix.
-     */
-    public void stateCollection() {
-
-        // each row corresponds to that input layer's index in inputLayers
-        // the columns the states of the neurons in their given layer
-        double[][] layerStates = new double[inputLayers.size()][];
-
-        int i = 0;
-
-        // Populate layer list and determine sNumColumns
-        int sNumRows = getInputData().length;
-        int sNumColumns = 0;
-        for (List<? extends Neuron> Layer : inputLayers) {
-            // get overall number of columns for stateMatrix
-            sNumColumns += Layer.size();
-            // set column lengths for input layer states
-            layerStates[i] = new double[Layer.size()];
-            i++;
-        }
-
-        stateMatrix = new double[sNumRows][sNumColumns];
-
-        // State harvesting
-
-        // Iterate through rows of input data for training
-        for (int row = 0; row < sNumRows; row++) {
-            // Iterate through input layers and determine what kind of layer it
-            // is
-            for (List<? extends Neuron> layer : inputLayers) {
-                for (int col = 0; col < layer.size(); col++) {
-                    // is an input layer directly set by our input matrix
-                    if (layer.get(0).getFanIn().isEmpty()
-                            || layer.get(0).getFanIn() == null) {
-                        layer.get(col).setActivation(getInputData()[row][col]);
-                    }
-                    // is a hidden layer
-                    else if (!layer.equals(getOutputLayer())) {
-                        layer.get(col).update();
-                    }
-                    // one of the input layers is the output layer
-                    else {
-                        // Teacher-forcing recurrent output connections
-                        layer.get(col).setActivation(
-                                getTrainingData()[row][col]);
-                    }
-                    // set values of the appropriate columns and rows of layer
-                    // states
-                    layerStates[inputLayers.indexOf(layer)][col] = layer.get(
-                            col).getActivation();
-                }
-
-            }
-            // concatenate into one array and harvest/collect
-            stateMatrix[row] = concactStates(layerStates, sNumColumns);
-
-        }
-    }
-
-    /**
-     * Implements the Weiner-Hopf solution to LMS linear regression.
-     *
-     * @return: a weight matrix which will be used to connect any given number
-     *          of input layers to the output layer.
-     */
-    public double[][] weinerHopfSolution() {
-        Matrix S = new Matrix(stateMatrix);
-        Matrix D = new Matrix(getTrainingData());
-
-        D = S.transpose().times(D);
-        S = S.transpose().times(S);
-
-        S = S.inverse();
-
-        double[][] wOut = S.times(D).transpose().getArray();
-        D = null;
-        S = null;
-
-        return wOut;
-    }
-    
-    public double [][] moorePenroseSolution(){
-    	Matrix S = new Matrix(stateMatrix);
-    	Matrix D = new Matrix(getTrainingData());
-    	
-    	//Computes Moore-Penrose Pseudoinverse
-    	S = Matrices.pinv(S);
-    	
-    	double [][] wOut = S.times(D).transpose().getArray();
-    	S = null;
-    	D = null;
-    	
-    	return wOut;
-    }
-
-    /**
-     * @param wOut
-     */
-    public void setWOut(double[][] wOut) {
-        int index;
-        for (int j = 0; j < getOutputLayer().size(); j++) {
-            index = 0;
-            for (List<? extends Neuron> lay : inputLayers) {
-                for (int i = 0; i < lay.size(); i++) {
-                    Synapse syn = new Synapse(lay.get(i), getOutputLayer().get(j));
-                    this.getNetwork().addSynapse(syn);
-                    syn.setStrength(wOut[j][index]);
-                    index++;
-                }
-            }
-        }
-    }
-
     public static void main(String[] args) {
-        
+
+        RootNetwork network = test2();
+        System.out.println(network);
+
+        // Write to file
+        String FILE_OUTPUT_LOCATION = "./";
+        File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
+        try {
+            RootNetwork.getXStream().toXML(network,
+                    new FileOutputStream(theFile));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Simple AND Test
+     */
+    private static RootNetwork test1() {
         RootNetwork network = new RootNetwork();
         Neuron input1 = new Neuron(network, "ClampedNeuron");
         input1.setLocation(10, 70);
@@ -248,57 +180,89 @@ public class LMSOffline extends Trainer {
         network.addNeuron(input1);
         network.addNeuron(input2);
         network.addNeuron(output);
-        List inputList = new ArrayList();
+        List<Neuron> inputList = new ArrayList<Neuron>();
         inputList.add(input1);
         inputList.add(input2);
-        List outputList = new ArrayList();
+        List<Neuron> outputList = new ArrayList<Neuron>();
         outputList.add(output);
 
+        // ConnectionLayers
+        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
+        synapse.setLowerBound(0);
+        synapse.setUpperBound(1);
+        AllToAll.setBaseSynapse(synapse);
+        AllToAll connection = new AllToAll(network, inputList, outputList);
+        connection.connectNeurons();
 
-        int numCopiesData = 100;
-        double inputData[][] = new double[numCopiesData*4][2];
-        double trainingData[][] = new double[numCopiesData*4][1];
-        for (int i = 0; i < numCopiesData * 4; i++) {
-            if ((i % 4) == 1) {
-                inputData[i][0] = 1;
-                inputData[i][1] = 1;
-                trainingData[i][0] = 1;
-            } else if ((i % 4) == 2) {
-                inputData[i][0] = -1;
-                inputData[i][1] = 1;
-                trainingData[i][0] = -1;
-            } else if ((i % 4) == 3) {
-                inputData[i][0] = 1;
-                inputData[i][1] = -1;
-                trainingData[i][0] = -1;
-            } else if ((i % 4) == 4) {
-                inputData[i][0] = -1;
-                inputData[i][1] = -1;
-                trainingData[i][0] = -1;
-            }
-
-        }
+        // AND Task
+        double inputData[][] = { { -1, -1 }, { 1, -1 }, { -1, 1 }, { 1, 1 } };
+        double trainingData[][] = { { -1 }, { -1 }, { -1 }, { 1 } };
 
         // Initialize the trainer
-        LMSOffline trainer = new LMSOffline(network, inputList);
+        LMSOffline trainer = new LMSOffline(network);
         trainer.setInputData(inputData);
         trainer.setTrainingData(trainingData);
         trainer.setInputLayer(inputList);
         trainer.setOutputLayer(outputList);
-        trainer.train("MoorePenrose");
-
-        //System.out.println(network);
-
-        // Write to file
-        String FILE_OUTPUT_LOCATION = "~";
-        File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
-        try {
-            RootNetwork.getXStream().toXML(network,
-                    new FileOutputStream(theFile));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
+        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
+        trainer.setSolutionType(SolutionType.WIENER_HOPF);
+        trainer.train(1);
+        return network;
     }
 
+    /**
+     * Simple association test
+     */
+    private static RootNetwork test2() {
+
+        RootNetwork network = new RootNetwork();
+
+        double inputData[][] = { { .95, 0, 0, 0 }, { 0, .95, 0, 0 },
+                { 0, 0, .95, 0 }, { 0, 0, 0, .95 } };
+        double trainingData[][] = { { .95, 0 }, { .95, 0 }, { 0, .95 },
+                { 0, .95 } };
+
+        // Set up input layer
+        List<Neuron> inputLayer = new ArrayList<Neuron>();
+        for (int i = 0; i < 4; i++) {
+            Neuron neuron = new Neuron(network, new ClampedNeuron());
+            neuron.setLocation(10 + (i*40), 70);
+            neuron.setIncrement(1);
+            network.addNeuron(neuron);
+            inputLayer.add(neuron);
+            System.out.println("Input " + i + " = " + neuron.getId());
+        }
+
+        // Set up output layer
+        List<Neuron> outputLayer = new ArrayList<Neuron>();
+        for (int i = 0; i < 2; i++) {
+            Neuron neuron = new Neuron(network, new LinearNeuron());
+            ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
+            neuron.setLocation(15 + (i*40), 0);
+            neuron.setLowerBound(0);
+            neuron.setUpperBound(1);
+            network.addNeuron(neuron);
+            //System.out.println("Output " + i + " = " + neuron.getId());
+            outputLayer.add(neuron);
+        }
+
+        // Connect Layers
+        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
+        synapse.setLowerBound(0);
+        synapse.setUpperBound(1);
+        AllToAll.setBaseSynapse(synapse);
+        AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
+        connection.connectNeurons();
+
+        // Initialize the trainer
+        LMSOffline trainer = new LMSOffline(network);
+        trainer.setInputData(inputData);
+        trainer.setTrainingData(trainingData);
+        trainer.setInputLayer(inputLayer);
+        trainer.setOutputLayer(outputLayer);
+        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
+        trainer.setSolutionType(SolutionType.WIENER_HOPF);
+        trainer.train(1);
+        return network;
+    }
 }

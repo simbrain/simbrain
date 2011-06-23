@@ -21,15 +21,17 @@ package org.simbrain.network.util;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import Jama.Matrix;
-import Jama.EigenvalueDecomposition;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
 
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
+
 /**
- * <b>SimnetUtils</b> provides utility classes relating to simbrain networks.
+ * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.
+ *
  * @author jyoshimi
  * @author ztosi
  */
@@ -52,15 +54,15 @@ public class SimnetUtils {
 
         for (int i = 0; i < srcLayer.size(); i++) {
             for (int j = 0; j < targetLayer.size(); j++) {
-                Synapse s = Network.getSynapse(srcLayer.get(i), targetLayer
-                        .get(j));
+                Synapse s = Network.getSynapse(srcLayer.get(i),
+                        targetLayer.get(j));
 
                 if (s != null) {
                     ret[i][j] = s.getStrength();
                 } else {
                     ret[i][j] = 0;
                 }
-                //System.out.println("[" + i + "][" + j + "]" + ret[i][j]);
+                // System.out.println("[" + i + "][" + j + "]" + ret[i][j]);
             }
         }
         return ret;
@@ -69,7 +71,7 @@ public class SimnetUtils {
     /**
      * Set the weights connecting two lists of neurons using a weight matrix.
      * Assumes that each row of the matrix corresponds to a source neuron's
-     * fan-out weight vector, as above.
+     * fan-out weight vector, as above. Missing weights are ignored.
      *
      * @param src the list of source neurons
      * @param tar the list of target neurons
@@ -82,6 +84,34 @@ public class SimnetUtils {
                 Synapse s = Network.getSynapse(src.get(i), tar.get(j));
                 if (s != null) {
                     s.setStrength(w[i][j]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the weights connecting two lists of neurons using a weight matrix.
+     * Assumes that each row of the matrix corresponds to a source neuron's
+     * fan-out weight vector, as above. If a weight is missing it is added to
+     * the provided network
+     *
+     * @param network network in which missing weights should be added.
+     * @param src the list of source neurons
+     * @param tar the list of target neurons
+     * @param w the new weight values for the network.
+     */
+    public static void setWeightsFillBlanks(final Network network,
+            final List<Neuron> src, final List<Neuron> tar,
+            final double[][] w) {
+        for (int i = 0; i < src.size(); i++) {
+            for (int j = 0; j < tar.size(); j++) {
+                Synapse s = Network.getSynapse(src.get(i), tar.get(j));
+                if (s != null) {
+                    s.setStrength(w[i][j]);
+                } else {
+                    Synapse newSynapse = new Synapse(src.get(i), tar.get(j));
+                    newSynapse.setStrength(w[i][j]);
+                    network.addSynapse(newSynapse);
                 }
             }
         }
@@ -118,31 +148,8 @@ public class SimnetUtils {
     }
 
     /**
-     * Sets the weight strengths for the weights connecting two layers of
-     * neurons. Nulls are ignored. Only the strengths are passed along.
+     * Scales weights connecting source and target lists.
      *
-     * TODO: Untested and unused.
-     *
-     * @param src source neurons
-     * @param tar target neurons
-     * @param weights weight matrix to set.
-     */
-    public static void setWeightMatrix(List<Neuron> src,
-            List<Neuron> tar,  final Synapse[][] weights) {
-
-        for (int i = 0; i < src.size(); i++) {
-            for (int j = 0; j < tar.size(); j++) {
-                Synapse s = Network.getSynapse(src.get(i), tar.get(j));
-                if (s != null) {
-                    s.setStrength(weights[i][j].getStrength());
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Scales all the weights.
      * @param src source neurons
      * @param tar target neurons
      * @param scalar scalar value which is multiplied by the weight matrix
@@ -151,16 +158,20 @@ public class SimnetUtils {
             double scalar) {
         for (Neuron source : src) {
             for (Neuron target : tar) {
-                double wt = Network.getSynapse(source, target).getStrength();
-                Network.getSynapse(source, target).setStrength(wt * scalar);
+                Synapse weight = Network.getSynapse(source, target);
+                if (weight != null) {
+                    Network.getSynapse(source, target).setStrength(
+                            weight.getStrength() * scalar);
+                }
             }
         }
     }
 
     /**
-     * @param weightMatrix
-     *            : a matrix representation of the weights for use in linear
-     *            algebraic operations
+     * Find the largest eigenvalue for the provided matrix.
+     *
+     * @param weightMatrix a matrix representation of the weights for use in
+     *            linear algebraic operations
      * @return the largest eigenvalue of this matrix by absolute value
      */
     public static double findMaxEig(double[][] weightMatrix) {
@@ -185,19 +196,16 @@ public class SimnetUtils {
     }
 
     /**
-     * @param src
-     *            : list of source neurons
-     * @param tar
-     *            : list of target neurons
-     * @param desiredEigen
-     *            : the new max eig or spectral radius for the weight matrix
+     * @param src list of source neurons
+     * @param tar list of target neurons
+     * @param desiredEigen : the new max eig or spectral radius for the weight
+     *            matrix
      */
-    public static void scaleEigenValue(List<Neuron> src, List<Neuron> tar,
+    public static void scaleEigenvalue(List<Neuron> src, List<Neuron> tar,
             double desiredEigen) {
         double maxEigen = findMaxEig(getWeights(src, tar));
         scaleWeights(src, tar, desiredEigen / maxEigen);
     }
-
 
     /**
      * Return the upper left corner of a list of objects, based on neurons.

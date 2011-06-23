@@ -1070,4 +1070,21 @@ public abstract class Network {
         this.rootNetwork = rootNetwork;
     }
 
+    /**
+     * Convenience method for asynchronously updating a set of neurons, by
+     * calling each neuron's update function (which sets a buffer), and then
+     * setting each neuron's activation to the buffer state.
+     *
+     * @param neuronList the list of neurons to be updated
+     */
+    public void updateNeurons(List<Neuron> neuronList) {
+        // TODO: Update by priority if priority based update?
+        for (Neuron neuron : neuronList) {
+            neuron.update();
+        }
+        for (Neuron neuron : neuronList) {
+            neuron.setActivation(neuron.getBuffer());
+        }
+    }
+
 }

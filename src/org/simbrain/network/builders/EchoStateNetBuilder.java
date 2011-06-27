@@ -38,6 +38,7 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.trainer.DataGenerators;
 import org.simbrain.trainer.LMSOffline;
@@ -82,8 +83,7 @@ public final class EchoStateNetBuilder {
 
    /** Default TANH neurons for the reservoir */
     {
-     // TODO: Messy... SigmoidalNeuron needs clean up
-        ((SigmoidalNeuron) reservoirNeuronType).setImplementationIndex(3);
+        ((SigmoidalNeuron) reservoirNeuronType).setType(SigmoidType.LOGISTIC);
     }
 
     /** Default output neuron type */

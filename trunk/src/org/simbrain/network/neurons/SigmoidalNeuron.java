@@ -30,23 +30,40 @@ import org.simbrain.network.util.RandomSource;
  */
 public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
 
-    /** Function list. */
-    private static String[] functionList = {"Sigmoidal", "Arctan", "Barebones" };
+    /** Implementations of the Sigmoidal activation function. */
+    public static enum SigmoidType {
+        /** Arctangent. */
+        ARCTAN {
+            @Override
+            public String toString() {
+                return "Arctan";
+            }
+        },
+        /** Logistic unscaled. */
+        BARE {
+            @Override
+            public String toString() {
+                return "Logistic (unscaled)";
+            }
+        },
+        /** Logistic scaled. */
+        LOGISTIC {
+            @Override
+            public String toString() {
+                return "Logistic (scaled)";
+            }
+        },
+        /** Tanh. */
+        TANH {
+            @Override
+            public String toString() {
+                return "Tanh";
+            }
+        }
+    };
 
-    /** Implementation index. */
-    private int implementationIndex = SIGM;
-
-    /** Tanh. */
-    public static final int TANH = 3;
-
-    /** Tanh. */
-    public static final int BARE = 2;
-
-    /** Arctan. */
-    public static final int ARCTAN = 1;
-
-    /** Standard Sigmoidal. */
-    public static final int SIGM = 0;
+    /** Current implementation. */
+    private SigmoidType type = SigmoidType.LOGISTIC;
 
     /** Bias. */
     private double bias = 0;
@@ -62,6 +79,23 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
 
     /** Clipping. */
     private boolean clipping = false;
+
+    /**
+     * Default sigmoidal.
+     */
+    public SigmoidalNeuron() {
+        super();
+    }
+
+    /**
+     * Construct a sigmoid update with a specified implementaiton.
+     *
+     * @param type the implementation to use.
+     */
+    public SigmoidalNeuron(SigmoidType type) {
+        super();
+        this.type = type;
+    }
 
     /**
      * {@inheritDoc}
@@ -87,17 +121,17 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
         double lowerBound = neuron.getLowerBound();
 
         // TANH not currently used because identical to SIGM
-        if (implementationIndex == TANH) {
+        if (type == SigmoidType.TANH) {
             double a = (2 * slope) / (upperBound - lowerBound);
             val = (((upperBound - lowerBound) / 2) * tanh(a * val)) + ((upperBound  + lowerBound) / 2);
-        } else if (implementationIndex == ARCTAN) {
+        } else if (type == SigmoidType.ARCTAN) {
             double a = (Math.PI * slope) / (upperBound - lowerBound);
             val = ((upperBound - lowerBound) / Math.PI) * Math.atan(a * val) + ((upperBound  + lowerBound) / 2);
-        } else if (implementationIndex == SIGM) {
+        } else if (type == SigmoidType.LOGISTIC) {
             double diff = upperBound - lowerBound;
             //val = diff * sigm(4 * slope * val / diff) + lowerBound;
             val = diff * sigm(slope * val / diff) + lowerBound;
-        } else if (implementationIndex == BARE) {
+        } else if (type == SigmoidType.BARE) {
             val = sigm(val);
         }
 
@@ -140,7 +174,7 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
         SigmoidalNeuron sn = new SigmoidalNeuron();
         sn.setBias(getBias());
         sn.setClipping(getClipping());
-        sn.setImplementationIndex(getImplementationIndex());
+        sn.setType(getType());
         sn.setSlope(getSlope());
         sn.setAddNoise(getAddNoise());
         sn.noiseGenerator =  new RandomSource(noiseGenerator);
@@ -173,27 +207,6 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
      */
     public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
-    }
-
-    /**
-     * @return Returns the functionList.
-     */
-    public static String[] getFunctionList() {
-        return functionList;
-    }
-
-    /**
-     * @param index The impementatinIndex to set
-     */
-    public void setImplementationIndex(final int index) {
-        this.implementationIndex = index;
-    }
-
-    /**
-     * @return Returns the implementationIndex
-     */
-    public int getImplementationIndex() {
-        return implementationIndex;
     }
 
     /**
@@ -241,5 +254,19 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
     @Override
     public String getDescription() {
         return "Sigmoidal";
+    }
+
+    /**
+     * @return the type
+     */
+    public SigmoidType getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(SigmoidType type) {
+        this.type = type;
     }
 }

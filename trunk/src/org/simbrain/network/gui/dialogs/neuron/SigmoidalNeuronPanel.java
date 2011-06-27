@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
@@ -39,7 +40,9 @@ import org.simbrain.util.TristateDropDown;
 public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 
     /** Implementation combo box. */
-    private JComboBox cbImplementation = new JComboBox(SigmoidalNeuron.getFunctionList());
+    private JComboBox cbImplementation = new JComboBox(new SigmoidType[] {
+            SigmoidType.ARCTAN, SigmoidType.BARE, SigmoidType.LOGISTIC,
+            SigmoidType.TANH });
 
     /** Bias field. */
     private JTextField tfBias = new JTextField();
@@ -84,19 +87,19 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         SigmoidalNeuron neuronRef = (SigmoidalNeuron) ruleList.get(0);
 
-        cbImplementation.setSelectedIndex(neuronRef.getImplementationIndex());
+        cbImplementation.setSelectedItem(neuronRef.getType());
         tfBias.setText(Double.toString(neuronRef.getBias()));
         tfSlope.setText(Double.toString(neuronRef.getSlope()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalNeuron.class, "getImplementationIndex")) {
-            if ((cbImplementation.getItemCount() == SigmoidalNeuron.getFunctionList().length)) {
+        if (!NetworkUtils.isConsistent(ruleList, SigmoidalNeuron.class,
+                "getType")) {
+            if ((cbImplementation.getItemCount() == SigmoidType.values().length)) {
                 cbImplementation.addItem(NULL_STRING);
             }
-
-            cbImplementation.setSelectedIndex(SigmoidalNeuron.getFunctionList().length);
+            cbImplementation.setSelectedIndex(SigmoidType.values().length);
         }
 
         if (!tfBias.getText().equals(NULL_STRING)) {
@@ -137,7 +140,7 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     public void fillDefaultValues() {
         SigmoidalNeuron neuronRef = new SigmoidalNeuron();
 
-        cbImplementation.setSelectedIndex(neuronRef.getImplementationIndex());
+        cbImplementation.setSelectedItem(neuronRef.getType());
         tfBias.setText(Double.toString(neuronRef.getBias()));
         tfSlope.setText(Double.toString(neuronRef.getSlope()));
         isClipping.setSelected(neuronRef.getClipping());
@@ -153,7 +156,8 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
             SigmoidalNeuron neuronRef = (SigmoidalNeuron) ruleList.get(i);
 
             if (!cbImplementation.getSelectedItem().equals(NULL_STRING)) {
-                neuronRef.setImplementationIndex(cbImplementation.getSelectedIndex());
+                neuronRef.setType((SigmoidType) cbImplementation
+                        .getSelectedItem());
             }
             if (!tfBias.getText().equals(NULL_STRING)) {
                 neuronRef.setBias(Double.parseDouble(tfBias.getText()));

@@ -624,6 +624,15 @@ public class OdorWorld {
     }
 
     /**
+     * Fire a property changed event.
+     */
+    public void firePropertyChangedEvent() {
+        for (WorldListener listener : listenerList) {
+            listener.propertyChanged();
+        }
+    }
+
+    /**
      * @return the wrapAround
      */
     public boolean getWrapAround() {
@@ -638,17 +647,42 @@ public class OdorWorld {
     }
 
     /**
+     * Set width.
+     *
+     * @param newWidth new width
+     * @param fireEvent whether to fire a property changed event
+     */
+    public void setWidth(int newWidth, boolean fireEvent) {
+        this.width = newWidth;
+        if (fireEvent) {
+            firePropertyChangedEvent();
+        }
+    }
+
+    /**
+     * Set height.
+     *
+     * @param newHeight new height
+     * @param fireEvent whether to fire a property changed event
+     */
+    public void setHeight(int newHeight, boolean fireEvent) {
+        this.height = newHeight;
+        if (fireEvent) {
+            firePropertyChangedEvent();
+        }
+    }
+    /**
      * @param height the height to set
      */
     public void setHeight(int height) {
-        this.height = height;
+        setHeight(height, true);
     }
 
     /**
      * @param width the width to set
      */
     public void setWidth(int width) {
-        this.width = width;
+        setWidth(width, true);
     }
 
     /**
@@ -689,5 +723,7 @@ public class OdorWorld {
     public double getTotalSmellVectorLength() {
         return totalSmellVectorLength;
     }
+
+
 
 }

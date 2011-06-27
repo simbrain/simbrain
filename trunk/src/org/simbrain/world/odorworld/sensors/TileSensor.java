@@ -28,8 +28,13 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
  */
 public class TileSensor extends Sensor {
 
-    /** Whether the sensor is activated or not. */
-    private double isActivated = 0;
+    /**
+     * Value of the sensor; activationAmount if "active", 0 otherwise.
+     */
+    private double value = 0;
+
+    /** Value to return when the tile sensor is activated. */
+    private double activationAmount = 1;
 
     /** Upper left corner. */
     private int x;
@@ -74,18 +79,17 @@ public class TileSensor extends Sensor {
         boolean ytwo = entityY < (y + height);
 
         if (xone && xtwo && yone && ytwo) {
-            isActivated = 1;
+            value = activationAmount;
         } else {
-            isActivated = 0;
+            value = 0;
         }
     }
 
     /**
-     * @return whether this tile is occupied or not
+     * @return value associated with this sensor, 0 if occupied,
      */
-    public double isActivated() {
-        return isActivated;
+    public double getValue() {
+        return value;
     }
-
 
 }

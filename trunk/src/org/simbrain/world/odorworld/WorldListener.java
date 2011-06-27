@@ -81,4 +81,9 @@ interface WorldListener {
      */
     void effectorAdded(final Effector effector);
 
+    /**
+     * Some world parameter has changed.
+     */
+    void propertyChanged();
+
 }

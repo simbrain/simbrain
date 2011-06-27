@@ -47,7 +47,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
- * <b>OdorWorldPanel</b> represent the OdorWorld. 
+ * <b>OdorWorldPanel</b> represent the OdorWorld.
  */
 public class OdorWorldPanel extends JPanel implements KeyListener {
 
@@ -143,6 +143,9 @@ public class OdorWorldPanel extends JPanel implements KeyListener {
 
             public void entityChanged(OdorWorldEntity entity) {
                 repaint();
+            }
+
+            public void propertyChanged() {
             }
         });
     }

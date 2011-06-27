@@ -25,10 +25,14 @@ import java.awt.event.ComponentListener;
 
 import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
- * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
- * data.  The main environment codes is in {@link OdorWorldPanel}.
+ * <b>WorldPanel</b> is the container for the world component. Handles toolbar
+ * buttons, and serializing of world data. The main environment codes is in
+ * {@link OdorWorldPanel}.
  */
 public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> {
 
@@ -48,12 +52,14 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         super(frame, component);
         setLayout(new BorderLayout());
         worldPanel = new OdorWorldPanel(component.getWorld());
-        worldPanel.setPreferredSize(new Dimension(400, 425));
         add("Center", worldPanel);
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
-        getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this class?
-        //component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory()); //TODO: Think then Remove
+        setGuiSizeToWorldSize();
+        getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
+                                            // class?
+        // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
+        // //TODO: Think then Remove
 
         this.getParentFrame().pack();
 
@@ -66,14 +72,58 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
             }
 
             public void componentResized(ComponentEvent arg0) {
-                worldPanel.getWorld().setWidth(worldPanel.getWidth());
-                worldPanel.getWorld().setHeight(worldPanel.getHeight());
+                worldPanel.getWorld().setWidth(worldPanel.getWidth(), false);
+                worldPanel.getWorld().setHeight(worldPanel.getHeight(), false);
             }
 
             public void componentShown(ComponentEvent arg0) {
             }
         });
 
+        worldPanel.getWorld().addListener(new WorldListener() {
+
+            public void updated() {
+            }
+
+            public void entityAdded(OdorWorldEntity entity) {
+            }
+
+            public void entityChanged(OdorWorldEntity entity) {
+            }
+
+            public void entityRemoved(OdorWorldEntity entity) {
+            }
+
+            public void sensorAdded(Sensor sensor) {
+            }
+
+            public void sensorRemoved(Sensor sensor) {
+            }
+
+            public void effectorRemoved(Effector effector) {
+            }
+
+            public void effectorAdded(Effector effector) {
+            }
+
+            public void propertyChanged() {
+                setGuiSizeToWorldSize();
+            }
+
+        });
+
+    }
+
+    /**
+     * Sets the size of the gui panel based on the "logical" size of the world
+     * object.
+     */
+    private void setGuiSizeToWorldSize() {
+        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld()
+                .getWidth(), worldPanel.getWorld().getHeight()));
+        worldPanel.setSize(new Dimension(worldPanel.getWorld().getWidth(),
+                worldPanel.getWorld().getHeight()));
+        this.getParentFrame().pack();
     }
 
     /**
@@ -89,7 +139,8 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     public void postAddInit() {
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
-        getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this class?
+        getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
+                                            // class?
         getParentFrame().pack(); // Force a repaint
     }
 
@@ -102,6 +153,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
 
     /**
      * Sets odor world frame menu.
+     *
      * @param menu Menu
      */
     public void setMenu(final OdorWorldFrameMenu menu) {
@@ -112,14 +164,5 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
     public void closing() {
         // TODO Auto-generated method stub
     }
-
-    /* (non-Javadoc)
-     * @see org.simbrain.workspace.gui.GuiComponent#update()
-     */
-//    @Override
-    // Commented this out since it has no obvious effect
-//    protected void update() {
-//        worldPanel.repaint();
-//    }
 
 }

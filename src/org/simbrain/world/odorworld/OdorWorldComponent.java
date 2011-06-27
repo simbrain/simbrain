@@ -258,6 +258,10 @@ public class OdorWorldComponent extends WorkspaceComponent {
             public void entityChanged(OdorWorldEntity entity) {
                 setChangedSinceLastSave(true);
             }
+            public void propertyChanged() {
+                // TODO Auto-generated method stub
+                
+            }
         });
     }
 

@@ -40,8 +40,8 @@ import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 import org.simbrain.network.util.SimnetUtils;
-import org.simbrain.trainer.DataGenerators;
 import org.simbrain.trainer.LMSOffline;
+import org.simbrain.trainer.ReservoirComputingUtils;
 import org.simbrain.trainer.LMSOffline.SolutionType;
 
 /**
@@ -69,8 +69,14 @@ public final class EchoStateNetBuilder {
     /** Default network has weights from the output to the reservoir */
     private boolean backWeights = true;
 
+    /** Default network has no recurrent output weights */
+    private boolean recurrentOutWeights = false;
+    
+    /** Default network has direct input to output connections */
+    private boolean directInOutWeights = true;
+    
     /** Default reservoir neuron type */
-    private NeuronUpdateRule reservoirNeuronType = new SigmoidalNeuron();
+    private NeuronUpdateRule reservoirNeuronType = new LinearNeuron();
 
     /** Reference to input layer. */
     private List<Neuron> inputLayer;
@@ -83,8 +89,9 @@ public final class EchoStateNetBuilder {
 
    /** Default TANH neurons for the reservoir */
     {
-        ((SigmoidalNeuron) reservoirNeuronType).setType(SigmoidType.LOGISTIC);
+        ((SigmoidalNeuron) reservoirNeuronType).setType(SigmoidType.TANH);
     }
+
 
     /** Default output neuron type */
     private NeuronUpdateRule outputNeuronType = new LinearNeuron();
@@ -145,9 +152,10 @@ public final class EchoStateNetBuilder {
 
         GridLayout reservoirLayout = new GridLayout(betweenNeuronInterval,
                 betweenNeuronInterval, (int) Math.sqrt(numReservoirNodes));
-        initialGridPostion = new Point2D.Double((int) initialPosition.getX()
-                - getWidth(reservoirLayer) / 2, (int) initialPosition.getY()
-                - betweenLayerInterval);
+        initialGridPostion = new Point2D.Double((int) inputLayer.get(0).getX()
+               , (int) initialPosition.getY()
+                - betweenLayerInterval - (int)Math.sqrt(numReservoirNodes)*
+                GridLayout.getVSpacing());
         reservoirLayout.setInitialLocation(initialGridPostion);
         reservoirLayout.layoutNeurons(reservoirLayer);
 
@@ -227,19 +235,28 @@ public final class EchoStateNetBuilder {
         // TODO: Add methods for training to various configurations...
 
         // Generate the reservoir data to be used in training
-        double[][] mainInputData = DataGenerators.generateReservoirData(
-                getRootNetwork(), getInputLayer(), inputData,
-                getReservoirLayer());
+        double[][] mainInputData = ReservoirComputingUtils.generateData(
+                this,inputData,
+                trainingData);
 
         //System.out.println("-------");
         //System.out.println(Utils.doubleMatrixToString(mainInputData));
+        
+        ArrayList<Neuron> full = new ArrayList<Neuron>();
+        
+        for(Neuron node : inputLayer){
+            full.add(node);
+        }
+        for(Neuron node : reservoirLayer){
+            full.add(node);
+        }
 
         LMSOffline trainer = new LMSOffline(network);
         trainer.setInputData(mainInputData);
         trainer.setTrainingData(trainingData);
-        trainer.setInputLayer(getReservoirLayer());
+        trainer.setInputLayer(full);
         trainer.setOutputLayer(getOutputLayer());
-        trainer.setSolutionType(SolutionType.MOORE_PENROSE); //TODO: Ability to set
+        trainer.setSolutionType(SolutionType.WIENER_HOPF); //TODO: Ability to set
         trainer.train(1);
 
     }
@@ -315,11 +332,11 @@ public final class EchoStateNetBuilder {
 
     public void setSpectralRadius(double spectralRadius) {
         this.spectralRadius = spectralRadius;
-        if (spectralRadius <= 1.0) {
-            System.out.println("Warning: Setting the spectral radius to a "
-                    + "value greater than or equal to 1 will guarantee the "
-                    + "network has no echo-states for any left-infinite "
-                    + "input sequences, unless certain parameters are met "
+        if (spectralRadius >= 1.0) {
+            System.out.println("Warning: Setting the spectral radius to a \n"
+                    + "value greater than or equal to 1 will guarantee the \n"
+                    + "network has no echo-states for any left-infinite \n"
+                    + "input sequences, unless certain parameters are met \n"
                     + "relating to the amplitude of the input.");
         }
     }
@@ -372,7 +389,22 @@ public final class EchoStateNetBuilder {
     public List<Neuron> getOutputLayer() {
         return outputLayer;
     }
+    
+    public void setRecurrentOutWeights(boolean recurrentWeights) {
+        this.recurrentOutWeights = recurrentWeights;
+    }
 
+    public boolean hasRecurrentOutWeights() {
+        return recurrentOutWeights;
+    }
+
+    public void setDirectInOutWeights(boolean directInOutWeights) {
+        this.directInOutWeights = directInOutWeights;
+    }
+
+    public boolean hasDirectInOutWeights() {
+        return directInOutWeights;
+    }
 
     /**
      * Test the esn builder using an xor through time task.
@@ -381,17 +413,17 @@ public final class EchoStateNetBuilder {
      */
     public static void main (String args []){
         final RootNetwork network = new RootNetwork();
-        EchoStateNetBuilder esn = new EchoStateNetBuilder(network, 2, 20, 10);
+        EchoStateNetBuilder esn = new EchoStateNetBuilder(network, 2, 100, 10);
         esn.setInSparsity(0.2);
-        esn.setResSparsity(0.05);
+        esn.setResSparsity(0.2);
         esn.setBackSparsity(0.2);
-        esn.setSpectralRadius(0.98);
+        esn.setSpectralRadius(0.8);
 
         esn.buildNetwork();
 
         // Create xor through time data
         int history = 10;
-        int numInputs = history + 10000;
+        int numInputs = history + 50000;
         double [][] preInputData = new double [history][2];
         double [][] inputData = new double [numInputs][2];
         double [][] teachData = new double [numInputs][history];
@@ -454,23 +486,25 @@ public final class EchoStateNetBuilder {
     private static double[] getXORValues(int truthTableRow) {
         double[] retVal = new double[3];
         if (truthTableRow == 0) {
-            retVal[0] = 1;
-            retVal[1] = 1;
-            retVal[2] = -1;
+            retVal[0] = 1.0;
+            retVal[1] = 1.0;
+            retVal[2] = -1.0;
         } else if (truthTableRow == 1) {
-            retVal[0] = -1;
-            retVal[1] = 1;
-            retVal[2] = 1;
+            retVal[0] = -1.0;
+            retVal[1] = 1.0;
+            retVal[2] = 1.0;
         } else if (truthTableRow == 2) {
-            retVal[0] = 1;
-            retVal[1] = -1;
-            retVal[2] = 1;
+            retVal[0] = 1.0;
+            retVal[1] = -1.0;
+            retVal[2] = 1.0;
         } else if (truthTableRow == 3) {
-            retVal[0] = -1;
-            retVal[1] = -1;
-            retVal[2] = -1;
+            retVal[0] = -1.0;
+            retVal[1] = -1.0;
+            retVal[2] = -1.0;
         }
         return retVal;
     }
+
+   
 
 }

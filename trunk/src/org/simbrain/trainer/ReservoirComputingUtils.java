@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.trainer;
 
 import java.io.File;
@@ -24,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.builders.EchoStateNetBuilder;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
@@ -33,22 +16,13 @@ import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.trainer.LMSOffline.SolutionType;
-import org.simbrain.util.Utils;
 
-/**
- * Provides static methods for generating input to be used in Trainers.
- * Currently provides methods for creating input data for reservoir networks, by
- * updating the states of a reservoir and then adding those states to a matrix.
- *
- * @author jyoshimi
- * @author ztosi
- */
-public class DataGenerators {
-
+public class ReservoirComputingUtils {
     // TODO: These methods may not work if more complex network updating is
-    // required
-    // when setting the reservoir states.
-
+    // required when setting the reservoir states.
+    // TODO: Functions for setting trained ESN weights may not function
+    // properly for recurrent output weights
+    
     /**
      * Create data to be used in training a reservoir based network, as follows:
      * 1) Iterate through each row of the input data and use it to set the input
@@ -64,8 +38,8 @@ public class DataGenerators {
      */
     public static double[][] generateCombinedInputReservoirData(
             RootNetwork network, List<Neuron> inputNeurons,
-            double[][] inputData, List<Neuron> reservoirNeurons) {
-
+            double [][] inputData, List<Neuron> reservoirNeurons) {
+ 
         // / Return matrix
         double[][] returnMatrix = new double[inputData.length][inputNeurons
                 .size() + reservoirNeurons.size()];
@@ -82,7 +56,7 @@ public class DataGenerators {
                 returnMatrix[row][col] = neuron.getActivation();
                 col++;
             }
-
+            
             // Update reservoir and add the resulting values to the
             // return matrix
             network.updateNeurons(reservoirNeurons);
@@ -147,6 +121,90 @@ public class DataGenerators {
 
         return returnMatrix;
 
+    }
+
+    /**
+     * A general method for harvesting state data for an arbitrary Echo-State
+     * Network. This method iterates through each row of input and teacher data
+     * (if the network possesses back weights and/or recurrent output weights),
+     * and updates the reservoir. Depending on the ESN's un-frozen connectivity
+     * the resulting return matrix will have rows consisting of concatenated
+     * input, reservoir, and (teacher-forced) output states in that order.
+     * 
+     * @param esn
+     *            The ESN builder from which parameters for state harvesting are
+     *            inferred
+     * @param inputData
+     *            data input to the ESN
+     * @param teacherData
+     *            training data used for teacher-forcing if required
+     * @return a matrix of data to be used for offline training
+     */
+    public static double[][] generateData(EchoStateNetBuilder esn,
+            double[][] inputData, double[][] teacherData) {
+        // The minimum number of state matrix columns
+        int columnNumber = esn.getNumReservoirNodes();
+
+        if (esn.hasDirectInOutWeights()) {
+            //Add columns for the input layer states
+            columnNumber += esn.getNumInputNodes();
+        }
+        if (esn.hasRecurrentOutWeights()) {
+            //Add columns for output layer states
+            columnNumber += esn.getNumOutputNodes();
+        }
+        //State matrix
+        double[][] returnMatrix = new double[inputData.length][columnNumber];
+
+        //Iterate through each row of input data
+        for (int row = 0; row < inputData.length; row++) {
+
+            int col = 0;
+
+            //Clamp input neurons based on input data
+            for (Neuron neuron : esn.getInputLayer()) {
+                double clampValue = inputData[row][col];
+                neuron.setActivation(clampValue);
+                if (esn.hasDirectInOutWeights()) {
+                    //Add input states to state matrix if direct in to out
+                    //connections are desired
+                    returnMatrix[row][col] = neuron.getActivation();
+                    col++;
+                }
+
+            }
+
+            // TODO: Potentially shift teacher data to correspond to reservoir
+            // states
+
+            if (esn.hasBackWeights()) {
+                int count = 0;
+                for (Neuron neuron : esn.getOutputLayer()) {
+                    // Teacher forcing
+                    double clampValue = teacherData[row][count];
+                    neuron.setActivation(clampValue);
+                }
+            }
+
+            //Update the reservoir: handles teacher-forced back-weights
+            esn.getRootNetwork().updateNeurons(esn.getReservoirLayer());
+            for (Neuron neuron : esn.getReservoirLayer()) {
+                returnMatrix[row][col] = neuron.getActivation();
+                col++;
+            }
+
+            //Add output states to state matrix if there are recurrent outputs
+            if (esn.hasRecurrentOutWeights()) {
+                for (int i = 0; i < teacherData[0].length; i++) {
+                    //Teacher-forcing
+                    returnMatrix[row][col] = teacherData[row][i];
+                    col++;
+                }
+            }
+
+        }
+
+        return returnMatrix;
     }
 
     /**
@@ -251,7 +309,7 @@ public class DataGenerators {
         network.randomizeWeights();
 
         // Create input data for trainer
-        double[][] inputData = DataGenerators
+        double[][] inputData = ReservoirComputingUtils
                 .generateCombinedInputReservoirData(network, clampedLayer,
                         clampData, hiddenLayer);
 
@@ -278,4 +336,5 @@ public class DataGenerators {
         return network;
     }
 
+   
 }

@@ -85,7 +85,7 @@ public class OdorWorld {
             object.updateSmellSource();
             object.updateSensors();
             object.applyEffectors();
-            updateSprite(object, 1); // time defaults to 1 now
+            updateEntity(object, 1); // time defaults to 1 now
         }
         fireUpdateEvent();
     }
@@ -232,53 +232,6 @@ public class OdorWorld {
         }
     }
 
-    // /**
-    // * Add an odor world entity.
-    // *
-    // * @param entity entity to add
-    // * @param tileX x position of entity
-    // * @param tileY y position of entity
-    // */
-    // private void addEntity(final OdorWorldEntity entity, final int tileX,
-    // final int tileY) {
-    //
-    // entity.setX(tileX);
-    // entity.setY(tileY);
-    // entity.setVelocityX( -1 + (float) Math.random() * 2);
-    // entity.setVelocityY(-1 + (float) Math.random() * 2);
-    // addEntity(entity);
-    // }
-
-    // //TODO: way to add an entity with an animation
-    //
-    // /**
-    // * Add a basic entity at specified point.
-    // *
-    // * @param p the location where the object should be added
-    // */
-    // public void addBasicEntity(final int x, final int y, final String
-    // imageName) {
-    //
-    // Animation anim = new Animation(imageName);
-    // //animation.addFrame(ResourceManager.getImage("Mouse_0.gif"), 150);
-    // //animation.addFrame(ResourceManager.getImage("Mouse_345.gif"), 150);
-    //
-    // BasicEntity entity = new BasicEntity(this, anim);
-    // addEntity(entity, x, y);
-    // fireUpdateEvent();
-    // }
-    //
-    // /**
-    // * Currently mouse is the only option!
-    // */
-    // public void addRotatingEntity(final double[] p) {
-    // RotatingEntity entity = new RotatingEntity(this);
-    // entity.addEffector(new RotationEffector(entity));
-    // entity.addSensor(new SmellSensor(entity));
-    // addEntity(entity, (int) p[0], (int) p[1]);
-    // fireUpdateEvent();
-    // }
-
     /**
      * Returns a properly initialized xstream object.
      *
@@ -316,63 +269,35 @@ public class OdorWorld {
     }
 
     /**
-     * Updates the creature. TODO: to be rewritten
+     * Updates all entities.
      */
-    private void updateSprite(final OdorWorldEntity sprite,
+    private void updateEntity(final OdorWorldEntity entity,
             final long elapsedTime) {
 
         // Collision detection
-        float dx = sprite.getVelocityX();
-        float oldX = sprite.getX();
+        float dx = entity.getVelocityX();
+        float oldX = entity.getX();
         float newX = oldX + dx * elapsedTime;
-        float dy = sprite.getVelocityY();
-        float oldY = sprite.getY();
+        float dy = entity.getVelocityY();
+        float oldY = entity.getY();
         float newY = oldY + dy * elapsedTime;
-
-        // Handle tile collisions
-        // Point tile = getTileCollision(creature, newX, creature.getY());
-        // if (tile != null) {
-        // // Line up with the tile boundary
-        // if (dx > 0) {
-        // creature.setX(
-        // OdorWorldRenderer.tilesToPixels(tile.x) -
-        // creature.getWidth());
-        // }
-        // else if (dx < 0) {
-        // creature.setX(
-        // OdorWorldRenderer.tilesToPixels(tile.x + 1));
-        // }
-        // }
-        // tile = getTileCollision(creature, creature.getX(), newY);
-        // if (tile != null) {
-        // // Line up with the tile boundary
-        // if (dx > 0) {
-        // creature.setY(
-        // OdorWorldRenderer.tilesToPixels(tile.y) -
-        // creature.getHeight());
-        // }
-        // else if (dx < 0) {
-        // creature.setY(
-        // OdorWorldRenderer.tilesToPixels(tile.y + 1));
-        // }
-        // }
 
         // Very simple motion
         if (dx != 0) {
-            sprite.setX(sprite.getX() + dx);
+            entity.setX(entity.getX() + dx);
         }
         if (dy != 0) {
-            sprite.setY(sprite.getY() + dy);
+            entity.setY(entity.getY() + dy);
         }
 
         // Handle sprite collisions
-        sprite.setHasCollided(false);
-        for (OdorWorldEntity entity : entityList) {
-            if (entity == sprite) {
+        entity.setHasCollided(false);
+        for (OdorWorldEntity otherEntity : entityList) {
+            if (entity == otherEntity) {
                 continue;
             }
-            if (entity.getReducedBounds().intersects(sprite.getReducedBounds())) {
-                sprite.setHasCollided(true);
+            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
+                otherEntity.setHasCollided(true);
             }
         }
 
@@ -389,41 +314,36 @@ public class OdorWorld {
         // // sprite.setY(newY);
         // }
 
-        if (wrapAround) {
-
-            if (sprite.getX() >= getWidth()) {
-                sprite.setX(sprite.getX() - getWidth());
-            }
-            if (sprite.getX() < 0) {
-                sprite.setX(sprite.getX() + getWidth());
-            }
-            if (sprite.getY() >= getHeight()) {
-                sprite.setY(sprite.getY() - getHeight());
-            }
-            if (sprite.getY() < 0) {
-                sprite.setY(sprite.getY() + getHeight());
-            }
-        } else {
-            // Not wrap-around
-            if (sprite.getX() >= getWidth()) {
-                sprite.setX(sprite.getX() - sprite.getWidth()/2);
-            }
-            if (sprite.getX() < 0) {
-                sprite.setX(sprite.getX() + sprite.getWidth()/2);
-            }
-            if (sprite.getY() >= getHeight()) {
-                sprite.setY(sprite.getY() - sprite.getHeight()/2);
-            }
-            if (sprite.getY() < 0) {
-                sprite.setY(sprite.getY() + sprite.getHeight()/2);
-            }
-        }
-
         // Update creature
-        sprite.update(elapsedTime);
+        entity.update(elapsedTime);
 
-        // System.out.println("x: " + creature.getX() + " y:" +
-        // creature.getY());
+        //System.out.println(sprite.getId() + " new - x: " + sprite.getX() + " y:" + sprite.getY());
+    }
+
+    /**
+     * Check whether the provided point is in bounds or not.
+     *
+     * @param x the point to check
+     * @return whether the point is in bounds or not.
+     */
+    public boolean isInBoundsX(float x) {
+        if ((x < 0) || (x > getWidth())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check whether the provided point is in bounds or not.
+     *
+     * @param y the point to check
+     * @return whether the point is in bounds or not.
+     */
+    public boolean isInBoundsY(float y) {
+        if ((y < 0) || (y > getHeight())) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -483,40 +403,6 @@ public class OdorWorld {
             }
         }
         return false;
-    }
-
-    /**
-     * Gets the tile that a Sprites collides with. Only the OdorWorldEntity's X
-     * or Y should be changed, not both. Returns null if no collision is
-     * detected.
-     */
-    public Point getTileCollision(OdorWorldEntity sprite, float newX, float newY) {
-        float fromX = Math.min(sprite.getX(), newX);
-        float fromY = Math.min(sprite.getY(), newY);
-        float toX = Math.max(sprite.getX(), newX);
-        float toY = Math.max(sprite.getY(), newY);
-
-        // Get the tile locations
-        int fromTileX = OdorWorldRenderer.pixelsToTiles(fromX);
-        int fromTileY = OdorWorldRenderer.pixelsToTiles(fromY);
-        int toTileX = OdorWorldRenderer.pixelsToTiles(toX + sprite.getWidth()
-                - 1);
-        int toTileY = OdorWorldRenderer.pixelsToTiles(toY + sprite.getHeight()
-                - 1);
-
-        // Check each tile for a collision
-        // for (int x = fromTileX; x <= toTileX; x++) {
-        // for (int y = fromTileY; y <= toTileY; y++) {
-        // if (x < 0 || x >= map.getWidth() || map.getTile(x, y) != null) {
-        // // collision found, return the tile
-        // pointCache.setLocation(x, y);
-        // return pointCache;
-        // }
-        // }
-        // }
-
-        // No collision found
-        return null;
     }
 
     /**
@@ -723,7 +609,5 @@ public class OdorWorld {
     public double getTotalSmellVectorLength() {
         return totalSmellVectorLength;
     }
-
-
 
 }

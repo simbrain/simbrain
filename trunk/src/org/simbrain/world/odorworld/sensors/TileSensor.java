@@ -29,7 +29,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 public class TileSensor extends Sensor {
 
     /**
-     * Value of the sensor; activationAmount if "active", 0 otherwise.
+     * Current value of the sensor; activationAmount if "active", 0 otherwise.
      */
     private double value = 0;
 
@@ -75,9 +75,10 @@ public class TileSensor extends Sensor {
         double entityY = parent.getCenterLocation()[1];
         boolean xone = entityX > x;
         boolean xtwo = entityX < (x + width);
-        boolean yone =  entityY > y;
+        boolean yone = entityY > y;
         boolean ytwo = entityY < (y + height);
 
+        //System.out.println(xone + " " + xtwo + " " + yone + " " + ytwo);
         if (xone && xtwo && yone && ytwo) {
             value = activationAmount;
         } else {
@@ -90,6 +91,41 @@ public class TileSensor extends Sensor {
      */
     public double getValue() {
         return value;
+    }
+
+    /**
+     * @return the activationAmount
+     */
+    public double getActivationAmount() {
+        return activationAmount;
+    }
+
+    /**
+     * @return the x
+     */
+    public int getX() {
+        return x;
+    }
+
+    /**
+     * @return the y
+     */
+    public int getY() {
+        return y;
+    }
+
+    /**
+     * @return the width
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * @return the height
+     */
+    public int getHeight() {
+        return height;
     }
 
 }

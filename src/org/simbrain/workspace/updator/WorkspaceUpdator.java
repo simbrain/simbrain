@@ -158,6 +158,13 @@ public class WorkspaceUpdator {
     }
 
     /**
+     * Reset the update controller to DEFAUT_CONTROLLER.
+     */
+    public void resetController() {
+        setUpdateController(DEFAULT_CONTROLLER);
+    }
+
+    /**
      * Sets the manager. Setting the manager to null clears the manager.
      *
      * @param manager the new manager.
@@ -457,6 +464,20 @@ public class WorkspaceUpdator {
     }
 
     /**
+     * Called when update controller is changed.
+     */
+    private void notifyUpdateControllerChanged() {
+
+        events.submit(new Runnable() {
+            public void run() {
+                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                    listener.changedUpdateController();
+                }
+            }
+        });
+    }
+
+    /**
      * @return the numThreads
      */
     public int getNumThreads() {
@@ -576,6 +597,7 @@ public class WorkspaceUpdator {
      */
     public void setUpdateController(final UpdateController updateController) {
         this.updateController = updateController;
+        notifyUpdateControllerChanged();
     }
 
 

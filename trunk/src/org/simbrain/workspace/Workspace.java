@@ -33,6 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
+import org.simbrain.workspace.updator.BufferedUpdator;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
 import org.simbrain.workspace.updator.UpdateController;
 import org.simbrain.workspace.updator.WorkspaceUpdator;
@@ -342,6 +343,7 @@ public class Workspace {
         this.setWorkspaceChanged(false);
         currentFile = null;
         fireWorkspaceCleared();
+        updator.resetController();
         manager.clearCouplings();
     }
 
@@ -596,6 +598,7 @@ public class Workspace {
             }
         }
     }
+
 
     /**
      * Returns all components of the specified type, e.g. all

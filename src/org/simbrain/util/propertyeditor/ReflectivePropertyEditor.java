@@ -496,7 +496,8 @@ public class ReflectivePropertyEditor extends JPanel {
                 // System.out.println(possibleSetter.getParameterTypes()[0].getName()
                 // + " =? " + getter.getReturnType().getName());
                 if (possibleSetter.getParameterTypes()[0].getName() == getter
-                        .getReturnType().getName()) {
+                        .getReturnType().getName()
+                        && (possibleSetter.getParameterTypes().length == 1)) {
                     // At this point set the list of setter methods for use in
                     // commit
                     editableMethods.add(possibleSetter);

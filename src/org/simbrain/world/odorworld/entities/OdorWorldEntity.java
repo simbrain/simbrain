@@ -166,15 +166,43 @@ public abstract class OdorWorldEntity {
     /**
      * Sets this OdorWorldEntity's current x position.
      */
-    public void setX(final float x) {
-        this.x = x;
+    public void setX(final float newx) {
+        //System.out.println("x:" + newx);
+        if (parentWorld.getWrapAround()) {
+            if (newx <= 0) {
+                this.x = parentWorld.getWidth()
+                        - (Math.abs(newx) % parentWorld.getWidth());
+            } else if (newx >  parentWorld.getWidth()) {
+                this.x = newx % parentWorld.getWidth();
+            } else {
+                this.x = newx;
+            }
+        } else {
+            if (parentWorld.isInBoundsX(newx)) {
+                this.x = newx;
+            }
+        }
     }
 
     /**
      * Sets this OdorWorldEntity's current y position.
      */
-    public void setY(final float y) {
-        this.y = y;
+    public void setY(final float newy) {
+        //System.out.println("y:" + newy);
+        if (parentWorld.getWrapAround()) {
+            if (newy <= 0) {
+                this.y = parentWorld.getHeight()
+                        - (Math.abs(newy) % parentWorld.getHeight());
+            } else if (newy >  parentWorld.getHeight()) {
+                this.y = newy % parentWorld.getHeight();
+            } else {
+                this.y = newy;
+            }
+        } else {
+            if (parentWorld.isInBoundsY(newy)) {
+                this.y = newy;
+            }
+        }
     }
 
     /**
@@ -182,6 +210,9 @@ public abstract class OdorWorldEntity {
      * image.
      */
     public int getWidth() {
+        while (getImage().getWidth(null) < 0) {
+            ;
+        }
         return animation.getImage().getWidth(null);
     }
 
@@ -190,6 +221,9 @@ public abstract class OdorWorldEntity {
      * image.
      */
     public int getHeight() {
+        while (getImage().getHeight(null) < 0) {
+            ;
+        }
         return animation.getImage().getHeight(null);
     }
 
@@ -402,9 +436,19 @@ public abstract class OdorWorldEntity {
      * @return center location of the entity.
      */
     public double[] getCenterLocation() {
-        return new double[] { x + getWidth() / 2, y + getHeight() / 2 };
+        return new double[] { x + (getWidth() / 2), y + (getHeight() / 2) };
     }
 
+    /**
+     * Set the location of this entity.
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     */
+    public void setCenterLocation(float x, float y) {
+        setX(x - (getWidth() / 2));
+        setY(y - (getHeight() / 2));
+    }
     /**
      * Returns the location of the entity as a double array.
      *
@@ -421,8 +465,8 @@ public abstract class OdorWorldEntity {
      * @param y y coordinate
      */
     public void setLocation(float x, float y) {
-        this.x = x;
-        this.y = y;
+        setX(x);
+        setY(y);
     }
 
     /**
@@ -630,14 +674,14 @@ public abstract class OdorWorldEntity {
      * @param x the x to set
      */
     public void setX(double x) {
-        this.x = (float) x;
+        setX((float) x);
     }
 
     /**
      * @param y the y to set
      */
     public void setY(double y) {
-        this.y = (float) y;
+        setY((float) y);
     }
 
     /**

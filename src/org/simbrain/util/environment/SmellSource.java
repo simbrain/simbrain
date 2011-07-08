@@ -286,7 +286,7 @@ public class SmellSource {
         }
         if (distance < stimulusDispersion) {
             if (decayFunction == DecayFunction.STEP) {
-                if (distance > peak) {
+                if (distance >= peak) {
                     ret = (double[]) (returnVector.clone());
                 }
             } else if (decayFunction == DecayFunction.LINEAR) {

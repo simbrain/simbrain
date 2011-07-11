@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -42,7 +43,7 @@ public class Utils {
 
     /**
      * Read a csv (comma-separated-values) files.
-     *
+     * 
      * @param theFile the file to read in
      * @return an two-dimensional array of comma-separated values
      */
@@ -63,7 +64,7 @@ public class Utils {
 
     /**
      * Read a csv (comma-separated-values) files.
-     *
+     * 
      * @param theFile the file to read in
      * @return an two-dimensional array of comma-separated values
      */
@@ -95,7 +96,7 @@ public class Utils {
 
     /**
      * Save data as CSV (comma-separated-value) file.
-     *
+     * 
      * @param data Data to be written
      * @param theFile File to be written to
      */
@@ -129,10 +130,11 @@ public class Utils {
      * absolutePath of the local user directory from the absolute path of the
      * file to be saved, and converts file-separators into forward slashes,
      * which are used for saving simualtion files.
-     *
+     * 
      * @param baseDir absolute path of the local simbrain directory.
      * @param absolutePath the absolute path of the file to be saved
-     * @return the relative path from the local directory to the file to be saved
+     * @return the relative path from the local directory to the file to be
+     *         saved
      */
     public static String getRelativePath(final String baseDir,
             final String absolutePath) {
@@ -150,7 +152,7 @@ public class Utils {
 
     /**
      * Extract file name from a path description.
-     *
+     * 
      * @param thePath the path
      * @return the extracted file name
      */
@@ -162,7 +164,7 @@ public class Utils {
 
     /**
      * Get the directory component of a file.
-     *
+     * 
      * @param theFile the file to get the directory of.
      * @return the extracted directory path
      */
@@ -176,7 +178,7 @@ public class Utils {
 
     /**
      * Convert an array of doubles into a String.
-     *
+     * 
      * @param theVec the array of doubles to convert
      * @param delimiter Delimiter
      * @return the String representation of the array
@@ -197,7 +199,7 @@ public class Utils {
     /**
      * Convert a delimeted string of doubles into an array of doubles. Undoes
      * String getVectorString.
-     *
+     * 
      * @param theVec string version of vector
      * @param delimiter delimeter used in that string
      * @return the corresponding array of doubles
@@ -218,7 +220,7 @@ public class Utils {
 
     /**
      * Converts an array of strings containing doubles into an array of values.
-     *
+     * 
      * @param line the array of strings
      * @return the array of doubles
      */
@@ -234,7 +236,7 @@ public class Utils {
 
     /**
      * Utility to class to convert arrays of doubles to strings.
-     *
+     * 
      * @param data array of doubles
      * @return string representation of that array
      */
@@ -267,7 +269,7 @@ public class Utils {
 
     /**
      * Checks whether an array list cantains a name, and warns you if it does.
-     *
+     * 
      * @param al the array list to check; must be an array of strings
      * @param theString the name to check for
      * @return true if the name is contained in the array, false otherwise
@@ -311,7 +313,7 @@ public class Utils {
     /**
      * Converts a floating point value into a color in HSB, with Saturation and
      * Brightness 1.
-     *
+     * 
      * @param fclr Float color
      * @return Hue, saturation, and brightness
      */
@@ -321,7 +323,7 @@ public class Utils {
 
     /**
      * returns the Hue associated with a Color.
-     *
+     * 
      * @param clr Color
      * @return Hue, saturation and brightness
      */
@@ -333,7 +335,7 @@ public class Utils {
     /**
      * Shows the quick reference guide in the help menu. The quick reference is
      * an html page in the Simbrain/doc directory.
-     *
+     * 
      * @param helpPage Help page
      */
     public static void showQuickRef(final String helpPage) {
@@ -357,7 +359,7 @@ public class Utils {
 
     /**
      * Convert a 2-d array of doubles to a string.
-     *
+     * 
      * @param matrix the matrix to print
      * @return the formatted string
      */
@@ -365,10 +367,89 @@ public class Utils {
         String result = "";
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
-                result += matrix[i][j] + " ";
+                result += Utils.round(matrix[i][j], 2) + " ";
             }
             result += "\n";
         }
         return result;
     }
+
+    /**
+     * <p>
+     * Decides if the operating system matches.
+     * </p>
+     * Source adapted from org.apache.commons.lang.SystemUtils
+     * 
+     * @param osNamePrefix the prefix for the os name
+     * @return true if matches, or false if not or can't determine
+     */
+    static boolean getOSMatches(String osNamePrefix) {
+        final String OS_NAME = System.getProperty("os.name");
+        if (OS_NAME == null) {
+            return false;
+        }
+        return OS_NAME.startsWith(osNamePrefix);
+    }
+
+    /**
+     * Determines whether the system is a Mac os x.
+     * 
+     * @return whether the system is a Mac os x.
+     */
+    public static boolean isMacOSX() {
+        return Utils.getOSMatches("Mac OS X");
+    }
+
+    /**
+     * Reimplementation of same method from
+     * org.apache.commons.collections.CollectionUtils.
+     *
+     * @param selection the collection to filter
+     * @param filter the predicate to be used in filtering.
+     * @return those members of the selection to which the predicate applies
+     */
+    public static Collection select(final Collection selection,
+            final Predicate filter) {
+        Collection ret = new ArrayList();
+        for (Object object : selection) {
+            if (filter.evaluate(object)) {
+                ret.add(object);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Re-implementation of same method from
+     * org.apache.commons.collections.CollectionUtils.
+     *
+     * @param a Collection
+     * @param b Collection
+     * @return union of two collections
+     */
+    public static Collection union(final Collection a, final Collection b) {
+        Collection ret = new ArrayList();
+        ret.addAll(a);
+        ret.addAll(b);
+        return ret;
+    }
+
+    /**
+     * Re-implementation of same method from
+     * org.apache.commons.collections.CollectionUtils.
+     *
+     * @param a Collection
+     * @param b Collection
+     * @return intersection of two collections
+     */
+    public static Collection intersection(final Collection a, final Collection b) {
+        Collection ret = new ArrayList();
+        for (Object object : a) {
+            if (b.contains(object)) {
+                ret.add(object);
+            }
+        }
+        return ret;
+    }
+
 }

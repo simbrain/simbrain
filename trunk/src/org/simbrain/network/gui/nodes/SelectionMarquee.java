@@ -25,7 +25,7 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
 
-import org.simbrain.util.SimbrainUtils;
+import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -41,7 +41,7 @@ public final class SelectionMarquee
     private static final Paint DEFAULT_PAINT = Color.WHITE;
 
     /** Default stroke. */
-    private static final Stroke DEFAULT_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(1.0f) : new PFixedWidthStroke(1.0f);
+    private static final Stroke DEFAULT_STROKE = Utils.isMacOSX() ? new BasicStroke(1.0f) : new PFixedWidthStroke(1.0f);
 
     /** Color of selection marquee. */
     private static Color marqueeColor = Color.yellow;

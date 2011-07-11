@@ -32,7 +32,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import org.simbrain.util.SimbrainUtils;
+import org.simbrain.util.Utils;
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 
@@ -315,7 +315,7 @@ public final class PixelMatrixImageNodeTableEditor
                     break;
                 case 5:
                     float strokeWidth = ((Float) value).floatValue();
-                    Stroke outlineStroke = SimbrainUtils.isMacOSX() ?
+                    Stroke outlineStroke = Utils.isMacOSX() ?
                         new BasicStroke(strokeWidth) : new PFixedWidthStroke(strokeWidth);
                     pixelMatrixImageNode.setOutlineStroke(outlineStroke);
                     break;

@@ -101,6 +101,7 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.ToggleButton;
+import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -1113,7 +1114,7 @@ public class NetworkPanel extends JPanel {
      * @return list of selectedNeurons
      */
     public Collection<NeuronNode> getSelectedNeurons() {
-        return SimbrainUtils.select(getSelection(),
+        return Utils.select(getSelection(),
                 Filters.getNeuronNodeFilter());
     }
 
@@ -1123,7 +1124,7 @@ public class NetworkPanel extends JPanel {
      * @return list of selected Synapses
      */
     public Collection<SynapseNode> getSelectedSynapses() {
-        return SimbrainUtils.select(getSelection(),
+        return Utils.select(getSelection(),
                 Filters.getSynapseNodeFilter());
     }
 
@@ -1133,7 +1134,7 @@ public class NetworkPanel extends JPanel {
      * @return list of selected Text objects
      */
     public ArrayList<TextNode> getSelectedText() {
-        return new ArrayList(SimbrainUtils.select(getSelection(),
+        return new ArrayList(Utils.select(getSelection(),
                 Filters.getTextNodeFilter()));
     }
 
@@ -1293,7 +1294,7 @@ public class NetworkPanel extends JPanel {
      * @return a collection of all persistent nodes
      */
     public Collection<ScreenElement> getSelectedScreenElements() {
-        return new ArrayList<ScreenElement>(SimbrainUtils.select(
+        return new ArrayList<ScreenElement>(Utils.select(
                 getSelection(), Filters.getSelectableFilter()));
     }
 

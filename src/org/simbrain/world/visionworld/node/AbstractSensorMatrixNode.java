@@ -26,7 +26,7 @@ import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
-import org.simbrain.util.SimbrainUtils;
+import org.simbrain.util.Utils;
 import org.simbrain.world.visionworld.SensorMatrix;
 
 import edu.umd.cs.piccolo.PNode;
@@ -46,13 +46,13 @@ abstract class AbstractSensorMatrixNode
     private static final Paint DEFAULT_GRID_PAINT = Color.BLACK;
 
     /** Default grid stroke. */
-    private static final Stroke DEFAULT_GRID_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_GRID_STROKE = Utils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Default outline paint. */
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Grid paint. */
     private Paint gridPaint = DEFAULT_GRID_PAINT;

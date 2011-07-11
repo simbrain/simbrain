@@ -30,7 +30,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.util.SimbrainUtils;
+import org.simbrain.util.Utils;
 import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.dialog.EditSensorDialog;
@@ -58,7 +58,7 @@ abstract class AbstractSensorNode
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = SimbrainUtils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Default selected paint. */
     private static final Paint DEFAULT_SELECTED_PAINT = Color.GRAY;

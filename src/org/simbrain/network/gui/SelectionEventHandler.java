@@ -33,7 +33,7 @@ import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.util.SimnetUtils;
-import org.simbrain.util.SimbrainUtils;
+import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
@@ -193,8 +193,8 @@ final class SelectionEventHandler
             Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot().getAllNodes(boundsFilter, null);
 
             if (event.isShiftDown()) {
-                Collection selection = SimbrainUtils.union(priorSelection, highlightedNodes);
-                selection.removeAll(SimbrainUtils.intersection(priorSelection, highlightedNodes));
+                Collection selection = Utils.union(priorSelection, highlightedNodes);
+                selection.removeAll(Utils.intersection(priorSelection, highlightedNodes));
                 networkPanel.setSelection(selection);
             } else {
                 networkPanel.setSelection(highlightedNodes);

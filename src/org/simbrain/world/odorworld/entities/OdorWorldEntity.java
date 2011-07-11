@@ -178,7 +178,7 @@ public abstract class OdorWorldEntity {
                 this.x = newx;
             }
         } else {
-            if (parentWorld.isInBoundsX(newx)) {
+            if (isInBoundsX(newx)) {
                 this.x = newx;
             }
         }
@@ -199,11 +199,42 @@ public abstract class OdorWorldEntity {
                 this.y = newy;
             }
         } else {
-            if (parentWorld.isInBoundsY(newy)) {
+            if (isInBoundsY(newy)) {
                 this.y = newy;
             }
         }
     }
+
+    /**
+     * Check whether, if the provided point is used to set the x (upper left)
+     * coordinate of the entity, the bounds of the object will be in
+     * bounds.
+     *
+     * @param x the point to check
+     * @return whether the point is in bounds or not.
+     */
+    public boolean isInBoundsX(float x) {
+        if ((x < 0) || ((x + getWidth()) > getParentWorld().getWidth())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check whether, if the provided point is used to set the y (upper left)
+     * coordinate of the entity, the bounds of the object will be in
+     * bounds.
+     *
+     * @param y the point to check
+     * @return whether the point is in bounds or not.
+     */
+    public boolean isInBoundsY(float y) {
+        if ((y < 0) || ((y + getHeight()) > getParentWorld().getHeight())) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * Gets this OdorWorldEntity's width, based on the size of the current
@@ -436,8 +467,28 @@ public abstract class OdorWorldEntity {
      * @return center location of the entity.
      */
     public double[] getCenterLocation() {
-        return new double[] { x + (getWidth() / 2), y + (getHeight() / 2) };
+        return new double[] { getCenterX(), getCenterY() };
     }
+
+    /**
+     * Returns the center x position of this entity.
+     *
+     * @return center x coordinate.
+     */
+    public double getCenterX() {
+        return x + (getWidth() / 2);
+    }
+
+    /**
+     * Returns the center y position of this entity.
+     *
+     * @return center y coordinate.
+     */
+    public double getCenterY() {
+        return y + (getHeight() / 2);
+    }
+    
+    
 
     /**
      * Set the location of this entity.

@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -318,32 +317,6 @@ public class OdorWorld {
         entity.update(elapsedTime);
 
         //System.out.println(sprite.getId() + " new - x: " + sprite.getX() + " y:" + sprite.getY());
-    }
-
-    /**
-     * Check whether the provided point is in bounds or not.
-     *
-     * @param x the point to check
-     * @return whether the point is in bounds or not.
-     */
-    public boolean isInBoundsX(float x) {
-        if ((x < 0) || (x > getWidth())) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check whether the provided point is in bounds or not.
-     *
-     * @param y the point to check
-     * @return whether the point is in bounds or not.
-     */
-    public boolean isInBoundsY(float y) {
-        if ((y < 0) || (y > getHeight())) {
-            return false;
-        }
-        return true;
     }
 
     /**

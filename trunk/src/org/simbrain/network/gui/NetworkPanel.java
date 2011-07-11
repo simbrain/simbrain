@@ -99,7 +99,6 @@ import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
-import org.simbrain.util.SimbrainUtils;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.util.Utils;
 

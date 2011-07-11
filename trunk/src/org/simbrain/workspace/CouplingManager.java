@@ -624,4 +624,19 @@ public class CouplingManager {
         }
     }
 
+    /**
+     * Convenience method for updating a set of couplings.
+     *
+     * @param couplingList the list of couplings to be updated
+     */
+    public void updateCouplings(List<Coupling<?>> couplingList) {
+        for (Coupling<?> coupling : couplingList) {
+            coupling.setBuffer();
+        }
+
+        for (Coupling<?> coupling : couplingList) {
+            coupling.update();
+        }
+    }
+
 }

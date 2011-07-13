@@ -368,7 +368,7 @@ public class TextWorldPanel extends JPanel implements KeyListener,
     /**
      * Highlight word beginning at <code>begin</code> nd ending at
      * <code>end</code>.
-     * 
+     *
      * @param begin offset of beginning of highlight
      * @param end offset of end of highlight
      */
@@ -458,6 +458,9 @@ public class TextWorldPanel extends JPanel implements KeyListener,
                     }
                 }
                 else if (world.getTheParseStyle() == TextWorld.ParseStyle.WORD) {
+                    
+                    //TODO: Move this elsewhere?
+                    
                     // Parse Words
                     String word = "";
                     int charCounter = 0;

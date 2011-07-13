@@ -83,10 +83,10 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
     private JMenu edit = new JMenu("Edit  ");
 
     /** Opens the dialog to define TextWorld Dictionary. */
-    private JMenu dictionary = new JMenu("Dictionary");
-
-    /** Opens the dialog to define TextWorld Dictionary. */
     private JMenuItem loadDictionary = new JMenuItem("Load dictionary");
+
+    /** Show dictionary. */
+    private JMenuItem showDictionary = new JMenuItem("Show dictionary");
 
     /** Opens user preferences dialog. */
     private JMenuItem preferences = new JMenuItem("Preferences");
@@ -100,6 +100,9 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
     /** The pane representing the text world. */
     private TextWorldPanel panel;
 
+    /** The text world. */
+    private TextWorld world;
+
     /**
      * Creates a new frame of type TextWorld.
      */
@@ -107,7 +110,8 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
             TextWorldComponent component) {
         super(frame, component);
 
-        panel = new TextWorldPanel(component.getWorld());
+        world = component.getWorld();
+        panel = new TextWorldPanel(world);
         panel.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         addMenuBar();
@@ -120,6 +124,8 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
         super.postAddInit();
         this.getParentFrame().pack();
     }
+
+    //TODO: Add below to listener classes and clean up below
 
     /**
      * Adds menu bar to the top of TextWorldComponent.
@@ -185,24 +191,26 @@ public class TextWorldDesktopComponent extends GuiComponent<TextWorldComponent> 
         file.add(saveAs);
         file.add(close);
 
-        loadDictionary.setActionCommand("loadDictionary");
-        loadDictionary.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        // preferences.setActionCommand("prefs");
+        // Edit menu
+        loadDictionary.setAction(TextWorldActions
+                .getLoadDictionaryAction(world));
+        showDictionary.setAction(TextWorldActions
+                .getShowDictionaryAction(world));
         preferences.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 panel.showTextWorldDialog();
             }
         });
-
         preferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        menuBar.add(edit);
-        dictionary.add(loadDictionary);
-        edit.add(dictionary);
+        edit.add(loadDictionary);
+        edit.add(showDictionary);
+        edit.addSeparator();
         edit.add(preferences);
+        menuBar.add(edit);
 
+        // Coupling menu
         menuBar.add(new CouplingMenuComponent("Couple", this.getWorkspaceComponent()
                 .getWorkspace(), this.getWorkspaceComponent()));
 

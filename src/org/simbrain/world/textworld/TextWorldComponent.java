@@ -65,10 +65,11 @@ public class TextWorldComponent extends WorkspaceComponent {
                 }
             }
             if (type.getTypeName().equalsIgnoreCase("Words")) {
-                for (String word : world.getWordList())
+                for (String word : world.getDictionary()) {
                     returnList.add(new PotentialProducer(this, world,
                             "currentItemContainsWord", double.class,
-                            String.class, word, "Word " + word));
+                            String.class, word, word));
+                }
             }
         }
         return returnList;

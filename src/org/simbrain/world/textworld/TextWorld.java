@@ -20,7 +20,10 @@ package org.simbrain.world.textworld;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
@@ -64,7 +67,7 @@ public class TextWorld {
     private String currentWord = "";
 
     /** Word list for word parsing. */
-    private List<String> wordList = new ArrayList<String>();
+    private Set<String> dictionary = new TreeSet<String>();
 
     /** List of listeners on this world. */
     private List<TextListener> listenerList = new ArrayList<TextListener>();
@@ -73,7 +76,6 @@ public class TextWorld {
      * Constructs an instance of TextWorld.
      */
     public TextWorld() {
-
     }
 
     /**
@@ -249,7 +251,7 @@ public class TextWorld {
                 return 0;
             }
         } else if (parseStyle == ParseStyle.WORD) {
-            if (getCurrentWord().contains("" + letter)) {
+            if (currentWord.contains("" + letter)) {
                 return 1;
             } else {
                 return 0;
@@ -260,15 +262,14 @@ public class TextWorld {
 
     /**
      * Returns 1 if the current item is this word (or if the current sentence
-     * contains this word), or 0 otherwise. Used for localist representations of
-     * words.
+     * contains this word), or 0 otherwise. //TODO: Reword!  Item = char / sentence / word I guess
      *
      * @param word the word to search for
      * @return 1 if the word is contained, 0 otherwise.
      */
     public int currentItemContainsWord(String word) {
         if (parseStyle == ParseStyle.WORD) {
-            if (getCurrentWord().equalsIgnoreCase(word)) {
+            if (currentWord.equalsIgnoreCase(word)) {
                 return 1;
             } else {
                 return 0;
@@ -292,13 +293,6 @@ public class TextWorld {
     }
 
     /**
-     * @return the currentWord
-     */
-    public String getCurrentWord() {
-        return currentWord;
-    }
-
-    /**
      * @param currentWord the currentWord to set
      */
     public void setCurrentWord(String currentWord) {
@@ -308,15 +302,17 @@ public class TextWorld {
     /**
      * @return the wordList
      */
-    public List<String> getWordList() {
-        return wordList;
+    public Set<String> getDictionary() {
+        return Collections.unmodifiableSet(dictionary);
     }
 
     /**
-     * @param wordList the wordList to set
+     * Add a word to the dictionary.
+     *
+     * @param word the word to add
      */
-    public void setWordList(List<String> wordList) {
-        this.wordList = wordList;
+    public void addWordToDictionary(String word) {
+        dictionary.add(word);
     }
 
 }

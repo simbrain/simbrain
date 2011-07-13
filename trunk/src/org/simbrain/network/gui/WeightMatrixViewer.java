@@ -147,7 +147,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         }
 
         @Override
-        public void setValue(int row, int col, double value) {
+        public void setValue(int row, int col, Double value) {
             if (weights[row][col] != null) {
                 weights[row][col].setStrength(value);
                 /**
@@ -163,13 +163,13 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         }
 
         @Override
-        public double getValue(int row, int col) {
+        public Double getValue(int row, int col) {
             // TODO: For null case render cell in some special way.
             // Other null handling also needed.
             if (weights[row][col] != null) {
                 return weights[row][col].getStrength();
             } else {
-                return 0;
+                return new Double(0);
             }
         }
 

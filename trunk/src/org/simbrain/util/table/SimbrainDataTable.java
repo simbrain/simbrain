@@ -27,14 +27,10 @@ import java.util.Random;
  * reasonable, readable way with XStream. Currently numerical table and a
  * default implementation are subclasses.
  *
+ * @param <T> the type of the data to be displayed.
  * @author jyoshimi
  */
-public abstract class SimbrainDataTable {
-
-    // The intention is that this be a generic table for display in
-    // SimbrainJTable, and that subclasses can contain
-    // any kind of data. However, there is kruft here, and this (and
-    // MutableTable) assume double values.
+public abstract class SimbrainDataTable<T> {
 
     /** Listeners. */
     private List<SimbrainTableListener> listeners;
@@ -52,7 +48,7 @@ public abstract class SimbrainDataTable {
      * @param col column index
      * @param value value to add
      */
-    public abstract void setValue(int row, int col, double value);
+    public abstract void setValue(int row, int col, T value);
 
     /**
      * Get the value of a specific cell in the table.
@@ -61,7 +57,7 @@ public abstract class SimbrainDataTable {
      * @param col the column index
      * @return the value at that cell
      */
-    public abstract double getValue(int row, int col);
+    public abstract T getValue(int row, int col);
 
     /**
      * Set the value at specific position in the table, and specify whether to
@@ -74,7 +70,7 @@ public abstract class SimbrainDataTable {
      * @param value value to add
      * @param fireEvent true if an event should be fired, false otherwise.
      */
-    public void setValue(final int row, final int column, final double value,
+    public void setValue(final int row, final int column, final T value,
             final boolean fireEvent) {
 
         setValue(row, column, value);
@@ -195,7 +191,5 @@ public abstract class SimbrainDataTable {
             listener.tableStructureChanged();
         }
     }
-
-
 
 }

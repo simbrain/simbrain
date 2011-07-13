@@ -49,10 +49,10 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
     private int columnWidth = DEFAULT_COLUMN_WIDTH;
 
     /** Maximum number of columns to display at one time in the scrollpane. */
-    private int maxColumnsToDisplayInWindow = DEFAULT_MAX_COLS;
+    private int maxVisibleColumns = DEFAULT_MAX_COLS;
 
     /** Maximum number of rows to display at one time in the scrollpane. */
-    private int maxRowsToDisplayInWindow = DEFAULT_MAX_ROWS;
+    private int maxVisibleRows = DEFAULT_MAX_ROWS;
 
     /**
      * Default constructor.
@@ -93,28 +93,58 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
 
         // Set width of scrollpane based on number of columns
         int cols = jtable.getData().getColumnCount() + 1;
-        if (cols < maxColumnsToDisplayInWindow) {
+        if (cols < maxVisibleColumns) {
             width = cols * columnWidth;
         } else {
-            width = maxColumnsToDisplayInWindow * columnWidth;
+            width = maxVisibleColumns * columnWidth;
             // Hack below for cases where cols = maxCols, and sizing is not
             // quite right.
-            if (cols > (maxColumnsToDisplayInWindow + 1)) {
+            if (cols > (maxVisibleColumns + 1)) {
                 jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
             }
         }
 
         // Set height of scrollpane based on number of rows
         int rows = jtable.getData().getRowCount() + 1;
-        if (rows < maxRowsToDisplayInWindow) {
+        if (rows < maxVisibleRows) {
             height = rows * rowHeight;
         } else {
-            height = maxRowsToDisplayInWindow * rowHeight;
+            height = maxVisibleRows * rowHeight;
         }
 
         setPreferredSize(new Dimension(width, height));
         revalidate();
 
+    }
+
+    /**
+     * @return the maxVisibleColumns
+     */
+    public int getMaxVisibleColumns() {
+        return maxVisibleColumns;
+    }
+
+    /**
+     * @param maxVisibleColumns the maxVisibleColumns to set
+     */
+    public void setMaxVisibleColumns(int maxVisibleColumns) {
+        this.maxVisibleColumns = maxVisibleColumns;
+        resize();
+    }
+
+    /**
+     * @return the maxVisibleRows
+     */
+    public int getMaxVisibleRows() {
+        return maxVisibleRows;
+    }
+
+    /**
+     * @param maxVisibleRows the maxVisibleRows to set
+     */
+    public void setMaxVisibleRows(int maxVisibleRows) {
+        this.maxVisibleRows = maxVisibleRows;
+        resize();
     }
 
 }

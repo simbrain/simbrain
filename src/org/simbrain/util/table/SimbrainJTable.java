@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 
 import org.jdesktop.swingx.JXTable;
 
@@ -63,8 +64,8 @@ public class SimbrainJTable extends JXTable {
     private List<String> rowHeadings;
 
     /**
-     * Column headings. Only used if set, otherwise default column headings
-     * (1...n) used.
+     * Custom column headings. Only used if set, otherwise default column
+     * headings (1...n) used.
      */
     private List<String> columnHeadings;
 
@@ -77,9 +78,12 @@ public class SimbrainJTable extends JXTable {
     /** Underlying Java table model. */
     private TableModel tableModel;
 
+    /** Whether to display column headings. */
+    private boolean displayColumnHeadings = true;
+
     /**
      * Construct the table with specified number of rows and columns.
-     * 
+     *
      * @param rows number of rows of data
      * @param cols number of columns of data
      */
@@ -90,7 +94,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Creates a new instance of the data world.
-     * 
+     *
      * @param dataModel
      */
     public SimbrainJTable(SimbrainDataTable dataModel) {
@@ -128,7 +132,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Returns the currently selected column.
-     * 
+     *
      * @return the currently selected column
      */
     public int getSelectedColumn() {
@@ -141,7 +145,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Returns the currently selected row.
-     * 
+     *
      * @return the currently selected row
      */
     public int getSelectedRow() {
@@ -185,7 +189,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Build the context menu for the table.
-     * 
+     *
      * @return The context menu.
      */
     protected JPopupMenu buildPopupMenu() {
@@ -216,7 +220,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a toolbar with buttons for opening from and saving to .csv files.
-     * 
+     *
      * @return the csv toolbar
      */
     public JToolBar getToolbarCSV() {
@@ -233,7 +237,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a toolbar with buttons for editing the table cells.
-     * 
+     *
      * @return the edit toolbar
      */
     public JToolBar getToolbarEditTable() {
@@ -269,7 +273,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a menu with items for opening from and saving to .csv files.
-     * 
+     *
      * @return the csv menu
      */
     public JMenu getMenuCSV() {
@@ -286,7 +290,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a menu with items for randomizing table values.
-     * 
+     *
      * @return the randomize menu
      */
     public JMenu getMenuRandomize() {
@@ -303,7 +307,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a menu with items for normalizing the data in a table.
-     * 
+     *
      * @return the normalize menu
      */
     public JMenu getMenuNormalize() {
@@ -320,7 +324,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a menu with items for filling table values.
-     * 
+     *
      * @return the fill menu
      */
     public JMenu getMenuFill() {
@@ -337,7 +341,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Return a menu with items for changing the table structure.
-     * 
+     *
      * @return the edit menu
      */
     public JMenu getMenuEdit() {
@@ -352,10 +356,10 @@ public class SimbrainJTable extends JXTable {
      * Select current row.
      */
     public void updateRowSelection() {
-        // TODO: If I don't call this, the line below does not work. Not sure
-        // why.
-        selectAll();
         if (getData() instanceof IterableRowsTable) {
+            // TODO: If I don't call this, the line below does not work. Not
+            // sure why.
+            selectAll();
             int currentRow = ((IterableRowsTable) data).getCurrentRow();
             setRowSelectionInterval(currentRow, currentRow);
         }
@@ -370,7 +374,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Sets the selected point.
-     * 
+     *
      * @param selectedPoint the selected point
      */
     public void setSelectedPoint(final Point selectedPoint) {
@@ -383,7 +387,7 @@ public class SimbrainJTable extends JXTable {
     private KeyListener keyListener = new KeyAdapter() {
         /**
          * Responds to key typed events.
-         * 
+         *
          * @param arg0 Key event
          */
         public void keyTyped(final KeyEvent arg0) {
@@ -393,7 +397,7 @@ public class SimbrainJTable extends JXTable {
 
     /**
      * Returns a copy of the underlying table model.
-     * 
+     *
      * @return the tableModel
      */
     public TableModel getTableModel() {
@@ -499,7 +503,7 @@ public class SimbrainJTable extends JXTable {
 
         /**
          * Construct the table model.
-         * 
+         *
          * @param model reference to underlying data.
          */
         public TableModel() {
@@ -530,6 +534,9 @@ public class SimbrainJTable extends JXTable {
 
         @Override
         public String getColumnName(int columnIndex) {
+            if (!displayColumnHeadings) {
+                return null;
+            }
             if (columnIndex > 0) {
                 if (columnHeadings != null) {
                     return columnHeadings.get(columnIndex - 1);
@@ -594,6 +601,26 @@ public class SimbrainJTable extends JXTable {
      */
     public void setColumnHeadings(List<String> columnHeadings) {
         this.columnHeadings = columnHeadings;
+    }
+
+    /**
+     * @return the displayColumnHeadings
+     */
+    public boolean isDisplayColumnHeadings() {
+        return displayColumnHeadings;
+    }
+
+    /**
+     * TODO: This only works for setting from true to false.  Setting from false
+     * back to true does not work.
+     *
+     * @param displayColumnHeadings the displayColumnHeadings to set
+     */
+    public void setDisplayColumnHeadings(boolean displayColumnHeadings) {
+        this.displayColumnHeadings = displayColumnHeadings;
+        if (displayColumnHeadings == false) {
+            this.setTableHeader(null); // dubious method but worked 
+        }
     }
 
 }

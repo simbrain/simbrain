@@ -29,7 +29,7 @@ import org.simbrain.util.Utils;
  *
  * @author jyoshimi
  */
-public abstract class NumericTable extends SimbrainDataTable {
+public abstract class NumericTable extends SimbrainDataTable<Double> {
 
     /** Randomization upper bound. */
     private int upperBound = 1;

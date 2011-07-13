@@ -124,7 +124,7 @@ public final class DefaultNumericTable extends NumericTable implements
     }
 
     @Override
-    public void setValue(final int row, final int column, final double value) {
+    public void setValue(final int row, final int column, final Double value) {
         rowData.get(row).set(column, value);
         fireTableDataChanged();
     }
@@ -136,7 +136,7 @@ public final class DefaultNumericTable extends NumericTable implements
      * @param column column index
      * @return value to get
      */
-    public double getValue(final int row, final int column) {
+    public Double getValue(final int row, final int column) {
         return rowData.get(row).get(column);
     }
 

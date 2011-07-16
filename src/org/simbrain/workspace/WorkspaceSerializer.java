@@ -122,7 +122,7 @@ public class WorkspaceSerializer {
              */
             if (desktopComponent != null) {
                 ArchiveContents.ArchivedComponent.ArchivedDesktopComponent dc
-                    = archiveComp.addDesktopComponent(desktopComponent);
+                = archiveComp.addDesktopComponent(desktopComponent);
                 entry = new ZipEntry(dc.getUri());
                 zipStream.putNextEntry(entry);
                 desktopComponent.save(zipStream);
@@ -179,7 +179,7 @@ public class WorkspaceSerializer {
         }
 
         contents = (ArchiveContents) ArchiveContents.xstream().fromXML(
-            new ByteArrayInputStream(entries.get("contents.xml")));
+                new ByteArrayInputStream(entries.get("contents.xml")));
 
         // Deserialize workspace parameters
         if (contents.getWorkspaceParameters() != null) {
@@ -205,9 +205,9 @@ public class WorkspaceSerializer {
 
                 if (archivedComponent.getDesktopComponent() != null) {
                     Rectangle bounds = (Rectangle) new XStream(new DomDriver())
-                            .fromXML(new ByteArrayInputStream(entries
-                                    .get(archivedComponent
-                                            .getDesktopComponent().getUri())));
+                    .fromXML(new ByteArrayInputStream(entries
+                            .get(archivedComponent
+                                    .getDesktopComponent().getUri())));
                     GuiComponent desktopComponent = desktop
                             .getDesktopComponent(wc);
                     desktopComponent.getParentFrame().setBounds(bounds);
@@ -238,28 +238,33 @@ public class WorkspaceSerializer {
                 Producer<?> producer = (Producer<?>) sourceComponent
                         .getAttributeManager()
                         .createProducer(
-                                sourceComponent.getObjectFromKey(couplingRef
+                                sourceComponent.getObjectFromKey(
+                                        couplingRef
                                         .getArchivedProducer()
                                         .getBaseObjectKey()),
-                                couplingRef.getArchivedProducer()
+                                        couplingRef.getArchivedProducer()
                                         .getMethodBaseName(),
-                                couplingRef.getArchivedProducer().getDataType(),
-                                couplingRef.getArchivedProducer()
+                                        couplingRef.getArchivedProducer().getDataType(),
+                                        couplingRef.getArchivedProducer()
                                         .getArgumentDataTypes(),
-                                couplingRef.getArchivedProducer()
+                                        couplingRef.getArchivedProducer()
                                         .getArgumentValues(),
-                                couplingRef.getArchivedProducer()
+                                        couplingRef.getArchivedProducer()
                                         .getDescription());
                 Consumer<?> consumer = (Consumer<?>) targetComponent
                         .getAttributeManager()
                         .createConsumer(
-                                targetComponent.getObjectFromKey(couplingRef
+                                targetComponent.getObjectFromKey(
+                                        couplingRef
                                         .getArchivedConsumer()
                                         .getBaseObjectKey()),
-                                couplingRef.getArchivedConsumer()
+                                        couplingRef.getArchivedConsumer()
                                         .getMethodBaseName(),
-                                couplingRef.getArchivedConsumer().getDataType(),
-                                couplingRef.getArchivedConsumer()
+                                        couplingRef.getArchivedProducer()
+                                        .getArgumentDataTypes(),
+                                        couplingRef.getArchivedProducer()
+                                        .getArgumentValues(),
+                                        couplingRef.getArchivedProducer()
                                         .getDescription());
                 workspace.addCoupling(new Coupling(producer, consumer));
 
@@ -276,7 +281,7 @@ public class WorkspaceSerializer {
      */
     private static void read(final InputStream istream, final byte[] bytes) throws IOException {
         int pos = 0;
-       while (pos < bytes.length) {
+        while (pos < bytes.length) {
             int read = istream.read(bytes, pos, bytes.length - pos);
             if (read < 0) { throw new RuntimeException("premature EOF"); }
             pos += read;

@@ -36,12 +36,13 @@ import org.simbrain.workspace.actions.GlobalStopAction;
 import org.simbrain.workspace.actions.GlobalUpdateAction;
 import org.simbrain.workspace.actions.NewConsoleAction;
 import org.simbrain.workspace.actions.NewDataWorldAction;
+import org.simbrain.workspace.actions.NewDisplayWorldAction;
 import org.simbrain.workspace.actions.NewGameWorldAction;
 import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
 import org.simbrain.workspace.actions.NewOscWorldAction;
-import org.simbrain.workspace.actions.NewTextWorldAction;
+import org.simbrain.workspace.actions.NewReaderWorldAction;
 import org.simbrain.workspace.actions.NewThreeDeeWorldAction;
 import org.simbrain.workspace.actions.NewTrainerAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
@@ -106,7 +107,10 @@ public class WorkspaceActionManager {
     private final Action newOscWorldAction;
 
     /** New text world action. */
-    private final Action newTextWorldAction;
+    private final Action newReaderWorldAction;
+
+    /** New text world action. */
+    private final Action newDisplayWorldAction;
 
     /** New vision world action. */
     private final Action newVisionWorldAction;
@@ -224,7 +228,8 @@ public class WorkspaceActionManager {
         newOscWorldAction = new NewOscWorldAction(workspace);
         newThreeDeeWorldAction = new NewThreeDeeWorldAction(workspace);
         newGameWorldAction = new NewGameWorldAction(workspace);
-        newTextWorldAction = new NewTextWorldAction(workspace);
+        newDisplayWorldAction = new NewDisplayWorldAction(workspace);
+        newReaderWorldAction = new NewReaderWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
 
         newTrainerAction = new NewTrainerAction(workspace);
@@ -279,7 +284,8 @@ public class WorkspaceActionManager {
         return Arrays.asList(new Action[] {
                 newDataWorldAction,
                 newOdorWorldAction,
-                newTextWorldAction,
+                newDisplayWorldAction,
+                newReaderWorldAction,
                 // newThreeDeeWorldAction,
                 newVisionWorldAction });
     }
@@ -390,13 +396,6 @@ public class WorkspaceActionManager {
      */
     public Action getNewOdorWorldAction() {
         return newOdorWorldAction;
-    }
-
-    /**
-     * @return the newTextWorldAction.
-     */
-    public Action getNewTextWorldAction() {
-        return newTextWorldAction;
     }
 
     /**

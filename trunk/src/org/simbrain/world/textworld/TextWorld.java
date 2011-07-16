@@ -25,52 +25,36 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * <b>TextWorld</b> acts as a text interface to neural networks, for use in
- * language parsing and other tasks. Users input text which parsed into vector
- * form and sent to the network, and vectors from the network are converted into
- * text and sent to this world.
+ * <b>TextWorld</b> is the base class for world types that involve the
+ * processing and display of text in relation to (mainly for now) neural
+ * networks.
  */
-public class TextWorld {
+public abstract class TextWorld {
 
-    // TODO: Set pause time, create editable dictionary
-    // TODO: The outputs don't come out nicely
-    // TODO: Set output menu using largest vector in the current dictionary
-    // TODO: Ability to set different delimiters
+    /** The main text in the text world. */
+    private String text;
 
-    /** Time to pause (in milliseconds) between parsed text to be sent. */
-    private int pauseTime = 100;
+    /** The current item of text (character, word, sentence, depending on parse style) .*/
+    private String currentItem;
 
-    /** Highlight color. */
-    private Color highlightColor = Color.GRAY;
+    /** What the current position in the text is. */
+    private int position = 0;
 
-    /** Does enter read current line. */
-    private boolean sendEnter = true;
-
-    /** List of parsing style. */
-    public enum ParseStyle {
-        CHARACTER, WORD, SENTENCE
-    };
-
-    /** The current parsing styles. */
-    private ParseStyle parseStyle = ParseStyle.WORD;
-
-    /** Input coding for distributed coding schemes (not yet supported). */
-    private double[] inputCoding; //TODO: Once supported will have to be initialized.
-
-    /** The current character. */
-    private char currentChar;
-
-    /** The current word. */
-    private String currentWord = "";
-
-    /** Word list for word parsing. */
+    /** Last position in the text. */
+    private int lastPosition;
+    
+    /** Word list for word parsing in both directions (reading and display). */
     private Set<String> dictionary = new TreeSet<String>();
 
     /** List of listeners on this world. */
     private List<TextListener> listenerList = new ArrayList<TextListener>();
+
+    /** Highlight color. */
+    private Color highlightColor = Color.GRAY;
 
     /**
      * Constructs an instance of TextWorld.
@@ -78,6 +62,11 @@ public class TextWorld {
     public TextWorld() {
     }
 
+    /**
+     * Advance the position in the text, and update the current item.
+     */
+    public abstract void update();
+    
     /**
      * Add a listener.
      *
@@ -97,20 +86,6 @@ public class TextWorld {
     }
 
     /**
-     * @return the pauseTime
-     */
-    public int getPauseTime() {
-        return pauseTime;
-    }
-
-    /**
-     * @param pauseTime the pauseTime to set
-     */
-    public void setPauseTime(int pauseTime) {
-        this.pauseTime = pauseTime;
-    }
-
-    /**
      * @return the highlightColor
      */
     public Color getHighlightColor() {
@@ -125,179 +100,63 @@ public class TextWorld {
     }
 
     /**
-     * @return the sendEnter
-     */
-    public boolean isSendEnter() {
-        return sendEnter;
-    }
-
-    /**
-     * @param sendEnter the sendEnter to set
-     */
-    public void setSendEnter(boolean sendEnter) {
-        this.sendEnter = sendEnter;
-    }
-
-    /**
-     * Returns the current parse style inside a comboboxwrapper. Used by
-     * preference dialog.
-     *
-     * @return the the comboBox
-     */
-    public ComboBoxWrapper getParseStyle() {
-        return new ComboBoxWrapper() {
-            public Object getCurrentObject() {
-                return parseStyle;
-            }
-
-            public Object[] getObjects() {
-                return ParseStyle.values();
-            }
-        };
-    }
-
-    /**
-     * Set the current parse style. Used by preference dialog.
-     *
-     * @param parseStyle the current style.
-     */
-    public void setParseStyle(ComboBoxWrapper parseStyle) {
-        setTheParseStyle((ParseStyle) parseStyle.getCurrentObject());
-    }
-
-    /**
-     * Set the parse style object.
-     *
-     * @param parseStyle the current parse style
-     */
-    private void setTheParseStyle(ParseStyle parseStyle) {
-        this.parseStyle = parseStyle;
-    }
-
-    /**
-     * Get the current parse style.
-     *
-     * @return the current parse style
-     */
-    public ParseStyle getTheParseStyle() {
-        return parseStyle;
-    }
-
-    /**
-     * @return the inputCoding
-     */
-    public double[] getInputCoding() {
-        return inputCoding;
-    }
-
-    /**
      * Notify listeners that the text has changed.
      */
-    private void fireTextChangedEvent() {
+    protected void fireTextChangedEvent() {
         for (TextListener listener : listenerList) {
             listener.textChanged();
         }
     }
 
     /**
-     * Code a character numerically. Convert a given character to an array of
-     * doubles.  For distributed representations of letters (not yet supported).
-     *
-     * @param c the character to be coded.
+     * @return the text
      */
-    public void encodeCharacter(char c) {
-
-        // This is just a quick temporary method to generate a
-        // vector from a character
-        String binaryRep = Integer.toBinaryString(c);
-        for (int i = 0; i < inputCoding.length - 1; i++) {
-            if (i < binaryRep.length()) {
-                inputCoding[i] = Double.parseDouble(binaryRep.substring(i,
-                        i + 1));
-            }
-        }
-        fireTextChangedEvent();
+    public String getText() {
+        return text;
     }
+
 
     /**
-     * Code a word numerically. Convert a given string representation of a word
-     * to an array of doubles. For distributed representations of words (not yet
-     * supported).
-     *
-     * @param word the word to be coded
+     * @param text the text to set
      */
-    public void encodeWord(String word) {
-        // Another temporary coding scheme
-        for (int i = 0; i < inputCoding.length - 1; i++) {
-            if (i < word.length()) {
-                inputCoding[i] = word.codePointAt(i);
-            }
-        }
-        fireTextChangedEvent();
+    public void setText(String text) {
+        this.text = text;
     }
 
-    /**
-     * Returns 1 if the current item (letter, word, sentence) contains this
-     * character, or 0 otherwise. Used for localist representations of letters.
-     *
-     * @param letter the letter to search for
-     * @return 1 if the letter is contained, 0 otherwise.
-     */
-    public int currentItemContainsLetter(char letter) {
-        if (parseStyle == ParseStyle.CHARACTER) {
-            if (getCurrentChar() == letter) {
-                return 1;
-            } else {
-                return 0;
-            }
-        } else if (parseStyle == ParseStyle.WORD) {
-            if (currentWord.contains("" + letter)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-        return 0;
-    }
 
     /**
-     * Returns 1 if the current item is this word (or if the current sentence
-     * contains this word), or 0 otherwise. //TODO: Reword!  Item = char / sentence / word I guess
-     *
-     * @param word the word to search for
-     * @return 1 if the word is contained, 0 otherwise.
+     * @return the position
      */
-    public int currentItemContainsWord(String word) {
-        if (parseStyle == ParseStyle.WORD) {
-            if (currentWord.equalsIgnoreCase(word)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-        return 0;
+    public int getPosition() {
+        return position;
     }
 
-    /**
-     * @return the currentChar
-     */
-    public char getCurrentChar() {
-        return currentChar;
-    }
 
     /**
-     * @param currentChar the currentChar to set
+     * @param position the position to set
      */
-    public void setCurrentChar(char currentChar) {
-        this.currentChar = currentChar;
+    public void setPosition(int newPosition) {
+        //System.out.println(position);
+        lastPosition = position;
+        this.position = newPosition;
     }
 
+
     /**
-     * @param currentWord the currentWord to set
+     * @return the currentItem
      */
-    public void setCurrentWord(String currentWord) {
-        this.currentWord = currentWord;
+    public String getCurrentItem() {
+        return currentItem;
     }
+
+
+    /**
+     * @return the lastPosition
+     */
+    public int getLastPosition() {
+        return lastPosition;
+    }
+    
 
     /**
      * @return the wordList
@@ -313,6 +172,45 @@ public class TextWorld {
      */
     public void addWordToDictionary(String word) {
         dictionary.add(word);
+    }
+
+
+    /**
+     * Check to see if the dictionary contains the provided word. Used
+     * for localist representations of words at component level.
+     * 
+     * @param word word to check for
+     * @return 1 if found, false otherwise
+     */
+    public double checkForWordInDictionary(String word) {
+        if (dictionary.contains(word)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Returns a properly initialized xstream object.
+     *
+     * @return the XStream object
+     */
+    static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(TextWorld.class, "listenerList");
+        return xstream;
+    }
+
+    /**
+     * Standard method call made to objects after they are deserialized. See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     *
+     * @return Initialized object.
+     */
+    protected Object readResolve() {
+        listenerList = new ArrayList<TextListener>();
+        return this;
     }
 
 }

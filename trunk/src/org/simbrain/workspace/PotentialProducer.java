@@ -26,8 +26,9 @@ package org.simbrain.workspace;
 public class PotentialProducer extends PotentialAttribute {
 
     /**
-     * Construct a potential producer.
-     * 
+     * Construct a potential producer for the case where the method has no
+     * arguments.
+     *
      * @param parent parent workspace component
      * @param methodBaseName method name
      * @param dataType class of data
@@ -37,26 +38,7 @@ public class PotentialProducer extends PotentialAttribute {
             String methodBaseName, Class<?> dataType, String description) {
         super(parent, object, methodBaseName, dataType, description);
     }
-
-    /**
-     * Construct a potential attribute for the case where the method has
-     * arguments.
-     * 
-     * @param parent parent workspace component
-     * @param object base object containing method to call
-     * @param methodName name of method to call
-     * @param dataType return type of method
-     * @param argDataTypes datatype of argument to method
-     * @param argValues values of argument to method
-     * @param description description of the attribute
-     */
-    protected PotentialProducer(WorkspaceComponent parent, Object object,
-            String methodName, Class<?> dataType, Class<?>[] argDataTypes,
-            Class<?>[] argValues, String description) {
-        super(parent, object, methodName, dataType, argDataTypes, argValues,
-                description);
-    }
-
+    
     /**
      * Construct a potential attribute for the case where the method has one
      * argument only.
@@ -74,6 +56,25 @@ public class PotentialProducer extends PotentialAttribute {
             Object argValue, String description) {
         super(parent, baseObject, methodName, dataType,
                 new Class[] { argDataType }, new Object[] { argValue },
+                description);
+    }
+
+    /**
+     * Construct a potential attribute for the case where the method has
+     * multiple arguments.
+     * 
+     * @param parent parent workspace component
+     * @param object base object containing method to call
+     * @param methodName name of method to call
+     * @param dataType return type of method
+     * @param argDataTypes datatype of argument to method
+     * @param argValues values of argument to method
+     * @param description description of the attribute
+     */
+    protected PotentialProducer(WorkspaceComponent parent, Object object,
+            String methodName, Class<?> dataType, Class<?>[] argDataTypes,
+            Class<?>[] argValues, String description) {
+        super(parent, object, methodName, dataType, argDataTypes, argValues,
                 description);
     }
 

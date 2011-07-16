@@ -74,7 +74,7 @@ public class PotentialAttribute {
         this.dataType = dataType;
         this.description = description;
     }
-
+            
     /**
      * Construct a potential attribute for the case where the method has
      * arguments.
@@ -82,18 +82,18 @@ public class PotentialAttribute {
      * @param parent parent workspace component
      * @param object base object containing method to call
      * @param methodName name of method to call
-     * @param dataType return type of method
+     * @param returnDataType return type of method
      * @param argDataTypes datatype of argument to method
      * @param argValues values of argument to method
      * @param description description of the attribute
      */
     protected PotentialAttribute(WorkspaceComponent parent, Object object,
-            String methodName, Class<?> dataType, Class<?>[] argDataTypes,
+            String methodName, Class<?> returnDataType, Class<?>[] argDataTypes,
             Object[] argValues, String description) {
         this.parent = parent;
         this.baseObject = object;
         this.methodName = methodName;
-        this.dataType = dataType;
+        this.dataType = returnDataType;
         this.argumentDataTypes = argDataTypes;
         this.argumentValues = argValues;
         this.description = description;

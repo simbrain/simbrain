@@ -27,29 +27,45 @@ import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 /**
  * <b>TextWorldComponent</b> is the container for the world component. Handles
  * toolbar buttons, and serializing of world data. The main environment code is
  * in {@link TextWorld}.
  */
-public class TextWorldComponent extends WorkspaceComponent {
+public class ReaderComponent extends WorkspaceComponent {
 
     /** Instance of world of type TextWorld. */
-    private final TextWorld world;
+    private final ReaderWorld world;
 
     /**
      * Creates a new frame of type TextWorld.
      *
      * @param name name of this component
      */
-    public TextWorldComponent(String name) {
+    public ReaderComponent(String name) {
         super(name);
-        world = new TextWorld();
+        world = new ReaderWorld();
+        init();
+    }
+
+    /**
+     * Construct a component from an existing world; used in deserializing.
+     *
+     * @param name name of component
+     * @param newWorld provided world
+     */
+    public ReaderComponent(String name, ReaderWorld newWorld) {
+        super(name);
+        world = newWorld;
+        init();
+    }
+    
+    /**
+     * Initialize attribute types.
+     */
+    private void init() {
         addProducerType(new AttributeType(this, "Letters", double.class, true));
-        addProducerType(new AttributeType(this, "Words", double.class, false));
+        addProducerType(new AttributeType(this, "Words", double.class, false));        
     }
 
     @Override
@@ -60,39 +76,29 @@ public class TextWorldComponent extends WorkspaceComponent {
                 char letter;
                 for (letter = 'a'; letter <= 'z'; letter++) {
                     returnList.add(new PotentialProducer(this, world,
-                            "currentItemContainsLetter", double.class,
+                            "matchCurrentLetter", double.class,
                             char.class, letter, "Letter " + letter));
                 }
             }
             if (type.getTypeName().equalsIgnoreCase("Words")) {
                 for (String word : world.getDictionary()) {
                     returnList.add(new PotentialProducer(this, world,
-                            "currentItemContainsWord", double.class,
+                            "matchCurrentItem", double.class,
                             String.class, word, word));
                 }
+
             }
         }
         return returnList;
     }
 
     /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    private static XStream getXStream() {
-        XStream xstream = new XStream(new DomDriver());
-        // omit fields
-        return xstream;
-    }
-
-
-    /**
      * {@inheritDoc}
      */
-    public static TextWorldComponent open(InputStream input, String name,
+    public static ReaderComponent open(InputStream input, String name,
             String format) {
-        return (TextWorldComponent) getXStream().fromXML(input);
+        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(input);
+        return new ReaderComponent(name, newWorld);
     }
 
     /**
@@ -100,7 +106,7 @@ public class TextWorldComponent extends WorkspaceComponent {
      */
     @Override
     public void save(final OutputStream output, final String format) {
-        getXStream().toXML(output);
+        ReaderWorld.getXStream().toXML(world, output);
     }
 
     @Override
@@ -110,12 +116,13 @@ public class TextWorldComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
+        world.update();
     }
 
     /**
      * @return the world
      */
-    public TextWorld getWorld() {
+    public ReaderWorld getWorld() {
         return world;
     }
 }

@@ -28,12 +28,14 @@ import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimpleFrame;
+import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.util.table.DefaultTextTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
@@ -139,6 +141,39 @@ public class TextWorldActions {
                 table.setDisplayColumnHeadings(false);
                 mainPanel.add(scroller);
                 SimpleFrame.displayPanel(mainPanel, "Dictionary");
+            }
+        };
+
+    }
+    
+    /**
+     * Action for displaying a preference dialog
+     *
+     * @param world the world for which a dialog should be shown
+     * @return the action
+     */
+    public static Action getShowPreferencesDialogAction(final TextWorld world) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+                putValue(NAME, "Preferences...");
+                putValue(SHORT_DESCRIPTION, "Show preferences dialog");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                ReflectivePropertyEditor editor = (new ReflectivePropertyEditor());
+                editor.setExcludeList(new String[] { "text", "position" });
+                editor.setUseSuperclass(false);
+                editor.setObject(world);
+                JDialog dialog = editor.getDialog();
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
             }
         };
 

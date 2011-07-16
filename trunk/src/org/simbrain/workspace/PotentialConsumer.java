@@ -24,19 +24,43 @@ package org.simbrain.workspace;
  * @author jyoshimi
  */
 public class PotentialConsumer extends PotentialAttribute {
-
+    
     /**
-     * Construct a potential consumer.
+     * Construct a potential attribute for the (default) case where the method has one
+     * argument only.
      *
      * @param parent parent workspace component
-     * @param object object on which to invoke method
-     * @param methodBaseName method name
-     * @param dataType class of data
-     * @param description description associated with potential consumer
+     * @param object base object containing method to call
+     * @param methodName name of method to call
+     * @param dataType return type of method
+     * @param argDataType datatype of argument to method
+     * @param argValue value of argument to method
+     * @param description description of the attribute
+     */
+    public PotentialConsumer(WorkspaceComponent parent, Object baseObject,
+            String methodName, Class<?> dataType, String description) {
+        super(parent, baseObject, methodName, dataType, description);
+    }
+
+    /**
+     * Construct a potential consumer for the case where the method has
+     * multiple arguments. The first is the "main datatype" of the consumer.
+     * 
+     * TODO: No support for more than two arguments currently.
+     * 
+     * @param parent parent workspace component
+     * @param object base object containing method to call
+     * @param methodName name of method to call
+     * @param dataType return type of method
+     * @param argDataTypes datatypes of argument to method
+     * @param argValues values of argument to method
+     * @param description description of the attribute
      */
     public PotentialConsumer(WorkspaceComponent parent, Object object,
-            String methodBaseName, Class dataType, String description) {
-        super(parent, object, methodBaseName, dataType, description);
+            String methodName, Class<?>[] argDataTypes,
+            Object[] argValues, String description) {
+        super(parent, object, methodName, argDataTypes[0], argDataTypes, argValues,
+                description);
     }
 
     /**
@@ -47,6 +71,5 @@ public class PotentialConsumer extends PotentialAttribute {
     public Consumer<?> createConsumer() {
         return getParent().getAttributeManager().createConsumer(this);
     }
-
-
+    
 }

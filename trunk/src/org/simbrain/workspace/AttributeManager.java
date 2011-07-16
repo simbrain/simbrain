@@ -19,11 +19,14 @@ package org.simbrain.workspace;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * A raft of methods for creating attributes and potential attributes. For
  * attributes (Producer and Consumer) the main creation method, using reflection
- * is here. You can create an attribute without specifying a description, in
+ * is here. 
+ * 
+ * You can create an attribute without specifying a description, in
  * which case a standard description is created. For potential attributes
  * (PotentialProducer and PotentialConsumer), there are two choices, so that
  * there are four creation methods. As with attributes, you can specify a custom
@@ -50,8 +53,8 @@ public class AttributeManager {
      *
      * @param parentObject base object
      * @param methodName name of method
-     * @param dataType type of data
-     * @param argumentDataTypes data types of arguments to the method
+     * @param dataType main data type of data (used in coupling manager)
+     * @param argumentDataTypes data types of all arguments to the method
      * @param argumentValues arguments to the method
      * @param description description of the producer
      * @return the resulting producer
@@ -207,7 +210,7 @@ public class AttributeManager {
 
     /**
      * Create an actual producer from a potential producer.
-     *
+     * 
      * @param potentialAttribute the potential attribute to actualize
      * @return the resulting producer
      */
@@ -221,10 +224,14 @@ public class AttributeManager {
                 potentialAttribute.getArgumentValues(),
                 potentialAttribute.getDescription());
     }
-
+    
     /**
      * Create a consumer. This version of the method does the real work; others
      * forward to it.
+     * 
+     * Assume first argumentDataType is the main data type.
+     * 
+     * TODO: Currently only works for one or two arguments only.
      *
      * @param parentObject parent object
      * @param methodName name of method
@@ -233,8 +240,8 @@ public class AttributeManager {
      * @return the resulting consumer
      */
     public Consumer<?> createConsumer(final Object parentObject,
-            final String methodName, final Class<?> dataType,
-            final String description) {
+            final String methodName, final Class<?>[] argumentDataTypes,
+            final Object[] argumentValues, final String description) {
 
         Consumer<?> consumer = new Consumer() {
 
@@ -243,13 +250,13 @@ public class AttributeManager {
             // Static initializer
             {
                 try {
-                    theMethod = parentObject.getClass().getMethod(methodName, new Class[] { dataType });
+                    theMethod = parentObject.getClass().getMethod(methodName, argumentDataTypes);
                 } catch (SecurityException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchMethodException e1) {
                     System.err.println("Could not find method "
                             + methodName + " with argument of type of "
-                            + dataType.getCanonicalName());
+                            + Arrays.asList(argumentDataTypes));
                     e1.printStackTrace();
                 }
             }
@@ -259,7 +266,12 @@ public class AttributeManager {
              */
             public void setValue(Object value) {
                 try {
-                    theMethod.invoke(parentObject, new Object[] { value });
+                    // Currently only works for case of one or two arguments.
+                    if (argumentDataTypes.length == 1) {
+                        theMethod.invoke(parentObject, new Object[] { value });                        
+                    } else {
+                        theMethod.invoke(parentObject, new Object[] {value, argumentValues[0]});
+                    }
                 } catch (IllegalArgumentException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -296,22 +308,15 @@ public class AttributeManager {
             /**
              * {@inheritDoc}
              */
-            public Class<?> getDataType() {
-                return dataType;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
             public Class<?>[] getArgumentDataTypes() {
-                return null;
+                return argumentDataTypes;
             }
 
             /**
              * {@inheritDoc}
              */
             public Object[] getArgumentValues() {
-                return null;
+                return argumentValues;
             }
 
             /**
@@ -319,6 +324,13 @@ public class AttributeManager {
              */
             public String getDescription() {
                 return description;
+            }
+
+            /**
+             * Assume first argument datatype is the "main" data type.
+             */
+            public Class<?> getDataType() {
+                return argumentDataTypes[0];
             }
 
         };
@@ -336,7 +348,21 @@ public class AttributeManager {
     public Consumer<?> createConsumer(final Object baseObject,
             final String methodName, final Class<?> dataType) {
         String description = getDescriptionString(baseObject, methodName, dataType);
-        return createConsumer(baseObject, methodName, dataType, description);
+        return createConsumer(baseObject, methodName,
+                new Class<?>[] { dataType }, null, description);
+    }
+
+    /**
+     * Create a consumer using
+     *  1) Parent Object
+     *  2) Method name
+     *  3) Data type
+     *  4) Description
+     */
+    public Consumer<?> createConsumer(final Object baseObject,
+            final String methodName, final Class<?> dataType, final String description) {
+        return createConsumer(baseObject, methodName,
+                new Class<?>[] { dataType }, null, description);
     }
 
     /**
@@ -347,7 +373,7 @@ public class AttributeManager {
      */
     public Consumer<?> createConsumer(final PotentialAttribute potentialAttribute) {
         return createConsumer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodName(), potentialAttribute.getDataType(),
+                .getMethodName(), potentialAttribute.getArgumentDataTypes(), potentialAttribute.getArgumentValues(),
                 potentialAttribute.getDescription());
     }
 
@@ -429,7 +455,7 @@ public class AttributeManager {
             final String methodName, final Class<?> dataType,
             final String description) {
         return new PotentialConsumer(parentComponent, parentObject, methodName,
-                dataType, description);
+                new Class<?>[]{dataType}, null, description);
     }
 
     /**

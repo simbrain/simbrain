@@ -100,8 +100,10 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.oscworld.OscWorldComponent;
 import org.simbrain.world.oscworld.OscWorldDesktopComponent;
-import org.simbrain.world.textworld.TextWorldComponent;
-import org.simbrain.world.textworld.TextWorldDesktopComponent;
+import org.simbrain.world.textworld.DisplayComponent;
+import org.simbrain.world.textworld.DisplayComponentDesktopGui;
+import org.simbrain.world.textworld.ReaderComponent;
+import org.simbrain.world.textworld.ReaderComponentDesktopGui;
 import org.simbrain.world.threedee.ThreeDeeComponent;
 import org.simbrain.world.threedee.gui.MainConsole;
 import org.simbrain.world.visionworld.VisionWorldComponent;
@@ -344,6 +346,7 @@ public class SimbrainDesktop {
         // TODO use a configuration file
         registerComponent(BarChartComponent.class, BarChartGui.class);
         registerComponent(ConsoleComponent.class, ConsoleDesktopComponent.class);
+        registerComponent(DisplayComponent.class, DisplayComponentDesktopGui.class);
         registerComponent(DataWorldComponent.class, DataWorldDesktopComponent.class);
 //        registerComponent(MidiWorldComponent.class, MidiWorldDesktopComponent.class);
         registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
@@ -351,11 +354,11 @@ public class SimbrainDesktop {
         registerComponent(OscWorldComponent.class, OscWorldDesktopComponent.class);
         registerComponent(PieChartComponent.class, PieChartGui.class);
         registerComponent(ProjectionComponent.class, ProjectionGui.class);
+        registerComponent(ReaderComponent.class, ReaderComponentDesktopGui.class);
         registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
         registerComponent(ThreeDeeComponent.class, MainConsole.class);
         registerComponent(TrainerComponent.class, TrainerDesktopComponent.class);
         registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
-        registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
         registerComponent(GameComponent.class, GameDesktopComponent.class);
     }

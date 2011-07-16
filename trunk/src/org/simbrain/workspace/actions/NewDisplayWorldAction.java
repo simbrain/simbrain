@@ -24,12 +24,12 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.textworld.TextWorldComponent;
+import org.simbrain.world.textworld.DisplayComponent;
 
 /**
- * Add text world to workspace.
+ * Add display text world to workspace.
  */
-public final class NewTextWorldAction extends WorkspaceAction {
+public final class NewDisplayWorldAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,8 +38,8 @@ public final class NewTextWorldAction extends WorkspaceAction {
      * Create a new text world action with the specified
      * workspace.
      */
-    public NewTextWorldAction(Workspace workspace) {
-        super("TextWorld (Beta)", workspace);
+    public NewDisplayWorldAction(Workspace workspace) {
+        super("TextWorld-Display (Beta)", workspace);
         putValue(SHORT_DESCRIPTION, "New Text World");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }
@@ -47,7 +47,7 @@ public final class NewTextWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        TextWorldComponent world = new TextWorldComponent("");
+        DisplayComponent world = new DisplayComponent("");
         workspace.addWorkspaceComponent(world);
     }
 }

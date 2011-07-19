@@ -26,6 +26,7 @@ import java.util.List;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.textworld.TextWorld.TextItem;
 
 /**
  * <b>TextWorldComponent</b> is the container for the world component. Handles
@@ -65,7 +66,18 @@ public class ReaderComponent extends WorkspaceComponent {
      */
     private void init() {
         addProducerType(new AttributeType(this, "Letters", double.class, true));
-        addProducerType(new AttributeType(this, "Words", double.class, false));        
+        addProducerType(new AttributeType(this, "Words", double.class, false));
+        world.addListener(new TextListener() {
+            public void textChanged() {
+            }
+            public void dictionaryChanged() {
+               ReaderComponent.this.firePotentialAttributesChanged();
+            }
+            public void positionChanged() {
+            }
+            public void currentItemChanged(TextItem newItem) {
+            }
+        });
     }
 
     @Override
@@ -123,6 +135,11 @@ public class ReaderComponent extends WorkspaceComponent {
      * @return the world
      */
     public ReaderWorld getWorld() {
+        return world;
+    }
+
+    @Override
+    public Object getObjectFromKey(String objectKey) {
         return world;
     }
 }

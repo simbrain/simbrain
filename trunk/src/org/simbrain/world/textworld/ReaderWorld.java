@@ -18,36 +18,28 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * <b>ReaderWorld</b> parses underlying text and can produce numerical
- * representations of it.
+ * <b>ReaderWorld</b> parses the text in the underlying text world by letter or
+ * "word" (where a "word" is the text between instances of a delimiter specified
+ * by a regular expression), and can then convert these items to numbers for use
+ * in, for example, a neural networks.
  */
 public class ReaderWorld extends TextWorld {
 
-    /** The current item of text (letter, word, etc., depending on parse configuration) .*/
-    private String currentItem;
-    
     /** List of parsing style. */
     public enum ParseStyle {
         CHARACTER, WORD
     };
 
     /** The current parsing style. */
-    private ParseStyle parseStyle = ParseStyle.CHARACTER;
+    private ParseStyle parseStyle = ParseStyle.WORD;
 
     /** For use with word parsing. */
     private String delimeter = "";
@@ -57,47 +49,128 @@ public class ReaderWorld extends TextWorld {
 
     /** Pattern matcher. */
     private Matcher matcher;
+    
+    /**
+     * Position after the last delimeter found, which is where the current item
+     * should begin.
+     */
+    private int positionAfterLastDelimeter;
+
+    /**
+     * Whether the matcher object is in a valid state so that matcher.end() can
+     * be called.
+     */
+    private boolean matcherInValidState = false;
 
     /**
      * Constructs an instance of TextWorld.
      */
     public ReaderWorld() {
+
+        // Set whitespace as default delimeter
         setDelimeter("\\s");
+        resetMatcher();
+
+        // Text Listener
+        this.addListener(new TextListener() {
+
+            public void textChanged() {
+                //System.out.println("In textchanged");
+                resetMatcher();
+            }
+
+            public void dictionaryChanged() {
+            }
+
+            public void positionChanged() {
+                //System.out.println("In position changed");
+                resetMatcher();
+            }
+
+            public void currentItemChanged(TextItem newItem) {
+            }
+
+        });
     }
 
+    /**
+     * Reset the parser and specify the region focused on by it, to go from the
+     * current cursor position to the end of the text.
+     */
+    void resetMatcher() {
+        int begin = getPosition();
+        int end = getText().length();
+        //System.out.println(begin + "," + end);
+        matcher = pattern.matcher(getText());
+        matcher.region(begin, end);
+        positionAfterLastDelimeter = begin;
+        matcherInValidState = false;
+    }
 
     /**
      * Advance the position in the text, and update the current item.
      */
     public void update() {
-        // parse text
         if (parseStyle == ParseStyle.CHARACTER) {
-            if(getPosition() < getText().length()) {
-                currentItem = getText().substring(getPosition(), getPosition()+1);
-                setPosition(getPosition()+1);
+            if (getPosition() < getText().length()) {
+                int begin = getPosition();
+                int end = getPosition() + 1;
+                if (begin <= end) {
+                    setCurrentItem(new TextItem(begin, end, getText()
+                            .substring(begin, end)));
+                    setPosition(end);
+                } else {
+                    System.err.println("Problem with positions:" + begin + ","
+                            + end);
+                }
+
             } else {
-                currentItem = "";
+                setCurrentItem(new TextItem(getPosition(), getPosition(), ""));
+                setPosition(0);
             }
         } else if (parseStyle == ParseStyle.WORD) {
-
-            // Search string from caret to end of doc
-            matcher = pattern.matcher(getText().substring(getPosition()));
-            if(matcher.find()) {
-                currentItem = matcher.group();
-                setPosition(getPosition() + matcher.group().length());
-            } else {
-                currentItem = "";
+            if (matcher != null) {
+                if (matcherInValidState) {
+                    positionAfterLastDelimeter = matcher.end();
+                }
+                if (getPosition() < getText().length()) {
+                    if (matcher.find()) {
+                        matcherInValidState = true;
+                        // System.out.println("Delimeter found: [" +
+                        // matcher.group() + "]("
+                        // + matcher.start() + "," + matcher.end()+")");
+                        int begin = positionAfterLastDelimeter;
+                        int end = matcher.start();
+                        if (begin <= end) {
+                            setCurrentItem(new TextItem(begin, end, getText()
+                                    .substring(begin, end)));
+                            setPosition(end, false); // But now it does not
+                                                     // reset!
+                        } else {
+                            System.err.println("Problem with positions:"
+                                    + begin + "," + end);
+                        }
+                        // System.out.println(getCurrentItem());
+                    } else {
+                        matcherInValidState = false;
+                        //System.out.println("nothing found");
+                        setCurrentItem(new TextItem(getPosition(),
+                                getPosition(), ""));
+                        setPosition(0); //TODO:Option to reset to beginning of text
+                    }
+                } else {
+                    setCurrentItem(new TextItem(getPosition(), getPosition(),
+                            ""));
+                    setPosition(0);
+                }
             }
         }
-        fireTextChangedEvent();
     }
-    
-
 
     /**
      * Returns the current parse style inside a comboboxwrapper. Used by
      * preference dialog.
-     *
+     * 
      * @return the the comboBox
      */
     public ComboBoxWrapper getParseStyle() {
@@ -114,7 +187,7 @@ public class ReaderWorld extends TextWorld {
 
     /**
      * Set the current parse style. Used by preference dialog.
-     *
+     * 
      * @param parseStyle the current style.
      */
     public void setParseStyle(ComboBoxWrapper parseStyle) {
@@ -123,7 +196,7 @@ public class ReaderWorld extends TextWorld {
 
     /**
      * Set the parse style object.
-     *
+     * 
      * @param parseStyle the current parse style
      */
     private void setTheParseStyle(ParseStyle parseStyle) {
@@ -132,21 +205,12 @@ public class ReaderWorld extends TextWorld {
 
     /**
      * Get the current parse style.
-     *
+     * 
      * @return the current parse style
      */
     public ParseStyle getTheParseStyle() {
         return parseStyle;
     }
-
-
-    /**
-     * @return the currentItem
-     */
-    public String getCurrentItem() {
-        return currentItem;
-    }
-
 
     /**
      * @param parseStyle the parseStyle to set
@@ -162,24 +226,24 @@ public class ReaderWorld extends TextWorld {
         return delimeter;
     }
 
-
     /**
      * @param delimeter the delimeter to set
      */
     public void setDelimeter(String delimeter) {
         this.delimeter = delimeter;
         pattern = Pattern.compile(delimeter);
+        resetMatcher();
     }
 
     /**
-     * Returns 1 if the current item is this character, or 0 otherwise.
-     * Used for localist representations of letters.
-     *
+     * Returns 1 if the current item is this character, or 0 otherwise. Used for
+     * localist representations of letters.
+     * 
      * @param letter the letter to search for
      * @return 1 if the letter is contained, 0 otherwise.
      */
     public int matchCurrentLetter(char letter) {
-        if (currentItem.equalsIgnoreCase(String.valueOf(letter))) {
+        if (getCurrentItem().getText().equalsIgnoreCase(String.valueOf(letter))) {
             return 1;
         } else {
             return 0;
@@ -187,31 +251,27 @@ public class ReaderWorld extends TextWorld {
     }
 
     /**
-     * Returns 1 if the current item matches the provided text, 0 otherwise. Used for localist 
-     * representation of words.
-     *
+     * Returns 1 if the current item matches the provided text, 0 otherwise.
+     * Used for localist representation of words.
+     * 
      * @param text the text to search for
      * @return 1 if the word is contained, 0 otherwise.
      */
     public int matchCurrentItem(String text) {
-        if (currentItem.equalsIgnoreCase(text)) {
+        if (getCurrentItem().getText().equalsIgnoreCase(text)) {
             return 1;
         } else {
             return 0;
         }
-    }    
+    }
 
-    
     /**
      * Returns a properly initialized xstream object.
-     *
+     * 
      * @return the XStream object
      */
     static XStream getXStream() {
         XStream xstream = TextWorld.getXStream();
         return xstream;
     }
-
-
-
 }

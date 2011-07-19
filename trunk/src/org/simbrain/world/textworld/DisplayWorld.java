@@ -18,23 +18,11 @@
  */
 package org.simbrain.world.textworld;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.simbrain.util.propertyeditor.ComboBoxWrapper;
-
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>TextWorld</b> is a text world which is for display of text, and number >
- * text converstion.
+ * text conversion.
  */
 public class DisplayWorld extends TextWorld {
 
@@ -78,7 +66,7 @@ public class DisplayWorld extends TextWorld {
      */
     public void addTextIfAboveThreshold(final double value, final String string) {
         if (value > threshold) {
-            addText(string + " "); // TODO: Replace space with delim field
+            addText(string + " "); // TODO: Replace space with user-specified "buffer" string
         }
     }
 

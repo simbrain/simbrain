@@ -32,6 +32,23 @@ import java.util.Arrays;
  * there are four creation methods. As with attributes, you can specify a custom
  * description or not. You can also use an attribute type when creating the
  * potential attribute.
+ * 
+ * Main type.  The type used when passing info from producer to consumer.
+ * These must match.
+ * 
+ * Auxiliary arguments.   Used when calling the method (using reflection) associated
+ * with a producer or consumer.   In these cases both the argument types and
+ * an unchanging argument value must be specified.
+ * 
+ * For producers (getters): the return type is the main type, and all args are additional.
+ *  Example: double getValue(int bar-index).   
+ *      double is the main type
+ *      int is auxiliary
+ *      
+ * For consumers (setters): the _first_ argument is the main type, and all other
+ *  arguments are auxiliary. 
+ * 
+ * TODO: Refer other classes here for info 
  *
  * @author jyoshimi
  */
@@ -227,15 +244,15 @@ public class AttributeManager {
     
     /**
      * Create a consumer. This version of the method does the real work; others
-     * forward to it.
-     * 
-     * Assume first argumentDataType is the main data type.
+     * forward to it.  Note that, unlike createProducer, this does not have a main datatype
+     * argument, because that is implicitly the first element of argument dataTypes
      * 
      * TODO: Currently only works for one or two arguments only.
      *
      * @param parentObject parent object
      * @param methodName name of method
-     * @param dataType type of data
+     * @param argumentDataTypes type of all arguments, where the first is the main data type
+     * @param argumentValues values for arguments _after_ the first argument
      * @param description description
      * @return the resulting consumer
      */
@@ -254,10 +271,16 @@ public class AttributeManager {
                 } catch (SecurityException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchMethodException e1) {
-                    System.err.println("Could not find method "
-                            + methodName + " with argument of type of "
-                            + Arrays.asList(argumentDataTypes));
-                    e1.printStackTrace();
+                    System.err.print("Could not find method "
+                            + methodName + " ");
+                   if (argumentDataTypes != null) {
+                       System.err.print("with arguments of type ");                       
+                       for(Class<?> type: argumentDataTypes) {
+                           System.err.print(type.getCanonicalName());                
+                       }
+                       System.err.println();
+                   }
+                   e1.printStackTrace();
                 }
             }
 
@@ -339,10 +362,10 @@ public class AttributeManager {
     }
 
     /**
-     * Create a consumer using
+     * Create a consumer using:
      *  1) Parent Object
      *  2) Method name
-     *  3) Data type
+     *  3) Data type (so no auxiliary args: one value in argument list and null value list)
      *  Description is automatically created.
      */
     public Consumer<?> createConsumer(final Object baseObject,
@@ -353,10 +376,10 @@ public class AttributeManager {
     }
 
     /**
-     * Create a consumer using
+     * Create a consumer using:
      *  1) Parent Object
      *  2) Method name
-     *  3) Data type
+     *  3) Data type (so no auxiliary args: one value in argument list and null value list)
      *  4) Description
      */
     public Consumer<?> createConsumer(final Object baseObject,
@@ -441,13 +464,15 @@ public class AttributeManager {
         return createPotentialProducer(baseObject, methodName, dataType,
                 description);
     }
+    
+    // Potential Consumers
 
     /**
      * Create a potential consumer. All information is provided.
      *
      * @param parentObject base object
      * @param methodName name of method
-     * @param dataType type of data
+     * @param dataType type of data  (so no auxiliary args: one value in argument list and null value list)
      * @param description custom description
      * @return the resulting consumer
      */

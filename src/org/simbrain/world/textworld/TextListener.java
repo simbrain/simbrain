@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.textworld;
 
+import org.simbrain.world.textworld.TextWorld.TextItem;
+
 /**
  * Listen for changes in the text world.
  */
@@ -27,5 +29,20 @@ public interface TextListener {
      * The text has changed.
      */
     void textChanged();
+    
+    /**
+     * The dictionary has changed.
+     */
+    void dictionaryChanged();
+    
+    /**
+     * The position of the caret has changed.
+     */
+    void positionChanged();
+    
+    /**
+     * The current item has changed
+     */
+    void currentItemChanged(TextItem newItem);
 
 }

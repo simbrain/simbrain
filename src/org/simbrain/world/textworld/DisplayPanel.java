@@ -30,6 +30,8 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.simbrain.world.textworld.TextWorld.TextItem;
+
 /**
  * Display text data from another source.
  * 
@@ -71,17 +73,17 @@ public class DisplayPanel extends JPanel {
                 //TODO: Check if needed in all places, migrate to separate method
                 //      Careful of infinite loops later if this fires events in world
                 //System.out.println("changedUpdate");
-                world.setText(textArea.getText());
+                world.setText(textArea.getText(), false);
             }
 
             public void insertUpdate(DocumentEvent arg0) {
                 //System.out.println("insertUpdate");
-                world.setText(textArea.getText());
+                world.setText(textArea.getText(), false);
             }
 
             public void removeUpdate(DocumentEvent arg0) {
                 //System.out.println("removeUpdate");
-                world.setText(textArea.getText());
+                world.setText(textArea.getText(), false);
             }
             
         });
@@ -105,14 +107,21 @@ public class DisplayPanel extends JPanel {
                 
         world.addListener(new TextListener() {
 
-            // TODO: Rename in listener
-            // Update cursor position
-            // Update current highlighted item
             public void textChanged() {
                 textArea.setText(world.getText());
                 if (world.getPosition() < textArea.getDocument().getLength()) {
                     textArea.setCaretPosition(world.getPosition());
                 }
+            }
+
+            public void dictionaryChanged() {
+            }
+
+            public void positionChanged() {
+                world.setPosition(textArea.getCaretPosition(), false);
+            }
+
+            public void currentItemChanged(TextItem newItem) {
             }
         });
 

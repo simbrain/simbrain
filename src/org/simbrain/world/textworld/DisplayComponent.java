@@ -26,6 +26,7 @@ import java.util.List;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.textworld.TextWorld.TextItem;
 
 /**
  * <b>DisplayComponent</b> is a component which wraps a display world with consumers.
@@ -62,8 +63,26 @@ public class DisplayComponent extends WorkspaceComponent {
      * Initialize attribute types.
      */
     private void init() {
-        addConsumerType(new AttributeType(this, "StringReader", String.class, false));
-        addConsumerType(new AttributeType(this, "WordReader", double.class, true));
+        addConsumerType(new AttributeType(this, "StringReader", String.class,
+                false));
+        addConsumerType(new AttributeType(this, "WordReader", double.class,
+                true));
+        world.addListener(new TextListener() {
+
+            public void textChanged() {
+            }
+
+            public void dictionaryChanged() {
+                DisplayComponent.this.firePotentialAttributesChanged();
+            }
+
+            public void positionChanged() {
+            }
+
+            public void currentItemChanged(TextItem newItem) {
+            }
+
+        });
     }
 
     @Override
@@ -117,6 +136,11 @@ public class DisplayComponent extends WorkspaceComponent {
      * @return the world
      */
     public DisplayWorld getWorld() {
+        return world;
+    }
+    
+    @Override
+    public Object getObjectFromKey(String objectKey) {
         return world;
     }
 }

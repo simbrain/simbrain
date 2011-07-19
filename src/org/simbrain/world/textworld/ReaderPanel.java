@@ -35,6 +35,8 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import org.simbrain.world.textworld.TextWorld.TextItem;
+
 /**
  * Display panel for reading data from user and showing text world's state.
  *
@@ -61,39 +63,54 @@ public class ReaderPanel extends JPanel {
         textArea.setLineWrap(true);
         textArea.setText(world.getText());
         
+        init();
+        
+    }
+    
+    
+    /**
+     * Initialize all the listeners of this class. 
+     */
+    private void init() {
+        
         textArea.addCaretListener(new CaretListener() {
 
             public void caretUpdate(CaretEvent arg0) {
                 //System.out.println("caretUpdate");
-                world.setPosition(textArea.getCaretPosition());
+
+                // Tricky here. Need to set the position without firing an event
+                // (and then infinite loop),
+                // but also need to reset the matcher in the underlying object.
+                // I wish there were a cleaner way...
+                world.setPosition(textArea.getCaretPosition(), false);
+                world.resetMatcher();  
+
                 //removeHighlights(textArea);
             }
             
         });
+        
+
+        // Listener for changes in the textarea
         textArea.getDocument().addDocumentListener(new DocumentListener() {
 
             public void changedUpdate(DocumentEvent arg0) {
-                //TODO: Check if needed in all places, migrate to separate method
-                //      Careful of infinite loops later if this fires events in world
                 //System.out.println("changedUpdate");
-                world.setText(textArea.getText());
+                world.setText(textArea.getText(), false);
             }
 
             public void insertUpdate(DocumentEvent arg0) {
                 //System.out.println("insertUpdate");
-                world.setText(textArea.getText());
+                world.setText(textArea.getText(), false);
             }
 
             public void removeUpdate(DocumentEvent arg0) {
                 //System.out.println("removeUpdate");
-                world.setText(textArea.getText());
+                world.setText(textArea.getText(), false);
             }
             
         });
-        //TODO: Back and forth updating
-        //       panel > world (textArea.addTextListener...
-        //       world > panel
-        
+
         final JScrollPane inputScrollPane = new JScrollPane(textArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -112,28 +129,24 @@ public class ReaderPanel extends JPanel {
         });
                 
         world.addListener(new TextListener() {
-
-            //TODO: Rename in listener
-            //      Update cursor position
-            //      Update current highlighted item
             public void textChanged() {
-                //textArea.setText(world.getText()); 
-                if(world.getTheParseStyle() == ReaderWorld.ParseStyle.CHARACTER) {
-                    if (world.getCurrentItem() != null) {
-                        if (world.getCurrentItem().equalsIgnoreCase("")) {
-                            removeHighlights(textArea);
-                        } else {
-                            highlight(world.getLastPosition(), world.getLastPosition()
-                                    + world.getCurrentItem().length());
-                        }                                            
-                    }
-                } else if (world.getTheParseStyle() == ReaderWorld.ParseStyle.WORD) {
-//                    if (world.matcher != null) {
-//                        highlight(world.matcher.start(), world.matcher.end());                        
-//                    }
-                }
-                if(world.getPosition() < textArea.getDocument().getLength()) {
-                    textArea.setCaretPosition(world.getPosition());                    
+                // TODO: Is the below needed?  
+                //textArea.setText(world.getText(), false); 
+            }
+
+            public void dictionaryChanged() {
+            }
+
+            public void positionChanged() {
+                textArea.setCaretPosition(world.getPosition());                    
+            }
+
+            public void currentItemChanged(TextItem newItem) {
+                if (world.getCurrentItem().getText().equalsIgnoreCase("")) {
+                    removeHighlights(textArea);
+                } else {
+                    highlight(world.getCurrentItem().getBeginPosition(), world
+                            .getCurrentItem().getEndPosition());
                 }
             }
             

@@ -36,10 +36,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public abstract class TextWorld {
 
     /** The main text in the text world. */
-    private String text;
-
-    /** The current item of text (character, word, sentence, depending on parse style) .*/
-    private String currentItem;
+    private String text = "";
+    
+    /** The current item of text (letter, word, etc.) */
+    private TextItem currentItem;
 
     /** What the current position in the text is. */
     private int position = 0;
@@ -107,6 +107,33 @@ public abstract class TextWorld {
             listener.textChanged();
         }
     }
+    
+    /**
+     * Notify listeners that the dictionary has changed.
+     */
+    protected void fireDictionaryChangedEvent() {
+        for (TextListener listener : listenerList) {
+            listener.dictionaryChanged();
+        }
+    }
+
+    /**
+     * Notify listeners that the caret position has changed.
+     */
+    protected void firePositionChangedEvent() {
+        for (TextListener listener : listenerList) {
+            listener.positionChanged();
+        }
+    }
+    
+    /**
+     * Notify listeners that the caret position has changed.
+     */
+    protected void fireCurrentItemChanged(TextItem newItem) {
+        for (TextListener listener : listenerList) {
+            listener.currentItemChanged(newItem);
+        }
+    }
 
     /**
      * @return the text
@@ -115,14 +142,25 @@ public abstract class TextWorld {
         return text;
     }
 
-
     /**
      * @param text the text to set
      */
     public void setText(String text) {
-        this.text = text;
+        setText(text, true);
     }
 
+    /**
+     * Set text, and fire an event if the fireEvent flag is set.
+     * 
+     * @param text the text to set
+     * @param fireEvent whether or not to fire an event
+     */
+    public void setText(final String text, final boolean fireEvent) {
+        this.text = text;
+        if (fireEvent) {
+            fireTextChangedEvent();            
+        }
+    }
 
     /**
      * @return the position
@@ -131,22 +169,29 @@ public abstract class TextWorld {
         return position;
     }
 
-
     /**
      * @param position the position to set
      */
     public void setPosition(int newPosition) {
-        //System.out.println(position);
-        lastPosition = position;
-        this.position = newPosition;
+        setPosition(newPosition, true);
     }
-
-
+    
     /**
-     * @return the currentItem
+     * Set position.  Fire event only if specified.
+     *
+     * @param newPosition new position to set
+     * @param fireEvent whether to fire event
      */
-    public String getCurrentItem() {
-        return currentItem;
+    public void setPosition(final int newPosition, final boolean fireEvent) {
+        if (newPosition < text.length()) {
+            lastPosition = position;
+            this.position = newPosition;            
+            if (fireEvent) {
+                firePositionChangedEvent();                
+            }
+        } else {
+            System.err.println("Invalid position:" + newPosition);
+        }
     }
 
 
@@ -155,8 +200,7 @@ public abstract class TextWorld {
      */
     public int getLastPosition() {
         return lastPosition;
-    }
-    
+    }    
 
     /**
      * @return the wordList
@@ -172,6 +216,7 @@ public abstract class TextWorld {
      */
     public void addWordToDictionary(String word) {
         dictionary.add(word);
+        fireDictionaryChangedEvent();
     }
 
 
@@ -211,6 +256,77 @@ public abstract class TextWorld {
     protected Object readResolve() {
         listenerList = new ArrayList<TextListener>();
         return this;
+    }
+    
+    /**
+     * Represents the "current item", and includes a representation
+     * of the beginning and ending of the item in the main text.
+     */
+    class TextItem {
+    
+        /** Initial position in main text. */
+        private final int beginPosition;
+        
+        /** Final position in main text. */
+        private final int endPosition;
+        
+        /** The item text. */
+        private final String text;
+        
+        /**
+         * Construct this text item.
+         *
+         * @param beginPosition
+         * @param endPosition
+         * @param text
+         */
+        public TextItem(int beginPosition, int endPosition, String text) {
+            this.beginPosition = beginPosition;
+            this.endPosition = endPosition;
+            this.text = text;
+        }
+
+        /**
+         * @return the beginPosition
+         */
+        public int getBeginPosition() {
+            return beginPosition;
+        }
+
+        /**
+         * @return the endPosition
+         */
+        public int getEndPosition() {
+            return endPosition;
+        }
+
+        /**
+         * @return the text
+         */
+        public String getText() {
+            return text;
+        }
+        
+        @Override
+        public String toString() {
+            return "(" + beginPosition + "," + endPosition + ") " + text;
+        }
+        
+    }
+
+    /**
+     * @return the currentItem
+     */
+    public TextItem getCurrentItem() {
+        return currentItem;
+    }
+
+    /**
+     * @param currentItem the currentItem to set
+     */
+    public void setCurrentItem(TextItem currentItem) {
+        this.currentItem = currentItem;
+        fireCurrentItemChanged(currentItem);
     }
 
 }

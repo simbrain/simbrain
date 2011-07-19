@@ -239,33 +239,21 @@ public class WorkspaceSerializer {
                         .getAttributeManager()
                         .createProducer(
                                 sourceComponent.getObjectFromKey(
-                                        couplingRef
-                                        .getArchivedProducer()
-                                        .getBaseObjectKey()),
-                                        couplingRef.getArchivedProducer()
-                                        .getMethodBaseName(),
+                                        couplingRef.getArchivedProducer().getBaseObjectKey()),
+                                        couplingRef.getArchivedProducer().getMethodBaseName(),
                                         couplingRef.getArchivedProducer().getDataType(),
-                                        couplingRef.getArchivedProducer()
-                                        .getArgumentDataTypes(),
-                                        couplingRef.getArchivedProducer()
-                                        .getArgumentValues(),
-                                        couplingRef.getArchivedProducer()
-                                        .getDescription());
+                                        couplingRef.getArchivedProducer().getArgumentDataTypes(),
+                                        couplingRef.getArchivedProducer().getArgumentValues(),
+                                        couplingRef.getArchivedProducer().getDescription());
                 Consumer<?> consumer = (Consumer<?>) targetComponent
                         .getAttributeManager()
                         .createConsumer(
                                 targetComponent.getObjectFromKey(
-                                        couplingRef
-                                        .getArchivedConsumer()
-                                        .getBaseObjectKey()),
-                                        couplingRef.getArchivedConsumer()
-                                        .getMethodBaseName(),
-                                        couplingRef.getArchivedProducer()
-                                        .getArgumentDataTypes(),
-                                        couplingRef.getArchivedProducer()
-                                        .getArgumentValues(),
-                                        couplingRef.getArchivedProducer()
-                                        .getDescription());
+                                        couplingRef.getArchivedConsumer().getBaseObjectKey()),
+                                        couplingRef.getArchivedConsumer().getMethodBaseName(),
+                                        couplingRef.getArchivedConsumer().getArgumentDataTypes(),
+                                        couplingRef.getArchivedConsumer().getArgumentValues(),
+                                        couplingRef.getArchivedConsumer().getDescription());
                 workspace.addCoupling(new Coupling(producer, consumer));
 
             }

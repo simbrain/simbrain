@@ -76,7 +76,7 @@ public final class EchoStateNetBuilder {
     private boolean directInOutWeights = true;
     
     /** Default reservoir neuron type */
-    private NeuronUpdateRule reservoirNeuronType = new LinearNeuron();
+    private NeuronUpdateRule reservoirNeuronType = new SigmoidalNeuron();
 
     /** Reference to input layer. */
     private List<Neuron> inputLayer;
@@ -254,7 +254,7 @@ public final class EchoStateNetBuilder {
         LMSOffline trainer = new LMSOffline(network);
         trainer.setInputData(mainInputData);
         trainer.setTrainingData(trainingData);
-        trainer.setInputLayer(full);
+        trainer.setInputLayer(reservoirLayer);
         trainer.setOutputLayer(getOutputLayer());
         trainer.setSolutionType(SolutionType.WIENER_HOPF); //TODO: Ability to set
         trainer.train(1);
@@ -413,57 +413,20 @@ public final class EchoStateNetBuilder {
      */
     public static void main (String args []){
         final RootNetwork network = new RootNetwork();
-        EchoStateNetBuilder esn = new EchoStateNetBuilder(network, 2, 100, 10);
+        EchoStateNetBuilder esn = new EchoStateNetBuilder(network, 1, 500, 1);
+        esn.setBackWeights(true);
+        esn.setDirectInOutWeights(false);
         esn.setInSparsity(0.2);
-        esn.setResSparsity(0.2);
-        esn.setBackSparsity(0.2);
-        esn.setSpectralRadius(0.8);
+        esn.setResSparsity(0.1);
+        esn.setBackSparsity(0.5);
+        esn.setSpectralRadius(0.99);
 
         esn.buildNetwork();
 
-        // Create xor through time data
-        int history = 10;
-        int numInputs = history + 50000;
-        double [][] preInputData = new double [history][2];
-        double [][] inputData = new double [numInputs][2];
-        double [][] teachData = new double [numInputs][history];
-        double[] buffer = new double[history + numInputs];
-
-        Random generator = new Random();
-        for (int i = 0; i < history + numInputs; i++) {
-
-            int truthTableRow = generator.nextInt(4);
-            double[] xorVals = getXORValues(truthTableRow);
-
-            if (i < history) {
-                preInputData[i][0] = xorVals[0];
-                preInputData[i][1] = xorVals[1];
-                buffer[i] = xorVals[2];
-            } else {
-                inputData[i - history][0] = xorVals[0];
-                inputData[i - history][1] = xorVals[1];
-                buffer[i] = xorVals[2];
-            }
-        }
-
-        // Populate teacher matrix
-        for (int i = 0; i < numInputs; i++) {
-            for (int j = 0; j < history; j++) {
-                teachData[i][j] = buffer[i + j];
-            }
-        }
-
-        // Print diagnostics
-        //System.out.println(Utils.doubleMatrixToString(preInputData));
-        //System.out.println("-------");
-        //System.out.println(Utils.doubleMatrixToString(inputData));
-        //System.out.println("-------");
-        //System.out.println(Utils.doubleArrayToString(buffer));
-        //System.out.println("-------");
-        //System.out.println(Utils.doubleMatrixToString(teachData));
-
-        // Train the network
-        esn.train(inputData, teachData);
+        double [][] ins = sineWaveInputGen(54000);
+        double [][] outs = sineWaveDataGen(ins, 300);
+                    
+        esn.train(ins, outs);
 
         // Write to file
         String FILE_OUTPUT_LOCATION = "./";
@@ -477,33 +440,35 @@ public final class EchoStateNetBuilder {
 
     }
 
-    /**
-     * Helper method for test function.
-     *
-     * @param truthTableRow one of the 4 rows an xor's truth table
-     * @return the specified row: <1,1-1>,<-1,1,1>, <1,-1,1>, or <1,1,-1>
-     */
-    private static double[] getXORValues(int truthTableRow) {
-        double[] retVal = new double[3];
-        if (truthTableRow == 0) {
-            retVal[0] = 1.0;
-            retVal[1] = 1.0;
-            retVal[2] = -1.0;
-        } else if (truthTableRow == 1) {
-            retVal[0] = -1.0;
-            retVal[1] = 1.0;
-            retVal[2] = 1.0;
-        } else if (truthTableRow == 2) {
-            retVal[0] = 1.0;
-            retVal[1] = -1.0;
-            retVal[2] = 1.0;
-        } else if (truthTableRow == 3) {
-            retVal[0] = -1.0;
-            retVal[1] = -1.0;
-            retVal[2] = -1.0;
+    public static double [] [] sineWaveInputGen(int numTrials){
+        double [][] input = new double [numTrials][1];
+        //numTrials -> 54,000
+        int interval = (int) numTrials/100;
+        int counter = interval;
+        double frequency = 0.01;
+        for(int i = 0; i < numTrials; i++){
+            input[i][0] = frequency;
+             if(i > counter){
+                 counter += interval;
+                 frequency += 0.01;
+             }
         }
-        return retVal;
+        return input;
     }
+    
+    public static double [] [] sineWaveDataGen(double [][] inputs, int interval){
+        double [][] outs = new double[inputs.length][1];
+        //Currently intervals are 300
+        double time = 0;
+        for(int i = 0; i < inputs.length; i++){
+            outs[i][0] = Math.sin(inputs[i][0] * time);
+            time += 1.0;
+        }
+        
+        return outs;
+        
+    }
+    
 
    
 

@@ -43,7 +43,7 @@ import org.simbrain.util.Utils;
  */
 public class TableActionManager {
 
-    /** Directory where tables are stored. */
+    /** Ddefault directory where tables are stored. */
     private static String CSV_DIRECTORY = "."
             + System.getProperty("file.separator") + "simulations"
             + System.getProperty("file.separator") + "tables";
@@ -60,8 +60,8 @@ public class TableActionManager {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-                putValue(NAME, "Import (.csv)");
-                putValue(SHORT_DESCRIPTION, "Import table from .csv");
+                putValue(NAME, "Open (.csv)");
+                putValue(SHORT_DESCRIPTION, "Open table from .csv");
             }
 
             /**
@@ -92,7 +92,7 @@ public class TableActionManager {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
                 putValue(NAME, "Export (.csv)");
-                putValue(SHORT_DESCRIPTION, "Export table to .csv");
+                putValue(SHORT_DESCRIPTION, "Save table as .csv");
             }
 
             /**

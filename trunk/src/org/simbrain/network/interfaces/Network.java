@@ -558,6 +558,18 @@ public abstract class Network {
     }
 
     /**
+     * Set biases on all neurons with a bias to 0.
+     */
+    public void clearBiases() {
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            if(neuron.getUpdateRule() instanceof BiasedNeuron) {
+                ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
+            }
+        }
+        getRootNetwork().fireNetworkChanged();
+    }
+ 
+   /**
      * Sets all neurons to a specified value.
      *
      * @param value value to set

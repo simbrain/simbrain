@@ -94,6 +94,22 @@ public abstract class SimbrainDataTable<T> {
      * @return the columns in the dataset.
      */
     public abstract int getRowCount();
+    
+    /**
+     * Returns a string array representation of the table, useful in csv
+     * parsing.
+     *
+     * @return string array version of table
+     */
+    public String[][] asStringArray() {
+        String stringArray[][] = new String[getRowCount()][getColumnCount()];
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getColumnCount(); j++) {
+                stringArray[i][j] = "" + getValue(i,j);
+            }
+        }
+        return stringArray;
+    }
 
     /**
      * Add a table listener.

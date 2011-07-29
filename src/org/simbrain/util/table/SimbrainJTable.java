@@ -80,6 +80,15 @@ public class SimbrainJTable extends JXTable {
 
     /** Whether to display column headings. */
     private boolean displayColumnHeadings = true;
+    
+    /** Whether to display the default popup menu. */
+    private boolean displayPopUpMenu = true;
+    
+    /**
+     * Whether the table's data has changed or not, since the last save. Used
+     * externally.
+     */
+    private boolean hasChangedSinceLastSave = false;
 
     /**
      * Construct the table with specified number of rows and columns.
@@ -128,6 +137,7 @@ public class SimbrainJTable extends JXTable {
         getColumnModel().getColumn(0).setPreferredWidth(30);
         // TODO: Make preferred width for first column settable
 
+        hasChangedSinceLastSave = false;
     }
 
     /**
@@ -179,7 +189,7 @@ public class SimbrainJTable extends JXTable {
             }
             // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
             boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
-            if (isRightClick) {
+            if (isRightClick && displayPopUpMenu) {
                 JPopupMenu menu = buildPopupMenu();
                 menu.show(SimbrainJTable.this, (int) selectedPoint.getX(),
                         (int) selectedPoint.getY());
@@ -454,6 +464,7 @@ public class SimbrainJTable extends JXTable {
             public void columnAdded(int column) {
                 fireTableStructureChanged();
                 fireTableDataChanged();
+                hasChangedSinceLastSave = true;
             }
 
             /**
@@ -462,6 +473,7 @@ public class SimbrainJTable extends JXTable {
             public void columnRemoved(int column) {
                 fireTableStructureChanged();
                 fireTableDataChanged();
+                hasChangedSinceLastSave = true;
             }
 
             /**
@@ -469,6 +481,7 @@ public class SimbrainJTable extends JXTable {
              */
             public void cellDataChanged(int row, int column) {
                 fireTableCellUpdated(row, column);
+                hasChangedSinceLastSave = true;
             }
 
             /**
@@ -476,6 +489,7 @@ public class SimbrainJTable extends JXTable {
              */
             public void rowAdded(int row) {
                 fireTableRowsInserted(row, row);
+                hasChangedSinceLastSave = true;
             }
 
             /**
@@ -483,6 +497,7 @@ public class SimbrainJTable extends JXTable {
              */
             public void rowRemoved(int row) {
                 fireTableRowsDeleted(row, row);
+                hasChangedSinceLastSave = true;
             }
 
             /**
@@ -490,6 +505,7 @@ public class SimbrainJTable extends JXTable {
              */
             public void tableStructureChanged() {
                 fireTableStructureChanged();
+                hasChangedSinceLastSave = true;
             }
 
             /**
@@ -497,6 +513,7 @@ public class SimbrainJTable extends JXTable {
              */
             public void tableDataChanged() {
                 fireTableDataChanged();
+                hasChangedSinceLastSave = true;
             }
 
         };
@@ -621,6 +638,34 @@ public class SimbrainJTable extends JXTable {
         if (displayColumnHeadings == false) {
             this.setTableHeader(null); // dubious method but worked 
         }
+    }
+
+    /**
+     * @return the displayPopUpMenu
+     */
+    public boolean isDisplayPopUpMenu() {
+        return displayPopUpMenu;
+    }
+
+    /**
+     * @param displayPopUpMenu the displayPopUpMenu to set
+     */
+    public void setDisplayPopUpMenu(boolean displayPopUpMenu) {
+        this.displayPopUpMenu = displayPopUpMenu;
+    }
+
+    /**
+     * @return the hasChanged
+     */
+    public boolean hasChanged() {
+        return hasChangedSinceLastSave;
+    }
+
+    /**
+     * @param hasChanged the hasChanged to set
+     */
+    public void setHasChangedSinceLastSave(boolean hasChanged) {
+        this.hasChangedSinceLastSave = hasChanged;
     }
 
 }

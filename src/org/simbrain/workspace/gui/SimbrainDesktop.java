@@ -935,7 +935,7 @@ public class SimbrainDesktop {
             if (workspace.getCurrentFile() != null)  {
                 save(workspace.getCurrentFile());
             } else {
-                saveAs(); // Show save-as is there is no current file.
+                saveAs(); // Show save-as if there is no current file.
             }
         }
     }

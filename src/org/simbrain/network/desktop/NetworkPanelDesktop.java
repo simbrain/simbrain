@@ -96,6 +96,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getLayoutMenu());
         editMenu.addSeparator();
         editMenu.add(actionManager.getShowWeightMatrixAction());
+        editMenu.add(actionManager.getShowTrainerAction());
         editMenu.addSeparator();
 //        editMenu.add(actionManager.getGroupAction());
 //        editMenu.add(actionManager.getUngroupAction());

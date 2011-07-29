@@ -153,8 +153,9 @@ public abstract class NumericTable extends SimbrainDataTable<Double> {
     public void readData(final File file) {
 
         String[][] values = Utils.getStringMatrix(file);
-        // TOOD: If mutable do it
-        //reset(values.length, values[0].length, 0);
+        if (this instanceof MutableTable) {
+            ((MutableTable)this).reset(values.length, values[0].length);            
+        }
         for (int i = 0; i < values.length; i++) {
             for (int j = 0; j < values[0].length; j++) {
                 if (((String) (values[i][j])).length() > 0) {
@@ -178,8 +179,9 @@ public abstract class NumericTable extends SimbrainDataTable<Double> {
      * @param data the new data
      */
     public void setData(double[][] data) {
-        // If mutable then do it...
-        //reset(data.length, data[0].length, 0);
+        if (this instanceof MutableTable) {
+            ((MutableTable)this).reset(data.length, data[0].length);            
+        }
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[0].length; j++) {
                 setValue(i, j, data[i][j], false);
@@ -204,12 +206,8 @@ public abstract class NumericTable extends SimbrainDataTable<Double> {
         return returnList;
     }
 
-    /**
-     * Returns a string array representation of the table, useful in csv
-     * parsing.
-     *
-     * @return string array version of table
-     */
+    //TODO: Needed?  Also superclass not tested
+    @Override
     public String[][] asStringArray() {
         double doubleArray[][] = asArray();
         String stringArray[][] = new String[getRowCount()][getColumnCount()];

@@ -67,6 +67,20 @@ public final class DefaultNumericTable extends NumericTable implements
         this.numColumns = numColumns;
         init();
     }
+    
+    /**
+     * Construct a table from an 2-d array of doubles.
+     *
+     * @param data array of doubles
+     */
+    public DefaultNumericTable(final double[][] data) {
+        this.numRows = data.length;
+        if(data.length > 0) {
+            this.numColumns = data[0].length;            
+        }
+        init();
+        setData(data);
+    }
 
     /**
      * Default constructor.

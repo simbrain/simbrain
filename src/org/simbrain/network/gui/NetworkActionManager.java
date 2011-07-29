@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.FixedFanout;
@@ -73,6 +72,7 @@ import org.simbrain.network.gui.actions.ShowMainToolBarAction;
 import org.simbrain.network.gui.actions.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.ShowPrioritiesAction;
 import org.simbrain.network.gui.actions.ShowRunToolBarAction;
+import org.simbrain.network.gui.actions.ShowTrainerAction;
 import org.simbrain.network.gui.actions.ShowWeightMatrixAction;
 import org.simbrain.network.gui.actions.ShowWeightsAction;
 import org.simbrain.network.gui.actions.SpaceHorizontalAction;
@@ -278,6 +278,9 @@ public final class NetworkActionManager {
     /** Shows a weight matrix panel. */
     private final Action showWeightMatrixAction;
 
+    /** Shows a trainer dialog. */
+    private final Action showTrainerAction;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -402,6 +405,7 @@ public final class NetworkActionManager {
         synapseGroupAction = new NewSynapseGroupAction(networkPanel);
 
         showWeightMatrixAction = new ShowWeightMatrixAction(networkPanel);
+        showTrainerAction = new ShowTrainerAction(networkPanel);
     }
 
     /**
@@ -986,6 +990,13 @@ public final class NetworkActionManager {
      */
     public Action getShowWeightMatrixAction() {
         return showWeightMatrixAction;
+    }
+
+    /**
+     * @return the show weight matrix action
+     */
+    public Action getShowTrainerAction() {
+        return showTrainerAction;
     }
 
 }

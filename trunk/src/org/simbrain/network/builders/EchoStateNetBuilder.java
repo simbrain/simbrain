@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.simbrain.network.connections.Sparse2;
 import org.simbrain.network.groups.NeuronLayer;
@@ -73,7 +72,7 @@ public final class EchoStateNetBuilder {
     private boolean recurrentOutWeights = false;
     
     /** Default network has direct input to output connections */
-    private boolean directInOutWeights = true;
+    private boolean directInOutWeights = false;
     
     /** Default reservoir neuron type */
     private NeuronUpdateRule reservoirNeuronType = new SigmoidalNeuron();
@@ -111,6 +110,13 @@ public final class EchoStateNetBuilder {
     /** space between neurons within layers */
     private int betweenNeuronInterval = 50;
 
+    /**
+     * Default Constructor, all values are assumed default. 
+     */
+    public EchoStateNetBuilder(final RootNetwork network){
+    	this.network = network;
+    }
+    
     /**
      * Constructor with size of layers specified.
      *
@@ -216,9 +222,8 @@ public final class EchoStateNetBuilder {
             double sparsity) {
         Sparse2 sparseConnections = new Sparse2(network, src, tar);
         // TODO: More elegant way to do this?
-        Sparse2.setExcitatoryProbability(sparsity / 2);
-        Sparse2.setInhibitoryProbability(sparsity / 2);
-        sparseConnections.connectNeurons();
+        
+        sparseConnections.connectNeurons(sparsity);
     }
 
     /**
@@ -227,12 +232,8 @@ public final class EchoStateNetBuilder {
      * @param inputData input data for input nodes
      * @param trainingData training data
      */
-    public void train(double[][] inputData, double[][] trainingData) {
-
-        // TODO: Check that inputData.length matches inputlayer size, similarly
-        // for outputlayer and training data
-
-        // TODO: Add methods for training to various configurations...
+    public void train(SolutionType solution, double[][] inputData, 
+    		double[][] trainingData) {
 
         // Generate the reservoir data to be used in training
         double[][] mainInputData = ReservoirComputingUtils.generateData(
@@ -244,17 +245,35 @@ public final class EchoStateNetBuilder {
         
         ArrayList<Neuron> full = new ArrayList<Neuron>();
         
-        for(Neuron node : inputLayer){
-            full.add(node);
+        if(directInOutWeights){
+        	for(Neuron node : inputLayer){
+            	full.add(node);
+        	}
         }
         for(Neuron node : reservoirLayer){
             full.add(node);
         }
 
+        if(recurrentOutWeights){
+        	for(Neuron node : reservoirLayer){
+                full.add(node);
+            }
+        }
+        
+        if(inputData[0].length != full.size()){
+        	throw new IllegalArgumentException("Input data length does not " +
+        			"match training node set");
+        }
+        
+        if(trainingData[0].length != outputLayer.size()){
+        	throw new IllegalArgumentException("Output data length does not " +
+        			"match the number of output nodes");
+        }
+        
         LMSOffline trainer = new LMSOffline(network);
         trainer.setInputData(mainInputData);
         trainer.setTrainingData(trainingData);
-        trainer.setInputLayer(reservoirLayer);
+        trainer.setInputLayer(full);
         trainer.setOutputLayer(getOutputLayer());
         trainer.setSolutionType(SolutionType.WIENER_HOPF); //TODO: Ability to set
         trainer.train(1);
@@ -413,7 +432,7 @@ public final class EchoStateNetBuilder {
      */
     public static void main (String args []){
         final RootNetwork network = new RootNetwork();
-        EchoStateNetBuilder esn = new EchoStateNetBuilder(network, 1, 500, 1);
+        EchoStateNetBuilder esn = new EchoStateNetBuilder(network, 1, 100, 1);
         esn.setBackWeights(true);
         esn.setDirectInOutWeights(false);
         esn.setInSparsity(0.2);
@@ -426,7 +445,7 @@ public final class EchoStateNetBuilder {
         double [][] ins = sineWaveInputGen(54000);
         double [][] outs = sineWaveDataGen(ins, 300);
                     
-        esn.train(ins, outs);
+        esn.train(SolutionType.WIENER_HOPF,ins, outs);
 
         // Write to file
         String FILE_OUTPUT_LOCATION = "./";

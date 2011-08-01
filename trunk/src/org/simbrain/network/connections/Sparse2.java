@@ -18,6 +18,7 @@
 package org.simbrain.network.connections;
 
 import java.util.List;
+import java.util.Random;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -39,14 +40,16 @@ import org.simbrain.network.synapses.ClampedSynapse;
 public class Sparse2 extends ConnectNeurons {
 
     /** Probability connection will be an excitatory weight. */
-    private static double excitatoryProbability = .1;
+    private static double excitatoryProbability;
 
     /** Probability connection will be an inhibitory weight. */
-    private static double inhibitoryProbability = .1;
+    private static double inhibitoryProbability;
 
     /** base synapse is clamped for most sparse connections */
 	private static Synapse baseSynapse = Synapse
 			.getTemplateSynapse(new ClampedSynapse());
+	
+	private Random rGen;
 
 	/**
 	 * Min and Max weight values. As of now floor ought to be negative and
@@ -66,6 +69,7 @@ public class Sparse2 extends ConnectNeurons {
 	public Sparse2(final Network network, final List<? extends Neuron> neurons,
 			final List<? extends Neuron> neurons2) {
         super(network, neurons, neurons2);
+        rGen = new Random();
     }
 
 	/** {@inheritDoc} */
@@ -78,35 +82,23 @@ public class Sparse2 extends ConnectNeurons {
     }
 
     /** @inheritDoc */
-    public void connectNeurons() {
+    public void connectNeurons(double prob) {
 
         for (Neuron source : sourceNeurons) {
 
             for (Neuron target : targetNeurons) {
 
-
-                // Don't add a connection if there is already one present
-                //  TODO: Add option to turn this off?
-				if (Network.getSynapse(source, target) != null) {
-					continue;
-                }
-
-                if (Math.random() < excitatoryProbability) {
-                    Synapse synapse = baseSynapse
-                            .instantiateTemplateSynapse
-                            (source, target, network);
-                    synapse.setStrength(excitatoryRand());
-                    network.addSynapse(synapse);
-                    continue;
-                }
-                if (Math.random() < inhibitoryProbability) {
-                    Synapse synapse = baseSynapse
-                            .instantiateTemplateSynapse
-                            (source, target, network);
-                    synapse.setStrength(inhibitoryRand());
-                    network.addSynapse(synapse);
-                }
-
+            	if(Math.random() < prob){
+            		 Synapse synapse = baseSynapse
+                     	.instantiateTemplateSynapse(source, target, network);
+            		 if(rGen.nextBoolean())
+            			 synapse.setStrength(excitatoryRand());
+            		 else
+            			 synapse.setStrength(inhibitoryRand());
+            		 
+            		 network.addSynapse(synapse);
+            		
+            	}
             }
         }
     }
@@ -138,7 +130,7 @@ public class Sparse2 extends ConnectNeurons {
      * @param excitatoryProbability the excitatoryProbability to set
      */
     public static void setExcitatoryProbability
-    	(final double excitatoryProbability) {
+    	(double excitatoryProbability) {
         Sparse.excitatoryProbability = excitatoryProbability;
     }
 
@@ -152,8 +144,8 @@ public class Sparse2 extends ConnectNeurons {
     /**
      * @param inhibitoryProbability the inhibitoryProbability to set
      */
-    public static void setInhibitoryProbability(
-            final double inhibitoryProbability) {
+    public static void setInhibitoryProbability
+    	(double inhibitoryProbability) {
         Sparse.inhibitoryProbability = inhibitoryProbability;
     }
 
@@ -185,6 +177,12 @@ public class Sparse2 extends ConnectNeurons {
 
 	public double getceiling() {
 		return ceiling;
+	}
+
+	@Override
+	public void connectNeurons() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

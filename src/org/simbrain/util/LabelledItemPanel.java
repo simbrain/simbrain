@@ -101,8 +101,51 @@ public class LabelledItemPanel extends JPanel {
 
         myNextItemRow++;
     }
+    
+	/**
+	 * Adds a labeled item to the panel on the current myNextItemRow, at the
+	 * specified column
+	 * @param labelText The label text for the item.
+	 * @param item The item to be added.
+	 * @param col desired grid bag layour column
+	 */
+    public void addItem(final String labelText, final JComponent item, int col) {
+        // Create the label and its constraints
+        JLabel label = new JLabel(labelText);
 
-    /**
+        GridBagConstraints labelConstraints = new GridBagConstraints();
+
+        labelConstraints.gridx = col;
+        labelConstraints.gridy = myNextItemRow;
+        labelConstraints.insets = new Insets(10, 10, 0, 0);
+        labelConstraints.anchor = GridBagConstraints.NORTHEAST;
+        labelConstraints.fill = GridBagConstraints.NONE;
+
+        add(label, labelConstraints);
+
+        // Add the component with its constraints
+        GridBagConstraints itemConstraints = new GridBagConstraints();
+
+        itemConstraints.gridx = col+1;
+        itemConstraints.gridy = myNextItemRow;
+        itemConstraints.insets = new Insets(10, 10, 0, 10);
+        itemConstraints.weightx = 1.0;
+        itemConstraints.anchor = GridBagConstraints.WEST;
+        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
+
+        add(item, itemConstraints);
+
+    }
+    
+    public int getMyNextItemRow() {
+    	return myNextItemRow;
+    }
+
+    public void setMyNextItemRow(int myNextItemRow) {
+    	this.myNextItemRow = myNextItemRow;
+    }
+
+	/**
      * Modification of addItem which takes a label, rather than text, as an argument.
      *
      * @param label Label to be added

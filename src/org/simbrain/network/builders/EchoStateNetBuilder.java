@@ -78,13 +78,13 @@ public final class EchoStateNetBuilder {
     private NeuronUpdateRule reservoirNeuronType = new SigmoidalNeuron();
 
     /** Reference to input layer. */
-    private List<Neuron> inputLayer;
+    private List<Neuron> inputLayer = new ArrayList<Neuron>();
 
     /** Reference to input layer. */
-    private List<Neuron> reservoirLayer;
+    private List<Neuron> reservoirLayer = new ArrayList<Neuron>();
 
     /** Reference to input layer. */
-    private List<Neuron> outputLayer;
+    private List<Neuron> outputLayer = new ArrayList<Neuron>();
 
    /** Default TANH neurons for the reservoir */
     {
@@ -141,11 +141,11 @@ public final class EchoStateNetBuilder {
     public void buildNetwork() {
 
         // initialize the Layers
-        inputLayer = initializeLayer(new ClampedNeuron(),
+        initializeLayer(inputLayer, new ClampedNeuron(),
                 LayerType.Input, numInputNodes);
-        reservoirLayer = initializeLayer(reservoirNeuronType,
+        initializeLayer(reservoirLayer, reservoirNeuronType,
                 LayerType.Hidden, numReservoirNodes);
-        outputLayer = initializeLayer(new LinearNeuron(),
+        initializeLayer(outputLayer, outputNeuronType,
                 LayerType.Output, numOutputNodes);
 
         // Layout layers
@@ -192,21 +192,17 @@ public final class EchoStateNetBuilder {
      *            type of layer
      * @return a list of the neurons in this layer
      */
-    private List<Neuron> initializeLayer(NeuronUpdateRule nodeType,
+    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
             LayerType layerType, int nodes) {
 
-        List<Neuron> nodeList = new ArrayList<Neuron>();
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(network, nodeType);
             network.addNeuron(node);
             node.setIncrement(1); // TODO: Reasonable?
-            nodeList.add(node);
+            layer.add(node);
         }
         // Create group based on layer and add to the network
-        NeuronLayer layer = new NeuronLayer(network, nodeList, layerType);
-        network.addGroup(layer);
-
-        return nodeList;
+        network.addGroup(new NeuronLayer(network, layer, layerType));
     }
 
     /**
@@ -260,7 +256,7 @@ public final class EchoStateNetBuilder {
             }
         }
         
-        if(inputData[0].length != full.size()){
+        if(mainInputData[0].length != full.size()){
         	throw new IllegalArgumentException("Input data length does not " +
         			"match training node set");
         }
@@ -436,9 +432,9 @@ public final class EchoStateNetBuilder {
         esn.setBackWeights(true);
         esn.setDirectInOutWeights(false);
         esn.setInSparsity(0.2);
-        esn.setResSparsity(0.1);
-        esn.setBackSparsity(0.5);
-        esn.setSpectralRadius(0.99);
+        esn.setResSparsity(0.05);
+        esn.setBackSparsity(0.2);
+        esn.setSpectralRadius(0.95);
 
         esn.buildNetwork();
 

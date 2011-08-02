@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+  
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Examples</p>
+</div>
+<p> </p>
+<h1>Examples</h1>
+<br>
+<p>Here are some quick tutorials on how to do specific things in Simbrain.&nbsp;&nbsp; <br>
+</p>
+<p>Note that the basics of building a network and other simple examples are covered in the <a href="QuickStart.html">quick-start</a>.<br>
+</p>
+<p><span class="heading">Plot the activation of a node over time.<br>
+</span></p>
+<p>Create a <a href="Network.html">neural network</a> and a <a href="Plot/time_series.html">time series plot</a>.&nbsp;&nbsp; You will now creating&nbsp; a <a href="Workspace/Couplings.html">coupling</a>
+from a node in the neural network to a time series in the
+plot.&nbsp;&nbsp; The easiest way to do this is as follows.&nbsp; Right
+click on the node whose activation you want to plot, and in the context
+menu go to&nbsp;<span class="command">Send coupling to &gt; TimeSeriesPlot1 &gt; Series0.</span>&nbsp;&nbsp;
+(TimeSeriesPlot1 is the name of the time series plot. If you have
+multiple plots open it might be a different name.&nbsp; Series0 is a
+particular time series in the plot.) &nbsp; By repeating this for
+different nodes you can plot the activation of multiple neurons at
+once. &nbsp;If you want to add more time series beyond the default 5, click "add" in the time series component.&nbsp;  <br>
+</p>
+<p>Now run your simulation and you should see a plot of the changing
+activation of the neuron.&nbsp; For some purposes it helps to turn
+"auto range" off in the time series preferences, and manually set&nbsp;
+upper and lower bounds.<br>
+</p>
+<p><span class="heading">Train a 2-layer network on a pattern association task<br>
+</span></p>
+<p>For now see the preliminary <a href="Network/trainers.html">trainer</a> docs.  </p>
+<span style="font-weight: bold;"></span>
+</div>
+
+</body></html>

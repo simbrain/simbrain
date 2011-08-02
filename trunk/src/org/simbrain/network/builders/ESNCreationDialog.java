@@ -39,12 +39,9 @@ import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 
 /**
+ * Creates a GUI dialog for the creation of an arbitrary echo-state network.
  * 
  * @author ztosi
- * 
- * Creates a GUI dialog for the creation of an arbitrary echo-state network.
- * NOTE: All text fields are encapsulated in a try/catch block which catches
- * any thrown NumberFormatException upon the user "okaying" the dialog values.
  * 
  */
 @SuppressWarnings("serial")
@@ -113,10 +110,10 @@ public class ESNCreationDialog extends StandardDialog{
     private String [] options = { "Linear", "Tanh", "Logistic"};
     
     /**Combo-box governing desired neuron type of the reservoir*/
-    private JComboBox ReservoirNeuronTypes = new JComboBox(options);
+    private JComboBox reservoirNeuronTypes = new JComboBox(options);
     
     /**Combo-box governing the desired neuron type of the ourput layer*/
-    private JComboBox OutputNeuronTypes = new JComboBox(options);
+    private JComboBox outputNeuronTypes = new JComboBox(options);
     
     /**
      * Creation dialog constructor
@@ -141,9 +138,9 @@ public class ESNCreationDialog extends StandardDialog{
         
         //Add text-fields
         esnPanel.addItem("Number of inputs nodes:", tfNumInputs);
-        esnPanel.addItem("Reservoir Neuron Type:", ReservoirNeuronTypes, 2);
+        esnPanel.addItem("Reservoir Neuron Type:", reservoirNeuronTypes, 2);
         esnPanel.addItem("Number of res nodes:", tfNumReservoir);
-        esnPanel.addItem("Output Neuron Type:", OutputNeuronTypes, 2);
+        esnPanel.addItem("Output Neuron Type:", outputNeuronTypes, 2);
         esnPanel.addItem("Number of output nodes:", tfNumOutputs);
         
         //GridBagConstraints for next section
@@ -213,6 +210,8 @@ public class ESNCreationDialog extends StandardDialog{
         //Ensures section content will be below section separator
         cRow++;
         esnPanel.setMyNextItemRow(cRow);
+        //Reset column value
+        gbc.gridx = 0;
     }
     
 
@@ -269,10 +268,10 @@ public class ESNCreationDialog extends StandardDialog{
 	        builder.setDirectInOutWeights
 	        	(directInOutWeights.isSelected());
 	        NeuronUpdateRule resUp = 
-	        	boxMap.get(ReservoirNeuronTypes.getSelectedItem());
+	        	boxMap.get(reservoirNeuronTypes.getSelectedItem());
 	        builder.setReservoirNeuronType(resUp);
 	        NeuronUpdateRule outUp = 
-	        	boxMap.get(OutputNeuronTypes.getSelectedItem());
+	        	boxMap.get(outputNeuronTypes.getSelectedItem());
 	        builder.setOutputNeuronType(outUp);
 	        
 	        

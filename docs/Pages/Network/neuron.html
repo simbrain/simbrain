@@ -4,11 +4,12 @@
 
 
 
+
 <link href="../../Styles.css" rel="stylesheet" type="text/css" /></head><body>
-<a href="../../SimbrainDocs.html"><div class="logo">
-  <p><span /></p>
+<a href="../../SimbrainDocs.html" /><div class="logo">
+<a href="../../SimbrainDocs.html">  </a><p><span /></p>
 </div>
-</a>
+
 <div id="main_docs">
   <div class="navi"> <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Neurons</p>
   </div>
@@ -90,41 +91,74 @@ adjusted. For example, if increment is set to .1, then each time the up
 arrow is pressed the neuron will increase its activation by .1. This
 feature does not affect the neuron while the network is being iterated.</p>
   </blockquote>
-	<p class="heading2"><a name="UpBound" id="UpBound" />Upper bound</p> 
-	<blockquote>
-	  <p>This
+	<p class="heading2"><a name="UpBound" id="UpBound">Upper bound</a></p><a name="UpBound" id="UpBound"> 
+	</a><blockquote>
+<a name="UpBound" id="UpBound">	  </a><p><a name="UpBound" id="UpBound">This
 field plays different roles depending on the type of the neuron
 (documented accordingly) but in general it determines the maximum level
 of activity of a node. It also determines the range of colors which a
 neuron can take on. The upper and lower bound determine the bounds of
-randomization.</p>
-  </blockquote>
-	<p class="heading2"><a name="LowBound" id="LowBound" />Lower bound</p> 
-	<blockquote>
-	  <p>This
+randomization.</a></p>
+<a name="UpBound" id="UpBound">  </a></blockquote>
+<a name="UpBound" id="UpBound">	</a><p class="heading2"><a name="LowBound" id="LowBound">Lower bound</a></p><a name="LowBound" id="LowBound"> 
+	</a><blockquote>
+<a name="LowBound" id="LowBound">	  </a><p><a name="LowBound" id="LowBound">This
 field plays different roles depending on the type of the neuron but in
 general it determines the minimum level of activity of a node. It also
-determines the range of colors which a neuron can take on.</p>
-    
-	</blockquote>
-    </blockquote>
-    <p><span class="heading"><a name="clipping"></a>Clipping</span></p>
-<p> If a neuron uses clipping, then if its activation exceeds its  upper or lower bound, the activation is set to the upper or lower bound that it exceeds. Similarly with weights and their strength. </p>
+determines the range of colors which a neuron can take on.</a></p>
+<a name="LowBound" id="LowBound">    
+	</a></blockquote>
+<a name="LowBound" id="LowBound">    </a></blockquote>
+<a name="LowBound" id="LowBound">    </a><p><span class="heading"><a name="clipping" />Clipping</span></p>
+<p> If a neuron uses clipping, then if its activation exceeds its upper
+or lower bound, the activation is set to the upper or lower bound that
+it exceeds. Similarly with weights and their strength. </p>
 <p>&nbsp;</p>
-<p class="heading"><a name="clamping" id="clamping"></a>Clamping</p>
-<p>In general, a clamped synapse or node will not change over time; it is &quot;clamped&quot; to its current value. There are two ways to clamp neurons and synapses in Simbrain. </p>
+<p class="heading"><a name="clamping" id="clamping" />Clamping</p>
+<p>In general, a clamped synapse or node will not change over time; it
+is "clamped" to its current value. There are two ways to clamp neurons
+and synapses in Simbrain. </p>
 <blockquote>
-  <p>(1) Set the type  of a synapse to <a href="synapse/clamped.html">clamped synapse</a> or the type of a neuron to <a href="neuron/clamped.html">clamped neuron</a>. This allows specific subsets of synapses or neurons to be clamped.<br> 
+  <p>(1) Set the type  of a synapse to <a href="synapse/clamped.html">clamped synapse</a> or the type of a neuron to <a href="neuron/clamped.html">clamped neuron</a>. This allows specific subsets of synapses or neurons to be clamped.<br /> 
     </p>
-  <p>(2) In the <a href="toolbar.html">Toolbar</a> or <a href="menu.html#MenuEdit">Edit menu</a>, select &quot;Clamp weights&quot; or &quot;Clamp neurons.&quot; These cause <em>all</em> weights or synapses in a simulation to be clamped. This is useful when, for example, training a Hopfield network. You clamp the neurons at a value, then run the network to train the weights. Then you unclamp the neurons and clamp the weights, to test the network's memory. This method applies to the network globally, in that the neurons or synapses are not individually set to be clamped. The advantage of this method is that it allows you to temporarily turn off learning to focus on activation dynamics, or temporarily block activation change in order to focus on weight dynamics. </p>
+  <p>(2) In the <a href="toolbar.html">Toolbar</a> or <a href="menu.html#MenuEdit">Edit menu</a>, select "Clamp weights" or "Clamp neurons." These cause <em>all</em>
+weights or synapses in a simulation to be clamped. This is useful when,
+for example, training a Hopfield network. You clamp the neurons at a
+value, then run the network to train the weights. Then you unclamp the
+neurons and clamp the weights, to test the network's memory. This
+method applies to the network globally, in that the neurons or synapses
+are not individually set to be clamped. The advantage of this method is
+that it allows you to temporarily turn off learning to focus on
+activation dynamics, or temporarily block activation change in order to
+focus on weight dynamics. </p>
 </blockquote>
-<p>Note that some <a href="subnetwork.html">subnetworks</a> override clamping, in particular when they manually train their weights. Also note that the activation of a clamped neuron can be changed by using the up and down keys, and similarly with clamped weights. </p>
+<p>Note that some <a href="subnetwork.html">subnetworks</a> override
+clamping, in particular when they manually train their weights. Also
+note that the activation of a clamped neuron can be changed by using
+the up and down keys, and similarly with clamped weights.</p>
+<p>Confusion alret: he word "clamped" gets used both as a name for a kind of synapse and
+neuron update, and for the buttons in the toolbar, but the meaning is
+slightly different.&nbsp; The toolbar buttons are a kind of temporary
+override, while the update rules are permanent.&nbsp;&nbsp; I know you
+understand the distinction but I think I saw this come up somewhere so
+I thought I'd mention it. Clamped for neurons is useful mainly when it
+is input neurons that the user will manually set&nbsp; themselves. /
+This is a more general problem.&nbsp; The word "clamped" gets used both
+as a name for a kind of synapse and neuron update, and for the buttons
+in the toolbar, but the meaning is slightly different.&nbsp; The
+toolbar buttons are a kind of temporary override, while the update
+rules are permanent. </p>
+
 <p>&nbsp;</p>
-<p class="heading"><a name="wtdinput" id="wtdinput"></a>Weighted Input </p>
-<p>Each input to a node can have different amounts of influence on that node. The amount of influence that an input has is called the &quot;weight&quot; of that input. We represent the weight of the <em>i</em><sup>th</sup> input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup> node by <em>a</em><sub>i</sub>. The weighted input is then: 
-<p align="center"><img src="equations/weighted.gif" width="167" height="75">
-<p>Note that a sensory input term <em>I</em> is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. </p>
+<p class="heading"><a name="wtdinput" id="wtdinput" />Weighted Input </p>
+<p>Each input to a node can have different amounts of influence on that
+node. The amount of influence that an input has is called the "weight"
+of that input. We represent the weight of the <em>i</em><sup>th</sup> input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup> node by <em>a</em><sub>i</sub>. The weighted input is then: 
+</p><p align="center"><img src="equations/weighted.gif" height="75" width="167" />
+</p><p>Note that a sensory input term <em>I</em> is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. </p>
 <p>When a source neuron is a spiking neuron (see <a href="spikingnetworks.html">spiking networks</a>) the weight times activation term for that neuron is replaced by something more complex. See <a href="spikingnetworks.html">spiking networks</a>.</p>
-<p>&quot;Weighted input&quot; is also referred to as &quot;net input&quot; in much of the connectionist literature. To make a neuron whose acitvation value equals its weighted input, use a <a href="neuron/linear.html">linear neuron</a> with slope = 1 and bias = 0. </p>
+<p>"Weighted input" is also referred to as "net input" in much of the
+connectionist literature. To make a neuron whose acitvation value
+equals its weighted input, use a <a href="neuron/linear.html">linear neuron</a> with slope = 1 and bias = 0. </p>
 </div>
 </body></html>

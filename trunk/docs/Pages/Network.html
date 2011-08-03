@@ -1,15 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
-  <title>Simbrain Documentation</title>
+<html><head><title>Simbrain Documentation</title>
+
+  
 
   
   
   <link href="../Styles.css" rel="stylesheet" type="text/css">
 
   
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-
-</head><body>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head><body>
 <a href="../SimbrainDocs.html">
 <div class="logo">
 <p><span></span></p>
@@ -29,7 +28,7 @@ Main <br>
 	<a href="Network/menu.html">Menus / Keyboard</a><br>
   	<a href="Network/network_prefs.html">Preferences</a><br>
 	<a href="Network/toolbar.html">Toolbar</a><br>
-	<a href="Network/network_op.html">Visual Conventions</a>
+	<a href="Network/visualConventions.html">Visual Conventions</a>
 	<br>
  </p>
 
@@ -61,7 +60,8 @@ Reference<br>
 <h1>Network</h1>
 <p>Networks
 are built by creating neurons and connecting them with synapses. They
-are run by pressing the "play" or "step" buttons. (See the <a href="Network/quickref.html">quick reference</a>).</p>
+are run by pressing the "play" or "step" button (see the <a href="Network/quickref.html">quick reference</a>). For a sense of what the colors, circles, etc. signify see the discussion of <a href="Network/visualConventions.html">visual conventions</a>.<br>
+</p>
 <p>There are a variety of different <a href="Network/neuron.html">neurons</a>
 and <a href="Network/synapse.html">synapses</a>,
 each with their own rules and parameters. By combining these together
@@ -94,75 +94,10 @@ acts as a toggle switch. You can also press the step button <img src="../Images/
 (or press "space") to iterate the network a single time. Sometimes
 repeatedly hitting the space bar is useful way to test a network.</p>
 <blockquote>
-  <p>Quick reference for meanings of colors, etc. </p>
-  <p>&nbsp;</p>
-  <p><strong>Zero neuron </strong>: a neuron with a value of 0
-represents a <em>non-</em>active
-neuron, which is either not firing or is firing at a very low rate. In
-terms of voltages, this can be thought of as a neuron which is at its <em>resting
-potential</em>,
-that is, which has its baseline electrical charge, which is actually
-typically around -70mV (millivolts). In Simbrain this corresponds to
-the color 0. </p>
-  <p><strong>Positive activation</strong>: a
-neuron with positive activation can be thought of as firing at above
-its normal rate. In terms of voltages, this can be thought of as a
-neuron which is <em>above</em> its resting potential, e.g. -50mV. Such
-a neuron is sometimes said to be "excited" or "depolarized." In
-Simbrain this corresponds to a shade of red by default. </p>
-  <p><strong>Negative activation</strong>:
-it is hard to say what a neuron with negative activation corresponds to
-in terms of firing rates. In terms of voltages, this can be thought of
-as a neuron which is <em>below</em> its resting potential, e.g. -50mV.
-Such a neuron is sometimes said to be "inhibited" or "hyperpolarized."
-In Simbrain this corresponds to a shade of blue by default. </p>
-  <p><strong>Excitatory synapse</strong>:
-a weight with a positive value corresponds to an excitatory synapse.
-When these synapses are activated the post-synaptic neuron is <em>more</em>
-likely to fire, they "heat things up," as it were. An excitatory
-synapse is one which releases excitatory neurotransmitters, which bind
-to channels post-synaptically which cause currents that lead to an
-increase in the post-synaptic voltage potential. AMPA synapses are a
-common type of excitatory synapse. Excitatory synapses are shown as red
-discs in Simbrain. </p>
-  <p><strong>Inhibitory synapse</strong>: a
-weight with a negative value corresponds to an inhibitory synapse. When
-these synapses are activated the post-synaptic neuron is <em>less</em>
-likely to fire, they "cool things down," as it were. An inhibitory
-synapse is one which releases inhibitory neurotransmitters, which bind
-to channels post-synaptically which cause currents that lead to a
-decrease in the post-synaptic voltage potential. GABA synapses are a
-common type of inhibitory synapse. Inhibitory synapses are shown as
-blue discs in Simbrain.</p>
-  <p><strong>Zero synapse</strong>: a weight with a value of 0 is a way
-of mathematically representing the <em>absence of</em> a connection.
-In Simbrain this is currently represented as blue, inhibitory. </p>
-  <p><strong>Net input </strong>:
-the net input to a neuron represents, roughly, the summation of
-excitatory and inhibitory signals, from excitatory and inhibitory
-synapses, at the cell body. </p>
-  <p><strong>Bias</strong>: the bias of a neuron can be thought as its
-base-line firing rate or its resting potential.</p>
-  <p><strong>Clipping / Upper and Lower Bounds</strong>: There are
-upper and lower limits on the firing rate (in hertz) or voltage
-potential (in mV) of a neuron.</p>
-  <span class="heading"><br>
-New Material</span><br>
-  <p><span style="text-decoration: underline;"><br>
-  </span></p>
-  <p><span style="text-decoration: underline;">Confusion about clamping</span>:
-The word "clamped" gets used both as a name for a kind of synapse and
-neuron update, and for the buttons in the toolbar, but the meaning is
-slightly different.&nbsp; The toolbar buttons are a kind of temporary
-override, while the update rules are permanent.&nbsp;&nbsp; I know you
-understand the distinction but I think I saw this come up somewhere so
-I thought I'd mention it. Clamped for neurons is useful mainly when it
-is input neurons that the user will manually set&nbsp; themselves. /
-This is a more general problem.&nbsp; The word "clamped" gets used both
-as a name for a kind of synapse and neuron update, and for the buttons
-in the toolbar, but the meaning is slightly different.&nbsp; The
-toolbar buttons are a kind of temporary override, while the update
-rules are permanent.<br>
+  <p><br>
+ </p>
+  <p><br>
+</p><span class="heading"></span><p><span style="text-decoration: underline;"></span><br>
   </p>
   <p><br>
   </p>

@@ -1,32 +1,36 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<title>Simbrain Documentation</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../Styles.css" rel="stylesheet" type="text/css">
-</head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
 
-<body>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html"><div class="logo">
   <p><span></span></p>
 </div></a>
 <div id="main_docs">
   <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Network Operation</p>
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Updating</p>
   </div>
-  <p><h1>Network Operation</h1>
-  <p>Each time the step button is pressed in the network panel--that is, each time a network is iterated--the following occurs:</p>
-    <blockquote>
-      <p> 1. Any <a href="couplings.html">input nodes</a> are updated based on <a href="couplings.html">sensory couplings</a>. <br>
-      2. The high level <a href="network/standardnetwork.html">standard network</a> is updated. This updates all  <a href="neuron.html">neurons</a>, <a href="synapse.html">synapses</a>, and <a href="subnetwork.html">subnetworks</a>. Their colors and sizes are updated accordingly. There are three different ways that you could update the activation values of the network components, as shown <a href="updateMethod.html">here</a><br>
-      3. State information is sent to the <a href="../Gauge.html">gauges</a>.<br>
-      4. Signals are sent to <a href="../World.html">worlds</a> via <a href="couplings.html">Output couplings</a>. </p>
-  </blockquote>
-    <p align="left">To reflect the fact that the network has been updated the &quot;time&quot; label is updated as well.</p>
-    <p align="left">The neural network is essentially a graph, a collection of nodes connected by vertices (the vertices are neurons and the connections are synapses). The whole network has three lists: a list of nodes, a list of connections, and a list of networks (&quot;subnetworks&quot;). The connections have references to the source and target nodes they connect. When a network is updated the program goes through the list of neurons and calls an update function internal to each one, and similarly with the list of synapses. Buffers are used so that the whole network can be updated synchronously. </p>
+  <p></p><h1>Network Operation</h1>
+  <p>Each
+time the step button is pressed in the network panel--that is, a
+default network update occurs. The default "buffered update" updates
+all neurons in an asynchronous manner.&nbsp;&nbsp; Priority and custom
+update are also possible.<br>
+</p>
+<p>Buffered update.&nbsp; The neural network is essentially a graph, a collection of nodes
+connected by vertices (the vertices are neurons and the connections are
+synapses). The whole network has three lists: a list of nodes, a list
+of connections, and a list of networks ("subnetworks"). The connections
+have references to the source and target nodes they connect. When a
+network is updated the program goes through the list of neurons and
+calls an update function internal to each one, and similarly with the
+list of synapses. Buffers are used so that the whole network can be
+updated synchronously.</p>
+<p align="left">To reflect the fact that the network has been updated the "time" label is updated as well.</p>
+    
     <p>&nbsp;</p>
 
 </div>
-</body>
-</html>
+</body></html>

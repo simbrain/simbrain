@@ -51,7 +51,7 @@ public final class ShowHelpAction extends AbstractAction {
         SwingUtilities.invokeLater(new Runnable() {
                 /** @see Runnable */
                 public void run() {
-                    Utils.showQuickRef(theURL);
+                    Utils.showHelpPage(theURL);
                 }
             });
     }

@@ -61,7 +61,6 @@ public final class SRNBuilder {
     /** Custom update rule for SRN "copy-back" of hidden layer values to the
      * context layer at the end of each network iteration. */
 	CustomUpdateRule update = new CustomUpdateRule(){
-		@Override
 		public void update(RootNetwork network) {
 			network.updateAllNeurons();
             network.updateAllSynapses();

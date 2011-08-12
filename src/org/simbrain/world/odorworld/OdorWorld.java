@@ -110,6 +110,16 @@ public class OdorWorld {
         recomputeMaxStimulusLength();
 
     }
+    
+    /**
+     * Does the world contain this entity? 
+     *
+     * @param entity the entity to check for
+     * @return whether it is in this world or not.
+     */
+    public boolean containsEntity(final OdorWorldEntity entity) {
+        return entityList.contains(entity);
+    }
 
     /**
      * Adds an agent and by default adds several sensors and effectors to it.

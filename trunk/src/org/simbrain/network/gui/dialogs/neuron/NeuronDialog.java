@@ -273,6 +273,7 @@ public class NeuronDialog extends StandardDialog {
             String name = ((ClassDescriptionPair) cbNeuronType
                     .getSelectedItem()).getSimpleName()
                     .replaceAll("Neuron", "");
+            name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
             helpAction.setTheURL("Network/neuron/" + name + ".html");
         }
     }

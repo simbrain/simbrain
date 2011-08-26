@@ -4,7 +4,7 @@ body
 	font-size: 13px; 
 	font-family: Verdana, Arial, Helvetica, sans-serif; 
 	line-height: 20px; 
-	background-image: url("images/bg/bgradient%20copy.gif"); 
+	background-image: url("images/bg/bgradient.gif"); 
 	background-repeat: repeat-x; 
 	margin: 10px 20px 0; 
 	left: 14px; 
@@ -230,3 +230,4 @@ a:hover
 	text-decoration: none; 
 	background-color: #f93;
 }
+

@@ -245,13 +245,23 @@ public class WorkspaceSerializer {
                                         couplingRef.getArchivedProducer().getArgumentDataTypes(),
                                         couplingRef.getArchivedProducer().getArgumentValues(),
                                         couplingRef.getArchivedProducer().getDescription());
+                
+                // For backwards compatibility. TODO: Explain better
+                Class[] argDataTypes;
+                if ( couplingRef.getArchivedConsumer().getArgumentDataTypes() == null) {
+                    System.out.println("using it...");
+                    argDataTypes = new Class[]{couplingRef.getArchivedConsumer().getDataType()};
+                } else {
+                    argDataTypes =  couplingRef.getArchivedConsumer().getArgumentDataTypes();
+                }
+
                 Consumer<?> consumer = (Consumer<?>) targetComponent
                         .getAttributeManager()
                         .createConsumer(
                                 targetComponent.getObjectFromKey(
                                         couplingRef.getArchivedConsumer().getBaseObjectKey()),
                                         couplingRef.getArchivedConsumer().getMethodBaseName(),
-                                        couplingRef.getArchivedConsumer().getArgumentDataTypes(),
+                                        argDataTypes,
                                         couplingRef.getArchivedConsumer().getArgumentValues(),
                                         couplingRef.getArchivedConsumer().getDescription());
                 workspace.addCoupling(new Coupling(producer, consumer));

@@ -361,6 +361,7 @@ class ArchiveContents {
             this.argumentValues = attribute.getArgumentValues();
             this.dataType = attribute.getDataType();
             this.description = attribute.getDescription();
+
         }
 
         /**

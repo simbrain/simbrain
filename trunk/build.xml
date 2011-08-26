@@ -81,10 +81,12 @@
 		</copy>
 		<copy todir="${build.main}/simulations">
 			<fileset dir="simulations">
+				<exclude name="**/archives/**"/>
 			</fileset>
 		</copy>
 		<copy todir="${build.main}/scripts">
 			<fileset dir="scripts">
+				<exclude name="**/archives/**"/>
 			</fileset>
 		</copy>
 		<copy todir="${build.main}" file="${etc}/Readme.rtf" />

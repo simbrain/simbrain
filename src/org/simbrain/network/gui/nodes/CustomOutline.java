@@ -250,7 +250,7 @@ public class CustomOutline extends PPath implements PropertyChangeListener {
             super(net);
             box = PPath.createRectangle(0, 0, BOX_WIDTH, BOX_HEIGHT);
             box.setPaint(java.awt.Color.LIGHT_GRAY);
-            box.setTransparency(.5f);
+            //box.setTransparency(.5f);
             box.setStrokePaint(java.awt.Color.GRAY);
             setBounds(box.getBounds());
             addChild(box);

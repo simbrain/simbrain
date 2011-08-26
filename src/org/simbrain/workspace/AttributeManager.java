@@ -241,17 +241,20 @@ public class AttributeManager {
                 potentialAttribute.getArgumentValues(),
                 potentialAttribute.getDescription());
     }
-    
+
     /**
      * Create a consumer. This version of the method does the real work; others
-     * forward to it.  Note that, unlike createProducer, this does not have a main datatype
-     * argument, because that is implicitly the first element of argument dataTypes
-     * 
-     * TODO: Currently only works for one or two arguments only.
+     * forward to it. Note that, unlike createProducer, this does not have a
+     * main datatype argument, because that is implicitly the first element of
+     * argument dataTypes.
+     *
+     * TODO: Currently only works for one or two arguments
+     * only.
      *
      * @param parentObject parent object
      * @param methodName name of method
-     * @param argumentDataTypes type of all arguments, where the first is the main data type
+     * @param argumentDataTypes type of all arguments, where the first is the
+     *            main data type
      * @param argumentValues values for arguments _after_ the first argument
      * @param description description
      * @return the resulting consumer
@@ -267,20 +270,21 @@ public class AttributeManager {
             // Static initializer
             {
                 try {
-                    theMethod = parentObject.getClass().getMethod(methodName, argumentDataTypes);
+                    theMethod = parentObject.getClass().getMethod(methodName,
+                            argumentDataTypes);
                 } catch (SecurityException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchMethodException e1) {
-                    System.err.print("Could not find method "
-                            + methodName + " ");
-                   if (argumentDataTypes != null) {
-                       System.err.print("with arguments of type ");                       
-                       for(Class<?> type: argumentDataTypes) {
-                           System.err.print(type.getCanonicalName());                
-                       }
-                       System.err.println();
-                   }
-                   e1.printStackTrace();
+                    System.err.print("Could not find method " + methodName
+                            + " ");
+                    if (argumentDataTypes != null) {
+                        System.err.print("with arguments of type ");
+                        for (Class<?> type : argumentDataTypes) {
+                            System.err.print(type.getCanonicalName());
+                        }
+                        System.err.println();
+                    }
+                    e1.printStackTrace();
                 }
             }
 

@@ -31,6 +31,7 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
+import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
@@ -69,9 +70,6 @@ public class RootNetwork extends Network {
 
     /** Used to temporarily hold weights at their current value. */
     private boolean clampNeurons = false;
-
-    /** Whether network files should use tabs or not. */
-    private boolean usingTabs = true;
 
     /**
      * Two types of time used in simulations. DISCRETE: Network update
@@ -191,6 +189,7 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "groupListeners");
         xstream.omitField(RootNetwork.class, "neuronListeners");
         xstream.omitField(RootNetwork.class, "networkListeners");
+        xstream.omitField(RootNetwork.class, "usingTabs"); // Backwards compatibility issue
         xstream.omitField(RootNetwork.class, "subnetworkListeners");
         xstream.omitField(RootNetwork.class, "synapseListeners");
         xstream.omitField(RootNetwork.class, "textListeners");
@@ -201,6 +200,7 @@ public class RootNetwork extends Network {
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");
         xstream.omitField(Neuron.class, "readOnlyFanIn");
+        xstream.omitField(SigmoidalNeuron.class, "implementationIndex"); // Backwards compatibility issue
         return xstream;
     }
 
@@ -208,7 +208,7 @@ public class RootNetwork extends Network {
      * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
-     * 
+     *
      * @return Initialized object.
      */
     private Object readResolve() {
@@ -814,20 +814,6 @@ public class RootNetwork extends Network {
     public void setClampNeurons(final boolean clampNeurons) {
         this.clampNeurons = clampNeurons;
         this.fireNeuronClampToggle();
-    }
-
-    /**
-     * @return Returns the isUsingTabs.
-     */
-    public boolean getUsingTabs() {
-        return usingTabs;
-    }
-
-    /**
-     * @param usingTabs The isUsingTabs to set.
-     */
-    public void setUsingTabs(final boolean usingTabs) {
-        this.usingTabs = usingTabs;
     }
 
     /**

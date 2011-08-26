@@ -1554,6 +1554,7 @@ public class NetworkPanel extends JPanel {
         }
         // TODO: Take care of subnetworks
         canvas.getLayer().addChild(modelGroup);
+        modelGroup.moveToFront();
     }
 
     /**

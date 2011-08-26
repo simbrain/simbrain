@@ -383,12 +383,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         } else if (spikeResponsePanel != null) {
             String spacelessString = spikeResponsePanel.getResponseFunction()
                     .replace(" ", "");
+            spacelessString = spacelessString.substring(0, 1).toLowerCase()
+                    .concat(spacelessString.substring(1));
             helpAction.setTheURL("Network/synapse/spikeresponders/"
                     + spacelessString + ".html");
         } else {
             String name = ((ClassDescriptionPair) cbSynapseType
                     .getSelectedItem()).getSimpleName()
                     .replaceAll("Synapse", "");
+            name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
             helpAction.setTheURL("Network/synapse/" + name + ".html");
         }
     }

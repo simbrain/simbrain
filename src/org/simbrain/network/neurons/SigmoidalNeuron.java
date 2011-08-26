@@ -260,6 +260,9 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
      * @return the type
      */
     public SigmoidType getType() {
+        if (type == null) {
+            type = SigmoidType.LOGISTIC; //TODO: Explain (backwards compat) 
+        }
         return type;
     }
 

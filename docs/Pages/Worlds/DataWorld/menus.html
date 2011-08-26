@@ -1,10 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
+<html><head><title>Simbrain Documentation</title>
 
-<title>Simbrain Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head>
 
-<body>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../../SimbrainDocs.html"><div class="logo">
   <p><span></span></p>
 </div></a>
@@ -24,9 +23,35 @@
    <blockquote>
       <p><span class="heading2">Add a Row</span>: Add a row to DataWorld.</p>
       <p><span class="heading2">Add a Column</span>: Add a column to DataWorld.</p>
-      <p><span class="heading2">ZeroFill the Table</span>: Fill the entire table with the zero value. </p>
+      <p><span class="heading2">ZeroFill the Table</span>:&nbsp; Sets each cell of the data table to 0. </p>
       <p> <span class="heading2">Remove a row</span>: Remove a row frm DataWorld</p>
-      <p><span class="heading2">Remove a Column</span>: Remove a column from DataWorld. </p>
+      
+  <p><span class="heading2">Remove a Column</span>: Remove a column from DataWorld.&nbsp;<br>
+  </p>
+  <p><br>
+  <span class="heading2">Insert row:</span>&nbsp;Adds one row to the data table above the highlighted row.<br>
+  <br>
+  <span class="heading2">Insert column</span>: Adds one column to the data table.<br>
+  <br>
+  <span class="heading2">Delete row</span>: Remove the highlighted row from the data table.<br>
+  <br>
+  <span class="heading2">Delete column</span>: Removes one column from the data table.<br>
+  <br>
+  <span class="heading2">Edit &gt; Set Columns/Rows:</span>&nbsp;Sets the number of columns and rows for the data table.<br>
+  <br>
+  <span class="heading2">Randomize &gt; Randomize</span>: randomizes the data table contents within the range of the Randomization Bounds (default 0 to 1).<br>
+  <br>
+  <span class="heading2">Randomize &gt; Randomization Bounds</span>: Sets the lower and upper bounds for data randomization.<br>
+  <br>
+  <span class="heading2">Normalize &gt; Normalize Column</span>: Scales the currently selected column's values from their original range to values between 0 and 1.<br>
+  <br>
+  <span class="heading2">Normalize &gt; Normalize Table:</span>&nbsp;Scales data table values from their original range to values between 0 and 1.<br>
+  <br>
+  <span class="heading2">Fill Values &gt; Fill Table</span>: Sets each cell of the data table to the user-specified value.<br>
+  <br>
+  <span class="heading2">Fill Values &gt; Zero Fill Table</span>: Sets each cell of the data table to 0.<br>
+  </p>
+
       <p>  <span class="heading2">Randomize</span>: Randomizes all values within the table. </p>
       <p><span class="heading2">Adjust randomization bounds</span>: Sets the upper and lower limit for randomizing the table values. </p>
       <p> <span class="heading2">Iteration Mode</span>:
@@ -35,10 +60,7 @@ to is iterated, the selected row moves forward. Running a coupled
 network thereby has the effect of iterating through the entire set of
 columns. This feature allows one to create a specific sequence of
 inputs to a network and repeatedly deliver it. </p>
-      <p><span class="heading2">Use Last Column (only used in iteration mode) </span>:
-If selected, then when the dataworld is in iteration mode, the last
-column indicates how many times the network uses that row before
-iterating to the next row.</p>
+      
     </blockquote>
    <p class="heading">Pop-up Menus</p>
    <blockquote>

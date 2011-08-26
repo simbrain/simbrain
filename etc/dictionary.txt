@@ -12,3 +12,7 @@ updator
 simbrain
 deselected
 synaptic
+localist
+toolbar
+csv
+uncomment

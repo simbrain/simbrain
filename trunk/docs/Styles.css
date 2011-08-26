@@ -4,7 +4,7 @@ body
 	font-size: 13px; 
 	font-family: Verdana, Arial, Helvetica, sans-serif; 
 	line-height: 20px; 
-	background-image: url("images/bg/bgradient.gif"); 
+	background-image: url("Images/bg/bgradient.gif"); 
 	background-repeat: repeat-x; 
 	margin: 10px 20px 0; 
 	left: 14px; 
@@ -12,7 +12,7 @@ body
 
 div.logo
 { 
-	background-image: url("images/simbrainlogo.gif"); 
+	background-image: url("Images/simbrainlogo.gif"); 
 	background-repeat: no-repeat; 
 	margin: 0 0 0; 
 	position: absolute; 

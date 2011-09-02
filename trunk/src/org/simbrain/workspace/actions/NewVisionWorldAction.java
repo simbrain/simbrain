@@ -38,7 +38,7 @@ public final class NewVisionWorldAction extends WorkspaceAction {
      * workspace.
      */
     public NewVisionWorldAction(Workspace workspace) {
-        super("Vision World", workspace);
+        super("Vision World (Beta)", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Glasses.png"));
     }
 

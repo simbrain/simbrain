@@ -103,13 +103,33 @@ public class KeyBindings {
             }
         });
 
-        // TODO: Figure this out.  Also need released.
-        inputMap.put(KeyStroke.getKeyStroke("Alt"), "altPress");
+        // Selection Mode
+        inputMap.put(KeyStroke.getKeyStroke("S"), "selectionMode");
+        panel.getActionMap().put("selectionMode",
+                panel.getActionManager().getSelectionEditModeAction());
+
+        // Pan Mode
+        inputMap.put(KeyStroke.getKeyStroke("K"), "panMode");
+        panel.getActionMap().put("panMode",
+                panel.getActionManager().getPanEditModeAction());
+
+        // Text Mode
+        inputMap.put(KeyStroke.getKeyStroke("T"), "textMode");
+        panel.getActionMap().put("textMode",
+                panel.getActionManager().getTextEditModeAction());
+
+        // Zoom mode
+        inputMap.put(
+                KeyStroke.getKeyStroke("Z"),
+                "altPress");
         panel.getActionMap().put("altPress", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Here");
                 if (panel.getEditMode().isZoomIn()) {
                     panel.setEditMode(EditMode.ZOOM_OUT);
+                } else if (panel.getEditMode().isZoomOut()) {
+                    panel.setEditMode(EditMode.ZOOM_IN);
+                } else {
+                    panel.setEditMode(EditMode.ZOOM_IN);
                 }
             }
         });

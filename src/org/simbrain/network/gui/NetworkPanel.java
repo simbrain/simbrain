@@ -337,7 +337,6 @@ public class NetworkPanel extends JPanel {
 
         // Register key support
         KeyBindings.addBindings(this);
-        addKeyListener(new NetworkKeyAdapter(this));
 
         // Repaint whenever window is opened or changed.
         this.addComponentListener(new ComponentAdapter() {

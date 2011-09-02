@@ -23,7 +23,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Pan edit mode action.
+ * Wand edit mode action.
  */
 public final class WandEditModeAction
     extends EditModeAction {
@@ -39,7 +39,7 @@ public final class WandEditModeAction
         putValue(SHORT_DESCRIPTION, "Wand Mode");
 
         //networkPanel.getInputMap().put(KeyStroke.getKeyStroke('k'), this);
-        networkPanel.getActionMap().put(this, this);
+        //networkPanel.getActionMap().put(this, this);
 
     }
 }

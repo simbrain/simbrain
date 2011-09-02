@@ -19,8 +19,6 @@
 
 package org.simbrain.network.gui.actions;
 
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
@@ -39,9 +37,6 @@ public class TextEditModeAction extends EditModeAction {
         super("Text", networkPanel, EditMode.TEXT);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
         putValue(SHORT_DESCRIPTION, "Text Mode (t)");
-
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('t'), this);
-        networkPanel.getActionMap().put(this, this);
     }
 
 }

@@ -999,4 +999,11 @@ public final class NetworkActionManager {
         return showTrainerAction;
     }
 
+    /**
+     * @return the selectionEditModeAction
+     */
+    public Action getSelectionEditModeAction() {
+        return selectionEditModeAction;
+    }
+
 }

@@ -41,8 +41,6 @@ public final class ZoomEditModeAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("ZoomIn.png"));
         putValue(SHORT_DESCRIPTION, "Zoom mode (z)");
 
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('z'), this);
-        networkPanel.getActionMap().put(this, this);
     }
 
 }

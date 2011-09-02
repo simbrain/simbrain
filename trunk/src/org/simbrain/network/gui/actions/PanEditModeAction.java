@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.gui.actions;
 
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
@@ -39,9 +37,6 @@ public final class PanEditModeAction
         super("Pan", networkPanel, EditMode.PAN);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Pan.png"));
         putValue(SHORT_DESCRIPTION, "Pan Mode (k)");
-
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('k'), this);
-        networkPanel.getActionMap().put(this, this);
 
     }
 }

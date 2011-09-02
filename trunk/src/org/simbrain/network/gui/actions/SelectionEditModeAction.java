@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.gui.actions;
 
-import javax.swing.KeyStroke;
-
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
@@ -41,9 +39,6 @@ public final class SelectionEditModeAction
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Arrow.png"));
         putValue(SHORT_DESCRIPTION, "Selection mode (s)");
-
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('s'), this);
-        networkPanel.getActionMap().put(this, this);
 
     }
 }

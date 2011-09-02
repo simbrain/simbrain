@@ -18,13 +18,11 @@
  */
 package org.simbrain.network.gui;
 
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.StyleConstants;
 
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.interfaces.NetworkTextObject;

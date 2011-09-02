@@ -79,7 +79,12 @@ final class ZoomEventHandler
 
         double x = event.getPosition().getX();
         double y = event.getPosition().getY();
-        double w = camera.getViewBounds().getWidth() * zoom;
+        double w = 1;
+        if (networkPanel.getEditMode().isZoomIn()) {
+            w = camera.getViewBounds().getWidth() * ZOOM_IN_FACTOR;
+        } else if (networkPanel.getEditMode().isZoomOut()) {
+            w = camera.getViewBounds().getWidth() * ZOOM_OUT_FACTOR;
+        }
 
         PBounds rect = new PBounds(x - (w / 2), y - (w / 2), w, w);
         camera.animateViewToCenterBounds(rect, true, ZOOM_ANIMATION_DURATION);

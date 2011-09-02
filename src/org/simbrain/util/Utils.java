@@ -257,14 +257,15 @@ public class Utils {
     }
 
     /**
+     * Returns a string rounded to the desired precision.
+     *
      * @param num double to convert
      * @param precision number of decimal places
      * @return string representation of rounded decimal
      */
     public static String round(final double num, final int precision) {
         BigDecimal bd = new BigDecimal(num);
-
-        return bd.setScale(precision, BigDecimal.ROUND_DOWN).toString();
+        return bd.setScale(precision, BigDecimal.ROUND_HALF_UP).toString();
     }
 
     /**

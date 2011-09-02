@@ -559,13 +559,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         } else if ((act > 0) && (neuron.getActivation() < 1)) {
             // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
-            activationText.setText(String.valueOf(Utils.round(act, 4))
-                    .substring(1, 3));
+            activationText.setText(Utils.round(act, 1).replaceAll("^0*", "")
+                    .replaceAll(".0$", ""));
         } else if ((act < 0) && (act > -1)) { // Between 0 and -1
             // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
-            activationText.setText("-"
-                    + String.valueOf(Utils.round(act, 4)).substring(2, 4));
+            activationText.setText(Utils.round(act, 1).replaceAll("^-0*", "-")
+                    .replaceAll(".0$", ""));
         } else { // greater than 1 or less than -1
             // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);

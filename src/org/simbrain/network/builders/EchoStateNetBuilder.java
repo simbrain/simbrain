@@ -70,10 +70,10 @@ public final class EchoStateNetBuilder {
 
     /** Default network has no recurrent output weights */
     private boolean recurrentOutWeights = false;
-    
+
     /** Default network has direct input to output connections */
     private boolean directInOutWeights = false;
-    
+
     /** Default reservoir neuron type */
     private NeuronUpdateRule reservoirNeuronType = new SigmoidalNeuron();
 
@@ -95,6 +95,8 @@ public final class EchoStateNetBuilder {
     /** Default output neuron type */
     private NeuronUpdateRule outputNeuronType = new LinearNeuron();
 
+    private SolutionType solType;
+    
     /** Initial position of network (from bottom left). */
     private Point2D.Double initialPosition = new Point2D.Double(0, 0);
 
@@ -111,12 +113,14 @@ public final class EchoStateNetBuilder {
     private int betweenNeuronInterval = 50;
 
     /**
-     * Default Constructor, all values are assumed default. 
+     * Default Constructor, all values are assumed default.
+     * @param network
+     *              the root network to which this ESN is incorporated
      */
-    public EchoStateNetBuilder(final RootNetwork network){
-    	this.network = network;
+    public EchoStateNetBuilder(final RootNetwork network) {
+        this.network = network;
     }
-    
+
     /**
      * Constructor with size of layers specified.
      *
@@ -160,8 +164,8 @@ public final class EchoStateNetBuilder {
                 betweenNeuronInterval, (int) Math.sqrt(numReservoirNodes));
         initialGridPostion = new Point2D.Double((int) inputLayer.get(0).getX()
                , (int) initialPosition.getY()
-                - betweenLayerInterval - (int)Math.sqrt(numReservoirNodes)*
-                GridLayout.getVSpacing());
+                - betweenLayerInterval - (int) Math.sqrt(numReservoirNodes)
+                * GridLayout.getVSpacing());
         reservoirLayout.setInitialLocation(initialGridPostion);
         reservoirLayout.layoutNeurons(reservoirLayer);
 
@@ -186,11 +190,14 @@ public final class EchoStateNetBuilder {
 
     /**
      * Initializes a layer.
+     * @param layer
+     *            the layer to be initialized
      * @param nodeType
      *            type of nodes in the layer
      * @param layerType
      *            type of layer
-     * @return a list of the neurons in this layer
+     * @param nodes
+     *            number of nodes in the layer
      */
     private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
             LayerType layerType, int nodes) {
@@ -218,60 +225,61 @@ public final class EchoStateNetBuilder {
             double sparsity) {
         Sparse2 sparseConnections = new Sparse2(network, src, tar);
         // TODO: More elegant way to do this?
-        
+
         sparseConnections.connectNeurons(sparsity);
     }
 
     /**
      * Train the ESN using the provided data.
      *
+     * @param solution the type of linear regression which is to be used
      * @param inputData input data for input nodes
      * @param trainingData training data
      */
-    public void train(SolutionType solution, double[][] inputData, 
-    		double[][] trainingData) {
+    public void train(double[][] inputData,
+            double[][] trainingData) {
 
         // Generate the reservoir data to be used in training
         double[][] mainInputData = ReservoirComputingUtils.generateData(
-                this,inputData,
-                trainingData);
+                this, inputData, trainingData);
 
         //System.out.println("-------");
         //System.out.println(Utils.doubleMatrixToString(mainInputData));
-        
-        ArrayList<Neuron> full = new ArrayList<Neuron>();
-        
-        if(directInOutWeights){
-        	for(Neuron node : inputLayer){
-            	full.add(node);
-        	}
-        }
-        for(Neuron node : reservoirLayer){
-            full.add(node);
-        }
 
-        if(recurrentOutWeights){
-        	for(Neuron node : reservoirLayer){
+        ArrayList<Neuron> full = new ArrayList<Neuron>();
+
+        if (directInOutWeights) {
+            for (Neuron node : inputLayer) {
                 full.add(node);
             }
         }
-        
-        if(mainInputData[0].length != full.size()){
-        	throw new IllegalArgumentException("Input data length does not " +
-        			"match training node set");
+        for (Neuron node : reservoirLayer) {
+            full.add(node);
         }
-        
-        if(trainingData[0].length != outputLayer.size()){
-        	throw new IllegalArgumentException("Output data length does not " +
-        			"match the number of output nodes");
+
+        if (recurrentOutWeights) {
+            for (Neuron node : reservoirLayer) {
+                full.add(node);
+            }
         }
-        
+
+        if (mainInputData[0].length != full.size()) {
+            throw new IllegalArgumentException("Input data length does not "
+                    + "match training node set");
+        }
+
+        if (trainingData[0].length != outputLayer.size()) {
+            throw new IllegalArgumentException("Output data length does not "
+                    + "match the number of output nodes");
+        }
+
         LMSOffline trainer = new LMSOffline(network);
         trainer.setInputData(mainInputData);
         trainer.setTrainingData(trainingData);
         trainer.setInputLayer(full);
         trainer.setOutputLayer(getOutputLayer());
-        trainer.setSolutionType(SolutionType.WIENER_HOPF); //TODO: Ability to set
+        //TODO: Ability to set
+        trainer.setSolutionType(solType);
         trainer.train(1);
 
     }
@@ -404,7 +412,7 @@ public final class EchoStateNetBuilder {
     public List<Neuron> getOutputLayer() {
         return outputLayer;
     }
-    
+
     public void setRecurrentOutWeights(boolean recurrentWeights) {
         this.recurrentOutWeights = recurrentWeights;
     }
@@ -441,7 +449,9 @@ public final class EchoStateNetBuilder {
         double [][] ins = sineWaveInputGen(54000);
         double [][] outs = sineWaveDataGen(ins, 300);
                     
-        esn.train(SolutionType.WIENER_HOPF,ins, outs);
+        esn.setSolType(SolutionType.WIENER_HOPF);
+        
+        esn.train(ins, outs);
 
         // Write to file
         String FILE_OUTPUT_LOCATION = "./";
@@ -482,6 +492,14 @@ public final class EchoStateNetBuilder {
         
         return outs;
         
+    }
+
+    public void setSolType(SolutionType solType) {
+        this.solType = solType;
+    }
+
+    public SolutionType getSolType() {
+        return solType;
     }
     
 

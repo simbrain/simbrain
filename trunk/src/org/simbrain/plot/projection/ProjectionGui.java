@@ -310,6 +310,14 @@ public class ProjectionGui extends GuiComponent<ProjectionComponent> implements
         for (Action action : actionManager.getOpenSavePlotActions()) {
             fileMenu.add(action);
         }
+        final JMenu exportImport = new JMenu("Export/Import...");
+        fileMenu.add(exportImport);
+        exportImport.add(ProjectionPlotActions
+                .getExportDataHi(getWorkspaceComponent()
+                        .getProjectionModel()));
+        exportImport.add(ProjectionPlotActions
+                .getExportDataLow(getWorkspaceComponent()
+                        .getProjectionModel()));
 
         final JMenu editMenu = new JMenu("Edit");
         final JMenuItem preferences = new JMenuItem("Preferences...");

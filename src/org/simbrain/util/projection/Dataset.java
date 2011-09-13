@@ -412,10 +412,10 @@ public class Dataset {
 
         CSVPrinter thePrinter = new CSVPrinter(f);
 
-        thePrinter.printlnComment("");
-        thePrinter.printlnComment("File: " + theFile.getName());
-        thePrinter.printlnComment("");
-        thePrinter.println();
+        //thePrinter.printlnComment("");
+        ///thePrinter.printlnComment("File: " + theFile.getName());
+        //thePrinter.printlnComment("");
+        //thePrinter.println();
         thePrinter.println(this.getDoubleStrings());
 
         thePrinter.println();
@@ -785,7 +785,7 @@ public class Dataset {
     }
 
     /**
-     * Makes this dataset a copy of the passed in dataset
+     * Makes this dataset a copy of the passed in dataset.
      *
      * @param other the the dataset
      */
@@ -821,7 +821,7 @@ public class Dataset {
     public String[][] getDoubleStrings() {
         int numPoints = getNumPoints();
         String[][] ret = new String[numPoints][dimensions];
-        
+
         for (int i = 0; i < numPoints; i++) {
             double[] tempPoint = (double[]) getPoint(i);
 

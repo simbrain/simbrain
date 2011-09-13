@@ -135,7 +135,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Create a new neuron node.
-     * 
+     *
      * @param net Reference to NetworkPanel
      * @param neuron reference to model neuron
      */
@@ -550,24 +550,24 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             // TODO: Make background bigger than label text
         }
 
-        // 0 (or close to it) is a special case--a black font
-        if ((act > -.01) && (act < .01)) { // text.setPaint(Color.black);
-            activationText.setFont(NEURON_FONT);
-            activationText.setText("0");
-            // In all other cases the background color of the neuron is white
-            // Between 0 and 1
-        } else if ((act > 0) && (neuron.getActivation() < 1)) {
+        if ((act > 0) && (neuron.getActivation() < 1)) { // Between 0 and 1
             // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
-            activationText.setText(Utils.round(act, 1).replaceAll("^0*", "")
-                    .replaceAll(".0$", ""));
-        } else if ((act < 0) && (act > -1)) { // Between 0 and -1
+            String text = Utils.round(act, 1);
+            if (text.startsWith("0.")) {
+                text = text.replaceAll("0.", ".");
+                if (text.equals(".0")) {
+                    text = "0";
+                }
+            }
+            activationText.setText(text);
+        } else if ((act > -1) &&  (act < 0)) { // Between -1 and 0
             // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
             activationText.setText(Utils.round(act, 1).replaceAll("^-0*", "-")
                     .replaceAll(".0$", ""));
-        } else { // greater than 1 or less than -1
-            // text.setPaint(Color.white);
+        } else { 
+            // greater than 1 or less than -1
             activationText.setFont(NEURON_FONT_BOLD);
             if (Math.abs(act) < 10) {
                 activationText.scale(.9);

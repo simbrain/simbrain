@@ -14,6 +14,7 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.trainer.LMSOffline.SolutionType;
 
@@ -174,15 +175,24 @@ public class ReservoirComputingUtils {
 
             }
 
-            // TODO: Potentially shift teacher data to correspond to reservoir
-            // states
 
             if (esn.hasBackWeights()) {
                 int count = 0;
+                double clampValue = 0.5;
                 for (Neuron neuron : esn.getOutputLayer()) {
                     // Teacher forcing
-                    double clampValue = teacherData[row][count];
+                    if (row > 0) {
+                        if (neuron.getUpdateRule() instanceof SigmoidalNeuron) {
+                            clampValue =
+                                ((SigmoidalNeuron) neuron.getUpdateRule()).
+                                    inverse(teacherData[row - 1][count],
+                                            neuron);
+                        } else {
+                            clampValue = teacherData[row - 1][count];
+                        }
+                    }
                     neuron.setActivation(clampValue);
+                    count++;
                 }
             }
 

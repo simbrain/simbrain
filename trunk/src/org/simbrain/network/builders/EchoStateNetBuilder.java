@@ -28,6 +28,7 @@ import java.util.List;
 import org.simbrain.network.connections.Sparse2;
 import org.simbrain.network.groups.NeuronLayer;
 import org.simbrain.network.groups.NeuronLayer.LayerType;
+import org.simbrain.network.interfaces.CustomUpdateRule;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -69,10 +70,10 @@ public final class EchoStateNetBuilder {
     private boolean backWeights = true;
 
     /** Default network has no recurrent output weights */
-    private boolean recurrentOutWeights = false;
+    private boolean recurrentOutWeights;
 
     /** Default network has direct input to output connections */
-    private boolean directInOutWeights = false;
+    private boolean directInOutWeights;
 
     /** Default reservoir neuron type */
     private NeuronUpdateRule reservoirNeuronType = new SigmoidalNeuron();
@@ -95,8 +96,9 @@ public final class EchoStateNetBuilder {
     /** Default output neuron type */
     private NeuronUpdateRule outputNeuronType = new LinearNeuron();
 
+    /** The type method of Linear Regression used in training*/
     private SolutionType solType;
-    
+
     /** Initial position of network (from bottom left). */
     private Point2D.Double initialPosition = new Point2D.Double(0, 0);
 
@@ -106,11 +108,17 @@ public final class EchoStateNetBuilder {
     /** Initial position of output layer */
     private Point2D.Double initialOutPosition;
 
+    /** Default space between layers */
+    private static final int DEFAULT_LAYER_INTERVAL = 100;
+
     /** space between layers */
-    private int betweenLayerInterval = 100;
+    private int betweenLayerInterval = DEFAULT_LAYER_INTERVAL;
+
+    /** Default space between layers */
+    private static final int DEFAULT_NEURON_INTERVAL = 50;
 
     /** space between neurons within layers */
-    private int betweenNeuronInterval = 50;
+    private int betweenNeuronInterval = DEFAULT_NEURON_INTERVAL;
 
     /**
      * Default Constructor, all values are assumed default.
@@ -148,12 +156,10 @@ public final class EchoStateNetBuilder {
         initializeLayer(inputLayer, new ClampedNeuron(),
                 LayerType.Input, numInputNodes);
         initializeLayer(reservoirLayer, reservoirNeuronType,
-                LayerType.Hidden, numReservoirNodes);
+                LayerType.Reservoir, numReservoirNodes);
         initializeLayer(outputLayer, outputNeuronType,
                 LayerType.Output, numOutputNodes);
 
-        // Layout layers
-        // TODO: create new layout for reservoirs
         LineLayout layerLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);
         layerLayout.setInitialLocation(new Point((int) initialPosition.getX()
@@ -205,7 +211,7 @@ public final class EchoStateNetBuilder {
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(network, nodeType);
             network.addNeuron(node);
-            node.setIncrement(1); // TODO: Reasonable?
+            node.setIncrement(1); //TODO: Reasonable?
             layer.add(node);
         }
         // Create group based on layer and add to the network
@@ -232,7 +238,6 @@ public final class EchoStateNetBuilder {
     /**
      * Train the ESN using the provided data.
      *
-     * @param solution the type of linear regression which is to be used
      * @param inputData input data for input nodes
      * @param trainingData training data
      */
@@ -242,6 +247,7 @@ public final class EchoStateNetBuilder {
         // Generate the reservoir data to be used in training
         double[][] mainInputData = ReservoirComputingUtils.generateData(
                 this, inputData, trainingData);
+
 
         //System.out.println("-------");
         //System.out.println(Utils.doubleMatrixToString(mainInputData));
@@ -258,8 +264,9 @@ public final class EchoStateNetBuilder {
         }
 
         if (recurrentOutWeights) {
-            for (Neuron node : reservoirLayer) {
+            for (Neuron node : outputLayer) {
                 full.add(node);
+
             }
         }
 
@@ -273,12 +280,22 @@ public final class EchoStateNetBuilder {
                     + "match the number of output nodes");
         }
 
+        for (Neuron n : getOutputLayer()) {
+            if (n.getUpdateRule() instanceof SigmoidalNeuron) {
+                for (int i = 0; i < trainingData.length; i++) {
+                    int col = getOutputLayer().indexOf(n);
+                    trainingData[i][col] = ((SigmoidalNeuron)
+                            n.getUpdateRule()).inverse(trainingData[i][col],
+                                    n);
+                }
+            }
+        }
+
         LMSOffline trainer = new LMSOffline(network);
         trainer.setInputData(mainInputData);
         trainer.setTrainingData(trainingData);
         trainer.setInputLayer(full);
         trainer.setOutputLayer(getOutputLayer());
-        //TODO: Ability to set
         trainer.setSolutionType(solType);
         trainer.train(1);
 
@@ -355,13 +372,6 @@ public final class EchoStateNetBuilder {
 
     public void setSpectralRadius(double spectralRadius) {
         this.spectralRadius = spectralRadius;
-        if (spectralRadius >= 1.0) {
-            System.out.println("Warning: Setting the spectral radius to a \n"
-                    + "value greater than or equal to 1 will guarantee the \n"
-                    + "network has no echo-states for any left-infinite \n"
-                    + "input sequences, unless certain parameters are met \n"
-                    + "relating to the amplitude of the input.");
-        }
     }
 
     public double getSpectralRadius() {
@@ -429,12 +439,25 @@ public final class EchoStateNetBuilder {
         return directInOutWeights;
     }
 
-    /**
-     * Test the esn builder using an xor through time task.
-     *
-     * @param args
-     */
-    public static void main (String args []){
+    public void setSolType(SolutionType solType) {
+        this.solType = solType;
+    }
+
+    public SolutionType getSolType() {
+        return solType;
+    }
+
+    public static int getDEFAULT_LAYER_INTERVAL() {
+        return DEFAULT_LAYER_INTERVAL;
+    }
+
+    public static int getDEFAULT_NEURON_INTERVAL() {
+        return DEFAULT_NEURON_INTERVAL;
+    }
+
+    /*
+
+    public static void main (String args []) {
         final RootNetwork network = new RootNetwork();
         EchoStateNetBuilder esn = new EchoStateNetBuilder(network, 1, 100, 1);
         esn.setBackWeights(true);
@@ -448,9 +471,9 @@ public final class EchoStateNetBuilder {
 
         double [][] ins = sineWaveInputGen(54000);
         double [][] outs = sineWaveDataGen(ins, 300);
-                    
+
         esn.setSolType(SolutionType.WIENER_HOPF);
-        
+
         esn.train(ins, outs);
 
         // Write to file
@@ -480,8 +503,9 @@ public final class EchoStateNetBuilder {
         }
         return input;
     }
-    
-    public static double [] [] sineWaveDataGen(double [][] inputs, int interval){
+
+    public static double [] [] sineWaveDataGen(
+        double [][] inputs, int interval) {
         double [][] outs = new double[inputs.length][1];
         //Currently intervals are 300
         double time = 0;
@@ -489,20 +513,14 @@ public final class EchoStateNetBuilder {
             outs[i][0] = Math.sin(inputs[i][0] * time);
             time += 1.0;
         }
-        
+
         return outs;
-        
+
     }
 
-    public void setSolType(SolutionType solType) {
-        this.solType = solType;
-    }
-
-    public SolutionType getSolType() {
-        return solType;
-    }
     
 
-   
+*/
+
 
 }

@@ -19,6 +19,7 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
+import org.simbrain.network.interfaces.Inverse;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
@@ -28,7 +29,7 @@ import org.simbrain.network.util.RandomSource;
  * <b>SigmoidalNeuron</b> provides variuos implementations of a standard
  * sigmoidal neuron.
  */
-public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
+public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, Inverse {
 
     /** Implementations of the Sigmoidal activation function. */
     public static enum SigmoidType {
@@ -117,22 +118,21 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
     public void update(Neuron neuron) {
 
         double val = neuron.getWeightedInputs() + bias;
-        double upperBound = neuron.getUpperBound();
-        double lowerBound = neuron.getLowerBound();
 
         // TANH not currently used because identical to SIGM
-        if (type == SigmoidType.TANH) {
-            double a = (2 * slope) / (upperBound - lowerBound);
-            val = (((upperBound - lowerBound) / 2) * tanh(a * val)) + ((upperBound  + lowerBound) / 2);
-        } else if (type == SigmoidType.ARCTAN) {
-            double a = (Math.PI * slope) / (upperBound - lowerBound);
-            val = ((upperBound - lowerBound) / Math.PI) * Math.atan(a * val) + ((upperBound  + lowerBound) / 2);
-        } else if (type == SigmoidType.LOGISTIC) {
-            double diff = upperBound - lowerBound;
-            //val = diff * sigm(4 * slope * val / diff) + lowerBound;
-            val = diff * sigm(slope * val / diff) + lowerBound;
-        } else if (type == SigmoidType.BARE) {
-            val = sigm(val);
+        switch(type) {
+        case TANH:
+            val = tanh(val, neuron);
+            break;
+        case ARCTAN:
+            val = atan(val, neuron);
+            break;
+        case LOGISTIC:
+            val = sigm(val, neuron);
+            break;
+        default:
+            val = 1 / 1 + Math.exp(-val);
+            break;
         }
 
         if (addNoise) {
@@ -147,24 +147,112 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public double inverse(double val, Neuron neuron) {
+        switch(type) {
+        case TANH:
+            val = invTanh(val, neuron);
+            break;
+        case ARCTAN:
+            val = invAtan(val, neuron);
+            break;
+        case LOGISTIC:
+            val = invSigm(val, neuron);
+            break;
+        default:
+            val = -Math.log(1 / val - 1);
+            break;
+        }
+        return val;
+    }
+
+    /**
      * Returns the results of the hyperbolic tangent function.
      *
      * @param input argument
+     * @param neuron undergoing update
      * @return results of tanh
      */
-    private double tanh(final double input) {
-        double val = Math.exp(2 * input);
-        return ((val - 1) / (val + 1));
+    private double tanh(final double input, Neuron neuron) {
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
+        return (upperBound - lowerBound) * Math.tanh(input) + lowerBound;
+    }
+
+    /**
+     * Returns the result of the arc hyperbolic tangent function
+     *
+     * @param input argument
+     * @param neuron from which the value is being mapped
+     * @return arctanh
+     */
+    private double invTanh(final double input, Neuron neuron) {
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
+        double z = (input - lowerBound) / (upperBound - lowerBound);
+        return 0.5 * (Math.log((1 + z)) / (1 - z));
     }
 
     /**
      * Returns the results of the standard sigmoidal function.
      *
-     * @param in argument
+     * @param input argument
+     * @param neuron undergoing update
      * @return results of sigm
      */
-    private double sigm(final double in) {
-        return  1 / (1 + Math.exp(-in));
+    private double sigm(final double input, Neuron neuron) {
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
+        double diff = upperBound - lowerBound;
+        return diff * (1 / (1 + Math.exp(-(slope * input / diff))))
+            + lowerBound;
+    }
+
+    /**
+     * Returns the results of the inverse of the standard sigmoidal function
+     *
+     * @param input argument
+     * @param neuron from which the value is being mapped
+     * @return the inverse sigmoid
+     */
+    private double invSigm(final double input, Neuron neuron) {
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
+        double diff = upperBound - lowerBound;
+        return diff * -Math.log(diff / (input - lowerBound) - 1) / slope;
+    }
+
+    /**
+     * Returns the result of the arctangent function
+     *
+     * @param input argument
+     * @param neuron undergoing update
+     * @return results of atan
+     */
+    private double atan(final double input, Neuron neuron) {
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
+        double a = (Math.PI * slope) / (upperBound - lowerBound);
+        return ((upperBound - lowerBound) / Math.PI) * Math.atan(a * input)
+            + ((upperBound  + lowerBound) / 2);
+    }
+
+    /**
+     * Returns the result of the inverse arctangent or tangent function
+     *
+     * @param input argument
+     * @param neuron from which the value is being mapped
+     * @return the inverse of the atan activation function
+     */
+    private double invAtan(final double input, Neuron neuron) {
+        double upperBound = neuron.getUpperBound();
+        double lowerBound = neuron.getLowerBound();
+        double a = (Math.PI * slope) / (upperBound - lowerBound);
+        double diff = upperBound - lowerBound;
+        double z = ((input - ((upperBound + lowerBound) / 2))
+                * (Math.PI / diff));
+        return Math.tan(z) / a;
     }
 
     /**

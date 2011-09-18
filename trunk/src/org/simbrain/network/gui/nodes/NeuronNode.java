@@ -109,7 +109,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     private PText priorityText = new PText("...");
 
     /** Background for label text, so that background objects don't show up. */
-    PNode labelBackground;
+    private PNode labelBackground;
 
     /** Whether the node is currently moving or not. */
     private boolean isMoving = false;
@@ -253,7 +253,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Returns information about couplings.
-     * 
+     *
      * @return coupling information.
      */
     private String getCouplingText() {
@@ -417,7 +417,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Check whether the specified saturation is valid or not.
-     * 
+     *
      * @param val the saturation value to check.
      * @return whether it is valid or not.
      */
@@ -438,7 +438,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /**
      * Creates an arrow which designates an on-screen neuron as an output node,
      * which sends signals to an external environment (the world object).
-     * 
+     *
      * @return an object representing the input arrow of a PNodeNeuron
      * @see org.simbrain.sim.world
      */
@@ -464,7 +464,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Create the input label.
-     * 
+     *
      * @return the input label.
      */
     private PText createInputLabel() {
@@ -477,7 +477,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Create the output label.
-     * 
+     *
      * @return the output label.
      */
     private PText createOutputLabel() {
@@ -491,7 +491,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     /**
      * Creates an arrow which designates an on-screen neuron as an input node,
      * which receives signals from an external environment (the world object).
-     * 
+     *
      * @return an object representing the input arrow of a PNodeNeuron
      * @see org.simbrain.sim.world
      */
@@ -559,6 +559,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 if (text.equals(".0")) {
                     text = "0";
                 }
+            } else {
+                text = text.replaceAll(".0$", "");
             }
             activationText.setText(text);
         } else if ((act > -1) &&  (act < 0)) { // Between -1 and 0
@@ -650,7 +652,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Returns String representation of this NeuronNode.
-     * 
+     *
      * @return String representation of this node.
      */
     public String toString() {
@@ -662,7 +664,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     /**
      * Return the neuron for this neuron node.
-     * 
+     *
      * @return the neuron for this neuron node
      */
     public Neuron getNeuron() {
@@ -674,7 +676,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * <p>
      * This is a bound property.
      * </p>
-     * 
+     *
      * @param neuron neuron for this neuron node
      */
     public void setNeuron(final Neuron neuron) {

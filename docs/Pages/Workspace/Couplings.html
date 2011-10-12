@@ -19,32 +19,18 @@
   </div>
   <p>
   </p><h1>Couplings</h1><br>
-<p>A coupling is a link from an object in an attribute of an object in
-another component (or the same component). A producer produces values
-that are read by a consumer.</p>
+<p>An individual coupling represents a one way informational link between two attributes in Simbrain. These links can occur between attributes of different components or even within the same component. In this way information can be made to flow from one component to another. When using the couplings manager, the attribute which sends information to another attribute is known as a <b><i>producer</i></b>, and the attribute receiving that information is known as a <b><i>consumer</i></b> (see <b>Coupling Creation</b> below).</p>
 
-<p>A list of all current couplings is shown in the Coupligns tab of the bottom information pane.</p>
-<p>Most windows in Simbrain and workspace components, which are
-wrappers around other objects, which are designed to exist in a
-workspace.&nbsp; This mainly means attributes (for couplings).
-Couplings tie these objects together via attributes. Attributes are the
-"hooks" or "anchor points" that make up couplings. There are two kinds,
-producing and consuming, which spit out and gobble up numbers
-(currently; may be abstracted to more general datatypes).&nbsp; So, the
-workspace can be thought of as a bunch of things that spit out numbers
-and read them in. Making a simulation amounts to making number
-spitter-outers and number-readers.&nbsp; For example, a simulation
-might involve coupling neurons whose neurons are producers to a bar
-chart whose bars are consumers (to see this, try bar chart test in the
-script menu).</p>
+<p>A list of all current couplings can be found in the Coupligns tab of the bottom information pane or within the coupling manager.</p>
+
+<p>Most windows in Simbrain (i.e. workspace components) are
+wrappers around other objects designed to exist in the
+workspace. These nested objects are known as attributes and can (for instance) include such values as the activation of a given neuron in the workspace, or a value of a line on a time-series (see <b>Attributes</b> below). &nbsp; Attributes can be thought of as the "hooks" or "anchor points" that make up couplings, and couplings represent the uni-directional data flow between these hooks. In this sense where the information is coming from and where it is being sent to must be specified and the workspace can be thought of as a collection of components which send and receive information (producers and consumers respectively). Making a simulation amounts to making components which send and recieve information, and coupling these components represents the way in which this information transfer is carried out.&nbsp; For example, a simulation might involve coupling neurons whose neurons are producers to a bar chart whose bars are consumers (to see this, try bar chart test in the script menu).</p>
 <p><br>
 </p>
 
-
-
-
 <p><span class="heading"><a name="Attributes"></a>Attributes</span></p>
-<p>An attribute is generic term for a producer or consumer, something that produces values or consumes values.</p>
+<p>More specifically, an attribute is generic term for a any part of a component which has a value that may be sent to or recieved from another component, i.e. something that produces values or consumes values.</p>
 <p>Examples are neuron activations, weight strengths, or bars on a bar chart, or sensor values for an agent in a virtual world.</p>
 <p>They are the parts of a coupling, attachments points in the
 simulation environment that can be connected together in the broader
@@ -55,36 +41,38 @@ simulation.</p>
 </p>
 <p>There are a few different ways to create couplings.<br>
 </p>
-<p>1. Use the coupling manager. To open this press the coupling manager
+<p><b>1.</b> Use the coupling manager. To open this press the coupling manager
 button on the Simbrain toolbar. This allows you to view every coupling
-in the workspace. Here is a screenshot of the current coupling manager.
-The current design is based on a mode where each component has its own
-list of &#8220;bound couplings.&#8221; &nbsp;That will change, however. &nbsp;(We
-should discuss this &#8230;)</p>
-<p>2. &nbsp;Via context menus inside specific components. &nbsp;E.g. if
+in the workspace. 
+The current design is based on a mode where each component can be selected as either a 
+consumer or producer of data. Having done just that in the example below, notice that
+selecting a given component causes its attributes which are suitable for coupling to appear in 
+the producer and consumer boxes. Below is a screenshot of the coupling manager. In this example, the activation of neuron 102 in network 1 will be sent to a time series plot, where it will be plotted as time series </p>
+
+
+<p><img src="../../Images/CouplingDialog.png" height="420" width="718"></p>
+
+<p><b>Note</b>: Currently each attribute carries with it a specific data type (in this case <b>double</b>). Couplings can only occur between attributes which share the same data type.</p>
+
+<p><br><b>2.</b> &nbsp;Via context menus inside specific components (see below). &nbsp;E.g. if
 you right click on a neuron in a neural network a context menu will
 point you to all other potential consuming and producing attributes in
 the whole workspace. &nbsp;These context menus are built at the
-workspace menu by polling all current workspacecomponents.<br>
+workspace menu by polling all current workspace components.<br>
 </p>
-<p>3. Via "coupling" commands in some menus. &nbsp;Quick and easy!&nbsp;&nbsp; <br>
-</p>
-<p>4. Using a script.<span class="heading"><br>
-</span></p>
-<p><span class="heading">Coupling Manager</span></p>
-<p>Todo: How to use the GUi<br>
 
-<span class="heading"></span></p>
 
-<p><span class="heading">Confusions</span><br>
-</p>
-<p>Sometimes the terminology can be confusing. For example, in order
-world, sensors seem to consume (info) and motors seem to produce
-(motion). &nbsp;&nbsp;But in the context of the workspace it&#8217;s the
-opposite. &nbsp;&nbsp;consumed info is produced or sent elsewhere...
-produced motion is based on consumed info from elsewhere.]<br>
-</p>
+<p><img src="../../Images/EasyCoupling.png" height="385" width="856"></p>
 <br>
+
+<p><br><b>3.</b> Via "coupling" commands in some menus. &nbsp;Quick and easy!&nbsp;&nbsp; <br>
+</p>
+
+<p><img src="../../Images/QuickCoupling.png" height="650" width="800"></p>
 <br>
+
+<p><b>4.</b> Using a beanshell script one can directly code couplings. While efficient for more advanced users, scripts are generally speaking not a part of the simbrain GUI (with perhaps exception to their selection from a menu or any GUIs they might spawn). See the <a href="../Scripting.html">Scripting</a> page for more information.<br>
+</p>
+
 </div>
 </body></html>

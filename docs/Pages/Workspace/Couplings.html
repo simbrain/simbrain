@@ -8,6 +8,9 @@
 
 
 
+
+
+
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html"><div class="logo">
@@ -19,59 +22,178 @@
   </div>
   <p>
   </p><h1>Couplings</h1><br>
-<p>An individual coupling represents a one way informational link between two attributes in Simbrain. These links can occur between attributes of different components or even within the same component. In this way information can be made to flow from one component to another. When using the couplings manager, the attribute which sends information to another attribute is known as a <b><i>producer</i></b>, and the attribute receiving that information is known as a <b><i>consumer</i></b> (see <b>Coupling Creation</b> below).</p>
+<p>An individual coupling represents a one way informational link
+between two attributes in Simbrain. These links can occur between
+attributes of different components or even within the same component.
+In this way information can be made to flow from one component to
+another. When using the couplings manager, the attribute which sends
+information to another attribute is known as a <b><i>producer</i></b>, and the attribute receiving that information is known as a <b><i>consumer</i></b> (see <a href="#Creation">coupling creation</a>).</p>
 
-<p>A list of all current couplings can be found in the Coupligns tab of the bottom information pane or within the coupling manager.</p>
+<p>A list of all current couplings can be found in the <span style="font-weight: bold;">couplings tab</span> of the <a href="PropertyTabs.html">property tab</a> at the bottom of the desktop.</p>
 
-<p>Most windows in Simbrain (i.e. workspace components) are
-wrappers around other objects designed to exist in the
-workspace. These nested objects are known as attributes and can (for instance) include such values as the activation of a given neuron in the workspace, or a value of a line on a time-series (see <b>Attributes</b> below). &nbsp; Attributes can be thought of as the "hooks" or "anchor points" that make up couplings, and couplings represent the uni-directional data flow between these hooks. In this sense where the information is coming from and where it is being sent to must be specified and the workspace can be thought of as a collection of components which send and receive information (producers and consumers respectively). Making a simulation amounts to making components which send and recieve information, and coupling these components represents the way in which this information transfer is carried out.&nbsp; For example, a simulation might involve coupling neurons whose neurons are producers to a bar chart whose bars are consumers (to see this, try bar chart test in the script menu).</p>
+<p>Most windows in Simbrain (i.e. workspace <a href="Components.html">components)</a> are
+wrappers around other objects (e.g. neurons), whose values can be linked to one another.&nbsp; These values are <a href="#Attributes">attributes</a> and can (for
+instance) include such values as the activation of a given neuron in
+the workspace, or a value of a line on a time-series. &nbsp; Attributes can be thought of as the "hooks" or "anchor
+points" that make up couplings, and couplings represent the
+uni-directional data flow between these hooks. For
+example, a simulation might involve coupling neurons whose neurons are
+producers to a bar chart whose bars are consumers (to see this, try bar
+chart test in the script menu).</p>
 <p><br>
 </p>
 
 <p><span class="heading"><a name="Attributes"></a>Attributes</span></p>
-<p>More specifically, an attribute is generic term for a any part of a component which has a value that may be sent to or recieved from another component, i.e. something that produces values or consumes values.</p>
-<p>Examples are neuron activations, weight strengths, or bars on a bar chart, or sensor values for an agent in a virtual world.</p>
-<p>They are the parts of a coupling, attachments points in the
-simulation environment that can be connected together in the broader
-simulation.</p>
+
+<p>An attribute is any part of a
+component which has a value that may be sent to or recieved from
+another component, i.e. something that produces values or consumes
+values. Examples are neuron activations, weight strengths, or bars on a
+bar chart, or sensor values for an agent in a virtual world.&nbsp; A
+coupling is a pair that contains one producing attribute and one
+consuming attribute.&nbsp; <br>
+</p>
+<p>Each attribute has a data type: numeric, String, etc. &nbsp; Currently only
+numeric data types are used.&nbsp; The data type is shown in terms of the
+relevant Java class or <a href="http://download.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html">primitive data type.</a>&nbsp;
+Currently most attributes in Simbrain are of type double, a kind of
+floating point number.&nbsp; Couplings can only occur between attributes
+which share the same data type.</p>
+<p>The attributes in a component can be viewed in the coupling manager dialog.<br>
+</p>
+
+
+<p><span style="text-decoration: underline;"><span class="heading2"></span></span><span class="heading">Coupling Manager</span></p>
+<p>To open the coupling manager press the coupling
+manager
+button&nbsp;<img style="width: 18px; height: 18px;" alt="coupling icon" src="../../Images/Coupling.png"> on the Simbrain <a href="Toolbar.html">toolbar</a> or use the menu&nbsp;<span class="command">Couplings &gt; Coupling Manager</span>.&nbsp;
+The coupling manager allows you to create and delete couplings , set
+attribute visibility, and view workspace attributes.&nbsp; The coupling
+manager is organized in to three columns<br>
+</p>
+<p style="margin-left: 40px;"><span class="heading2">Producer / Consumer lists</span>:
+these are the columns on the left and right side of the coupling
+manager: producers on the left; consumers on the right. Intuitively you
+are connecting a consumer to a producer to produce a coupling, which is
+displayed in the middle. &nbsp; The drop down box at the top of each
+column shows all current workspace components.&nbsp;&nbsp; Selecting
+that component shows what producing or consuming attributes are
+currently visible in that component.</p>
+<p style="margin-left: 40px;"><span class="heading2">Coupling list</span>:
+this is the middle column of the coupling manager and it shows all
+current couplings in the workspace (not only some subset of
+couplings).&nbsp;&nbsp;&nbsp;</p>
+<p>The following commands are possible&nbsp; in the coupling manager:</p>
+<p style="margin-left: 40px;"><span class="heading2">Add coupling(s)</span>:
+This button creates new couplings, as follows.&nbsp; It begins with the
+first selected attribute in the producer list and&nbsp; the first
+selected attribute in the producer list, and then creates a coupling
+from those attributes.&nbsp;&nbsp; If multiple consumers and producers
+are selected it creates as many couplings as it can in this way.&nbsp;
+The default is to link each selected producer with one selected
+consumer, but if&nbsp; many-one is selected in the drop-down box next
+to the add coupling(s) button, then each selected consumer is coupled
+to all selected producers. <br>
+</p>
+<p style="margin-left: 40px;"><span class="heading2">Delete Couplings</span>: This button deletes all selected couplings from the coupling list.</p>
+<p style="margin-left: 40px;"><span class="heading2">Set Attribute Visibilities</span>: This button opens up the <a href="#visibility">attribute visibility</a> dialog for the currently selected consumer or producer list.<br>
+</p>
+<br>
+
+
+
+
+<p style="text-align: center;"><img style="width: 534px; height: 312px;" src="../../Images/CouplingDialog.png"></p>
+<p><span class="heading"><br>
+</span></p>
+<br>
+<br>
+<p><span class="heading"><a name="visibility"></a>Attribute Visibility</span></p>
+<p>Not all attributes are automatically "visible" in the relevant gui
+components (coupling manager, menus, etc. described below).&nbsp;&nbsp;
+The reason is that there are so many things that can be attributes
+(every numerical property of every neuron and synapse in a neural
+network, for example), that it would overwhelm the
+gui.&nbsp;&nbsp;&nbsp; Each component has some attributes visible by
+default.&nbsp;&nbsp; To modify what the visible attributes are, use the
+set attribute visibility dialog, accessible from the <span style="font-weight: bold;">coupling manager. </span>For
+example, in this dialog, we see available attributes for the currently
+selected network component.&nbsp; Only neuron activations are&nbsp;
+visible in this component.&nbsp; When clicking on the visibility
+checkboxes notice that attributes appear and disappear in the producer
+list window.<br>
+</p>
 <p><br>
 </p>
-<p><span class="heading">Coupling Creation</span><br>
+<p style="text-align: center;">
+<img style="width: 433px; height: 154px;" alt="Attribute Visibility Dialog" src="../../Images/AttributeVisibilityDialog.png"></p>
+<p><br>
 </p>
-<p>There are a few different ways to create couplings.<br>
+<p><span class="heading"><a name="Creation"></a>Coupling Creation</span><br>
 </p>
-<p><b>1.</b> Use the coupling manager. To open this press the coupling manager
-button on the Simbrain toolbar. This allows you to view every coupling
-in the workspace. 
-The current design is based on a mode where each component can be selected as either a 
-consumer or producer of data. Having done just that in the example below, notice that
-selecting a given component causes its attributes which are suitable for coupling to appear in 
-the producer and consumer boxes. Below is a screenshot of the coupling manager. In this example, the activation of neuron 102 in network 1 will be sent to a time series plot, where it will be plotted as time series </p>
+
+<p>There are at least 4 ways to create couplings.<br>
+</p>
 
 
-<p><img src="../../Images/CouplingDialog.png" height="420" width="718"></p>
 
-<p><b>Note</b>: Currently each attribute carries with it a specific data type (in this case <b>double</b>). Couplings can only occur between attributes which share the same data type.</p>
-
-<p><br><b>2.</b> &nbsp;Via context menus inside specific components (see below). &nbsp;E.g. if
+<p><b>1.</b> Use the coupling manager, as described in the discussion
+of the coupling manager above. An example is shown in the screenshot
+below. In that example, a coupling is created between the activation
+attribute of
+neuron 102 in network 1 (the producer), and one time series (one
+colored line, the consumer) in a time series plot.&nbsp; So activation
+of that neuron will be be plotted as time series when the simulation
+runs.<br>
+</p>
+<p><br>
+<b>2.</b> &nbsp;Via context menus inside specific components (see below).&nbsp; This is for making one coupling at a time. E.g. if
 you right click on a neuron in a neural network a context menu will
 point you to all other potential consuming and producing attributes in
 the whole workspace. &nbsp;These context menus are built at the
-workspace menu by polling all current workspace components.<br>
+workspace menu by polling all current workspace components.</p>
+
+<p><br>
 </p>
 
 
-<p><img src="../../Images/EasyCoupling.png" height="385" width="856"></p>
+
+<p style="text-align: center;"><img style="border: 1px solid ; width: 615px; height: 277px;" alt="coupling example" src="../../Images/EasyCoupling.png"></p>
 <br>
 
-<p><br><b>3.</b> Via "coupling" commands in some menus. &nbsp;Quick and easy!&nbsp;&nbsp; <br>
+<p><br><b>3.</b> Via "coupling" commands in some menus.&nbsp; This can
+be used to create multiple couplings from one component to another, in
+one shot.&nbsp; Quick and
+easy!&nbsp; The source component is the one from which the menu command
+is called, and the target component is the one selected using that menu
+command.&nbsp; For example, in the screenshot below couplings are being
+made <span style="font-style: italic;">from</span> Network1 <span style="font-style: italic;">to</span> timeSeriesPlot1. &nbsp; <br>
+</p>
+<p>The way it works is that all visible producers in the source
+component (i.e. those that would be visible if the coupling manager
+were opened and that component were selected in the source list) and
+coupled 1-1 to visible consumers in the target component.&nbsp; The
+order of attributes is the same as appears in the producer and consumer
+lists. For example, in the screenshot below, the first five neuron
+activations are coupled to the available 5 time series in the time
+series plot.<br>
+</p>
+<p>Notice that in the screenshot the couplings tabs is open on the bottom
+of the workspace and that it shows the couplings that were
+made.&nbsp;&nbsp; <br>
 </p>
 
-<p><img src="../../Images/QuickCoupling.png" height="650" width="800"></p>
+<p><br>
+</p>
+
+
+<p style="text-align: center;"><img style="border: 1px solid ; width: 638px; height: 518px;" alt="example" src="../../Images/QuickCoupling.png"></p>
 <br>
 
-<p><b>4.</b> Using a beanshell script one can directly code couplings. While efficient for more advanced users, scripts are generally speaking not a part of the simbrain GUI (with perhaps exception to their selection from a menu or any GUIs they might spawn). See the <a href="../Scripting.html">Scripting</a> page for more information.<br>
+<p><b>4.</b> Using a beanshell script one can directly code couplings.
+While efficient for more advanced users, scripts are generally speaking
+not a part of the simbrain GUI (with perhaps exception to their
+selection from a menu or any GUIs they might spawn). See the <a href="../Scripting.html">Scripting</a> page for more information.<br>
 </p>
 
 </div>

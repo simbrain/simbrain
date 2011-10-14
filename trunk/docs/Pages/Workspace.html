@@ -2,105 +2,79 @@
 <html><head><title>Simbrain Documentation</title>
 
 
-
-
-
-
-
-
-
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div></a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Workspace</p>
-  </div>
-  <div id="menu">
-	  <p class="menubold">Contents</p>
-	    <blockquote>
-		  
   
-  <p><a href="Workspace/Couplings.html">Couplings</a><br>
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Workspace</p>
+</div>
+<div id="menu">
+<p class="menubold">Contents</p>
+<blockquote>
+  <p><a href="Workspace/Components.html">Components</a><br>
+  <a href="Workspace/Couplings.html">Couplings</a><br>
   <a href="Workspace/Examples.html">Examples</a><br>
-		    <a href="Workspace/Menus.html">Menus</a><br>
+  <a href="Workspace/Menus.html">Menus</a><br>
   <a href="Workspace/Preferences.html">Preferences</a><br>
   <a href="Workspace/PropertyTabs.html">Property Tabs</a><br>
-	      <a href="Scripting.html">Scripts<br>
+  <a href="Scripting.html">Scripts<br>
   </a><a href="Workspace/Toolbar.html">Toolbar</a><br>
   <a href="Workspace/Update.html">Update</a><br>
 &nbsp;</p>
-
-	    </blockquote>
-  </div>
- <p>
- </p><h1>Workspace</h1>
- 
- <p>The Simbrain <span style="font-weight: bold;">workspace</span>
+</blockquote>
+</div>
+<p> </p>
+<h1>Workspace</h1>
+<p>The Simbrain <span style="font-weight: bold;">workspace</span>
 is the framework within which a simulation is run. It contains
 components which are coupled to one another, and tools for managing
-these interactions.&nbsp; In the GUI, the workspace is visible as the
-Simbrain <span style="font-weight: bold;">desktop</span>. </p>
- 
-<p>The
-workspace&nbsp; is responsible for (1) maintaining a list of
-components, (2) a list of couplings and a coupling manager for managing
-interactions between componetns, (3) an updator for managing simulation
-update.<br>
-<br>
-Most windows in Simbrain and workspace components, which are wrappers
-around other objects, which are designed to exist in a workspace.
-Couplings tie these components together via attributes.&nbsp;&nbsp; For
-example, a simulation might involve coupling neurons whose neurons are
-producers to a bar chart whose bars are consumers (to see this, try bar
-chart test in the script menu).<br>
- </p>
-<br>
-<p><img src="../Images/WorkspaceLarge.png" height="370" width="600"></p>
- <h2 class="heading"> Components [move this]<br>
- </h2>
-<p><br>
+these interactions.&nbsp;&nbsp; More specifically, the
+workspace&nbsp; is responsible for:<br>
 </p>
-<p>Adding components: To add components press the relevant button on the toolbar, or use the Insert menu.</p>
-
-<p>Saving / Opening: Use the save, open buttons and the File menu. </p>
-<p>All open components are shown in the  Components tab of the bottom information pane. </p><h2 class="heading">Running a simulation [move this]<br>
- </h2>
- <p>&nbsp;</p>
- <p>Press the iterate and play buttons in the main toolbar. </p>
- <p>In
-a terminal component, or in the terminal tab of the bottom information
-pane, use workspace.iterate(N), where N is the number of iterations to
-iterate. <br>
-</p><span class="heading">Overview</span><br>
-<br>
-The main things you need to do to make a simulation are:<br>
-<br>
-<div style="margin-left: 40px;">1) Add components<br>
-- Use the buttons<br>
-- Add from a script<br>
-<br>
-2) Connect together components<br>
-- Use the coupling manager<br>
-- Use the menus (single or group)<br>
-- Make them in a program script (and then, for GUI, save)<br>
-<br>
-3) Run the simulation<br>
-- Use the built in method (buffering based)<br>
-- Create your own update method</div>
-<p><br>
-<br>
-<br>
+<p style="margin-left: 40px;">(1) Maintaining a list of
+<a href="Workspace/Components.html">components</a> (neural networks, virtual worlds, data tables, plots, etc.)<br>
+(2) Maintining a list of <a href="Workspace/Couplings.html">couplings</a>,
+which are links between components (e.g.&nbsp; from a neural network to
+a time-series plot of the activation of some nodes in that network).<br>
+(3) Managing simulation <a href="Workspace/Update.html">updates</a>. Sometimes custom updating is needed, and the workspace has different methods for achieving thi.<br>
+</p>
+<p>The workspace is visible in the GUI as the
+Simbrain <span style="font-weight: bold;">desktop</span> (a screenshot is below). The desktop contains menus, a toolbar,
+and a main space in which all components are shown. &nbsp; There is
+also a set of tabs at the bottom of the network which allow the user to
+view couplings, set certain properties of components, and monitor a
+simulation in other ways.
+</p>
+<p>Workspaces are stored as .zip files.&nbsp; These files contain .xml
+representations of all components and couplings in a simulation (and
+some other information as well)&nbsp; They can be unzipped, and
+individual saved
+component and coupling descriptions can be inspected (Note that
+you cannot currently change the files, rezip, and re-open).<br>
 </p>
 
+<br>
+<p style="text-align: center;"><img src="../Images/WorkspaceLarge.png" height="370" width="600"></p>
+<br>
+<br>
+<p><br>
+<br>
+</p>
 <span style="font-weight: bold;">
 </span>
-
 <p><span style="font-weight: bold;"><br>
 </span></p>
-
-
 </div>
+
 </body></html>

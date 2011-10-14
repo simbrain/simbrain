@@ -1,14 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
+<html><head><title>Simbrain Documentation</title>
+
+
   
 
   
   
-  <title>Simbrain Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
   
-  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head>
-<body>
+  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html">
 <div class="logo">
 <p><span></span></p>
@@ -21,7 +22,8 @@
 <h1>ToolbarS</h1>
 <p>This toolbar offers high level manipulation and statistics on the networks in the workspace.<br>
 </p>
-<p><span class="heading"><br>Data IO Toolbar</span></p>
+<p><span class="heading">Data IO Toolbar</span></p>
+
 <p>The data IO toolbar allows the user to save or load the state of the workspace.<br>
 </p>
 
@@ -37,7 +39,7 @@
       <td width="94%"> Save: when clicked will bring up a file chooser allowing the user to save the current workspace. <br> </td>
     </tr>
 
-</table>
+</tbody></table>
 
 <p><span class="heading"><br>Global Network Update Toolbar</span></p>
 <p>The global iteration toolbar holds options allowing the user to update all the networks in the workspace simultaneously.<br>
@@ -45,13 +47,16 @@
 
 <table style="margin-left: 40px;" border="0">
 
-    <tr>
+    <tbody><tr>
       <td><img src="../../Images/Step.gif" height="18" width="18"></td>
       <td width="94%"> Global step update algorithm: One click will update every network in the workspace by one timestep.</td>
     </tr>
     <tr>
       <td><img src="../../Images/Play.gif" height="18" width="18"></td>
-      <td> Global iteration update algorithm: One click will continue to updating every network in the workspace iteratively until clicked again. Note that the image on the button becomes that of a "stop" button <img style="width: 18px; height: 18px;" alt="Stop" src="../../Images/Stop.png">. Pressing this
+      <td>
+Global iteration update algorithm: One click will continue to updating
+every network in the workspace iteratively until clicked again. Note
+that the image on the button becomes that of a "stop" button <img style="width: 18px; height: 18px;" alt="Stop" src="../../Images/Stop.png">. Pressing this
 button will stop the network. Thus the play/stop button acts as a
 toggle switch.</td>
     </tr>
@@ -67,41 +72,63 @@ toggle switch.</td>
   <tbody>
     <tr>
       <td><img src="../../Images/Coupling.png" height="18" width="18"></td>
-      <td width="94%">Coupling manager: clicking this icon will bring up the coupling manager, allowing the user to send information between different objects
+      <td width="94%">Coupling
+manager: clicking this icon will bring up the coupling manager,
+allowing the user to send information between different objects
 in Simbrain. For more information see: <a href="./Couplings.html">Couplings</a> </td>
     </tr>
     <tr>
-  </tbody>
+  </tr></tbody>
 </table>
 <p><span class="heading"><br>Network, Statistic, and Training Toolbar</span>&nbsp;<br>
 </p>
-<p>This toolbar allows the user to create networks, worlds, organize statistical charts for network data, train networks and access the console.<br>
+<p>This toolbar allows the user to create networks, worlds, organize
+statistical charts for network data, train networks and access the
+console.<br>
 
 </p>
 <table style="margin-left: 40px;" border="0">
   <tbody>
     <tr>
       <td><img src="../../Images/Network.png" height="18" width="18"></td>
-     <td width="94%">The <a href="../Network.html">Network</a> creator: clicking this button will open a network window in the workspace. From the network window the user can construct any number of networks available within Simbrain.</td>
+     <td width="94%">The <a href="../Network.html">Network</a>
+creator: clicking this button will open a network window in the
+workspace. From the network window the user can construct any number of
+networks available within Simbrain.</td>
     </tr>
     <tr>
       <td><img src="../../Images/World.png" height="18" width="18"></td>
-      <td> The <a href="../World.html">World</a> button, when clicked displays a menu of the different kinds of worlds available in Simbrain. Worlds exist as a sort of virtual place where neural networks in Simbrain can both acquire input and in some cases effect their environment with their output. </td>
+      <td> The <a href="../World.html">World</a>
+button, when clicked displays a menu of the different kinds of worlds
+available in Simbrain. Worlds exist as a sort of virtual place where
+neural networks in Simbrain can both acquire input and in some cases
+effect their environment with their output. </td>
     </tr>
     <tr>
       <td><img src="../../Images/BarChart.png" height="18" width="18"></td>
-      <td>The statistics button brings up a list of statistical visuals, which can be coupled to various aspects of Simbrain's neural networks.</td>
+      <td>The
+statistics button brings up a list of statistical visuals, which can be
+coupled to various aspects of Simbrain's neural networks.</td>
     </tr>
-    <tr>
-      <td><img src="../../Images/Trainer.png" height="18" width="18"></td>
-      <td>Opens the trainer window allowing the user to train the network. (Depricated?) </td>
-    </tr>
+    
 	<tr>
       <td><img src="../../Images/Terminal.png" height="18" width="18"></td>
       <td>The console button allows the user command line level access to Simbrain's features. </td>
     </tr>
   </tbody>
 </table>
+<p><span class="heading"><br>
+</span></p>
+<p><span class="heading">Iteration Display<br>
+</span></p>
+
+<p>To the right of all toolbars is a display of the current iteration
+number.&nbsp; It can be reset to zero by double clicking on it.<br>
+</p>
+
+<p><span class="heading"><br>
+</span></p>
+
 </div>
 
 </body></html>

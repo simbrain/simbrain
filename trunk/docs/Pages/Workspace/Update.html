@@ -6,6 +6,7 @@
 
 
 
+
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html"><div class="logo">
@@ -17,10 +18,21 @@
   </div>
   <p>
   </p><h1>Update</h1><br>
+<p><span class="heading">Running a simulation</span><br>
+<br>
+Press the iterate and play buttons in the main toolbar. [TODO: Insert pictures of buttons]<br>
+<br>
+In a terminal component, or in the terminal tab of the bottom
+information pane, use workspace.iterate(N), where N is the number of
+iterations to iterate. <br>
+</p>
+<p><span class="heading2">Update Types</span><br>
+</p>
 <p>Simbrain update is complex.&nbsp; Under the hood, there is an
 updator that manages workspace updates.&nbsp; The updator allows you to
 configure the system in various ways, and automatically takes advantage
 of multiple processors. </p>
+
 
 <p>The default update updates each component, then couplings.&nbsp; This in turn can happen in several ways.</p>
 

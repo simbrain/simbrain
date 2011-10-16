@@ -31,7 +31,7 @@ public class NeuronLayer extends NeuronGroup {
 
     /** Enumeration of layer types. */
     public enum LayerType {
-        Input, Hidden, Output, Context
+        Input, Hidden, Output, Context, Reservoir
     }
 
     /** The type of this layer: input, hidden, or outout. */

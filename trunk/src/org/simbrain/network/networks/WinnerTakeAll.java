@@ -85,7 +85,8 @@ public class WinnerTakeAll extends Network {
         super();
         setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new Neuron(this, new LinearNeuron())); //TODO: Prevent invalid states like this?
+          //TODO: Prevent invalid states like this?
+          this.addNeuron(new Neuron(this, new LinearNeuron()));
         }
         layout.layoutNeurons(this);
     }
@@ -103,7 +104,7 @@ public class WinnerTakeAll extends Network {
         int winnerIndex;
         if (useRandom) {
             if (Math.random() < randomProb) {
-                winnerIndex = new Random().nextInt(getNeuronList().size());
+                winnerIndex = getRandomWinnerIndex();
             } else {
                 winnerIndex = getWinningIndex();
             }
@@ -122,6 +123,16 @@ public class WinnerTakeAll extends Network {
     }
 
     /**
+     *
+     * Returns index of random winning neuron.
+     *
+     * @return index of random winner
+     */
+    private int getRandomWinnerIndex() {
+        return new Random().nextInt(getNeuronList().size());
+    }
+
+    /**
      * Returns the index of the input node with the greatest net input.
      *
      * @return winning node's index
@@ -129,12 +140,24 @@ public class WinnerTakeAll extends Network {
     private int getWinningIndex() {
         int winnerIndex = 0;
         double max = Double.NEGATIVE_INFINITY;
+        double lastVal  =  getNeuronList().get(0).getWeightedInputs();
+        boolean tie = true;
         for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = (Neuron) getNeuronList().get(i);
-            if (n.getWeightedInputs() > max) {
+            Neuron n = getNeuronList().get(i);
+            double val = n.getWeightedInputs();
+            if (val != lastVal) {
+                tie = false;
+            }
+            lastVal = val;
+            if (val > max) {
                 winnerIndex = i;
                 max = n.getWeightedInputs();
             }
+        }
+        // Break ties randomly
+        // (TODO: Add a field so use can decide if they want this)
+        if (tie) {
+            winnerIndex = getRandomWinnerIndex();
         }
         return winnerIndex;
     }

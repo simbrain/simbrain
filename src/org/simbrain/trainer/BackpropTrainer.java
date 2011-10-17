@@ -74,6 +74,9 @@ public class BackpropTrainer extends Trainer {
     /** Internal representation of network. */
     private List<NeuronGroup> layers;
 
+    /** A switch representing whether or not momentum is being used */
+    private boolean momentum;
+    
     /**
      * Initialize without a network. A call to setNetwork and init() must occur
      * before the trainer can be used.
@@ -153,18 +156,7 @@ public class BackpropTrainer extends Trainer {
      * TODO: Confusing code. Improve.
      */
     public void updateNetwork() {
-        // Update beginning with the first hidden layer.
-        for (int i = layers.size() - 2; i >= 0; i--) {
-            //int j = 0; System.out.println("\nUpdating group: " + layers.get(i).getName()
-            //        + " iteration: " + j++);
-            NeuronGroup currentLayer = layers.get(i);
-            for (Neuron neuron : currentLayer.getNeuronList()) {
-                neuron.update();
-                neuron.setActivation(neuron.getBuffer());
-                //  TODO: Make a better method.  "forceUpdate" or something.
-                //System.out.println(neuron.getId() + ":" + neuron.getActivation());
-            }
-        }
+        
     }
 
     @Override
@@ -455,6 +447,14 @@ public class BackpropTrainer extends Trainer {
      */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
+    }
+
+    public void setMomentum(boolean momentum) {
+        this.momentum = momentum;
+    }
+
+    public boolean hasMomentum() {
+        return momentum;
     }
 
 }

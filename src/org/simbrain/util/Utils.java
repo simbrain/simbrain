@@ -75,7 +75,8 @@ public class Utils {
 
         try {
             // # is a comment delimeter in net files
-            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
+            theParser = new CSVParser(new FileInputStream(theFile), "", "",
+                    "#");
             stringMatrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n"

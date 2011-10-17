@@ -119,7 +119,6 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
 
         double val = neuron.getWeightedInputs() + bias;
 
-        // TANH not currently used because identical to SIGM
         switch(type) {
         case TANH:
             val = tanh(val, neuron);
@@ -177,7 +176,7 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
     private double tanh(final double input, Neuron neuron) {
         double upperBound = neuron.getUpperBound();
         double lowerBound = neuron.getLowerBound();
-        return (upperBound - lowerBound) * Math.tanh(input) + lowerBound;
+        return (((upperBound - lowerBound) * (0.5 * Math.tanh(input) + 0.5)) + (lowerBound));
     }
 
     /**
@@ -190,8 +189,8 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
     private double invTanh(final double input, Neuron neuron) {
         double upperBound = neuron.getUpperBound();
         double lowerBound = neuron.getLowerBound();
-        double z = (input - lowerBound) / (upperBound - lowerBound);
-        return 0.5 * (Math.log((1 + z)) / (1 - z));
+        double z = 0.5 * (((input - lowerBound) / (upperBound - lowerBound)) - 0.5);
+        return (Math.log((1 + z)) / (1 - z));
     }
 
     /**

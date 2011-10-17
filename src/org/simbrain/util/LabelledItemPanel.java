@@ -28,7 +28,8 @@ import javax.swing.JPanel;
 
 
 /**
- * <b>LabelledItemPanel</b> provides a panel for laying out labelled elements neatly with all the labels and elements
+ * <b>LabelledItemPanel</b> provides a panel for laying out labeled elements
+ * neatly with all the labels and elements
  * aligned down the screen.
  *
  * @author David Fraser
@@ -68,7 +69,8 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * This method adds a labelled item to the panel. The item is added to the row below the last item added.
+     * This method adds a labelled item to the panel. The item is added to the
+     * row below the last item added.
      *
      * @param labelText The label text for the item.
      * @param item The item to be added.
@@ -101,15 +103,16 @@ public class LabelledItemPanel extends JPanel {
 
         myNextItemRow++;
     }
-    
-	/**
+
+    /**
 	 * Adds a labeled item to the panel on the current myNextItemRow, at the
 	 * specified column
 	 * @param labelText The label text for the item.
 	 * @param item The item to be added.
-	 * @param col desired grid bag layour column
+	 * @param col desired grid bag layor column
 	 */
-    public void addItem(final String labelText, final JComponent item, int col) {
+    public void addItem(final String labelText, final JComponent item,
+            int col) {
         // Create the label and its constraints
         JLabel label = new JLabel(labelText);
 

@@ -21,7 +21,7 @@ import org.simbrain.workspace.*;
 	workspace.addWorkspaceComponent(networkComponent);
 	RootNetwork network = networkComponent.getRootNetwork();
 	GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
-	layout.setInitialLocation(new Point(10, 10));
+	//layout.setInitialLocation(new Point(10, 10));
 	for (int i = 0; i < NUM_NEURONS; i++) {
 	    Neuron neuron = new Neuron(network, "IntegrateAndFireNeuron");
 	    ((IntegrateAndFireNeuron)neuron.getUpdateRule()).setTimeConstant(.1);

@@ -163,11 +163,11 @@ public class ESNCreationDialog extends StandardDialog {
         sectionSeparator("Network Parameters", gbc, 1);
 
         //Add text-fields
-        esnPanel.addItem("Number of inputs nodes:", tfNumInputs);
+        esnPanel.addItem("Input Nodes:", tfNumInputs);
         esnPanel.addItem("Reservoir Neuron Type:", reservoirNeuronTypes, 2);
-        esnPanel.addItem("Number of res nodes:", tfNumReservoir);
+        esnPanel.addItem("Reservoir Nodes:", tfNumReservoir);
         esnPanel.addItem("Output Neuron Type:", outputNeuronTypes, 2);
-        esnPanel.addItem("Number of output nodes:", tfNumOutputs);
+        esnPanel.addItem("Output Nodes:", tfNumOutputs);
 
         //GridBagConstraints for next section
         int row = esnPanel.getMyNextItemRow();
@@ -370,8 +370,8 @@ public class ESNCreationDialog extends StandardDialog {
             panel.repaint();
 
             int dialogOpts = JOptionPane.showConfirmDialog(new JPanel(),
-                    "\nNetwork Construction Complete. \n\nBegin training "
-                    + "procedure? \n(Warning: This may a while)");
+                    "Network Construction Complete. \nBegin training "
+                    + "procedure?\n(Warning: This may a while)\n");
 
             if (dialogOpts == JOptionPane.YES_OPTION) {
                 builder.train(inputData, teacherData);

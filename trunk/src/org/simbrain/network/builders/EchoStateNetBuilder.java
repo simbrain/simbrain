@@ -32,6 +32,7 @@ import org.simbrain.network.interfaces.CustomUpdateRule;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -120,6 +121,35 @@ public final class EchoStateNetBuilder {
     /** space between neurons within layers */
     private int betweenNeuronInterval = DEFAULT_NEURON_INTERVAL;
 
+    /** Updates ESN by layer */
+    private CustomUpdateRule update = new CustomUpdateRule() {
+
+        @Override
+        public void update(RootNetwork network) {
+            for (Neuron n : inputLayer) {
+                n.update();
+            }
+            for (Neuron n : inputLayer) {
+                n.setActivation(n.getBuffer());
+            }
+
+            for (Neuron n : reservoirLayer) {
+                n.update();
+            }
+            for (Neuron n : reservoirLayer) {
+                n.setActivation(n.getBuffer());
+            }
+
+            for (Neuron n : outputLayer) {
+                n.update();
+            }
+            for (Neuron n : outputLayer) {
+                n.setActivation(n.getBuffer());
+            }
+        }
+
+    };
+
     /**
      * Default Constructor, all values are assumed default.
      * @param network
@@ -159,6 +189,9 @@ public final class EchoStateNetBuilder {
                 LayerType.Reservoir, numReservoirNodes);
         initializeLayer(outputLayer, outputNeuronType,
                 LayerType.Output, numOutputNodes);
+
+        network.setUpdateMethod(UpdateMethod.CUSTOM);
+        network.setCustomUpdateRule(update);
 
         LineLayout layerLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);
@@ -211,6 +244,7 @@ public final class EchoStateNetBuilder {
         for (int i = 0; i < nodes; i++) {
             Neuron node = new Neuron(network, nodeType);
             network.addNeuron(node);
+            
             node.setIncrement(1); //TODO: Reasonable?
             layer.add(node);
         }

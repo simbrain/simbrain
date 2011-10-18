@@ -81,7 +81,7 @@ public class HopfieldPropertiesDialog extends StandardDialog {
     /**
      * @return the update order.
      */
-    public int getType() {
+    public int getUpdateType() {
         if (cbUpdateOrder.getSelectedIndex() == 0) {
             return SEQUENTIAL;
         } else {

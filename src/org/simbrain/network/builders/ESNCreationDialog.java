@@ -232,7 +232,6 @@ public class ESNCreationDialog extends StandardDialog {
 
         noise.addActionListener(new ActionListener(){
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 if (noise.isSelected()) {
                     noiseMax.setEnabled(true);

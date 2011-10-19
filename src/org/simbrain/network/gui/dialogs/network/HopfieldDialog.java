@@ -134,14 +134,4 @@ public class HopfieldDialog extends StandardDialog {
         numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
     }
 
-    /**
-     * @return the update order.
-     */
-    public int getType() {
-        if (cbUpdateOrder.getSelectedIndex() == 0) {
-            return SEQUENTIAL;
-        } else {
-            return RANDOM;
-        }
-    }
 }

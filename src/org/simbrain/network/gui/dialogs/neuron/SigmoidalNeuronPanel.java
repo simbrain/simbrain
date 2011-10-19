@@ -41,7 +41,7 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 
     /** Implementation combo box. */
     private JComboBox cbImplementation = new JComboBox(new SigmoidType[] {
-            SigmoidType.ARCTAN, SigmoidType.BARE, SigmoidType.LOGISTIC,
+            SigmoidType.ARCTAN, SigmoidType.LOGISTIC,
             SigmoidType.TANH });
 
     /** Bias field. */

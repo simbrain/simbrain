@@ -80,8 +80,6 @@ import org.simbrain.plot.scatterplot.ScatterPlotGui;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.trainer.TrainerComponent;
-import org.simbrain.trainer.TrainerDesktopComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.ToggleButton;
@@ -357,7 +355,6 @@ public class SimbrainDesktop {
         registerComponent(ReaderComponent.class, ReaderComponentDesktopGui.class);
         registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
         registerComponent(ThreeDeeComponent.class, MainConsole.class);
-        registerComponent(TrainerComponent.class, TrainerDesktopComponent.class);
         registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
         registerComponent(GameComponent.class, GameDesktopComponent.class);
@@ -491,7 +488,6 @@ public class SimbrainDesktop {
         });
         button.setComponentPopupMenu(gaugeMenu);
         bar.add(button);
-        bar.add(actionManager.getNewTrainerAction());
         bar.add(actionManager.getNewConsoleAction());
 
         // Initialize time label
@@ -591,7 +587,6 @@ public class SimbrainDesktop {
         JMenu insertMenu = new JMenu("Insert");
         insertMenu.add(actionManager.getNewNetworkAction());
         //insertMenu.add(new OpenEditorAction(this)); //TODO: Move this action manager
-        insertMenu.add(actionManager.getNewTrainerAction());
         JMenu newGaugeSubMenu = new JMenu("New Plot");
         for (Action action : actionManager.getPlotActions()) {
             newGaugeSubMenu.add(action);

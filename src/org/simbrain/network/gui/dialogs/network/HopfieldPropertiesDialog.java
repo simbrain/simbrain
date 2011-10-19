@@ -74,7 +74,7 @@ public class HopfieldPropertiesDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        hop.setUpdateOrder(getType());
+        hop.setUpdateOrder(getUpdateType());
         super.closeDialogOk();
     }
 

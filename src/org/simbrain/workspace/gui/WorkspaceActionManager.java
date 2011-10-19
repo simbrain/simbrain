@@ -44,7 +44,6 @@ import org.simbrain.workspace.actions.NewOdorWorldAction;
 import org.simbrain.workspace.actions.NewOscWorldAction;
 import org.simbrain.workspace.actions.NewReaderWorldAction;
 import org.simbrain.workspace.actions.NewThreeDeeWorldAction;
-import org.simbrain.workspace.actions.NewTrainerAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
 import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
@@ -187,9 +186,6 @@ public class WorkspaceActionManager {
     /** Show hide property tab. */
     private final Action propertyTabAction;
 
-    /** Add trainer action. */
-    private Action newTrainerAction;
-
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
@@ -231,8 +227,6 @@ public class WorkspaceActionManager {
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
-
-        newTrainerAction = new NewTrainerAction(workspace);
 
         workspaceHelpAction = new WorkspaceHelpAction();
 
@@ -559,10 +553,4 @@ public class WorkspaceActionManager {
         return showPropertyDialogAction;
     }
 
-    /**
-     * @return new trainer action
-     */
-    public Action getNewTrainerAction() {
-        return newTrainerAction;
-    }
 }

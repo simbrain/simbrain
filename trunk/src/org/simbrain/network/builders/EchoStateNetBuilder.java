@@ -121,11 +121,9 @@ public final class EchoStateNetBuilder {
     /** space between neurons within layers */
     private int betweenNeuronInterval = DEFAULT_NEURON_INTERVAL;
 
-<<<<<<< .mine
     /** Updates ESN by layer */
     private CustomUpdateRule update = new CustomUpdateRule() {
 
-        @Override
         public void update(RootNetwork network) {
             for (Neuron n : inputLayer) {
                 n.update();
@@ -157,37 +155,6 @@ public final class EchoStateNetBuilder {
     
     private double noiseMin;
     
-=======
-    /** Updates ESN by layer */
-    private CustomUpdateRule update = new CustomUpdateRule() {
-
-        @Override
-        public void update(RootNetwork network) {
-            for (Neuron n : inputLayer) {
-                n.update();
-            }
-            for (Neuron n : inputLayer) {
-                n.setActivation(n.getBuffer());
-            }
-
-            for (Neuron n : reservoirLayer) {
-                n.update();
-            }
-            for (Neuron n : reservoirLayer) {
-                n.setActivation(n.getBuffer());
-            }
-
-            for (Neuron n : outputLayer) {
-                n.update();
-            }
-            for (Neuron n : outputLayer) {
-                n.setActivation(n.getBuffer());
-            }
-        }
-
-    };
-
->>>>>>> .r2437
     /**
      * Default Constructor, all values are assumed default.
      * @param network

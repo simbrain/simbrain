@@ -55,14 +55,10 @@ public class Neuron  {
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
-	
     private NeuronUpdateRule updateRule;
 
     /** A unique id for this neuron. */
     private String id = null;
-    
-    /** An index number for this neuron. */
-    private int index;
 
     /** An optional String description associated with this neuron. */
     private String label = "";
@@ -872,12 +868,4 @@ public class Neuron  {
     public static ClassDescriptionPair[] getRuleList() {
         return RULE_LIST;
     }
-
-	public void setIndex(int index) {
-		this.index = index;
-	}
-
-	public int getIndex() {
-		return index;
-	}
 }

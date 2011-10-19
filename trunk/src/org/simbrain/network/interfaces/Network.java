@@ -21,7 +21,6 @@ package org.simbrain.network.interfaces;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import Jama.*;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.networks.Competitive;
@@ -369,7 +368,6 @@ public abstract class Network {
     public void addNeuron(final Neuron neuron) {
         //TODO: Exception if neuron.getParentNetwork != this.
         neuronList.add(neuron);
-        neuron.setIndex(neuronList.indexOf(neuron));
         if ((rootNetwork != null)) {
             neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
             rootNetwork.updatePriorityList();
@@ -1083,8 +1081,6 @@ public abstract class Network {
     public void setRootNetwork(final RootNetwork rootNetwork) {
         this.rootNetwork = rootNetwork;
     }
-    
-  
 
     /**
      * Convenience method for asynchronously updating a set of neurons, by

@@ -1,4 +1,4 @@
-package org.simbrain.trainer;
+package org.simbrain.network.trainers;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,7 +16,7 @@ import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
-import org.simbrain.trainer.LMSOffline.SolutionType;
+import org.simbrain.network.trainers.LMSOffline.SolutionType;
 
 public class ReservoirComputingUtils {
     // TODO: These methods may not work if more complex network updating is
@@ -356,14 +356,12 @@ public class ReservoirComputingUtils {
 
         // Initialize the trainer (comment / uncomment below for different
         // configurations)
-        LMSOffline trainer = new LMSOffline(network);
+        LMSOffline trainer = new LMSOffline(network, inputLayer, outputLayer);
         // LMSTrainer trainer = new LMSTrainer(network);
         trainer.setInputData(inputData);
         trainer.setTrainingData(trainingData);
-        trainer.setInputLayer(inputLayer);
-        trainer.setOutputLayer(outputLayer);
         trainer.setSolutionType(SolutionType.MOORE_PENROSE);
-        trainer.train(1);
+        trainer.apply();
         // trainer.train(1000);
         return network;
     }

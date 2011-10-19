@@ -41,9 +41,9 @@ import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 import org.simbrain.network.util.SimnetUtils;
-import org.simbrain.trainer.LMSOffline;
-import org.simbrain.trainer.ReservoirComputingUtils;
-import org.simbrain.trainer.LMSOffline.SolutionType;
+import org.simbrain.network.trainers.LMSOffline;
+import org.simbrain.network.trainers.ReservoirComputingUtils;
+import org.simbrain.network.trainers.LMSOffline.SolutionType;
 
 /**
  * Builds an Echo-State Network with options for all valid weight
@@ -337,13 +337,11 @@ public final class EchoStateNetBuilder {
             }
         }
 
-        LMSOffline trainer = new LMSOffline(network);
+        LMSOffline trainer = new LMSOffline(network, full, getOutputLayer());
         trainer.setInputData(mainInputData);
         trainer.setTrainingData(trainingData);
-        trainer.setInputLayer(full);
-        trainer.setOutputLayer(getOutputLayer());
         trainer.setSolutionType(solType);
-        trainer.train(1);
+        trainer.apply();
 
     }
 

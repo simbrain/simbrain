@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.trainer.LMSOffline.SolutionType;
+import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;

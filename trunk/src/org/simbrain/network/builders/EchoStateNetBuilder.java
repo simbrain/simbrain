@@ -121,6 +121,7 @@ public final class EchoStateNetBuilder {
     /** space between neurons within layers */
     private int betweenNeuronInterval = DEFAULT_NEURON_INTERVAL;
 
+<<<<<<< .mine
     /** Updates ESN by layer */
     private CustomUpdateRule update = new CustomUpdateRule() {
 
@@ -150,6 +151,43 @@ public final class EchoStateNetBuilder {
 
     };
 
+    private boolean noise;
+    
+    private double noiseMax;
+    
+    private double noiseMin;
+    
+=======
+    /** Updates ESN by layer */
+    private CustomUpdateRule update = new CustomUpdateRule() {
+
+        @Override
+        public void update(RootNetwork network) {
+            for (Neuron n : inputLayer) {
+                n.update();
+            }
+            for (Neuron n : inputLayer) {
+                n.setActivation(n.getBuffer());
+            }
+
+            for (Neuron n : reservoirLayer) {
+                n.update();
+            }
+            for (Neuron n : reservoirLayer) {
+                n.setActivation(n.getBuffer());
+            }
+
+            for (Neuron n : outputLayer) {
+                n.update();
+            }
+            for (Neuron n : outputLayer) {
+                n.setActivation(n.getBuffer());
+            }
+        }
+
+    };
+
+>>>>>>> .r2437
     /**
      * Default Constructor, all values are assumed default.
      * @param network
@@ -279,6 +317,13 @@ public final class EchoStateNetBuilder {
             double[][] trainingData) {
 
         // Generate the reservoir data to be used in training
+        ReservoirComputingUtils.setNoise(noise);
+
+        if (noise) {
+            ReservoirComputingUtils.setNoiseMax(noiseMax);
+            ReservoirComputingUtils.setNoiseMin(noiseMin);
+        }
+
         double[][] mainInputData = ReservoirComputingUtils.generateData(
                 this, inputData, trainingData);
 
@@ -487,6 +532,30 @@ public final class EchoStateNetBuilder {
 
     public static int getDEFAULT_NEURON_INTERVAL() {
         return DEFAULT_NEURON_INTERVAL;
+    }
+
+    public void setNoise(boolean noise) {
+        this.noise = noise;
+    }
+
+    public boolean hasNoise() {
+        return noise;
+    }
+
+    public void setNoiseMax(double noiseMax) {
+        this.noiseMax = noiseMax;
+    }
+
+    public double getNoiseMax() {
+        return noiseMax;
+    }
+
+    public void setNoiseMin(double noiseMin) {
+        this.noiseMin = noiseMin;
+    }
+
+    public double getNoiseMin() {
+        return noiseMin;
     }
 
     /*

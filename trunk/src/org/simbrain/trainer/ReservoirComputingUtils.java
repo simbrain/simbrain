@@ -24,6 +24,11 @@ public class ReservoirComputingUtils {
     // TODO: Functions for setting trained ESN weights may not function
     // properly for recurrent output weights
     
+    
+    private static boolean noise;
+    private static double noiseMax;
+    private static double noiseMin;
+    
     /**
      * Create data to be used in training a reservoir based network, as follows:
      * 1) Iterate through each row of the input data and use it to set the input
@@ -197,9 +202,17 @@ public class ReservoirComputingUtils {
             }
 
             //Update the reservoir: handles teacher-forced back-weights
-            esn.getRootNetwork().updateNeurons(esn.getReservoirLayer());
-            for (Neuron neuron : esn.getReservoirLayer()) {
-                returnMatrix[row][col] = neuron.getActivation();
+            for (Neuron n : esn.getReservoirLayer()) {
+                n.update();
+            }
+            for (Neuron n : esn.getReservoirLayer()) {
+                double val = n.getBuffer();
+                if (noise) {
+                    n.setActivation(val + reservoirNoise());
+                } else {
+                    n.setActivation(val);
+                }
+                returnMatrix[row][col] = n.getActivation();
                 col++;
             }
 
@@ -215,6 +228,14 @@ public class ReservoirComputingUtils {
         }
 
         return returnMatrix;
+    }
+
+    /**
+     *  Adds noise to the reservoir's part of the state matrix.
+     * @return noise
+     */
+    public static double reservoirNoise(){
+        return (noiseMax - noiseMin) * Math.random() + noiseMin;
     }
 
     /**
@@ -238,6 +259,7 @@ public class ReservoirComputingUtils {
         }
 
     }
+
 
     /**
      * Train a simple reservoir network using the data generator and LMSOffline.
@@ -344,6 +366,30 @@ public class ReservoirComputingUtils {
         trainer.train(1);
         // trainer.train(1000);
         return network;
+    }
+
+    public static void setNoise(boolean addNoise) {
+        ReservoirComputingUtils.noise = addNoise;
+    }
+
+    public static boolean hasNoise() {
+        return noise;
+    }
+
+    public static void setNoiseMax(double noise) {
+        ReservoirComputingUtils.noiseMax = noise;
+    }
+
+    public static double getNoiseMax() {
+        return noiseMax;
+    }
+
+    public static void setNoiseMin(double noiseMin) {
+        ReservoirComputingUtils.noiseMin = noiseMin;
+    }
+
+    public static double getNoiseMin() {
+        return noiseMin;
     }
 
    

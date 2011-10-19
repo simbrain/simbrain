@@ -79,6 +79,10 @@ public class ESNCreationDialog extends StandardDialog {
      * reservoir*/
     private JTextField backSparsity = new JTextField();
 
+    private JTextField noiseMax = new JTextField();
+    
+    private JTextField noiseMin = new JTextField();
+    
     /** A check-box which determines whether or not this ESN will have recurrent
      * output weights*/
     private JCheckBox recurrentOutputWeights = new JCheckBox();
@@ -91,6 +95,8 @@ public class ESNCreationDialog extends StandardDialog {
     /** A check-box which destermines whether or not this ESN will have weights
      * directly from input to output*/
     private JCheckBox directInOutWeights = new JCheckBox();
+    
+    private JCheckBox noise = new JCheckBox();
 
     /**Maps string values to corresponding NeuronUpdateRules for the
      * combo-boxes governing desired Neuron type for a given layer
@@ -224,9 +230,29 @@ public class ESNCreationDialog extends StandardDialog {
         inputDataButton.setText("...");
         teacherDataButton.setText("...");
 
+        noise.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (noise.isSelected()) {
+                    noiseMax.setEnabled(true);
+                    noiseMin.setEnabled(true);
+                } else {
+                    noiseMax.setEnabled(false);
+                    noiseMin.setEnabled(false);
+                }
+            }
+
+        }); {
+
+        }
+
         esnPanel.addItem("Regression Type: ", linearRegressionSol, 2);
         esnPanel.addItem("Input Data: ", inputDataButton);
+        esnPanel.addItem("Maximum Noise: ", noiseMax, 2);
         esnPanel.addItem("Teacher Data:", teacherDataButton);
+        esnPanel.addItem("Minimum Noise: ", noiseMin, 2);
+        esnPanel.addItem("Noise: ", noise);
 
         setContentPane(esnPanel);
         fillFieldValues();
@@ -362,6 +388,12 @@ public class ESNCreationDialog extends StandardDialog {
                 builder.setSolType(SolutionType.WIENER_HOPF);
             } else {
                 builder.setSolType(SolutionType.MOORE_PENROSE);
+            }
+            
+            if(noise.isSelected()){
+                builder.setNoise(true);
+                builder.setNoiseMax(Double.parseDouble(noiseMax.getText()));
+                builder.setNoiseMin(Double.parseDouble(noiseMin.getText()));
             }
 
             //Build network

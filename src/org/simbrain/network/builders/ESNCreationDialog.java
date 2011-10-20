@@ -388,8 +388,8 @@ public class ESNCreationDialog extends StandardDialog {
             } else {
                 builder.setSolType(SolutionType.MOORE_PENROSE);
             }
-            
-            if(noise.isSelected()){
+
+            if (noise.isSelected()) {
                 builder.setNoise(true);
                 builder.setNoiseMax(Double.parseDouble(noiseMax.getText()));
                 builder.setNoiseMin(Double.parseDouble(noiseMin.getText()));

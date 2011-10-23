@@ -190,7 +190,7 @@ public class ReservoirComputingUtils {
                         if (neuron.getUpdateRule() instanceof SigmoidalNeuron) {
                             clampValue =
                                 ((SigmoidalNeuron) neuron.getUpdateRule()).
-                                    inverse(teacherData[row - 1][count],
+                                    getInverse(teacherData[row - 1][count],
                                             neuron);
                         } else {
                             clampValue = teacherData[row - 1][count];

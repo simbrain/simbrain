@@ -331,7 +331,7 @@ public final class EchoStateNetBuilder {
                 for (int i = 0; i < trainingData.length; i++) {
                     int col = getOutputLayer().indexOf(n);
                     trainingData[i][col] = ((SigmoidalNeuron)
-                            n.getUpdateRule()).inverse(trainingData[i][col],
+                            n.getUpdateRule()).getInverse(trainingData[i][col],
                                     n);
                 }
             }

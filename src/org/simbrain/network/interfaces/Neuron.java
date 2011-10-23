@@ -429,6 +429,9 @@ public class Neuron  {
                 }
             }
         }
+        if (this.getUpdateRule() instanceof BiasedNeuron) {
+            wtdSum += ((BiasedNeuron) this.getUpdateRule()).getBias();
+        }
 
         return wtdSum;
     }

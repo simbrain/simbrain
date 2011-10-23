@@ -19,6 +19,7 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
+import org.simbrain.network.interfaces.Differentiable;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
@@ -28,7 +29,7 @@ import org.simbrain.network.util.RandomSource;
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearNeuron extends NeuronUpdateRule implements BiasedNeuron {
+public class LinearNeuron extends NeuronUpdateRule implements BiasedNeuron, Differentiable {
 
     /** Slope. */
     private double slope = 1;
@@ -77,7 +78,7 @@ public class LinearNeuron extends NeuronUpdateRule implements BiasedNeuron {
      */
     public void update(Neuron neuron) {
         double wtdInput = neuron.getWeightedInputs();
-        double val = slope * (wtdInput + bias);
+        double val = slope * wtdInput;
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
@@ -88,6 +89,19 @@ public class LinearNeuron extends NeuronUpdateRule implements BiasedNeuron {
         }
 
         neuron.setBuffer(val);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public double getDerivative(double val, Neuron neuron) {
+        if (val >= neuron.getUpperBound()) {
+            return 0;
+        } else if (val <= neuron.getLowerBound()) {
+            return 0;
+        } else {
+            return slope;
+        }
     }
 
     /**
@@ -164,4 +178,5 @@ public class LinearNeuron extends NeuronUpdateRule implements BiasedNeuron {
     public String getDescription() {
         return "Linear";
     }
+
 }

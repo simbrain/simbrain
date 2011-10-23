@@ -19,17 +19,24 @@
 package org.simbrain.network.neurons;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
-import org.simbrain.network.interfaces.Inverse;
+import org.simbrain.network.interfaces.Differentiable;
+import org.simbrain.network.interfaces.Invertible;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 /**
- * <b>SigmoidalNeuron</b> provides variuos implementations of a standard
+ * <b>SigmoidalNeuron</b> provides various implementations of a standard
  * sigmoidal neuron.
+ *
+ * @author Scott Hotton
+ * @author Zach Tosi
+ * @author Jeff Yoshimi
+ *
  */
-public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, Inverse {
+public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron,
+        Differentiable, Invertible {
 
     /** Implementations of the Sigmoidal activation function. */
     public static enum SigmoidType {
@@ -40,18 +47,11 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
                 return "Arctan";
             }
         },
-        /** Logistic unscaled. */
-        BARE {
-            @Override
-            public String toString() {
-                return "Logistic (unscaled)";
-            }
-        },
-        /** Logistic scaled. */
+        /** Logistic. */
         LOGISTIC {
             @Override
             public String toString() {
-                return "Logistic (scaled)";
+                return "Logistic";
             }
         },
         /** Tanh. */
@@ -78,9 +78,6 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
     /** Adds noise to neuron. */
     private boolean addNoise = false;
 
-    /** Clipping. */
-    private boolean clipping = false;
-
     /**
      * Default sigmoidal.
      */
@@ -89,7 +86,7 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
     }
 
     /**
-     * Construct a sigmoid update with a specified implementaiton.
+     * Construct a sigmoid update with a specified implementation.
      *
      * @param type the implementation to use.
      */
@@ -117,7 +114,7 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
      */
     public void update(Neuron neuron) {
 
-        double val = neuron.getWeightedInputs() + bias;
+        double val = neuron.getWeightedInputs();
 
         switch(type) {
         case TANH:
@@ -127,10 +124,10 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
             val = atan(val, neuron);
             break;
         case LOGISTIC:
-            val = sigm(val, neuron);
+            val = logistic(val, neuron);
             break;
         default:
-            val = 1 / 1 + Math.exp(-val);
+            val = logistic(val, neuron);
             break;
         }
 
@@ -138,17 +135,45 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping) {
-            val = neuron.clip(val);
-        }
-
         neuron.setBuffer(val);
+    }
+
+    /**
+     * Return the derivative of the activation function.
+     *
+     * @param x value to be passed to the derivative.
+     * @param neuron neuron on which to compute the derivative
+     * @return derivative
+     */
+    public double getDerivative(final double x, final Neuron neuron) {
+        double retVal = 0;
+        double u = neuron.getUpperBound();
+        double l = neuron.getLowerBound();
+        double diff = u - l;
+
+        switch(type) {
+        case TANH:
+            double a = (2 * slope) / diff;
+            retVal = diff / 2 * a * Math.pow(1 / Math.cosh(a * x), 2);
+            break;
+        case ARCTAN:
+            a = (Math.PI * slope) / diff;
+            retVal = a * (diff / Math.PI) * (1 / (1 + Math.pow(a * x, 2)));
+            break;
+        case LOGISTIC:
+            retVal = slope / (Math.exp(slope * x / diff)
+                    * Math.pow(1 / Math.exp(slope * x / diff) + 1, 2));
+            break;
+        default:
+            break;
+        }
+        return retVal;
     }
 
     /**
      * {@inheritDoc}
      */
-    public double inverse(double val, Neuron neuron) {
+    public double getInverse(double val, Neuron neuron) {
         switch(type) {
         case TANH:
             val = invTanh(val, neuron);
@@ -160,11 +185,14 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
             val = invSigm(val, neuron);
             break;
         default:
-            val = -Math.log(1 / val - 1);
+            val = invSigm(val, neuron);
             break;
         }
         return val;
     }
+
+    //TODO Move variables like diff and a to init, and make sure init is called when
+    //  upper bound, lower bound, or slope are changed.
 
     /**
      * Returns the results of the hyperbolic tangent function.
@@ -174,9 +202,11 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
      * @return results of tanh
      */
     private double tanh(final double input, Neuron neuron) {
-        double upperBound = neuron.getUpperBound();
-        double lowerBound = neuron.getLowerBound();
-        return (((upperBound - lowerBound) * (0.5 * Math.tanh(input) + 0.5)) + (lowerBound));
+        double u = neuron.getUpperBound();
+        double l = neuron.getLowerBound();
+        double diff = u - l;
+        double a = (2 * slope) / diff;
+        return (diff / 2) * Math.tanh(a * input) + ((u + l) / 2);
     }
 
     /**
@@ -187,9 +217,9 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
      * @return arctanh
      */
     private double invTanh(final double input, Neuron neuron) {
-        double upperBound = neuron.getUpperBound();
-        double lowerBound = neuron.getLowerBound();
-        double z = 0.5 * (((input - lowerBound) / (upperBound - lowerBound)) - 0.5);
+        double u = neuron.getUpperBound();
+        double l = neuron.getLowerBound();
+        double z = 0.5 * (((input - l) / (u - l)) - 0.5);
         return (Math.log((1 + z)) / (1 - z));
     }
 
@@ -200,12 +230,21 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
      * @param neuron undergoing update
      * @return results of sigm
      */
-    private double sigm(final double input, Neuron neuron) {
-        double upperBound = neuron.getUpperBound();
-        double lowerBound = neuron.getLowerBound();
-        double diff = upperBound - lowerBound;
-        return diff * (1 / (1 + Math.exp(-(slope * input / diff))))
-            + lowerBound;
+    private double logistic(final double input, Neuron neuron) {
+        double u = neuron.getUpperBound();
+        double l = neuron.getLowerBound();
+        double diff = u - l;
+        return diff * logistic(slope * input / diff) + l;
+    }
+
+    /**
+     * Returns the standard logistic.
+     *
+     * @param x input argument
+     * @return result of logistic
+     */
+    private double logistic(double x) {
+        return 1 / (1 + Math.exp(-x));
     }
 
     /**
@@ -230,11 +269,11 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
      * @return results of atan
      */
     private double atan(final double input, Neuron neuron) {
-        double upperBound = neuron.getUpperBound();
-        double lowerBound = neuron.getLowerBound();
-        double a = (Math.PI * slope) / (upperBound - lowerBound);
-        return ((upperBound - lowerBound) / Math.PI) * Math.atan(a * input)
-            + ((upperBound  + lowerBound) / 2);
+        double u = neuron.getUpperBound();
+        double l = neuron.getLowerBound();
+        double diff = u - l;
+        double a = (Math.PI * slope) / diff;
+        return (diff / Math.PI) * Math.atan(a * input) + ((u + l) / 2);
     }
 
     /**
@@ -260,7 +299,6 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
     public SigmoidalNeuron deepCopy() {
         SigmoidalNeuron sn = new SigmoidalNeuron();
         sn.setBias(getBias());
-        sn.setClipping(getClipping());
         sn.setType(getType());
         sn.setSlope(getSlope());
         sn.setAddNoise(getAddNoise());
@@ -324,20 +362,6 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
         this.addNoise = addNoise;
     }
 
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
-
-    /**
-     * @param clipping The clipping to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
-    }
-
     @Override
     public String getDescription() {
         return "Sigmoidal";
@@ -359,4 +383,5 @@ public class SigmoidalNeuron extends NeuronUpdateRule implements BiasedNeuron, I
     public void setType(SigmoidType type) {
         this.type = type;
     }
+
 }

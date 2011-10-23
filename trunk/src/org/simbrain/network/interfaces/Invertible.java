@@ -19,20 +19,22 @@
 package org.simbrain.network.interfaces;
 
 /**
- * An inverse function for neurons with invertible update rules.
+ * Indicates that an update rule is invertible.
+ *
  * Required for LMSOffline training
  * @author ztosi
  *
  */
-public interface Inverse {
+public interface Invertible {
 
     /**
      * The inverse of the activation function.
+     *
      * @param val the value being sent through the neuron's
      *          inverse activation function
      * @param neuron the neuron this inverse value is being mapped from
      * @return the inverse activation of parameter val
      */
-    double inverse(double val, Neuron neuron);
+    double getInverse(double val, Neuron neuron);
 
 }

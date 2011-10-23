@@ -59,9 +59,6 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
 
-    /** Clipping combo box. */
-    private TristateDropDown isClipping = new TristateDropDown();
-
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 
@@ -75,7 +72,6 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Implementation", cbImplementation);
         mainTab.addItem("Bias", tfBias);
         mainTab.addItem("Slope", tfSlope);
-        mainTab.addItem("Use clipping", isClipping);
         mainTab.addItem("Add noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
@@ -90,7 +86,6 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
         cbImplementation.setSelectedItem(neuronRef.getType());
         tfBias.setText(Double.toString(neuronRef.getBias()));
         tfSlope.setText(Double.toString(neuronRef.getSlope()));
-        isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
@@ -108,10 +103,6 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalNeuron.class, "getSlope")) {
             tfSlope.setText(NULL_STRING);
-        }
-
-        if (!NetworkUtils.isConsistent(ruleList, SigmoidalNeuron.class, "getClipping")) {
-            isClipping.setNull();
         }
 
         if (!NetworkUtils.isConsistent(ruleList, SigmoidalNeuron.class, "getAddNoise")) {
@@ -143,7 +134,6 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
         cbImplementation.setSelectedItem(neuronRef.getType());
         tfBias.setText(Double.toString(neuronRef.getBias()));
         tfSlope.setText(Double.toString(neuronRef.getSlope()));
-        isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
     }
@@ -165,10 +155,6 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 
             if (!tfSlope.getText().equals(NULL_STRING)) {
                 neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
-            }
-
-            if (!isClipping.isNull()) {
-                neuronRef.setClipping(isClipping.isSelected());
             }
 
             if (!isAddNoise.isNull()) {

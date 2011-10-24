@@ -48,7 +48,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      */
     public AllToAllPanel(final AllToAll connection) {
         super(connection);
-        this.addItem("Allow Self Connections", allowSelfConnect);
+        this.addItem("Make Self Connections", allowSelfConnect);
         JButton setSynapseType = new JButton("Set...");
         setSynapseType.addActionListener(new ActionListener() {
 

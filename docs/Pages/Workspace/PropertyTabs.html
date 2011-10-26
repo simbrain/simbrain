@@ -26,21 +26,21 @@
 used to monitor the state of the workspace and set properties.<br>
 </p>
 <p><span class="heading">Components</span></p>
-<p>A list of components.&nbsp; <br>
+<p>A list of the components in the workspace (see: <a href="./Components.html">components</a> for more information).&nbsp; <br>
 </p>
 <p>In List:</p>
-<p style="margin-left: 40px;">Type</p>
-<p style="margin-left: 40px;">GuiOn</p>
-<p style="margin-left: 40px;">Update On</p>
+<p style="margin-left: 40px;">Type: Shows the kind of workspace components (network, bar chart, time series, etc).</p>
+<p style="margin-left: 40px;">GuiOn: A simple checkbox allowing the user to enable (default) or disable the component's GUI. Doing this will <b>visually</b> remove the component from the workspace, lowering the computational time and memory usage of all network operations. </p>
+<p style="margin-left: 40px;">Update On: A simple checkbox allowing the user to enable (default) or disable the updating of a network component. If this option is not selected, the component will not update when the global (workspace) update is activated (see: <a href="./Update.html">Update</a> for more information).</p>
 <p style="margin-left: 40px;">Priority <br>
 </p>
 <p><br>
 </p>
 <p class="heading">Couplings</p>
-<p>A list of couplings<br>
+<p>A list of all the active couplings in the workspace listing their parent component and the direction of information flow (see: <a href="./Couplings">Couplings</a> for more information).<br>
 </p>
 <p class="heading">Terminal</p>
-<p>A beanshell terminal.&nbsp; See the discussion in <a href="../Scripting.html">scripting.</a><br>
+<p>A beanshell terminal allowing the user a command line level interface with Simbrain.&nbsp; See the discussion in <a href="../Scripting.html">scripting.</a><br>
 </p>
 <p class="heading">Updator</p>
 <p>Status of updator. See update.<br>

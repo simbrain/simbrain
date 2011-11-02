@@ -13,7 +13,7 @@
     <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Updating</p>
   </div>
   <p></p><h1>Network Operation</h1>
-  <p>Each time the step button is pressed in the network panel--the network moves forward in time by one iteration; that is, it takes on a new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. However, as one might imagine, there are multiple ways to go about this given a construct as complex as an artificial neural network. To this end, Simbrain includes three built in update types: buffered (default), priority-based, and layer-based, and for more advanced users also includes the option of creating custom update methods. At the network level update rules can be changed by going to File > Network Preferences (or "ctrl + ,"), and selecting the "logic" tab. From there the desired update method for the network can be selected from a combo-box (see below). <br>
+  <p>Each time the step button is pressed in the network panel--the network moves forward in time by one iteration; that is, it takes on a new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. However, as one might imagine, there are multiple ways to go about this given a construct as complex as an artificial neural network. To this end, Simbrain includes two built in update types: buffered (default) and priority-based. For more advanced users Simbrain also includes the option of creating custom update methods. At the network level update rules can be changed by going to File > Network Preferences (or "ctrl + ,"), and selecting the "logic" tab. From there the desired update method for the network can be selected from a combo-box (see below). <br>
 
 <p><img style="border: 1px solid ; width: 300px; height: 240px;" alt="example" src="../../Images/UpdateDialog.png"></p>
 <br>
@@ -29,15 +29,16 @@ To reflect the fact that the network has been updated the "time" label is update
 
 </p>
 
-<p><span class="heading">Buffered Update</span><br>.&nbsp; 
+<p><span class="heading">Buffered Update</span><br>&nbsp; 
 Buffered update is the default update rule in Simbrain. For every component of the network, the new value at time <i>t</i> is calculated from the attribute values at <i>t - 1</i> and stored in the buffer. No activation values are changed until every buffer as been calculated. Then all activations are updated simultaneously based on their buffer values.</p>
 
 
 <p><span class="heading">Priority-Based Update</span><br>.&nbsp; 
 When using a priority based update, each node is assigned a priority value. The lower this value, the higher the node's priority. Based on this value all the network components are sorted into a queue. The program addresses the head of this queue first calling the component's update method and immediately setting its activation based on its buffer value before moving on to the next component in the queue. Components with the same priority are ordered arbitrarily in this queue.</p>
 
-<p><span class="heading">Layer-Based Update</span><br>.&nbsp; 
-TODO: Discuss layer-based update.</p>
+<p><span class="heading">Custom Update </span><br>&nbsp; 
+For more advanced users the option exists to create a custom update rule. Specifying a custom update rule is not availble in the GUI and must be instantiated and defined either within a script (see <a href="../Scripting.html"> scripting</a>) or by editing the Simbrain source code. 
+</p>
 
     
     <p>&nbsp;</p>

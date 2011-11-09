@@ -111,7 +111,7 @@ public class SOMDialog extends StandardDialog implements ActionListener {
      */
     private void init() {
         // Initializes dialog
-        setTitle("New SOM Netwok");
+        setTitle("New SOM Network");
 
         fillFieldValues();
 

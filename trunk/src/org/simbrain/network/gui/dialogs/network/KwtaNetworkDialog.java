@@ -90,7 +90,7 @@ public class KwtaNetworkDialog extends StandardDialog {
      */
     private void init() {
         // Initializes dialog
-        setTitle("New K Winner Take All Netwok");
+        setTitle("New K Winner Take All Network");
 
         fillFieldValues();
 

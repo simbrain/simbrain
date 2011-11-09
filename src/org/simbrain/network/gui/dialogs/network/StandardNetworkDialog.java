@@ -88,7 +88,7 @@ public class StandardNetworkDialog extends StandardDialog {
      */
     private void init() {
         // Initializes dialog
-        setTitle("New Standard Netwok");
+        setTitle("New Standard Network");
 
         fillFieldValues();
 

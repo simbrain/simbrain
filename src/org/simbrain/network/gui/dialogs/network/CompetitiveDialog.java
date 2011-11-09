@@ -114,7 +114,7 @@ public class CompetitiveDialog extends StandardDialog implements ActionListener 
      */
     private void init() {
         // Initializes dialog
-        setTitle("New Competitive Netwok");
+        setTitle("New Competitive Network");
 
         cbUseLeakyLearning.addActionListener(this);
         cbUseLeakyLearning.setActionCommand("useLeakyLearning");

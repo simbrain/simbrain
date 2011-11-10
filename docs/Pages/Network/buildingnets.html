@@ -1,15 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
-  <title>Simbrain Documentation</title>
+<html><head><title>Simbrain Documentation</title>
+
+
+  
 
   
   
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
   
-  <link href="../../Styles.css" rel="stylesheet" type="text/css">
-
-</head><body>
+  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html">
 <div class="logo">
 <p><span></span></p>
@@ -17,13 +17,16 @@
 </a>
 <div class="text" id="main_docs">
 <div class="navi">
-<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Building and Editing Networks</p>
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Basics of Building and Editing Networks</p>
 </div>
 <!--  -->
-<h1>Building and Editing Networks</h1>
+<h1>The Basics: Building and Editing Networks<br>
+</h1>
+
 <p>Network
 editing in Simbrain is modeled on a familiar "draw" interface which
 involves creating screen elements, copying, and pasting.</p>
+
 <p class="heading"><a name="NewNode"></a>Creating nodes. </p>
 <blockquote>
   <p><span class="heading2">To create a node:</span> Nodes are created
@@ -41,75 +44,9 @@ its type, and then copy and paste repeatedly. </p>
   <p><span class="heading2">To create networks or groups of neurons.</span>
 Subnets are created using <span class="command">new &gt; new network</span>.
 Subnets and small groups of neurons can be created, copied, and
-repeatedly pasted to quickly create many sets of similar elements. </p>
-</blockquote>
-<p class="heading"><a name="sourceTarget"></a>Source and Target Neurons<br>
+repeatedly pasted to quickly create many sets of similar elements.</p><br>
+</blockquote><p class="heading"><a name="SelectNodes"></a>Selecting nodes and weights<br>
 </p>
-<blockquote>Varous commands in Simbrain (e.g: connecing nodes, training
-weights, viewing weight matrices) require you to specify a set of
-source and target neurons.&nbsp;&nbsp; Source neurons are surrounded by
-red squares and target neurons are surrounded by the standard green
-selection squares.&nbsp;&nbsp; Here is an example.<br>
-  <br>
-  <div style="text-align: center;"><img style="border: 1px solid ; width: 416px; height: 302px;" alt="source / target neurons" src="../../Images/sourceTarget.png"><br>
-  </div>
-  <br>
-  <span class="heading2">To set target neurons</span>: simply select as usual<br>
-  <span class="heading2">To set source neurons</span>: select a group of neurons and either (1) press the "1" key, (2) right click and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>, or (3) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>.<br>
-  <span class="heading2">To clear all source neurons</span>: unselect all neurons (but clicking outside of any neuron), and (1) press the "1" key or  (2) right click and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>, or (3) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>.<br>
-  <span class="heading2">To clear specific source neurons</span>: select the neurons of interest and (1) right click and select&nbsp;<span class="command">Connect &gt; Clear Source Neuron(s)</span>, or (2) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Clear Source Neuron(s)</span>.<br>
-
-  <br>
-Note that the same neurons can be source and target neurons.<br>
-
-</blockquote>
-
-<p class="heading"><a name="ConnectNodes"></a>Connecting nodes.</p>
-<blockquote><br>
-  <span class="heading2">Keyboard shortcut method</span><br>
-  <br>
-To quckly connect neurons:<br>
-  <br>
-&nbsp;&nbsp;&nbsp; 1) Set source neurons (select and then keyboard 1)<br>
-&nbsp;&nbsp;&nbsp; 2) Set target neurons (using the standad selection
-mechanism / the green lasso)<br>
-&nbsp;&nbsp;&nbsp; 3) Connect (keyboard 2)<br>
-  <br>
-This method works well.&nbsp; You wil get used to it quickly and then
-use it: select source &gt; 1 &gt; select&nbsp; target &gt; 2.&nbsp; It
-goes fast.&nbsp; <br>
-  <br>
-  <span class="heading2">Menu method</span><br>
-  <br>
-&nbsp;&nbsp;&nbsp; - select source neurons<br>
-&nbsp;&nbsp;&nbsp; - menu connect &gt; set as source<br>
-&nbsp;&nbsp;&nbsp; - select target<br>
-&nbsp;&nbsp;&nbsp; - menu connect &gt; connect-source-target &gt; all
-to all<br>
-  <br><span class="heading2">Connection objects</span><br>
-  <br>
-For this and the next method you can set properties of connection
-object using the &#8220;Set Connection Properties...&#8221; dialog.&nbsp; You can
-make some very fancy and complex patterns of synaptic connection using
-this.&nbsp; You can also add your own custom connection style.<br>
-  <br>
-  <span class="heading2">Simple Connect Method<br>
-  <br>
-  </span>
-  <p><span class="heading2">To connect a group of source nodes to one
-target node</span>: Select one or more "source" nodes, then right-click
-on a target neuron and select <span class="command">connect nodes</span>
-from the pop-up menu. </p>
-  <p><span class="heading2">To connect a chain of nodes, one to another</span>:
-Enter build mode, and single click in the following pattern: source,
-target 1, target 1, target 2, target 2, target 3,...</p>
-  <br>
-  <p><br>
-  </p>
-  <p><br>
-  </p>
-</blockquote>
-<p class="heading"><a name="SelectNodes"></a>Selecting nodes</p>
 <p> Neurons and weights can be selected so that operations can be
 performed on the selected group of items (e.g., randomizing selected
 items, adjusting them up or down, etc.). Selecting neurons and weights
@@ -191,11 +128,13 @@ new paste&#8217;s follow the rule. In this way you can quickly build big
 networks.</p>
 <p><span class="heading">Wand Tool<br>
 </span></p>
-<tr>
-<p>  <td><img src="../../Images/Wand.png" height="18" width="18"></td>
 
-The wand tool, which can be found on the network toolbar, is a tool used to alter the activations of neurons within its range.
-As of the current version of Simbrain the wand only injects activation. The addiion of multiple modes of neuron alteration to the wands function are planned for future releases.<br>
+<p>  <img src="../../Images/Wand.png" height="18" width="18">
+The wand tool, which can be found on the network toolbar, is a tool
+used to alter the activations of neurons within its range.
+As of the current version of Simbrain the wand only injects activation.
+The addiion of multiple modes of neuron alteration to the wands
+function are planned for future releases.<br>
 
 <br><b>To use the wand simply:</b><br>
 &nbsp;&nbsp;&nbsp; 1) Click on the wand icon<br>
@@ -203,15 +142,16 @@ As of the current version of Simbrain the wand only injects activation. The addi
 mouse key<br>
 &nbsp;&nbsp;&nbsp; 3) All neurons will reach their maximum level (the
 &#8220;upper bound&#8221; value), as shown below.<br>
-<p style="text-align: left;"><img style="width: 500px; height: 500px;" src="../../Images/wandExample.png"></p>
+</p><p style="text-align: left;"><img style="width: 500px; height: 500px;" src="../../Images/wandExample.png"></p>
 <br>
 <br>
-The radius in pixels of the wand's effect can be adjusted by going to Edit > Wand/Edit Mode Preferences within a network window.<br>
+The radius in pixels of the wand's effect can be adjusted by going to
+Edit &gt; Wand/Edit Mode Preferences within a network window.<br>
 <br>
 <p style="text-align: left;"><img style="width: 300px; height: 350px;" src="../../Images/WandMenu.png"></p>
 <br>
-</tr>
-</p>
+
+
 </div>
 
 </body></html>

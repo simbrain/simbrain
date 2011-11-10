@@ -18,6 +18,8 @@
  */
 package org.simbrain.util.projection;
 
+import org.simbrain.util.propertyeditor.ComboBoxWrapper;
+
 
 
 /**
@@ -180,27 +182,27 @@ public class Settings {
         this.sammonAddMethod = sammonAddMethod;
     }
 
-//    /**
-//     * @return the imageBox
-//     */
-//    public ComboBoxable getSammonAddPointMethod() {
-//        return new ComboBoxable() {
-//            public Object getCurrentObject() {
-//                return getSammonAddMethod();
-//            }
-//
-//            public Object[] getObjects() {
-//                return SammonAddMethod.values();
-//            }
-//        };
-//    }
-//
-//    /**
-//     * @param imageBox the imageBox to set
-//     */
-//    public void setSammonAddPointMethod(ComboBoxable decayFunctionBox) {
-//        setSammonAddMethod((SammonAddMethod) decayFunctionBox.getCurrentObject());
-//    }
+    /**
+     * @return the imageBox
+     */
+    public ComboBoxWrapper getSammonAddPointMethod() {
+        return new ComboBoxWrapper() {
+            public Object getCurrentObject() {
+                return getSammonAddMethod();
+            }
+
+            public Object[] getObjects() {
+                return SammonAddMethod.values();
+            }
+        };
+    }
+
+    /**
+     * @param imageBox the imageBox to set
+     */
+    public void setSammonAddPointMethod(ComboBoxWrapper decayFunctionBox) {
+        setSammonAddMethod((SammonAddMethod) decayFunctionBox.getCurrentObject());
+    }
 
 
 }

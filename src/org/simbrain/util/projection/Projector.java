@@ -84,12 +84,13 @@ public class Projector {
             return false;
         }
 
-        boolean newPointAdded = currentProjectionMethod.addDatapoint(point);
         currentPoint = point;
-
-        /* This is needed to invoke the current projector's init function */
-        if (currentProjectionMethod.isIterable()) {
-            currentProjectionMethod.init(getUpstairs(), getDownstairs());
+        boolean newPointAdded = currentProjectionMethod.addDatapoint(point);
+        if (newPointAdded) {
+            /* This is needed to invoke the current projector's init function */
+            if (currentProjectionMethod.isIterable()) {
+                currentProjectionMethod.init(getUpstairs(), getDownstairs());
+            }
         }
 
         error = 0;

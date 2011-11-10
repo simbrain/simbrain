@@ -36,7 +36,7 @@ public final class GaugePreferences {
     }
     
     /** The default tolerance. */
-    private static final double DEFAULT_TOLERANCE = .05;
+    private static final double DEFAULT_TOLERANCE = .5;
     /** The default perturbation. */
     private static final double DEFAULT_PERTURBATION = .1;
     /** The default iterations between updates. */

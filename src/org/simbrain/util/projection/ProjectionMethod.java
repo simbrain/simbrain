@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import org.apache.log4j.Logger;
+import org.simbrain.util.projection.Settings.SammonAddMethod;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -30,7 +31,7 @@ import com.Ostermiller.util.CSVParser;
  * contains a high dimensional dataset (an "upstairs") and a low-dimensional
  * projection of that high dimensional data (a "downstairs"). Classes which
  * extend this class provide different ways of projecting the high dimensional
- * space to the lowdimensional space. This class provides general methods for
+ * space to the low dimensional space. This class provides general methods for
  * handling pairs of datasets and checking their integrity.
  */
 public abstract class ProjectionMethod {
@@ -77,7 +78,7 @@ public abstract class ProjectionMethod {
         if (down == null) {
             downstairs = new Dataset(2, upstairs.getNumPoints());
 
-            // Initialy use coordinate projection
+            // Initially use coordinate projection
             // Creates a new projector.
             ProjectCoordinate initialProjection = new ProjectCoordinate(theSettings);
             initialProjection.init(upstairs, downstairs);
@@ -253,11 +254,11 @@ public abstract class ProjectionMethod {
      */
     public boolean addDatapoint(final double[] point) {
        // logger.debug("addDatapoint called");
-        // Add the upstairs point
+
         double tolerance = theSettings.getTolerance();
+        double[] newPoint = null;
         if (upstairs.addPoint(point, tolerance)) {
             //For 1-d datasets plot points on a horizontal line
-            double[] newPoint;
             if (point.length == 1) {
                 newPoint = new double[] {point[0], 0 };
                 downstairs.addPoint(newPoint);
@@ -265,8 +266,24 @@ public abstract class ProjectionMethod {
             }
 
             //TODO: To be refactored.
-            newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings
-                    .getHiD2(), point);
+
+            if (this instanceof ProjectSammon) {
+
+                // Add the downstairs point differently depending on the add
+                // method The first case is the default case: add the points and run
+                // the projection.  The other cases are custom add methods
+                if (theSettings.getSammonAddMethod() == SammonAddMethod.REFRESH) {
+                    newPoint = AddData.coordinate(theSettings.getHiD1(),
+                            theSettings.getHiD2(), point);
+                } else if (theSettings.getSammonAddMethod() == SammonAddMethod.TRIANGULATE) {
+                    newPoint = AddData.triangulate(upstairs, downstairs, point);
+                } else if (theSettings.getSammonAddMethod() == SammonAddMethod.NN_SUBSPACE) {
+                    newPoint = AddData.nnSubspace(upstairs, downstairs, point);
+                }
+            } else {
+                newPoint = AddData.coordinate(theSettings.getHiD1(),
+                        theSettings.getHiD2(), point);
+            }
             downstairs.addPoint(newPoint);
             this.project();
             return true;
@@ -274,26 +291,7 @@ public abstract class ProjectionMethod {
         return false;
     }
 
-//  if (this instanceof ProjectSammon) {
-//  // Add the downstairs point differently depending on the add method
-//  //   The first case is the default case: add the points and run the projection
-//  //   The other cases are custom add methods
-//  if (theSettings.getSammonAddMethod().equals(SammonAddMethod.REFRESH)) {
-//      newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
-//      downstairs.addPoint(newPoint);
-//      this.project();
-//  } else if (theSettings.getSammonAddMethod().equals(SammonAddMethod.TRIANGULATE)) {
-//      newPoint = AddData.triangulate(upstairs, downstairs, point);
-//      downstairs.addPoint(newPoint);
-//  } else if (theSettings.getSammonAddMethod().equals(SammonAddMethod.NN_SUBSPACE)) {
-//      newPoint = AddData.nnSubspace(upstairs, downstairs, point);
-//      downstairs.addPoint(newPoint);
-//  } 
-//} else {
-//  newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
-//  downstairs.addPoint(newPoint);
-//  this.project();
-//}
+
 
     /**
      * @return distance within which points are considered unique

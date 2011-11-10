@@ -509,16 +509,18 @@ public class NTree implements Iterable<double[]> {
     }
     
     /**
-     * replaces the point at the given index with the one provided
+     * replaces the point at the given index with the one provided.
      *
      * @param index the index to set the point at
      * @param point the point to set
      */
     public void set(int index, double[] point) {
         double[] old = list.get(index);
-        Leaf leaf = all.get(old);
+        Leaf leaf = all.get(old); //leaf can be null sometimes..
+        if(leaf == null) {
+            System.out.println(index);
+        }
         int leafIndex = leaf.points.indexOf(old);
-        
         leaf.points.set(leafIndex, point);
         all.put(point, leaf);
         all.remove(old);

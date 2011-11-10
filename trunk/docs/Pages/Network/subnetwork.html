@@ -1,52 +1,51 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><title>Simbrain Documentation</title>
+<html><head>
+  <title>Simbrain Documentation</title>
 
-
-
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
-<a href="../../SimbrainDocs.html"><div class="logo">
-  <p><span></span></p>
-</div></a>
-<div id="main_docs">
-  <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Subnetwork</p>
-  </div>
-  <div id="menu">
-    <p class="menubold">Contents</p>
-    <blockquote>
-      Subnetwork Types<br>
-	<p>
-        <a href="network/actorcriticnetwork.html">Actor-Critic</a><br>
-        <a href="network/backpropnetwork.html">Backprop</a><br>
-        <a href="network/competitivenetwork.html">Competitive</a><br>
-        <a href="network/hopfieldnetwork.html">Hopfield</a><br>
-	<a href="network/KwinnerTakeAllNetwork.html">K Winner Take All</a><br>
-        <a href="network/lmsnetwork.html">LMS</a><br>
-	  <a href="network/som.html">Self-Organizing Map</a><br>
-        <a href="network/standardnetwork.html">Standard</a><br>
-        <a href="network/winnerTakeAll.html">Winner Take All</a>
-      </p>
-      Other Topics<br>
-      <p>
-        <a href="network/layouts.html">Layouts</a><br>
-        <a href="network/subnetwork_tab.html">Subnetwork Tab</a><br>
-      <a href="network/trainingFile.html">Training Files</a>
-      </p>
-    </blockquote>
-  </div>
-  <p>
-  </p><h1>Subnetworks</h1>
   
-<p>Subnetworks are used when special rules are required that go beyond what is available using the <a href="network_op.html">standard update</a>
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../../Styles.css" rel="stylesheet" type="text/css">
+
+</head><body>
+<a href="../../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Subnetwork</p>
+</div>
+<div id="menu">
+<p class="menubold">Contents<br>
+</p>
+<blockquote>
+  <p> <a href="network/competitivenetwork.html">Competitive</a><br>
+  <a href="network/hopfieldnetwork.html">Hopfield</a><br>
+  <a href="network/KwinnerTakeAllNetwork.html">K Winner Take All</a><br>
+  <a href="network/som.html">Self-Organizing Map</a><br>
+  <a href="network/standardnetwork.html">Standard</a><br>
+  <a href="network/winnerTakeAll.html">Winner Take All</a> </p>
+  <p> <br>
+</p></blockquote>
+</div>
+<p> </p>
+<h1>Subnetworks</h1>
+<p>Subnetworks are used when special rules are required that go beyond
+what is available using the <a href="network_op.html">standard update</a>
 method. For example, some networks must have their nodes updated in a
 special order, or must have their synapses updated in a way which
 requires more information than is available locally to the synapses.
 Subnetworks are distinguished by being surrounded by a gray line, with
 a special tab in the upper left-hand corner: </p>
-<p><img src="../../Images/subnetwork.png" height="201" width="250"></p>
-<p>The upper-left tab, or "<a href="network/subnetwork_tab.html">subnetwork tab</a>," is the your interface with the subnetwork and its properties. </p>
-<p>Subnetworks are created either by using the <span class="command">insert menu</span> in the network window, or right clicking and using the <span class="command">new network</span>
+<p>The upper-left tab, or "<a href="network/subnetwork_tab.html">subnetwork
+tab</a>," is the your interface with the subnetwork and its properties.
+</p>
+<p>Subnetworks are created either by using the <span class="command">insert
+menu</span> in the network window, or right clicking and using the <span class="command">new network</span>
 submenu. Neurons and synapses cannot currently be added inside
 subnetworks, though subnets can be connected to anything outside of
 themselves. </p>
@@ -54,8 +53,49 @@ themselves. </p>
 the subnetwork hierarchy. Subnetworks (networks within networks) are
 themselves network objects, with lists of neurons and nodes, and
 perhaps additional subnetworks. If a subnetwork itself has subnetworks,
-those are not shown as such in the GUI. </p>
-<p></p>
+those are not shown as such in the GUI. <br>
+</p>
+<p><span class="heading">Subnetwork Tab</span><br>
+</p>
+<p> The tab is your interface with the subnetwork via the GUI. The text
+inside the tab displays what type of subnetwork it is. If you drag the
+tab, it will drag the entire subnetwork. By double-clicking on the tab,
+one can view the subnetwork's properties, while right clicking on it
+reveals actions that are specific to the subnetwork. Here are some
+standard operations available in the subnetwork tab (more specific
+actions and operations are described in the documentation for specific
+subnetork types). </p>
+<p class="heading"><span class="heading2">Delete</span></p>
+<blockquote>
+  <p>Deletes the entire subnetwork. </p>
+</blockquote>
+<p class="heading"><span class="heading2">Double Click</span></p>
+<blockquote>
+  <p>If
+you double-click on the subnetwork tab it calls up that network's
+properties dialog. These properties depend on the subnetwork type. </p>
+</blockquote>
+<p class="heading"><span class="heading2">Hide / Show Outline</span></p>
+<blockquote>
+  <p>Hides or reveals the outline drawn around the nodes of that
+subnetwork </p>
+</blockquote>
+<p class="heading"><span class="heading2">Randomize</span></p>
+<blockquote>
+  <p>Unless
+otherwise noted, this simply calls the randomization method on each
+neuron, which sets it to a value from within its upper and lower
+bounds. In some cases it is overridden to perform other operations on
+the subnetwork as well. For example, backprop network randomization
+randomizes biases. </p>
+</blockquote>
+<p class="heading heading2">Set Properties</p>
+<p style="margin-left: 40px;"><br>
+</p>
+<p style="margin-left: 40px;">Same as double clicking. Calls up the
+property dialog for that subnetwork type. </p>
+
 <p>&nbsp;</p>
 </div>
+
 </body></html>

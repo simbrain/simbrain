@@ -38,6 +38,7 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -75,6 +76,7 @@ import org.simbrain.network.gui.nodes.subnetworks.KwtaNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.SOMNode;
 import org.simbrain.network.gui.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.WTANetworkNode;
+import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.NetworkTextObject;
@@ -97,10 +99,12 @@ import org.simbrain.network.networks.SOM;
 import org.simbrain.network.networks.Standard;
 import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.trainers.Backprop;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.gui.GenericFrame;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -818,12 +822,22 @@ public class NetworkPanel extends JPanel {
 
         EditMode oldEditMode = this.editMode;
         this.editMode = newEditMode;
+        if (editMode == EditMode.WAND) {
+            editMode.resetWandCursor();
+        }
         firePropertyChange("editMode", oldEditMode, this.editMode);
+        updateCursor();
+    }
+
+    /**
+     * Update the cursor.
+     */
+    public void updateCursor() {
         setCursor(this.editMode.getCursor());
     }
 
     /**
-     * Delete selected itemes.
+     * Delete selected items.
      */
     public void deleteSelectedObjects() {
 
@@ -2356,4 +2370,21 @@ public class NetworkPanel extends JPanel {
     public PCanvas getCanvas() {
         return canvas;
     }
+
+    /**
+     * Show the trainer panel. This is overridden by the desktop version to
+     * display the panel within the Simbrain desktop.
+     */
+    public void showTrainer() {
+        Backprop trainer = new Backprop(getRootNetwork(),
+                getSourceModelNeurons(),
+                getSelectedModelNeurons());
+        JDialog dialog = new JDialog();
+        TrainerPanel trainerPanel = new TrainerPanel((GenericFrame) dialog,
+                trainer);
+        dialog.setContentPane(trainerPanel);
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+
 }

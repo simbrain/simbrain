@@ -39,7 +39,7 @@ public final class EditMode {
     private static final Point CENTER_POINT = new Point(9, 9);
 
     /** Cursor for this edit mode. */
-    private final Cursor cursor;
+    private Cursor cursor;
 
     /** Selection edit mode. */
     public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
@@ -82,38 +82,17 @@ public final class EditMode {
         }
     }
 
+    BufferedImage image;
+    
     /**
-     * Construct a "wand" edit mode.
-     *
-     * TODO: Is this the right place for this?
-     *
+     * Construct a "wand" edit mode. TODO: Is this the right place for this?
+     * 
      * @param name name of edit mode
      * @param radius radius of wand
      */
     private EditMode(String name, int radius) {
         this.wandRadius = radius;
-        BufferedImage image = new BufferedImage(radius+1, radius+1,
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D) image.getGraphics();
-
-        // Draw stroke around wand
-        int stroke = 1;
-        g2.setColor(Color.BLACK);
-        g2.setStroke(new BasicStroke(stroke));
-        g2.drawOval(0, 0, radius, radius);
-
-        // Draw wand itself
-        g2.setColor(Color.YELLOW);
-        g2.setStroke(new BasicStroke(1));
-        float alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g2.fillOval(0, 0, radius, radius);
-        //g2.fillRect(0, 0, radius, radius);
-
-        // Add cursor
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        Cursor newCursor = tk.createCustomCursor(image, CENTER_POINT, "wand");
-        this.cursor = newCursor;
+        resetWandCursor();
     }
 
     /**
@@ -202,6 +181,35 @@ public final class EditMode {
      */
     public void setWandRadius(int wandRadius) {
         this.wandRadius = wandRadius;
+        resetWandCursor();
+    }
+
+    /**
+     * Reset the wand cursor (must happen when its size is reset).
+     */
+    protected void resetWandCursor() {
+        image = new BufferedImage(wandRadius + 1, wandRadius + 1,
+                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = (Graphics2D) image.getGraphics();
+
+        // Draw stroke around wand
+        int stroke = 1;
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(stroke));
+        g2.drawOval(0, 0, wandRadius, wandRadius);
+
+        // Draw wand itself
+        g2.setColor(Color.YELLOW);
+        g2.setStroke(new BasicStroke(1));
+        float alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                alpha));
+        g2.fillOval(0, 0, wandRadius, wandRadius);
+        // g2.fillRect(0, 0, radius, radius);
+
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Cursor newCursor = tk.createCustomCursor(image, CENTER_POINT, "wand");
+        this.cursor = newCursor;
     }
 
 }

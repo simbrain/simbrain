@@ -29,13 +29,14 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Group;
 
 import edu.umd.cs.piccolo.PNode;
 
 /**
- * Represents a {@link org.simbrain.network.interfaces.Group}. 
+ * Represents a {@link org.simbrain.network.interfaces.Group}.
  */
 public class GroupNode extends CustomOutline implements PropertyChangeListener {
 
@@ -72,6 +73,7 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
         setStrokePaint(Color.yellow);
         this.setConextMenu(getContextMenu());
         this.setTextLabel(group.getLabel());
+
     }
 
 
@@ -122,6 +124,20 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
     public void updateText() {
         this.setTextLabel(group.getLabel());
         this.updateInteractionBox();
+    }
+    
+    @Override
+    protected void updateInteractionBox() {
+        if(group instanceof NeuronGroup) {
+            interactionBox.setOffset(this.getBounds().getX()
+                    - interactionBox.getOFFSET_X(), this.getBounds().getY()
+                    - interactionBox.getOFFSET_Y());            
+        } else {
+            interactionBox.setOffset(this.getBounds().getCenterX()
+                    - interactionBox.getOFFSET_X(), this.getBounds().getCenterY()
+                    - interactionBox.getOFFSET_Y());            
+            
+        }
     }
 
     /**

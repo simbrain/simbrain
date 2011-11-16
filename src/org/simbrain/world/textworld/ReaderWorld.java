@@ -39,7 +39,7 @@ public class ReaderWorld extends TextWorld {
     };
 
     /** The current parsing style. */
-    private ParseStyle parseStyle = ParseStyle.WORD;
+    private ParseStyle parseStyle = ParseStyle.CHARACTER;
 
     /** For use with word parsing. */
     private String delimeter = "";
@@ -49,7 +49,7 @@ public class ReaderWorld extends TextWorld {
 
     /** Pattern matcher. */
     private Matcher matcher;
-    
+
     /**
      * Position after the last delimeter found, which is where the current item
      * should begin.
@@ -125,8 +125,9 @@ public class ReaderWorld extends TextWorld {
                 }
 
             } else {
-                setCurrentItem(new TextItem(getPosition(), getPosition(), ""));
-                setPosition(0);
+                System.out.println("here");
+                //setCurrentItem(new TextItem(getPosition(), getPosition(), ""));
+                setPosition(1);
             }
         } else if (parseStyle == ParseStyle.WORD) {
             if (matcher != null) {
@@ -170,7 +171,7 @@ public class ReaderWorld extends TextWorld {
     /**
      * Returns the current parse style inside a comboboxwrapper. Used by
      * preference dialog.
-     * 
+     *
      * @return the the comboBox
      */
     public ComboBoxWrapper getParseStyle() {
@@ -187,7 +188,7 @@ public class ReaderWorld extends TextWorld {
 
     /**
      * Set the current parse style. Used by preference dialog.
-     * 
+     *
      * @param parseStyle the current style.
      */
     public void setParseStyle(ComboBoxWrapper parseStyle) {
@@ -238,11 +239,14 @@ public class ReaderWorld extends TextWorld {
     /**
      * Returns 1 if the current item is this character, or 0 otherwise. Used for
      * localist representations of letters.
-     * 
+     *
      * @param letter the letter to search for
      * @return 1 if the letter is contained, 0 otherwise.
      */
     public int matchCurrentLetter(char letter) {
+        if (getCurrentItem() == null) {
+            return 0;
+        }
         if (getCurrentItem().getText().equalsIgnoreCase(String.valueOf(letter))) {
             return 1;
         } else {
@@ -253,7 +257,7 @@ public class ReaderWorld extends TextWorld {
     /**
      * Returns 1 if the current item matches the provided text, 0 otherwise.
      * Used for localist representation of words.
-     * 
+     *
      * @param text the text to search for
      * @return 1 if the word is contained, 0 otherwise.
      */
@@ -267,7 +271,7 @@ public class ReaderWorld extends TextWorld {
 
     /**
      * Returns a properly initialized xstream object.
-     * 
+     *
      * @return the XStream object
      */
     static XStream getXStream() {

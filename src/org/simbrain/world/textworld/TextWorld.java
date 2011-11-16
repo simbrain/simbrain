@@ -37,7 +37,7 @@ public abstract class TextWorld {
 
     /** The main text in the text world. */
     private String text = "";
-    
+
     /** The current item of text (letter, word, etc.) */
     private TextItem currentItem;
 
@@ -46,7 +46,7 @@ public abstract class TextWorld {
 
     /** Last position in the text. */
     private int lastPosition;
-    
+
     /** Word list for word parsing in both directions (reading and display). */
     private Set<String> dictionary = new TreeSet<String>();
 
@@ -66,7 +66,7 @@ public abstract class TextWorld {
      * Advance the position in the text, and update the current item.
      */
     public abstract void update();
-    
+
     /**
      * Add a listener.
      *
@@ -107,7 +107,7 @@ public abstract class TextWorld {
             listener.textChanged();
         }
     }
-    
+
     /**
      * Notify listeners that the dictionary has changed.
      */
@@ -125,7 +125,7 @@ public abstract class TextWorld {
             listener.positionChanged();
         }
     }
-    
+
     /**
      * Notify listeners that the caret position has changed.
      */
@@ -151,14 +151,14 @@ public abstract class TextWorld {
 
     /**
      * Set text, and fire an event if the fireEvent flag is set.
-     * 
+     *
      * @param text the text to set
      * @param fireEvent whether or not to fire an event
      */
     public void setText(final String text, final boolean fireEvent) {
         this.text = text;
         if (fireEvent) {
-            fireTextChangedEvent();            
+            fireTextChangedEvent();
         }
     }
 
@@ -175,7 +175,7 @@ public abstract class TextWorld {
     public void setPosition(int newPosition) {
         setPosition(newPosition, true);
     }
-    
+
     /**
      * Set position.  Fire event only if specified.
      *
@@ -183,11 +183,11 @@ public abstract class TextWorld {
      * @param fireEvent whether to fire event
      */
     public void setPosition(final int newPosition, final boolean fireEvent) {
-        if (newPosition < text.length()) {
+        if (newPosition <= text.length()) {
             lastPosition = position;
-            this.position = newPosition;            
+            this.position = newPosition;
             if (fireEvent) {
-                firePositionChangedEvent();                
+                firePositionChangedEvent();
             }
         } else {
             System.err.println("Invalid position:" + newPosition);
@@ -200,7 +200,7 @@ public abstract class TextWorld {
      */
     public int getLastPosition() {
         return lastPosition;
-    }    
+    }
 
     /**
      * @return the wordList
@@ -257,22 +257,22 @@ public abstract class TextWorld {
         listenerList = new ArrayList<TextListener>();
         return this;
     }
-    
+
     /**
      * Represents the "current item", and includes a representation
      * of the beginning and ending of the item in the main text.
      */
     class TextItem {
-    
+
         /** Initial position in main text. */
         private final int beginPosition;
-        
+
         /** Final position in main text. */
         private final int endPosition;
-        
+
         /** The item text. */
         private final String text;
-        
+
         /**
          * Construct this text item.
          *
@@ -306,12 +306,12 @@ public abstract class TextWorld {
         public String getText() {
             return text;
         }
-        
+
         @Override
         public String toString() {
             return "(" + beginPosition + "," + endPosition + ") " + text;
         }
-        
+
     }
 
     /**

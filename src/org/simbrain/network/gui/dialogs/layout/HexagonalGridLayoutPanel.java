@@ -18,14 +18,15 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 
-
 /**
- * <b>LayoutPanel</b> allows the user to define the layout of a network.
+ * <b>HexagonalGridLayoutPanel</b> allows the user to define the layout of a
+ * network.
  */
 public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
 
@@ -38,20 +39,25 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
     /** Vertical spacing field. */
     private JTextField tfVSpacing = new JTextField("50");
 
+    /** Manual spacing field. */
+    private JCheckBox setNumColumns = new JCheckBox();
+
     /**
      * Default constructor.
      */
     public HexagonalGridLayoutPanel() {
-        this.addItem("Number of columns", tfNumColumns);
         this.addItem("Horizontal spacing between neurons", tfHSpacing);
         this.addItem("Vertical spacing between neurons", tfVSpacing);
+        this.addItem("Manually set number of columns", setNumColumns);
+        this.addItem("Number of columns", tfNumColumns);
     }
 
     /** @see AbstractLayoutPanel */
     public Layout getNeuronLayout() {
-        HexagonalGridLayout layout = new HexagonalGridLayout(Double.parseDouble(tfHSpacing
-                .getText()), Double.parseDouble(tfVSpacing.getText()), Integer
-                .parseInt(tfNumColumns.getText()));
+        HexagonalGridLayout layout = new HexagonalGridLayout(
+                Double.parseDouble(tfHSpacing.getText()),
+                Double.parseDouble(tfVSpacing.getText()),
+                Integer.parseInt(tfNumColumns.getText()));
         return layout;
     }
 
@@ -59,15 +65,21 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
      * Applies settings after OK button is pressed.
      */
     public void commitChanges() {
-        HexagonalGridLayout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
-        HexagonalGridLayout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
-        HexagonalGridLayout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
+        HexagonalGridLayout.setNumColumns(Integer.parseInt(tfNumColumns
+                .getText()));
+        HexagonalGridLayout
+                .setHSpacing(Double.parseDouble(tfHSpacing.getText()));
+        HexagonalGridLayout
+                .setVSpacing(Double.parseDouble(tfVSpacing.getText()));
+        HexagonalGridLayout.setManualColumns(setNumColumns.isSelected());
     }
 
     @Override
     public void fillFieldValues() {
-        tfNumColumns.setText(Integer.toString(HexagonalGridLayout.getNumColumns()));
+        tfNumColumns.setText(Integer.toString(HexagonalGridLayout
+                .getNumColumns()));
         tfHSpacing.setText(Double.toString(HexagonalGridLayout.getHSpacing()));
         tfVSpacing.setText(Double.toString(HexagonalGridLayout.getVSpacing()));
+        setNumColumns.setSelected(HexagonalGridLayout.isManualColumns());
     }
 }

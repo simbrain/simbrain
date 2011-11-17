@@ -84,8 +84,9 @@ public class SOMDialog extends StandardDialog implements ActionListener {
      */
     public SOMDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(),
-                           new HexagonalGridLayoutPanel(), new GridLayoutPanel()});
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
+                new HexagonalGridLayoutPanel(), new GridLayoutPanel(),
+                new LineLayoutPanel() });
         init();
     }
 

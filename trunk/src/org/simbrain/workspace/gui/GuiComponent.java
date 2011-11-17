@@ -63,6 +63,9 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(GuiComponent.class);
 
+    /** Reference to parent desktop. */
+    private SimbrainDesktop desktop;
+
     /**
      * Construct a workspace component.
      *
@@ -354,6 +357,23 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      */
     public GenericFrame getParentFrame() {
         return this.parentFrame;
+    }
+
+    /**
+     * @return the desktop
+     */
+    public SimbrainDesktop getDesktop() {
+        return desktop;
+    }
+
+    /**
+     * TODO: This should really be set at construction time, but that would
+     * require deep changes so this should suffice for now.
+     *
+     * @param desktop the desktop to set
+     */
+    public void setDesktop(SimbrainDesktop desktop) {
+        this.desktop = desktop;
     }
 
 }

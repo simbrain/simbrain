@@ -771,6 +771,7 @@ public class SimbrainDesktop {
      */
     public void registerComponentInstance(final WorkspaceComponent workspaceComponent,
             final GuiComponent guiComponent) {
+        guiComponent.setDesktop(this);
         guiComponents.put(workspaceComponent, guiComponent);
     }
 

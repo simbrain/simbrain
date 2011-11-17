@@ -47,6 +47,9 @@ public class HexagonalGridLayout implements Layout {
     /** Vertical spacing between neurons. */
     private static double vSpacing = 50;
 
+    /** Manually set number of columns in grid. */
+    private static boolean manualColumns = false;
+
     /**
      * Create a layout.
      *
@@ -73,21 +76,25 @@ public class HexagonalGridLayout implements Layout {
         ArrayList<Neuron> neurons = network.getFlatNeuronList();
         layoutNeurons(neurons);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void layoutNeurons(final List<Neuron> neurons) {
         int rowNum = 0;
+        int numCols = numColumns;
+        if (!manualColumns) {
+            numCols = (int) Math.sqrt(neurons.size());
+        }
         for (int i = 0; i < neurons.size(); i++) {
             Neuron neuron = (Neuron) neurons.get(i);
-            if (i % numColumns == 0) {
+            if (i % numCols == 0) {
                 rowNum++;
             }
             if (rowNum % 2 == 0) {
-                neuron.setX(initialX + hSpacing / 2 + (i % numColumns) * hSpacing);
+                neuron.setX(initialX + hSpacing / 2 + (i % numCols) * hSpacing);
             } else {
-                neuron.setX(initialX + (i % numColumns) * hSpacing);
+                neuron.setX(initialX + (i % numCols) * hSpacing);
             }
             neuron.setY(initialY + rowNum * vSpacing);
         }
@@ -154,4 +161,19 @@ public class HexagonalGridLayout implements Layout {
     public String toString() {
         return "Hexagonal Grid Layout";
     }
+
+    /**
+     * @return the manualColumns
+     */
+    public static boolean isManualColumns() {
+        return manualColumns;
+    }
+
+    /**
+     * @param manualColumns the manualColumns to set
+     */
+    public static void setManualColumns(boolean manualColumns) {
+        HexagonalGridLayout.manualColumns = manualColumns;
+    }
+
 }

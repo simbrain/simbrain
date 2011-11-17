@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.layouts.GridLayout;
@@ -25,7 +26,7 @@ import org.simbrain.network.layouts.Layout;
 
 
 /**
- * <b>LayoutPanel</b> allows the user to define the layout of a network.
+ * <b>GridLayoutPanel</b> allows the user to define the layout of a network.
  */
 public class GridLayoutPanel extends AbstractLayoutPanel  {
 
@@ -38,13 +39,17 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
     /** Vertical spacing field. */
     private JTextField tfVSpacing = new JTextField();
 
+    /** Manual spacing field. */
+    private JCheckBox setNumColumns = new JCheckBox();
+
     /**
      * Default constructor.
      */
     public GridLayoutPanel() {
-        this.addItem("Number of columns", tfNumColumns);
         this.addItem("Horizontal spacing between neurons", tfHSpacing);
         this.addItem("Vertical spacing between neurons", tfVSpacing);
+        this.addItem("Manually set number of columns", setNumColumns);
+        this.addItem("Number of columns", tfNumColumns);
     }
 
     /** @see AbstractLayoutPanel */
@@ -60,6 +65,7 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
         GridLayout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
         GridLayout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
         GridLayout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
+        GridLayout.setManualColumns(setNumColumns.isSelected());
     }
 
     @Override
@@ -67,6 +73,7 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
         tfNumColumns.setText(Integer.toString(GridLayout.getNumColumns()));
         tfHSpacing.setText(Double.toString(GridLayout.getHSpacing()));
         tfVSpacing.setText(Double.toString(GridLayout.getVSpacing()));
+        setNumColumns.setSelected(GridLayout.isManualColumns());
     }
 
 }

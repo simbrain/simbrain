@@ -29,6 +29,9 @@ public class GridLayout implements Layout {
     /** Vertical spacing between neurons. */
     private static double vSpacing = 50;
 
+    /** Manually set number of columns in grid. */
+    private static boolean manualColumns = false;
+
     /**
      * Create a layout.
      *
@@ -54,18 +57,23 @@ public class GridLayout implements Layout {
         ArrayList<Neuron> neurons = network.getFlatNeuronList();
         layoutNeurons(neurons);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void layoutNeurons(final List<Neuron> neurons) {
         int rowNum = 0;
+        int numCols = numColumns;
+        if (!manualColumns) {
+            numCols = (int) Math.sqrt(neurons.size());
+        }
+
         for (int i = 0; i < neurons.size(); i++) {
             Neuron neuron = (Neuron) neurons.get(i);
-            if (i % numColumns == 0) {
+            if (i % numCols == 0) {
                 rowNum++;
             }
-            neuron.setX(initialX + (i % numColumns) * hSpacing);
+            neuron.setX(initialX + (i % numCols) * hSpacing);
             neuron.setY(initialY + rowNum * vSpacing);
         }
     }
@@ -130,5 +138,19 @@ public class GridLayout implements Layout {
     /** @override */
     public String toString() {
         return "Grid Layout";
+    }
+
+    /**
+     * @return the manualColumns
+     */
+    public static boolean isManualColumns() {
+        return manualColumns;
+    }
+
+    /**
+     * @param manualColumns the manualColumns to set
+     */
+    public static void setManualColumns(boolean manualColumns) {
+        GridLayout.manualColumns = manualColumns;
     }
 }

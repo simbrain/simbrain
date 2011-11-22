@@ -6,6 +6,7 @@
 
 
 
+
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html"><div class="logo">
@@ -16,17 +17,21 @@
     <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Scripting</p>
   </div>
   <p></p><h1>Scripting<br>
-</h1><blockquote><br>Simbrain neural networks can be modified in custom
-ways using scripts.&nbsp; Some useful scripts come pre-loaded and are
+</h1><blockquote><br>Simbrain neural networks can be customized using scripts.&nbsp; Some useful scripts come pre-loaded and are
 described below. To invoke a script use the <span class="command">scripts</span> menu in network window.<br>
   <br>These are beanshell <a href="../Scripting.html">scripts</a>
-specifically for a network. The scripts can be edited in
+specifically for a network. They can be edited in
 {Simbrain}/scripts/network.&nbsp; After adding a new script in that
-direcory it shows up in network windows.&nbsp; Even without learning
-how to write scripts, there are often a few key parameters that can be
-edited at the top of a script.&nbsp; If you do decide to do serious
-work editing a script, the two accessible variables are <span style="text-decoration: underline;">networkPanel</span> and <span style="text-decoration: underline;">network</span>.<br>
+direcory it shows up in network windows. <br>
   <br>
+One specific use of Simbrain scripts is to create a <a href="network_op.html#CustomUpdate">custom update</a> methods  <br>
+  <br>
+  <span class="heading">Accessible Variables</span><br>
+  <br>
+The two Simbrain variables provided to you by a network script are <span style="text-decoration: underline;">networkPanel</span> and <span style="text-decoration: underline;">network</span>.<br>
+  <br>
+  <span class="heading">Pre-loaded Scripts</span><br>
+<br>
 Some useful scripts include:<br>
   <blockquote>
       <p><span class="heading2"><a name="addLayered"></a>addLayeredNetwork</span>: to add a standard feed-forward network.&nbsp; You specify how many layers and how many neurons per layer in the dialog.<br>

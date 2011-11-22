@@ -2,6 +2,7 @@
 <html><head><title>Simbrain Documentation</title>
 
 
+
   
 
   
@@ -25,7 +26,6 @@
 <p class="menubold">Connection Types</p>
 <blockquote>
   <p><a href="synapse/clamped.html">All to All<br>
-Fixed Fanout<br>
 One to One<br>
 Radial</a><br>
 Sparse<a href="synapse/hebbian.html"></a><br>
@@ -35,7 +35,17 @@ Sparse<a href="synapse/hebbian.html"></a><br>
 <p> </p>
 <h1>Connecting Neurons<br>
 </h1><br>
-<p>Perhaps one of the most essential parts of building a network aside from creating the neurons is connecting those neurons to other neurons (and sometimes the same neurons). Connections embody the GUI component of <a href="./synapse.html">synapses</a> in Simbrain, and therefore graphically allow the one to manipulate the parameters of the synapses connecting one set of neurons to another. In addition to granting access to underlying synapses, connections and their related GUI components allow one to determine the topology of how (out of a multitude of ways) one set of neurons can connect to another. In the side menu are pages dedicated to each of the standard ways neurons can be connected in Simbrain.
+<p>Perhaps one of the most essential parts of building a network aside
+from creating the neurons is connecting those neurons to other neurons
+(and sometimes the same neurons). Connections embody the GUI component
+of <a href="./synapse.html">synapses</a> in Simbrain, and therefore
+graphically allow the one to manipulate the parameters of the synapses
+connecting one set of neurons to another. In addition to granting
+access to underlying synapses, connections and their related GUI
+components allow one to determine the topology of how (out of a
+multitude of ways) one set of neurons can connect to another. In the
+side menu are pages dedicated to each of the standard ways neurons can
+be connected in Simbrain.
 </p>
 <br>
 
@@ -115,32 +125,52 @@ Connections can be selected in 3 different ways via the selection methods laid o
 </p>
 
 <p>
-<img style="width: 406px; height: 232px;" src="../../Images/weightmatrixviewer.png" align="right"><p align="left">The <span class="command">Show Weight Matrix</span> option can be selected after right clicking any neuron or group of neurons. The window itself represents the selected neurons as columns and all source neurons to these neurons as rows. This equates all selected neurons to target neurons as far as the weight matrix viewer is concerned. All non-zero entries in the viewer represent the strength of the connection between the neuron in the cell's row and the neuron represented in its column. Likewise a zero entry represents that no connection exists between the neurons designated by the row and coulumn of the cell (though there can be a GUI connection with a value of zero in rare cases).</p> <br><br>
+<img style="width: 406px; height: 232px;" src="../../Images/weightmatrixviewer.png" align="right"></p><p align="left">The <span class="command">Show Weight Matrix</span>
+option can be selected after right clicking any neuron or group of
+neurons. The window itself represents the selected neurons as columns
+and all source neurons to these neurons as rows. This equates all
+selected neurons to target neurons as far as the weight matrix viewer
+is concerned. All non-zero entries in the viewer represent the strength
+of the connection between the neuron in the cell's row and the neuron
+represented in its column. Likewise a zero entry represents that no
+connection exists between the neurons designated by the row and coulumn
+of the cell (though there can be a GUI connection with a value of zero
+in rare cases).</p> <br><br>
 
 <blockquote>
 <span class="heading2">Weight Matrix Viewer Toolbar<br>
   <br>
   </span>
-Additionally one can manipulate the strength of connections through the weight matrix viewer. Clicking on a cell allows one to manipulate the synaptic strength of the connection represented by the cell. One can also randomize the values in the matrix, set values from a .csv file or save values to a .csv file.<br>
+Additionally one can manipulate the strength of connections through the
+weight matrix viewer. Clicking on a cell allows one to manipulate the
+synaptic strength of the connection represented by the cell. One can
+also randomize the values in the matrix, set values from a .csv file or
+save values to a .csv file.<br>
 
 <table style="margin-left: 40px;" border="0">
 <tbody>
 <tr>
 
 <td width="6%"><img src="../../Images/Rand.png" height="18" width="18"></td>
-<td width="94%"> Pressing the Random button will uniformly randomize the strength of all conections represented in the weight matrix viewer between two numbers (default (1,-1))</td></tr>
+<td width="94%"> Pressing the Random button will uniformly randomize
+the strength of all conections represented in the weight matrix viewer
+between two numbers (default (1,-1))</td></tr>
 <tr>
 <td><img src="../../Images/Prefs.gif" height="18" width="18"></td>
 <td>Pressing the Preferences button will allow one to set the upper and lower bounds on the viewer's randomize function.</td></tr>
 <tr><td><img src="../../Images/Open.png" height="18" width="18"></td>
-<td>Pressing the Open button allows one to open a .csv file and set the values of the connections represented by the viewer to the values specified in the file. Files representing matrices different from the dimensions of the weight matrix shown in the viewer are unsuitable for this task.</td></tr>
+<td>Pressing the Open button allows one to open a .csv file and set the
+values of the connections represented by the viewer to the values
+specified in the file. Files representing matrices different from the
+dimensions of the weight matrix shown in the viewer are unsuitable for
+this task.</td></tr>
 <tr><td><img src="../../Images/Save.png" height="18" width="18"></td>
 <td>Pressing the Save button allows one to save the weight matrix as a .csv file, which can be opened later (as above).</td>
 </tr>
 </tbody>
 </table>
 <br>
-</p>
+
 </blockquote>
 </div>
 

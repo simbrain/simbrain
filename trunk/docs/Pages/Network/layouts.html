@@ -21,20 +21,12 @@
 <div class="navi">
 <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Layouts</p>
 </div>
-<div id="menu">
-<p class="menubold">Layout Types</p>
-<blockquote>
-<p><a href="synapse/clamped.html">Grid</a><br>
-<a href="synapse/hebbian.html">Hex</a><br>
-Line<a href="synapse/hebbianThreshold.html"></a></p></blockquote></div>
-<p> </p>
-<h1>Neuron Layouts</h1>
+<h1>Neuron Layouts</h1><br>
 <p>Layouts refer in the most simple sense to how any group of neurons
 is
-positionally organized in a Simbrain network window. Currently four
-layout types are possible, and can be applied to any selected set of
-neurons or specified before the creation of a subnetwork. (Shown below
-and to the left)<br>
+positionally organized in a Simbrain network window. Currently three
+layout types are possible (plus an additional type not accessable in the GUI), and can be applied to any selected set of
+neurons or specified before the creation of a subnetwork.<br>
 </p>
 <p>Specifically, subnetworks are initialized with a pre-defined
 number of neurons laid out in an appropriate manner. There are
@@ -46,15 +38,17 @@ subnetwork. (Shown below and to the right).<br>
 <p><span style="font-style: italic;">Note:</span> In each case below,
 "initial position" corresponnds to the last
 position clicked on screen, or the upper left corner if no position has
-been clicked (this is the same as with neurons).</p>
+been clicked (this is the same as with neurons). Examples of each kind of layout can be found below the pictures below.</p>
 <br>
-<p style="text-align: left;"><img style="width: 300px; height: 240px;" alt="Subnetwork Layout" src="../../Images/SubnetLayout.png"></p>
-<p style="text-align: left;"><img src="../../Images/LayoutDemo.png" alt="Neuron Layout Demo" style="width: 433px; height: 279px;"></p>
+<p style="text-align: left;"><img src="../../Images/LayoutDemo.png" alt="Neuron Layout Demo" style="width: 433px; height: 279px;">
+&nbsp;<img style="width: 300px; height: 240px;" alt="Subnetwork Layout" src="../../Images/SubnetLayout.png"></p>
 <p style="text-align: center;">
 </p>
+<br>
+<br>
 <p class="heading">Grid</p>
 <p>Neurons are laid out in a grid, beginning at an initial position and
-moving downward. </p>
+moving downward.<img style="width: 175px; height: 120px;" src="../../Images/gridProperties.png" align="right"> </p>
 <blockquote>
   <p><span class="heading2">Number of columns:</span> How many columns
 there will be in the grid.</p>
@@ -64,7 +58,8 @@ Distance between the neurons from left to right. </p>
 Distance between the neurons up and down. </p>
 </blockquote>
 <p class="heading">Line</p>
-<p>Neurons are laid out in a line, beginning at an initial position.</p>
+<p>Neurons are laid out in a line, beginning at an initial position.
+<img style="width: 175px; height: 95px;" src="../../Images/lineProperties.png" align="right"></p>
 <blockquote>
   <p><span class="heading2">Layout Style</span>: Whether the neurons
 are laid out horizontally or vertically.</p>
@@ -76,7 +71,15 @@ between the neurons.</p>
 <blockquote> </blockquote>
 <p><span class="heading"></span><span class="heading"></span><span style="font-weight: bold;"><span class="heading">Hexagonal <br>
 </span></span></p>
-<p>Neurons are laid out in a hexagonal pattern.<br>
+<p>Neurons are laid out in a hexagonal pattern.<img style="width: 175px; height: 120px;" src="../../Images/hexgridProperties.png" align="right"><br>
+<blockquote>
+  <p><span class="heading2">Number of columns:</span> How many columns
+there will be in the grid.</p>
+  <p><span class="heading2">Horizontal Spacing between neurons</span>:
+Distance between the neurons from left to right. </p>
+  <p><span class="heading2">Vertical Spacing between neurons</span>:
+Distance between the neurons up and down. </p>
+</blockquote>
 <span style="font-weight: bold;"><span class="heading"></span></span></p>
 <p class="heading">Layers</p>
 <p>Currently, subnetworks that have

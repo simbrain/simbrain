@@ -32,7 +32,6 @@ import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.actions.AlignHorizontalAction;
 import org.simbrain.network.gui.actions.AlignVerticalAction;
-import org.simbrain.network.gui.actions.ApplyLayoutAction;
 import org.simbrain.network.gui.actions.ClampNeuronsAction;
 import org.simbrain.network.gui.actions.ClampWeightsAction;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -245,8 +244,8 @@ public final class NetworkActionManager {
     /** Layout types. */
     private Action gridLayout, hexagonalLayout, lineLayout;
 
-    /** Show layout dialog action. */
-    private Action showLayoutDialog;
+   // /** Show layout dialog action. */
+  //  private Action showLayoutDialog;
 
     /**
      * Sets the GUI to be used while running networks. Note that the action is
@@ -386,12 +385,9 @@ public final class NetworkActionManager {
         sparseSelf = new ApplyConnectionAction(networkPanel, new Sparse(),
                 "Sparse (self)", true);
 
-        gridLayout = new ApplyLayoutAction(networkPanel, new GridLayout(), "Grid");
-        hexagonalLayout = new ApplyLayoutAction(networkPanel,new HexagonalGridLayout(), "Hex");
-        lineLayout = new ApplyLayoutAction(networkPanel, new LineLayout(), "Line");
-
-        showLayoutDialog = new ShowLayoutDialogAction();
-
+        gridLayout = new ShowLayoutDialogAction(new GridLayout(), networkPanel);
+        hexagonalLayout = new ShowLayoutDialogAction(new HexagonalGridLayout(), networkPanel);
+        lineLayout = new ShowLayoutDialogAction(new LineLayout(), networkPanel);
 
         showConnectDialogAction = new ShowConnectDialogAction(networkPanel);
         setSourceNeuronsAction = new SetSourceNeurons(networkPanel);
@@ -506,7 +502,7 @@ public final class NetworkActionManager {
             layoutMenu.add(action);
         }
         layoutMenu.addSeparator();
-        layoutMenu.add(showLayoutDialog);
+        //layoutMenu.add(showLayoutDialog);
         return layoutMenu;
     }
 

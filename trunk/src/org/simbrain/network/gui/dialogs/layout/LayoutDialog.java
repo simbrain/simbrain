@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
@@ -48,23 +49,30 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
     private JPanel mainPanel = new JPanel();
 
     /** Array of layout panels available to a given network type.*/
-    private Layout[] layouts = new Layout[]{new LineLayout(), new GridLayout(),
+    private Layout[] layouts = {new LineLayout(), new GridLayout(),
             new HexagonalGridLayout()};
 
     /** Layouts combo box. */
-    private JComboBox cbLayouts = new JComboBox(layouts);
+    private JComboBox cbLayouts;
 
-
+    /** The current Layout */
+    private Layout currentLayout;
+    
+    private NetworkPanel networkPanel;
+    
     /**
      * Constructor for creating independent dialog.
      */
-    public LayoutDialog() {
+    public LayoutDialog(NetworkPanel networkPanel) {
         JPanel panel = new JPanel();
+        this.networkPanel = networkPanel;
+        setTitle("Set Layout Properties");
         panel.setLayout(new BorderLayout());
-
+        cbLayouts = new JComboBox(layouts);
         cbLayouts.addActionListener(this);
         topPanel.addItem("Layout Style", cbLayouts);
         panel.add("North", topPanel);
+        
         initPanel();
 //        layoutPanel = layouts[0];
         mainPanel.add(layoutPanel);
@@ -73,10 +81,32 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
     }
 
     /**
+     * Constructor for creating independent dialog.
+     */
+    public LayoutDialog(Layout layout, NetworkPanel networkPanel) {
+    	this.networkPanel = networkPanel;    	
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        currentLayout = layout;
+        setTitle(layout.getLayoutName() + " Properties");
+        panel.add("North", topPanel);
+        panel.setName(layout.getLayoutName());
+        initPanel();
+//        layoutPanel = layouts[0];
+        mainPanel.add(layoutPanel);
+        
+        panel.add("Center", mainPanel);
+  
+        setContentPane(panel);
+    }
+    
+    /**
      * Initialize the layout panel based upon the current layout type.
      */
-    private void initPanel() {
-        Layout currentLayout = (Layout) cbLayouts.getSelectedItem();
+    private void initPanel() {    	
+    	if(cbLayouts != null){
+    		currentLayout = (Layout) cbLayouts.getSelectedItem();
+    	}
         if (currentLayout instanceof LineLayout) {
             clearOptionsPanel();
             layoutPanel = new LineLayoutPanel();
@@ -108,8 +138,11 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
 
     /** @see StandardDialog */
     protected void closeDialogOk() {
-        super.closeDialogOk();
+        super.closeDialogOk();  
         commitChanges();
+        currentLayout.setInitialLocation(networkPanel.getLastClickedPosition());
+        currentLayout.layoutNeurons(networkPanel.getSelectedModelNeurons());
+        networkPanel.repaint();
     }
 
     /** @see AbstractLayoutPanel */
@@ -131,5 +164,21 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
     public Layout getNeuronLayout() {
      return layoutPanel.getNeuronLayout();
     }
+
+	public Layout getCurrentLayout() {
+		return currentLayout;
+	}
+
+	public void setCurrentLayout(Layout currentLayout) {
+		this.currentLayout = currentLayout;
+	}
+
+	public NetworkPanel getNetworkPanel() {
+		return networkPanel;
+	}
+
+	public void setNetworkPanel(NetworkPanel networkPanel) {
+		this.networkPanel = networkPanel;
+	}
 
 }

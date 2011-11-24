@@ -22,7 +22,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
+import org.simbrain.network.layouts.Layout;
 
 /**
  * Show layout dialog action.
@@ -33,20 +35,36 @@ public class ShowLayoutDialogAction extends AbstractAction {
      * Serial UID.
      */
     private static final long serialVersionUID = -3355422356278099294L;
-
+    
+    private Layout layout;
+    
+    private NetworkPanel networkPanel;
+    
     /**
      * Show layout dialog action.
      */
-    public ShowLayoutDialogAction() {
-        super("Set Layout Properties...");
+    public ShowLayoutDialogAction(Layout layout, NetworkPanel networkPanel) {
+        super(layout.getLayoutName());
+        this.layout = layout;
+        this.networkPanel = networkPanel;     
+    }
+    
+    public ShowLayoutDialogAction(NetworkPanel networkPanel){
+    	super("Set Layout Properties");
+    	this.networkPanel = networkPanel;
     }
 
     /** @see ActionEvent. */
     public void actionPerformed(ActionEvent e) {
-        LayoutDialog dialog = new LayoutDialog();
+    	LayoutDialog dialog;
+    	if(layout != null)
+    		dialog = new LayoutDialog(layout, networkPanel);
+    	else
+    		dialog = new LayoutDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+        
     }
 
 }

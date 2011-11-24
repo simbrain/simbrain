@@ -18,16 +18,28 @@
  */
 package org.simbrain.network.gui.actions;
 
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.AddNeuronsDialog;
+import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
+import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
+import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * Creates a group of neurons.
@@ -38,7 +50,37 @@ public final class AddNeuronsAction
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
+/*
+    class ShowNeuronDialog extends AbstractAction{
 
+    	private ArrayList<NeuronNode> nodes;
+    	
+    	public ShowNeuronDialog(ArrayList<NeuronNode> nodes){
+    		super("Neuron Parameters");
+    		this.nodes = nodes;
+    	}
+    	
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			NeuronDialog nDialog = new NeuronDialog(nodes){
+				protected void closeDialogOk(){
+					super.closeDialogOk();
+			        commitChanges();
+			        LayoutDialog dialog = new LayoutDialog(networkPanel);
+			        dialog.pack();
+			        dialog.setLocationRelativeTo(null);
+			        dialog.setVisible(true);
+				}
+			};
+			nDialog.pack();
+			nDialog.setLocationRelativeTo(null);
+			nDialog.setVisible(true);
+		}
+    	
+    }
+    
+    private Action nDialog;
+    */
     /**
      * Create a new neuron action with the specified network panel.
      *
@@ -62,19 +104,10 @@ public final class AddNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        String result = JOptionPane.showInputDialog("Number of neurons to add", "100");
-        if (result != null) {
-            int numNeurons = Integer.parseInt(result);
-            GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numNeurons));
-            ArrayList<Neuron> list = new ArrayList<Neuron>();
-            layout.setInitialLocation(networkPanel.getLastClickedPosition());
-            for (int i = 0; i < numNeurons; i++) {
-                Neuron neuron = new Neuron(networkPanel.getRootNetwork(), new LinearNeuron()); 
-                list.add(neuron);
-                networkPanel.getRootNetwork().addNeuron(neuron);
-            }
-            layout.layoutNeurons(list);
-            networkPanel.repaint();
-        }
+    	AddNeuronsDialog and = new AddNeuronsDialog(networkPanel);
+        and.pack();
+        and.setLocationRelativeTo(null);
+        and.setVisible(true);
     }
+  
 }

@@ -244,9 +244,6 @@ public final class NetworkActionManager {
     /** Layout types. */
     private Action gridLayout, hexagonalLayout, lineLayout;
 
-   // /** Show layout dialog action. */
-  //  private Action showLayoutDialog;
-
     /**
      * Sets the GUI to be used while running networks. Note that the action is
      * wrapped in CheckBoxMenuItem.
@@ -501,8 +498,6 @@ public final class NetworkActionManager {
         for (Action action : getLayoutActions()) {
             layoutMenu.add(action);
         }
-        layoutMenu.addSeparator();
-        //layoutMenu.add(showLayoutDialog);
         return layoutMenu;
     }
 

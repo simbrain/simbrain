@@ -39,6 +39,11 @@ import org.simbrain.util.StandardDialog;
  */
 public class LayoutDialog extends StandardDialog implements ActionListener {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     /** The current layout panel. */
     private AbstractLayoutPanel layoutPanel;
 
@@ -55,15 +60,17 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
     /** Layouts combo box. */
     private JComboBox cbLayouts;
 
-    /** The current Layout */
+    /** The current Layout.*/
     private Layout currentLayout;
-    
-    private NetworkPanel networkPanel;
-    
+
+    /** The network panel where layout will occur.*/
+    private final NetworkPanel networkPanel;
+
     /**
      * Constructor for creating independent dialog.
+     * @param networkPanel the networkPanel where layout will occur
      */
-    public LayoutDialog(NetworkPanel networkPanel) {
+    public LayoutDialog(final NetworkPanel networkPanel) {
         JPanel panel = new JPanel();
         this.networkPanel = networkPanel;
         setTitle("Set Layout Properties");
@@ -72,7 +79,6 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
         cbLayouts.addActionListener(this);
         topPanel.addItem("Layout Style", cbLayouts);
         panel.add("North", topPanel);
-        
         initPanel();
 //        layoutPanel = layouts[0];
         mainPanel.add(layoutPanel);
@@ -82,9 +88,11 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
 
     /**
      * Constructor for creating independent dialog.
+     * @param layout the kind of layout
+     * @param networkPanel the network panel where layout will occur
      */
-    public LayoutDialog(Layout layout, NetworkPanel networkPanel) {
-    	this.networkPanel = networkPanel;    	
+    public LayoutDialog(Layout layout, final NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         currentLayout = layout;
@@ -94,19 +102,17 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
         initPanel();
 //        layoutPanel = layouts[0];
         mainPanel.add(layoutPanel);
-        
         panel.add("Center", mainPanel);
-  
         setContentPane(panel);
     }
-    
+
     /**
      * Initialize the layout panel based upon the current layout type.
      */
-    private void initPanel() {    	
-    	if(cbLayouts != null){
-    		currentLayout = (Layout) cbLayouts.getSelectedItem();
-    	}
+    private void initPanel() {
+        if (cbLayouts != null) {
+            currentLayout = (Layout) cbLayouts.getSelectedItem();
+        }
         if (currentLayout instanceof LineLayout) {
             clearOptionsPanel();
             layoutPanel = new LineLayoutPanel();
@@ -139,7 +145,6 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
     /** @see StandardDialog */
     protected void closeDialogOk() {
         super.closeDialogOk();  
-        commitChanges();
         currentLayout.setInitialLocation(networkPanel.getLastClickedPosition());
         currentLayout.layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();
@@ -148,7 +153,6 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
     /** @see AbstractLayoutPanel */
     public void commitChanges() {
         layoutPanel.commitChanges();
-        
     }
 
     /** @see ActionListener */
@@ -175,10 +179,6 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
 
 	public NetworkPanel getNetworkPanel() {
 		return networkPanel;
-	}
-
-	public void setNetworkPanel(NetworkPanel networkPanel) {
-		this.networkPanel = networkPanel;
 	}
 
 }

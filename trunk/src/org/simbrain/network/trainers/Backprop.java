@@ -111,7 +111,6 @@ public class Backprop extends Trainer implements IterableAlgorithm {
     @Override
     public void apply() {
 
-
         rmsError = 0;
         int numRows = getMinimumNumRows();
         int numInputs = getInputLayer().size();
@@ -155,6 +154,7 @@ public class Backprop extends Trainer implements IterableAlgorithm {
 
         // Update RMS error
         rmsError = Math.sqrt(rmsError / (numRows * getOutputLayer().size()));
+        fireErrorUpdated();
         iteration += this.getIteration();
     }
 

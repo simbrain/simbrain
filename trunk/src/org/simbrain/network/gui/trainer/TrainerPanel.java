@@ -13,22 +13,22 @@
  */
 package org.simbrain.network.gui.trainer;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.lang.reflect.Constructor;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.builders.LayeredNetworkBuilder;
+import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.trainers.Backprop;
 import org.simbrain.network.trainers.IterableAlgorithm;
@@ -38,14 +38,16 @@ import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.workspace.gui.GenericJFrame;
 
 /**
  * GUI for supervised learning in Simbrain, using back-propagation, LMS, and
  * (eventually) other algorithms. A GUI front end for the trainer class.
  *
- * @author jeff yoshimi
+ * @author Jeff Yoshimi
  */
-public class TrainerPanel extends JDialog {
+public class TrainerPanel extends JPanel {
 
     /** Data window. */
     private JPanel dataWindow;
@@ -71,26 +73,39 @@ public class TrainerPanel extends JDialog {
     /** Run panel; changes depending on learning rule selected. */
     private JPanel runPanel;
 
+    /** Data panel. */
+    private JPanel dataPanel = new JPanel();
+
     /** Combo box for training algorithm. */
     private JComboBox cbTrainingAlgorithm;
+
+    /** Combo box for training algorithm. */
+    private JComboBox cbDataFormat;
+
+    /** Parent frame. */
+    private GenericFrame parentFrame;
+
+    /**
+     * Type of the data viewer: an input data viewer or training data viewer.
+     */
+    enum DataFormat {
+        LOAD_DATA {
+            public String toString() {
+                return "Load data";
+            }
+        },
+        SINGLE_STEP {
+            public String toString() {
+                return "Use current activations";
+            }
+        };
+    };
 
     /** Panel showing the current "run control" */
     private JPanel currentTrainerRunControls;
 
     /** Indicates that (an iterative) training algorithm is running. */
     private JLabel runningLabel = new JLabel();
-
-    /**
-     * Current input data file. When re-opening input data uses this as a
-     * pointer.
-     */
-    private File currentInputFile;
-
-    /**
-     * Current training data file. When re-opening input data uses this as a
-     * pointer.
-     */
-    private File currentTrainingFile;
 
     /**
      * Type of the data viewer: an input data viewer or training data viewer.
@@ -104,42 +119,59 @@ public class TrainerPanel extends JDialog {
      *
      * @param trainer the trainer this panel represents
      */
-    public TrainerPanel(final Trainer trainer) {
+    public TrainerPanel(final GenericFrame parentFrame, final Trainer trainer) {
 
         // Initial setup
         this.trainer = trainer;
+        this.parentFrame = parentFrame;
 
         // Main Panel
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(3, 1));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        parentFrame.setTitle("Train " + trainer.getTopologyDescription() + " net");
 
         // Top items
-        topItems = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        topItems = new JPanel();
+        topItems.setLayout(new BoxLayout(topItems, BoxLayout.Y_AXIS));
         topItems.setBorder(BorderFactory.createTitledBorder("Learning Rule"));
+        JPanel comboBoxPlusButton = new JPanel();
+        comboBoxPlusButton.setAlignmentX(CENTER_ALIGNMENT);
         cbTrainingAlgorithm = new JComboBox(Trainer.getRuleList());
         cbTrainingAlgorithm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 trainerChanged();
             }
         });
-        topItems.add(cbTrainingAlgorithm);
+        comboBoxPlusButton.add(cbTrainingAlgorithm);
         JButton properties = new JButton(
                 TrainerGuiActions.getPropertiesDialogAction(this));
-        topItems.add(properties);
+        comboBoxPlusButton.add(properties);
+        topItems.add(comboBoxPlusButton);
         mainPanel.add(topItems);
 
         // Center run panel
-        runPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        runPanel = new JPanel();
+        runPanel.setLayout(new BoxLayout(runPanel, BoxLayout.Y_AXIS));
         runPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
         mainPanel.add("Center", runPanel);
 
         // Data windows
-        dataWindow = new JPanel();
+        dataWindow = new JPanel(new BorderLayout());
         dataWindow.setBorder(BorderFactory.createTitledBorder("Data"));
-        dataWindow.add(new JButton(TrainerGuiActions.getEditDataAction(this,
-                TrainerDataType.Input)));
-        dataWindow.add(new JButton(TrainerGuiActions.getEditDataAction(this,
-                TrainerDataType.Trainer)));
+        dataWindow.setLayout(new BoxLayout(dataWindow, BoxLayout.Y_AXIS));
+        cbDataFormat = new JComboBox(DataFormat.values());
+        cbDataFormat.setAlignmentX(CENTER_ALIGNMENT);
+        JPanel buffer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buffer.add(cbDataFormat);
+        dataWindow.add("North", buffer);
+        dataWindow.add(dataPanel);
+
+        cbDataFormat.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                refreshDataPanel();
+            }
+        });
+
         mainPanel.add(dataWindow);
 
         // Add trainer listener
@@ -147,9 +179,82 @@ public class TrainerPanel extends JDialog {
 
         // Initialize trainer specific panels
         trainerChanged();
+        refreshDataPanel();
 
         // Add mainPanel
         add(mainPanel);
+
+    }
+
+    /**
+     * Refresh the data panel.
+     */
+    private void refreshDataPanel() {
+        dataPanel.removeAll();
+        if (cbDataFormat.getSelectedItem() == DataFormat.LOAD_DATA) {
+            JPanel loadPanel = new LoadDataPanel();
+            dataPanel.add(loadPanel);
+        } else if (cbDataFormat.getSelectedItem() == DataFormat.SINGLE_STEP) {
+            JPanel singleStepPanel = new SingleStepPanel();
+            dataPanel.add(singleStepPanel);
+        }
+        trainerChanged();
+    }
+
+    /**
+     * Panel for single step training.
+     */
+    class SingleStepPanel extends JPanel {
+
+        /**
+         * Construct panel.
+         */
+        public SingleStepPanel() {
+            final JLabel currentInput = new JLabel("Input: ");
+            final JLabel currentTraining = new JLabel("Training: ");
+
+            this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            JButton setDataButton = new JButton("Set Data");
+            setDataButton.setAlignmentX(CENTER_ALIGNMENT);
+            currentInput.setAlignmentX(CENTER_ALIGNMENT);
+            currentTraining.setAlignmentX(CENTER_ALIGNMENT);
+            this.add(setDataButton);
+            this.add(currentInput);
+            this.add(currentTraining);
+            setDataButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    double[] inputVector = Network
+                            .getActivationVector(trainer.getInputLayer());
+                    double[] trainingVector = Network
+                            .getActivationVector(trainer.getOutputLayer());
+                    currentInput.setText("Input: "
+                            + Utils.getVectorString(inputVector, ","));
+                    currentTraining.setText("Target:  "
+                            + Utils.getVectorString(trainingVector, ","));
+                    trainer.setInputData(new double[][] { inputVector});
+                    trainer.setTrainingData(new double[][] { trainingVector});
+                    parentFrame.pack();
+                }
+            });
+        }
+
+    }
+
+    /**
+     * Panel for editing or loading data.
+     */
+    class LoadDataPanel extends JPanel {
+
+        /**
+         * Construct panel.
+         */
+        public LoadDataPanel() {
+            super();
+            add(new JButton(TrainerGuiActions.getEditDataAction(
+                    TrainerPanel.this, TrainerDataType.Input)));
+            add(new JButton(TrainerGuiActions.getEditDataAction(
+                    TrainerPanel.this, TrainerDataType.Trainer)));
+        }
 
     }
 
@@ -167,9 +272,13 @@ public class TrainerPanel extends JDialog {
             Constructor<?> trainerConstructor = selectedTrainer
                     .getConstructor(Trainer.class);
             trainer = (Trainer) trainerConstructor.newInstance(oldTrainer);
+            trainer.getListeners().clear();
+            trainer.getListeners().addAll(oldTrainer.getListeners());
             trainer.init();
-            trainer.getNetwork().clearActivations();
-            trainer.getNetwork().clearBiases();
+            if (cbDataFormat.getSelectedItem() != DataFormat.SINGLE_STEP) {
+                trainer.getNetwork().clearActivations();
+                trainer.getNetwork().clearBiases();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -185,7 +294,7 @@ public class TrainerPanel extends JDialog {
 
         }
         runPanel.add(currentTrainerRunControls);
-        pack();
+        parentFrame.pack();
     }
 
     /**
@@ -201,10 +310,13 @@ public class TrainerPanel extends JDialog {
              */
             public void errorUpdated() {
                 if (trainer instanceof IterableAlgorithm) {
-                    model.update();
-                    IterableAlgorithm theTrainer = (IterableAlgorithm) trainer;
-                    model.addData(0, theTrainer.getIteration(),
-                            theTrainer.getError());
+                    if (model != null) {
+                        model.update();
+                        IterableAlgorithm theTrainer = (IterableAlgorithm) trainer;
+                        model.addData(0, theTrainer.getIteration(),
+                                theTrainer.getError());
+                    }
+                    updateErrorField();
                 }
             }
 
@@ -324,34 +436,6 @@ public class TrainerPanel extends JDialog {
     }
 
     /**
-     * @return the currentInputFile
-     */
-    public File getCurrentInputFile() {
-        return currentInputFile;
-    }
-
-    /**
-     * @param currentInputFile the currentInputFile to set
-     */
-    public void setCurrentInputFile(File currentInputFile) {
-        this.currentInputFile = currentInputFile;
-    }
-
-    /**
-     * @return the currentTrainingFile
-     */
-    public File getCurrentTrainingFile() {
-        return currentTrainingFile;
-    }
-
-    /**
-     * @param currentTrainingFile the currentTrainingFile to set
-     */
-    public void setCurrentTrainingFile(File currentTrainingFile) {
-        this.currentTrainingFile = currentTrainingFile;
-    }
-
-    /**
      * Iterate the trainer one time and update graphics.
      */
     final void iterate() {
@@ -380,7 +464,7 @@ public class TrainerPanel extends JDialog {
             } else {
                 runningLabel.setVisible(true);
             }
-            pack();
+            parentFrame.pack();
         }
     }
 
@@ -399,14 +483,16 @@ public class TrainerPanel extends JDialog {
     public static void main(String[] args) {
         RootNetwork network = new RootNetwork();
         LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
-        int[] nodesPerLayer = new int[] { 2, 1 };
+        int[] nodesPerLayer = new int[] { 2, 2, 1 };
         builder.setNodesPerLayer(nodesPerLayer);
         builder.buildNetwork(network);
         Backprop trainer = new Backprop(network, network.getGroup("Group_1")
                 .getNeuronList(), network.getGroup("Group_2").getNeuronList());
-        TrainerPanel trainerPanel = new TrainerPanel(trainer);
-        trainerPanel.pack();
-        trainerPanel.setVisible(true);
+        GenericJFrame frame = new GenericJFrame();
+        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
+        frame.setContentPane(trainerPanel);
+        frame.pack();
+        frame.setVisible(true);
     }
 
 }

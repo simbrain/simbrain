@@ -17,8 +17,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
@@ -37,7 +35,6 @@ import org.simbrain.network.trainers.IterableAlgorithm;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -63,9 +60,7 @@ public class TrainerGuiActions {
 
     /**
      * Action invoked when pressing the input or training data button on the
-     * trainer panel. If a data file is already associated with the input or
-     * training data, then just display the data, otherwise prompt to open it. A
-     * fair number of helper methods are used below.
+     * trainer panel.
      *
      * @param trainerPanel the parent trainer panel
      * @param type whether this is input or training data
@@ -83,74 +78,17 @@ public class TrainerGuiActions {
                 } else {
                     putValue(NAME, "Training data");
                 }
-                putValue(SHORT_DESCRIPTION, "Open / edit data...");
+                putValue(SHORT_DESCRIPTION, "Edit data");
             }
 
             /**
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                File theFile = null;
-                if (type == TrainerDataType.Input) {
-                    if (trainerPanel.getTrainer().getInputData() == null) {
-                        theFile = openData(trainerPanel, type);
-                    } else {
-                        theFile = trainerPanel.getCurrentInputFile();
-                        trainerPanel.getTrainer().setInputData(theFile);
-                    }
-                } else {
-                    if (trainerPanel.getTrainer().getTrainingData() == null) {
-                        theFile = openData(trainerPanel, type);
-                    } else {
-                        theFile = trainerPanel.getCurrentTrainingFile();
-                        trainerPanel.getTrainer().setTrainingData(theFile);
-                    }
-                }
-                if (theFile != null) {
-                    displayDataInViewerPanel(trainerPanel, type, theFile);
-                }
+                TrainerGuiActions.displayDataInViewerPanel(trainerPanel, type);
             }
 
         };
-    }
-
-    /**
-     * Let the user choose the csv file. If the file is in the wrong format a
-     * message is displayed.
-     *
-     * @param trainerPanel the parent trainer panel
-     * @param type whether this is input or training data
-     * @return the opened file, or null if none found or selected
-     */
-    private static File openData(final TrainerPanel trainerPanel,
-            final TrainerDataType type) {
-        SFileChooser chooser = new SFileChooser(getDataDirectory(),
-                "comma-separated-values (csv)", "csv");
-        File theFile = chooser.showOpenDialog();
-        if (theFile != null) {
-            if (type == TrainerDataType.Input) {
-                try {
-                    trainerPanel.getTrainer().setInputData(theFile);
-                    trainerPanel.setCurrentInputFile(theFile);
-                } catch (InvalidDataException exception) {
-                    JOptionPane.showMessageDialog(null, exception.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return null;
-                }
-            } else {
-                try {
-                    trainerPanel.getTrainer().setTrainingData(theFile);
-                    trainerPanel.setCurrentTrainingFile(theFile);
-                } catch (InvalidDataException exception) {
-                    JOptionPane.showMessageDialog(null, exception.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return null;
-                }
-            }
-            setDataDirectory(chooser.getCurrentLocation());
-            return theFile;
-        }
-        return null;
     }
 
     /**
@@ -161,14 +99,12 @@ public class TrainerGuiActions {
      * @param type whether this is input or training data
      * @param theFile the File associated with this data
      */
-    private static void displayDataInViewerPanel(
-            final TrainerPanel trainerPanel, final TrainerDataType type,
-            final File theFile) {
+    public static void displayDataInViewerPanel(
+            final TrainerPanel trainerPanel, final TrainerDataType type) {
 
         // Set up frame and main panel
         JFrame frame = new JFrame();
         final DataViewer viewer = new DataViewer(trainerPanel, type);
-        viewer.getTable().setHasChangedSinceLastSave(false);
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add("Center", viewer);
 
@@ -179,8 +115,8 @@ public class TrainerGuiActions {
         JToolBar fileToolBar = new JToolBar();
         fileToolBar
                 .add(getOpenCSVAction(trainerPanel, viewer.getTable(), type));
-        fileToolBar
-                .add(getSaveCSVAction(trainerPanel, viewer.getTable(), type));
+        fileToolBar.add(TableActionManager
+                .getSaveCSVAction((NumericTable) viewer.getTable().getData()));
         toolbars.add(fileToolBar);
 
         // Edit tools
@@ -191,22 +127,11 @@ public class TrainerGuiActions {
                 .add(TableActionManager.getDeleteRowAction(viewer.getTable()));
         toolbars.add(editToolBar);
 
+        // Randomize tools
+        toolbars.add(viewer.getTable().getToolbarRandomize());
+
         mainPanel.add("North", toolbars);
 
-        frame.addWindowListener(new WindowAdapter() {
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                if (viewer.getTable().hasChanged()) {
-                    boolean hasCancelled = showHasChangedDialog(viewer);
-                    if (hasCancelled) {
-                        return;
-                    }
-                }
-                super.windowClosing(e);
-            }
-
-        });
         frame.getContentPane().add(mainPanel);
         frame.pack();
 
@@ -227,33 +152,7 @@ public class TrainerGuiActions {
 
         // Display the frame
         frame.setVisible(true);
-        frame.setTitle(theFile.getName());
-    }
-
-    /**
-     * Show a has-changed dialog.
-     *
-     * @param viewer viewer to check
-     * @return whether the user cancelled or not
-     */
-    private static boolean showHasChangedDialog(DataViewer viewer) {
-
-        String[] options = { "Save", "Don't Save", "Cancel" };
-        int result = JOptionPane.showOptionDialog(viewer,
-                "This table has changed since last save,\n"
-                        + "Would you like to save these changes?",
-                "Table Has Changed", JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-
-        if (result == JOptionPane.OK_OPTION) {
-            viewer.save();
-            return false;
-        } else if (result == JOptionPane.NO_OPTION) {
-            return false;
-        } else if (result == JOptionPane.CANCEL_OPTION) {
-            return true;
-        }
-        return false;
+        //frame.setTitle(theFile.getName());
     }
 
     /**
@@ -308,10 +207,8 @@ public class TrainerGuiActions {
                 if (theFile != null) {
                     if (type == TrainerDataType.Input) {
                         try {
-                            ((NumericTable) table.getData()).readData(theFile);
                             trainer.getTrainer().setInputData(theFile);
-                            trainer.setCurrentInputFile(theFile);
-                            table.setHasChangedSinceLastSave(false);
+                            ((NumericTable) table.getData()).readData(theFile);
                             ((JFrame) table.getTopLevelAncestor())
                                     .setTitle(theFile.getName());
                         } catch (InvalidDataException exception) {
@@ -321,10 +218,8 @@ public class TrainerGuiActions {
                         }
                     } else {
                         try {
-                            ((NumericTable) table.getData()).readData(theFile);
                             trainer.getTrainer().setTrainingData(theFile);
-                            trainer.setCurrentTrainingFile(theFile);
-                            table.setHasChangedSinceLastSave(false);
+                            ((NumericTable) table.getData()).readData(theFile);
                             ((JFrame) table.getTopLevelAncestor())
                                     .setTitle(theFile.getName());
                         } catch (InvalidDataException exception) {
@@ -340,49 +235,6 @@ public class TrainerGuiActions {
         };
     }
 
-    /**
-     * Action for saving to a comma separated value file (with no dialog. This
-     * is save rather than save-as). Replaces the default simbrainjtable action
-     * for this, so that the trainer and trainer panel can be updated as
-     * appropriate.
-     *
-     * @return the action
-     */
-    public static Action getSaveCSVAction(final TrainerPanel trainer,
-            final SimbrainJTable table, final TrainerDataType type) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
-                putValue(NAME, "Save");
-                if (type == TrainerDataType.Input) {
-                    putValue(SHORT_DESCRIPTION,
-                            "Save input data: " + trainer.getCurrentInputFile());
-                } else {
-                    putValue(SHORT_DESCRIPTION, "Save training data: "
-                            + trainer.getCurrentTrainingFile());
-                }
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                if (type == TrainerDataType.Input) {
-                    Utils.writeMatrix(table.getData().asStringArray(),
-                            trainer.getCurrentInputFile());
-                    table.setHasChangedSinceLastSave(false);
-                } else {
-                    Utils.writeMatrix(table.getData().asStringArray(),
-                            trainer.getCurrentTrainingFile());
-                    table.setHasChangedSinceLastSave(false);
-                }
-
-            }
-
-        };
-    }
 
     /**
      * Returns a "play" action, that can be used to repeatedly iterate iterable

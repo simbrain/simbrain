@@ -48,7 +48,7 @@ public abstract class Trainer {
     private final List<Neuron> outputLayer;
 
     /** Listener list. */
-    private List<TrainerListener> listeners = new ArrayList<TrainerListener>();
+    private final List<TrainerListener> listeners = new ArrayList<TrainerListener>();
 
     /**
      * Same number of columns as input network. Same number of rows as training
@@ -126,13 +126,14 @@ public abstract class Trainer {
     }
 
     /**
-     * @param inputData the inputData to set
+     * @param newData the inputData to set
+     * @throws InvalidDataException
      */
     public final void setInputData(double[][] newData) {
         if (newData != null) {
             if (newData[0].length != inputLayer.size()) {
-                throw new InvalidDataException("Data mismatch: input data has "
-                        + newData[0].length + " columns, input layer has "
+                throw new InvalidDataException("Data mismatch: selected data has "
+                        + newData[0].length + " columns; input layer has "
                         + inputLayer.size() + " neurons");
             }
             // System.out.println("Input Data: \n" +
@@ -162,15 +163,15 @@ public abstract class Trainer {
     /**
      * Set training data.
      *
-     * @param trainingData the trainingData to set
+     * @param newData the trainingData to set
      * @throws InvalidDataException
      */
     public void setTrainingData(double[][] newData) {
         if (newData != null) {
             if (newData[0].length != outputLayer.size()) {
                 throw new InvalidDataException(
-                        "Data mismatch: training data has " + newData[0].length
-                                + " columns, input layer has "
+                        "Data mismatch: selected data has " + newData[0].length
+                                + " columns; output layer has "
                                 + outputLayer.size() + " neurons");
             }
             this.trainingData = newData;
@@ -260,6 +261,16 @@ public abstract class Trainer {
         listeners.add(trainerListener);
     }
 
+    /**
+     * Returns a description of the network topology.
+     *
+     * @return the description
+     */
+    public String getTopologyDescription() {
+        String retString = inputLayer.size() + " > " + outputLayer.size();
+        return retString;
+    }
+
     @Override
     public String toString() {
         String retString = "";
@@ -289,6 +300,13 @@ public abstract class Trainer {
      */
     public static ClassDescriptionPair[] getRuleList() {
         return RULE_LIST;
+    }
+
+    /**
+     * @return the listeners
+     */
+    public List<TrainerListener> getListeners() {
+        return listeners;
     }
 
 }

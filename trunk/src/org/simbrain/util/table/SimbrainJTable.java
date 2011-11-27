@@ -80,7 +80,7 @@ public class SimbrainJTable extends JXTable {
 
     /** Whether to display column headings. */
     private boolean displayColumnHeadings = true;
-    
+
     /** Whether to display the default popup menu. */
     private boolean displayPopUpMenu = true;
     

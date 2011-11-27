@@ -657,11 +657,12 @@ public class NetworkPanel extends JPanel {
      */
     private JMenuItem getLayoutMenu() {
         JMenuItem layoutProperties = new JMenuItem("Set Layout Properties...");
+        final NetworkPanel thispanel = this;
         layoutProperties.addActionListener(new ActionListener() {
 
             /** @see ActionEvent. */
             public void actionPerformed(ActionEvent e) {
-                LayoutDialog dialog = new LayoutDialog();
+                LayoutDialog dialog = new LayoutDialog(thispanel);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);

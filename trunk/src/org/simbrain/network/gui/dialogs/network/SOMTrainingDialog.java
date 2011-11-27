@@ -322,7 +322,7 @@ public class SOMTrainingDialog extends StandardDialog implements
         tfLearningRate.setText("" + som.getInitAlpha());
         tfNeighborhoodSize.setText("" + som.getInitNeighborhoodSize());
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
-        tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
+        tfNeigborhoodDecayAmount.setText(Double.toString(som.getNeighborhoodDecayAmount()));
         this.checkTrainingFiles();
     }
 
@@ -331,8 +331,8 @@ public class SOMTrainingDialog extends StandardDialog implements
      */
     public void fillLabelValues() {
         epochs.setText(Integer.toString(som.getEpochs()));
-        learningRate.setText(Double.toString(som.getAlpha()));
-        neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
+        learningRate.setText(Utils.round(som.getAlpha(), 2));
+        neighborhoodSize.setText(Utils.round(som.getNeighborhoodSize(), 2));
         updateCompleted = true;
     }
 

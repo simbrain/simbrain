@@ -28,7 +28,9 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
 
 /**
- * <b>Competitive</b> implements a Competitive network.
+ * <b>Competitive</b> implements a simple competitive network (See PDP 1, ch. 151-193.)
+ * 
+ * TODO: Add "recall" function as with SOM
  *
  * @author Jeff Yoshimi
  */

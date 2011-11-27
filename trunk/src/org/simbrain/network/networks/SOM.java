@@ -14,6 +14,8 @@ import org.simbrain.network.neurons.LinearNeuron;
  * <b>SOM</b> implements a Self-Organizing Map network.
  *
  * @author William B. St. Clair
+ * 
+ * TODO: Move all "training" functions over to trainer
  */
 public class SOM extends Network {
 
@@ -48,7 +50,7 @@ public class SOM extends Network {
     private static final double DEFAULT_DECAY_RATE = 0.05;
 
     /** The default neighborhoodDecayAmount. */
-    private static final int DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = 5;
+    private static final double DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = 5;
 
     /** Initial Learning Rate. */
     private double initAlpha = DEFAULT_ALPHA;
@@ -102,7 +104,7 @@ public class SOM extends Network {
     private double alphaDecayRate = DEFAULT_DECAY_RATE;
 
     /** The amount that the neighborhood decrements. */
-    private int neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
+    private double neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
     /**
      * Default constructor.
@@ -191,6 +193,8 @@ public class SOM extends Network {
     /**
      * Iterates the network based on training inputs. Does not respect superior
      * networks.
+     * 
+     * TODO: Integrate this code with train and update.
      */
     public void iterate() {
         for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
@@ -293,6 +297,8 @@ public class SOM extends Network {
     /**
      * Trains the network in batches based on trainingInputs. Does not respect
      * superior networks.
+     * 
+     * TODO: Integrate this code with train and update
      */
     public void train() {
         int epochNumber;
@@ -366,7 +372,7 @@ public class SOM extends Network {
      * current iteration is equal to the total number of vectors to be analyzed,
      * update the network parameters and count one full iteration. Else the
      * network must be in recallMode. If all neurons are clamped, return. Find
-     * the SOM neuron with heighest activation. Set the activations of input
+     * the SOM neuron with highest activation. Set the activations of input
      * neurons according to the SOM weights.
      */
     public void update() {
@@ -414,15 +420,14 @@ public class SOM extends Network {
                     }
                 }
             }
-            // Whenever updateInterval time-steps pass, update learning rate,
-            // etc.
-            if (this.getRootNetwork().getTime() % updateInterval == 0) {
-                alpha *= alphaDecayRate;
-                if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-                    neighborhoodSize -= neighborhoodDecayAmount;
-                } else {
-                    neighborhoodSize = 0;
-                }
+            alpha *= (1 - alphaDecayRate);
+            // TODO: Now reducing decay rate as
+            // percentage. Document and make
+            // others consistent with this.
+            if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+                neighborhoodSize -= neighborhoodDecayAmount;
+            } else {
+                neighborhoodSize = 0;
             }
         }
     }
@@ -498,7 +503,7 @@ public class SOM extends Network {
      *
      * @return neighborhoodDecayAmount
      */
-    public int getNeighborhoodDecayAmount() {
+    public double getNeighborhoodDecayAmount() {
         return neighborhoodDecayAmount;
     }
 
@@ -599,6 +604,8 @@ public class SOM extends Network {
      */
     public void setInitNeighborhoodSize(final double initNeighborhoodSize) {
         this.initNeighborhoodSize = initNeighborhoodSize;
+        // TODO: make it possibly to directly set n-hood size
+        neighborhoodSize = initNeighborhoodSize;
     }
 
     /**
@@ -606,7 +613,7 @@ public class SOM extends Network {
      *
      * @param neighborhoodDecayAmount decay amount
      */
-    public void setNeighborhoodDecayAmount(final int neighborhoodDecayAmount) {
+    public void setNeighborhoodDecayAmount(final double neighborhoodDecayAmount) {
         this.neighborhoodDecayAmount = neighborhoodDecayAmount;
     }
 

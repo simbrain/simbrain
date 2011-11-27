@@ -31,7 +31,7 @@ import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.networks.SOM;
-import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.Utils;
 
 /**
  * <b>SOMNode</b> is the graphical representation of SOM Networks.
@@ -64,30 +64,24 @@ public class SOMNode extends SubnetworkNode {
                                      final double y) {
 
         super(networkPanel, subnetwork, x, y);
-        
+
         subnetwork.getRootNetwork().addNetworkListener(new NetworkListener() {
 
             public void networkChanged() {
                 SOMNode.this.setLabel("SOM - Learning rate:"
-                        + SimbrainMath.roundDouble(subnetwork.getAlpha(), 2)
-                        + " N-size:" + subnetwork.getNeighborhoodSize());
+                        + Utils.round(subnetwork.getAlpha(), 2) + " N-size:"
+                        + Utils.round(subnetwork.getNeighborhoodSize(), 2));
             }
 
             public void networkUpdateMethodChanged() {
-                // TODO Auto-generated method stub
-                
             }
 
             public void neuronClampToggled() {
-                // TODO Auto-generated method stub
-                
             }
 
             public void synapseClampToggled() {
-                // TODO Auto-generated method stub
-                
             }
-            
+
         });
 
         resetAction = new AbstractAction("Reset Network") {
@@ -129,8 +123,10 @@ public class SOMNode extends SubnetworkNode {
 
     /** @see org.simbrain.network.gui.nodes.ScreenElement */
     protected String getToolTipText() {
-        return "Current learning rate: " + getSOMSubnetwork().getAlpha() + "  Current neighborhood size: "
-            + getSOMSubnetwork().getNeighborhoodSize();
+        return "Current learning rate: "
+                + Utils.round(getSOMSubnetwork().getAlpha(), 2)
+                + "  Current neighborhood size: "
+                + Utils.round(getSOMSubnetwork().getNeighborhoodSize(), 2);
     }
 
     /** @see org.simbrain.network.gui.nodes.ScreenElement */

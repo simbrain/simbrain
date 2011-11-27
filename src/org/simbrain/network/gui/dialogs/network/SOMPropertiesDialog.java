@@ -11,6 +11,7 @@ import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.SOM;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 /**
  * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a SOM.
@@ -80,7 +81,7 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
       som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
       som.setInitNeighborhoodSize(Double.parseDouble(tfInitNeighborhoodSize.getText()));
       som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-      som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
+      som.setNeighborhoodDecayAmount(Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
       super.closeDialogOk();
     }
 
@@ -91,9 +92,9 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
         tfAlpha.setText(Double.toString(som.getInitAlpha()));
         tfInitNeighborhoodSize.setText(Double.toString(som.getInitNeighborhoodSize()));
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
-        tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
-        lLearningRate.setText(Double.toString(som.getAlpha()));
-        lNeighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
+        tfNeigborhoodDecayAmount.setText(Double.toString(som.getNeighborhoodDecayAmount()));
+        lLearningRate.setText(Utils.round(som.getAlpha(), 2));
+        lNeighborhoodSize.setText(Utils.round(som.getNeighborhoodSize(), 2));
     }
 
     public void actionPerformed(final ActionEvent e) {

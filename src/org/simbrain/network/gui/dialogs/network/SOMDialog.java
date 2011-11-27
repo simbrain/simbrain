@@ -152,7 +152,7 @@ public class SOMDialog extends StandardDialog implements ActionListener {
         tfNumNeurons.setText(Integer.toString(som.getNumNeurons()));
         tfNumInputVectors.setText(Integer.toString(som.getNumInputVectors()));
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
-        tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
+        tfNeigborhoodDecayAmount.setText(Double.toString(som.getNeighborhoodDecayAmount()));
     }
 
 }

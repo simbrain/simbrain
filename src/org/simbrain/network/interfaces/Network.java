@@ -1099,4 +1099,22 @@ public abstract class Network {
         }
     }
 
+
+    /**
+     * Get the activations associated with a list of neurons.
+     *
+     * @param neuronList the neurons whose activations to get.
+     * @return vector of activations
+     */
+    public static double[] getActivationVector(List<Neuron> neuronList) {
+        double[] ret = new double[neuronList.size()];
+
+        for (int i = 0; i < neuronList.size(); i++) {
+            Neuron n = neuronList.get(i);
+            ret[i] = n.getActivation();
+        }
+
+        return ret;
+    }
+
 }

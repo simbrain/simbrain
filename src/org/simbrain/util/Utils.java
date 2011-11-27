@@ -189,10 +189,10 @@ public class Utils {
         String retString = "";
 
         for (int i = 0; i < (theVec.length - 1); i++) {
-            retString = retString.concat("" + theVec[i] + delimiter);
+            retString = retString.concat("" + round(theVec[i], 1) + delimiter);
         }
 
-        retString = retString.concat("" + theVec[theVec.length - 1]);
+        retString = retString.concat("" + round(theVec[theVec.length - 1],1));
 
         return retString;
     }

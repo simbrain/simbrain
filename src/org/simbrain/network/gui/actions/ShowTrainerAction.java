@@ -30,7 +30,7 @@ import org.simbrain.network.trainers.Backprop;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Show Trainer object for training selected source and target neurons
+ * Show Trainer object for training selected source and target neurons.
  */
 public final class ShowTrainerAction extends AbstractAction {
 
@@ -82,12 +82,6 @@ public final class ShowTrainerAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Backprop trainer = new Backprop(networkPanel.getRootNetwork(),
-                networkPanel.getSourceModelNeurons(),
-                networkPanel.getSelectedModelNeurons());
-        TrainerPanel trainerPanel = new TrainerPanel(trainer);
-        trainerPanel.pack();
-        trainerPanel.setVisible(true);
-
+        networkPanel.showTrainer();
     }
 }

@@ -137,6 +137,7 @@ public class LMSIterative extends Trainer implements IterableAlgorithm {
                 bias.setBias(bias.getBias() + (learningRate * error));
             }
             rmsError = Math.sqrt(rmsError / (numInputs * numOutputs));
+            fireErrorUpdated();
             iteration++;
         }
     }

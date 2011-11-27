@@ -44,7 +44,7 @@ public final class ShowTrainerAction extends AbstractAction {
      */
     public ShowTrainerAction(final NetworkPanel networkPanel) {
 
-        super("Show trainer");
+        super("Show Trainer...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

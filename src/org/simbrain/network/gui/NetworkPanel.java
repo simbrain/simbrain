@@ -624,10 +624,6 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(actionManager.getShowConnectDialogAction());
         contextMenu.addSeparator();
 
-        // Layout actions
-        contextMenu.add(getLayoutMenu());
-        contextMenu.addSeparator();
-
         // Preferences
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
 

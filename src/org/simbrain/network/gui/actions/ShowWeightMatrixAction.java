@@ -45,7 +45,7 @@ public final class ShowWeightMatrixAction extends AbstractAction {
      */
     public ShowWeightMatrixAction(final NetworkPanel networkPanel) {
 
-        super("Show weight matrix");
+        super("Show Weight Matrix");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

@@ -145,6 +145,7 @@ public class LayoutDialog extends StandardDialog implements ActionListener {
     /** @see StandardDialog */
     protected void closeDialogOk() {
         super.closeDialogOk();  
+        commitChanges();
         currentLayout.setInitialLocation(networkPanel.getLastClickedPosition());
         currentLayout.layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();

@@ -19,6 +19,7 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -273,6 +274,7 @@ public class NetworkPanel extends JPanel {
 
         // Toolbars
         toolbars = new JPanel(new BorderLayout());
+        toolbars.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         mainToolBar = this.createMainToolBar();
         runToolBar = this.createRunToolBar();
         editToolBar = this.createEditToolBar();

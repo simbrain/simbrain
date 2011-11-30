@@ -383,7 +383,8 @@ public final class NetworkActionManager {
                 "Sparse (self)", true);
 
         gridLayout = new ShowLayoutDialogAction(new GridLayout(), networkPanel);
-        hexagonalLayout = new ShowLayoutDialogAction(new HexagonalGridLayout(), networkPanel);
+        hexagonalLayout = new ShowLayoutDialogAction(new HexagonalGridLayout(),
+                networkPanel);
         lineLayout = new ShowLayoutDialogAction(new LineLayout(), networkPanel);
 
         showConnectDialogAction = new ShowConnectDialogAction(networkPanel);

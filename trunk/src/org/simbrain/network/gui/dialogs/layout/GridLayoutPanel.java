@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.gui.dialogs.layout;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
@@ -40,7 +43,7 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
     private JTextField tfVSpacing = new JTextField();
 
     /** Manual spacing field. */
-    private JCheckBox setNumColumns = new JCheckBox();
+    private JCheckBox manuallySetNumColumns = new JCheckBox();
 
     /**
      * Default constructor.
@@ -48,8 +51,13 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
     public GridLayoutPanel() {
         this.addItem("Horizontal spacing between neurons", tfHSpacing);
         this.addItem("Vertical spacing between neurons", tfVSpacing);
-        this.addItem("Manually set number of columns", setNumColumns);
+        this.addItem("Manually set number of columns", manuallySetNumColumns);
         this.addItem("Number of columns", tfNumColumns);
+        manuallySetNumColumns.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                enableDisableSpacingFields();
+            }
+        });
     }
 
     /** @see AbstractLayoutPanel */
@@ -60,12 +68,24 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
         return layout;
     }
 
+    /**
+     * Enable or disable spacing fields depending on whether the layout is in
+     * manual columns mode.
+     */
+    private void enableDisableSpacingFields() {
+        if (manuallySetNumColumns.isSelected()) {
+            tfNumColumns.setEnabled(true);
+        } else {
+            tfNumColumns.setEnabled(false);
+        }
+    }
+
     @Override
     public void commitChanges() {
         GridLayout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
         GridLayout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
         GridLayout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
-        GridLayout.setManualColumns(setNumColumns.isSelected());
+        GridLayout.setManualColumns(manuallySetNumColumns.isSelected());
     }
 
     @Override
@@ -73,7 +93,8 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
         tfNumColumns.setText(Integer.toString(GridLayout.getNumColumns()));
         tfHSpacing.setText(Double.toString(GridLayout.getHSpacing()));
         tfVSpacing.setText(Double.toString(GridLayout.getVSpacing()));
-        setNumColumns.setSelected(GridLayout.isManualColumns());
+        manuallySetNumColumns.setSelected(GridLayout.isManualColumns());
+        enableDisableSpacingFields();
     }
 
 }

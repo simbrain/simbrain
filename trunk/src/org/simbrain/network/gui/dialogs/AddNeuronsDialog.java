@@ -1,3 +1,16 @@
+/*
+ * Part of Simbrain--a java-based neural network kit Copyright (C) 2005,2007 The
+ * Authors. See http://www.simbrain.net/credits This program is free software;
+ * you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version. This program is
+ * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+ * should have received a copy of the GNU General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
+ * - Suite 330, Boston, MA 02111-1307, USA.
+ */
 package org.simbrain.network.gui.dialogs;
 
 import java.awt.GridBagConstraints;
@@ -5,75 +18,69 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * A dialog for adding multiple neurons to the network at once giving options
- * on how and what kind of neurons are laid out.
+ * A dialog for adding multiple neurons to the network. User can specify a
+ * neuron type and a layout.
  *
  * @author ztosi
- *
+ * @author jyoshimi
  */
 public class AddNeuronsDialog extends StandardDialog {
 
-    /**
-     * Default.
-     */
+    /** Default. */
     private static final long serialVersionUID = 1L;
 
-    /**The default layout.*/
+    /** The default layout. */
     private static final Layout DEFAULT_LAYOUT = new GridLayout();
 
-    /**The default neuron.*/
+    /** The default neuron. */
     private static final NeuronUpdateRule DEFAULT_NEURON = new LinearNeuron();
 
-    /**The network panel neurons will be added to.*/
-    private final NetworkPanel networkPanel;
-
-    /**Item panel where options will be displayed.*/
-    private LabelledItemPanel addNeuronsPanel = new LabelledItemPanel();
-
-    /**Button allowing selection of type of neuron to add.**/
-    private JButton selectNeuronType = new JButton();
-
-    /**Button allowing selection of Layout.*/
-    private JButton selectLayout = new JButton();
-
-    /**A button that adds the specified number of neurons to the network.*/
-    private JButton addButton = new JButton("add");
-
-    /**Text field where desired number of neurons is entered.*/
-    private JTextField numNeurons = new JTextField("0");
-
-    /**The layout to be used on the neurons.*/
+    /** The layout to be used on the neurons. */
     private Layout layout = DEFAULT_LAYOUT;
 
-    /**The type of neuron being laid out.*/
-    private NeuronUpdateRule neuronUpdateRule = DEFAULT_NEURON;
+    /** Default number of neurons. */
+    private static final int DEFAULT_NUM_NEURONS = 25;
 
-    /**An ArrayList containing the GUI neurons.*/
+    /** The network panel neurons will be added to. */
+    private final NetworkPanel networkPanel;
+
+    /** The base neuron to copy. */
+    private Neuron baseNeuron;
+
+    /** Item panel where options will be displayed. */
+    private LabelledItemPanel addNeuronsPanel = new LabelledItemPanel();
+
+    /** Button allowing selection of type of neuron to add. **/
+    private JButton selectNeuronType = new JButton();
+
+    /** Button allowing selection of Layout. */
+    private JButton selectLayout = new JButton();
+
+    /** Text field where desired number of neurons is entered. */
+    private JTextField numNeurons = new JTextField("" + DEFAULT_NUM_NEURONS);
+
+    /** An ArrayList containing the GUI neurons. */
     private final ArrayList<NeuronNode> nodes = new ArrayList<NeuronNode>();
 
     /**
      * Constructs the dialog.
+     *
      * @param networkPanel the panel the neurons are being added to.
      */
     public AddNeuronsDialog(final NetworkPanel networkPanel) {
@@ -85,7 +92,7 @@ public class AddNeuronsDialog extends StandardDialog {
      * Initializes the add neurons panel with default settings.
      */
     private void init() {
-        setTitle("Add Neurons");
+        setTitle("Add Neurons...");
 
         GridBagConstraints c = new GridBagConstraints();
 
@@ -97,14 +104,11 @@ public class AddNeuronsDialog extends StandardDialog {
 
         networkPanel.clearSelection();
 
-        selectNeuronType.setEnabled(false);
-        selectLayout.setEnabled(false);
+        baseNeuron = new Neuron(networkPanel.getRootNetwork(), DEFAULT_NEURON);
+        setActionListeners();
 
-        instantiateButtons();
-
-        selectNeuronType.setText(neuronUpdateRule.getDescription());
+        selectNeuronType.setText(baseNeuron.getUpdateRule().getDescription());
         selectLayout.setText(layout.getLayoutName());
-        addNeuronsPanel.addItem("", addButton, 2);
         addNeuronsPanel.addItem("Number of Neurons: ", numNeurons);
         addNeuronsPanel.addItem("Select Neuron Type: ", selectNeuronType);
         addNeuronsPanel.addItem("Select Layout: ", selectLayout);
@@ -112,81 +116,47 @@ public class AddNeuronsDialog extends StandardDialog {
         setContentPane(addNeuronsPanel);
     }
 
-
     /**
-     * Instantiates the panel's buttons and sets their action listeners.
+     * Set buttons' action listeners.
      */
-    private void instantiateButtons() {
+    private void setActionListeners() {
         selectNeuronType.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent arg0) {
-                networkPanel.showSelectedNeuronProperties();
-                neuronUpdateRule = networkPanel.getSelectedModelNeurons()
-                        .get(0).getUpdateRule();
-                selectNeuronType.setText(neuronUpdateRule.
-                        getDescription());
-                selectNeuronType.setContentAreaFilled(true);
-                selectNeuronType.repaint();
-                addNeuronsPanel.repaint();
+                ArrayList<NeuronNode> list = new ArrayList<NeuronNode>();
+                list.add(new NeuronNode(networkPanel, baseNeuron));
+                NeuronDialog dialog = new NeuronDialog(list);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                selectNeuronType.setText(baseNeuron.getUpdateRule()
+                        .getDescription());
+                AddNeuronsDialog.this.pack();
             }
         });
 
         selectLayout.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent arg0) {
-                LayoutDialog lDialog = new LayoutDialog(networkPanel);
-	            lDialog.pack();
-	            lDialog.setLocationRelativeTo(null);
-	            lDialog.setVisible(true);
-	            layout = lDialog.getCurrentLayout();
-	            selectLayout.setText(layout.getLayoutName());
-	            selectLayout.setContentAreaFilled(true);
-	            selectLayout.repaint();
-	        }
-	    });
-
-	    addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!nodes.isEmpty()) {
-                    nodes.clear();
-                    networkPanel.deleteSelectedObjects();
-                }
-                try {
-                    
-                    addNeuronsToPanel();
-                    if (addButton.getText() == "add" && !nodes.isEmpty()) {
-                    addButton.setText("change");
-                    addButton.setContentAreaFilled(true);
-                    addButton.repaint();
-                    }
-                    if (!selectLayout.isEnabled() && !nodes.isEmpty()) {
-                        selectLayout.setEnabled(true);
-                    }
-                    if (!selectNeuronType.isEnabled() && !nodes.isEmpty()) {
-                        selectNeuronType.setEnabled(true);
-                    }
-               } catch (NumberFormatException nfe) {
-                   JOptionPane.showMessageDialog(null,
-                       "Inappropriate Field Values:"
-                       + "\nIntegers only.", "Error",
-                       JOptionPane.ERROR_MESSAGE);
-                }
-
+                LayoutDialog lDialog = new LayoutDialog(LayoutDialog
+                        .getCurrentLayout(), networkPanel);
+                lDialog.pack();
+                lDialog.setLocationRelativeTo(null);
+                lDialog.setVisible(true);
+                layout = lDialog.getCurrentLayout();
+                selectLayout.setText(layout.getLayoutName());
+                AddNeuronsDialog.this.pack();
             }
         });
 
-	}
+    }
 
     /**
-     * Lays out the neurons in their current state.
+     * Adds the neurons to the panel.
      */
-	private void addNeuronsToPanel() {
-	    int number = Integer.parseInt(numNeurons.getText());
+    private void addNeuronsToPanel() {
+        int number = Integer.parseInt(numNeurons.getText());
         for (int i = 0; i < number; i++) {
-            Neuron neuron = new Neuron(
-                networkPanel.getRootNetwork(),
-                neuronUpdateRule);
+            Neuron neuron = new Neuron(networkPanel.getRootNetwork(),
+                    baseNeuron);
             nodes.add(new NeuronNode(networkPanel, neuron));
             networkPanel.getRootNetwork().addNeuron(neuron);
         }
@@ -194,26 +164,23 @@ public class AddNeuronsDialog extends StandardDialog {
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
         layout.layoutNeurons(networkPanel.getSelectedModelNeurons());
         networkPanel.repaint();
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected void closeDialogOk() {
-		super.closeDialogOk();
-		addNeuronsPanel.setVisible(false);
-		dispose();
-	}
-
-	/**
+    /**
      * {@inheritDoc}
      */
-	protected void closeDialogCancel(){
-	    super.closeDialogCancel();
-	    nodes.clear();
-        networkPanel.deleteSelectedObjects();
-        addNeuronsPanel.setVisible(false);
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        addNeuronsToPanel();
         dispose();
-	}
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void closeDialogCancel() {
+        super.closeDialogCancel();
+        dispose();
+    }
 
 }

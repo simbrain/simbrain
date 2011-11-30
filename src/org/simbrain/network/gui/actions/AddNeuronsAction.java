@@ -109,5 +109,4 @@ public final class AddNeuronsAction
         and.setLocationRelativeTo(null);
         and.setVisible(true);
     }
-  
 }

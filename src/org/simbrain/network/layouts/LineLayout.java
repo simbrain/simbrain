@@ -143,7 +143,7 @@ public class LineLayout implements Layout {
      */
     public static void setOrientation(final LineOrientation orientation) {
         LineLayout.orientation = orientation;
-        System.out.println("LineLayout orientation: " + LineLayout.orientation);
+        //System.out.println("LineLayout orientation: " + LineLayout.orientation);
     }
 
     /**

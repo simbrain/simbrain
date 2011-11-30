@@ -73,6 +73,7 @@ public class NetworkTextObject {
         this.text = text.getText();
         this.x = text.getX();
         this.y = text.getY();
+        this.fontSize = text.getFontSize();
         this.fontName = text.getFontName();
         this.bold = text.isBold();
         this.italic = text.isItalic();

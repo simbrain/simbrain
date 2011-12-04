@@ -1,20 +1,15 @@
 /*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Part of Simbrain--a java-based neural network kit Copyright (C) 2005,2007 The
+ * Authors. See http://www.simbrain.net/credits This program is free software;
+ * you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version. This program is
+ * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+ * should have received a copy of the GNU General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
+ * - Suite 330, Boston, MA 02111-1307, USA.
  */
 package org.simbrain.network.gui.dialogs.connect;
 
@@ -58,22 +53,22 @@ public class OneToOnePanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
-                Synapse temp = OneToOne.getBaseSynapse();
+                Synapse temp = connection.getBaseSynapse();
                 list.add(temp);
                 SynapseDialog dialog = new SynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 Synapse synapse = dialog.getSynapseList().get(0);
-                OneToOne.setBaseSynapse(synapse);
+                connection.setBaseSynapse(synapse);
                 baseSynapseLabel.setText(synapse.getType());
             }
 
         });
-        baseSynapseLabel.setText(OneToOne.getBaseSynapse().getType());
+        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
-        this.addItem("Connection Orientaiton: ", orientationBox);
+        this.addItem("Connection Orientation: ", orientationBox);
         this.addItem("Bidirectional Connection: ", bidirectionalConnection);
     }
 
@@ -81,19 +76,22 @@ public class OneToOnePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-        OneToOne.setUseBidirectionalConnections(bidirectionalConnection
-                .isSelected());
-        OneToOne.setConnectOrientation((Comparator) orientationBox
-                .getSelectedItem());
+        ((OneToOne) connection)
+                .setUseBidirectionalConnections(bidirectionalConnection
+                        .isSelected());
+        ((OneToOne) connection)
+                .setConnectOrientation((Comparator) orientationBox
+                        .getSelectedItem());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        bidirectionalConnection.setSelected(OneToOne
+        bidirectionalConnection.setSelected(((OneToOne) connection)
                 .isUseBidirectionalConnections());
-        orientationBox.setSelectedItem(OneToOne.getConnectOrientation());
+        orientationBox.setSelectedItem(((OneToOne) connection)
+                .getConnectOrientation());
     }
 
 }

@@ -129,9 +129,9 @@ public class Sparse2 extends ConnectNeurons {
     /**
      * @param excitatoryProbability the excitatoryProbability to set
      */
-    public static void setExcitatoryProbability
+    public void setExcitatoryProbability
     	(double excitatoryProbability) {
-        Sparse.excitatoryProbability = excitatoryProbability;
+        this.excitatoryProbability = excitatoryProbability;
     }
 
     /**
@@ -144,22 +144,22 @@ public class Sparse2 extends ConnectNeurons {
     /**
      * @param inhibitoryProbability the inhibitoryProbability to set
      */
-    public static void setInhibitoryProbability
+    public void setInhibitoryProbability
     	(double inhibitoryProbability) {
-        Sparse.inhibitoryProbability = inhibitoryProbability;
+        this.inhibitoryProbability = inhibitoryProbability;
     }
 
     /**
      * @param theBaseSynapse new synapse type
      */
-	public static void setbaseSynapse(Synapse theBaseSynapse) {
+	public void setbaseSynapse(Synapse theBaseSynapse) {
 		baseSynapse = theBaseSynapse;
 	}
 
 	/**
 	 * @return the base synapse
 	 */
-	public static Synapse getbaseSynapse() {
+	public Synapse getbaseSynapse() {
 		return baseSynapse;
 	}
 

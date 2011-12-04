@@ -46,17 +46,6 @@ public abstract class ConnectNeurons {
     protected List<? extends Neuron> targetNeurons;
 
     /**
-     * Default connection type.
-     */
-    public static final ConnectNeurons DEFAULT_CONNECTION_TYPE = new AllToAll();
-
-    /**
-     * Holds "current" connection object. Used in Gui so that users can set a
-     * current type (see parameter-free constructor below)then simply apply it.
-     */
-    public static ConnectNeurons currentConnectionType = DEFAULT_CONNECTION_TYPE;
-
-    /**
      * Default constructor.
      *
      * @param network network to receive  connections
@@ -85,7 +74,8 @@ public abstract class ConnectNeurons {
      * @param neurons source neurons
      * @param neurons2 target neurons
      */
-    public void connectNeurons(final Network network, final List<Neuron> neurons, final List<Neuron> neurons2) {
+    public void connectNeurons(final Network network,
+            final List<Neuron> neurons, final List<Neuron> neurons2) {
         this.network = network;
         sourceNeurons = neurons;
         targetNeurons = neurons2;

@@ -1,20 +1,15 @@
 /*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Part of Simbrain--a java-based neural network kit Copyright (C) 2005,2007 The
+ * Authors. See http://www.simbrain.net/credits This program is free software;
+ * you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version. This program is
+ * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+ * should have received a copy of the GNU General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
+ * - Suite 330, Boston, MA 02111-1307, USA.
  */
 package org.simbrain.network.gui.dialogs.connect;
 
@@ -60,7 +55,7 @@ public class RadialPanel extends AbstractConnectionPanel {
 
     /**
      * This method is the default constructor.
-     * 
+     *
      * @param connection type
      */
     public RadialPanel(final Radial connection) {
@@ -73,19 +68,19 @@ public class RadialPanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> excitatoryList = new ArrayList<Synapse>();
-                excitatoryList.add(Radial.getBaseExcitatorySynapse());
+                excitatoryList.add(connection.getBaseExcitatorySynapse());
                 SynapseDialog dialog = new SynapseDialog(excitatoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 Synapse excitatorySynapse = dialog.getSynapseList().get(0);
-                Radial.setBaseExcitatorySynapse(excitatorySynapse);
+                connection.setBaseExcitatorySynapse(excitatorySynapse);
                 baseExcitatorySynapseLabel.setText(excitatorySynapse.getType());
             }
 
         });
-        baseExcitatorySynapseLabel.setText(Radial.getBaseExcitatorySynapse()
-                .getType());
+        baseExcitatorySynapseLabel.setText(connection
+                .getBaseExcitatorySynapse().getType());
         this.addItem("Base Excitatory Synapse Type:",
                 baseExcitatorySynapseLabel);
         this.addItem("Set Base Excitatory Synapse Type:",
@@ -99,19 +94,19 @@ public class RadialPanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
-                inhibitoryList.add(Radial.getBaseInhibitorySynapse());
+                inhibitoryList.add(connection.getBaseInhibitorySynapse());
                 SynapseDialog dialog = new SynapseDialog(inhibitoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
-                Radial.setBaseInhibitorySynapse(inhibitorySynapse);
+                connection.setBaseInhibitorySynapse(inhibitorySynapse);
                 baseInhibitorySynapseLabel.setText(inhibitorySynapse.getType());
             }
 
         });
-        baseInhibitorySynapseLabel.setText(Radial.getBaseInhibitorySynapse()
-                .getType());
+        baseInhibitorySynapseLabel.setText(connection
+                .getBaseInhibitorySynapse().getType());
         this.addItem("Base Inhibitory Synapse Type:",
                 baseInhibitorySynapseLabel);
         this.addItem("Set Inhibitory Base Synapse Type:",
@@ -124,28 +119,34 @@ public class RadialPanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-        Radial.setExcitatoryProbability(Double.parseDouble(tfExciteProbability
-                .getText()));
-        Radial.setExcitatoryRadius(Double.parseDouble(tfExciteRadius.getText()));
-        Radial.setInhibitoryProbability(Double.parseDouble(tfInhibitProbability
-                .getText()));
-        Radial.setInhibitoryRadius(Double.parseDouble(tfInhibitRadius.getText()));
-        Radial.setAllowSelfConnections(allowSelfConnect.isSelected());
+        ((Radial) connection).setExcitatoryProbability(Double
+                .parseDouble(tfExciteProbability.getText()));
+        ((Radial) connection).setExcitatoryRadius(Double
+                .parseDouble(tfExciteRadius.getText()));
+        ((Radial) connection).setInhibitoryProbability(Double
+                .parseDouble(tfInhibitProbability.getText()));
+        ((Radial) connection).setInhibitoryRadius(Double
+                .parseDouble(tfInhibitRadius.getText()));
+        ((Radial) connection).setAllowSelfConnections(allowSelfConnect
+                .isSelected());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        tfExciteProbability.setText(Double.toString(Radial
+        tfExciteProbability.setText(Double.toString(((Radial) connection)
                 .getExcitatoryProbability()));
-        tfInhibitProbability.setText(Double.toString(Radial
+        tfInhibitProbability.setText(Double.toString(((Radial) connection)
                 .getInhibitoryProbability()));
-        tfExciteRadius.setText(Double.toString(Radial.getExcitatoryRadius()));
-        tfInhibitProbability.setText(Double.toString(Radial
+        tfExciteRadius.setText(Double.toString(((Radial) connection)
+                .getExcitatoryRadius()));
+        tfInhibitProbability.setText(Double.toString(((Radial) connection)
                 .getInhibitoryProbability()));
-        tfInhibitRadius.setText(Double.toString(Radial.getInhibitoryRadius()));
-        allowSelfConnect.setSelected(Radial.isAllowSelfConnections());
+        tfInhibitRadius.setText(Double.toString(((Radial) connection)
+                .getInhibitoryRadius()));
+        allowSelfConnect.setSelected(((Radial) connection)
+                .isAllowSelfConnections());
     }
 
 }

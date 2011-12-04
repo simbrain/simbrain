@@ -400,8 +400,8 @@ public class Backprop extends Trainer implements IterableAlgorithm {
         synapse.setUpperBound(.5);
 
         // Connect input layer to hidden layer
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection = new AllToAll(network, inputLayer, hiddenLayer);
+        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // Connect hidden layer to hidden layer2

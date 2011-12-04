@@ -55,7 +55,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
-import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
+import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesDialog;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -622,8 +622,9 @@ public class NetworkPanel extends JPanel {
         contextMenu.addSeparator();
 
         // Connection actions
+        contextMenu.add(actionManager.getClearSourceNeuronsAction());
         contextMenu.add(actionManager.getSetSourceNeuronsAction());
-        contextMenu.add(actionManager.getShowConnectDialogAction());
+        contextMenu.add(actionManager.getShowQuickConnectDialogAction());
         contextMenu.addSeparator();
 
         // Preferences
@@ -1002,7 +1003,7 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the connect properties dialog.
      */
     public void showConnectProperties() {
-        ConnectionDialog dialog = new ConnectionDialog();
+        QuickConnectPreferencesDialog dialog = new QuickConnectPreferencesDialog();
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

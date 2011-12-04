@@ -144,8 +144,8 @@ public final class LayeredNetworkBuilder {
             }
 
             // Connect input layer to hidden layer
-            AllToAll.setBaseSynapse(synapse);
             AllToAll connection = new AllToAll(network, lastLayer, hiddenLayer);
+            connection.setBaseSynapse(synapse);
             connection.connectNeurons();
 
             // Reset last layer

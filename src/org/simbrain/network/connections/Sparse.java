@@ -34,16 +34,16 @@ import org.simbrain.network.interfaces.Synapse;
 public class Sparse extends ConnectNeurons {
 
     /** Probability connection will be an excitatory weight. */
-    public static double excitatoryProbability = .1;
+    public double excitatoryProbability = .1;
 
     /** Probability connection will be an inhibitory weight. */
-    public static double inhibitoryProbability = .1;
+    public double inhibitoryProbability = .1;
 
     /** Template synapse for excitatory synapses. */
-    private static Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
+    private Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
 
     /** Template synapse for inhibitory synapses. */
-    private static Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
+    private Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
 
     // Initialize base synapses
     {
@@ -101,57 +101,57 @@ public class Sparse extends ConnectNeurons {
     /**
      * @return the excitatoryProbability
      */
-    public static double getExcitatoryProbability() {
+    public double getExcitatoryProbability() {
         return excitatoryProbability;
     }
 
     /**
      * @param excitatoryProbability the excitatoryProbability to set
      */
-    public static void setExcitatoryProbability(final double excitatoryProbability) {
-        Sparse.excitatoryProbability = excitatoryProbability;
+    public void setExcitatoryProbability(final double excitatoryProbability) {
+        this.excitatoryProbability = excitatoryProbability;
     }
 
     /**
      * @return the inhibitoryProbability
      */
-    public static double getInhibitoryProbability() {
+    public double getInhibitoryProbability() {
         return inhibitoryProbability;
     }
 
     /**
      * @param inhibitoryProbability the inhibitoryProbability to set
      */
-    public static void setInhibitoryProbability(
+    public void setInhibitoryProbability(
             final double inhibitoryProbability) {
-        Sparse.inhibitoryProbability = inhibitoryProbability;
+        this.inhibitoryProbability = inhibitoryProbability;
     }
 
     /**
      * @return the baseExcitatorySynapse
      */
-    public static Synapse getBaseExcitatorySynapse() {
+    public Synapse getBaseExcitatorySynapse() {
         return baseExcitatorySynapse;
     }
 
     /**
      * @param baseExcitatorySynapse the baseExcitatorySynapse to set
      */
-    public static void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
-        Sparse.baseExcitatorySynapse = baseExcitatorySynapse;
+    public void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
+        this.baseExcitatorySynapse = baseExcitatorySynapse;
     }
 
     /**
      * @return the baseInhibitorySynapse
      */
-    public static Synapse getBaseInhibitorySynapse() {
+    public Synapse getBaseInhibitorySynapse() {
         return baseInhibitorySynapse;
     }
 
     /**
      * @param baseInhibitorySynapse the baseInhibitorySynapse to set
      */
-    public static void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
-        Sparse.baseInhibitorySynapse = baseInhibitorySynapse;
+    public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
+        this.baseInhibitorySynapse = baseInhibitorySynapse;
     }
 }

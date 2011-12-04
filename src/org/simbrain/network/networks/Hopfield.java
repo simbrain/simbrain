@@ -98,11 +98,11 @@ public class Hopfield extends Network {
         // Add the synapses
         AllToAll connection = new AllToAll(this, getNeuronList(),
                 getNeuronList());
-        AllToAll.setAllowSelfConnection(false);
+        connection.setAllowSelfConnection(false);
         Synapse templateSynapse = Synapse
                 .getTemplateSynapse(new ClampedSynapse());
         templateSynapse.setStrength(0);
-        AllToAll.setBaseSynapse(templateSynapse);
+        connection.setBaseSynapse(templateSynapse);
         connection.connectNeurons();
     }
 

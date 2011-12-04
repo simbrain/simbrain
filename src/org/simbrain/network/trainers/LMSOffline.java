@@ -239,8 +239,8 @@ public class LMSOffline extends Trainer {
         Synapse synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection = new AllToAll(network, inputList, outputList);
+        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // AND Task
@@ -297,8 +297,8 @@ public class LMSOffline extends Trainer {
         Synapse synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
+        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // Initialize the trainer

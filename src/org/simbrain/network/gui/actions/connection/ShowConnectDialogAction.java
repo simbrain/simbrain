@@ -33,7 +33,6 @@ public final class ShowConnectDialogAction
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
      * Construct connection dialog action.
      *
@@ -41,7 +40,7 @@ public final class ShowConnectDialogAction
      */
     public ShowConnectDialogAction(final NetworkPanel networkPanel) {
 
-        super("Set Connection Properties...");
+        super("Set Quick Connect Properties...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

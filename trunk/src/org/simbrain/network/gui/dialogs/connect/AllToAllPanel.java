@@ -54,17 +54,17 @@ public class AllToAllPanel extends AbstractConnectionPanel {
 
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> list = new ArrayList<Synapse>();
-                list.add(AllToAll.getBaseSynapse());
+                list.add(connection.getBaseSynapse());
                 SynapseDialog dialog = new SynapseDialog(list);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 Synapse synapse = dialog.getSynapseList().get(0);
-                AllToAll.setBaseSynapse(synapse);
+                connection.setBaseSynapse(synapse);
                 baseSynapseLabel.setText(synapse.getType());
             }
         });
-        baseSynapseLabel.setText(AllToAll.getBaseSynapse().getType());
+        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
         this.addItem("Base Synapse Type:", baseSynapseLabel);
         this.addItem("Set Base Synapse Type:", setSynapseType);
     }
@@ -73,14 +73,16 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void commitChanges() {
-        AllToAll.setAllowSelfConnection(allowSelfConnect.isSelected());
+        ((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
+                .isSelected());
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        allowSelfConnect.setSelected(AllToAll.isAllowSelfConnection());
+        allowSelfConnect.setSelected(((AllToAll) connection)
+                .isAllowSelfConnection());
     }
 
 }

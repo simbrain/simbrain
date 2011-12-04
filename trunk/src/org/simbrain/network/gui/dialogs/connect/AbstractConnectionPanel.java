@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
  * <b>AbstractNeuronPanel</b>.
  */
@@ -35,7 +34,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
-    
+
     /** Reference to underlying connection object. */
     protected ConnectNeurons connection;
 
@@ -78,6 +77,7 @@ public abstract class AbstractConnectionPanel extends JPanel {
 
     /**
      * Add notes or other text to bottom of panel.  Can be html formatted.
+     *
      * @param text Text to be added
      */
     public void addBottomText(final String text) {

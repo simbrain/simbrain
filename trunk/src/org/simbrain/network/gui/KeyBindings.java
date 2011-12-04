@@ -27,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.connections.QuickConnectPreferences;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
@@ -146,8 +147,10 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("2"), "connectNeurons");
         panel.getActionMap().put("connectNeurons", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                ConnectNeurons connection = ConnectNeurons.currentConnectionType;
-                connection.connectNeurons(panel.getRootNetwork(), panel.getSourceModelNeurons(),
+                ConnectNeurons connection = QuickConnectPreferences
+                        .getCurrentConnection();
+                connection.connectNeurons(panel.getRootNetwork(),
+                        panel.getSourceModelNeurons(),
                         panel.getSelectedModelNeurons());
             }
         });

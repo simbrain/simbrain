@@ -33,7 +33,7 @@ public class Comparators {
      */
     public static final Comparator<Neuron> X_ORDER = new Comparator<Neuron>() {
         public String toString() {
-            return "X_ORDER";
+            return "Vertical";
         }
         public int compare(final Neuron neuron1, final Neuron neuron2) {
             return Double.compare(neuron1.getX(), neuron2.getX());
@@ -45,7 +45,7 @@ public class Comparators {
      */
     public static final Comparator<Neuron> Y_ORDER = new Comparator<Neuron>() {
         public String toString() {
-            return "Y_ORDER";
+            return "Horizontal";
         }
         public int compare(final Neuron neuron1, final Neuron neuron2) {
             return Double.compare(neuron1.getY(), neuron2.getY());

@@ -228,8 +228,8 @@ public final class NetworkActionManager {
     /** Sets the source neurons for neuron connections. */
     private Action setSourceNeuronsAction;
 
-    /** Show the connect neurons dialog. */
-    private final Action showConnectDialogAction;
+    /** Show the quick connect dialog. */
+    private final Action showQuickConnectDialogAction;
 
     /** Create a neuron group. */
     private final Action neuronGroupAction;
@@ -387,7 +387,7 @@ public final class NetworkActionManager {
                 networkPanel);
         lineLayout = new ShowLayoutDialogAction(new LineLayout(), networkPanel);
 
-        showConnectDialogAction = new ShowConnectDialogAction(networkPanel);
+        showQuickConnectDialogAction = new ShowConnectDialogAction(networkPanel);
         setSourceNeuronsAction = new SetSourceNeurons(networkPanel);
         clearSourceNeuronsAction = new ClearSourceNeurons(networkPanel);
 
@@ -506,11 +506,13 @@ public final class NetworkActionManager {
      * @return connection actions
      */
     public List<Action> getConnectionActions() {
-        return Arrays.asList(new Action[] { allToAll, fixedFanout, oneToOne,
+        return Arrays.asList(new Action[] { allToAll, oneToOne,
                 radial, sparse });
     }
 
     /**
+     * (Not current used).
+     * 
      * @return self connect actions
      */
     public List<Action> getSelfConnectionActions() {
@@ -525,22 +527,15 @@ public final class NetworkActionManager {
      */
     public JMenu getConnectionMenu() {
         // Connection menu
-        JMenu connectionsMenu = new JMenu("Connect");
-        JMenu sourceTargetMenu = new JMenu("Connect Source-Target");
+        JMenu connectionsMenu = new JMenu("Connect Neurons");
+        connectionsMenu.add(getClearSourceNeuronsAction());
+        connectionsMenu.add(getSetSourceNeuronsAction());
+        JMenu connectMenu = new JMenu("Connect Neurons");
         for (Action action : getConnectionActions()) {
-            sourceTargetMenu.add(action);
+            connectMenu.add(action);
         }
-        connectionsMenu.add(sourceTargetMenu);
-        JMenu selfConnectMenu = new JMenu("Self-connect");
-        for (Action action : getSelfConnectionActions()) {
-            selfConnectMenu.add(action);
-        }
-        connectionsMenu.add(selfConnectMenu);
-        connectionsMenu.addSeparator();
-        connectionsMenu.add(setSourceNeuronsAction);
-        connectionsMenu.add(clearSourceNeuronsAction);
-        connectionsMenu.addSeparator();
-        connectionsMenu.add(showConnectDialogAction);
+        connectionsMenu.add(connectMenu);
+        connectionsMenu.add(getShowQuickConnectDialogAction());
         return connectionsMenu;
     }
 
@@ -911,6 +906,13 @@ public final class NetworkActionManager {
     }
 
     /**
+     * @return the clearSourceNeuronsAction
+     */
+    public Action getClearSourceNeuronsAction() {
+        return clearSourceNeuronsAction;
+    }
+
+    /**
      * Return the show GUI action. TODO: This is not an action.
      *
      * @return show GUI action
@@ -945,8 +947,8 @@ public final class NetworkActionManager {
     /**
      * @return the showConnectDialogAction.
      */
-    public Action getShowConnectDialogAction() {
-        return showConnectDialogAction;
+    public Action getShowQuickConnectDialogAction() {
+        return showQuickConnectDialogAction;
     }
 
     /**

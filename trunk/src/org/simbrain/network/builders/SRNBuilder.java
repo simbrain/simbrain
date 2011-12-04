@@ -150,7 +150,7 @@ public final class SRNBuilder {
         //Standard all to all connections
         AllToAll connect = new AllToAll(network);
         //No self connection
-        AllToAll.setAllowSelfConnection(false);
+        connect.setAllowSelfConnection(false);
         //TODO: Way to set weight ranges and excitatory probability?
         connect.connectNeurons(inputLayer, hiddenLayer, -1.0, 1.0, 0.5);
         connect.connectNeurons(contextLayer, hiddenLayer, -1.0, 1.0, 0.5);

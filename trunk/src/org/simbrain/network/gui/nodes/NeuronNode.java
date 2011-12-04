@@ -311,26 +311,21 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        // Group action
-        //contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
-        //contextMenu.addSeparator();
-
-        // Model Group Actions
-        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
-        contextMenu.addSeparator();
-
-        // Add Connect Actions
-        if (getNetworkPanel().getSelectedNeurons() != null) {
-            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(),
-                    getNetworkPanel().getSelectedNeurons(), this));
-        }
-        contextMenu.addSeparator();
+        // Add Connection Actions
         contextMenu.add(getNetworkPanel().getActionManager()
                 .getConnectionMenu());
         contextMenu.addSeparator();
 
         // Layout actions
         contextMenu.add(getNetworkPanel().getActionManager().getLayoutMenu());
+        contextMenu.addSeparator();
+
+        // Group action
+        //contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
+        //contextMenu.addSeparator();
+
+        // Model Group Actions
+        contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
         contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected

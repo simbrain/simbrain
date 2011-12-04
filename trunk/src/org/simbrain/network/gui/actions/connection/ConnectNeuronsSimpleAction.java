@@ -31,6 +31,8 @@ import org.simbrain.network.synapses.ClampedSynapse;
 /**
  * Connect neurons action. Connects a set of source neurons to a set of target
  * neurons.
+ *
+ * Not currently used.
  */
 public class ConnectNeuronsSimpleAction extends AbstractAction {
 

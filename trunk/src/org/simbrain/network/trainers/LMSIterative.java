@@ -212,8 +212,8 @@ public class LMSIterative extends Trainer implements IterableAlgorithm {
         Synapse synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
+        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // Set initial weights (from an Emergent sim)
@@ -277,8 +277,8 @@ public class LMSIterative extends Trainer implements IterableAlgorithm {
         Synapse synapse = new Synapse(null, null,  new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
+        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // Set initial weights

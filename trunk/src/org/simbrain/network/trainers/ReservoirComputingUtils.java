@@ -317,24 +317,24 @@ public class ReservoirComputingUtils {
         Synapse synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection = new AllToAll(network, clampedLayer, outputLayer);
+        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // Connect clamped to output layer
         synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection2 = new AllToAll(network, clampedLayer, hiddenLayer);
+        connection2.setBaseSynapse(synapse);
         connection2.connectNeurons();
 
         // Connect hidden to output layer
         synapse = new Synapse(null, null, new ClampedSynapse());
         synapse.setLowerBound(0);
         synapse.setUpperBound(1);
-        AllToAll.setBaseSynapse(synapse);
         AllToAll connection3 = new AllToAll(network, hiddenLayer, outputLayer);
+        connection3.setBaseSynapse(synapse);
         connection3.connectNeurons();
 
         // Randomize synapses

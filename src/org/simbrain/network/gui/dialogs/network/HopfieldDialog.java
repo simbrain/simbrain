@@ -98,9 +98,21 @@ public class HopfieldDialog extends StandardDialog {
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
         Hopfield hop = new Hopfield(networkPanel.getRootNetwork(), numUnits,
                 layout);
+        hop.setUpdateOrder(getUpdateType());
         networkPanel.getRootNetwork().addNetwork(hop);
         networkPanel.repaint();
         super.closeDialogOk();
+    }
+
+    /**
+     * @return the update order.
+     */
+    public int getUpdateType() {
+        if (cbUpdateOrder.getSelectedIndex() == 0) {
+            return SEQUENTIAL;
+        } else {
+            return RANDOM;
+        }
     }
 
     /**

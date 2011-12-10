@@ -25,6 +25,8 @@ import org.simbrain.network.interfaces.RootNetwork.TimeType;
 /**
  * <b>RunningAverageNeuron</b> keeps a running average of current and past
  * activity.
+ * 
+ * TODO: Currently explodes.   Fix and improve.  See http://en.wikipedia.org/wiki/Moving_average
  */
 public class RunningAverageNeuron extends NeuronUpdateRule {
 

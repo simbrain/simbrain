@@ -141,7 +141,7 @@ public class AddNeuronsDialog extends StandardDialog {
                 lDialog.pack();
                 lDialog.setLocationRelativeTo(null);
                 lDialog.setVisible(true);
-                layout = lDialog.getCurrentLayout();
+                layout = LayoutDialog.getCurrentLayout();
                 selectLayout.setText(layout.getLayoutName());
                 AddNeuronsDialog.this.pack();
             }

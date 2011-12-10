@@ -52,9 +52,6 @@ public class LayoutDialog extends StandardDialog {
     /** Layouts combo box. */
     private JComboBox cbLayouts;
 
-    // TODO: Using a static layout as the current layout is dubious, but works
-    // for now.
-
     /** The current Layout. */
     private static Layout currentLayout = new GridLayout();
 
@@ -62,7 +59,7 @@ public class LayoutDialog extends StandardDialog {
     private final NetworkPanel networkPanel;
 
     /**
-     * Constructor for creating independent dialog.
+     * Constructor for creating dialog.
      *
      * @param networkPanel the networkPanel where layout will occur
      */
@@ -122,15 +119,16 @@ public class LayoutDialog extends StandardDialog {
         }
         currentLayout = (Layout) cbLayouts.getSelectedItem();
         if (currentLayout instanceof LineLayout) {
-            layoutPanel = new LineLayoutPanel();
+            layoutPanel = new LineLayoutPanel((LineLayout) currentLayout);
             layoutPanel.fillFieldValues();
             mainPanel.add(layoutPanel);
         } else if (currentLayout instanceof GridLayout) {
-            layoutPanel = new GridLayoutPanel();
+            layoutPanel = new GridLayoutPanel((GridLayout) currentLayout);
             layoutPanel.fillFieldValues();
             mainPanel.add(layoutPanel);
         } else if (currentLayout instanceof HexagonalGridLayout) {
-            layoutPanel = new HexagonalGridLayoutPanel();
+            layoutPanel = new HexagonalGridLayoutPanel(
+                    (HexagonalGridLayout) currentLayout);
             layoutPanel.fillFieldValues();
             mainPanel.add(layoutPanel);
         }

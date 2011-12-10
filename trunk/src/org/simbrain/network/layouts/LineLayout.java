@@ -46,7 +46,7 @@ public class LineLayout implements Layout {
     };
 
     /** Current line orientation. */
-    private static LineOrientation orientation = LineOrientation.HORIZONTAL;
+    private LineOrientation orientation = LineOrientation.HORIZONTAL;
 
     /** Initial x position of line of neurons. */
     private double initialX;
@@ -55,7 +55,7 @@ public class LineLayout implements Layout {
     private double initialY;
 
     /** Spacing between neurons. */
-    private static double spacing = 40;
+    private double spacing = 40;
 
 
     /**
@@ -70,8 +70,8 @@ public class LineLayout implements Layout {
             final double spacing, final LineOrientation orientation) {
         initialX = initialx;
         initialY = initialy;
-        LineLayout.spacing = spacing;
-        LineLayout.orientation = orientation;
+        this.spacing = spacing;
+        this.orientation = orientation;
     }
 
     /**
@@ -81,8 +81,8 @@ public class LineLayout implements Layout {
      * @param orientation of the neurons
      */
     public LineLayout(final double spacing, final LineOrientation orientation) {
-        LineLayout.spacing = spacing;
-        LineLayout.orientation = orientation;
+        this.spacing = spacing;
+        this.orientation = orientation;
     }
 
     /**
@@ -134,30 +134,30 @@ public class LineLayout implements Layout {
     /**
      * @return the orientation
      */
-    public static LineOrientation getOrientation() {
+    public LineOrientation getOrientation() {
         return orientation;
     }
 
     /**
      * @param orientation the orientation to set
      */
-    public static void setOrientation(final LineOrientation orientation) {
-        LineLayout.orientation = orientation;
-        //System.out.println("LineLayout orientation: " + LineLayout.orientation);
+    public void setOrientation(final LineOrientation orientation) {
+        this.orientation = orientation;
+        //System.out.println("LineLayout orientation: " + this.orientation);
     }
 
     /**
      * @return the spacing
      */
-    public static double getSpacing() {
+    public double getSpacing() {
         return spacing;
     }
 
     /**
      * @param spacing the spacing to set
      */
-    public static void setSpacing(final double spacing) {
-        LineLayout.spacing = spacing;
+    public void setSpacing(final double spacing) {
+        this.spacing = spacing;
     }
 
     /** @override */

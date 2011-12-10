@@ -209,14 +209,14 @@ public final class EchoStateNetBuilder {
         initialGridPostion = new Point2D.Double((int) inputLayer.get(0).getX()
                , (int) initialPosition.getY()
                 - betweenLayerInterval - (int) Math.sqrt(numReservoirNodes)
-                * GridLayout.getVSpacing());
+                * reservoirLayout.getVSpacing());
         reservoirLayout.setInitialLocation(initialGridPostion);
         reservoirLayout.layoutNeurons(reservoirLayer);
 
         initialOutPosition = new Point2D.Double((int) initialPosition.getX()
                 - getWidth(outputLayer) / 2, (int) initialPosition.getY()
                 - (2 * betweenLayerInterval + Math.sqrt(numReservoirNodes)
-                        * GridLayout.getVSpacing()));
+                        * reservoirLayout.getVSpacing()));
         layerLayout.setInitialLocation(initialOutPosition);
         layerLayout.layoutNeurons(outputLayer);
 

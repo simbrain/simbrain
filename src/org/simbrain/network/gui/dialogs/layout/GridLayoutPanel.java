@@ -45,10 +45,14 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
     /** Manual spacing field. */
     private JCheckBox manuallySetNumColumns = new JCheckBox();
 
+    /** Reference to the underlying layout. */
+    private final GridLayout layout;
+
     /**
      * Default constructor.
      */
-    public GridLayoutPanel() {
+    public GridLayoutPanel(GridLayout layout) {
+        this.layout = layout;
         this.addItem("Horizontal spacing between neurons", tfHSpacing);
         this.addItem("Vertical spacing between neurons", tfVSpacing);
         this.addItem("Manually set number of columns", manuallySetNumColumns);
@@ -58,14 +62,6 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
                 enableDisableSpacingFields();
             }
         });
-    }
-
-    /** @see AbstractLayoutPanel */
-    public Layout getNeuronLayout() {
-        GridLayout layout = new GridLayout(Double.parseDouble(tfHSpacing
-                .getText()), Double.parseDouble(tfVSpacing.getText()), Integer
-                .parseInt(tfNumColumns.getText()));
-        return layout;
     }
 
     /**
@@ -82,18 +78,18 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
 
     @Override
     public void commitChanges() {
-        GridLayout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
-        GridLayout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
-        GridLayout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
-        GridLayout.setManualColumns(manuallySetNumColumns.isSelected());
+        layout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
+        layout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
+        layout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
+        layout.setManualColumns(manuallySetNumColumns.isSelected());
     }
 
     @Override
     public void fillFieldValues() {
-        tfNumColumns.setText(Integer.toString(GridLayout.getNumColumns()));
-        tfHSpacing.setText(Double.toString(GridLayout.getHSpacing()));
-        tfVSpacing.setText(Double.toString(GridLayout.getVSpacing()));
-        manuallySetNumColumns.setSelected(GridLayout.isManualColumns());
+        tfNumColumns.setText(Integer.toString(layout.getNumColumns()));
+        tfHSpacing.setText(Double.toString(layout.getHSpacing()));
+        tfVSpacing.setText(Double.toString(layout.getVSpacing()));
+        manuallySetNumColumns.setSelected(layout.isManualColumns());
         enableDisableSpacingFields();
     }
 

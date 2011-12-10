@@ -650,27 +650,6 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Creates a menu item for setting layout properties.
-     *
-     * @return layout menu properties menu item
-     */
-    private JMenuItem getLayoutMenu() {
-        JMenuItem layoutProperties = new JMenuItem("Set Layout Properties...");
-        final NetworkPanel thispanel = this;
-        layoutProperties.addActionListener(new ActionListener() {
-
-            /** @see ActionEvent. */
-            public void actionPerformed(ActionEvent e) {
-                LayoutDialog dialog = new LayoutDialog(thispanel);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-        });
-        return layoutProperties;
-    }
-
-    /**
      * Create the iteration tool bar.
      *
      * @return the toolbar.

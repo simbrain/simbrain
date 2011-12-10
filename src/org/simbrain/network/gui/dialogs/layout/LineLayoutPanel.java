@@ -16,6 +16,7 @@ package org.simbrain.network.gui.dialogs.layout;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -31,35 +32,30 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
     /** Layout style selected. */
     private JComboBox cbLayouts = new JComboBox(new LineOrientation[] {
             LineOrientation.HORIZONTAL, LineOrientation.VERTICAL });
+    
+    /** Reference to the underlying layout. */
+    private final LineLayout layout;
 
     /**
      * Default constructor.
      */
-    public LineLayoutPanel() {
+    public LineLayoutPanel(LineLayout layout) {
+        this.layout = layout;
         this.addItem("Layout Style", cbLayouts);
         this.addItem("Spacing between neurons", tfSpacing);
     }
 
-    /**
-     * @return Returns the neuronLayout.
-     */
-    public Layout getNeuronLayout() {
-        LineLayout layout = new LineLayout(Double.parseDouble(tfSpacing
-                .getText()), (LineOrientation) cbLayouts.getSelectedItem());
-        return layout;
-    }
-
     @Override
     public void commitChanges() {
-        LineLayout
+        layout
                 .setOrientation((LineOrientation) cbLayouts.getSelectedItem());
-        LineLayout.setSpacing(Double.parseDouble(tfSpacing.getText()));
+        layout.setSpacing(Double.parseDouble(tfSpacing.getText()));
     }
 
     @Override
     public void fillFieldValues() {
-        cbLayouts.setSelectedItem(LineLayout.getOrientation());
-        tfSpacing.setText(Double.toString(LineLayout.getSpacing()));
+        cbLayouts.setSelectedItem(layout.getOrientation());
+        tfSpacing.setText(Double.toString(layout.getSpacing()));
     }
 
 }

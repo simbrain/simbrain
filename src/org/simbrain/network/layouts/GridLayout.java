@@ -21,16 +21,16 @@ public class GridLayout implements Layout {
     private double initialY;
 
     /** Number of columns in the layout. */
-    private static int numColumns = 3;
+    private int numColumns = 3;
 
     /** Horizontal spacing between neurons. */
-    private static double hSpacing = 50;
+    private double hSpacing = 50;
 
     /** Vertical spacing between neurons. */
-    private static double vSpacing = 50;
+    private double vSpacing = 50;
 
     /** Manually set number of columns in grid. */
-    private static boolean manualColumns = false;
+    private boolean manualColumns = false;
 
     /**
      * Create a layout.
@@ -40,9 +40,9 @@ public class GridLayout implements Layout {
      * @param numColumns number of columns of neurons
      */
     public GridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
-        GridLayout.hSpacing = hSpacing;
-        GridLayout.vSpacing = vSpacing;
-        GridLayout.numColumns = numColumns;
+        this.hSpacing = hSpacing;
+        this.vSpacing = vSpacing;
+        this.numColumns = numColumns;
     }
 
     /**
@@ -96,42 +96,42 @@ public class GridLayout implements Layout {
     /**
      * @return the numColumns
      */
-    public static int getNumColumns() {
+    public int getNumColumns() {
         return numColumns;
     }
 
     /**
      * @param numColumns the numColumns to set
      */
-    public static void setNumColumns(final int numColumns) {
-        GridLayout.numColumns = numColumns;
+    public void setNumColumns(final int numColumns) {
+        this.numColumns = numColumns;
     }
 
     /**
      * @return the hSpacing
      */
-    public static double getHSpacing() {
+    public double getHSpacing() {
         return hSpacing;
     }
 
     /**
      * @param spacing the hSpacing to set
      */
-    public static void setHSpacing(final double spacing) {
+    public void setHSpacing(final double spacing) {
         hSpacing = spacing;
     }
 
     /**
      * @return the vSpacing
      */
-    public static double getVSpacing() {
+    public double getVSpacing() {
         return vSpacing;
     }
 
     /**
      * @param spacing the vSpacing to set
      */
-    public static void setVSpacing(final double spacing) {
+    public void setVSpacing(final double spacing) {
         vSpacing = spacing;
     }
 
@@ -143,14 +143,14 @@ public class GridLayout implements Layout {
     /**
      * @return the manualColumns
      */
-    public static boolean isManualColumns() {
+    public boolean isManualColumns() {
         return manualColumns;
     }
 
     /**
      * @param manualColumns the manualColumns to set
      */
-    public static void setManualColumns(boolean manualColumns) {
-        GridLayout.manualColumns = manualColumns;
+    public void setManualColumns(boolean manualColumns) {
+        this.manualColumns = manualColumns;
     }
 }

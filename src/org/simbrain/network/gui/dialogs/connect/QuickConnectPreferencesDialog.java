@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 
 import org.simbrain.network.connections.AllToAll;
@@ -25,6 +26,7 @@ import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -65,6 +67,9 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
         typePanel.addItem("Connection Type", cbConnectionType);
         cbConnectionType.setSelectedItem(QuickConnectPreferences
                 .getCurrentConnection());
+        ShowHelpAction helpAction = new ShowHelpAction();
+        helpAction.setTheURL("Network/connections.html");
+        addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);
         mainPanel.add(optionsPanel);

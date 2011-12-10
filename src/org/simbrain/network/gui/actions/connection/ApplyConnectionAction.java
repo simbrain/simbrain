@@ -14,8 +14,10 @@
 package org.simbrain.network.gui.actions.connection;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
@@ -23,6 +25,7 @@ import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.AllToAllPanel;
 import org.simbrain.network.gui.dialogs.connect.OneToOnePanel;
@@ -50,7 +53,7 @@ public final class ApplyConnectionAction extends AbstractAction {
 
     /**
      * Construct the action.
-     * 
+     *
      * @param networkPanel networkPanel, must not be null
      * @param connection the connection to apply
      * @param name the name of this action
@@ -95,6 +98,9 @@ public final class ApplyConnectionAction extends AbstractAction {
                 optionsPanel.fillFieldValues();
             }
             ConnectionDialog dialog = new ConnectionDialog();
+            ShowHelpAction helpAction = new ShowHelpAction();
+            helpAction.setTheURL("Network/connections.html");
+            dialog.addButton(new JButton(helpAction));
             dialog.setContentPane(optionsPanel);
             dialog.setLocationRelativeTo(null);
             dialog.pack();
@@ -107,6 +113,8 @@ public final class ApplyConnectionAction extends AbstractAction {
      * Dialog for displaying connection panel.
      */
     private class ConnectionDialog extends StandardDialog {
+
+        @Override
         protected void closeDialogOk() {
             super.closeDialogOk();
             optionsPanel.commitChanges();

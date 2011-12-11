@@ -2,44 +2,50 @@
 <html><head><title>Simbrain Documentation</title>
 
 
+  
 
-
-
-<link href="../../Styles.css" rel="stylesheet" type="text/css" /></head><body>
-<a href="../../SimbrainDocs.html" /><div class="logo">
-<a href="../../SimbrainDocs.html">  </a><p><span /></p>
+  
+  
+  <link href="../../Styles.css" rel="stylesheet" type="text/css" /></head><body>
+<a href="../../SimbrainDocs.html">
+</a>
+<div class="logo"><a href="../../SimbrainDocs.html"> </a>
+<p><span /></p>
 </div>
 
 <div id="main_docs">
-  <div class="navi"> <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Neurons</p>
-  </div>
-  <div id="menu">
-	  <p class="menubold">Neuron Types</p>
-		<blockquote>
-          <p><a href="neuron/additive.html">Additive</a><br />
-              <a href="neuron/binary.html">Binary</a><br />
-              <a href="neuron/clamped.html">Clamped</a><br />
-              <a href="neuron/decay.html">Decay</a><br />
-              <a href="neuron/iac.html">IAC</a><br />
-              <a href="neuron/integrateAndFire.html">Integrate and fire</a> (s) <br />
-              <a href="neuron/izhikevich.html">Izhikevich</a> (s) <br />
-              <a href="neuron/linear.html">Linear</a><br />
-              <a href="neuron/LMS.html">LMS</a>            <br />
-              <a href="neuron/logistic.html">Logistic</a><br />
-              <a href="neuron/nakarushton.html">Naka-Rushton</a><br />
-	      <a href="neuron/point.html">Point</a><br />
-	      <a href="neuron/random.html">Random<br />
-          </a><a href="neuron/runningaverage.html">Running Average<br />
-          </a><a href="neuron/sigmoidal.html">Sigmoidal</a><br />
-              <a href="neuron/sinusoidal.html">Sinusoidal</a><br />
-              <a href="neuron/stochastic.html">Stochastic</a> <br />
-              <a href="neuron/threevalued.html">Three valued<br />
-          </a><a href="neuron/trace.html">Trace</a></p>
-          <p>"(s)" indicates a <a href="spikingnetworks.html">spiking neuron</a></p>
-	  </blockquote>
-  </div>
-	<p /><h1>Neurons</h1>
-	<p>Neurons
+<div class="navi">
+<p><a href="../../SimbrainDocs.html">Simbrain</a>
+&gt; <a href="../Network.html">Network</a> &gt; Neurons</p>
+</div>
+<div id="menu">
+<p class="menubold">Neuron Types</p>
+<blockquote>
+  <p><a href="neuron/additive.html">Additive</a><br />
+  <a href="neuron/binary.html">Binary</a><br />
+  <a href="neuron/clamped.html">Clamped</a><br />
+  <a href="neuron/decay.html">Decay</a><br />
+  <a href="neuron/iac.html">IAC</a><br />
+  <a href="neuron/integrateAndFire.html">Integrate and fire</a> (s) <br />
+  <a href="neuron/izhikevich.html">Izhikevich</a> (s) <br />
+  <a href="neuron/linear.html">Linear</a><br />
+  <a href="neuron/LMS.html">LMS</a> <br />
+  <a href="neuron/logistic.html">Logistic</a><br />
+  <a href="neuron/nakarushton.html">Naka-Rushton</a><br />
+  <a href="neuron/point.html">Point</a><br />
+  <a href="neuron/random.html">Random<br />
+  </a> <a href="neuron/sigmoidal.html">Sigmoidal</a><br />
+  <a href="neuron/sinusoidal.html">Sinusoidal</a><br />
+  <a href="neuron/stochastic.html">Stochastic</a> <br />
+  <a href="neuron/threevalued.html">Three valued<br />
+  </a><a href="neuron/trace.html">Trace</a></p>
+  <p>"(s)" indicates a <a href="spikingnetworks.html">spiking neuron</a></p>
+</blockquote>
+</div>
+<p>
+</p>
+<h1>Neurons</h1>
+<p>Neurons
 or "nodes" are represented by circles. The numbers inside the neurons
 corresponds to their "activation level." (What this level represents
 varies with neuron type: in many cases it can be thought of as
@@ -51,17 +57,18 @@ than 0, red; less than 0, blue; or equal to 0, white. These color
 conventions can be customized, as described in the <a href="network_prefs.html">preference dialog</a>.
 The closeness of the neuron's activiation level to the neuron's upper
 or lower bound is visualized by the intensity of the color. </p>
-	<p>There
+<p>There
 are a variety of different neuron types in Simbrain, each of which has
 numerous parameters that can be set. This page addresses properties
 common to all of the different neuron types. Details on particular
 neuron types can be found on their respective pages. </p>
-	<p class="heading">Setting Neuron Properties </p>
-	<blockquote>
-	<p>Neuron parameters can be adjusted as follows:</p>
-	<blockquote>
-      <p><span class="heading2">Setting single neurons: </span>Double click on a neuron or right click on it and select set properties.</p>
-      <p><span class="heading2">Setting multiple neurons:</span>
+<p class="heading">Setting Neuron Properties </p>
+<blockquote>
+  <p>Neuron parameters can be adjusted as follows:</p>
+  <blockquote>
+    <p><span class="heading2">Setting single neurons: </span>Double
+click on a neuron or right click on it and select set properties.</p>
+    <p><span class="heading2">Setting multiple neurons:</span>
 Select more than one neuron, and either double click on one of the
 neurons, or select set properties from the popup or network menu. A
 multiple neuron dialog box will appear. If the selected neurons are of
@@ -69,96 +76,100 @@ different types, only the common properties appear. Otherwise all
 properties appear. Consistent properties are shown, inconsistent
 properties are marked by a null string: ". . ." Changes you make will
 apply to all selected neurons. </p>
-      
-    </blockquote>
-    </blockquote>
-    <p class="heading">Common Neuron Properties</p>
-    <blockquote>
-    <p class="heading2">Activation</p>
-    <blockquote>
-      <p>The
+  </blockquote>
+</blockquote>
+<p class="heading">Common Neuron Properties</p>
+<blockquote>
+  <p class="heading2">Activation</p>
+  <blockquote>
+    <p>The
 current level of activity of this neuron. How this should be
 interpreted is dependent on the neuron type and application (e.g.
 firing rate, voltage potential, etc.). This is represented by the
 neuron's color, and can be seen exactly by lingering over the neuron or
 observing the value in the neuron's properties. </p>
-    </blockquote>
-    <p class="heading2">Increment</p>
-	<blockquote>
-	  <p>This
+  </blockquote>
+  <p class="heading2">Increment</p>
+  <blockquote>
+    <p>This
 sets the amount that a neuron is incremented when it is manually
 adjusted. For example, if increment is set to .1, then each time the up
 arrow is pressed the neuron will increase its activation by .1. This
 feature does not affect the neuron while the network is being iterated.</p>
   </blockquote>
-	<p class="heading2"><a name="UpBound" id="UpBound">Upper bound</a></p><a name="UpBound" id="UpBound"> 
-	</a><blockquote>
-<a name="UpBound" id="UpBound">	  </a><p><a name="UpBound" id="UpBound">This
+  <p class="heading2"><a name="UpBound" id="UpBound">Upper bound<br />
+  </a></p>
+  <blockquote>
+    <p>This
 field plays different roles depending on the type of the neuron
 (documented accordingly) but in general it determines the maximum level
 of activity of a node. It also determines the range of colors which a
 neuron can take on. The upper and lower bound determine the bounds of
-randomization.</a></p>
-<a name="UpBound" id="UpBound">  </a></blockquote>
-<a name="UpBound" id="UpBound">	</a><p class="heading2"><a name="LowBound" id="LowBound">Lower bound</a></p><a name="LowBound" id="LowBound"> 
-	</a><blockquote>
-<a name="LowBound" id="LowBound">	  </a><p><a name="LowBound" id="LowBound">This
+randomization.</p>
+  </blockquote>
+  <p class="heading2"><a name="LowBound" id="LowBound">Lower bound</a></p>
+  <blockquote>
+    <p>This
 field plays different roles depending on the type of the neuron but in
 general it determines the minimum level of activity of a node. It also
-determines the range of colors which a neuron can take on.</a></p>
-<a name="LowBound" id="LowBound">    
-	</a></blockquote>
-<a name="LowBound" id="LowBound">    </a></blockquote>
-<a name="LowBound" id="LowBound">    </a><p><span class="heading"><a name="clipping" />Clipping</span></p>
-<p> If a neuron uses clipping, then if its activation exceeds its upper
-or lower bound, the activation is set to the upper or lower bound that
-it exceeds. Similarly with weights and their strength. </p>
-<p>&nbsp;</p>
-<p class="heading"><a name="clamping" id="clamping" />Clamping</p>
-<p>In general, a clamped synapse or node will not change over time; it
+determines the range of colors which a neuron can take on.</p>
+  </blockquote>
+  <p class="heading2"><a name="clipping" id="LowBound">Clipping<br />
+  </a></p>
+  <blockquote>
+    <p>If a neuron uses clipping, then if its activation exceeds its
+upper or lower bound, the activation is set to the upper or lower bound
+that it exceeds. Similarly with weights and their strength.</p>
+  </blockquote>
+</blockquote>
+<p class="heading"><a name="clamping" id="clamping">Clamping</a></p>
+<p>In general, a clamped synapse or
+node will not change over time; it
 is "clamped" to its current value. There are two ways to clamp neurons
-and synapses in Simbrain. </p>
+and synapses in Simbrain.<br />
+</p>
 <blockquote>
-  <p>(1) Set the type  of a synapse to <a href="synapse/clamped.html">clamped synapse</a> or the type of a neuron to <a href="neuron/clamped.html">clamped neuron</a>. This allows specific subsets of synapses or neurons to be clamped.<br /> 
-    </p>
-  <p>(2) In the <a href="toolbar.html">Toolbar</a> or <a href="menu.html#MenuEdit">Edit menu</a>, select "Clamp weights" or "Clamp neurons." These cause <em>all</em>
-weights or synapses in a simulation to be clamped. This is useful when,
-for example, training a Hopfield network. You clamp the neurons at a
-value, then run the network to train the weights. Then you unclamp the
-neurons and clamp the weights, to test the network's memory. This
-method applies to the network globally, in that the neurons or synapses
-are not individually set to be clamped. The advantage of this method is
-that it allows you to temporarily turn off learning to focus on
-activation dynamics, or temporarily block activation change in order to
-focus on weight dynamics. </p>
+  <p>(1) Set the type of a synapse to <a href="synapse/clamped.html">clamped
+synapse</a> or the type of a
+neuron to <a href="neuron/clamped.html">clamped neuron</a>. This
+allows specific subsets of synapses or neurons to be permanently clamped.<br />
+  </p>
+  <p>(2) In the <a href="toolbar.html">Toolbar</a> or <a href="menu.html#MenuEdit">Edit menu</a>, use the "Clamp weights" <img style="width: 18px; height: 18px;" alt="Clamp Weight" src="../../Images/Clamp_W.png" /> or
+"Clamp neurons" <img style="width: 18px; height: 18px;" alt="Clamp Neuron" src="../../Images/Clamp_N.png" /> buttons. &nbsp; These cause <em>all</em>
+weights or synapses in a simulation to be clamped. This is useful as a
+temporary override and can be used to train certain types of networks
+(e.g. recurrent auto-associators using hebbian synapses). </p>
 </blockquote>
 <p>Note that some <a href="subnetwork.html">subnetworks</a> override
 clamping, in particular when they manually train their weights. Also
 note that the activation of a clamped neuron can be changed by using
 the up and down keys, and similarly with clamped weights.</p>
-<p>Confusion alret: he word "clamped" gets used both as a name for a kind of synapse and
-neuron update, and for the buttons in the toolbar, but the meaning is
-slightly different.&nbsp; The toolbar buttons are a kind of temporary
-override, while the update rules are permanent.&nbsp;&nbsp; I know you
-understand the distinction but I think I saw this come up somewhere so
-I thought I'd mention it. Clamped for neurons is useful mainly when it
-is input neurons that the user will manually set&nbsp; themselves. /
-This is a more general problem.&nbsp; The word "clamped" gets used both
-as a name for a kind of synapse and neuron update, and for the buttons
-in the toolbar, but the meaning is slightly different.&nbsp; The
-toolbar buttons are a kind of temporary override, while the update
-rules are permanent. </p>
 
-<p>&nbsp;</p>
-<p class="heading"><a name="wtdinput" id="wtdinput" />Weighted Input </p>
-<p>Each input to a node can have different amounts of influence on that
+<p class="heading">Weighted Input</p>
+<p><a name="wtdinput" id="wtdinput">Each input to a node
+can have
+different amounts of influence on that
 node. The amount of influence that an input has is called the "weight"
-of that input. We represent the weight of the <em>i</em><sup>th</sup> input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup> node by <em>a</em><sub>i</sub>. The weighted input is then: 
-</p><p align="center"><img src="equations/weighted.gif" height="75" width="167" />
-</p><p>Note that a sensory input term <em>I</em> is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. </p>
-<p>When a source neuron is a spiking neuron (see <a href="spikingnetworks.html">spiking networks</a>) the weight times activation term for that neuron is replaced by something more complex. See <a href="spikingnetworks.html">spiking networks</a>.</p>
+of that input. We represent the weight of the <em>i</em><sup>th</sup>
+input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup>
+node by <em>a</em><sub>i</sub>. The weighted input is then:<br />
+
+
+
+
+
+</a></p>
+<div style="text-align: center;"><a name="wtdinput" id="wtdinput"><img src="equations/weighted.gif" height="75" width="167" /></a></div>
+<p>
+</p><p><a name="wtdinput" id="wtdinput"> </a> Note that a sensory input term <em>I</em>
+is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. </p>
+<p>When a source neuron is a spiking neuron (see <a href="spikingnetworks.html">spiking networks</a>) the weight times
+activation term for that neuron is replaced by something more complex.
+See <a href="spikingnetworks.html">spiking networks</a>.</p>
 <p>"Weighted input" is also referred to as "net input" in much of the
 connectionist literature. To make a neuron whose acitvation value
-equals its weighted input, use a <a href="neuron/linear.html">linear neuron</a> with slope = 1 and bias = 0. </p>
+equals its weighted input, use a <a href="neuron/linear.html">linear
+neuron</a> with slope = 1 and bias = 0. </p>
 </div>
+
 </body></html>

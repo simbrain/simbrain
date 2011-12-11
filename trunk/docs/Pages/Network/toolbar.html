@@ -1,14 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
+<html><head><title>Simbrain Documentation</title>
+
+
   
 
   
   
-  <title>Simbrain Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
   
-  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head>
-<body>
+  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../SimbrainDocs.html">
 <div class="logo">
 <p><span></span></p>
@@ -29,10 +30,13 @@ Toolbars can be turned off using the <a href="menu.html#View">network view</a> m
 <table style="margin-left: 40px;" border="0">
   <tbody>
     <tr>
-      <td width="4%"><img style="width: 16px; height: 16px;" alt="a" src="../../Images/ZoomIn.gif">
-<img style="width: 16px; height: 16px;" alt="a" src="../../Images/ZoomOut.gif"></td>
+      <td width="4%"><img style="width: 16px; height: 16px;" alt="a" src="../../Images/ZoomIn.gif"></td>
       <td width="94%">Zoom
-in or out in the network panel.&nbsp; By pressing z the one can toggle between zoom in and zoom out mode. When this tool is active, the cursor will change to a small magnifying glass with either a "+" or a "-" in the center representing the active zoom mode.&nbsp; Clicking and lassoing a
+in or out in the network panel.&nbsp; By pressing z the one can toggle
+between zoom in and zoom out mode. When this tool is active, the cursor
+will change to a small magnifying glass with either a "+" or a "-" in
+the center representing the active zoom mode.&nbsp; Clicking and
+lassoing a
 region of the screen can be used to zoom in to that region of the
 screen .&nbsp; <span style="font-style: italic;"></span><em>Note: </em>Zooming
 and panning are only effective if <a href="menu.html#Autozoom">autozoom</a>
@@ -55,13 +59,17 @@ left-clicking.</td>
     <tr>
       <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="Text mode" src="../../Images/Text.png"></td>
       <td style="vertical-align: top;">Text mode.&nbsp; In this mode
-text can be added to the simulation.<br>
+text can be added anywhere
+in the
+network panel.&nbsp; Text objects can be subsequently edited by
+double-clicking on them. &nbsp; Text can be formatted by right clicking
+on a text object and selecting&nbsp;<span class="command">Text Properties...</span>.
       </td>
     </tr>
     <tr>
       <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="Wand" src="../../Images/Wand.png"></td>
-      <td style="vertical-align: top;">Wand mode.&nbsp; Inject
-activation to nodes quickly for testing.&nbsp; More information can be found in the wand tool instructions at the bottom of the page.<br>
+      <td style="vertical-align: top;">Wand mode.&nbsp; Can be used to inject
+activation to nodes quickly for testing.&nbsp; See <a href="wand.html">wand tool</a>.<br>
       </td>
     </tr>
   </tbody>
@@ -130,44 +138,16 @@ backspace). </td>
   <tbody>
     <tr>
       <td><img style="width: 18px; height: 18px;" alt="Clamp Neuron" src="../../Images/Clamp_N.png"></td>
-      <td>Clamp neurons. See <a href="common.html#clamping">clamping</a>.
+      <td>Clamp neurons.&nbsp; When selected,&nbsp; neurons will not be updated. &nbsp; See <a href="neuron.html#clamping">clamping</a>.
       </td>
     </tr>
     <tr>
       <td><img style="width: 18px; height: 18px;" alt="Clamp Weight" src="../../Images/Clamp_W.png"></td>
-      <td>Clamp weights. See <a href="common.html#clamping">clamping</a>.</td>
+      <td>Clamp weights.&nbsp; When selected, synapses will not be updated.&nbsp; See <a href="neuron.html#clamping">clamping</a>.</td>
     </tr>
   </tbody>
 </table>
-<br>
-<p><span class="heading">Tool Details:<br>
-</span></p>
-<br>
-<p><span class="heading">Wand Tool:<br>
-</span></p>
-<p>  <img src="../../Images/Wand.png" height="18" width="18">
-The wand tool, which can be found on the network toolbar, is a tool
-used to alter the activations of neurons within its range.
-As of the current version of Simbrain the wand only injects activation.
-The addiion of multiple modes of neuron alteration to the wands
-function are planned for future releases.<br>
-
-<br><b>To use the wand simply:</b><br>
-&nbsp;&nbsp;&nbsp; 1) Click on the wand icon<br>
-&nbsp;&nbsp;&nbsp; 2) Pass the wand over neurons while holding the
-mouse key<br>
-&nbsp;&nbsp;&nbsp; 3) All neurons will reach their maximum level (the
-&#8220;upper bound&#8221; value), as shown below.<br>
-</p><p style="text-align: left;"><img style="width: 500px; height: 500px;" src="../../Images/wandExample.png"></p>
-<br>
-The radius in pixels of the wand's effect can be adjusted by going to
-Edit &gt; Wand/Edit Mode Preferences within a network window.<br>
-
-<p><span class="heading">Text Tool:<br>
-</span></p>
-<p>
-<img style="width: 18px; height: 18px;" alt="Text mode" src="../../Images/Text.png">
-The text tool can be used to place a text object anywhere in the network panel. While it provides little in the way of functionality it does allow the user to label functional items within the network panel. Upon its addition to the panel, the text object can be moved, cut, pasted, and copied like any other network object.
+<br><br>
 </div>
 
 </body></html>

@@ -101,7 +101,7 @@ public class SOMDialog extends StandardDialog implements ActionListener {
         som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
         som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
         som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-        som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
+        som.setNeighborhoodDecayAmount(Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
         networkPanel.getRootNetwork().addNetwork(som);
         networkPanel.repaint();
         super.closeDialogOk();

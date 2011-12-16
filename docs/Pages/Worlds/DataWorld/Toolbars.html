@@ -1,9 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head>
+<html><head><title>Simbrain Documentation</title>
 
-<title>Simbrain Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head>
-<body>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
 <a href="../../../SimbrainDocs.html"><div class="logo">
   <p><span></span></p>
 </div></a>
@@ -13,69 +13,52 @@
   </div>
   <p>
   </p><h1>Toolbars</h1>
-  <p><span class="heading">Main Toolbar</span></p>
-<p>This toolbar allows you to set the edit mode for the network, visible as the cursor graphic.<br>
+  <p><span class="heading">Table Structure Toolbar<br>
+</span></p>
+<p>This toolbar allows you to add and remove rows and columns.<br>
 </p>
 
 <table style="margin-left: 40px;" border="0">
   <tbody>
     <tr>
-      <td width="6%"><img src="../../../Images/ZoomIn.gif" height="18" width="18"></td>
-      <td width="94%">Zoom
-in on the network.&nbsp; Key (TODO) can be used to change it zoom out
-mode.&nbsp; Clicking zooms in or out. &nbsp; Clicking and lassoing a
-region of the screen can be used to zoom in to that region of the
-screen .&nbsp; <span style="font-style: italic;"></span><em>Note: </em>Zooming
-and panning are only effective if <a href="../../Network/menu.html#Autozoom">autozoom</a>
-is turned off.&nbsp; <br>
+      <td width="6%"><img style="width: 18px; height: 18px;" alt="add row" src="../../../Images/AddTableRow.png"><br>
+</td>
+      <td width="94%">Add a row to the table. 
 
       </td>
     </tr>
     <tr>
-      <td><img src="../../../Images/Pan.gif" height="18" width="18"></td>
-      <td>Pan Mode. Move the view of the network around (to actually
-move the network select all and drag the network). <em>Note: </em>Zooming
-and panning are only functional if autozoom is turned off. </td>
+      <td><img style="width: 18px; height: 18px;" alt="add col" src="../../../Images/AddTableColumn.png"><br>
+</td>
+      <td>Add a column to the table.</td>
     </tr>
     <tr>
-      <td style="vertical-align: top;"><img src="../../../Images/Arrow.gif" height="18" width="18"></td>
-      <td style="vertical-align: top;">Selection mode. Select nodes and
-weights by lassoing or
-left-clicking.</td>
+      <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="delete row" src="../../../Images/DeleteRowTable.png"><br>
+</td>
+      <td style="vertical-align: top;">Remove a row from the table.</td>
     </tr>
     <tr>
-      <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="Text mode" src="../../../Images/Text.png"></td>
-      <td style="vertical-align: top;">Text mode.&nbsp; In this mode
-text can be added to the simulation.<br>
+      <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="delete column" src="../../../Images/DeleteColumnTable.png"></td>
+      <td style="vertical-align: top;">Remove column from the table.
       </td>
     </tr>
-    <tr>
-      <td style="vertical-align: top;"><img style="width: 18px; height: 18px;" alt="Wand" src="../../../Images/Wand.png"></td>
-      <td style="vertical-align: top;">Wand mode.&nbsp; Inject
-activation to nodes quickly for testing.&nbsp; See wand tool.<br>
-      </td>
-    </tr>
+    
   </tbody>
 </table>
-<p><span class="heading">Run Toolbar</span>&nbsp;<br>
+<p><span class="heading">Randomization Toolbar</span>&nbsp;<br>
 </p>
-<p>This toolbar is for running the network, independently of the
-workspace.&nbsp;&nbsp; It is hidden by default (because it can be
-easily confused with workspace run / step) and must be turned on using
-the view menu.&nbsp;&nbsp; <br>
+<p>For randomizing values in table cells. <br>
 
 </p>
 
   
     <table style="margin-left: 40px;" border="0"><tbody><tr>
-      <td><img style="width: 18px; height: 18px;" alt="Play" src="../../../Images/Play.png"></td>
-      <td>Run network . Repeatedly iterates the network. Note that the
-image on the button becomes that of a "stop" button <img style="width: 18px; height: 18px;" alt="Stop" src="../../../Images/Stop.png">. Pressing this
-button will stop the network. Thus the play/stop button acts as a
-toggle switch. </td>
+      <td><img style="width: 18px; height: 18px;" alt="randomize" src="../../../Images/Rand.png"><br>
+</td>
+      <td>Randomize all cells in the table by sampling from a uniform distribution.. </td>
     </tr>
     <tr>
-      <td><img style="width: 18px; height: 18px;" alt="Step" src="../../../Images/Step.png"></td>
-      <td>Step through one update cycle (Also keyboard space and S,
-depending on <a href="../../Network/couplings.html#InteractionMode">interaction mode</a>).</td></tr></tbody></table></div>
+      <td><img style="width: 18px; height: 18px;" alt="prefs" src="../../../Images/Prefs.gif"><br>
+</td>
+      <td>Adjust upper and loewr bounds of the randomization.</td></tr></tbody></table></div>
 </body></html>

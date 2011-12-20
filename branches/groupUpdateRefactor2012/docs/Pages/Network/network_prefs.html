@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Network Preferences</p>
+  </div>
+  <p></p><h1>Network Preferences</h1>
+<div style="text-align: left;"><img style="width: 300px; height: 240px;" src="../../Images/NetworkDialog.png"><br>
+</div>
+<div style="text-align: left;"><br>
+The Network Preferences dialog can be opened by going to File &gt;
+Network Preferences within a network window. The dialog offers ways to
+alter the graphical, logical, and other miscellaneous properties of the
+network window and/or the network within that window.&nbsp;
+&nbsp;
+
+  </div>
+<p class="heading">Graphics</p>
+    <blockquote>
+      <p><span class="heading2">Color:</span>
+allows the user to change the color of the various components within
+the network frame. The colors that can be changed are: Background,
+Line, Hot node, Cool node, Excitatory weight, Inhibitory weight, Lasso,
+Selection and Spiking. The current color selection is indicated by the
+color box located between the combo box and the "Set" button. </p>
+      <blockquote>
+        <p><span class="heading2">Background color</span>: is the color of the network background.</p>
+        <p><span class="heading2">Cool node color:</span> is the color of a neuron that has an activation level less than zero.</p>
+        <p><span class="heading2">Excitatory weight color:</span> is the color of the synapse that has a strength  greater than zero.</p>
+        <p><span class="heading2">Hot node color:</span> is the color of a neuron that has an activation level greater than zero.</p>
+        <p><span class="heading2">Inhibitory weight color:</span> is the color of the synapse that has a strength  less than zero.</p>
+        <p><span class="heading2">Lasso color:</span> is the color of the line that appears when dragging the mouse to select neurons and weights. </p>
+        <p><span class="heading2">Line color:</span> is the color of the lines that connect neurons.</p>
+        <p><span class="heading2">Selection color:</span> is the color of the box that surrounds items that have been selected. </p>
+        <p><span class="heading2">Spiking color:</span> is the color of a neuron's outline (and outgoing synapse lines) when it spikes.</p>
+      </blockquote>
+      <p><span class="heading2">Weight size max/min:</span>
+sets the maximum and minimum size a weight can be. This option only
+changes the graphical size of the weight and has no bering on how the
+weight behaves.</p>
+	<p><span class="heading2">Show Subnet Outline:</span> toggles subnetwork outlines on and off.
+</p>
+	<p><span class="heading2">Show time: </span> toggles display of iterations/time at the bottom of the network frame.
+</p>
+    </blockquote>
+    <p class="heading">Logic</p>
+    <blockquote>
+      <p><span class="heading2">Round off neuron values:</span> if selected will round neuron values as per the precision set by the user.</p>
+      <p><span class="heading2">Precision of round-off:</span>
+determines to what precision neuron values will be rounded off. Option
+is only available when "Round off neuron values" is enabled. </p>
+ <p><span class="heading2">Network Update Method:</span> determines the update rule used to update the network. Only preset options are available in this menu (see: <a href="../Scripting.html"> scripting</a> for detailed information on how to implement custom update rules).
+  </blockquote>
+    <p align="left"><span class="heading">Misc.</span></p>
+    <blockquote>
+      <p><span class="heading2">Nudge amount:</span>
+is the amount of indent to be used when indenting network files. This
+option is only valid when "Indent network files" is selected. </p>
+    </blockquote>
+</div>
+</body></html>

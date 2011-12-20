@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+  <title>Simbrain Documentation</title>
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../../Styles.css" rel="stylesheet" type="text/css">
+
+</head><body>
+<a href="../../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Updating</p>
+</div>
+<h1>Network Operation</h1>
+<p>Each time the step button is pressed in the network panel--the
+network moves forward in time by one iteration; that is, it takes on a
+new state as a result of its current state. This is known as <a href="../Workspace/Update.html">updating</a> the network. However, as
+one might imagine, there are multiple ways to go about this given a
+construct as complex as an artificial neural network. To this end,
+Simbrain includes two built in update types: buffered (default) and
+priority-based. For more advanced users Simbrain also includes the
+option of creating custom update methods. At the network level update
+rules can be changed by going to File &gt; Network Preferences (or
+"ctrl + ,"), and selecting the "logic" tab. From there the desired
+update method for the network can be selected from a combo-box (see
+below). <br>
+</p>
+<img style="border: 1px solid ; width: 300px; height: 240px;" alt="example" src="../../Images/UpdateDialog.png">
+<br>
+The differences in these update methods can sometimes be subtle and
+requires an understaning of how artificial neural networks are
+simulated on a serial machine (and specifically in simbrain). To this
+end: Artificial neural networks are essentially graphs, a collection of
+nodes connected by vertices (the vertices are neurons and the
+connections are synapses). The whole network has three lists: a list of
+nodes, a list
+of connections, and a list of networks ("subnetworks"). The connections
+have references to the source and target nodes they connect. When a
+network is updated the program goes through the list of neurons and
+calls an update function internal to each one, and similarly with the
+list of synapses. Before these values are actually changed they are
+stored as a buffer within each network component. In this way, an
+update method can be thought of as the specific way or order in which
+buffered values are transformed into actual values. <br>
+<br>
+To reflect the fact that the network has been updated the "time" label
+is updated as well.
+<br>
+<br>
+<p><span class="heading"><span class="heading2">Buffered Update</span></span><br>
+</p>
+<p>Buffered update is the default update rule in Simbrain. For every
+component of the network, the new value at time <i>t</i> is calculated
+from the attribute values at <i>t - 1</i> and stored in the buffer. No
+activation values are changed until every buffer as been calculated.
+Then all activations are updated simultaneously based on their buffer
+values.</p>
+<p><span class="heading"><span class="heading2">Priority-Based Update</span></span><br>
+</p>
+<p>When using a priority based update, each node is assigned a priority
+value. The lower this value, the higher the node's priority. Based on
+this value all the network components are sorted into a queue. The
+program addresses the head of this queue first calling the component's
+update method and immediately setting its activation based on its
+buffer value before moving on to the next component in the queue.
+Components with the same priority are ordered arbitrarily in this queue.</p>
+<p><span class="heading"><span class="heading2"><a name="CustomUpdate"></a>Custom
+Update </span></span><br>
+</p>
+<p>For more advanced users the option exists to create a custom update
+rule. Specifying a custom update rule is not availble in the GUI and
+must be instantiated and defined either within a script (see <a href="../Scripting.html"> scripting</a>) or by editing the Simbrain
+source code. </p>
+<p>&nbsp;</p>
+</div>
+
+</body></html>

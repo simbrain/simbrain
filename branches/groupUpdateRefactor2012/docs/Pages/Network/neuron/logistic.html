@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Logistic</p>
+  </div>
+  <p><h1>Logistic Neuron</h1></p>
+  <p>This is a simple quadratic map that produces chaotic behavior. It based on the well-known logistic map:</p>
+<p><img src="../equations/Logistic.png" width="163" height="56"></p>
+<p>The logistic map takes a number in the interval [0,1] back to itself. Here the quadratic map has been rescaled so that it takes a number in the interval from the <a href="../neuron.html#LowBound">lower bound</a> to the <a href="../neuron.html#UpBound">upper bound</a> back into itself. The growth rate determines the exact form of the quadratic function. </p>
+<p>Note that the output of the function is  <a href="../common.html#clipping">clipped</a> so as to stay within the upper and lower bounds. </p>
+<p>This type of neuron functions autonomously; it does not use neuron, or sensory sensory input. It can be thought of as a signal generation device that produces chaotic inputs to other neurons. </p>
+<p class="heading">Growth rate</p>
+<blockquote>
+  <p>A number that determines the exact form of the quadratic function. It must be between 0 and 4. To produce chaotic behavior it should be between 3.56 and 4. Due to the presence of periodic windows not all growth rates in this interval produce chaos. By default the growth rate is 3.9, which does produce chaotic behavior. </p>
+</blockquote>
+</div>
+</body>
+</html>

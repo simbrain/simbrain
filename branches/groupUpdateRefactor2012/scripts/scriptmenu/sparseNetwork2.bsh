@@ -1,0 +1,40 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.workspace.*;
+
+{
+
+    // Parameters 
+    int NUM_NEURONS = 100;
+    double GRID_SPACE = 50;
+    double INHIBITORY_PROB = .2;
+    double INHIBITORY_RADIUS = 100;
+    double EXCITATORY_PROB = .1;
+    double EXCITATORY_RADIUS = 200;
+
+    // Build Network
+    NetworkComponent networkComponent = new NetworkComponent("Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    RootNetwork network = networkComponent.getRootNetwork();
+    GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(NUM_NEURONS));
+    layout.setInitialLocation(new Point(10, 10));
+    for (int i = 0; i < NUM_NEURONS; i++) {
+        Neuron neuron = new Neuron(network, "NakaRushtonNeuron");
+        network.addNeuron(neuron);
+    }
+    layout.layoutNeurons(network);
+    Radial connection = new Radial(network, network.getFlatNeuronList(),
+            network.getFlatNeuronList());
+    connection.setExcitatoryProbability(EXCITATORY_PROB);
+    connection.setInhibitoryProbability(INHIBITORY_PROB);
+    connection.setExcitatoryRadius(EXCITATORY_RADIUS);
+    connection.setInhibitoryRadius(INHIBITORY_RADIUS);
+    connection.connectNeurons();
+    network.randomizeNeurons();
+    desktop.getDesktopComponent(networkComponent).postAddInit();
+
+}

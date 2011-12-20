@@ -1,0 +1,56 @@
+package org.simbrain;
+
+import java.awt.Point;
+import java.util.ArrayList;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.workspace.*;
+
+{
+    // Parameters 
+    int SOM_NEURONS = 9;
+    int INPUT_NEURONS = 25;
+    double GRID_SPACE = 50;
+
+    // Initialize network component
+    NetworkComponent networkComponent = new NetworkComponent("Self Organizing Map");
+    workspace.addWorkspaceComponent(networkComponent);
+    RootNetwork root = networkComponent.getRootNetwork();
+
+    // Build Self Organizing Map
+    GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(SOM_NEURONS));
+    layout.setInitialLocation(new Point (500,250));
+    SOM som = new SOM(root, SOM_NEURONS, layout);
+    root.addNetwork(som);
+
+    // Build Input Layer
+    GridLayout inputLayout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(INPUT_NEURONS));
+    inputLayout.setInitialLocation(new Point (200,200));
+    StandardNetwork inputLayer = new StandardNetwork(root);
+    for (int i = 0; i < INPUT_NEURONS; i++) {
+        Neuron neuron = new Neuron(inputLayer, "RandomNeuron");
+        inputLayer.addNeuron(neuron);
+    }
+    inputLayout.layoutNeurons(inputLayer);
+    inputLayer.randomizeNeurons();
+    root.addNetwork(inputLayer);
+
+    // Connect layers
+    AllToAll connection = new AllToAll(root, inputLayer.getFlatNeuronList(), som.getFlatNeuronList());
+    connection.connectNeurons();
+
+    // Reset SOM
+    som.reset();
+    desktop.getDesktopComponent(networkComponent).postAddInit();
+
+
+    //TODO: Add an interesting data environment and then
+    //	be able to look at objects and see what they activate in the SOM
+    //
+    //	Map to a projection / SOM
+            
+}

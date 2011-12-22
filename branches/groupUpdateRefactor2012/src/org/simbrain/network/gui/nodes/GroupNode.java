@@ -86,7 +86,7 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
         JPopupMenu ret = new JPopupMenu();
         Action groupOnOff = new AbstractAction("Group is active") {
             public void actionPerformed(final ActionEvent event) {
-                group.toggleOnOff();
+                //group.toggleOnOff(); //REDO
             }
         };
         Action removeGroup = new AbstractAction("Remove group") {

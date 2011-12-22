@@ -20,11 +20,11 @@ package org.simbrain.network.networks;
 
 import java.util.Random;
 
-import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.UpdatableGroup;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurons.DecayNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 
 
@@ -34,7 +34,7 @@ import org.simbrain.network.neurons.LinearNeuron;
  * the lower value. In case of a tie the node which wins is arbitrary (the first
  * in an internally maintained list).
  */
-public class WinnerTakeAll extends Network {
+public class WinnerTakeAll extends NeuronGroup implements UpdatableGroup {
 
     /** Default initial number of units. */
     private static final int DEFAULT_NUM_UNITS = 5;
@@ -54,12 +54,6 @@ public class WinnerTakeAll extends Network {
     /** Probability of setting the winner randomly, when useRandom is true. */
     private double randomProb = .1;
 
-    /**
-     * Default constructor.
-     */
-    public WinnerTakeAll() {
-        super();
-    }
 
     /**
      * Copy constructor.
@@ -68,7 +62,7 @@ public class WinnerTakeAll extends Network {
      * @param oldNet old network
      */
     public WinnerTakeAll(RootNetwork newRoot,  WinnerTakeAll oldNet) {
-        super(newRoot, oldNet);
+        super(null,null);
         setLoseValue(oldNet.getLoseValue());
         setWinValue(oldNet.getWinValue());
         setUseRandom(oldNet.isUseRandom());
@@ -82,13 +76,12 @@ public class WinnerTakeAll extends Network {
      * @param layout the way to layout the network
      */
     public WinnerTakeAll(final RootNetwork root, final int numNeurons, final Layout layout) {
-        super();
-        setRootNetwork(root);
+        super(root);
         for (int i = 0; i < numNeurons; i++) {
           //TODO: Prevent invalid states like this?
-          this.addNeuron(new Neuron(this, new LinearNeuron()));
+          this.addNeuron(new Neuron(root, new LinearNeuron()));
         }
-        layout.layoutNeurons(this);
+        layout.layoutNeurons(this.getNeuronList());
     }
 
     /**
@@ -96,7 +89,9 @@ public class WinnerTakeAll extends Network {
      */
     public void update() {
 
-        if (getRootNetwork().getClampNeurons()) {
+        System.out.println("In WTA update");
+        
+        if (getParent().getClampNeurons()) {
             return;
         }
 
@@ -223,5 +218,15 @@ public class WinnerTakeAll extends Network {
      */
     public void setRandomProb(double randomProb) {
         this.randomProb = randomProb;
+    }
+
+    public boolean getEnabled() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setEnabled(boolean enabled) {
+        // TODO Auto-generated method stub
+        
     }
 }

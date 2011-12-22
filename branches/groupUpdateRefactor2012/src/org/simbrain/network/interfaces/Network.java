@@ -27,8 +27,6 @@ import org.simbrain.network.networks.Competitive;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.networks.KWTA;
 import org.simbrain.network.networks.SOM;
-import org.simbrain.network.networks.Standard;
-import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.network.util.CopyPaste;
 
 /**
@@ -117,11 +115,11 @@ public abstract class Network {
             return new KWTA(newRoot, (KWTA) oldNetwork);
         } else if (oldNetwork instanceof SOM) {
             return new SOM(newRoot, (SOM) oldNetwork);
-        } else if (oldNetwork instanceof Standard) {
-            return new Standard(newRoot, (Standard) oldNetwork);
-        } else if (oldNetwork instanceof WinnerTakeAll) {
-            return new WinnerTakeAll(newRoot, (WinnerTakeAll) oldNetwork);
-        }
+        } 
+            //REDO
+//        } else if (oldNetwork instanceof WinnerTakeAll) {
+//            return new WinnerTakeAll(newRoot, (WinnerTakeAll) oldNetwork);
+//        }
         return null;
     }
 
@@ -479,10 +477,12 @@ public abstract class Network {
 
             Group group = getRootNetwork().containedInGroup(toDelete);
             if (group != null) {
-                group.deleteNeuron(toDelete);
-                if (group.isEmpty()) {
-                    this.getRootNetwork().deleteGroup(group);
-                }
+                
+                //REDO
+//                group.deleteNeuron(toDelete);
+//                if (group.isEmpty()) {
+//                    this.getRootNetwork().deleteGroup(group);
+//                }
             }
 
             // Update priority list
@@ -529,10 +529,11 @@ public abstract class Network {
         // If deleting this synapse empties a parent group, delete that group
         Group group = getRootNetwork().containedInGroup(toDelete);
         if (group != null) {
-            group.deleteSynapse(toDelete);
-            if (group.isEmpty()) {
-                this.getRootNetwork().deleteGroup(group);
-            }
+            //REDO
+//            group.deleteSynapse(toDelete);
+//            if (group.isEmpty()) {
+//                this.getRootNetwork().deleteGroup(group);
+//            }
         }
 
         // Notify listeners that this synapse has been deleted
@@ -923,7 +924,8 @@ public abstract class Network {
      * @param group group of network elements
      */
     public void addGroup(final Group group) {
-        group.setParent(rootNetwork);
+        //REDO
+//        group.setParent(rootNetwork);
         if ((rootNetwork != null)) {
             String id = getRootNetwork().getGroupIdGenerator().getId();
             group.setId(id);

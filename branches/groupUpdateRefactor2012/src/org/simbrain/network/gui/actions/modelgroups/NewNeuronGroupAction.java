@@ -62,8 +62,10 @@ public final class NewNeuronGroupAction
         NeuronGroup group = new NeuronGroup(networkPanel.getRootNetwork(),
                 (List<Neuron>) networkPanel.getSelectedModelNeurons());
 
-        if (group.getElementCount() > 0) {
-            networkPanel.getRootNetwork().addGroup(group);
-        }
+        
+        //REDO
+//        if (group.getElementCount() > 0) {
+//            networkPanel.getRootNetwork().addGroup(group);
+//        }
     }
 }

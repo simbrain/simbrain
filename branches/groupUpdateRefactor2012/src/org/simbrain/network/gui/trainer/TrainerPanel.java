@@ -27,7 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.simbrain.network.builders.LayeredNetworkBuilder;
+import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.trainers.Backprop;
@@ -481,18 +481,19 @@ public class TrainerPanel extends JPanel {
      * @param args
      */
     public static void main(String[] args) {
-        RootNetwork network = new RootNetwork();
-        LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
-        int[] nodesPerLayer = new int[] { 2, 2, 1 };
-        builder.setNodesPerLayer(nodesPerLayer);
-        builder.buildNetwork(network);
-        Backprop trainer = new Backprop(network, network.getGroup("Group_1")
-                .getNeuronList(), network.getGroup("Group_2").getNeuronList());
-        GenericJFrame frame = new GenericJFrame();
-        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
-        frame.setContentPane(trainerPanel);
-        frame.pack();
-        frame.setVisible(true);
+//        RootNetwork network = new RootNetwork();
+//        LayeredNetwork builder = new LayeredNetwork();
+//        int[] nodesPerLayer = new int[] { 2, 2, 1 };
+//        builder.setNodesPerLayer(nodesPerLayer);
+//        builder.buildNetwork(network);
+        //REDO
+//        Backprop trainer = new Backprop(network, network.getGroup("Group_1")
+//                .getNeuronList(), network.getGroup("Group_2").getNeuronList());
+//        GenericJFrame frame = new GenericJFrame();
+//        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
+//        frame.setContentPane(trainerPanel);
+//        frame.pack();
+//        frame.setVisible(true);
     }
 
 }

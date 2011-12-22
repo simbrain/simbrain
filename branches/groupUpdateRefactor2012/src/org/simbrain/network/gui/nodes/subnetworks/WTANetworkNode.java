@@ -27,7 +27,8 @@ public class WTANetworkNode extends SubnetworkNode {
                                      final double x,
                                      final double y) {
 
-        super(networkPanel, subnetwork, x, y);
+        //REDO
+        super(networkPanel, null, x, y);
     }
 
     /** @see org.simbrain.network.gui.nodes.ScreenElement */
@@ -64,7 +65,9 @@ public class WTANetworkNode extends SubnetworkNode {
 
     /** @see org.simbrain.network.gui.nodes.ScreenElement */
     public WinnerTakeAll getWTASubnetwork() {
-        return ((WinnerTakeAll) getSubnetwork());
+        // REDO
+        return null;
+        //return ((WinnerTakeAll) getSubnetwork());
     }
 
 }

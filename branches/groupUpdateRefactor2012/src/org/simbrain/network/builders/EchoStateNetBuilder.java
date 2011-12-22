@@ -19,15 +19,10 @@ package org.simbrain.network.builders;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.Sparse2;
-import org.simbrain.network.groups.NeuronLayer;
-import org.simbrain.network.groups.NeuronLayer.LayerType;
 import org.simbrain.network.interfaces.CustomUpdateRule;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
@@ -36,14 +31,13 @@ import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.network.trainers.ReservoirComputingUtils;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
+import org.simbrain.network.trainers.ReservoirComputingUtils;
+import org.simbrain.network.util.SimnetUtils;
 
 /**
  * Builds an Echo-State Network with options for all valid weight
@@ -187,13 +181,14 @@ public final class EchoStateNetBuilder {
      */
     public void buildNetwork() {
 
+        //REDO
         // initialize the Layers
-        initializeLayer(inputLayer, new ClampedNeuron(),
-                LayerType.Input, numInputNodes);
-        initializeLayer(reservoirLayer, reservoirNeuronType,
-                LayerType.Reservoir, numReservoirNodes);
-        initializeLayer(outputLayer, outputNeuronType,
-                LayerType.Output, numOutputNodes);
+//        initializeLayer(inputLayer, new ClampedNeuron(),
+//                LayerType.Input, numInputNodes);
+//        initializeLayer(reservoirLayer, reservoirNeuronType,
+//                LayerType.Reservoir, numReservoirNodes);
+//        initializeLayer(outputLayer, outputNeuronType,
+//                LayerType.Output, numOutputNodes);
 
         network.setUpdateMethod(UpdateMethod.CUSTOM);
         network.setCustomUpdateRule(update);
@@ -232,30 +227,31 @@ public final class EchoStateNetBuilder {
                 spectralRadius);
     }
 
-    /**
-     * Initializes a layer.
-     * @param layer
-     *            the layer to be initialized
-     * @param nodeType
-     *            type of nodes in the layer
-     * @param layerType
-     *            type of layer
-     * @param nodes
-     *            number of nodes in the layer
-     */
-    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
-            LayerType layerType, int nodes) {
-
-        for (int i = 0; i < nodes; i++) {
-            Neuron node = new Neuron(network, nodeType);
-            network.addNeuron(node);
-            
-            node.setIncrement(1); //TODO: Reasonable?
-            layer.add(node);
-        }
-        // Create group based on layer and add to the network
-        network.addGroup(new NeuronLayer(network, layer, layerType));
-    }
+    //REDO
+//    /**
+//     * Initializes a layer.
+//     * @param layer
+//     *            the layer to be initialized
+//     * @param nodeType
+//     *            type of nodes in the layer
+//     * @param layerType
+//     *            type of layer
+//     * @param nodes
+//     *            number of nodes in the layer
+//     */
+//    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
+//            LayerType layerType, int nodes) {
+//
+//        for (int i = 0; i < nodes; i++) {
+//            Neuron node = new Neuron(network, nodeType);
+//            network.addNeuron(node);
+//            
+//            node.setIncrement(1); //TODO: Reasonable?
+//            layer.add(node);
+//        }
+//        // Create group based on layer and add to the network
+//        network.addGroup(new NeuronLayer(network, layer, layerType));
+//    }
 
     /**
      * Sparsely connects two layers (or one recurrently).

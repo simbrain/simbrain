@@ -98,7 +98,8 @@ public class WTADialog extends StandardDialog {
       wta.setLoseValue(Double.parseDouble(loserValue.getText()));
       wta.setUseRandom(useRandomBox.isSelected());
       wta.setRandomProb(Double.parseDouble(randomProb.getText()));
-      networkPanel.getRootNetwork().addNetwork(wta);
+      
+      networkPanel.getRootNetwork().addGroup(wta);
       networkPanel.repaint();
       super.closeDialogOk();
     }
@@ -139,11 +140,12 @@ public class WTADialog extends StandardDialog {
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        WinnerTakeAll wta = new WinnerTakeAll();
-        loserValue.setText(Double.toString(wta.getLoseValue()));
-        numberOfUnits.setText(Integer.toString(wta.getNumUnits()));
-        winnerValue.setText(Double.toString(wta.getWinValue()));
-        useRandomBox.setSelected(wta.isUseRandom());
-        randomProb.setText("" + wta.getRandomProb());
+        
+        //REDO: Pull default values
+        loserValue.setText("" + 0);
+        numberOfUnits.setText("" + 5);
+        winnerValue.setText("" + 1);
+        useRandomBox.setSelected(false);
+        randomProb.setText("" + .01);
     }
 }

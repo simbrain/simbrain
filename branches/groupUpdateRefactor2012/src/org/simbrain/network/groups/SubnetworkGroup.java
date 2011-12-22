@@ -14,25 +14,31 @@ package org.simbrain.network.groups;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.util.Comparators;
 
 /**
- * Generic group of neurons. TODO: Make horizontal and vertical orientation
- * possible for group ordering.
+ * 
  */
-public class NeuronGroup extends Group {
+public class SubnetworkGroup extends Group {
 
     /** Set of neurons. */
     private final List<Neuron> neuronList = new ArrayList<Neuron>();
+    
+  /** Set of synapses. */
+  private Set<Synapse> synapseList = new HashSet<Synapse>();
+
 
     /** @see Group */
-    public NeuronGroup(final RootNetwork net, final List<Neuron> neurons) {
+    public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons) {
         super(net);
         for (Neuron neuron : neurons) {
             neuronList.add(neuron);
@@ -40,7 +46,7 @@ public class NeuronGroup extends Group {
         Collections.sort(neuronList, Comparators.X_ORDER);
     }
 
-    public NeuronGroup(RootNetwork root) {
+    public SubnetworkGroup(RootNetwork root) {
         super(root);
     }
 
@@ -114,14 +120,86 @@ public class NeuronGroup extends Group {
             neuron.update();
         }
     }
+
+  /**
+   * True if this group has no neurons, synapses, or networks.
+   *
+   * @return whether the group is empty or not.
+   */
+  public boolean isEmpty() {
+      boolean neuronsGone = neuronList.isEmpty();
+      boolean synapsesGone = synapseList.isEmpty();
+      return (neuronsGone && synapsesGone);
+  }
+
+  /**
+   * Returns the number of neurons and synapses in this group.
+   *
+   * @return the number of neurons and synapses in this group.
+   */
+  public int getElementCount() {
+      return neuronList.size() + synapseList.size();
+  }
+
+  /**
+   * Returns a debug string.
+   *
+   * @return the debug string.
+   */
+  public String debugString() {
+      String ret =  new String();
+      ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
+      ret += (" " + this.getSynapseList().size() + " synapse(s).");
+      return ret;
+  }
+
+
+  /**
+   * Add synapse.
+   *
+   * @param synapse synapse to add
+   */
+  public void addSynapse(Synapse synapse) {
+      synapseList.add(synapse);
+  }
+
+  /**
+   * Delete a synapse.
+   *
+   * @param toDelete synapse to delete
+   */
+  public void deleteSynapse(Synapse toDelete) {
+      synapseList.remove(toDelete);
+      getParent().fireGroupChanged(this, this);
+  }
+
+  /**
+   * @return a list of weights
+   */
+  public List<Synapse> getSynapseList() {
+      return new ArrayList<Synapse>(synapseList);
+  }
+
+  /**
+   * Update group.  Override for special updating.
+   */
+  public void update() {
+      updateNeurons();
+      updateAllSynapses();
+  }
+
+
+
+  /**
+   * Update all synapses.
+   */
+  public void updateAllSynapses() {
+      for (Synapse synapse : synapseList) {
+          synapse.update();
+      }
+  }
+
     
-    //REDO: Add label / id info below
     
-    @Override
-    public String toString() {
-        String ret = new String();
-        ret += ("Neuron group with " + this.getNeuronList().size() + " neuron(s),");
-        return ret;
-    }
 
 }

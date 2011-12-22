@@ -6,15 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.groups.NeuronLayer;
-import org.simbrain.network.groups.NeuronLayer.LayerType;
 import org.simbrain.network.interfaces.CustomUpdateRule;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neurons.ClampedNeuron;
 
 /**
  * Builds a simple recurrent network from the specified parameters.
@@ -100,15 +97,15 @@ public final class SRNBuilder {
     /** Builds a simple recurrent network. */
     public void build() {
 
-        //Initialize layers
-        initializeLayer(inputLayer, new ClampedNeuron(),
-                LayerType.Input, numInputNodes);
-        initializeLayer(hiddenLayer, hiddenNeuronType,
-                LayerType.Hidden, numHiddenNodes);
-        initializeLayer(outputLayer, outputNeuronType,
-                LayerType.Output, numOutputNodes);
-        initializeLayer(contextLayer, new ClampedNeuron(),
-                LayerType.Context, numHiddenNodes);
+        //Initialize layers //REDO
+//        initializeLayer(inputLayer, new ClampedNeuron(),
+//                LayerType.Input, numInputNodes);
+//        initializeLayer(hiddenLayer, hiddenNeuronType,
+//                LayerType.Hidden, numHiddenNodes);
+//        initializeLayer(outputLayer, outputNeuronType,
+//                LayerType.Output, numOutputNodes);
+//        initializeLayer(contextLayer, new ClampedNeuron(),
+//                LayerType.Context, numHiddenNodes);
 
         //Initial context layer values set to 0.5 (as in Elman 1991)
         //TODO: way to set this?
@@ -157,26 +154,26 @@ public final class SRNBuilder {
         connect.connectNeurons(hiddenLayer, outputLayer, -1.0, 1.0, 0.5);
     }
 
-    /**
-     * Initializes a layer by adding the desired number of neurons with the
-     * desired neuron update rule to the List of neurons
-     * @param layer the list of neurons
-     * @param nodeType the desired neuron update rule
-     * @param layerType the type of layer for labeling as a neuron group
-     * @param nodes the desired number of nodes
-     */
-    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
-            LayerType layerType, int nodes) {
-
-        for (int i = 0; i < nodes; i++) {
-            Neuron node = new Neuron(network, nodeType);
-            network.addNeuron(node);
-            node.setIncrement(1); // TODO: Reasonable?
-            layer.add(node);
-        }
-        // Create group based on layer and add to the network
-        network.addGroup(new NeuronLayer(network, layer, layerType));
-    }
+//    /**
+//     * Initializes a layer by adding the desired number of neurons with the
+//     * desired neuron update rule to the List of neurons
+//     * @param layer the list of neurons
+//     * @param nodeType the desired neuron update rule
+//     * @param layerType the type of layer for labeling as a neuron group
+//     * @param nodes the desired number of nodes
+//     */
+//    private void initializeLayer(List<Neuron> layer, NeuronUpdateRule nodeType,
+//            LayerType layerType, int nodes) {
+//
+//        for (int i = 0; i < nodes; i++) {
+//            Neuron node = new Neuron(network, nodeType);
+//            network.addNeuron(node);
+//            node.setIncrement(1); // TODO: Reasonable?
+//            layer.add(node);
+//        }
+//        // Create group based on layer and add to the network
+//        network.addGroup(new NeuronLayer(network, layer, layerType));
+//    }
 
 
     /**

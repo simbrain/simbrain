@@ -246,11 +246,6 @@ public class RootNetwork extends Network {
         return this;
     }
 
-    @Deprecated
-    public void updateRootNetwork() {
-        update();
-    }
-
     /**
      * The core update function of the neural network. Calls the current update
      * function on each neuron, decays all the neurons, and checks their bounds.
@@ -304,8 +299,11 @@ public class RootNetwork extends Network {
     public void updateAllGroups() {
         // Update group lists
         if (getGroupList() != null) {
-            for (Group n : getGroupList()) {
-                n.update();
+            
+            for (Group group : getGroupList()) {
+                if (group instanceof UpdatableGroup) {
+                    ((UpdatableGroup)group).update();                    
+                }
             }
         }
     }
@@ -368,15 +366,16 @@ public class RootNetwork extends Network {
      */
     public Group containedInGroup(final Object object) {
         for (Group group : getGroupList()) {
-            if (object instanceof Neuron) {
-                if (group.getNeuronList().contains(object)) {
-                    return group;
-                }
-            } else if (object instanceof Synapse) {
-                if (group.getSynapseList().contains(object)) {
-                    return group;
-                }
-            }
+            //REDO
+//            if (object instanceof Neuron) {
+//                if (group.getNeuronList().contains(object)) {
+//                    return group;
+//                }
+//            } else if (object instanceof Synapse) {
+//                if (group.getSynapseList().contains(object)) {
+//                    return group;
+//                }
+//            }
         }
         return null;
     }

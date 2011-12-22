@@ -17,7 +17,9 @@
  */
 package org.simbrain.network.groups;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
@@ -29,19 +31,16 @@ import org.simbrain.network.interfaces.Synapse;
  */
 public class SynapseGroup extends Group {
 
+  /** Set of synapses. */  // TODO: Why a set?
+  private Set<Synapse> synapseList = new HashSet<Synapse>();
+
 
     /** @see Group */
     public SynapseGroup(final RootNetwork net, final List<Synapse> synapseList) {
         super(net);
         for (Synapse synapse : synapseList) {
-            addSynapse(synapse);
+            synapseList.add(synapse);
         }
-    }
-
-    /** @Override. */
-    public Network duplicate() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 

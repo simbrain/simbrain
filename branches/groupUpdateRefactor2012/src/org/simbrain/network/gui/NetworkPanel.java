@@ -461,13 +461,21 @@ public class NetworkPanel extends JPanel {
             }
 
             public void synapseRemoved(final NetworkEvent<Synapse> e) {
-                SynapseNode toDelete = findSynapseNode(e.getObject());
-                if (toDelete != null) {
-                    toDelete.getTarget().getConnectedSynapses()
-                            .remove(toDelete);
-                    toDelete.getSource().getConnectedSynapses()
-                            .remove(toDelete);
-                    canvas.getLayer().removeChild(toDelete);
+                Synapse synapse = e.getObject();
+                SynapseNode synapseNode = findSynapseNode(synapse);
+                if (synapseNode != null) {
+                    synapseNode.getTarget().getConnectedSynapses()
+                            .remove(synapseNode);
+                    synapseNode.getSource().getConnectedSynapses()
+                            .remove(synapseNode);
+                    canvas.getLayer().removeChild(synapseNode);
+                    if (synapse.getParentGroup() != null) {
+                        GroupNode groupNode = findModelGroupNode(synapse.getParentGroup());
+                        if (groupNode != null) {
+                            groupNode.removeReference(synapseNode);
+                            groupNode.updateBounds();                        
+                        }
+                    }
                 }
             }
         });
@@ -537,7 +545,8 @@ public class NetworkPanel extends JPanel {
                     // Add synapse nodes to canvas.. ?
                     for (Synapse synapse : ((SynapseGroup) e.getObject())
                             .getSynapseList()) {
-                        SynapseNode node = findSynapseNode(synapse); //TODO: Why not create it?
+                        addSynapse(synapse);
+                        SynapseNode node = findSynapseNode(synapse);
                         canvas.getLayer().addChild(node);
                         if (node != null) {
                             nodes.add(node);

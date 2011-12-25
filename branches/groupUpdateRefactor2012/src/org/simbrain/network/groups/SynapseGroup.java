@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.simbrain.network.interfaces.Group;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 
@@ -27,14 +28,13 @@ import org.simbrain.network.interfaces.Synapse;
 public class SynapseGroup extends Group {
 
     /** Set of synapses. */
-    // TODO: Why a set?
-    private final Set<Synapse> synapseList = new HashSet<Synapse>();
+    private final List<Synapse> synapseList = new ArrayList<Synapse>();
 
     /** @see Group */
     public SynapseGroup(final RootNetwork net, final List<Synapse> list) {
         super(net);
         for (Synapse synapse : list) {
-            synapseList.add(synapse);
+            addSynapse(synapse);
         }
     }
 
@@ -45,23 +45,22 @@ public class SynapseGroup extends Group {
      */
     public void addSynapse(Synapse synapse) {
         synapseList.add(synapse);
+        synapse.setParentGroup(this);
+    }
+    
+    @Override
+    public void removeSynapse(Synapse toDelete) {
+        synapseList.remove(toDelete);
+        //REDO
+        //getParent().fireGroupChanged(this, this);
     }
 
-    /**
-     * Delete a synapse.
-     * 
-     * @param toDelete synapse to delete
-     */
-    public void deleteSynapse(Synapse toDelete) {
-        synapseList.remove(toDelete);
-        // parent.fireGroupChanged(this, this);
-    }
 
     /**
      * @return a list of weights
      */
     public List<Synapse> getSynapseList() {
-        return new ArrayList<Synapse>(synapseList);
+        return synapseList;
     }
 
     /**

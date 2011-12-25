@@ -135,6 +135,7 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
                     - interactionBox.getOFFSET_X(), this.getBounds().getY()
                     - interactionBox.getOFFSET_Y());            
         } else {
+            // Synapse group
             interactionBox.setOffset(this.getBounds().getCenterX()
                     - interactionBox.getOFFSET_X(), this.getBounds().getCenterY()
                     - interactionBox.getOFFSET_Y());            

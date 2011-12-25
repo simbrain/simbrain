@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.interfaces.Group;
+import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -54,9 +55,9 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
     // */
     // private int[] nodesPerLayer = { 5, 3, 5 };
 
-    private List<NeuronGroup> layers = new ArrayList<NeuronGroup>();
+    private final List<NeuronGroup> layers = new ArrayList<NeuronGroup>();
 
-    private List<SynapseGroup> connections = new ArrayList<SynapseGroup>(); //REDO
+    private final List<SynapseGroup> connections = new ArrayList<SynapseGroup>();
 
     /** Enumeration of layer types. */
     public enum LayerType {
@@ -127,17 +128,31 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
             addLayer(new NeuronGroup(network, hiddenLayer));
 
             // Connect input layer to hidden layer
-            AllToAll connection = new AllToAll(network, lastLayer, hiddenLayer);
-            connection.setBaseSynapse(synapse);
-            connection.connectNeurons();
+            List<Synapse> synapseList = new ArrayList<Synapse>();
+            for (Neuron source : lastLayer) {
+                for (Neuron target : hiddenLayer) {
+                    Synapse newSynapse = synapse.instantiateTemplateSynapse(
+                            source, target, network);
+                    //network.addSynapse(newSynapse); 
+                    //Redo: think about what's lost by not calling the above. E.g. id generation.
+                    newSynapse.randomize();
+                    synapseList.add(newSynapse);
+                }
+            }
+
+            // Create synapse group
+            addSynapseLayer(new SynapseGroup(this.getParentNetwork(),
+                    synapseList));
 
             // Reset last layer
             lastLayer = hiddenLayer;
         }
 
-        // Randomize weights
-        network.randomizeWeights();
-
+    }
+    
+    private void addSynapseLayer(SynapseGroup group) {
+        connections.add(group);
+        group.setParentGroup(this);
     }
     
     
@@ -155,6 +170,11 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
     public void removeLayer(NeuronGroup layer) {
         layers.remove(layer);
         // REDO: group changed?
+    }
+    
+    //REDO: Naming... weight layer / neuron layer
+    public void removeWeightLayer(SynapseGroup weightLayer) {
+        connections.remove(weightLayer);
     }
 
 
@@ -254,6 +274,13 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
     @Override
     public boolean isEmpty() {
         return layers.isEmpty();
+    }
+
+    /**
+     * @return the connections
+     */
+    public List<SynapseGroup> getWeightLayer() {
+        return connections;
     }
 
 }

@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.networks.Competitive;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.networks.KWTA;
@@ -554,8 +555,16 @@ public abstract class Network {
             toDelete.getTarget().removeSource(toDelete);
         }
 
-        // Remove from the list
-        synapseList.remove(toDelete);
+        if(toDelete.getParentGroup() != null) {
+            toDelete.getParentGroup().removeSynapse(toDelete);
+            if (toDelete.getParentGroup().isEmpty()) {
+                deleteGroup(toDelete.getParentGroup());
+            }
+        } else {
+            synapseList.remove(toDelete);
+        }
+
+        
     }
 
     /**
@@ -944,6 +953,9 @@ public abstract class Network {
                 for (NeuronGroup layer : ((LayeredNetwork)group).getLayers()) {
                     addGroup(layer);
                 }
+                for (SynapseGroup weightLayer : ((LayeredNetwork)group).getWeightLayer()) {
+                    addGroup(weightLayer);
+                }
             }
 
             // TODO: Think
@@ -965,10 +977,15 @@ public abstract class Network {
         groupList.remove(toDelete);
         rootNetwork.fireGroupDeleted(toDelete);
         if (toDelete.getParentGroup() != null) {
-            // Redo: Smelly
+            // Redo: Ok to check for types here?  I guess so..
             if (toDelete.getParentGroup() instanceof LayeredNetwork) {
-                ((LayeredNetwork) toDelete.getParentGroup())
-                        .removeLayer((NeuronGroup) toDelete);
+                if (toDelete instanceof NeuronGroup) {
+                    ((LayeredNetwork) toDelete.getParentGroup())
+                            .removeLayer((NeuronGroup) toDelete);
+                } else if (toDelete instanceof SynapseGroup) {
+                    ((LayeredNetwork) toDelete.getParentGroup())
+                            .removeWeightLayer((SynapseGroup) toDelete);
+                }
             }
             if (toDelete.getParentGroup().isEmpty()) {
                 deleteGroup(toDelete.getParentGroup());                

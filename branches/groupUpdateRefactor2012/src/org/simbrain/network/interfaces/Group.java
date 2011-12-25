@@ -35,22 +35,22 @@ import java.util.Set;
 public abstract class Group {
 
     /** Reference to the network this group is a part of. */
-    private final RootNetwork parent;
+    private final RootNetwork parentNetwork;
 
-//    /** Set of neurons. */
-//    private List<Neuron> neuronList = new ArrayList<Neuron>();
-//
-//    /** Set of synapses. */
-//    private Set<Synapse> synapseList = new HashSet<Synapse>();
-//
 //    /** Whether this Group should be active or not. */
 //    private boolean isOn = true;
-//
+
     /** Name of this group. */
     private String id;
 
     /** Name of this group. */
-    private String label = "Test"; //REDO
+    private String label;
+
+    /**
+     * Parent group of this group, or null if it has none. For group types which
+     * have a hierarchy of groups.
+     */
+    private Group parentGroup;
 
     /**
      * Construct a model group with a reference to its root network.
@@ -58,10 +58,20 @@ public abstract class Group {
      * @param net reference to root network.
      */
     public Group(final RootNetwork net) {
-        parent = net;
+        parentNetwork = net;
     }
+    
+    /**
+     * Remove a neuron.  Subclasses with neuron lists should override this.
+     * 
+     * @param toDelete neuron to delete
+     */
+    public void removeNeuron(Neuron neuron) {};
+        
+    public abstract boolean isEmpty();
 
-//    /**
+
+    //    /**
 //     * True if the group contains the specified neuron.
 //     *
 //     * @param n neuron to check for.
@@ -90,17 +100,7 @@ public abstract class Group {
 //        return isOn;
 //    }
 //
-//    /**
-//     * True if this group has no neurons, synapses, or networks.
-//     *
-//     * @return whether the group is empty or not.
-//     */
-//    public boolean isEmpty() {
-//        boolean neuronsGone = neuronList.isEmpty();
-//        boolean synapsesGone = synapseList.isEmpty();
-//        return (neuronsGone && synapsesGone);
-//    }
-//
+
 //    /**
 //     * Returns the number of neurons and synapses in this group.
 //     *
@@ -133,57 +133,11 @@ public abstract class Group {
         }
     }
 
-//
-//    /**
-//     * Add synapse.
-//     *
-//     * @param synapse synapse to add
-//     */
-//    public void addSynapse(Synapse synapse) {
-//        synapseList.add(synapse);
-//    }
-
-//    /**
-//     * Delete a synapse.
-//     *
-//     * @param toDelete synapse to delete
-//     */
-//    public void deleteSynapse(Synapse toDelete) {
-//        synapseList.remove(toDelete);
-//        parent.fireGroupChanged(this, this);
-//    }
-
-//    /**
-//     * @return a list of weights
-//     */
-//    public List<Synapse> getSynapseList() {
-//        return new ArrayList<Synapse>(synapseList);
-//    }
-//
-//    /**
-//     * Update group.  Override for special updating.
-//     */
-//    public void update() {
-//        updateAllNeurons();
-//        updateAllSynapses();
-//    }
-//
-
-//
-//    /**
-//     * Update all synapses.
-//     */
-//    public void updateAllSynapses() {
-//        for (Synapse synapse : synapseList) {
-//            synapse.update();
-//        }
-//    }
-
     /**
      * @return the parent
      */
-    public RootNetwork getParent() {
-        return parent;
+    public RootNetwork getParentNetwork() {
+        return parentNetwork;
     }
 
     /**
@@ -212,14 +166,22 @@ public abstract class Group {
      */
     public void setLabel(String label) {
         this.label = label;
-        parent.fireGroupParametersChanged(this);
+        parentNetwork.fireGroupParametersChanged(this);
     }
 
-//    /**
-//     * @param parent the parent to set
-//     */
-//    public void setParent(RootNetwork parent) {
-//        this.parent = parent;
-//    }
+    /**
+     * @return the parentGroup
+     */
+    public Group getParentGroup() {
+        return parentGroup;
+    }
+
+    /**
+     * @param parentGroup the parentGroup to set
+     */
+    public void setParentGroup(Group parentGroup) {
+        this.parentGroup = parentGroup;
+    }
+
 
 }

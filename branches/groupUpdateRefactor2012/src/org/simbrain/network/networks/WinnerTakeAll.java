@@ -88,10 +88,8 @@ public class WinnerTakeAll extends NeuronGroup implements UpdatableGroup {
      * Update network.
      */
     public void update() {
-
-        System.out.println("In WTA update");
         
-        if (getParent().getClampNeurons()) {
+        if (getParentNetwork().getClampNeurons()) {
             return;
         }
 

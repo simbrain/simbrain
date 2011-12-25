@@ -29,6 +29,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Group;
@@ -128,7 +129,8 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
     
     @Override
     protected void updateInteractionBox() {
-        if(group instanceof NeuronGroup) {
+        //TODO: Handle this in subclases? 
+        if((group instanceof NeuronGroup) || (group instanceof LayeredNetwork)) {
             interactionBox.setOffset(this.getBounds().getX()
                     - interactionBox.getOFFSET_X(), this.getBounds().getY()
                     - interactionBox.getOFFSET_Y());            

@@ -61,12 +61,10 @@ public final class NewSynapseGroupAction
 
         SynapseGroup group = new SynapseGroup(networkPanel.getRootNetwork(),
                 (List<Synapse>) networkPanel.getSelectedModelSynapses());
-
         
-        //REDO
-//        if (group.getElementCount() > 0) {
-//            networkPanel.getRootNetwork().addGroup(group);
-//        }
+        if (group.getSynapseList().size() > 0) {
+            networkPanel.getRootNetwork().addGroup(group);
+        }
 
     }
 }

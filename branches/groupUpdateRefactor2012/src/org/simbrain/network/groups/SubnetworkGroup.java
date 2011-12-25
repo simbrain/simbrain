@@ -32,10 +32,9 @@ public class SubnetworkGroup extends Group {
 
     /** Set of neurons. */
     private final List<Neuron> neuronList = new ArrayList<Neuron>();
-    
-  /** Set of synapses. */
-  private Set<Synapse> synapseList = new HashSet<Synapse>();
 
+    /** Set of synapses. */
+    private Set<Synapse> synapseList = new HashSet<Synapse>();
 
     /** @see Group */
     public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons) {
@@ -121,85 +120,75 @@ public class SubnetworkGroup extends Group {
         }
     }
 
-  /**
-   * True if this group has no neurons, synapses, or networks.
-   *
-   * @return whether the group is empty or not.
-   */
-  public boolean isEmpty() {
-      boolean neuronsGone = neuronList.isEmpty();
-      boolean synapsesGone = synapseList.isEmpty();
-      return (neuronsGone && synapsesGone);
-  }
+    @Override
+    public boolean isEmpty() {
+        boolean neuronsGone = neuronList.isEmpty();
+        boolean synapsesGone = synapseList.isEmpty();
+        return (neuronsGone && synapsesGone);
+    }
 
-  /**
-   * Returns the number of neurons and synapses in this group.
-   *
-   * @return the number of neurons and synapses in this group.
-   */
-  public int getElementCount() {
-      return neuronList.size() + synapseList.size();
-  }
+    /**
+     * Returns the number of neurons and synapses in this group.
+     * 
+     * @return the number of neurons and synapses in this group.
+     */
+    public int getElementCount() {
+        return neuronList.size() + synapseList.size();
+    }
 
-  /**
-   * Returns a debug string.
-   *
-   * @return the debug string.
-   */
-  public String debugString() {
-      String ret =  new String();
-      ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
-      ret += (" " + this.getSynapseList().size() + " synapse(s).");
-      return ret;
-  }
+    /**
+     * Returns a debug string.
+     * 
+     * @return the debug string.
+     */
+    public String debugString() {
+        String ret = new String();
+        ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
+        ret += (" " + this.getSynapseList().size() + " synapse(s).");
+        return ret;
+    }
 
+    /**
+     * Add synapse.
+     * 
+     * @param synapse synapse to add
+     */
+    public void addSynapse(Synapse synapse) {
+        synapseList.add(synapse);
+    }
 
-  /**
-   * Add synapse.
-   *
-   * @param synapse synapse to add
-   */
-  public void addSynapse(Synapse synapse) {
-      synapseList.add(synapse);
-  }
+    /**
+     * Delete a synapse.
+     * 
+     * @param toDelete synapse to delete
+     */
+    public void deleteSynapse(Synapse toDelete) {
+        synapseList.remove(toDelete);
+        getParentNetwork().fireGroupChanged(this, this);
+    }
 
-  /**
-   * Delete a synapse.
-   *
-   * @param toDelete synapse to delete
-   */
-  public void deleteSynapse(Synapse toDelete) {
-      synapseList.remove(toDelete);
-      getParent().fireGroupChanged(this, this);
-  }
+    /**
+     * @return a list of weights
+     */
+    public List<Synapse> getSynapseList() {
+        return new ArrayList<Synapse>(synapseList);
+    }
 
-  /**
-   * @return a list of weights
-   */
-  public List<Synapse> getSynapseList() {
-      return new ArrayList<Synapse>(synapseList);
-  }
+    /**
+     * Update group. Override for special updating.
+     */
+    public void update() {
+        updateNeurons();
+        updateAllSynapses();
+    }
 
-  /**
-   * Update group.  Override for special updating.
-   */
-  public void update() {
-      updateNeurons();
-      updateAllSynapses();
-  }
-
-
-
-  /**
-   * Update all synapses.
-   */
-  public void updateAllSynapses() {
-      for (Synapse synapse : synapseList) {
-          synapse.update();
-      }
-  }
-
-    
-    
+    /**
+     * Update all synapses.
+     */
+    public void updateAllSynapses() {
+        for (Synapse synapse : synapseList) {
+            synapse.update();
+        }
+    }
 
 }

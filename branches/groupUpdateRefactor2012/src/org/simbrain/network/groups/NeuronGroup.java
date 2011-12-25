@@ -30,12 +30,13 @@ public class NeuronGroup extends Group {
 
     /** Set of neurons. */
     private final List<Neuron> neuronList = new ArrayList<Neuron>();
+    
 
     /** @see Group */
     public NeuronGroup(final RootNetwork net, final List<Neuron> neurons) {
         super(net);
         for (Neuron neuron : neurons) {
-            neuronList.add(neuron);
+            addNeuron(neuron);
         }
         Collections.sort(neuronList, Comparators.X_ORDER);
     }
@@ -87,16 +88,14 @@ public class NeuronGroup extends Group {
      */
     public void addNeuron(Neuron neuron) {
         neuronList.add(neuron);
+        neuron.setParentGroup(this);
     }
 
-    /**
-     * Delete a neuron.
-     * 
-     * @param toDelete neuron to delete
-     */
-    public void deleteNeuron(Neuron toDelete) {
+    @Override
+    public void removeNeuron(Neuron toDelete) {
         neuronList.remove(toDelete);
-        // parent.fireGroupChanged(this, this);
+        //REDO
+        //getParent().fireGroupChanged(this, this);
     }
 
     /**
@@ -106,22 +105,26 @@ public class NeuronGroup extends Group {
         return neuronList;
     }
 
+    //REDO: Possibly change below to update if update goes to parent
+    
     /**
      * Update all neurons.
      */
     public void updateNeurons() {
-        for (Neuron neuron : neuronList) {
-            neuron.update();
-        }
+        getParentNetwork().updateNeurons(neuronList);
     }
     
-    //REDO: Add label / id info below
-    
+    //REDO: Add label / id info below    
     @Override
     public String toString() {
         String ret = new String();
         ret += ("Neuron group with " + this.getNeuronList().size() + " neuron(s),");
         return ret;
+    }   
+
+    @Override
+    public boolean isEmpty() {
+        return neuronList.isEmpty();
     }
 
 }

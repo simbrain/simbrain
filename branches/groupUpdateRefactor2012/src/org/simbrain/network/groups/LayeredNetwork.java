@@ -23,6 +23,7 @@ import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.UpdatableGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
@@ -34,11 +35,10 @@ import org.simbrain.network.synapses.ClampedSynapse;
  * integers I1...In which correspond to the number of nodes in layers L1...Ln,
  * and where L1 is the input layer and Ln is the output layer.
  * 
- * @author jeff yoshimi
+ * @author Jeff Yoshimi
  */
-public class LayeredNetwork extends Group {
+public class LayeredNetwork extends Group implements UpdatableGroup {
 
-    // TODO: Possibly abstract core concepts to a superclass
     // TODO: Default neurons, synapses (input / output special?). upper /lower
     // bounds
     // TODO: Possibly add "justification" (right, left, center) field
@@ -54,9 +54,9 @@ public class LayeredNetwork extends Group {
     // */
     // private int[] nodesPerLayer = { 5, 3, 5 };
 
-    private List<NeuronGroup> layers;
+    private List<NeuronGroup> layers = new ArrayList<NeuronGroup>();
 
-    private List<SynapseGroup> connections;
+    private List<SynapseGroup> connections = new ArrayList<SynapseGroup>(); //REDO
 
     /** Enumeration of layer types. */
     public enum LayerType {
@@ -78,8 +78,11 @@ public class LayeredNetwork extends Group {
      * @param network the parent network to which the layered network is being
      *            added
      */
-    public LayeredNetwork(final RootNetwork network, int[] nodesPerLayer) {
+    public LayeredNetwork(final RootNetwork network, int[] nodesPerLayer,
+            Point2D.Double initialPosition) {
         super(network);
+        
+        this.initialPosition = initialPosition;
 
         // Layout
         LineLayout layout = new LineLayout(betweenNeuronInterval,
@@ -91,9 +94,9 @@ public class LayeredNetwork extends Group {
             Neuron neuron = new Neuron(network, new ClampedNeuron());
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
-            network.addNeuron(neuron);
             inputLayer.add(neuron);
         }
+        addLayer(new NeuronGroup(network, inputLayer));
         layout.setInitialLocation(new Point((int) initialPosition.getX()
                 - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
         layout.layoutNeurons(inputLayer);
@@ -113,7 +116,6 @@ public class LayeredNetwork extends Group {
                 Neuron neuron = new Neuron(network, new SigmoidalNeuron());
                 neuron.setLowerBound(0);
                 neuron.setUpdatePriority(i);
-                network.addNeuron(neuron);
                 hiddenLayer.add(neuron);
             }
 
@@ -122,13 +124,7 @@ public class LayeredNetwork extends Group {
                     - layerWidth / 2, (int) initialPosition.getY()
                     - (betweenLayerInterval * i)));
             layout.layoutNeurons(hiddenLayer);
-            if (i == nodesPerLayer.length - 1) {
-                NeuronGroup group = new NeuronGroup(network);
-                network.addGroup(group);
-            } else {
-                NeuronGroup group = new NeuronGroup(network);
-                network.addGroup(group);
-            }
+            addLayer(new NeuronGroup(network, hiddenLayer));
 
             // Connect input layer to hidden layer
             AllToAll connection = new AllToAll(network, lastLayer, hiddenLayer);
@@ -143,6 +139,24 @@ public class LayeredNetwork extends Group {
         network.randomizeWeights();
 
     }
+    
+    
+    /**
+     * Add a layer.
+     *
+     * @param group the layer to add
+     */
+    private void addLayer(NeuronGroup group) {
+        layers.add(group);
+        group.setParentGroup(this);
+    }
+    
+    //REDO: Don't like this being public...
+    public void removeLayer(NeuronGroup layer) {
+        layers.remove(layer);
+        // REDO: group changed?
+    }
+
 
     /**
      * Return the width of the specified layer, in pixels.
@@ -194,6 +208,52 @@ public class LayeredNetwork extends Group {
      */
     public void setInitialPosition(Point2D.Double initialPosition) {
         this.initialPosition = initialPosition;
+    }
+    
+    @Override
+    public String toString() {
+        String ret = new String();
+        ret += ("Layered network with " + layers.size() + " layers.");
+        return ret;
+    }
+
+    /**
+     * @return the layers
+     */
+    public List<NeuronGroup> getLayers() {
+        return layers;
+    }
+
+    public void update() {
+        for (NeuronGroup layer : layers) {
+            layer.updateNeurons();
+        }
+    }
+
+    public boolean getEnabled() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setEnabled(boolean enabled) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    
+
+    //TODO
+    public List <Neuron> getFlatNeuronList() {
+        List<Neuron> ret = new ArrayList<Neuron>();
+        for (NeuronGroup layer : layers) {
+            ret.addAll(layer.getNeuronList());            
+        }
+        return ret;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return layers.isEmpty();
     }
 
 }

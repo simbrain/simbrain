@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -47,6 +48,7 @@ import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
+import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
@@ -408,8 +410,16 @@ public class NetworkPanel extends JPanel {
             }
 
             public void neuronRemoved(final NetworkEvent<Neuron> e) {
-                NeuronNode node = findNeuronNode(e.getObject());
+                Neuron neuron = (Neuron)e.getObject();
+                NeuronNode node = findNeuronNode(neuron);
                 node.removeFromParent();
+                if (neuron.getParentGroup() != null) {
+                    GroupNode groupNode = findModelGroupNode(neuron.getParentGroup());
+                    if (groupNode != null) {
+                        groupNode.removeReference(node);
+                        groupNode.updateBounds();                        
+                    }
+                }
                 centerCamera();
             }
 
@@ -436,8 +446,10 @@ public class NetworkPanel extends JPanel {
 
             public void synapseChanged(final NetworkEvent<Synapse> e) {
                 SynapseNode synapseNode = findSynapseNode(e.getObject());
-                synapseNode.updateColor();
-                synapseNode.updateDiameter();
+                if (synapseNode != null) {
+                    synapseNode.updateColor();
+                    synapseNode.updateDiameter();                    
+                }
             }
 
             public void synapseTypeChanged(
@@ -503,49 +515,76 @@ public class NetworkPanel extends JPanel {
                 // REDO
 
                 // Make a list of neuron and synapse nodes
-                ArrayList<PNode> nodes = new ArrayList<PNode>();
+                List<PNode> nodes = new ArrayList<PNode>();
 
-                // Neuron Group //TODO: Think about this logic
                 if (e.getObject() instanceof NeuronGroup) {
+                    // Add neurons to canvas
                     for (Neuron neuron : ((NeuronGroup) e.getObject())
                             .getNeuronList()) {
-                        addNeuron(neuron);
-                        NeuronNode node = findNeuronNode(neuron);
+                        NeuronNode node = getNeuronNode(NetworkPanel.this, neuron);
+                        canvas.getLayer().addChild(node);
+                        nodes.add(node);
+                    }
+                    // Add neuron nodes to group node
+                    GroupNode neuronGroup = new GroupNode(NetworkPanel.this, e.getObject());
+                    for (PNode node : nodes) {
+                        neuronGroup.addReference(node);
+                    }
+                    // Add neuron group to canvas
+                    canvas.getLayer().addChild(neuronGroup);
+                    neuronGroup.updateBounds();                    
+                } else if (e.getObject() instanceof SynapseGroup) {
+                    // Add synapse nodes to canvas.. ?
+                    for (Synapse synapse : ((SynapseGroup) e.getObject())
+                            .getSynapseList()) {
+                        SynapseNode node = findSynapseNode(synapse); //TODO: Why not create it?
+                        canvas.getLayer().addChild(node);
                         if (node != null) {
                             nodes.add(node);
                         }
                     }
-                    GroupNode neuronGroup = getModelGroupNodeFromGroup(e
-                            .getObject());
+                    // Add synapse nodes to group node
+                    GroupNode synapseGroupNode = new GroupNode(NetworkPanel.this, e.getObject());
                     for (PNode node : nodes) {
-                        neuronGroup.addReference(node);
+                        synapseGroupNode.addReference(node);
+                        node.moveToBack(); //TODO: Why needed? where are they moved up front?
                     }
-                    canvas.getLayer().addChild(neuronGroup);
-                    neuronGroup.updateBounds();
-                    
-                }
-                
+                    // Add neuron group to canvas
+                    canvas.getLayer().addChild(synapseGroupNode);
+                    synapseGroupNode.updateBounds();                    
+                } else if (e.getObject() instanceof LayeredNetwork) {
 
-//                for (Synapse synapse : e.getObject().getSynapseList()) {
-//                    SynapseNode node = findSynapseNode(synapse);
-//                    if (node != null) {
-//                        nodes.add(node);
-//                    }
-//                }
+                    // Find layers (neuron groups) which should already have been added
+                    for(NeuronGroup layer : ((LayeredNetwork)e.getObject()).getLayers()) {
+                        GroupNode neuronGroupNode = findModelGroupNode(layer);
+                        nodes.add(neuronGroupNode);
+                    }
+                    //Add layers to layered network node
+                    GroupNode layeredNetworkNode = new GroupNode(NetworkPanel.this,
+                            (Group) e.getObject());
+                    for (PNode node : nodes) {
+                        layeredNetworkNode.addReference(node);                            
+                    }
+                    // Add layered network node to canvas
+                    canvas.getLayer().addChild(layeredNetworkNode);
+                    layeredNetworkNode.updateBounds();
+                }
 
             }
 
             /** @see NetworkListener */
             public void groupChanged(final NetworkEvent<Group> e) {
+                
                 // Not sure if this method works properly. Performance seems to
                 // degrade after this method is called.
                 // I suppose the proper way is to compare the group before and
                 // after and just change what changed but I'm not sure of the
                 // best way to do that
-                GroupNode groupNode = findModelGroupNode(e.getObject());
-                groupNode.getOutlinedObjects().clear();
+                GroupNode groupNode = findModelGroupNode(e.getObject());               
+                
                 
                 //REDO
+//                groupNode.getOutlinedObjects().clear();
 
 //                // Make a list of neuron and synapse nodes
 //                ArrayList<PNode> nodes = new ArrayList<PNode>();
@@ -571,8 +610,19 @@ public class NetworkPanel extends JPanel {
 
             /** @see NetworkListener */
             public void groupRemoved(final NetworkEvent<Group> event) {
-                GroupNode node = findModelGroupNode(event.getObject());
-                node.removeFromParent();
+                Group group = event.getObject();
+                GroupNode node = findModelGroupNode(group);
+                if (node != null) {
+                    node.removeFromParent();
+                    if (group.getParentGroup() != null) {
+                        GroupNode groupNode = findModelGroupNode(group.getParentGroup());
+                        if (groupNode != null) {
+                            groupNode.removeReference(node);
+                            groupNode.updateBounds();                        
+                        }
+                    }                    
+                }
+                centerCamera();
             }
 
             /** @see NetworkListener */
@@ -1425,6 +1475,8 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * REDO: Needed?
+     * 
      * Add representation of specified neuron to network panel.
      */
     private void addNeuron(final Neuron neuron) {
@@ -1582,22 +1634,6 @@ public class NetworkPanel extends JPanel {
         } else if (subnetwork instanceof KWTA) {
             ret = new KwtaNetworkNode(this, (KWTA) subnetwork,
                     upperLeft.getX(), upperLeft.getY());
-        }
-        return ret;
-    }
-
-    /**
-     * Returns the appropriate ModelGroupNode.
-     *
-     * @param group the model group
-     * @return the ModelGroupNode
-     */
-    private GroupNode getModelGroupNodeFromGroup(final Group group) {
-        GroupNode ret = null;
-        if (group instanceof NeuronGroup) {
-            ret = new GroupNode(this, group);
-        } else if (group instanceof SynapseGroup) {
-            ret = new GroupNode(this, group);
         }
         return ret;
     }

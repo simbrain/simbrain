@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.groups.LayeredNetwork;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.networks.Competitive;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.networks.KWTA;
@@ -473,41 +475,46 @@ public abstract class Network {
      */
     public void deleteNeuron(final Neuron toDelete) {
 
-        if (toDelete.getParentNetwork().getNeuronList().contains(toDelete)) {
 
-            Group group = getRootNetwork().containedInGroup(toDelete);
-            if (group != null) {
-                
-                //REDO
-//                group.deleteNeuron(toDelete);
-//                if (group.isEmpty()) {
-//                    this.getRootNetwork().deleteGroup(group);
-//                }
-            }
+//        Group group = getRootNetwork().containedInGroup(toDelete);
+//        if (group != null) {
+//
+//            // REDO
+//            // group.deleteNeuron(toDelete);
+//            // if (group.isEmpty()) {
+//            // this.getRootNetwork().deleteGroup(group);
+//            // }
+//        }
 
-            // Update priority list
-            rootNetwork.updatePriorityList();
+        // Update priority list
+        rootNetwork.updatePriorityList();
 
-            // Remove outgoing synapses
-            while (toDelete.getFanOut().size() > 0) {
-                List<Synapse> fanOut = toDelete.getFanOut();
-                Synapse s = fanOut.get(fanOut.size() - 1);
-                deleteSynapse(s);
-            }
-
-            // Remove incoming synapses
-            while (toDelete.getFanIn().size() > 0) {
-                List<Synapse> fanIn = toDelete.getFanIn();
-                Synapse s = fanIn.get(fanIn.size() - 1);
-                deleteSynapse(s);
-            }
-
-            // Remove the neuron itself
-            toDelete.getParentNetwork().getNeuronList().remove(toDelete);
-
-            // Notify listeners (views) that this neuron has been deleted
-            rootNetwork.fireNeuronDeleted(toDelete);
+        // Remove outgoing synapses
+        while (toDelete.getFanOut().size() > 0) {
+            List<Synapse> fanOut = toDelete.getFanOut();
+            Synapse s = fanOut.get(fanOut.size() - 1);
+            deleteSynapse(s);
         }
+
+        // Remove incoming synapses
+        while (toDelete.getFanIn().size() > 0) {
+            List<Synapse> fanIn = toDelete.getFanIn();
+            Synapse s = fanIn.get(fanIn.size() - 1);
+            deleteSynapse(s);
+        }
+
+        // Remove the neuron itself
+        if(toDelete.getParentGroup() != null) {
+            toDelete.getParentGroup().removeNeuron(toDelete);
+            if (toDelete.getParentGroup().isEmpty()) {
+                deleteGroup(toDelete.getParentGroup());
+            }
+        } else {
+            toDelete.getParentNetwork().getNeuronList().remove(toDelete);            
+        }
+
+        // Notify listeners (views) that this neuron has been deleted
+        rootNetwork.fireNeuronDeleted(toDelete);
 
         //If we just removed the last neuron of a network, remove that network
         Network parent = toDelete.getParentNetwork();
@@ -932,6 +939,18 @@ public abstract class Network {
             if (group.getLabel() == null) {
                 group.setLabel(id.replaceAll("_"," "));                
             }
+            
+            if (group instanceof LayeredNetwork) {
+                for (NeuronGroup layer : ((LayeredNetwork)group).getLayers()) {
+                    addGroup(layer);
+                }
+            }
+
+            // TODO: Think
+            for(Synapse synapse : synapseList) {
+                rootNetwork.fireSynapseAdded(synapse);
+            }
+            
             groupList.add(group);
             rootNetwork.fireGroupAdded(group);
         }
@@ -945,6 +964,16 @@ public abstract class Network {
     public void deleteGroup(final Group toDelete) {
         groupList.remove(toDelete);
         rootNetwork.fireGroupDeleted(toDelete);
+        if (toDelete.getParentGroup() != null) {
+            // Redo: Smelly
+            if (toDelete.getParentGroup() instanceof LayeredNetwork) {
+                ((LayeredNetwork) toDelete.getParentGroup())
+                        .removeLayer((NeuronGroup) toDelete);
+            }
+            if (toDelete.getParentGroup().isEmpty()) {
+                deleteGroup(toDelete.getParentGroup());                
+            }
+        }
     }
 
 
@@ -992,21 +1021,23 @@ public abstract class Network {
 
     /**
      * Create "flat" list of neurons, which includes the top-level neurons plus
-     * all subnet neurons.
+     * all group neurons.
      *
      * @return the flat list
      */
-    public ArrayList<Neuron> getFlatNeuronList() {
-        ArrayList<Neuron> ret = new ArrayList<Neuron>();
+    public List<Neuron> getFlatNeuronList() {
+        
+        List<Neuron> ret = new ArrayList<Neuron>();
         ret.addAll(neuronList);
 
-        for (int i = 0; i < networkList.size(); i++) {
-            Network net = (Network) networkList.get(i);
-            ArrayList<Neuron> toAdd;
-
-            toAdd = net.getFlatNeuronList();
-
-            ret.addAll(toAdd);
+        for (int i = 0; i < groupList.size(); i++) {
+            if (groupList.get(i) instanceof NeuronGroup) {
+                NeuronGroup group = (NeuronGroup) groupList.get(i);
+                ret.addAll(group.getNeuronList());
+            } else if (groupList.get(i) instanceof LayeredNetwork) { 
+                LayeredNetwork group = (LayeredNetwork) groupList.get(i);
+                ret.addAll(group.getFlatNeuronList());                
+            }
         }
 
         return ret;

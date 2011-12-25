@@ -101,6 +101,9 @@ public class Neuron  {
 
     /** Target value. */
     private double targetValue = 0;
+    
+    /** Parent group, if any (null if none). */
+    private Group parentGroup;
 
     /**
      *  Sequence in which the update function should be called
@@ -868,5 +871,19 @@ public class Neuron  {
      */
     public static ClassDescriptionPair[] getRuleList() {
         return RULE_LIST;
+    }
+
+    /**
+     * @return the parentGroup
+     */
+    public Group getParentGroup() {
+        return parentGroup;
+    }
+
+    /**
+     * @param parentGroup the parentGroup to set
+     */
+    public void setParentGroup(Group parentGroup) {
+        this.parentGroup = parentGroup;
     }
 }

@@ -3,7 +3,7 @@ import java.awt.geom.Point2D;
 import java.awt.Point;
 
 import org.simbrain.network.*;
-import org.simbrain.network.builders.*;
+import org.simbrain.network.groups.*;
 
 import javax.swing.*;
 
@@ -37,10 +37,8 @@ import javax.swing.*;
     Point2D lastClicked = networkPanel.getLastClickedPosition();
 
     // Create the layered network
-    LayeredNetworkBuilder builder = new LayeredNetworkBuilder();
-    builder.setInitialPosition(lastClicked);
-    builder.setNodesPerLayer(topology);
-    builder.buildNetwork(networkPanel.getRootNetwork());
+    networkPanel.getRootNetwork().addGroup(new LayeredNetwork(networkPanel.getRootNetwork(), 
+            topology, lastClicked));
     
     // Ensures network will display properly
     networkPanel.repaint();

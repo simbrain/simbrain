@@ -99,7 +99,7 @@ public class HopfieldDialog extends StandardDialog {
         Hopfield hop = new Hopfield(networkPanel.getRootNetwork(), numUnits,
                 layout);
         hop.setUpdateOrder(getUpdateType());
-        networkPanel.getRootNetwork().addNetwork(hop);
+        networkPanel.getRootNetwork().addGroup(hop);
         networkPanel.repaint();
         super.closeDialogOk();
     }
@@ -142,8 +142,10 @@ public class HopfieldDialog extends StandardDialog {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        Hopfield dh = new Hopfield();
-        numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
+        //REDO: Pull default values
+        numberOfUnits.setText("" + 9);
+//        Hopfield dh = new Hopfield();
+//        numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
     }
 
 }

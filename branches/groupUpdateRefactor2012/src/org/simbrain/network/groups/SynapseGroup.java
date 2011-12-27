@@ -37,6 +37,11 @@ public class SynapseGroup extends Group {
             addSynapse(synapse);
         }
     }
+    
+    /** @see Group */
+    public SynapseGroup(final RootNetwork net) {
+        super(net);
+    }
 
     /**
      * Add synapse.

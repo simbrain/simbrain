@@ -12,72 +12,79 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.util.Comparators;
 
 /**
- * 
+ * REDO: Rename to subnetwork?
  */
 public class SubnetworkGroup extends Group {
+    
+    /** List of neurons. */
+    private final NeuronGroup neuronGroup;
 
-    /** Set of neurons. */
-    private final List<Neuron> neuronList = new ArrayList<Neuron>();
+    /** List of synapses. */
+    private final SynapseGroup synapseGroup;
 
-    /** Set of synapses. */
-    private Set<Synapse> synapseList = new HashSet<Synapse>();
-
+    //TODO: A version where you add both neurons and synapses?  Or one where you add nothing 
+    //      to remove the case below.
+    
     /** @see Group */
     public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons) {
         super(net);
-        for (Neuron neuron : neurons) {
-            neuronList.add(neuron);
+        setLabel("Subnetwork");
+        
+        // Neuron Group
+        if (neurons != null) {
+            neuronGroup = new NeuronGroup(net, neurons);      
+            for (Neuron neuron : neurons) {
+                addNeuron(neuron);
+            }            } else {
+            neuronGroup = new NeuronGroup(net);
         }
-        Collections.sort(neuronList, Comparators.X_ORDER);
+        neuronGroup.setLabel("Neuron group");
+        neuronGroup.setParentGroup(this);
+        
+        // Synapse Group
+        synapseGroup = new SynapseGroup(net);
+        synapseGroup.setLabel("Synapse group");
+        synapseGroup.setParentGroup(this);
     }
 
-    public SubnetworkGroup(RootNetwork root) {
-        super(root);
-    }
-
-    /**
-     * Randomize fan-in for all neurons in group.
-     */
-    public void randomizeIncomingWeights() {
-        for (Neuron neuron : neuronList) {
-            neuron.randomizeFanIn();
-        }
-    }
-
-    /**
-     * Randomize all neurons in group.
-     */
-    public void randomize() {
-        for (Neuron neuron : neuronList) {
-            neuron.randomize();
-        }
-    }
-
-    /**
-     * Randomize bias for all neurons in group.
-     * 
-     * @param lower lower bound for randomization.
-     * @param upper upper bound for randomization.
-     */
-    public void randomizeBiases(double lower, double upper) {
-        for (Neuron neuron : neuronList) {
-            neuron.randomizeBias(lower, upper);
-        }
-    }
+//    /**
+//     * Randomize fan-in for all neurons in group.
+//     */
+//    public void randomizeIncomingWeights() {
+//        for (Neuron neuron : neuronList) {
+//            neuron.randomizeFanIn();
+//        }
+//    }
+//
+//    /**
+//     * Randomize all neurons in group.
+//     */
+//    public void randomize() {
+//        for (Neuron neuron : neuronList) {
+//            neuron.randomize();
+//        }
+//    }
+//
+//    /**
+//     * Randomize bias for all neurons in group.
+//     * 
+//     * @param lower lower bound for randomization.
+//     * @param upper upper bound for randomization.
+//     */
+//    public void randomizeBiases(double lower, double upper) {
+//        for (Neuron neuron : neuronList) {
+//            neuron.randomizeBias(lower, upper);
+//        }
+//    }
 
     /** @Override. */
     public Network duplicate() {
@@ -91,39 +98,56 @@ public class SubnetworkGroup extends Group {
      * @param neuron neuron to add
      */
     public void addNeuron(Neuron neuron) {
-        neuronList.add(neuron);
-    }
-
-    /**
-     * Delete a neuron.
-     * 
-     * @param toDelete neuron to delete
-     */
-    public void deleteNeuron(Neuron toDelete) {
-        neuronList.remove(toDelete);
-        // parent.fireGroupChanged(this, this);
-    }
-
-    /**
-     * @return a list of neurons
-     */
-    public List<Neuron> getNeuronList() {
-        return neuronList;
-    }
-
-    /**
-     * Update all neurons.
-     */
-    public void updateNeurons() {
-        for (Neuron neuron : neuronList) {
-            neuron.update();
-        }
+        neuronGroup.addNeuron(neuron);
+        //neuron.setParentGroup(this); REDO: Think... Is this the parent?
     }
 
     @Override
+    public void removeNeuron(Neuron toDelete) {
+        neuronGroup.removeNeuron(toDelete);
+        //REDO
+        //getParent().fireGroupChanged(this, this);
+    }
+    
+    /**
+     * Add synapse.
+     * 
+     * @param synapse synapse to add
+     */
+    public void addSynapse(Synapse synapse) {
+        synapseGroup.addSynapse(synapse);
+        //getParentNetwork().fireGroupChanged(this, this);
+        //synapse.setParentGroup(this);
+    }
+
+    @Override
+    public void removeSynapse(Synapse toDelete) {
+        synapseGroup.removeSynapse(toDelete);
+        //REDO
+        //getParent().fireGroupChanged(this, this);
+    }
+
+//
+//    /**
+//     * @return a list of neurons
+//     */
+//    public List<Neuron> getNeuronList() {
+//        return neuronList;
+//    }
+//
+//    /**
+//     * Update all neurons.
+//     */
+//    public void updateNeurons() {
+//        for (Neuron neuron : neuronList) {
+//            neuron.update();
+//        }
+//    }
+
+    @Override
     public boolean isEmpty() {
-        boolean neuronsGone = neuronList.isEmpty();
-        boolean synapsesGone = synapseList.isEmpty();
+        boolean neuronsGone = neuronGroup.isEmpty();
+        boolean synapsesGone = synapseGroup.isEmpty();
         return (neuronsGone && synapsesGone);
     }
 
@@ -133,62 +157,46 @@ public class SubnetworkGroup extends Group {
      * @return the number of neurons and synapses in this group.
      */
     public int getElementCount() {
-        return neuronList.size() + synapseList.size();
-    }
-
-    /**
-     * Returns a debug string.
-     * 
-     * @return the debug string.
-     */
-    public String debugString() {
-        String ret = new String();
-        ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
-        ret += (" " + this.getSynapseList().size() + " synapse(s).");
-        return ret;
-    }
-
-    /**
-     * Add synapse.
-     * 
-     * @param synapse synapse to add
-     */
-    public void addSynapse(Synapse synapse) {
-        synapseList.add(synapse);
-    }
-
-    /**
-     * Delete a synapse.
-     * 
-     * @param toDelete synapse to delete
-     */
-    public void deleteSynapse(Synapse toDelete) {
-        synapseList.remove(toDelete);
-        getParentNetwork().fireGroupChanged(this, this);
-    }
-
-    /**
-     * @return a list of weights
-     */
-    public List<Synapse> getSynapseList() {
-        return new ArrayList<Synapse>(synapseList);
+        return neuronGroup.getNeuronList().size() + synapseGroup.getSynapseList().size();
     }
 
     /**
      * Update group. Override for special updating.
      */
     public void update() {
-        updateNeurons();
-        updateAllSynapses();
+        neuronGroup.updateNeurons(); // TODO: Justmake it update in neurons, and dump the whole update interface
+        synapseGroup.update();
+    }
+
+//    /**
+//     * Update all synapses.
+//     */
+//    public void updateAllSynapses() {
+//        for (Synapse synapse : synapseList) {
+//            synapse.update();
+//        }
+//    }
+
+    
+    @Override
+    public String toString() {
+        String ret = new String();
+        ret += ("Subnetwork with " + neuronGroup.getNeuronList().size() + " neuron(s),");
+        ret += (" " + synapseGroup.getSynapseList().size() + " synapse(s).");
+        return ret;
     }
 
     /**
-     * Update all synapses.
+     * @return the neuronGroup
      */
-    public void updateAllSynapses() {
-        for (Synapse synapse : synapseList) {
-            synapse.update();
-        }
+    public NeuronGroup getNeuronGroup() {
+        return neuronGroup;
     }
 
+    /**
+     * @return the synapseGroup
+     */
+    public SynapseGroup getSynapseGroup() {
+        return synapseGroup;
+    }
 }

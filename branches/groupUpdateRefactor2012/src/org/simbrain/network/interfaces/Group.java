@@ -60,6 +60,8 @@ public abstract class Group {
     public Group(final RootNetwork net) {
         parentNetwork = net;
     }
+       
+    //REDO: Kind of weird that removeNeuron/Synapse are here but not add... 
     
     /**
      * Remove a neuron.  Subclasses with neuron lists should override this.

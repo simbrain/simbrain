@@ -50,6 +50,7 @@ import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
@@ -68,7 +69,6 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.subnetworks.CompetitiveNetworkNode;
-import org.simbrain.network.gui.nodes.subnetworks.HopfieldNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.KwtaNetworkNode;
 import org.simbrain.network.gui.nodes.subnetworks.SOMNode;
 import org.simbrain.network.gui.trainer.TrainerPanel;
@@ -88,7 +88,6 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.networks.Competitive;
-import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.networks.KWTA;
 import org.simbrain.network.networks.SOM;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -470,10 +469,10 @@ public class NetworkPanel extends JPanel {
                             .remove(synapseNode);
                     canvas.getLayer().removeChild(synapseNode);
                     if (synapse.getParentGroup() != null) {
-                        GroupNode groupNode = findModelGroupNode(synapse.getParentGroup());
-                        if (groupNode != null) {
-                            groupNode.removeReference(synapseNode);
-                            groupNode.updateBounds();                        
+                        GroupNode parentGroupNode = findModelGroupNode(synapse.getParentGroup());
+                        if (parentGroupNode != null) {
+                            parentGroupNode.removeReference(synapseNode);
+                            parentGroupNode.updateBounds();                        
                         }
                     }
                 }
@@ -520,8 +519,6 @@ public class NetworkPanel extends JPanel {
             /** @see NetworkListener */
             public void groupAdded(final NetworkEvent<Group> e) {
 
-                // REDO
-
                 // Make a list of neuron and synapse nodes
                 List<PNode> nodes = new ArrayList<PNode>();
 
@@ -547,8 +544,8 @@ public class NetworkPanel extends JPanel {
                             .getSynapseList()) {
                         addSynapse(synapse);
                         SynapseNode node = findSynapseNode(synapse);
-                        canvas.getLayer().addChild(node);
                         if (node != null) {
+                            canvas.getLayer().addChild(node);
                             nodes.add(node);
                         }
                     }
@@ -577,6 +574,25 @@ public class NetworkPanel extends JPanel {
                     // Add layered network node to canvas
                     canvas.getLayer().addChild(layeredNetworkNode);
                     layeredNetworkNode.updateBounds();
+                } else if (e.getObject() instanceof SubnetworkGroup) {
+                    
+                    // Create subnet node
+                    SubnetworkGroup subnet = (SubnetworkGroup) e.getObject();
+                    GroupNode subnetNode = new GroupNode(NetworkPanel.this, subnet);
+                    
+                    // Add neuron group node
+                    NeuronGroup neuronGroup = subnet.getNeuronGroup();
+                    GroupNode neuronGroupNode = findModelGroupNode(neuronGroup);
+                    subnetNode.addReference(neuronGroupNode);                            
+
+                    // Add synapse group node
+                    SynapseGroup synapseGroup = subnet.getSynapseGroup();
+                    GroupNode synapseGroupNode = findModelGroupNode(synapseGroup);
+                    subnetNode.addReference(synapseGroupNode);                            
+
+                    // Add subnetwork node to canvas
+                    canvas.getLayer().addChild(subnetNode);
+                    subnetNode.updateBounds(); 
                 }
 
             }
@@ -589,8 +605,9 @@ public class NetworkPanel extends JPanel {
                 // I suppose the proper way is to compare the group before and
                 // after and just change what changed but I'm not sure of the
                 // best way to do that
-                GroupNode groupNode = findModelGroupNode(e.getObject());               
+                //GroupNode groupNode = findModelGroupNode(e.getObject());               
                 
+                //NetworkPanel.this.syncToModel();
                 
                 //REDO
 //                groupNode.getOutlinedObjects().clear();
@@ -623,11 +640,12 @@ public class NetworkPanel extends JPanel {
                 GroupNode node = findModelGroupNode(group);
                 if (node != null) {
                     node.removeFromParent();
+                    // If this is a child group, then update the parent group node
                     if (group.getParentGroup() != null) {
-                        GroupNode groupNode = findModelGroupNode(group.getParentGroup());
-                        if (groupNode != null) {
-                            groupNode.removeReference(node);
-                            groupNode.updateBounds();                        
+                        GroupNode parentGroupNode = findModelGroupNode(group.getParentGroup());
+                        if (parentGroupNode != null) {
+                            parentGroupNode.removeReference(node);
+                            parentGroupNode.updateBounds();                        
                         }
                     }                    
                 }
@@ -1633,10 +1651,10 @@ public class NetworkPanel extends JPanel {
         } else if (subnetwork instanceof SOM) {
             ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(),
                     upperLeft.getY());
-        } else if (subnetwork instanceof Hopfield) {
-            ret = new HopfieldNetworkNode(this, (Hopfield) subnetwork,
-                    upperLeft.getX(), upperLeft.getY());
         // REDO
+//        else if (subnetwork instanceof Hopfield) {
+//            ret = new HopfieldNetworkNode(this, (Hopfield) subnetwork,
+//                    upperLeft.getX(), upperLeft.getY());
 //        } else if (subnetwork instanceof WinnerTakeAll) {
 //            ret = new WTANetworkNode(this, (WinnerTakeAll) subnetwork,
 //                    upperLeft.getX(), upperLeft.getY());
@@ -1660,7 +1678,7 @@ public class NetworkPanel extends JPanel {
                 addSynapse(synapse);
             }
         }
-        for (Neuron neuron : rootNetwork.getNeuronList()) {
+        for (Neuron neuron : rootNetwork.getNeuronList()) { 
             addNeuron(neuron);
         }
         for (Synapse synapse : rootNetwork.getSynapseList()) {

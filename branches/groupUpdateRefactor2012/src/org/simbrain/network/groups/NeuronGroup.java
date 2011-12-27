@@ -38,10 +38,11 @@ public class NeuronGroup extends Group {
         for (Neuron neuron : neurons) {
             addNeuron(neuron);
         }
+        //REDO: Why this?  Think.
         Collections.sort(neuronList, Comparators.X_ORDER);
     }
 
-    public NeuronGroup(RootNetwork root) {
+    public NeuronGroup(final RootNetwork root) {
         super(root);
     }
 

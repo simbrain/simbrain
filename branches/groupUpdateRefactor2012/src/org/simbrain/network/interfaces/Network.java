@@ -25,9 +25,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.networks.Competitive;
-import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.networks.KWTA;
 import org.simbrain.network.networks.SOM;
 import org.simbrain.network.util.CopyPaste;
@@ -112,8 +112,6 @@ public abstract class Network {
 
         if (oldNetwork instanceof Competitive) {
             return new Competitive(newRoot, (Competitive) oldNetwork);
-        } else if (oldNetwork instanceof Hopfield) {
-            return new Hopfield(newRoot, (Hopfield) oldNetwork);
         } else if (oldNetwork instanceof KWTA) {
             return new KWTA(newRoot, (KWTA) oldNetwork);
         } else if (oldNetwork instanceof SOM) {
@@ -123,6 +121,9 @@ public abstract class Network {
 //        } else if (oldNetwork instanceof WinnerTakeAll) {
 //            return new WinnerTakeAll(newRoot, (WinnerTakeAll) oldNetwork);
 //        }
+//        else if (oldNetwork instanceof Hopfield) {
+//            return new Hopfield(newRoot, (Hopfield) oldNetwork);
+//        } 
         return null;
     }
 
@@ -544,9 +545,6 @@ public abstract class Network {
 //            }
         }
 
-        // Notify listeners that this synapse has been deleted
-        this.getRootNetwork().fireSynapseDeleted(toDelete);
-
         // Remove references to this synapse from parent neurons
         if (toDelete.getSource() != null) {
             toDelete.getSource().removeTarget(toDelete);
@@ -564,7 +562,9 @@ public abstract class Network {
             synapseList.remove(toDelete);
         }
 
-        
+        // Notify listeners that this synapse has been deleted
+        this.getRootNetwork().fireSynapseDeleted(toDelete);
+
     }
 
     /**
@@ -940,8 +940,6 @@ public abstract class Network {
      * @param group group of network elements
      */
     public void addGroup(final Group group) {
-        //REDO
-//        group.setParent(rootNetwork);
         if ((rootNetwork != null)) {
             String id = getRootNetwork().getGroupIdGenerator().getId();
             group.setId(id);
@@ -956,9 +954,13 @@ public abstract class Network {
                 for (SynapseGroup weightLayer : ((LayeredNetwork)group).getWeightLayer()) {
                     addGroup(weightLayer);
                 }
+            } else if (group instanceof SubnetworkGroup) {
+                addGroup(((SubnetworkGroup)group).getNeuronGroup());
+                addGroup(((SubnetworkGroup)group).getSynapseGroup());
             }
 
-            // TODO: Think
+            // Redo: only do this for groups that have a synapse list...
+            //      Or move to layered network?
             for(Synapse synapse : synapseList) {
                 rootNetwork.fireSynapseAdded(synapse);
             }
@@ -975,7 +977,6 @@ public abstract class Network {
      */
     public void deleteGroup(final Group toDelete) {
         groupList.remove(toDelete);
-        rootNetwork.fireGroupDeleted(toDelete);
         if (toDelete.getParentGroup() != null) {
             // Redo: Ok to check for types here?  I guess so..
             if (toDelete.getParentGroup() instanceof LayeredNetwork) {
@@ -986,11 +987,12 @@ public abstract class Network {
                     ((LayeredNetwork) toDelete.getParentGroup())
                             .removeWeightLayer((SynapseGroup) toDelete);
                 }
-            }
+            } 
             if (toDelete.getParentGroup().isEmpty()) {
                 deleteGroup(toDelete.getParentGroup());                
             }
         }
+        rootNetwork.fireGroupDeleted(toDelete);
     }
 
 

@@ -36,7 +36,8 @@ public class HopfieldNetworkNode extends SubnetworkNode {
                                      final double x,
                                      final double y) {
 
-        super(networkPanel, subnetwork, x, y);
+        //REDO
+        super(networkPanel, null, x, y);
 
         randomizeAction = new AbstractAction("Randomize Discrete Hopfield network") {
             public void actionPerformed(final ActionEvent event) {
@@ -89,7 +90,9 @@ public class HopfieldNetworkNode extends SubnetworkNode {
 
     /** @see org.simbrain.network.gui.nodes.ScreenElement */
     public Hopfield getHopfieldSubnetwork() {
-        return ((Hopfield) getSubnetwork());
+        //REDO
+        return null;
+        //return ((Hopfield) getSubnetwork());
     }
 
 }

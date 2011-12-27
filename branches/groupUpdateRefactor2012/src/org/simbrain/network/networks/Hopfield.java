@@ -18,13 +18,17 @@
  */
 package org.simbrain.network.networks;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.UpdatableGroup;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.BinaryNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
@@ -32,7 +36,7 @@ import org.simbrain.network.synapses.ClampedSynapse;
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
  */
-public class Hopfield extends Network {
+public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
 
     //TODO: Generalize to capture a greater variety of Hopfield type networks.
 
@@ -52,20 +56,13 @@ public class Hopfield extends Network {
     private int numUnits = DEFAULT_NUM_UNITS;
 
     /**
-     * Default constructor.
-     */
-    public Hopfield() {
-        super();
-    }
-
-    /**
      * Copy constructor.
      *
      * @param newRoot new root network
      * @param oldNet old network.
      */
     public Hopfield(RootNetwork newRoot, Hopfield oldNet) {
-        super(newRoot, oldNet);
+        super(newRoot, null);
         this.setUpdateOrder(oldNet.getUpdateOrder());
     }
 
@@ -77,15 +74,13 @@ public class Hopfield extends Network {
      * @param root reference to RootNetwork.
      */
     public Hopfield(final RootNetwork root, final int numNeurons, final Layout layout) {
-        super();
-        this.setRootNetwork(root);
-        this.setParentNetwork(root);
+        super(root, null);
 
         //Create the neurons
         for (int i = 0; i < numNeurons; i++) {
             BinaryNeuron binary = new BinaryNeuron();
             binary.setThreshold(0);
-            Neuron n = new Neuron(this, binary);
+            Neuron n = new Neuron(root, binary);
             n.setUpperBound(1);
             n.setLowerBound(0);
             n.setIncrement(1);
@@ -93,56 +88,60 @@ public class Hopfield extends Network {
         }
 
         // Layout the neurons
-        layout.layoutNeurons(this);
+        layout.layoutNeurons(this.getNeuronGroup().getNeuronList());
 
         // Add the synapses
-        AllToAll connection = new AllToAll(this, getNeuronList(),
-                getNeuronList());
-        connection.setAllowSelfConnection(false);
-        Synapse templateSynapse = Synapse
-                .getTemplateSynapse(new ClampedSynapse());
-        templateSynapse.setStrength(0);
-        connection.setBaseSynapse(templateSynapse);
-        connection.connectNeurons();
+        for (Neuron source : this.getNeuronGroup().getNeuronList()) {
+            for (Neuron target : this.getNeuronGroup().getNeuronList()) {
+                if (source != target) {
+                    Synapse newSynapse = new Synapse(source, target, new ClampedSynapse()); 
+                    newSynapse.setStrength(0);
+                    addSynapse(newSynapse);
+                }
+            }
+        }
+        
     }
 
     /**
      * Randomize weights symmetrically.
      */
     public void randomizeWeights() {
-        for (int i = 0; i < getNeuronCount(); i++) {
-            for (int j = 0; j < i; j++) {
-                Synapse w = Network.getSynapse(getNeuron(i), getNeuron(j));
-                if (w != null) {
-                    w.randomize();
-                    w.setStrength(Math.round(w.getStrength()));
-                }
-                Synapse w2 = Network.getSynapse(getNeuron(j), getNeuron(i));
-                if (w2 != null) {
-                    w2.setStrength(w.getStrength());
-                }
-            }
-        }
-        getRootNetwork().fireNetworkChanged();
+        //REDO
+//        for (int i = 0; i < getNeuronList().size(); i++) {
+//            for (int j = 0; j < i; j++) {
+//                Synapse w = Network.getSynapse(getNeuron(i), getNeuron(j));
+//                if (w != null) {
+//                    w.randomize();
+//                    w.setStrength(Math.round(w.getStrength()));
+//                }
+//                Synapse w2 = Network.getSynapse(getNeuron(j), getNeuron(i));
+//                if (w2 != null) {
+//                    w2.setStrength(w.getStrength());
+//                }
+//            }
+//        }
+        getParentNetwork().fireNetworkChanged();
     }
 
     /**
      * Apply Hopfield training rule to current activation pattern.
      */
     public void train() {
-        //Assumes all neurons have the same upper and lower values
-        double low = getNeuron(0).getLowerBound();
-        double hi = getNeuron(0).getUpperBound();
-
-        for (int i = 0; i < this.getSynapseCount(); i++) {
-            Synapse w = this.getSynapse(i);
-            Neuron src = w.getSource();
-            Neuron tar = w.getTarget();
-            w.setStrength(w.getStrength()
-                    + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar
-                            .getActivation()) - hi - low) / (hi - low))));
-        }
-        getRootNetwork().fireNetworkChanged();
+        //REDO
+//        //Assumes all neurons have the same upper and lower values
+//        double low = getNeuron(0).getLowerBound();
+//        double hi = getNeuron(0).getUpperBound();
+//
+//        for (int i = 0; i < this.getSynapseCount(); i++) {
+//            Synapse w = this.getSynapse(i);
+//            Neuron src = w.getSource();
+//            Neuron tar = w.getTarget();
+//            w.setStrength(w.getStrength()
+//                    + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar
+//                            .getActivation()) - hi - low) / (hi - low))));
+//        }
+        getParentNetwork().fireNetworkChanged();
     }
 
     /**
@@ -150,19 +149,19 @@ public class Hopfield extends Network {
      */
     public void update() {
 
-        if (getRootNetwork().getClampNeurons()) {
+        if (getParentNetwork().getClampNeurons()) {
             return;
         }
 
-        int nCount = getNeuronCount();
+        int nCount = getNeuronGroup().getNeuronList().size();
         Neuron n;
 
         if (updateOrder == RANDOM_UPDATE) {
-            Collections.shuffle(getNeuronList());
+            Collections.shuffle(getNeuronGroup().getNeuronList());
         }
 
         for (int i = 0; i < nCount; i++) {
-            n = (Neuron) getNeuronList().get(i);
+            n = (Neuron) getNeuronGroup().getNeuronList().get(i);
             n.update();
             n.setActivation(n.getBuffer());
         }
@@ -189,6 +188,16 @@ public class Hopfield extends Network {
      */
     public void setUpdateOrder(final int updateOrder) {
         this.updateOrder = updateOrder;
+    }
+
+    public boolean getEnabled() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setEnabled(boolean enabled) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

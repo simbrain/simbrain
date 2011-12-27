@@ -104,7 +104,7 @@ public class CompetitiveDialog extends StandardDialog implements ActionListener 
         competitive.setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
-        networkPanel.getRootNetwork().addNetwork(competitive);
+        networkPanel.getRootNetwork().addGroup(competitive);
         networkPanel.repaint();
         super.closeDialogOk();
     }
@@ -168,14 +168,15 @@ public class CompetitiveDialog extends StandardDialog implements ActionListener 
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        Competitive ct = new Competitive();
-        tfEpsilon.setText(Double.toString(ct.getEpsilon()));
-        tfLoserValue.setText(Double.toString(ct.getLoseValue()));
-        tfNumNeurons.setText(Integer.toString(ct.getNumNeurons()));
-        tfWinnerValue.setText(Double.toString(ct.getWinValue()));
-        tfLeakyEpsilon.setText(Double.toString(ct.getLeakyEpsilon()));
-        cbUseLeakyLearning.setSelected(ct.getUseLeakyLearning());
-        cbNormalizeInputs.setSelected(ct.getNormalizeInputs());
+        // REDO
+        //Competitive ct = new Competitive();
+        tfEpsilon.setText(Double.toString(.1));
+        tfLoserValue.setText(Double.toString(0));
+        tfNumNeurons.setText(Integer.toString(5));
+        tfWinnerValue.setText(Double.toString(1));
+        tfLeakyEpsilon.setText(Double.toString(.1/4));
+        cbUseLeakyLearning.setSelected(false);
+        cbNormalizeInputs.setSelected(true);
     }
 
 }

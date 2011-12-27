@@ -36,19 +36,19 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
                                      final double x,
                                      final double y) {
 
-        super(networkPanel, subnetwork, x, y);
+        super(networkPanel, null, x, y);
 
         normalizeAction = new AbstractAction("Normalize network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.normalizeIncomingWeights();
-                subnetwork.getRootNetwork().fireNetworkChanged();
+                subnetwork.getParentNetwork().fireNetworkChanged();
             }
         };
 
         randomizeAction = new AbstractAction("Randomize Competitive network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomize();
-                subnetwork.getRootNetwork().fireNetworkChanged();
+                subnetwork.getParentNetwork().fireNetworkChanged();
             }
         };
     }
@@ -91,7 +91,8 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
 
     /** @see org.simbrain.network.gui.nodes.ScreenElement */
     public Competitive getCompetitiveSubnetwork() {
-        return ((Competitive) getSubnetwork());
+        // REDO
+        return null;
     }
 
 }

@@ -606,7 +606,7 @@ public class NetworkPanel extends JPanel {
                 // after and just change what changed but I'm not sure of the
                 // best way to do that
                 //GroupNode groupNode = findModelGroupNode(e.getObject());               
-                
+
                 //NetworkPanel.this.syncToModel();
                 
                 //REDO
@@ -1645,23 +1645,23 @@ public class NetworkPanel extends JPanel {
             final Point2D upperLeft, final Network subnetwork) {
         SubnetworkNode ret = null;
 
-        if (subnetwork instanceof Competitive) {
-            ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork,
-                    upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof SOM) {
-            ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(),
-                    upperLeft.getY());
-        // REDO
+        //REDO
+//        if (subnetwork instanceof Competitive) {
+//            ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork,
+//                    upperLeft.getX(), upperLeft.getY());
+//        } else if (subnetwork instanceof SOM) {
+//            ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(),
+//                    upperLeft.getY());
 //        else if (subnetwork instanceof Hopfield) {
 //            ret = new HopfieldNetworkNode(this, (Hopfield) subnetwork,
 //                    upperLeft.getX(), upperLeft.getY());
 //        } else if (subnetwork instanceof WinnerTakeAll) {
 //            ret = new WTANetworkNode(this, (WinnerTakeAll) subnetwork,
 //                    upperLeft.getX(), upperLeft.getY());
-        } else if (subnetwork instanceof KWTA) {
-            ret = new KwtaNetworkNode(this, (KWTA) subnetwork,
-                    upperLeft.getX(), upperLeft.getY());
-        }
+//        } else if (subnetwork instanceof KWTA) {
+//            ret = new KwtaNetworkNode(this, (KWTA) subnetwork,
+//                    upperLeft.getX(), upperLeft.getY());
+//        }
         return ret;
     }
 

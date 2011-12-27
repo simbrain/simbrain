@@ -20,6 +20,7 @@ import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.util.Comparators;
 
 /**
@@ -44,6 +45,16 @@ public class NeuronGroup extends Group {
 
     public NeuronGroup(final RootNetwork root) {
         super(root);
+    }
+    
+    public boolean inFanInOfSomeNode(final Synapse synapse) {
+        boolean ret = false;
+        for(Neuron neuron : neuronList) {
+            if (neuron.getFanIn().contains(synapse)) {
+                ret = true;
+            }
+        }
+        return ret;
     }
 
     /**

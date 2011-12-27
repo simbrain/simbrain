@@ -20,11 +20,15 @@ package org.simbrain.network.networks;
 
 import java.util.Iterator;
 
-import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.interfaces.UpdatableGroup;
 import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.neurons.LinearNeuron;
 
 /**
@@ -34,7 +38,7 @@ import org.simbrain.network.neurons.LinearNeuron;
  *
  * @author Jeff Yoshimi
  */
-public class Competitive extends Network {
+public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
 
     /** Learning rate. */
     private double epsilon = .1;
@@ -64,27 +68,6 @@ public class Competitive extends Network {
     private int winner;
 
     /**
-     * Default constructor.
-     */
-    public Competitive() {
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param newParent new root network
-     * @param oldNet old network.
-     */
-    public Competitive(RootNetwork newRoot, Competitive oldNet) {
-        super(newRoot, oldNet);
-        setEpsilon(oldNet.getEpsilon());
-        setLeakyEpsilon(oldNet.getLeakyEpsilon());
-        setLoseValue(oldNet.getLoseValue());
-        setWinValue(oldNet.getWinValue());
-        setNormalizeInputs(oldNet.getNormalizeInputs());
-    }
-
-    /**
      * Constructs a competitive network with specified number of neurons.
      *
      * @param numNeurons size of this network in neurons
@@ -92,26 +75,62 @@ public class Competitive extends Network {
      * @param root reference to RootNetwork.
      */
     public Competitive(final RootNetwork root, final int numNeurons, final Layout layout) {
-        super();
-        this.setRootNetwork(root);
+        super(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new Neuron(this, new LinearNeuron()));
+            addNeuron(new Neuron(root, new LinearNeuron()));
         }
-        layout.layoutNeurons(this);
+        layout.layoutNeurons(this.getNeuronGroup().getNeuronList());
+        root.addSynapseListener(new SynapseListener() {
+
+            public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
+                if (getSynapseGroup().getSynapseList().contains(networkEvent.getObject())) {
+                    removeSynapse(networkEvent.getObject());                   
+                }
+            }
+
+            public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
+                Synapse synapse = networkEvent.getObject();
+                if (getNeuronGroup().inFanInOfSomeNode(synapse)) {
+                    root.deleteSynapse(synapse); // remove from root net
+                    addSynapse(synapse); // add synapse to group
+                }
+            }
+
+            public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
+            }
+
+            public void synapseTypeChanged(
+                    NetworkEvent<SynapseUpdateRule> networkEvent) {
+            }
+            
+        });
+    }
+    
+    /**
+     * Copy constructor.
+     *
+     * @param newParent new root network
+     * @param oldNet old network.
+     */
+    public Competitive(RootNetwork newRoot, Competitive oldNet) {
+        super(newRoot, null);
+        setEpsilon(oldNet.getEpsilon());
+        setLeakyEpsilon(oldNet.getLeakyEpsilon());
+        setLoseValue(oldNet.getLoseValue());
+        setWinValue(oldNet.getWinValue());
+        setNormalizeInputs(oldNet.getNormalizeInputs());
     }
 
-    /**
-     * Update the network.
-     */
+    @Override
     public void update() {
 
-        updateAllNeurons();
+        getNeuronGroup().updateNeurons();
         max = 0;
         winner = 0;
 
         // Determine Winner
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = (Neuron) getNeuronList().get(i);
+        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+            Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
             n.getAverageInput();
             if (n.getActivation() > max) {
                 max = n.getActivation();
@@ -120,8 +139,8 @@ public class Competitive extends Network {
         }
 
         // Update weights on winning neuron
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron neuron = ((Neuron) getNeuronList().get(i));
+        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+            Neuron neuron = ((Neuron) getNeuronGroup().getNeuronList().get(i));
             double sumOfInputs = neuron.getTotalInput();
 
             // Don't update weights if no incoming lines have greater than zero
@@ -130,10 +149,10 @@ public class Competitive extends Network {
                 return;
             }
             if (i == winner) {
-                if (!getRootNetwork().getClampNeurons()) {
+                if (!getParentNetwork().getClampNeurons()) {
                     neuron.setActivation(winValue);
                 }
-                if (!getRootNetwork().getClampWeights()) {
+                if (!getParentNetwork().getClampWeights()) {
 
                     // Apply learning rule
                     for (Synapse incoming : neuron.getFanIn()) {
@@ -150,10 +169,10 @@ public class Competitive extends Network {
                     }
                 }
             } else {
-                if (!getRootNetwork().getClampNeurons()) {
+                if (!getParentNetwork().getClampNeurons()) {
                     neuron.setActivation(loseValue);
                 }
-                if ((useLeakyLearning) & (!getRootNetwork().getClampWeights())) {
+                if ((useLeakyLearning) & (!getParentNetwork().getClampWeights())) {
                     for (Synapse incoming : neuron.getFanIn()) {
                         activation = incoming.getSource().getActivation();
                         if (normalizeInputs) {
@@ -170,11 +189,11 @@ public class Competitive extends Network {
     }
 
     /**
-     * Normalize  weights coming in to this network, separtely for each neuron.
+     * Normalize  weights coming in to this network, separately for each neuron.
      */
     public void normalizeIncomingWeights() {
 
-        for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
+        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
             double normFactor = n.getSummedIncomingWeights();
             for (Synapse s : n.getFanIn()) {
@@ -189,7 +208,7 @@ public class Competitive extends Network {
     public void normalizeAllIncomingWeights() {
 
         double normFactor = getSummedIncomingWeights();
-        for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
+        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getStrength() / normFactor);
@@ -202,7 +221,7 @@ public class Competitive extends Network {
      */
     public void randomizeIncomingWeights() {
 
-        for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
+        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
             for (Synapse s : n.getFanIn()) {
                 s.randomize();
@@ -217,7 +236,7 @@ public class Competitive extends Network {
      */
     private double getSummedIncomingWeights() {
         double ret = 0;
-        for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
+        for (Iterator i = getNeuronGroup().getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
             ret += n.getSummedIncomingWeights();
         }
@@ -345,6 +364,16 @@ public class Competitive extends Network {
      */
     public void setUseLeakyLearning(final boolean useLeakyLearning) {
         this.useLeakyLearning = useLeakyLearning;
+    }
+
+    public boolean getEnabled() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setEnabled(boolean enabled) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

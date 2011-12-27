@@ -31,31 +31,39 @@ public class SubnetworkGroup extends Group {
     /** List of synapses. */
     private final SynapseGroup synapseGroup;
 
-    //TODO: A version where you add both neurons and synapses?  Or one where you add nothing 
-    //      to remove the case below.
     
-    /** @see Group */
+    // REDO: Javadocs
+
+    public SubnetworkGroup(final RootNetwork net) {
+        super(net);
+        neuronGroup = new NeuronGroup(net);
+        synapseGroup = new SynapseGroup(net);
+        init();
+    }
+    
     public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons) {
         super(net);
+        neuronGroup = new NeuronGroup(net, neurons);      
+        synapseGroup = new SynapseGroup(net);
+        init();
+    }
+
+    public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons, final List<Synapse> synapses) {
+        super(net);
+        neuronGroup = new NeuronGroup(net, neurons);      
+        synapseGroup = new SynapseGroup(net, synapses);
+        init();
+    }
+
+    private void init() {
         setLabel("Subnetwork");
-        
-        // Neuron Group
-        if (neurons != null) {
-            neuronGroup = new NeuronGroup(net, neurons);      
-            for (Neuron neuron : neurons) {
-                addNeuron(neuron);
-            }            } else {
-            neuronGroup = new NeuronGroup(net);
-        }
         neuronGroup.setLabel("Neuron group");
         neuronGroup.setParentGroup(this);
-        
-        // Synapse Group
-        synapseGroup = new SynapseGroup(net);
         synapseGroup.setLabel("Synapse group");
         synapseGroup.setParentGroup(this);
     }
 
+    
 //    /**
 //     * Randomize fan-in for all neurons in group.
 //     */
@@ -116,15 +124,13 @@ public class SubnetworkGroup extends Group {
      */
     public void addSynapse(Synapse synapse) {
         synapseGroup.addSynapse(synapse);
-        //getParentNetwork().fireGroupChanged(this, this);
-        //synapse.setParentGroup(this);
+        getParentNetwork().fireGroupChanged(this, this);
     }
 
     @Override
     public void removeSynapse(Synapse toDelete) {
         synapseGroup.removeSynapse(toDelete);
-        //REDO
-        //getParent().fireGroupChanged(this, this);
+        getParentNetwork().fireGroupChanged(this, this);
     }
 
 //

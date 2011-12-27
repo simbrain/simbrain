@@ -110,14 +110,14 @@ public abstract class Network {
     public static Network newInstance(final RootNetwork newRoot,
             final Network oldNetwork) {
 
-        if (oldNetwork instanceof Competitive) {
-            return new Competitive(newRoot, (Competitive) oldNetwork);
-        } else if (oldNetwork instanceof KWTA) {
-            return new KWTA(newRoot, (KWTA) oldNetwork);
-        } else if (oldNetwork instanceof SOM) {
-            return new SOM(newRoot, (SOM) oldNetwork);
-        } 
-            //REDO
+        //REDO
+//        if (oldNetwork instanceof Competitive) {
+//            return new Competitive(newRoot, (Competitive) oldNetwork);
+//        } else if (oldNetwork instanceof KWTA) {
+//            return new KWTA(newRoot, (KWTA) oldNetwork);
+//        } else if (oldNetwork instanceof SOM) {
+//            return new SOM(newRoot, (SOM) oldNetwork);
+//        } 
 //        } else if (oldNetwork instanceof WinnerTakeAll) {
 //            return new WinnerTakeAll(newRoot, (WinnerTakeAll) oldNetwork);
 //        }

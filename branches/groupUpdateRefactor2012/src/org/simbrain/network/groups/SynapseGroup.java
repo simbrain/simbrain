@@ -51,13 +51,15 @@ public class SynapseGroup extends Group {
     public void addSynapse(Synapse synapse) {
         synapseList.add(synapse);
         synapse.setParentGroup(this);
+        getParentNetwork().fireSynapseAdded(synapse);
+        getParentNetwork().fireGroupChanged(this, this);
     }
     
     @Override
     public void removeSynapse(Synapse toDelete) {
         synapseList.remove(toDelete);
-        //REDO
-        //getParent().fireGroupChanged(this, this);
+        getParentNetwork().fireSynapseDeleted(toDelete);
+        getParentNetwork().fireGroupChanged(this, this);
     }
 
 

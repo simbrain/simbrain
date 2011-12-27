@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.NetworkTextObject;
 import org.simbrain.network.interfaces.Neuron;
@@ -97,11 +99,11 @@ public class Clipboard {
         ArrayList<Object> ret = new ArrayList<Object>();
         for (Object object : list) {
             if (object instanceof Neuron) {
-                ret.add(net.findNeuronNode((Neuron) object));
+                ret.add((NeuronNode)net.getObjectNodeMap().get(object));
             } else if (object instanceof Network) {
                 ret.add(net.findSubnetworkNode((Network) object));
             } else if (object instanceof NetworkTextObject) {
-                ret.add(net.findTextNode((NetworkTextObject) object));
+                ret.add((TextNode)net.getObjectNodeMap().get(object));
             }
         }
         return ret;

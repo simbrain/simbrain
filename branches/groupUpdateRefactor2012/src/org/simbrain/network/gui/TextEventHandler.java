@@ -74,7 +74,8 @@ public class TextEventHandler extends PStyledTextEventHandler implements
                     networkPanel.getRootNetwork(), inputEvent.getPosition()
                             .getX(), inputEvent.getPosition().getY());
             networkPanel.getRootNetwork().addText(text);
-            TextNode node = networkPanel.findTextNode(text);
+            TextNode node = (TextNode) networkPanel.getObjectNodeMap()
+                    .get(text);
             if (node != null) {
                 startEditing(inputEvent, node.getPStyledText());
             }

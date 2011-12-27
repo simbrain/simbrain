@@ -21,10 +21,12 @@ package org.simbrain.network.gui.actions;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
 
@@ -63,15 +65,12 @@ public final class SelectIncomingWeightsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-//      TODO: Put this in a list-of-neurons subclass of arraylist?
-//      TODO: Explain in javadocs that selection classes take pnodes.
-//      This below must be inefficient...
-        ArrayList list = (ArrayList) networkPanel.getSelectedModelNeurons();
-        ArrayList sourceWeights = new ArrayList();
-        for (Iterator i = list.iterator(); i.hasNext(); ) {
-            Neuron neuron = (Neuron) i.next();
+        List<Neuron> list = networkPanel.getSelectedModelNeurons();
+        List<SynapseNode> sourceWeights = new ArrayList<SynapseNode>();
+        for (Neuron neuron : list) {
             for (Synapse synapse : neuron.getFanIn()) {
-                sourceWeights.add(networkPanel.findSynapseNode(synapse));
+                sourceWeights.add((SynapseNode) networkPanel.getObjectNodeMap()
+                        .get(synapse));
             }
         }
         networkPanel.clearSelection();

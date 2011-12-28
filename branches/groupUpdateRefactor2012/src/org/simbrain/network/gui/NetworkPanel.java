@@ -69,6 +69,9 @@ import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
+import org.simbrain.network.gui.nodes.groupNodes.LayeredNetworkNode;
+import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
@@ -85,6 +88,7 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
+import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.trainers.Backprop;
 import org.simbrain.network.util.SimnetUtils;
@@ -414,7 +418,7 @@ public class NetworkPanel extends JPanel {
                 if (neuron.getParentGroup() != null) {
                     GroupNode groupNode = (GroupNode) objectNodeMap.get(neuron.getParentGroup());
                     if (groupNode != null) {
-                        groupNode.removeReference(node);
+                        groupNode.removePNode(node);
                         groupNode.updateBounds();                        
                     }
                 }
@@ -478,7 +482,7 @@ public class NetworkPanel extends JPanel {
                         GroupNode parentGroupNode = (GroupNode) objectNodeMap
                                 .get(synapse.getParentGroup());
                         if (parentGroupNode != null) {
-                            parentGroupNode.removeReference(synapseNode);
+                            parentGroupNode.removePNode(synapseNode);
                             parentGroupNode.updateBounds();
                         }
                     }
@@ -542,7 +546,7 @@ public class NetworkPanel extends JPanel {
                     // Add neuron nodes to group node
                     GroupNode neuronGroup = new GroupNode(NetworkPanel.this, e.getObject());
                     for (PNode node : nodes) {
-                        neuronGroup.addReference(node);
+                        neuronGroup.addPNode(node);
                     }
                     // Add neuron group to canvas
                     canvas.getLayer().addChild(neuronGroup);
@@ -560,16 +564,10 @@ public class NetworkPanel extends JPanel {
                         }
                     }
                     // Add synapse nodes to group node
-                    GroupNode synapseGroupNode = new GroupNode(NetworkPanel.this, e.getObject());
+                    GroupNode synapseGroupNode = createGroupNode(e.getObject());
                     for (PNode node : nodes) {
-                        synapseGroupNode.addReference(node);
-                        // TODO Performance slow-down here.  Uncomment to see.
-                        //      To test create a Hopfield network with 16 or more nodes.
-                        //long start = System.currentTimeMillis(); 
+                        synapseGroupNode.addPNode(node);
                         node.moveToBack(); 
-                        //System.out.println("Time: "
-                        //        + (System.currentTimeMillis() - start));
-
                     }
                     // Add neuron group to canvas
                     canvas.getLayer().addChild(synapseGroupNode);
@@ -583,10 +581,9 @@ public class NetworkPanel extends JPanel {
                         nodes.add(neuronGroupNode);
                     }
                     //Add layers to layered network node
-                    GroupNode layeredNetworkNode = new GroupNode(NetworkPanel.this,
-                            (Group) e.getObject());
+                    GroupNode layeredNetworkNode = createGroupNode(e.getObject());
                     for (PNode node : nodes) {
-                        layeredNetworkNode.addReference(node);                            
+                        layeredNetworkNode.addPNode(node);                            
                     }
                     // Add layered network node to canvas
                     canvas.getLayer().addChild(layeredNetworkNode);
@@ -597,17 +594,17 @@ public class NetworkPanel extends JPanel {
                     
                     // Create subnet node
                     SubnetworkGroup subnet = (SubnetworkGroup) e.getObject();
-                    GroupNode subnetNode = new GroupNode(NetworkPanel.this, subnet);
+                    GroupNode subnetNode = createGroupNode(subnet);
                     
                     // Add neuron group node
                     NeuronGroup neuronGroup = subnet.getNeuronGroup();
                     GroupNode neuronGroupNode = (GroupNode) objectNodeMap.get(neuronGroup);
-                    subnetNode.addReference(neuronGroupNode);                            
+                    subnetNode.addPNode(neuronGroupNode);                            
 
                     // Add synapse group node
                     SynapseGroup synapseGroup = subnet.getSynapseGroup();
                     GroupNode synapseGroupNode = (GroupNode) objectNodeMap.get(synapseGroup);
-                    subnetNode.addReference(synapseGroupNode);                            
+                    subnetNode.addPNode(synapseGroupNode);                            
 
                     // Add subnetwork node to canvas
                     canvas.getLayer().addChild(subnetNode);
@@ -666,7 +663,7 @@ public class NetworkPanel extends JPanel {
                         GroupNode parentGroupNode = (GroupNode) objectNodeMap
                                 .get(group.getParentGroup());
                         if (parentGroupNode != null) {
-                            parentGroupNode.removeReference(node);
+                            parentGroupNode.removePNode(node);
                             parentGroupNode.updateBounds();                        
                         }
                     }                    
@@ -686,6 +683,29 @@ public class NetworkPanel extends JPanel {
 
     }
 
+    /**
+     * Returns the appropriate PNode given the kind of group it is.
+     *
+     * @param group the model group
+     * @return the appropriate PNode.
+     */
+    private GroupNode createGroupNode(Group group) {
+
+        GroupNode ret = null;
+        if (group instanceof SynapseGroup) {
+            ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
+        } else if (group instanceof LayeredNetwork) {
+            ret = new LayeredNetworkNode(NetworkPanel.this, (LayeredNetwork) group);
+        } else if (group instanceof Hopfield) {
+            ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
+        } else {
+            ret = new GroupNode(NetworkPanel.this, group); 
+        }
+        
+        return ret;
+    }
+    
+    
     //REDO
     /**
      * Creates a new rootNetwork JMenu.

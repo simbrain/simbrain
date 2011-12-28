@@ -29,19 +29,19 @@ import edu.umd.cs.piccolo.nodes.PText;
 /**
  * Interaction Box: graphical element for interacting with a group.
  */
-class InteractionBox extends ScreenElement {
+public class InteractionBox extends ScreenElement {
 
     /** Width of interaction box. */
-    private float BOX_WIDTH = 20;
+    private final static float DEFAULT_WIDTH = 20;
 
     /** Height of interaction box. */
-    private float BOX_HEIGHT = 10;
+    private final static float DEFAULT_HEIGHT = 10;
 
     /** Distance from upper left corner of group. */
-    private float OFFSET_X = 0;
+    private float boxOffset_X = 0;
 
     /** Distance from upper left corner of group. */
-    private float OFFSET_Y = BOX_HEIGHT + 3;
+    private float boxOffset_Y = -3;
 
     /** Main circle of node. */
     private PPath box;
@@ -51,15 +51,18 @@ class InteractionBox extends ScreenElement {
 
     /** Context menu. */
     private JPopupMenu contextMenu;
+    
+    /** Reference to associated groupNode. */
+    private GroupNode groupNode;
 
     /**
      * Create a new tab node.
      */
-    public InteractionBox(final NetworkPanel net) {
+    public InteractionBox(final NetworkPanel net, final GroupNode node) {
         super(net);
-        box = PPath.createRectangle(0, 0, BOX_WIDTH, BOX_HEIGHT);
+        groupNode = node;
+        box = PPath.createRectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         box.setPaint(java.awt.Color.LIGHT_GRAY);
-        //box.setTransparency(.5f);
         box.setStrokePaint(java.awt.Color.GRAY);
         setBounds(box.getBounds());
         addChild(box);
@@ -88,7 +91,12 @@ class InteractionBox extends ScreenElement {
         box.setBounds(textLabel.getBounds()); 
     }
 
-    /** @see ScreenElement */
+    @Override
+    protected void singleClickEvent() {
+        groupNode.selectAllNodes();
+    }
+
+    @Override
     protected JPopupMenu getContextMenu() {
         return contextMenu;
     }
@@ -110,7 +118,9 @@ class InteractionBox extends ScreenElement {
 
     @Override
     protected boolean hasPropertyDialog() {
-        return false;
+        // A cheat so that click events are registered, even if there is no
+        // prop. dialog
+        return true; 
     }
 
     @Override
@@ -138,45 +148,39 @@ class InteractionBox extends ScreenElement {
         return false;
     }
 
-
-    /**
-     * @return the x offset
-     */
-    public float getOFFSET_X() {
-        return OFFSET_X;
-    }
-
-
-    /**
-     * @param offset_x the offset to set
-     */
-    public void setOFFSET_X(float offset_x) {
-        OFFSET_X = offset_x;
-    }
-
-
-    /**
-     * @return the oFFSET_Y
-     */
-    public float getOFFSET_Y() {
-        return OFFSET_Y;
-    }
-
-
-    /**
-     * @param offset_y the oFFSET_Y to set
-     */
-    public void setOFFSET_Y(final float offset_y) {
-        OFFSET_Y = offset_y;
-    }
-
-
-
     /**
      * @param contextMenu the contextMenu to set
      */
     public void setContextMenu(final JPopupMenu contextMenu) {
         this.contextMenu = contextMenu;
+    }
+
+    /**
+     * @return the boxOffset_Y
+     */
+    public float getBoxOffset_Y() {
+        return boxOffset_Y;
+    }
+
+    /**
+     * @param boxOffset_Y the boxOffset_Y to set
+     */
+    public void setBoxOffset_Y(float boxOffset_Y) {
+        this.boxOffset_Y = boxOffset_Y;
+    }
+
+    /**
+     * @return the boxOffset_X
+     */
+    public float getBoxOffset_X() {
+        return boxOffset_X;
+    }
+
+    /**
+     * @param boxOffset_X the boxOffset_X to set
+     */
+    public void setBoxOffset_X(float boxOffset_X) {
+        this.boxOffset_X = boxOffset_X;
     }
 
 }

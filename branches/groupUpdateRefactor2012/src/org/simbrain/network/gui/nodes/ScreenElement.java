@@ -299,6 +299,13 @@ public abstract class ScreenElement
     }
 
     /**
+     * Called when element is single clicked on. Override to provide custom
+     * behaviors in that case.
+     */
+    protected void singleClickEvent() {        
+    }
+
+    /**
      * Property dialog event handler.
      */
     private class PropertyDialogEventHandler
@@ -312,21 +319,29 @@ public abstract class ScreenElement
             setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
         }
 
+        /** @see PBasicInputEventHandler */
+        public void mousePressed(final PInputEvent event) { 
+            singleClickEvent();            
+        }
 
         /** @see PBasicInputEventHandler */
         public void mouseClicked(final PInputEvent event) {
 
-            if (event.getClickCount() == 2) {
-                event.setHandled(true);
-                SwingUtilities.invokeLater(new Runnable() {
-                        /** @see Runnable */
-                        public void run() {
-                            JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
-                            propertyDialog.pack();
-                            propertyDialog.setLocationRelativeTo(null);
-                            propertyDialog.setVisible(true);
-                        }
-                    });
+            if (event.getClickCount() == 1) {
+                singleClickEvent();
+            } else if (event.getClickCount() == 2) {
+                if (ScreenElement.this.getPropertyDialog() != null) {
+                    event.setHandled(true);
+                    SwingUtilities.invokeLater(new Runnable() {
+                            /** @see Runnable */
+                            public void run() {
+                                JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
+                                propertyDialog.pack();
+                                propertyDialog.setLocationRelativeTo(null);
+                                propertyDialog.setVisible(true);
+                            }
+                        });                    
+                }
             }
         }
     }

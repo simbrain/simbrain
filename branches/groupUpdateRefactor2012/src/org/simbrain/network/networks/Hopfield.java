@@ -107,20 +107,21 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
      * Randomize weights symmetrically.
      */
     public void randomizeWeights() {
-        //REDO
-//        for (int i = 0; i < getNeuronList().size(); i++) {
-//            for (int j = 0; j < i; j++) {
-//                Synapse w = Network.getSynapse(getNeuron(i), getNeuron(j));
-//                if (w != null) {
-//                    w.randomize();
-//                    w.setStrength(Math.round(w.getStrength()));
-//                }
-//                Synapse w2 = Network.getSynapse(getNeuron(j), getNeuron(i));
-//                if (w2 != null) {
-//                    w2.setStrength(w.getStrength());
-//                }
-//            }
-//        }
+        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+            for (int j = 0; j < i; j++) {
+                Synapse w = Network.getSynapse(getNeuronGroup().getNeuronList()
+                        .get(i), getNeuronGroup().getNeuronList().get(j));
+                if (w != null) {
+                    w.randomize();
+                    w.setStrength(Math.round(w.getStrength()));
+                }
+                Synapse w2 = Network.getSynapse(getNeuronGroup().getNeuronList()
+                        .get(j), getNeuronGroup().getNeuronList().get(i));
+                if (w2 != null) {
+                    w2.setStrength(w.getStrength());
+                }
+            }
+        }
         getParentNetwork().fireNetworkChanged();
     }
 
@@ -128,19 +129,17 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
      * Apply Hopfield training rule to current activation pattern.
      */
     public void train() {
-        //REDO
-//        //Assumes all neurons have the same upper and lower values
-//        double low = getNeuron(0).getLowerBound();
-//        double hi = getNeuron(0).getUpperBound();
-//
-//        for (int i = 0; i < this.getSynapseCount(); i++) {
-//            Synapse w = this.getSynapse(i);
-//            Neuron src = w.getSource();
-//            Neuron tar = w.getTarget();
-//            w.setStrength(w.getStrength()
-//                    + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar
-//                            .getActivation()) - hi - low) / (hi - low))));
-//        }
+        //Assumes all neurons have the same upper and lower values
+        double low = getNeuronGroup().getNeuronList().get(0).getLowerBound();
+        double hi =  getNeuronGroup().getNeuronList().get(0).getUpperBound();
+
+        for (Synapse w : this.getSynapseGroup().getSynapseList()) {
+            Neuron src = w.getSource();
+            Neuron tar = w.getTarget();
+            w.setStrength(w.getStrength()
+                    + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar
+                            .getActivation()) - hi - low) / (hi - low))));
+        }
         getParentNetwork().fireNetworkChanged();
     }
 

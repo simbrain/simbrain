@@ -21,6 +21,7 @@ package org.simbrain.network.desktop;
 import java.awt.Color;
 
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
@@ -30,10 +31,9 @@ import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.trainers.Backprop;
+import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
 
 /**
@@ -216,26 +216,40 @@ public class NetworkPanelDesktop extends NetworkPanel {
         return contextMenu;
     }
 
-    /* (non-Javadoc)
-     * @see org.simbrain.network.gui.NetworkPanel#showTrainer()
-     */
-    @Override
-    public void showTrainer() {
-        // Show trainer within Simbrain desktop
-        Backprop trainer = new Backprop(getRootNetwork(),
-                getSourceModelNeurons(),
-                getSelectedModelNeurons());
+//    /* (non-Javadoc)
+//     * @see org.simbrain.network.gui.NetworkPanel#showTrainer()
+//     */
+//    @Override
+//    public void showTrainer() {
+//        // Show trainer within Simbrain desktop
+//        Backprop trainer = new Backprop(getRootNetwork(),
+//                getSourceModelNeurons(),
+//                getSelectedModelNeurons());
+//        GenericJInternalFrame frame = new GenericJInternalFrame();
+//        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
+//        frame.setContentPane(trainerPanel);
+//        component.getDesktop().addInternalFrame(frame);
+//        frame.pack();
+//        frame.setMaximizable(true);
+//        frame.setIconifiable(true);
+//        frame.setClosable(true);
+//        frame.setLocation(component.getX() + component.getWidth() + 5,
+//                component.getY());
+//        frame.setVisible(true);
+//    }
+//    
+    
+    public GenericFrame displayPanel(JPanel panel) {
         GenericJInternalFrame frame = new GenericJInternalFrame();
-        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
-        frame.setContentPane(trainerPanel);
+        frame.setContentPane(panel);
         component.getDesktop().addInternalFrame(frame);
         frame.pack();
         frame.setMaximizable(true);
         frame.setIconifiable(true);
         frame.setClosable(true);
-        frame.setLocation(component.getX() + component.getWidth() + 5,
-                component.getY());
         frame.setVisible(true);
+        return frame;
     }
+
 
 }

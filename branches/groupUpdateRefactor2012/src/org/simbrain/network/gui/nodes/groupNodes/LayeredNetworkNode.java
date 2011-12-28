@@ -45,7 +45,6 @@ public class LayeredNetworkNode extends GroupNode {
         super(networkPanel, group);
         setInteractionBox(new LayeredNetworkInteractionBox(networkPanel));
         setContextMenu();
-        setTextLabel("Layered network");
     }
     
     /**

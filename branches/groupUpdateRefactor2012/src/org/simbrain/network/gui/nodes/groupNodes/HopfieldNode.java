@@ -55,7 +55,6 @@ public class HopfieldNode extends GroupNode {
         setInteractionBox(new HopfieldInteractionBox(networkPanel));
         setContextMenu();
         setOutlinePadding(15f);
-        setTextLabel("Hopfield network");
     }
     
     /**

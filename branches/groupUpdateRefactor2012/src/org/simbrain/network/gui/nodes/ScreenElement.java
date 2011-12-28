@@ -61,7 +61,7 @@ public abstract class ScreenElement
     private boolean isGrouped = false;
 
     /**
-     * Default Constructor. Used by Castor.
+     * Default Constructor.
      */
     public ScreenElement() {
     }
@@ -91,6 +91,7 @@ public abstract class ScreenElement
      * Initialize this <code>ScreenElement</code>.
      */
     private void init() {
+        
         if (hasContextMenu()) {
             addInputEventListener(new ContextMenuEventHandler());
         }
@@ -108,6 +109,22 @@ public abstract class ScreenElement
                     }
                 });
         }
+        
+        // Basic event handler for single clicks
+        addInputEventListener(new PBasicInputEventHandler() {
+            /** @see PBasicInputEventHandler */
+            public void mousePressed(final PInputEvent event) {
+                System.out.println("Mouse Pressed: " + event);
+                singleClickEvent();
+            }
+
+            /** @see PBasicInputEventHandler */
+            public void mouseClicked(final PInputEvent event) {
+                System.out.println("Mouse Clicked: " + event);
+                singleClickEvent();
+            }
+
+        });
     }
 
 
@@ -302,7 +319,7 @@ public abstract class ScreenElement
      * Called when element is single clicked on. Override to provide custom
      * behaviors in that case.
      */
-    protected void singleClickEvent() {        
+    protected void singleClickEvent() { 
     }
 
     /**
@@ -319,29 +336,22 @@ public abstract class ScreenElement
             setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
         }
 
-        /** @see PBasicInputEventHandler */
-        public void mousePressed(final PInputEvent event) { 
-            singleClickEvent();            
-        }
 
         /** @see PBasicInputEventHandler */
         public void mouseClicked(final PInputEvent event) {
 
-            if (event.getClickCount() == 1) {
-                singleClickEvent();
-            } else if (event.getClickCount() == 2) {
-                if (ScreenElement.this.getPropertyDialog() != null) {
-                    event.setHandled(true);
-                    SwingUtilities.invokeLater(new Runnable() {
-                            /** @see Runnable */
-                            public void run() {
-                                JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
-                                propertyDialog.pack();
-                                propertyDialog.setLocationRelativeTo(null);
-                                propertyDialog.setVisible(true);
-                            }
-                        });                    
-                }
+            if (event.getClickCount() == 2) {
+                event.setHandled(true);
+                SwingUtilities.invokeLater(new Runnable() {
+                    /** @see Runnable */
+                    public void run() {
+                        JDialog propertyDialog = ScreenElement.this
+                                .getPropertyDialog();
+                        propertyDialog.pack();
+                        propertyDialog.setLocationRelativeTo(null);
+                        propertyDialog.setVisible(true);
+                    }
+                });
             }
         }
     }

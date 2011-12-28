@@ -118,9 +118,7 @@ public class InteractionBox extends ScreenElement {
 
     @Override
     protected boolean hasPropertyDialog() {
-        // A cheat so that click events are registered, even if there is no
-        // prop. dialog
-        return true; 
+        return false; 
     }
 
     @Override

@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.trainers.Backprop;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.gui.GenericFrame;
 
 /**
  * Show Trainer object for training selected source and target neurons.
@@ -82,6 +83,11 @@ public final class ShowTrainerAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.showTrainer();
+        Backprop trainer = new Backprop(networkPanel.getRootNetwork(),
+                networkPanel.getSourceModelNeurons(),
+                networkPanel.getSelectedModelNeurons());
+        TrainerPanel trainerPanel = new TrainerPanel(trainer);
+        GenericFrame frame = networkPanel.displayPanel(trainerPanel);
+        trainerPanel.setFrame(frame);
     }
 }

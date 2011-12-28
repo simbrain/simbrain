@@ -119,16 +119,14 @@ public class TrainerPanel extends JPanel {
      *
      * @param trainer the trainer this panel represents
      */
-    public TrainerPanel(final GenericFrame parentFrame, final Trainer trainer) {
+    public TrainerPanel(final Trainer trainer) {
 
         // Initial setup
         this.trainer = trainer;
-        this.parentFrame = parentFrame;
 
         // Main Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        parentFrame.setTitle("Train " + trainer.getTopologyDescription() + " net");
 
         // Top items
         topItems = new JPanel();
@@ -233,7 +231,7 @@ public class TrainerPanel extends JPanel {
                             + Utils.getVectorString(trainingVector, ","));
                     trainer.setInputData(new double[][] { inputVector});
                     trainer.setTrainingData(new double[][] { trainingVector});
-                    parentFrame.pack();
+                    //parentFrame.pack();
                 }
             });
         }
@@ -262,39 +260,45 @@ public class TrainerPanel extends JPanel {
      * Change the trainer based on the combo box selection.
      */
     private void trainerChanged() {
+        
+        System.out.println("in trainer changed");
 
-        // Reset the trainer object
-        Class<?> selectedTrainer = ((ClassDescriptionPair) cbTrainingAlgorithm
-                .getSelectedItem()).getTheClass();
-        Trainer oldTrainer = trainer;
-        try {
-            // Get the copy constructor and invoke it
-            Constructor<?> trainerConstructor = selectedTrainer
-                    .getConstructor(Trainer.class);
-            trainer = (Trainer) trainerConstructor.newInstance(oldTrainer);
-            trainer.getListeners().clear();
-            trainer.getListeners().addAll(oldTrainer.getListeners());
-            trainer.init();
-            if (cbDataFormat.getSelectedItem() != DataFormat.SINGLE_STEP) {
-                trainer.getNetwork().clearActivations();
-                trainer.getNetwork().clearBiases();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Update graphics panel
-        if (currentTrainerRunControls != null) {
-            runPanel.remove(currentTrainerRunControls);
-        }
-        if (trainer instanceof IterableAlgorithm) {
-            currentTrainerRunControls = createRunPanelIterable();
-        } else {
-            currentTrainerRunControls = createRunPanelNonIterable();
-
-        }
-        runPanel.add(currentTrainerRunControls);
-        parentFrame.pack();
+        // TODO: This is erasing the input data
+        
+//        // Reset the trainer object
+//        Class<?> selectedTrainer = ((ClassDescriptionPair) cbTrainingAlgorithm
+//                .getSelectedItem()).getTheClass();
+//        Trainer oldTrainer = trainer;
+//        try {
+//            // Get the copy constructor and invoke it
+//            Constructor<?> trainerConstructor = selectedTrainer
+//                    .getConstructor(Trainer.class);
+//            trainer = (Trainer) trainerConstructor.newInstance(oldTrainer);
+//            trainer.getListeners().clear();
+//            trainer.getListeners().addAll(oldTrainer.getListeners());
+//            trainer.init();
+//            if (cbDataFormat.getSelectedItem() != DataFormat.SINGLE_STEP) {
+//                trainer.getNetwork().clearActivations();
+//                trainer.getNetwork().clearBiases();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        // Update graphics panel
+//        if (currentTrainerRunControls != null) {
+//            runPanel.remove(currentTrainerRunControls);
+//        }
+//        if (trainer instanceof IterableAlgorithm) {
+//            currentTrainerRunControls = createRunPanelIterable();
+//        } else {
+//            currentTrainerRunControls = createRunPanelNonIterable();
+//
+//        }
+//        runPanel.add(currentTrainerRunControls);
+//        if (parentFrame != null) {
+//            parentFrame.pack();            
+//        }
     }
 
     /**
@@ -494,6 +498,14 @@ public class TrainerPanel extends JPanel {
 //        frame.setContentPane(trainerPanel);
 //        frame.pack();
 //        frame.setVisible(true);
+    }
+
+    /**
+     * @param parentFrame the parentFrame to set
+     */
+    public void setFrame(GenericFrame parentFrame) {
+        this.parentFrame = parentFrame;
+        parentFrame.setTitle("Train " + trainer.getTopologyDescription() + " net");            
     }
 
 }

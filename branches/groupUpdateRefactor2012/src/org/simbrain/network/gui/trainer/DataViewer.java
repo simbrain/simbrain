@@ -13,8 +13,14 @@
  */
 package org.simbrain.network.gui.trainer;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.interfaces.Neuron;
@@ -24,6 +30,7 @@ import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.SimbrainTableListener;
+import org.simbrain.util.table.TableActionManager;
 
 /**
  * Widget to display data used in training a neural network using supervised
@@ -68,6 +75,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         // Populate data in simbrain table
         if (type == TrainerDataType.Input) {
             if (trainer.getInputData() == null) {
+                System.out.println("Input data is null");
                 table = new SimbrainJTable(new DefaultNumericTable(
                         DEFAULT_NUM_ROWS, trainer.getInputLayer().size()));
             } else {
@@ -81,6 +89,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
             }
         } else {
             if (trainer.getTrainingData() == null) {
+                System.out.println("Training data is null");
                 table = new SimbrainJTable(new DefaultNumericTable(
                         DEFAULT_NUM_ROWS, trainer.getOutputLayer().size()));
             } else {
@@ -161,6 +170,38 @@ public class DataViewer extends SimbrainJTableScrollPanel {
      */
     public SimbrainJTable getTable() {
         return table;
+    }
+    
+    public static JPanel getDataViewerPanel(final TrainerPanel trainerPanel,
+            final TrainerDataType type) {
+        final DataViewer viewer = new DataViewer(trainerPanel, type);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add("Center", viewer);
+
+        // Toolbars
+        JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        // Open / Save Tools
+        JToolBar fileToolBar = new JToolBar();
+        fileToolBar
+                .add(TrainerGuiActions.getOpenCSVAction(trainerPanel, viewer.getTable(), type));
+        fileToolBar.add(TableActionManager
+                .getSaveCSVAction((NumericTable) viewer.getTable().getData()));
+        toolbars.add(fileToolBar);
+
+        // Edit tools
+        JToolBar editToolBar = new JToolBar();
+        editToolBar
+                .add(TableActionManager.getInsertRowAction(viewer.getTable()));
+        editToolBar
+                .add(TableActionManager.getDeleteRowAction(viewer.getTable()));
+        toolbars.add(editToolBar);
+
+        // Randomize tools
+        toolbars.add(viewer.getTable().getToolbarRandomize());
+
+        mainPanel.add("North", toolbars);
+        return mainPanel;
     }
 
 }

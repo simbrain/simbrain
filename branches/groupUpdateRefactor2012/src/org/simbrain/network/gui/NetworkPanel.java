@@ -40,6 +40,7 @@ import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -49,6 +50,7 @@ import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
+import org.simbrain.network.groups.BackpropNetwork;
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SubnetworkGroup;
@@ -69,10 +71,10 @@ import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.LayeredNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
-import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.NetworkTextObject;
@@ -90,7 +92,6 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.trainers.Backprop;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
@@ -695,7 +696,11 @@ public class NetworkPanel extends JPanel {
         if (group instanceof SynapseGroup) {
             ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
         } else if (group instanceof LayeredNetwork) {
-            ret = new LayeredNetworkNode(NetworkPanel.this, (LayeredNetwork) group);
+            if (group instanceof BackpropNetwork) {
+                ret = new BackpropNetworkNode(NetworkPanel.this, (BackpropNetwork) group);
+            } else {
+                ret = new LayeredNetworkNode(NetworkPanel.this, (LayeredNetwork) group);                
+            }
         } else if (group instanceof Hopfield) {
             ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
         } else {
@@ -2392,21 +2397,37 @@ public class NetworkPanel extends JPanel {
     public PCanvas getCanvas() {
         return canvas;
     }
-
+    
+//    /**
+//     * Show the trainer panel. This is overridden by the desktop version to
+//     * display the panel within the Simbrain desktop.
+//     */
+//    public void showTrainer() {
+//        Backprop trainer = new Backprop(getRootNetwork(),
+//                getSourceModelNeurons(),
+//                getSelectedModelNeurons());
+//        JDialog dialog = new JDialog();
+//        TrainerPanel trainerPanel = new TrainerPanel((GenericFrame) dialog,
+//                trainer);
+//        dialog.setContentPane(trainerPanel);
+//        dialog.pack();
+//        dialog.setVisible(true);
+//    }
+    
     /**
-     * Show the trainer panel. This is overridden by the desktop version to
-     * display the panel within the Simbrain desktop.
+     * Display a panel in a dialog. This is overridden by the desktop version to
+     * display the panel within the Simbrain desktop.  
+     *
+     * @param panel panel to display
+     * @return reference to frame the panel will be displayed in. 
      */
-    public void showTrainer() {
-        Backprop trainer = new Backprop(getRootNetwork(),
-                getSourceModelNeurons(),
-                getSelectedModelNeurons());
+    public GenericFrame displayPanel(JPanel panel) {
         JDialog dialog = new JDialog();
-        TrainerPanel trainerPanel = new TrainerPanel((GenericFrame) dialog,
-                trainer);
-        dialog.setContentPane(trainerPanel);
+        dialog.setContentPane(panel);
         dialog.pack();
         dialog.setVisible(true);
+        // TODO: Class cast exception.  Figure it out later (since not used now)
+        return (GenericFrame) dialog; 
     }
 
     /**

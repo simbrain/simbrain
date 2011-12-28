@@ -84,6 +84,7 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
         super(network);
         
         this.initialPosition = initialPosition;
+        setLabel("Layered Network");
 
         // Layout
         LineLayout layout = new LineLayout(betweenNeuronInterval,
@@ -97,7 +98,8 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
             neuron.setLowerBound(0);
             inputLayer.add(neuron);
         }
-        addLayer(new NeuronGroup(network, inputLayer));
+        NeuronGroup layer = new NeuronGroup(network, inputLayer);
+        addLayer(layer);
         layout.setInitialLocation(new Point((int) initialPosition.getX()
                 - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
         layout.layoutNeurons(inputLayer);
@@ -151,6 +153,8 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
     }
     
     private void addSynapseLayer(SynapseGroup group) {
+        group.setLabel("Weights " + (connections.size() + 1) + " > "
+                + (connections.size() + 2));
         connections.add(group);
         group.setParentGroup(this);
     }
@@ -162,6 +166,7 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
      * @param group the layer to add
      */
     private void addLayer(NeuronGroup group) {
+        group.setLabel("Layer " + (layers.size() + 1));
         layers.add(group);
         group.setParentGroup(this);
     }

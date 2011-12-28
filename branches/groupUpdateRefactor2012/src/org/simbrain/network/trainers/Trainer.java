@@ -136,8 +136,8 @@ public abstract class Trainer {
                         + newData[0].length + " columns; input layer has "
                         + inputLayer.size() + " neurons");
             }
-            // System.out.println("Input Data: \n" +
-            // Utils.doubleMatrixToString(newData));
+             System.out.println("Input Data: \n" +
+             Utils.doubleMatrixToString(newData));
             this.inputData = newData;
             init();
             fireInputDataChanged(inputData);
@@ -177,8 +177,8 @@ public abstract class Trainer {
             this.trainingData = newData;
             init();
             fireTrainingDataChanged(trainingData);
-            // System.out.println("Training Data: \n" +
-            // Utils.doubleMatrixToString(newData));
+             System.out.println("Training Data: \n" +
+             Utils.doubleMatrixToString(newData));
         }
     }
 

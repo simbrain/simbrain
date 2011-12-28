@@ -52,7 +52,7 @@ public class SynapseGroupNode extends GroupNode {
         setInteractionBox(new SynapseInteractionBox(networkPanel));
         setContextMenu();
         setOutlinePadding(-5);
-        this.setTextLabel("Synapse group");
+        setPickable(false);
     }
     
     /**

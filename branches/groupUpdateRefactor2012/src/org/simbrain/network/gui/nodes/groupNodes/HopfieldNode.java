@@ -28,7 +28,6 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesDialog;
-import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.networks.Hopfield;
 
@@ -41,7 +40,7 @@ import org.simbrain.network.networks.Hopfield;
  * 
  * @author jyoshimi
  */
-public class HopfieldNode extends GroupNode {
+public class HopfieldNode extends SubnetGroupNode {
     
     /**
      * Create a Hopfield Network PNode.

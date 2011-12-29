@@ -27,9 +27,6 @@ import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.networks.Competitive;
-import org.simbrain.network.networks.KWTA;
-import org.simbrain.network.networks.SOM;
 import org.simbrain.network.util.CopyPaste;
 
 /**
@@ -936,18 +933,21 @@ public abstract class Network {
     }
 
     /**
-     * Add a new group of network elements.
+     * Add a group to the network.
      *
      * @param group group of network elements
      */
     public void addGroup(final Group group) {
         if ((rootNetwork != null)) {
+            
+            // Generate group id
             String id = getRootNetwork().getGroupIdGenerator().getId();
             group.setId(id);
             if (group.getLabel() == null) {
                 group.setLabel(id.replaceAll("_"," "));                
             }
             
+            // Special creation steps associated with particular group types
             if (group instanceof LayeredNetwork) {
                 for (NeuronGroup layer : ((LayeredNetwork)group).getLayers()) {
                     addGroup(layer);
@@ -958,12 +958,6 @@ public abstract class Network {
             } else if (group instanceof SubnetworkGroup) {
                 addGroup(((SubnetworkGroup)group).getNeuronGroup());
                 addGroup(((SubnetworkGroup)group).getSynapseGroup());
-            }
-
-            // Redo: only do this for groups that have a synapse list...
-            //      Or move to layered network?
-            for(Synapse synapse : synapseList) {
-                rootNetwork.fireSynapseAdded(synapse);
             }
             
             groupList.add(group);
@@ -977,22 +971,39 @@ public abstract class Network {
      * @param toDelete the group to delete.
      */
     public void deleteGroup(final Group toDelete) {
+        
+        // Remove from the group list
         groupList.remove(toDelete);
+
+//        // Force delete synapse group in a subnet group
+//        if (toDelete instanceof SubnetworkGroup) {
+//            SynapseGroup synapseGroup = ((SubnetworkGroup)toDelete).getSynapseGroup(); 
+//            synapseGroup.setDeleteWhenEmpty(true);
+//            deleteGroup(synapseGroup);
+//        }
+        
+        // Deleting neuron and synapse groups with parent groups
         if (toDelete.getParentGroup() != null) {
-            // Redo: Ok to check for types here?  I guess so..
+            
+            // If this is a layer in a layered network, then remove the layer from the parent
             if (toDelete.getParentGroup() instanceof LayeredNetwork) {
                 if (toDelete instanceof NeuronGroup) {
                     ((LayeredNetwork) toDelete.getParentGroup())
                             .removeLayer((NeuronGroup) toDelete);
-                } else if (toDelete instanceof SynapseGroup) {
+                } else if ((toDelete instanceof SynapseGroup)) {
                     ((LayeredNetwork) toDelete.getParentGroup())
                             .removeWeightLayer((SynapseGroup) toDelete);
                 }
             } 
-            if (toDelete.getParentGroup().isEmpty()) {
-                deleteGroup(toDelete.getParentGroup());                
+            
+            // If the parent group is now empty, then (in some cases) remove the group
+            if ((toDelete.getParentGroup().isEmpty() && (toDelete
+                    .isDeleteWhenEmpty()))) {
+                deleteGroup(toDelete.getParentGroup());
             }
         }
+        
+        // Notify listeners that this group has been deleted.
         rootNetwork.fireGroupDeleted(toDelete);
     }
 

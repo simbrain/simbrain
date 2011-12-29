@@ -18,10 +18,6 @@
  */
 package org.simbrain.network.interfaces;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <b>Group</b>: a logical group of neurons and synapses (and perhaps other

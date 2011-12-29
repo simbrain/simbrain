@@ -13,14 +13,12 @@
 package org.simbrain.network.groups;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.simbrain.network.interfaces.Group;
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.listeners.NetworkEvent;
 
 /**
  * A group of synapses.
@@ -53,14 +51,16 @@ public class SynapseGroup extends Group {
         synapseList.add(synapse);
         synapse.setParentGroup(this);
         getParentNetwork().fireSynapseAdded(synapse);
-        getParentNetwork().fireGroupChanged(this, this);
+        NetworkEvent<Group> event = new NetworkEvent<Group>(getParentNetwork(), this, this);
+        event.setAuxiliaryObject(synapse);
+        getParentNetwork().fireGroupChanged(event,"synapseAdded"); 
     }
     
     @Override
     public void removeSynapse(Synapse toDelete) {
         synapseList.remove(toDelete);
         getParentNetwork().fireSynapseDeleted(toDelete);
-        getParentNetwork().fireGroupChanged(this, this);
+        getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
     }
 
 

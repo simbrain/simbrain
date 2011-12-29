@@ -77,7 +77,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     private final Group group;
 
     /**
-     * Create a new abstract subnetwork node from the specified parameters.
+     * Create a PNode representation of a model group.
      *
      * @param networkPanel
      *            networkPanel for this subnetwork node, must not be null.
@@ -273,6 +273,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      */
     protected void selectAllNodes() {
         //System.out.println(group.getLabel());
+        // REDO: Can't this happen in subclass overrides?
         if ((group instanceof LayeredNetwork)
                 || (group instanceof SubnetworkGroup)) {
             networkPanel.setSelection(getChildrenNeuronNodes(this));

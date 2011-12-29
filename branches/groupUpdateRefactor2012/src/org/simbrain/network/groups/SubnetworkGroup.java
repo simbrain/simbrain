@@ -128,13 +128,13 @@ public class SubnetworkGroup extends Group {
      */
     public void addSynapse(Synapse synapse) {
         synapseGroup.addSynapse(synapse);
-        getParentNetwork().fireGroupChanged(this, this);
+        getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
     }
 
     @Override
     public void removeSynapse(Synapse toDelete) {
         synapseGroup.removeSynapse(toDelete);
-        getParentNetwork().fireGroupChanged(this, this);
+        getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
     }
 
 //

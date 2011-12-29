@@ -756,18 +756,36 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Fire a group changed event to all registered model listeners. TODO:
-     * Change to grouptype changed?
+     * Fire a group changed event to all registered model listeners.  A string desription describes
+     * the change and is used by listeners to handle the event.   Old group is not currently used
+     * but may be in the future.
      * 
      * @param old Old group
      * @param changed New changed group
+     * @param changeDescription A description of the 
      */
-    public void fireGroupChanged(final Group old, final Group changed) {
+    public void fireGroupChanged(final Group old, final Group changed, final String changeDescription) {
 
         for (GroupListener listener : groupListeners) {
-            listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
+            listener.groupChanged(new NetworkEvent<Group>(this, old, changed),
+                    changeDescription);
         }
     }
+    
+    /**
+     * This version of fireGroupChanged fires a pre-set event, which may have an
+     * auxiliary object set.
+     * 
+     * @param event the network changed event.
+     * @param changeDescription A description of the
+     */
+    public void fireGroupChanged(final NetworkEvent<Group> event, final String changeDescription) {
+
+        for (GroupListener listener : groupListeners) {
+            listener.groupChanged(event, changeDescription);
+        }
+    }
+
 
     /**
      * Fire a group parameters changed event.

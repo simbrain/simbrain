@@ -54,6 +54,7 @@ public class SynapseGroupNode extends GroupNode {
         setContextMenu();
         setOutlinePadding(-5);
         setPickable(false);
+        updateVisibility();
     }
     
     /**
@@ -94,28 +95,18 @@ public class SynapseGroupNode extends GroupNode {
 
         PBounds bounds = new PBounds();
 
-//        if ((this.getGroup().getParentGroup() instanceof SubnetworkGroup)
-//                && (getOutlinedObjects().size() == 0)) {
-//            bounds = getNetworkPanel().getObjectNodeMap()
-//                    .get(getGroup().getParentGroup()).getBounds();
-
-        // REDO: Move below up?
-        if (getOutlinedObjects().size() == 0) {
-            this.removeFromParent();
-        } else {
-            for (PNode node : getOutlinedObjects()) {
-                PBounds childBounds = node.getGlobalBounds();
-                bounds.add(childBounds);
-                if (node instanceof SynapseNode) {
-                    bounds.add(((SynapseNode) node).getLine().getBounds());
-                }
+        for (PNode node : getOutlinedObjects()) {
+            PBounds childBounds = node.getGlobalBounds();
+            bounds.add(childBounds);
+            if (node instanceof SynapseNode) {
+                bounds.add(((SynapseNode) node).getLine().getBounds());
             }
-
-            double inset = getOutlinePadding();
-            bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
-                    bounds.getWidth() + (2 * inset), bounds.getHeight()
-                            + (2 * inset));            
         }
+
+        double inset = getOutlinePadding();
+        bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
+                bounds.getWidth() + (2 * inset), bounds.getHeight()
+                        + (2 * inset));
 
         setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
                 (float) bounds.getWidth(), (float) bounds.getHeight());
@@ -123,13 +114,38 @@ public class SynapseGroupNode extends GroupNode {
         updateInteractionBox();
         moveToBack();
     }
-    
+
     @Override
     protected void updateInteractionBox() {
         InteractionBox interactionBox = getInteractionBox();
         interactionBox.setOffset(
                 getBounds().getX() - interactionBox.getFullBounds().width,
                 getBounds().getCenterY() - interactionBox.getHeight() / 2);
+    }
+    
+    @Override
+    public void removePNode(PNode node) {
+        super.removePNode(node);
+        updateVisibility();
+    }
+
+    @Override
+    public void addPNode(PNode node) {
+        super.addPNode(node);
+        updateVisibility();
+    }
+    
+    /**
+     * If there are no synpase nodes to display, make this whole
+     * synapsegroupnode invisible.
+     */
+    private void updateVisibility() {
+        if (getOutlinedObjects().isEmpty()) {
+            setVisible(false);
+        } else {
+            setVisible(true);
+        }
+        
     }
 
 }

@@ -199,7 +199,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * @param neuron neuron to show in Gui
      * @return desktop version of NeuronNode, with context menu
      */
-    public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
+    public NeuronNode createNeuronNode(final NetworkPanel net, final Neuron neuron) {
         return new NeuronNodeDesktop(component.getWorkspaceComponent(), net, neuron);
     }
 

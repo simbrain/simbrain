@@ -39,8 +39,6 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -96,7 +94,8 @@ import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJDialog;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -2422,12 +2421,11 @@ public class NetworkPanel extends JPanel {
      * @return reference to frame the panel will be displayed in. 
      */
     public GenericFrame displayPanel(JPanel panel) {
-        JDialog dialog = new JDialog();
-        dialog.setContentPane(panel);
-        dialog.pack();
-        dialog.setVisible(true);
-        // TODO: Class cast exception.  Figure it out later (since not used now)
-        return (GenericFrame) dialog; 
+        GenericFrame frame = (GenericFrame) new GenericJDialog();
+        frame.setContentPane(panel);
+        frame.pack();
+        frame.setVisible(true);
+        return frame; 
     }
 
     /**

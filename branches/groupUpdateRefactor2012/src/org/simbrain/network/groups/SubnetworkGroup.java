@@ -55,12 +55,16 @@ public class SubnetworkGroup extends Group {
         init();
     }
 
+    /**
+     * Initialize the subnet.
+     */
     private void init() {
         setLabel("Subnetwork");
         neuronGroup.setLabel("Neuron group");
         neuronGroup.setParentGroup(this);
         synapseGroup.setLabel("Synapse group");
         synapseGroup.setParentGroup(this);
+        synapseGroup.setDeleteWhenEmpty(false);
     }
 
     

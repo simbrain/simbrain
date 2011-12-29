@@ -43,7 +43,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**

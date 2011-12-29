@@ -554,8 +554,9 @@ public abstract class Network {
         }
 
         if(toDelete.getParentGroup() != null) {
-            toDelete.getParentGroup().removeSynapse(toDelete);
-            if (toDelete.getParentGroup().isEmpty()) {
+            Group parentGroup = toDelete.getParentGroup();
+            parentGroup.removeSynapse(toDelete);
+            if (parentGroup.isEmpty() && parentGroup.isDeleteWhenEmpty()) {
                 deleteGroup(toDelete.getParentGroup());
             }
         } else {

@@ -17,7 +17,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Constructor;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -28,9 +27,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.groups.LayeredNetwork;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.trainers.Backprop;
 import org.simbrain.network.trainers.IterableAlgorithm;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.TrainerListener;
@@ -38,8 +38,8 @@ import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.gui.GenericFrame;
-import org.simbrain.workspace.gui.GenericJFrame;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJFrame;
 
 /**
  * GUI for supervised learning in Simbrain, using back-propagation, LMS, and
@@ -114,15 +114,20 @@ public class TrainerPanel extends JPanel {
         Input, Trainer
     };
 
+    /** Reference to parent panel. Used as a reference for displaying the trainer panel. */
+    private final NetworkPanel panel;
+    
     /**
      * Construct a trainer panel around a trainer object.
      *
+     * @param networkPanel the parent network panel
      * @param trainer the trainer this panel represents
      */
-    public TrainerPanel(final Trainer trainer) {
+    public TrainerPanel(final NetworkPanel networkPanel, final Trainer trainer) {
 
         // Initial setup
         this.trainer = trainer;
+        this.panel = networkPanel;
 
         // Main Panel
         JPanel mainPanel = new JPanel();
@@ -176,7 +181,6 @@ public class TrainerPanel extends JPanel {
         initializeTrainerListener();
 
         // Initialize trainer specific panels
-        trainerChanged();
         refreshDataPanel();
 
         // Add mainPanel
@@ -260,45 +264,31 @@ public class TrainerPanel extends JPanel {
      * Change the trainer based on the combo box selection.
      */
     private void trainerChanged() {
-        
-        System.out.println("in trainer changed");
+                
+        // Update the training method
+        String name = ((ClassDescriptionPair) cbTrainingAlgorithm
+                .getSelectedItem()).getSimpleName();
+        trainer.setTrainingMethod(name);
+        if (cbDataFormat.getSelectedItem() != DataFormat.SINGLE_STEP) {
+            trainer.getNetwork().clearActivations();
+            trainer.getNetwork().clearBiases();
+        }
 
-        // TODO: This is erasing the input data
-        
-//        // Reset the trainer object
-//        Class<?> selectedTrainer = ((ClassDescriptionPair) cbTrainingAlgorithm
-//                .getSelectedItem()).getTheClass();
-//        Trainer oldTrainer = trainer;
-//        try {
-//            // Get the copy constructor and invoke it
-//            Constructor<?> trainerConstructor = selectedTrainer
-//                    .getConstructor(Trainer.class);
-//            trainer = (Trainer) trainerConstructor.newInstance(oldTrainer);
-//            trainer.getListeners().clear();
-//            trainer.getListeners().addAll(oldTrainer.getListeners());
-//            trainer.init();
-//            if (cbDataFormat.getSelectedItem() != DataFormat.SINGLE_STEP) {
-//                trainer.getNetwork().clearActivations();
-//                trainer.getNetwork().clearBiases();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        // Update graphics panel
-//        if (currentTrainerRunControls != null) {
-//            runPanel.remove(currentTrainerRunControls);
-//        }
-//        if (trainer instanceof IterableAlgorithm) {
-//            currentTrainerRunControls = createRunPanelIterable();
-//        } else {
-//            currentTrainerRunControls = createRunPanelNonIterable();
-//
-//        }
-//        runPanel.add(currentTrainerRunControls);
-//        if (parentFrame != null) {
-//            parentFrame.pack();            
-//        }
+        // Update graphics panel
+        if (currentTrainerRunControls != null) {
+            runPanel.remove(currentTrainerRunControls);
+        }
+
+        // Set run controls
+        if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
+            currentTrainerRunControls = createRunPanelIterable();
+        } else {
+            currentTrainerRunControls = createRunPanelNonIterable();
+        }
+        runPanel.add(currentTrainerRunControls);
+        if (parentFrame != null) {
+            parentFrame.pack();            
+        }
     }
 
     /**
@@ -313,7 +303,7 @@ public class TrainerPanel extends JPanel {
              * {@inheritDoc}
              */
             public void errorUpdated() {
-                if (trainer instanceof IterableAlgorithm) {
+                if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
                     if (model != null) {
                         model.update();
                         IterableAlgorithm theTrainer = (IterableAlgorithm) trainer;
@@ -352,7 +342,7 @@ public class TrainerPanel extends JPanel {
         apply.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent arg0) {
-                trainer.apply();
+                trainer.update();
                 trainer.getNetwork().getRootNetwork().fireNetworkChanged();
             }
 
@@ -423,9 +413,10 @@ public class TrainerPanel extends JPanel {
      * Update error text field.
      */
     private void updateErrorField() {
-        if (trainer instanceof IterableAlgorithm) {
+        if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
             rmsError.setText("Error:"
-                    + Utils.round(((IterableAlgorithm) trainer).getError(), 4));
+                    + Utils.round(((IterableAlgorithm) trainer
+                            .getTrainingMethod()).getError(), 4));
         }
     }
 
@@ -443,7 +434,7 @@ public class TrainerPanel extends JPanel {
      * Iterate the trainer one time and update graphics.
      */
     final void iterate() {
-        trainer.apply();
+        trainer.update();
         updateErrorField();
         // model.addData(0, trainer.getIteration(), trainer.getCurrentError());
     }
@@ -485,19 +476,19 @@ public class TrainerPanel extends JPanel {
      * @param args
      */
     public static void main(String[] args) {
-//        RootNetwork network = new RootNetwork();
-//        LayeredNetwork builder = new LayeredNetwork();
-//        int[] nodesPerLayer = new int[] { 2, 2, 1 };
-//        builder.setNodesPerLayer(nodesPerLayer);
-//        builder.buildNetwork(network);
-        //REDO
-//        Backprop trainer = new Backprop(network, network.getGroup("Group_1")
-//                .getNeuronList(), network.getGroup("Group_2").getNeuronList());
-//        GenericJFrame frame = new GenericJFrame();
-//        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
-//        frame.setContentPane(trainerPanel);
-//        frame.pack();
-//        frame.setVisible(true);
+        RootNetwork network = new RootNetwork();
+        int[] topology = new int[] { 2, 2, 1 };
+        network.addGroup(new LayeredNetwork(network, topology, null));
+        NeuronGroup inputs = (NeuronGroup) network.getGroup("Group_2");
+        NeuronGroup outputs = (NeuronGroup) network.getGroup("Group_4");
+        Trainer trainer = new Trainer(network, inputs.getNeuronList(),
+                outputs.getNeuronList(), "Backprop");
+        GenericJFrame frame = new GenericJFrame();
+        TrainerPanel trainerPanel = new TrainerPanel(null, trainer);
+        trainerPanel.setFrame(frame);
+        frame.setContentPane(trainerPanel);
+        frame.pack();
+        frame.setVisible(true);
     }
 
     /**
@@ -505,7 +496,16 @@ public class TrainerPanel extends JPanel {
      */
     public void setFrame(GenericFrame parentFrame) {
         this.parentFrame = parentFrame;
-        parentFrame.setTitle("Train " + trainer.getTopologyDescription() + " net");            
+        parentFrame.setTitle("Train " + trainer.getTopologyDescription() + " net");          
+    }
+
+    /**
+     * Return references to parent network panel.
+     *
+     * @return network panel.
+     */
+    public NetworkPanel getNetworkPanel() {
+        return panel;
     }
 
 }

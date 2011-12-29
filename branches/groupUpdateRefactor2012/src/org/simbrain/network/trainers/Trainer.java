@@ -34,7 +34,7 @@ import org.simbrain.util.Utils;
  *
  * @author jyoshimi
  */
-public abstract class Trainer {
+public class Trainer {
 
     /**
      * Reference to the network being trained.
@@ -49,6 +49,12 @@ public abstract class Trainer {
 
     /** Listener list. */
     private final List<TrainerListener> listeners = new ArrayList<TrainerListener>();
+    
+    /**
+     * A reference to the training method, which actually computes the weight
+     * updates.  This can be changed as needed.
+     */
+    private TrainingMethod trainingMethod;
 
     /**
      * Same number of columns as input network. Same number of rows as training
@@ -74,49 +80,48 @@ public abstract class Trainer {
      * @param network parent network
      * @param inputLayer input layer
      * @param outputLayer output layer
+     * @param method the training method
      */
     public Trainer(Network network, List<Neuron> inputLayer,
-            List<Neuron> outputLayer) {
+            List<Neuron> outputLayer, TrainingMethod method) {
         this.network = network;
         this.inputLayer = inputLayer;
         this.outputLayer = outputLayer;
+        
         // TODO: Allow for vertical sorting... Or just document this.
         Collections.sort(inputLayer, Comparators.X_ORDER);
         Collections.sort(outputLayer, Comparators.X_ORDER);
+
+        setTrainingMethod(method);
+
+        // SimnetUtils.printLayers(SimnetUtils.getIntermedateLayers(network,
+        // inputLayer, outputLayer));
+    }
+    
+    /**
+     * Construct a trainer from a network, input, and output layer.
+     *
+     * @param network parent network
+     * @param inputLayer input layer
+     * @param outputLayer output layer
+     * @param method the training method name as a string.
+     */
+    public Trainer(Network network, List<Neuron> inputLayer,
+            List<Neuron> outputLayer, String method) {
+        this.network = network;
+        this.inputLayer = inputLayer;
+        this.outputLayer = outputLayer;
+        
+        // TODO: Allow for vertical sorting... Or just document this.
+        Collections.sort(inputLayer, Comparators.X_ORDER);
+        Collections.sort(outputLayer, Comparators.X_ORDER);
+
+        setTrainingMethod(method);
 
         // SimnetUtils.printLayers(SimnetUtils.getIntermedateLayers(network,
         // inputLayer, outputLayer));
     }
 
-    /**
-     * Copy constructor. NOTE: Subclasses must supply a copy constructor.
-     *
-     * @param trainer trainer whose data and input / output lists should be
-     *            copied
-     */
-    public Trainer(Trainer trainer) {
-        this(trainer.getNetwork(), trainer.getInputLayer(), trainer
-                .getOutputLayer());
-        this.setInputData(trainer.getInputData());
-        this.setTrainingData(trainer.getTrainingData());
-    }
-
-    /**
-     * Initialize the trainer.
-     */
-    public abstract void init();
-
-    /**
-     * Apply the algorithm. For iterable algorithms, this represents a single
-     * iteration.
-     */
-    public abstract void apply();
-
-    /**
-     * Randomize the network associated with this trainer, as appropriate to the
-     * algorithm.
-     */
-    public abstract void randomize();
 
     /**
      * @return the inputData
@@ -136,10 +141,10 @@ public abstract class Trainer {
                         + newData[0].length + " columns; input layer has "
                         + inputLayer.size() + " neurons");
             }
-             System.out.println("Input Data: \n" +
-             Utils.doubleMatrixToString(newData));
+            // System.out.println("Input Data: \n" +
+            // Utils.doubleMatrixToString(newData));
             this.inputData = newData;
-            init();
+            trainingMethod.init(this);
             fireInputDataChanged(inputData);
         }
     }
@@ -175,10 +180,10 @@ public abstract class Trainer {
                                 + outputLayer.size() + " neurons");
             }
             this.trainingData = newData;
-            init();
+            trainingMethod.init(this);
             fireTrainingDataChanged(trainingData);
-             System.out.println("Training Data: \n" +
-             Utils.doubleMatrixToString(newData));
+            // System.out.println("Training Data: \n" +
+            // Utils.doubleMatrixToString(newData));
         }
     }
 
@@ -307,6 +312,58 @@ public abstract class Trainer {
      */
     public List<TrainerListener> getListeners() {
         return listeners;
+    }
+
+    /**
+     * Apply the training method using the current data.
+     */
+    public void update() {
+        trainingMethod.apply(this);
+    }
+
+    /**
+     * @return the trainingMethod
+     */
+    public TrainingMethod getTrainingMethod() {
+        return trainingMethod;
+    }
+
+    /**
+     * @param trainingMethod the trainingMethod to set
+     */
+    public void setTrainingMethod(TrainingMethod trainingMethod) {
+        this.trainingMethod = trainingMethod;
+        trainingMethod.init(this);
+    }
+
+    /**
+     * Sets the training method using a String description. The provided
+     * description must match the class name. E.g. "Backprop" for
+     * "Backprop.java".
+     * 
+     * @param name the "simple name" of the class associated with the training
+     *            method rule to set.
+     */
+    public void setTrainingMethod(String name) {
+        try {
+            TrainingMethod newMethod = (TrainingMethod) Class.forName(
+                    "org.simbrain.network.trainers." + name).newInstance();
+            setTrainingMethod(newMethod);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(
+                    "The provided training method name, \"" + name
+                            + "\", does not correspond to a known method name."
+                            + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Randomize the trainer.
+     */
+    public void randomize() {
+        trainingMethod.randomize(this);        
     }
 
 }

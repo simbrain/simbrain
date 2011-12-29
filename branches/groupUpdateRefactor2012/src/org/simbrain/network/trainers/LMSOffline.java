@@ -44,7 +44,7 @@ import Jama.Matrix;
  * @author ztosi
  * @author jyoshimi
  */
-public class LMSOffline extends Trainer {
+public class LMSOffline extends TrainingMethod {
 
     /**
      * Solution methods for offline LMS.
@@ -75,55 +75,25 @@ public class LMSOffline extends Trainer {
     /** Current solution type. */
     private SolutionType solutionType = SolutionType.MOORE_PENROSE;
 
-    /**
-     * Construct the trainer.
-     *
-     * @param network parent network
-     * @param inputList input layer
-     * @param outputList output layer
-     */
-    public LMSOffline(RootNetwork network, List<Neuron> inputList,
-            List<Neuron> outputList) {
-        super(network, inputList, outputList);
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param trainer trainer to copy
-     */
-    public LMSOffline(Trainer trainer) {
-        super(trainer);
-    }
 
     @Override
-    public void randomize() {
-        // Not used; synapses created from scratch.
-    }
-
-    @Override
-    public void apply() {
+    public void apply(Trainer trainer) {
         if (solutionType == SolutionType.WIENER_HOPF) {
-            weinerHopfSolution();
+            weinerHopfSolution(trainer);
         } else if (solutionType == SolutionType.MOORE_PENROSE) {
-            moorePenroseSolution();
+            moorePenroseSolution(trainer);
         } else {
             throw new IllegalArgumentException("Solution type must be "
                     + "'MoorePenrose' or 'WeinerHopf'.");
         }
     }
 
-
-    @Override
-    public void init() {
-    }
-
     /**
      * Implements the Wiener-Hopf solution to LMS linear regression.
      */
-    public void weinerHopfSolution() {
-        Matrix inputMatrix = new Matrix(getInputData());
-        Matrix trainingMatrix = new Matrix(getTrainingData());
+    public void weinerHopfSolution(Trainer trainer) {
+        Matrix inputMatrix = new Matrix(trainer.getInputData());
+        Matrix trainingMatrix = new Matrix(trainer.getTrainingData());
 
         trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
         inputMatrix = inputMatrix.transpose().times(inputMatrix);
@@ -131,8 +101,8 @@ public class LMSOffline extends Trainer {
         inputMatrix = inputMatrix.inverse();
 
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
-        SimnetUtils.setWeightsFillBlanks(this.getNetwork(), getInputLayer(),
-                getOutputLayer(), wOut);
+        SimnetUtils.setWeightsFillBlanks(trainer.getNetwork(), trainer.getInputLayer(),
+                trainer.getOutputLayer(), wOut);
 
         trainingMatrix = null;
         inputMatrix = null;
@@ -141,16 +111,16 @@ public class LMSOffline extends Trainer {
     /**
      * Moore penrose.
      */
-    public void moorePenroseSolution() {
-        Matrix inputMatrix = new Matrix(getInputData());
-        Matrix trainingMatrix = new Matrix(getTrainingData());
+    public void moorePenroseSolution(Trainer trainer) {
+        Matrix inputMatrix = new Matrix(trainer.getInputData());
+        Matrix trainingMatrix = new Matrix(trainer.getTrainingData());
 
         // Computes Moore-Penrose Pseudoinverse
         inputMatrix = Matrices.pinv(inputMatrix);
 
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
-        SimnetUtils.setWeightsFillBlanks(this.getNetwork(), getInputLayer(),
-                getOutputLayer(), wOut);
+        SimnetUtils.setWeightsFillBlanks(trainer.getNetwork(), trainer.getInputLayer(),
+                trainer.getOutputLayer(), wOut);
         inputMatrix = null;
         trainingMatrix = null;
     }
@@ -248,12 +218,13 @@ public class LMSOffline extends Trainer {
         double trainingData[][] = { { -1 }, { -1 }, { -1 }, { 1 } };
 
         // Initialize the trainer
-        LMSOffline trainer = new LMSOffline(network, inputList, outputList);
-        trainer.setInputData(inputData);
-        trainer.setTrainingData(trainingData);
-        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
-        trainer.setSolutionType(SolutionType.WIENER_HOPF);
-        trainer.apply();
+        //REDO
+//        LMSOffline trainer = new LMSOffline(network, inputList, outputList);
+//        trainer.setInputData(inputData);
+//        trainer.setTrainingData(trainingData);
+//        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
+//        trainer.setSolutionType(SolutionType.WIENER_HOPF);
+//        trainer.apply();
         return network;
     }
 
@@ -302,12 +273,13 @@ public class LMSOffline extends Trainer {
         connection.connectNeurons();
 
         // Initialize the trainer
-        LMSOffline trainer = new LMSOffline(network, inputLayer, outputLayer);
-        trainer.setInputData(inputData);
-        trainer.setTrainingData(trainingData);
-        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
-        trainer.setSolutionType(SolutionType.WIENER_HOPF);
-        trainer.apply();
+        //REDO
+//        LMSOffline trainer = new LMSOffline(network, inputLayer, outputLayer);
+//        trainer.setInputData(inputData);
+//        trainer.setTrainingData(trainingData);
+//        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
+//        trainer.setSolutionType(SolutionType.WIENER_HOPF);
+//        trainer.apply();
         return network;
     }
 

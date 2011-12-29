@@ -114,13 +114,13 @@ public abstract class ScreenElement
         addInputEventListener(new PBasicInputEventHandler() {
             /** @see PBasicInputEventHandler */
             public void mousePressed(final PInputEvent event) {
-                System.out.println("Mouse Pressed: " + event);
+                //System.out.println("Mouse Pressed: " + event);
                 singleClickEvent();
             }
 
             /** @see PBasicInputEventHandler */
             public void mouseClicked(final PInputEvent event) {
-                System.out.println("Mouse Clicked: " + event);
+                //System.out.println("Mouse Clicked: " + event);
                 singleClickEvent();
             }
 

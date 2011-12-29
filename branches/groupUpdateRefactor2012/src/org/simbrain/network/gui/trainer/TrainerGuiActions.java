@@ -32,9 +32,11 @@ import javax.swing.JToolBar;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.trainers.InvalidDataException;
 import org.simbrain.network.trainers.IterableAlgorithm;
-import org.simbrain.network.trainers.Trainer;
+import org.simbrain.network.trainers.TrainingMethod;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -42,7 +44,7 @@ import org.simbrain.util.table.TableActionManager;
 
 /**
  * Contains actions for use in Trainer GUI.
- *
+ * 
  * @author jyoshimi
  */
 public class TrainerGuiActions {
@@ -61,7 +63,7 @@ public class TrainerGuiActions {
     /**
      * Action invoked when pressing the input or training data button on the
      * trainer panel.
-     *
+     * 
      * @param trainerPanel the parent trainer panel
      * @param type whether this is input or training data
      * @return the action
@@ -94,8 +96,8 @@ public class TrainerGuiActions {
     /**
      * Display the relevant type of data in a data viewer panel with its own
      * buttons.
-     *
-     * @param trainerPanel the parent panel
+     * 
+     * @param trainerPanel the parent trainer panel
      * @param type whether this is input or training data
      * @param theFile the File associated with this data
      */
@@ -103,7 +105,6 @@ public class TrainerGuiActions {
             final TrainerPanel trainerPanel, final TrainerDataType type) {
 
         // Set up frame and main panel
-        JFrame frame = new JFrame();
         final DataViewer viewer = new DataViewer(trainerPanel, type);
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add("Center", viewer);
@@ -131,34 +132,46 @@ public class TrainerGuiActions {
         toolbars.add(viewer.getTable().getToolbarRandomize());
 
         mainPanel.add("North", toolbars);
-
-        frame.getContentPane().add(mainPanel);
-        frame.pack();
-
-        // Set position of frame based on whether it is input or training data
-        int buffer = 10;
-        int xposition = (int) (Toolkit.getDefaultToolkit().getScreenSize()
-                .getWidth() / 2);
-        int yposition = (int) (Toolkit.getDefaultToolkit().getScreenSize()
-                .getHeight() / 2)
-                - (mainPanel.getHeight() / 2);
-        if (type == TrainerDataType.Input) {
-            xposition = xposition - mainPanel.getWidth() - buffer;
+        
+        // Set up frame
+        GenericFrame frame = null;
+        int xposition = 0;
+        int yposition = 0;
+        
+        if(trainerPanel.getNetworkPanel() != null) {
+            frame = trainerPanel.getNetworkPanel().displayPanel(
+                    mainPanel);
+            
         } else {
-            xposition = xposition + buffer;
+            frame = (GenericFrame) new GenericJDialog();
+            frame.setContentPane(mainPanel);
+            xposition = (int) (Toolkit.getDefaultToolkit().getScreenSize()
+                    .getWidth() / 2);
+            yposition = (int) (Toolkit.getDefaultToolkit().getScreenSize()
+                    .getHeight() / 2)
+                    - (mainPanel.getHeight() / 2);
+            // Set position of frame based on whether it is input or training data
+            int buffer = 10;
+            if (type == TrainerDataType.Input) {
+                xposition = xposition - mainPanel.getWidth() - buffer;
+            } else {
+                xposition = xposition + buffer;
+            }
         }
+
+        frame.pack();
         // System.out.println(mainPanel.getWidth() + " " + yposition);
         frame.setLocation(xposition, yposition);
-
+        
         // Display the frame
         frame.setVisible(true);
-        //frame.setTitle(theFile.getName());
+        // frame.setTitle(theFile.getName());
     }
 
     /**
      * Sets the current data directory in user preferences (memory for file
      * chooser).
-     *
+     * 
      * @param dir directory to set
      */
     public static void setDataDirectory(final String dir) {
@@ -167,7 +180,7 @@ public class TrainerGuiActions {
 
     /**
      * Return the current data directory.
-     *
+     * 
      * @return return the data directory
      */
     public static String getDataDirectory() {
@@ -178,7 +191,7 @@ public class TrainerGuiActions {
      * Action for opening from comma separated value file. Replaces the default
      * simbrainjtable action for this, so that the trainer and trainer panel can
      * be updated as appropriate.
-     *
+     * 
      * @param table table to load data in to
      * @return the action
      */
@@ -235,11 +248,10 @@ public class TrainerGuiActions {
         };
     }
 
-
     /**
      * Returns a "play" action, that can be used to repeatedly iterate iterable
      * training algorithms.
-     *
+     * 
      * @param trainerGui reference to trainer gui
      * @return the action
      */
@@ -288,8 +300,9 @@ public class TrainerGuiActions {
     }
 
     /**
-     * Returns a step action, for iterating iteratable learning algorithms one time.
-     *
+     * Returns a step action, for iterating iteratable learning algorithms one
+     * time.
+     * 
      * @param trainerGui reference to trainer gui
      * @return the action
      */
@@ -315,7 +328,7 @@ public class TrainerGuiActions {
 
     /**
      * Batch train network.
-     *
+     * 
      * @param trainerGui reference to trainer gui
      * @return the action
      */
@@ -342,7 +355,7 @@ public class TrainerGuiActions {
 
     /**
      * Randomizes network.
-     *
+     * 
      * @param trainerGui reference to trainer gui
      * @return the action
      */
@@ -361,7 +374,7 @@ public class TrainerGuiActions {
              */
             public void actionPerformed(ActionEvent arg0) {
                 if (trainerGui.getTrainer() != null) {
-                    if (trainerGui.getTrainer() instanceof IterableAlgorithm) {
+                    if (trainerGui.getTrainer().getTrainingMethod() instanceof IterableAlgorithm) {
                         trainerGui.getTrainer().randomize();
                         // trainerGui.setUpdateCompleted(true); // Stop trainer
                         // if it's running
@@ -378,7 +391,7 @@ public class TrainerGuiActions {
 
     /**
      * Clear the error graph.
-     *
+     * 
      * @param trainerGui reference to trainer gui
      * @return the action
      */
@@ -403,7 +416,7 @@ public class TrainerGuiActions {
 
     /**
      * Show properties dialog for currently selected trainer.
-     *
+     * 
      * @param trainerGui trainer panel
      * @return the action
      */
@@ -422,10 +435,11 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                Trainer trainer = trainerGui.getTrainer();
+                TrainingMethod method = trainerGui.getTrainer()
+                        .getTrainingMethod();
                 ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
                 editor.setUseSuperclass(false);
-                editor.setObject(trainer);
+                editor.setObject(method);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);
                 dialog.pack();

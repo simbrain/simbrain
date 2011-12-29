@@ -94,7 +94,7 @@ final class SelectionEventHandler
     /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
 
-        System.out.println("In net panel mouse clicked:" + event);
+        //System.out.println("In net panel mouse clicked:" + event);
         super.mouseClicked(event);
 
         PNode node = event.getPath().getPickedNode();

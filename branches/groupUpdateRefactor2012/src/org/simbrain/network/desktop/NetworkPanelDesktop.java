@@ -33,8 +33,8 @@ import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.workspace.gui.GenericFrame;
-import org.simbrain.workspace.gui.GenericJInternalFrame;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJInternalFrame;
 
 /**
  * Extension of Network Panel with functions used in a desktop setting.

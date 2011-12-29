@@ -37,6 +37,7 @@ import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.ReservoirComputingUtils;
+import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.util.SimnetUtils;
 
 /**
@@ -333,11 +334,11 @@ public final class EchoStateNetBuilder {
             }
         }
 
-        LMSOffline trainer = new LMSOffline(network, full, getOutputLayer());
+        Trainer trainer = new Trainer(network, full, getOutputLayer(), new LMSOffline());
         trainer.setInputData(mainInputData);
         trainer.setTrainingData(trainingData);
-        trainer.setSolutionType(solType);
-        trainer.apply();
+        ((LMSOffline) trainer.getTrainingMethod()).setSolutionType(solType);
+        trainer.update();
 
     }
 

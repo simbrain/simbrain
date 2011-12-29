@@ -46,6 +46,9 @@ public abstract class Group {
     /** Name of this group. */
     private String label;
 
+    /** Whether this group should be deleted when all its components are deleted. */
+    private boolean deleteWhenEmpty = true;
+
     /**
      * Parent group of this group, or null if it has none. For group types which
      * have a hierarchy of groups.
@@ -190,6 +193,20 @@ public abstract class Group {
      */
     public void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
+    }
+
+    /**
+     * @return the deleteWhenEmpty
+     */
+    public boolean isDeleteWhenEmpty() {
+        return deleteWhenEmpty;
+    }
+
+    /**
+     * @param deleteWhenEmpty the deleteWhenEmpty to set
+     */
+    public void setDeleteWhenEmpty(boolean deleteWhenEmpty) {
+        this.deleteWhenEmpty = deleteWhenEmpty;
     }
 
 

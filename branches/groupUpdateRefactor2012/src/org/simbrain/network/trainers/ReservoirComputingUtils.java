@@ -356,12 +356,12 @@ public class ReservoirComputingUtils {
 
         // Initialize the trainer (comment / uncomment below for different
         // configurations)
-        LMSOffline trainer = new LMSOffline(network, inputLayer, outputLayer);
-        // LMSTrainer trainer = new LMSTrainer(network);
+        Trainer trainer = new Trainer(network, inputLayer, outputLayer, new LMSOffline());
         trainer.setInputData(inputData);
         trainer.setTrainingData(trainingData);
-        trainer.setSolutionType(SolutionType.MOORE_PENROSE);
-        trainer.apply();
+        ((LMSOffline) trainer.getTrainingMethod())
+                .setSolutionType(SolutionType.MOORE_PENROSE);
+        trainer.update();
         // trainer.train(1000);
         return network;
     }

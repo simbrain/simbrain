@@ -272,7 +272,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      * Select all grouped objects.
      */
     protected void selectAllNodes() {
-        System.out.println(group.getLabel());
+        //System.out.println(group.getLabel());
         if ((group instanceof LayeredNetwork)
                 || (group instanceof SubnetworkGroup)) {
             networkPanel.setSelection(getChildrenNeuronNodes(this));

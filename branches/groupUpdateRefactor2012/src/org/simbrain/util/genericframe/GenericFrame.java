@@ -16,15 +16,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.gui;
+package org.simbrain.util.genericframe;
 
+import java.awt.Container;
 import java.awt.Rectangle;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JMenuBar;
 
 /**
- * Abstraction which is neutral between JFrames and JInternalFrames.
+ * Abstraction which is neutral between JFrames, JInternalFrames, and JDialogs.
  *
  * @author jyoshimi
  */
@@ -51,5 +52,9 @@ public interface GenericFrame {
     public void setVisible(boolean isVisible);
 
     public void setBounds(Rectangle bounds);
+
+    public void setLocation(int xposition, int yposition);
+    
+    public void setContentPane(Container container);
 
 }

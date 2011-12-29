@@ -35,7 +35,6 @@ import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.util.SimnetUtils;
@@ -46,7 +45,7 @@ import org.simbrain.network.util.SimnetUtils;
  *
  * @author jyoshimi
  */
-public class Backprop extends Trainer implements IterableAlgorithm {
+public class Backprop extends TrainingMethod implements IterableAlgorithm {
 
     /** Iteration number. */
     private int iteration;
@@ -71,36 +70,14 @@ public class Backprop extends Trainer implements IterableAlgorithm {
 
     /** Internal representation of network. */
     private List<List<Neuron>> layers;
-
-    /**
-     * Construct the trainer.
-     *
-     * @param network parent network
-     * @param inputLayer input layer
-     * @param outputLayer output layer
-     */
-    public Backprop(RootNetwork network, List<Neuron> inputLayer,
-            List<Neuron> outputLayer) {
-        super(network, inputLayer, outputLayer);
-    }
-
-    /**
-     * Copy constructor.
-     * //TODO: copy everything over
-     *
-     * @param trainer trainer to copy
-     */
-    public Backprop(Trainer trainer) {
-        super(trainer);
-    }
-
+    
     @Override
-    public void init() {
+    public void init(Trainer trainer) {
         errorMap = new HashMap<Neuron, Double>();
         weightDeltaMap = new HashMap<Synapse, Double>();
         biasDeltaMap = new HashMap<Neuron, Double>();
-        layers = SimnetUtils.getIntermedateLayers(getNetwork(),
-                getInputLayer(), getOutputLayer());
+        layers = SimnetUtils.getIntermedateLayers(trainer.getNetwork(),
+                trainer.getInputLayer(), trainer.getOutputLayer());
         iteration = 0;
         rmsError = 0;
         //SimnetUtils.printLayers(layers);
@@ -109,11 +86,10 @@ public class Backprop extends Trainer implements IterableAlgorithm {
 
     // One pass through the training data
     @Override
-    public void apply() {
-
+    public void apply(Trainer trainer) {
         rmsError = 0;
-        int numRows = getMinimumNumRows();
-        int numInputs = getInputLayer().size();
+        int numRows = getMinimumNumRows(trainer);
+        int numInputs = trainer.getInputLayer().size();
         //System.out.println("Data:" + numInputs + "/" + numRows);
 
         if ((numRows == 0) || (numInputs == 0)) {
@@ -124,14 +100,14 @@ public class Backprop extends Trainer implements IterableAlgorithm {
 
             // Set activations on input layer
             for (int i = 0; i < numInputs; i++) {
-                getInputLayer().get(i).setActivation(getInputData()[row][i]);
+                trainer.getInputLayer().get(i).setActivation(trainer.getInputData()[row][i]);
             }
 
             // Update network
-            updateNetwork();
+            updateNetwork(trainer);
 
             // Set weight and bias deltas by backpropagating error
-            backpropagateError(row);
+            backpropagateError(trainer, row);
 
             // Update weights
             for (Synapse synapse : weightDeltaMap.keySet()) {
@@ -153,8 +129,8 @@ public class Backprop extends Trainer implements IterableAlgorithm {
         }
 
         // Update RMS error
-        rmsError = Math.sqrt(rmsError / (numRows * getOutputLayer().size()));
-        fireErrorUpdated();
+        rmsError = Math.sqrt(rmsError / (numRows * trainer.getOutputLayer().size()));
+        trainer.fireErrorUpdated();
         iteration += this.getIteration();
     }
 
@@ -163,8 +139,8 @@ public class Backprop extends Trainer implements IterableAlgorithm {
      *
      * @param row current row of training data
      */
-    private void backpropagateError(int row) {
-        int numOutputs = getOutputLayer().size();
+    private void backpropagateError(Trainer trainer, int row) {
+        int numOutputs = trainer.getOutputLayer().size();
 
         // Iterate through layers from the output to the input layer.
         // For each layer, update weight-deltas, bias-deltas, and errors
@@ -175,8 +151,8 @@ public class Backprop extends Trainer implements IterableAlgorithm {
             // Special update for output layer
             if (i == layers.size() - 1) {
                 for (int j = 0; j < numOutputs; j++) {
-                    Neuron outputNeuron = getOutputLayer().get(j);
-                    double targetValue = this.getTrainingData()[row][j];
+                    Neuron outputNeuron = trainer.getOutputLayer().get(j);
+                    double targetValue = trainer.getTrainingData()[row][j];
                     double outputError = targetValue
                             - outputNeuron.getActivation();
                     storeErrorAndDeltas(outputNeuron, outputError);
@@ -237,7 +213,7 @@ public class Backprop extends Trainer implements IterableAlgorithm {
     }
 
     @Override
-    public void randomize() {
+    public void randomize(Trainer trainer) {
         for (List<Neuron> layer : layers) {
             // Don't update input layer
             if (layers.indexOf(layer) > 0) {
@@ -280,10 +256,10 @@ public class Backprop extends Trainer implements IterableAlgorithm {
     /**
      * Update internally constructed network.
      */
-    private void updateNetwork() {
+    private void updateNetwork(Trainer trainer) {
         for (List<Neuron> layer : layers) {
             if (layers.indexOf(layer) != 0) {
-                getNetwork().updateNeurons(layer);
+                trainer.getNetwork().updateNeurons(layer);
             }
         }
     }
@@ -309,12 +285,12 @@ public class Backprop extends Trainer implements IterableAlgorithm {
      *
      * @return least number of rows
      */
-    private int getMinimumNumRows() {
-        if ((getInputData() == null) || (getTrainingData() == null)) {
+    private int getMinimumNumRows(Trainer trainer) {
+        if ((trainer.getInputData() == null) || (trainer.getTrainingData() == null)) {
             return 0;
         }
-        int inputRows = getInputData().length;
-        int targetRows = getTrainingData().length;
+        int inputRows = trainer.getInputData().length;
+        int targetRows = trainer.getTrainingData().length;
         if (inputRows < targetRows) {
             return inputRows;
         } else {
@@ -417,25 +393,26 @@ public class Backprop extends Trainer implements IterableAlgorithm {
         network.randomizeBiases(-.5, .5);
 
         // Initialize the trainer
-        Backprop trainer = new Backprop(network, inputLayer, outputLayer);
-        trainer.setLearningRate(.9);
-        trainer.setInputData(inputData);
-        trainer.setTrainingData(trainingData);
-        trainer.init();
-        int epochs = 10000; // Takes 10K iteration to get < 0.1
-        for (int i = 0; i < epochs; i++) {
-            trainer.apply();
-            System.out.println("Epoch " + i + ", error = " + trainer.getError());
-        }
-
-        String FILE_OUTPUT_LOCATION = "./";
-        File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
-        try {
-            RootNetwork.getXStream().toXML(network,
-                    new FileOutputStream(theFile));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        // REDO
+//        Backprop trainer = new Backprop(network, inputLayer, outputLayer);
+//        trainer.setLearningRate(.9);
+//        trainer.setInputData(inputData);
+//        trainer.setTrainingData(trainingData);
+//        trainer.init();
+//        int epochs = 10000; // Takes 10K iteration to get < 0.1
+//        for (int i = 0; i < epochs; i++) {
+//            trainer.apply();
+//            System.out.println("Epoch " + i + ", error = " + trainer.getError());
+//        }
+//
+//        String FILE_OUTPUT_LOCATION = "./";
+//        File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
+//        try {
+//            RootNetwork.getXStream().toXML(network,
+//                    new FileOutputStream(theFile));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

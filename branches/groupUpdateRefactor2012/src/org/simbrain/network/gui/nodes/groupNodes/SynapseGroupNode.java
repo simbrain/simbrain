@@ -22,6 +22,7 @@ import java.awt.Color;
 
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
@@ -61,7 +62,6 @@ public class SynapseGroupNode extends GroupNode {
     private class SynapseInteractionBox extends InteractionBox {
         public SynapseInteractionBox(NetworkPanel net) {
             super(net, SynapseGroupNode.this);
-            setTransparency(1);
         }
 
     };
@@ -93,22 +93,32 @@ public class SynapseGroupNode extends GroupNode {
     public void updateBounds() {
 
         PBounds bounds = new PBounds();
-        for (PNode node : getOutlinedObjects()) {
-            PBounds childBounds = node.getGlobalBounds();
-            bounds.add(childBounds);
-            if (node instanceof SynapseNode) {
-                bounds.add(((SynapseNode)node).getLine().getBounds());
+
+//        if ((this.getGroup().getParentGroup() instanceof SubnetworkGroup)
+//                && (getOutlinedObjects().size() == 0)) {
+//            bounds = getNetworkPanel().getObjectNodeMap()
+//                    .get(getGroup().getParentGroup()).getBounds();
+
+        // REDO: Move below up?
+        if (getOutlinedObjects().size() == 0) {
+            this.removeFromParent();
+        } else {
+            for (PNode node : getOutlinedObjects()) {
+                PBounds childBounds = node.getGlobalBounds();
+                bounds.add(childBounds);
+                if (node instanceof SynapseNode) {
+                    bounds.add(((SynapseNode) node).getLine().getBounds());
+                }
             }
+
+            double inset = getOutlinePadding();
+            bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
+                    bounds.getWidth() + (2 * inset), bounds.getHeight()
+                            + (2 * inset));            
         }
-        
-        double inset = getOutlinePadding();
-        bounds.setRect(bounds.getX() - inset,
-                bounds.getY() - inset,
-                bounds.getWidth() + (2 * inset),
-                bounds.getHeight() + (2 * inset));
 
         setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                            (float) bounds.getWidth(), (float) bounds.getHeight());
+                (float) bounds.getWidth(), (float) bounds.getHeight());
 
         updateInteractionBox();
         moveToBack();

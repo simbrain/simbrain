@@ -1,4 +1,4 @@
-package org.simbrain.workspace.gui;
+package org.simbrain.util.genericframe;
 
 import java.beans.PropertyVetoException;
 

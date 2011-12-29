@@ -100,6 +100,10 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
         }
         NeuronGroup layer = new NeuronGroup(network, inputLayer);
         addLayer(layer);
+        if (initialPosition == null) {
+            initialPosition = new Point2D.Double(0,0);
+            
+        }
         layout.setInitialLocation(new Point((int) initialPosition.getX()
                 - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
         layout.layoutNeurons(inputLayer);

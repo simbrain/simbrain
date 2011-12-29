@@ -29,13 +29,14 @@ public class SynapseGroup extends Group {
 
     /** Set of synapses. */
     private final List<Synapse> synapseList = new ArrayList<Synapse>();
-
+    
     /** @see Group */
     public SynapseGroup(final RootNetwork net, final List<Synapse> list) {
         super(net);
         for (Synapse synapse : list) {
             addSynapse(synapse);
         }
+        
     }
     
     /** @see Group */

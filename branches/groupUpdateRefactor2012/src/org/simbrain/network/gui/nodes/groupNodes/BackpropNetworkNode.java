@@ -32,8 +32,8 @@ import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.DataViewer;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
-import org.simbrain.network.trainers.Backprop;
-import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.network.trainers.Trainer;
+import org.simbrain.util.genericframe.GenericFrame;
 
 /**
  * PNode representation of a group of a backprop network
@@ -54,7 +54,7 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
         setContextMenu();
     }
     
-    private Backprop getTrainer() {
+    private Trainer getTrainer() {
         return ((BackpropNetwork) getGroup()).getTrainer();
     }
     
@@ -73,7 +73,7 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
 
         @Override
         protected String getToolTipText() {
-            return "Current error: " + getTrainer().getError();
+            return "Backprop...";
         }
 
 //        @Override
@@ -94,9 +94,10 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
     private void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
-        Action trainNet = new AbstractAction("Show Trainer...") {
+        Action trainNet = new AbstractAction("Show Training Controls...") {
             public void actionPerformed(final ActionEvent event) {
-                TrainerPanel trainerPanel = new TrainerPanel(getTrainer());
+                TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
+                        getTrainer());
                 GenericFrame frame = getNetworkPanel().displayPanel(
                         trainerPanel);
                 trainerPanel.setFrame(frame);
@@ -105,7 +106,8 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
         menu.add(new JMenuItem(trainNet));
         Action showInputData = new AbstractAction("Show Input Data...") {
             public void actionPerformed(final ActionEvent event) {
-                TrainerPanel trainerPanel = new TrainerPanel(getTrainer());
+                TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
+                        getTrainer());
                 JPanel inputDataPanel = DataViewer.getDataViewerPanel(
                         trainerPanel, TrainerDataType.Input);
                 getNetworkPanel().displayPanel(inputDataPanel);
@@ -114,7 +116,8 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
         menu.add(showInputData);
         Action showTrainingData = new AbstractAction("Show Training Data...") {
             public void actionPerformed(final ActionEvent event) {
-                TrainerPanel trainerPanel = new TrainerPanel(getTrainer());
+                TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
+                        getTrainer());
                 JPanel inputDataPanel = DataViewer.getDataViewerPanel(
                         trainerPanel, TrainerDataType.Trainer);
                 getNetworkPanel().displayPanel(inputDataPanel);

@@ -75,7 +75,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         // Populate data in simbrain table
         if (type == TrainerDataType.Input) {
             if (trainer.getInputData() == null) {
-                System.out.println("Input data is null");
+                //System.out.println("Input data is null");
                 table = new SimbrainJTable(new DefaultNumericTable(
                         DEFAULT_NUM_ROWS, trainer.getInputLayer().size()));
             } else {
@@ -89,7 +89,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
             }
         } else {
             if (trainer.getTrainingData() == null) {
-                System.out.println("Training data is null");
+                //System.out.println("Training data is null");
                 table = new SimbrainJTable(new DefaultNumericTable(
                         DEFAULT_NUM_ROWS, trainer.getOutputLayer().size()));
             } else {

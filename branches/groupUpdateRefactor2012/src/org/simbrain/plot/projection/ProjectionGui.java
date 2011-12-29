@@ -49,10 +49,10 @@ import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.plot.ChartListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
-import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**

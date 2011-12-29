@@ -4,7 +4,7 @@ import java.awt.GridLayout;
 
 import javax.swing.SwingUtilities;
 
-import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.game.tictactoe.TicTacToeGui;
 import org.simbrain.world.game.tictactoe.TicTacToeGui.Listener;

@@ -37,7 +37,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
-import org.simbrain.workspace.gui.GenericFrame;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**

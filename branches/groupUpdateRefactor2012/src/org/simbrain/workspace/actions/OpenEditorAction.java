@@ -24,7 +24,7 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.EditorPanel;
-import org.simbrain.workspace.gui.GenericJInternalFrame;
+import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**

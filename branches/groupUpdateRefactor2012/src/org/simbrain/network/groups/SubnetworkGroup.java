@@ -200,7 +200,7 @@ public class SubnetworkGroup extends Group {
     /**
      * Update group. Override for special updating.
      */
-    public void update() {
+    public void invoke() {
         neuronGroup.updateNeurons(); // TODO: Justmake it update in neurons, and dump the whole update interface
         synapseGroup.update();
     }

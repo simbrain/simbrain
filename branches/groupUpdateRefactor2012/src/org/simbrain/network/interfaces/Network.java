@@ -28,6 +28,8 @@ import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.groups.UpdatableGroup;
+import org.simbrain.network.update_actions.UpdateGroup;
 import org.simbrain.network.util.CopyPaste;
 
 /**
@@ -73,7 +75,7 @@ public abstract class Network {
 
     /** Only used for sub-nets of complex networks which have parents. */
     private Network parentNet = null;
-
+    
     /**
      *  Sequence in which the update function should be called
      *  for this sub-network. By default, this is set to 0 for all
@@ -930,6 +932,7 @@ public abstract class Network {
             }
             
             // Special creation steps associated with particular group types
+            // REDO: Move below to overrided creation method in group
             if (group instanceof LayeredNetwork) {
                 for (NeuronGroup layer : ((LayeredNetwork)group).getLayers()) {
                     addGroup(layer);

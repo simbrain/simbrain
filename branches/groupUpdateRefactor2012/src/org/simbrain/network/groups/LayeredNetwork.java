@@ -273,6 +273,9 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
         return layers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void update() {
         for (NeuronGroup layer : layers) {
             layer.updateNeurons();

@@ -34,6 +34,7 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
@@ -84,7 +85,7 @@ public class RootNetwork extends Network {
 
     /** Whether this is a discrete or continuous time network. */
     private TimeType timeType = TimeType.DISCRETE;
-
+    
     /**
      * Enumeration for the update methods. BUFFER: Default update method; based
      * on buffering PRIORITYBASED: User sets the priority for each neuron,
@@ -130,6 +131,11 @@ public class RootNetwork extends Network {
 
     /** Custom update rule. */
     private CustomUpdateRule customRule;
+    
+    /**
+     * The update manager for this network.
+     */
+    private final UpdateManager updateManager;
 
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
@@ -167,6 +173,7 @@ public class RootNetwork extends Network {
      * @param id String id of this network
      */
     public RootNetwork() {
+        updateManager = new UpdateManager(this);
         init();
     }
 
@@ -176,6 +183,8 @@ public class RootNetwork extends Network {
     private void init() {
         setRootNetwork(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
+        // Default update method
+        updateManager.addAction(new BufferedUpdate(this));
     }
 
     /**
@@ -260,33 +269,37 @@ public class RootNetwork extends Network {
         updateTime();
 
         // Perform update
-        switch (this.updateMethod) {
-        case BUFFERED:
-            logger.debug("default update");
-            updateAllNeurons();
-            updateAllSynapses();
-            updateAllNetworks();
-            updateAllGroups();
-            break;
-        case PRIORITYBASED:
-            logger.debug("priority-based update");
-            updateNeuronsByPriority();
-            updateAllSynapses();
-            updateAllGroups();
-            break;
-        case CUSTOM:
-            logger.debug("custom update");
-            if (customRule != null) {
-                customRule.update(this);
-            }
-            break;
-        default:
-            updateAllNeurons();
-            updateAllSynapses();
-            updateAllNetworks();
-            updateAllGroups();
-            break;
-        }
+        for(UpdateAction action : updateManager.getActionList()) {
+            action.invoke();
+        }        
+        
+//        switch (this.updateMethod) {
+//        case BUFFERED:
+//            logger.debug("default update");
+//            updateAllNeurons();
+//            updateAllSynapses();
+//            updateAllNetworks();
+//            updateAllGroups();
+//            break;
+//        case PRIORITYBASED:
+//            logger.debug("priority-based update");
+//            updateNeuronsByPriority();
+//            updateAllSynapses();
+//            updateAllGroups();
+//            break;
+//        case CUSTOM:
+//            logger.debug("custom update");
+//            if (customRule != null) {
+//                customRule.update(this);
+//            }
+//            break;
+//        default:
+//            updateAllNeurons();
+//            updateAllSynapses();
+//            updateAllNetworks();
+//            updateAllGroups();
+//            break;
+//        }
 
         // Notify network listeners
         this.fireNetworkChanged();
@@ -1080,5 +1093,12 @@ public class RootNetwork extends Network {
             textList = new ArrayList<NetworkTextObject>();
         }
         return textList;
+    }
+
+    /**
+     * @return the updateManager
+     */
+    public UpdateManager getUpdateManager() {
+        return updateManager;
     }
 }

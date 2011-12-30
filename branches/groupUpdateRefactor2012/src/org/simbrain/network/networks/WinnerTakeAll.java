@@ -85,7 +85,7 @@ public class WinnerTakeAll extends NeuronGroup implements UpdatableGroup {
     }
 
     /**
-     * Update network.
+     * {@inheritDoc}
      */
     public void update() {
         

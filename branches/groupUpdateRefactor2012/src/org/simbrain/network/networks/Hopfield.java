@@ -144,7 +144,7 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
     }
 
     /**
-     * Update nodes randomly or sequentially.
+     * {@inheritDoc}
      */
     public void update() {
 

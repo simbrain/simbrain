@@ -130,7 +130,9 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
         setNormalizeInputs(oldNet.getNormalizeInputs());
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void update() {
 
         getNeuronGroup().updateNeurons();

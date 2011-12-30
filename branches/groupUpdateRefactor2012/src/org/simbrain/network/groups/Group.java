@@ -83,6 +83,11 @@ public abstract class Group {
      */
     public void removeSynapse(Synapse synapse) {};
         
+    /**
+     * Whether this group is empty or not.
+     *
+     * @return true if the group is empty, false otherwise.
+     */
     public abstract boolean isEmpty();
 
     /**
@@ -91,15 +96,6 @@ public abstract class Group {
     public abstract void delete();
 
 
-    //    /**
-//     * True if the group contains the specified neuron.
-//     *
-//     * @param n neuron to check for.
-//     * @return true if the group contains this neuron, false otherwise
-//     */
-//    public boolean containsNeuron(final Neuron n) {
-//        return neuronList.contains(n);
-//    }
 //
 //    /**
 //     * Turn the group on or off.  When off, the group update function
@@ -121,27 +117,7 @@ public abstract class Group {
 //    }
 //
 
-//    /**
-//     * Returns the number of neurons and synapses in this group.
-//     *
-//     * @return the number of neurons and synapses in this group.
-//     */
-//    public int getElementCount() {
-//        return neuronList.size() + synapseList.size();
-//    }
-//
-//    /**
-//     * Returns a debug string.
-//     *
-//     * @return the debug string.
-//     */
-//    public String debugString() {
-//        String ret =  new String();
-//        ret += ("Group with " + this.getNeuronList().size() + " neuron(s),");
-//        ret += (" " + this.getSynapseList().size() + " synapse(s).");
-//        return ret;
-//    }
-//
+    
     @Override
     public String toString() {
         if (label != null) {
@@ -199,7 +175,7 @@ public abstract class Group {
     /**
      * @param parentGroup the parentGroup to set
      */
-    public void setParentGroup(Group parentGroup) {
+    protected void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
     }
 
@@ -213,7 +189,7 @@ public abstract class Group {
     /**
      * @param deleteWhenEmpty the deleteWhenEmpty to set
      */
-    public void setDeleteWhenEmpty(boolean deleteWhenEmpty) {
+    protected void setDeleteWhenEmpty(boolean deleteWhenEmpty) {
         this.deleteWhenEmpty = deleteWhenEmpty;
     }
 

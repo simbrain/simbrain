@@ -42,6 +42,11 @@ public class NeuronGroup extends Group {
         Collections.sort(neuronList, Comparators.X_ORDER);
     }
 
+    /**
+     * Create a neuron group without any initial neurons.
+     * 
+     * @param root parent network
+     */
     public NeuronGroup(final RootNetwork root) {
         super(root);
     }
@@ -67,6 +72,13 @@ public class NeuronGroup extends Group {
         }
     }
     
+    /**
+     * Returns true if the provided synapse is in the fan-in weight vector of
+     * some node in this neuron group.
+     * 
+     * @param synapse the synapse to check
+     * @return true if it's attached to a neuron in this group
+     */
     public boolean inFanInOfSomeNode(final Synapse synapse) {
         boolean ret = false;
         for(Neuron neuron : neuronList) {
@@ -158,5 +170,15 @@ public class NeuronGroup extends Group {
     public boolean isEmpty() {
         return neuronList.isEmpty();
     }
+    
+    //    /**
+//  * True if the group contains the specified neuron.
+//  *
+//  * @param n neuron to check for.
+//  * @return true if the group contains this neuron, false otherwise
+//  */
+// public boolean containsNeuron(final Neuron n) {
+//     return neuronList.contains(n);
+// }
 
 }

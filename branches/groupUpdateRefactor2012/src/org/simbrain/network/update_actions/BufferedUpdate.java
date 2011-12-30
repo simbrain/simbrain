@@ -16,27 +16,48 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.update_actions;
+
+import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.UpdateAction;
 
 /**
- * Classes that implement this interface describe individual actions that together
- * comprise a network update.
- *
+ * Buffered update of loose items (neurons and synapses), i.e. items not in
+ * groups.  (Buffered update means order of update does not matter).
+ * 
  * @author jyoshimi
- *
  */
-public interface UpdateAction {
+public class BufferedUpdate implements UpdateAction {
 
-    /**
-     * Invoke this action. 
-     */
-    public void invoke();
+    /** Reference to network to update. */
+    private RootNetwork network;
     
     /**
-     * Provide a String description of this update method.
-     *
-     * @return the update description
+     * @param network
      */
-    public String getDescription();
+    public BufferedUpdate(RootNetwork network) {
+        this.network = network;
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public void invoke() {
+        network.updateAllNeurons();
+        network.updateAllSynapses();
+    }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public String getDescription() {
+        return "Buffered update of loose items";
+    }
+
+    @Override
+    public String toString() {
+        return getDescription();
+    }
+
 
 }

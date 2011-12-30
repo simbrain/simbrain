@@ -36,6 +36,7 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.UpdateManagerPanel;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -156,6 +157,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
     /** If true, then the user has manually changed the update method. */
     private boolean updateMethodChanged = false;
+    
+    /** Update manager panel. */
+    private UpdateManagerPanel updatePanel;
 
     /**
      * This method is the default constructor.
@@ -211,7 +215,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
         graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
         graphicsPanel.addItem("Show time", showTimeBox);
-
+        
         // Set up logic panel
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
@@ -221,12 +225,16 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         // Set up Misc Panel
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
 
+        // UpdatePanel
+        updatePanel = new UpdateManagerPanel(networkPanel.getRootNetwork());
+
         // Set up tab panels
         tabGraphics.add(graphicsPanel);
         tabLogic.add(logicPanel);
         tabMisc.add(miscPanel);
         tabbedPane.addTab("Graphics", tabGraphics);
         tabbedPane.addTab("Logic", tabLogic);
+        tabbedPane.addTab("Update", updatePanel);
         tabbedPane.addTab("Misc.", tabMisc);
         setContentPane(tabbedPane);
     }

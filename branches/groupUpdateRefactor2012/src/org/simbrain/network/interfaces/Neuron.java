@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.neurons.AdditiveNeuron;
 import org.simbrain.network.neurons.BinaryNeuron;

@@ -1,4 +1,6 @@
-package org.simbrain.network.interfaces;
+package org.simbrain.network.groups;
+
+import org.simbrain.network.interfaces.UpdateAction;
 
 public interface UpdatableGroup extends UpdateAction {
     

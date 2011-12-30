@@ -22,6 +22,9 @@ import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.util.PBounds;
+
 /**
  * REDO: Rename to subnet node when subnetworks dismantled.
  * 
@@ -37,6 +40,27 @@ public class SubnetGroupNode extends GroupNode {
      */
     public SubnetGroupNode(NetworkPanel networkPanel, SubnetworkGroup group) {
         super(networkPanel, group);
+    }
+    
+    @Override
+    public void updateBounds() {
+
+        PBounds bounds = new PBounds();
+        for (PNode node : getOutlinedObjects()) {
+            bounds.add(node.getGlobalBounds());
+        }
+        
+        // Add a little extra height at very top
+        double inset = getOutlinePadding();
+        bounds.setRect(bounds.getX() - inset,
+                bounds.getY() - inset - 15,
+                bounds.getWidth() + (2 * inset),
+                bounds.getHeight() + (2 * inset) + 15);
+
+        setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
+                            (float) bounds.getWidth(), (float) bounds.getHeight());
+
+        updateInteractionBox();
     }
 
 }

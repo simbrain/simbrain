@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.listeners;
 
-import org.simbrain.network.interfaces.Group;
+import org.simbrain.network.groups.Group;
 
 /**
  * Listener interface for receiving network events relating to model groups.

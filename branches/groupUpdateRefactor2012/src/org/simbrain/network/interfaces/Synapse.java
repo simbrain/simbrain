@@ -21,6 +21,7 @@ package org.simbrain.network.interfaces;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.synapses.HebbianCPCASynapse;
 import org.simbrain.network.synapses.HebbianSynapse;

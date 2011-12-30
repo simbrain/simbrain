@@ -49,6 +49,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.BackpropNetwork;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SubnetworkGroup;
@@ -72,8 +73,8 @@ import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.LayeredNetworkNode;
+import org.simbrain.network.gui.nodes.groupNodes.SubnetGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
-import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.NetworkTextObject;
 import org.simbrain.network.interfaces.Neuron;
@@ -583,7 +584,7 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Returns the appropriate PNode given the kind of group it is.
-     *
+     * 
      * @param group the model group
      * @return the appropriate PNode.
      */
@@ -594,16 +595,24 @@ public class NetworkPanel extends JPanel {
             ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
         } else if (group instanceof LayeredNetwork) {
             if (group instanceof BackpropNetwork) {
-                ret = new BackpropNetworkNode(NetworkPanel.this, (BackpropNetwork) group);
+                ret = new BackpropNetworkNode(NetworkPanel.this,
+                        (BackpropNetwork) group);
             } else {
-                ret = new LayeredNetworkNode(NetworkPanel.this, (LayeredNetwork) group);                
+                ret = new LayeredNetworkNode(NetworkPanel.this,
+                        (LayeredNetwork) group);
             }
-        } else if (group instanceof Hopfield) {
-            ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
+        } else if (group instanceof SubnetworkGroup) {
+            if (group instanceof Hopfield) {
+                ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
+            } else {
+                ret = new SubnetGroupNode(NetworkPanel.this,
+                        (SubnetworkGroup) group);
+            }
+
         } else {
-            ret = new GroupNode(NetworkPanel.this, group); 
+            ret = new GroupNode(NetworkPanel.this, group);
         }
-        
+
         return ret;
     }
     

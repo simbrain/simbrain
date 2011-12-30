@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SubnetworkGroup;
@@ -32,8 +33,8 @@ import org.simbrain.network.util.CopyPaste;
 /**
  * <b>Network</b> provides core neural network functionality and is the the main
  * API for external calls. Network objects are sets of neurons and weights
- * connecting them. Much of the actual update and learning logic occurs
- * (currently) in the individual nodes.
+ * connecting them. Most update and learning logic occurs in the neurons and weights themselves,
+ * as well as in special groups.
  */
 public abstract class Network {
 
@@ -474,17 +475,6 @@ public abstract class Network {
      */
     public void deleteNeuron(final Neuron toDelete) {
 
-
-//        Group group = getRootNetwork().containedInGroup(toDelete);
-//        if (group != null) {
-//
-//            // REDO
-//            // group.deleteNeuron(toDelete);
-//            // if (group.isEmpty()) {
-//            // this.getRootNetwork().deleteGroup(group);
-//            // }
-//        }
-
         // Update priority list
         rootNetwork.updatePriorityList();
 
@@ -502,7 +492,8 @@ public abstract class Network {
             deleteSynapse(s);
         }
 
-        // Remove the neuron itself
+        // Remove the neuron itself. Either from a parent group that holds it,
+        // or from the root network.
         if(toDelete.getParentGroup() != null) {
             toDelete.getParentGroup().removeNeuron(toDelete);
             if (toDelete.getParentGroup().isEmpty()) {
@@ -512,7 +503,7 @@ public abstract class Network {
             toDelete.getParentNetwork().getNeuronList().remove(toDelete);            
         }
 
-        // Notify listeners (views) that this neuron has been deleted
+        // Notify listeners that this neuron has been deleted
         rootNetwork.fireNeuronDeleted(toDelete);
 
         //If we just removed the last neuron of a network, remove that network
@@ -532,16 +523,6 @@ public abstract class Network {
      */
     public void deleteSynapse(final Synapse toDelete) {
 
-        // If deleting this synapse empties a parent group, delete that group
-        Group group = getRootNetwork().containedInGroup(toDelete);
-        if (group != null) {
-            //REDO
-//            group.deleteSynapse(toDelete);
-//            if (group.isEmpty()) {
-//                this.getRootNetwork().deleteGroup(group);
-//            }
-        }
-
         // Remove references to this synapse from parent neurons
         if (toDelete.getSource() != null) {
             toDelete.getSource().removeTarget(toDelete);
@@ -550,6 +531,7 @@ public abstract class Network {
             toDelete.getTarget().removeSource(toDelete);
         }
 
+        // If this synapse has a parent group, delete that group
         if(toDelete.getParentGroup() != null) {
             Group parentGroup = toDelete.getParentGroup();
             parentGroup.removeSynapse(toDelete);
@@ -975,33 +957,8 @@ public abstract class Network {
         // Remove from the group list
         groupList.remove(toDelete);
 
-//        // Force delete synapse group in a subnet group
-//        if (toDelete instanceof SubnetworkGroup) {
-//            SynapseGroup synapseGroup = ((SubnetworkGroup)toDelete).getSynapseGroup(); 
-//            synapseGroup.setDeleteWhenEmpty(true);
-//            deleteGroup(synapseGroup);
-//        }
-        
-        // Deleting neuron and synapse groups with parent groups
-        if (toDelete.getParentGroup() != null) {
-            
-            // If this is a layer in a layered network, then remove the layer from the parent
-            if (toDelete.getParentGroup() instanceof LayeredNetwork) {
-                if (toDelete instanceof NeuronGroup) {
-                    ((LayeredNetwork) toDelete.getParentGroup())
-                            .removeLayer((NeuronGroup) toDelete);
-                } else if ((toDelete instanceof SynapseGroup)) {
-                    ((LayeredNetwork) toDelete.getParentGroup())
-                            .removeWeightLayer((SynapseGroup) toDelete);
-                }
-            } 
-            
-            // If the parent group is now empty, then (in some cases) remove the group
-            if ((toDelete.getParentGroup().isEmpty() && (toDelete
-                    .isDeleteWhenEmpty()))) {
-                deleteGroup(toDelete.getParentGroup());
-            }
-        }
+        // Call delete method on this group being deleted
+        toDelete.delete();
         
         // Notify listeners that this group has been deleted.
         rootNetwork.fireGroupDeleted(toDelete);

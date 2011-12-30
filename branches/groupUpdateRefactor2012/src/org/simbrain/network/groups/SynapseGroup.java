@@ -15,7 +15,7 @@ package org.simbrain.network.groups;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Group;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
@@ -40,6 +40,27 @@ public class SynapseGroup extends Group {
     /** @see Group */
     public SynapseGroup(final RootNetwork net) {
         super(net);
+    }
+
+    @Override
+    public void delete() {
+        if (isMarkedForDeletion()) {
+            return;
+        } else {
+            setMarkedForDeletion(true);
+        }
+        for(Synapse synapse : synapseList) {
+            getParentNetwork().deleteSynapse(synapse);
+        }
+        if (getParentGroup() != null) {
+            if (getParentGroup() instanceof LayeredNetwork) {
+                Group parentGroup = getParentGroup();
+                ((LayeredNetwork) parentGroup).removeWeightLayer(this);
+            } 
+            if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
+                getParentNetwork().deleteGroup(getParentGroup());
+            }            
+        }
     }
 
     /**

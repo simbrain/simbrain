@@ -24,6 +24,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NetworkListener;

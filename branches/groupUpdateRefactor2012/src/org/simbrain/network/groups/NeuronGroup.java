@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -45,6 +44,27 @@ public class NeuronGroup extends Group {
 
     public NeuronGroup(final RootNetwork root) {
         super(root);
+    }
+    
+    @Override
+    public void delete() {
+        if (isMarkedForDeletion()) {
+            return;
+        } else {
+            setMarkedForDeletion(true);
+        }
+        for(Neuron neuron : neuronList) {
+            getParentNetwork().deleteNeuron(neuron);
+        }
+        if (getParentGroup() != null) {
+            if (getParentGroup() instanceof LayeredNetwork) {
+                Group parentGroup = getParentGroup();
+                ((LayeredNetwork) parentGroup).removeLayer(this);
+            }
+            if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
+                getParentNetwork().deleteGroup(getParentGroup());
+            }
+        }
     }
     
     public boolean inFanInOfSomeNode(final Synapse synapse) {

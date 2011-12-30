@@ -14,7 +14,6 @@ package org.simbrain.network.groups;
 
 import java.util.List;
 
-import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -31,16 +30,24 @@ public class SubnetworkGroup extends Group {
     /** List of synapses. */
     private final SynapseGroup synapseGroup;
 
-    
-    // REDO: Javadocs
-
+    /**
+     * Create subnetwork group.
+     *
+     * @param net parent network.
+     */
     public SubnetworkGroup(final RootNetwork net) {
         super(net);
         neuronGroup = new NeuronGroup(net);
         synapseGroup = new SynapseGroup(net);
         init();
     }
-    
+
+    /**
+     * Create subnetwork group with a set of neurons.
+     *
+     * @param net parent network
+     * @param neurons initial set of neurons
+     */
     public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons) {
         super(net);
         neuronGroup = new NeuronGroup(net, neurons);      
@@ -48,11 +55,31 @@ public class SubnetworkGroup extends Group {
         init();
     }
 
+    /**
+     * Create a subnetwork group with a set of neurons and weights.
+     *
+     * @param net parent network
+     * @param neurons initial neurons
+     * @param synapses initial weights
+     */
     public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons, final List<Synapse> synapses) {
         super(net);
         neuronGroup = new NeuronGroup(net, neurons);      
         synapseGroup = new SynapseGroup(net, synapses);
         init();
+    }
+    
+    @Override
+    public void delete() {
+        if (isMarkedForDeletion()) {
+            return;
+        } else {
+            setMarkedForDeletion(true);
+        }
+        neuronGroup.setDeleteWhenEmpty(true);
+        getParentNetwork().deleteGroup(neuronGroup);
+        synapseGroup.setDeleteWhenEmpty(true);
+        getParentNetwork().deleteGroup(synapseGroup);        
     }
 
     /**

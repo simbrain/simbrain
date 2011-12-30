@@ -19,12 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.interfaces.Group;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.UpdatableGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
@@ -156,6 +154,28 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
 
     }
     
+    @Override
+    public void delete() {
+        if (isMarkedForDeletion()) {
+            return;
+        } else {
+            setMarkedForDeletion(true);
+        }
+        for (NeuronGroup layer : layers) {
+            layer.setDeleteWhenEmpty(true);
+            getParentNetwork().deleteGroup(layer);            
+        }
+        for (SynapseGroup weightLayer : connections) {
+            weightLayer.setDeleteWhenEmpty(true);
+            getParentNetwork().deleteGroup(weightLayer);            
+        }        
+    }
+    
+    /**
+     * Add a weight layer.
+     *
+     * @param group the weight layer to add.
+     */
     private void addSynapseLayer(SynapseGroup group) {
         group.setLabel("Weights " + (connections.size() + 1) + " > "
                 + (connections.size() + 2));
@@ -268,7 +288,6 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
         // TODO Auto-generated method stub
         
     }
-    
     
 
     //TODO

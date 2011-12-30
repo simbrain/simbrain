@@ -16,7 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.groups;
+
+import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
 
 
 /**
@@ -44,6 +48,9 @@ public abstract class Group {
 
     /** Whether this group should be deleted when all its components are deleted. */
     private boolean deleteWhenEmpty = true;
+    
+    /** Flag which prevents infinite loops when deleting composite groups. */
+    private boolean markedForDeletion = false;
 
     /**
      * Parent group of this group, or null if it has none. For group types which
@@ -77,6 +84,11 @@ public abstract class Group {
     public void removeSynapse(Synapse synapse) {};
         
     public abstract boolean isEmpty();
+
+    /**
+     * Perform necessary deletion cleanup.
+     */
+    public abstract void delete();
 
 
     //    /**
@@ -205,5 +217,18 @@ public abstract class Group {
         this.deleteWhenEmpty = deleteWhenEmpty;
     }
 
+    /**
+     * @return the markedForDeletion
+     */
+    protected boolean isMarkedForDeletion() {
+        return markedForDeletion;
+    }
+
+    /**
+     * @param markedForDeletion the markedForDeletion to set
+     */
+    protected void setMarkedForDeletion(boolean markedForDeletion) {
+        this.markedForDeletion = markedForDeletion;
+    }
 
 }

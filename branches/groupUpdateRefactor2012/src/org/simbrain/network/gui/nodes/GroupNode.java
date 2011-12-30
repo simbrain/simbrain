@@ -32,17 +32,17 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.interfaces.Group;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
- * Represents a {@link org.simbrain.network.interfaces.Group}.  This class can be 
+ * Represents a {@link org.simbrain.network.groups.Group}.  This class can be 
  * used for default behavior.
  * 
  * Subclasses can provide custom behavior:
@@ -93,7 +93,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         setInteractionBox(box);
         this.setConextMenu(getDefaultContextMenu());
         this.setTextLabel(group.getLabel());
-
+        updateVisibility();
     }
     
     /**
@@ -166,6 +166,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         // Below was the source of major performance issues
         //node.getParent().addPropertyChangeListener(this); 
         outlinedObjects.add(node);
+        updateVisibility();
     }
     
     /**
@@ -176,10 +177,22 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     public void removePNode(final PNode node) {
         outlinedObjects.remove(node);
         node.removePropertyChangeListener(this);
-        if (outlinedObjects.isEmpty()) {
-            this.removeFromParent();
-        }
+        updateVisibility();
     }
+    
+  /**
+  * If this node has not been deleted, then it should be visible or not based on
+  * whether there are items to display.
+  * 
+  * TODO: But keep interaction box visible?
+  */
+ private void updateVisibility() {
+     if (getOutlinedObjects().isEmpty()) {
+         setVisible(false);
+     } else {
+         setVisible(true);
+     }        
+ }
 
     /**
      * Update the text label to reflect underlying group label.

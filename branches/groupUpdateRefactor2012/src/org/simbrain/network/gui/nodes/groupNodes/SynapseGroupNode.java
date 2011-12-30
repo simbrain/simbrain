@@ -54,7 +54,6 @@ public class SynapseGroupNode extends GroupNode {
         setContextMenu();
         setOutlinePadding(-5);
         setPickable(false);
-        updateVisibility();
     }
     
     /**
@@ -121,31 +120,6 @@ public class SynapseGroupNode extends GroupNode {
         interactionBox.setOffset(
                 getBounds().getX() - interactionBox.getFullBounds().width,
                 getBounds().getCenterY() - interactionBox.getHeight() / 2);
-    }
-    
-    @Override
-    public void removePNode(PNode node) {
-        super.removePNode(node);
-        updateVisibility();
-    }
-
-    @Override
-    public void addPNode(PNode node) {
-        super.addPNode(node);
-        updateVisibility();
-    }
-    
-    /**
-     * If there are no synpase nodes to display, make this whole
-     * synapsegroupnode invisible.
-     */
-    private void updateVisibility() {
-        if (getOutlinedObjects().isEmpty()) {
-            setVisible(false);
-        } else {
-            setVisible(true);
-        }
-        
-    }
+    }    
 
 }

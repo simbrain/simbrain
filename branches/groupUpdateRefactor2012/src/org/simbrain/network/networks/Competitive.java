@@ -21,11 +21,11 @@ package org.simbrain.network.networks;
 import java.util.Iterator;
 
 import org.simbrain.network.groups.SubnetworkGroup;
+import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.interfaces.SynapseUpdateRule;
-import org.simbrain.network.interfaces.UpdatableGroup;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
@@ -80,30 +80,39 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
             addNeuron(new Neuron(root, new LinearNeuron()));
         }
         layout.layoutNeurons(this.getNeuronGroup().getNeuronList());
-        root.addSynapseListener(new SynapseListener() {
+        root.addSynapseListener(synapseListener);
+    }
+    
+    /**
+     * Listen for synapse events and add new synapse when they arrive.
+     */
+    SynapseListener synapseListener = new SynapseListener() {
 
-            public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
-                if (getSynapseGroup().getSynapseList().contains(networkEvent.getObject())) {
-                    removeSynapse(networkEvent.getObject());                   
-                }
-            }
+        public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
+            // This is handled elsewhere
+        }
 
-            public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
-                Synapse synapse = networkEvent.getObject();
-                if (getNeuronGroup().inFanInOfSomeNode(synapse)) {
-                    root.deleteSynapse(synapse); // remove from root net
-                    addSynapse(synapse); // add synapse to group
-                }
+        public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
+            Synapse synapse = networkEvent.getObject();
+            if (getNeuronGroup().inFanInOfSomeNode(synapse)) {
+                getParentNetwork().deleteSynapse(synapse); // remove from root net
+                addSynapse(synapse); // add synapse to group
             }
+        }
 
-            public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
-            }
+        public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
+        }
 
-            public void synapseTypeChanged(
-                    NetworkEvent<SynapseUpdateRule> networkEvent) {
-            }
-            
-        });
+        public void synapseTypeChanged(
+                NetworkEvent<SynapseUpdateRule> networkEvent) {
+        }
+        
+    };
+    
+    @Override
+    public void delete() {
+        super.delete();
+        getParentNetwork().removeSynapseListener(synapseListener);
     }
     
     /**

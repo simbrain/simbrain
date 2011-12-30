@@ -21,9 +21,9 @@ package org.simbrain.network.networks;
 import java.util.Random;
 
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.UpdatableGroup;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
 

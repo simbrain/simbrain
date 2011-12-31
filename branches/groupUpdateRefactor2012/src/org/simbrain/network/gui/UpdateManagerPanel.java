@@ -14,29 +14,22 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
-import javax.swing.TransferHandler;
-import javax.swing.border.LineBorder;
 
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.UpdateAction;
@@ -44,23 +37,24 @@ import org.simbrain.network.interfaces.UpdateManager.UpdateManagerListener;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * (Prototype) Panel for display and ordering of network update actions.
+ * Panel for display and ordering of network update actions.
+ * 
+ * @author jeff yoshimi
  *
- * TODO
- *   - Show numbers for list
- *   - Add button
- *   - Clean up layout
  */
 public class UpdateManagerPanel extends JPanel {
 
-    /** The JList which represents actions. */
-    private JList actionList = new JList();
+    /** The JList which represents current actions. */
+    private final JList currentActionJList = new JList();
     
-    /** The JList model object. */
-    final DefaultListModel model  = new DefaultListModel();
-    
-    /** List of actions that can be added. */
-    final JComboBox potentialActionsComboBox = new JComboBox();
+    /** The model object for current actions. */
+    private final DefaultListModel currentActionListModel  = new DefaultListModel();
+
+    /** The JList which represents available actions. */
+    private final JList availableActionJList = new JList();
+
+    /** The model object for current actions. */
+    private final DefaultListModel availableActionListModel  = new DefaultListModel();
 
     /** Reference to root network. */
     private final RootNetwork network;
@@ -73,40 +67,42 @@ public class UpdateManagerPanel extends JPanel {
         super(new BorderLayout());
         this.network = network;
 
-        // Set up the list
-        actionList.setModel(model);
-        actionList.setDragEnabled(true);
-        actionList.setTransferHandler(createTransferHandler());
-        actionList.setDropMode(DropMode.INSERT);
-        updateList();
+        // Set up Current Action list
+        currentActionJList.setModel(currentActionListModel);
+        updateCurrentActionsList();
         configureJList();
-
-        // Scroll pane for showing lists larger than viewing window and setting
-        // maximum size
-        final JScrollPane listScroll = new JScrollPane(actionList);
-        listScroll
+        JScrollPane currentListScroll = new JScrollPane(currentActionJList);
+        currentListScroll
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        listScroll
+        currentListScroll
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        currentListScroll.setBorder(BorderFactory.createTitledBorder("Update Sequence"));
+        currentListScroll.setBackground(null);
 
-        // Allows the user to delete couplings within the list frame.
+        // Set up Available Action list
+        availableActionJList.setModel(availableActionListModel);
+        updateAvailableActionsList();
+        JScrollPane availableListScroll = new JScrollPane(availableActionJList);
+        availableListScroll
+                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        availableListScroll
+                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        availableListScroll.setBorder(BorderFactory.createTitledBorder("Available Update Actions"));
+        availableListScroll.setBackground(null);
+
+        // Add lists
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                availableListScroll, currentListScroll);
+        add(split, BorderLayout.CENTER);
+
+        
+        // Buttons
         JPanel buttonPanel = new JPanel();
-        JButton deleteActionsButton = new JButton(deleteActionsAction);
-        
+        JButton addActionsButton = new JButton(addActionsAction);       
+        buttonPanel.add(addActionsButton);
+        JButton deleteActionsButton = new JButton(deleteActionsAction);       
         buttonPanel.add(deleteActionsButton);
-        buttonPanel.add(potentialActionsComboBox);
-        updatePotentialActionList();
-        potentialActionsComboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                network.getUpdateManager().addAction(
-                        (UpdateAction) potentialActionsComboBox
-                                .getSelectedItem());
-            }
-        });
-        
-
-        // Add scroll pane to JPanel
-        add(listScroll, BorderLayout.CENTER);
+        updateAvailableActionsList();        
         add(buttonPanel, BorderLayout.SOUTH);
         
         // Listen for network updates
@@ -121,7 +117,7 @@ public class UpdateManagerPanel extends JPanel {
      * Configure the JList.
      */
     private void configureJList() {
-        actionList.setCellRenderer(new ListCellRenderer() {
+        currentActionJList.setCellRenderer(new ListCellRenderer() {
             public Component getListCellRendererComponent(JList list,
                     Object updateAction, int index, boolean isSelected,
                     boolean cellHasFocus) {
@@ -141,8 +137,7 @@ public class UpdateManagerPanel extends JPanel {
                 return label;
             }
         });
-    }
-    
+    }    
     
     /** Action which deletes selected actions. */
     Action deleteActionsAction = new AbstractAction() {
@@ -164,20 +159,38 @@ public class UpdateManagerPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            for (Object action : actionList.getSelectedValues()) {
+            for (Object action : currentActionJList.getSelectedValues()) {
                 network.getUpdateManager().removeAction((UpdateAction) action);
             }
         }
     };
+    
+    /** Action which deletes selected actions. */
+    Action addActionsAction = new AbstractAction() {
+        // Initialize
+        {
+            //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+            putValue(NAME, "Add actions");
+            putValue(SHORT_DESCRIPTION, "Add selected actions");
+        }
 
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            for (Object action : availableActionJList.getSelectedValues()) {
+                network.getUpdateManager().addAction((UpdateAction) action);
+            }
+        }
+    };
     
     /**
      * Update the JList's model.
      */
-    private void updateList() {
-        model.clear();
+    private void updateCurrentActionsList() {
+        currentActionListModel.clear();
         for (UpdateAction action : network.getUpdateManager().getActionList()) {
-            model.addElement(action);
+            currentActionListModel.addElement(action);
         }
         repaint();
     }
@@ -185,10 +198,10 @@ public class UpdateManagerPanel extends JPanel {
     /**
      * Update the combo box showing potential actions.
      */
-    private void updatePotentialActionList() {
-        potentialActionsComboBox.removeAllItems();
-        for (UpdateAction action : network.getUpdateManager().getPotentialActionList()) {
-            potentialActionsComboBox.addItem(action);
+    private void updateAvailableActionsList() {
+        availableActionListModel.clear();
+        for (UpdateAction action : network.getUpdateManager().getAvailableActionList()) {
+            availableActionListModel.addElement(action);
         }
         repaint();
     }
@@ -199,99 +212,99 @@ public class UpdateManagerPanel extends JPanel {
     private UpdateManagerListener listener = new UpdateManagerListener() {
 
         public void actionAdded(UpdateAction action) {
-            updateList();
+            updateCurrentActionsList();
         }
 
         public void actionRemoved(UpdateAction action) {
-            updateList();
+            updateCurrentActionsList();
         }
 
         public void actionOrderChanged() {
-            updateList();
+            updateCurrentActionsList();
         }
 
-        public void potentialActionAdded(UpdateAction action) {
-            updatePotentialActionList();
+        public void availableActionAdded(UpdateAction action) {
+            updateAvailableActionsList();
         }
 
-        public void potentialActionRemoved(UpdateAction action) {
-            updatePotentialActionList();
+        public void availableActionRemoved(UpdateAction action) {
+            updateAvailableActionsList();
         }
         
     };
 
-    /**
-     * Handle drag and drop events
-     * @return
-     */
-    private TransferHandler createTransferHandler() {
-        return new TransferHandler() {
-
-            public boolean canImport(TransferHandler.TransferSupport info) {
-                // we only import Strings
-                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    return false;
-                }
-
-                JList.DropLocation dl = (JList.DropLocation) info
-                        .getDropLocation();
-                if (dl.getIndex() == -1) {
-                    return false;
-                }
-                return true;
-            }
-
-            public boolean importData(TransferHandler.TransferSupport info) {
-                // if (!info.isDrop()) {
-                // return false;
-                // }
-
-                JList.DropLocation dl = (JList.DropLocation) info
-                        .getDropLocation();
-                int index = dl.getIndex();
-
-                // Get the string that is being dropped.
-                Transferable t = info.getTransferable();
-                String data;
-                try {
-                    data = (String) t.getTransferData(DataFlavor.stringFlavor);
-                } catch (Exception e) {
-                    System.out.println("NO!!!");
-                    return false;
-                }
-
-                // Perform the actual import.
-                if (index < model.size()) {
-                    model.removeElement(data);
-                    model.add(index, data);
-                } else {
-                    model.removeElement(data);
-                    model.addElement(data);
-                }
-                return true;
-            }
-
-            public int getSourceActions(JComponent c) {
-                return TransferHandler.MOVE;
-            }
-
-            protected Transferable createTransferable(JComponent c) {
-                Object[] values = actionList.getSelectedValues();
-
-                StringBuffer buff = new StringBuffer();
-
-                for (int i = 0; i < values.length; i++) {
-                    Object val = values[i];
-                    buff.append(val == null ? "" : val.toString());
-                    if (i != values.length - 1) {
-                        buff.append("\n");
-                    }
-                }
-                return new StringSelection(buff.toString());
-            }
-
-        };
-    }
+//    /**
+//     * Handle drag and drop events
+//     * @return
+//     */
+//    private TransferHandler createTransferHandler() {
+//        return new TransferHandler() {
+//
+//            public boolean canImport(TransferHandler.TransferSupport info) {
+//                // we only import Strings
+//                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+//                    return false;
+//                }
+//
+//                JList.DropLocation dl = (JList.DropLocation) info
+//                        .getDropLocation();
+//                if (dl.getIndex() == -1) {
+//                    return false;
+//                }
+//                return true;
+//            }
+//
+//            public boolean importData(TransferHandler.TransferSupport info) {
+//                // if (!info.isDrop()) {
+//                // return false;
+//                // }
+//
+//                JList.DropLocation dl = (JList.DropLocation) info
+//                        .getDropLocation();
+//                int index = dl.getIndex();
+//
+//                // Get the string that is being dropped.
+//                Transferable t = info.getTransferable();
+//                String data;
+//                try {
+//                    data = (String) t.getTransferData(DataFlavor.stringFlavor);
+//                } catch (Exception e) {
+//                    System.out.println("NO!!!");
+//                    return false;
+//                }
+//
+//                // Perform the actual import.
+//                if (index < model.size()) {
+//                    model.removeElement(data);
+//                    model.add(index, data);
+//                } else {
+//                    model.removeElement(data);
+//                    model.addElement(data);
+//                }
+//                return true;
+//            }
+//
+//            public int getSourceActions(JComponent c) {
+//                return TransferHandler.MOVE;
+//            }
+//
+//            protected Transferable createTransferable(JComponent c) {
+//                Object[] values = actionList.getSelectedValues();
+//
+//                StringBuffer buff = new StringBuffer();
+//
+//                for (int i = 0; i < values.length; i++) {
+//                    Object val = values[i];
+//                    buff.append(val == null ? "" : val.toString());
+//                    if (i != values.length - 1) {
+//                        buff.append("\n");
+//                    }
+//                }
+//                return new StringSelection(buff.toString());
+//            }
+//
+//        };
+//    }
 
 
 //    /**

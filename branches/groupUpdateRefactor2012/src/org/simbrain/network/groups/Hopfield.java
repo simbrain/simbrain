@@ -62,6 +62,7 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
     public Hopfield(RootNetwork newRoot, Hopfield oldNet) {
         super(newRoot);
         this.setUpdateOrder(oldNet.getUpdateOrder());
+        setLabel("Hopfield network");
     }
 
     /**
@@ -73,6 +74,7 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
      */
     public Hopfield(final RootNetwork root, final int numNeurons, final Layout layout) {
         super(root);
+        setLabel("Hopfield network");
 
         //Create the neurons
         for (int i = 0; i < numNeurons; i++) {

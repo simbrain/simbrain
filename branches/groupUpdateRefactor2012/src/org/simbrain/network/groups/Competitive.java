@@ -79,6 +79,7 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
         }
         layout.layoutNeurons(this.getNeuronGroup().getNeuronList());
         root.addSynapseListener(synapseListener);
+        setLabel("Competitive Network");
     }
     
     /**

@@ -65,6 +65,7 @@ public class WinnerTakeAll extends NeuronGroup implements UpdatableGroup {
         setWinValue(oldNet.getWinValue());
         setUseRandom(oldNet.isUseRandom());
         setRandomProb(oldNet.getRandomProb());
+        setLabel("Winner take all network");
     }
 
     /**
@@ -80,6 +81,7 @@ public class WinnerTakeAll extends NeuronGroup implements UpdatableGroup {
           this.addNeuron(new Neuron(root, new LinearNeuron()));
         }
         layout.layoutNeurons(this.getNeuronList());
+        setLabel("Winner take all network");
     }
 
     /**

@@ -45,7 +45,7 @@ public class UpdateManager {
     /**
      * The list of possible update actions that can be added to the main list.
      */
-    private final List<UpdateAction> potentialActionList = new ArrayList<UpdateAction>();
+    private final List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
 
     /**
      * List of listeners on this update manager
@@ -62,8 +62,8 @@ public class UpdateManager {
      */
     public UpdateManager(RootNetwork network) {
         this.network = network;
-        addPotentialAction(new BufferedUpdate(network));        
-        addPotentialAction(new PriorityUpdate(network));        
+        addAvailableAction(new BufferedUpdate(network));        
+        addAvailableAction(new PriorityUpdate(network));        
         addListeners();
 
     }
@@ -79,14 +79,14 @@ public class UpdateManager {
             public void groupAdded(NetworkEvent<Group> e) {
                 if (e.getObject() instanceof UpdatableGroup) {
                     addAction(new UpdateGroup(e.getObject()));
-                    addPotentialAction(new UpdateGroup(e.getObject()));
+                    addAvailableAction(new UpdateGroup(e.getObject()));
                 }            
             }
 
             public void groupRemoved(NetworkEvent<Group> e) {
                 if (e.getObject() instanceof UpdatableGroup) {
                     removeAction(new UpdateGroup(e.getObject()));
-                    removePotentialAction(new UpdateGroup(e.getObject()));
+                    removeAvailableAction(new UpdateGroup(e.getObject()));
                 }            
             }
 
@@ -154,10 +154,10 @@ public class UpdateManager {
      *
      * @param action the action to add.
      */
-    protected void addPotentialAction(UpdateAction action) {
-        potentialActionList.add(action);
+    protected void addAvailableAction(UpdateAction action) {
+        availableActionList.add(action);
         for(UpdateManagerListener listener : listeners) {
-            listener.potentialActionAdded(action);
+            listener.availableActionAdded(action);
         }
     }
     
@@ -166,10 +166,10 @@ public class UpdateManager {
      *
      * @param action the action to remove
      */
-    public void removePotentialAction(UpdateAction action) {
-        potentialActionList.remove(action);
+    public void removeAvailableAction(UpdateAction action) {
+        availableActionList.remove(action);
         for(UpdateManagerListener listener : listeners) {
-            listener.potentialActionRemoved(action);
+            listener.availableActionRemoved(action);
         }
     }
     
@@ -185,10 +185,10 @@ public class UpdateManager {
         public void actionRemoved(UpdateAction action);
 
         /** A potential action was added. */
-        public void potentialActionAdded(UpdateAction action);
+        public void availableActionAdded(UpdateAction action);
 
         /** An potential action was removed. */
-        public void potentialActionRemoved(UpdateAction action);
+        public void availableActionRemoved(UpdateAction action);
 
         /** The action order was changed. */
         public void actionOrderChanged();
@@ -197,8 +197,8 @@ public class UpdateManager {
     /**
      * @return the potentialActionList
      */
-    public List<UpdateAction> getPotentialActionList() {
-        return potentialActionList;
+    public List<UpdateAction> getAvailableActionList() {
+        return availableActionList;
     }
 
 }

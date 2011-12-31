@@ -54,11 +54,5 @@ public class UpdateGroup implements UpdateAction {
     public String getDescription() {
         return "Update " + group.getLabel();
     }
-    
-    @Override
-    public String toString() {
-        return getDescription();
-    }
-
 
 }

@@ -60,7 +60,7 @@ public final class SRNBuilder {
      * context layer at the end of each network iteration. */
     private CustomUpdateRule update = new CustomUpdateRule() {
         public void update(RootNetwork network) {
-            network.updateAllNeurons();
+            network.bufferedUpdateAllNeurons();
             network.updateAllSynapses();
             network.updateAllNetworks();
             network.updateAllGroups();

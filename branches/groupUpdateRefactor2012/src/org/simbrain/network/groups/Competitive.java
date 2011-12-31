@@ -95,6 +95,8 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
             Synapse synapse = networkEvent.getObject();
             if (getNeuronGroup().inFanInOfSomeNode(synapse)) {
                 getParentNetwork().deleteSynapse(synapse); // remove from root net
+                //synapse.setTarget(synapse.getTarget());
+                System.out.println(synapse.getTarget().getFanIn().size());
                 addSynapse(synapse); // add synapse to group
             }
         }

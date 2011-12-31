@@ -390,7 +390,7 @@ public class SOM extends Network {
         // Neuron update
         if (!getRootNetwork().getClampNeurons()) {
             if (updateMethod == STANDARD) {
-                this.updateAllNeurons();
+                this.bufferedUpdateAllNeurons();
             } else {
                 for (int i = 0; i < getNeuronList().size(); i++) {
                     Neuron n = (Neuron) getNeuronList().get(i);

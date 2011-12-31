@@ -413,7 +413,7 @@ public abstract class Network {
     /**
      * Calls {@link Neuron#update} for each neuron.
      */
-    public void updateAllNeurons() {
+    public void bufferedUpdateAllNeurons() {
 
         if (rootNetwork.getClampNeurons()) {
             return;

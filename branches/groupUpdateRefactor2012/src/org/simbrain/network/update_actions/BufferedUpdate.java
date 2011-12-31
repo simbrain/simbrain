@@ -43,7 +43,7 @@ public class BufferedUpdate implements UpdateAction {
      * {@inheritDoc}
      */
     public void invoke() {
-        network.updateAllNeurons();
+        network.bufferedUpdateAllNeurons();
         network.updateAllSynapses();
     }
     
@@ -53,11 +53,5 @@ public class BufferedUpdate implements UpdateAction {
     public String getDescription() {
         return "Buffered update of loose items";
     }
-
-    @Override
-    public String toString() {
-        return getDescription();
-    }
-
 
 }

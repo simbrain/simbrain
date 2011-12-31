@@ -62,7 +62,6 @@ public class UpdateManager {
      */
     public UpdateManager(RootNetwork network) {
         this.network = network;
-        addAvailableAction(new BufferedUpdate(network));        
         addAvailableAction(new PriorityUpdate(network));        
         addListeners();
 
@@ -79,14 +78,12 @@ public class UpdateManager {
             public void groupAdded(NetworkEvent<Group> e) {
                 if (e.getObject() instanceof UpdatableGroup) {
                     addAction(new UpdateGroup(e.getObject()));
-                    addAvailableAction(new UpdateGroup(e.getObject()));
                 }            
             }
 
             public void groupRemoved(NetworkEvent<Group> e) {
                 if (e.getObject() instanceof UpdatableGroup) {
                     removeAction(new UpdateGroup(e.getObject()));
-                    removeAvailableAction(new UpdateGroup(e.getObject()));
                 }            
             }
 
@@ -135,6 +132,7 @@ public class UpdateManager {
         for(UpdateManagerListener listener : listeners) {
             listener.actionAdded(action);
         }
+        removeAvailableAction(action);
     }
     
     /**
@@ -147,6 +145,7 @@ public class UpdateManager {
         for(UpdateManagerListener listener : listeners) {
             listener.actionRemoved(action);
         }
+        addAvailableAction(action);
     }
     
     /**

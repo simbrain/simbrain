@@ -50,9 +50,4 @@ public class PriorityUpdate implements UpdateAction {
         return "Priority update of loose items";
     }
 
-    @Override
-    public String toString() {
-        return getDescription();
-    }
-
 }

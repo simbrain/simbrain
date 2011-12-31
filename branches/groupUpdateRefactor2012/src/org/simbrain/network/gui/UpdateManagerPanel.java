@@ -14,7 +14,9 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -30,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
+import javax.swing.border.Border;
 
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.UpdateAction;
@@ -70,25 +73,28 @@ public class UpdateManagerPanel extends JPanel {
         // Set up Current Action list
         currentActionJList.setModel(currentActionListModel);
         updateCurrentActionsList();
-        configureJList();
+        configureCurrentJList();
         JScrollPane currentListScroll = new JScrollPane(currentActionJList);
         currentListScroll
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         currentListScroll
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        currentListScroll.setBorder(BorderFactory.createTitledBorder("Update Sequence"));
+        currentListScroll.setBorder(BorderFactory.createTitledBorder("Current Update Sequence"));
         currentListScroll.setBackground(null);
 
         // Set up Available Action list
         availableActionJList.setModel(availableActionListModel);
         updateAvailableActionsList();
+        configureAvailableJList();
         JScrollPane availableListScroll = new JScrollPane(availableActionJList);
+        availableActionJList.setBackground(getBackground());
+        availableListScroll.setBackground(null);
+        
         availableListScroll
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         availableListScroll
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         availableListScroll.setBorder(BorderFactory.createTitledBorder("Available Update Actions"));
-        availableListScroll.setBackground(null);
 
         // Add lists
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -116,7 +122,7 @@ public class UpdateManagerPanel extends JPanel {
     /**
      * Configure the JList.
      */
-    private void configureJList() {
+    private void configureCurrentJList() {
         currentActionJList.setCellRenderer(new ListCellRenderer() {
             public Component getListCellRendererComponent(JList list,
                     Object updateAction, int index, boolean isSelected,
@@ -124,9 +130,17 @@ public class UpdateManagerPanel extends JPanel {
                 
                 JLabel label = new JLabel((index + 1) + ": "
                         + ((UpdateAction) updateAction).getDescription());
+                if (index == 0) {
+                    label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
+                            Color.LIGHT_GRAY));                    
+                } else {
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                            Color.LIGHT_GRAY));                                        
+                }
+                label.setBackground(null);
                 if (isSelected) {
-                    label.setBackground(list.getSelectionBackground());
                     label.setForeground(list.getSelectionForeground());
+                    label.setBackground(list.getSelectionBackground());
                 } else {
                     label.setForeground(list.getForeground());
                     label.setBackground(list.getBackground());
@@ -139,12 +153,45 @@ public class UpdateManagerPanel extends JPanel {
         });
     }    
     
+    
+    /**
+     * Configure the JList.
+     */
+    private void configureAvailableJList() {
+        availableActionJList.setCellRenderer(new ListCellRenderer() {
+            public Component getListCellRendererComponent(JList list,
+                    Object updateAction, int index, boolean isSelected,
+                    boolean cellHasFocus) {                
+                JLabel label = new JLabel(((UpdateAction) updateAction).getDescription());
+                if (index == 0) {
+                    label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
+                            Color.LIGHT_GRAY));                    
+                } else {
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                            Color.LIGHT_GRAY));                                        
+                }
+                if (isSelected) {
+                    label.setBackground(list.getSelectionBackground());
+                    label.setForeground(list.getSelectionForeground());
+                } else {
+                    label.setForeground(list.getForeground());
+                    label.setBackground(null);
+                }
+                label.setEnabled(list.isEnabled());
+                label.setFont(list.getFont());
+                label.setOpaque(true);
+                return label;
+            }
+        });
+    }    
+    
+    
     /** Action which deletes selected actions. */
     Action deleteActionsAction = new AbstractAction() {
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-            putValue(NAME, "Delete actions");
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("minus.png"));
+            putValue(NAME, "Delete update actions");
             putValue(SHORT_DESCRIPTION, "Delete selected actions");
             UpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -169,8 +216,8 @@ public class UpdateManagerPanel extends JPanel {
     Action addActionsAction = new AbstractAction() {
         // Initialize
         {
-            //putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-            putValue(NAME, "Add actions");
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
+            putValue(NAME, "Add update actions");
             putValue(SHORT_DESCRIPTION, "Add selected actions");
         }
 

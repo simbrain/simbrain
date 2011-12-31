@@ -97,7 +97,7 @@ public class KWTA extends Network {
     public void update() {
         sortNeurons();
         setCurrentThresholdCurrent();
-        updateAllNeurons();
+        bufferedUpdateAllNeurons();
     }
 
     /**

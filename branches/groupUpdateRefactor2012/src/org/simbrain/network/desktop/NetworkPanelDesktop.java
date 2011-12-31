@@ -239,7 +239,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
 //    }
 //    
     
-    public GenericFrame displayPanel(JPanel panel) {
+    @Override
+    public GenericFrame displayPanel(JPanel panel, String title) {
         GenericJInternalFrame frame = new GenericJInternalFrame();
         frame.setContentPane(panel);
         component.getDesktop().addInternalFrame(frame);
@@ -247,6 +248,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         frame.setMaximizable(true);
         frame.setIconifiable(true);
         frame.setClosable(true);
+        frame.setTitle(title);
         frame.setVisible(true);
         return frame;
     }

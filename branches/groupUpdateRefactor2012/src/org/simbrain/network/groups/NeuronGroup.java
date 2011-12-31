@@ -131,12 +131,14 @@ public class NeuronGroup extends Group {
      * @param neuron neuron to add
      */
     public void addNeuron(Neuron neuron) {
+        neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
         neuronList.add(neuron);
         neuron.setParentGroup(this);
     }
 
     @Override
-    public void removeNeuron(Neuron toDelete) {
+    public void deleteNeuron(Neuron toDelete) {
+  
         neuronList.remove(toDelete);
         //REDO
         //getParent().fireGroupChanged(this, this);

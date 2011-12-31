@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.WinnerTakeAll;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -33,7 +34,6 @@ import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 

@@ -50,6 +50,7 @@ import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.BackpropNetwork;
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.Hopfield;
 import org.simbrain.network.groups.LayeredNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SubnetworkGroup;
@@ -89,7 +90,6 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
-import org.simbrain.network.networks.Hopfield;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
@@ -2404,12 +2404,14 @@ public class NetworkPanel extends JPanel {
      * display the panel within the Simbrain desktop.  
      *
      * @param panel panel to display
+     * @param title title for the frame
      * @return reference to frame the panel will be displayed in. 
      */
-    public GenericFrame displayPanel(JPanel panel) {
+    public GenericFrame displayPanel(JPanel panel, String title) {
         GenericFrame frame = (GenericFrame) new GenericJDialog();
         frame.setContentPane(panel);
         frame.pack();
+        frame.setTitle(title);
         frame.setVisible(true);
         return frame; 
     }

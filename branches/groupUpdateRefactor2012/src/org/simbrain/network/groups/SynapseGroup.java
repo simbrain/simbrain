@@ -69,6 +69,7 @@ public class SynapseGroup extends Group {
      * @param synapse synapse to add
      */
     public void addSynapse(Synapse synapse) {
+        synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapseList.add(synapse);
         synapse.setParentGroup(this);
         getParentNetwork().fireSynapseAdded(synapse);

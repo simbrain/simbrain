@@ -140,7 +140,7 @@ public class TrainerGuiActions {
         
         if(trainerPanel.getNetworkPanel() != null) {
             frame = trainerPanel.getNetworkPanel().displayPanel(
-                    mainPanel);
+                    mainPanel, "Trainer");
             
         } else {
             frame = (GenericFrame) new GenericJDialog();

@@ -14,47 +14,53 @@
 package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
+import javax.swing.border.LineBorder;
 
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.UpdateAction;
-import org.simbrain.network.listeners.GroupListener;
-import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.interfaces.UpdateManager.UpdateManagerListener;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.genericframe.GenericFrame;
 
 /**
  * (Prototype) Panel for display and ordering of network update actions.
  *
  * TODO
- *   - Listen for relevant changes?
  *   - Show numbers for list
  *   - Add button
  *   - Clean up layout
  */
 public class UpdateManagerPanel extends JPanel {
 
-    /** List of updatable actions. */
+    /** The JList which represents actions. */
     private JList actionList = new JList();
-
-    /** Instance of parent frame. */
-    private GenericFrame parentFrame;
+    
+    /** The JList model object. */
+    final DefaultListModel model  = new DefaultListModel();
+    
+    /** List of actions that can be added. */
+    final JComboBox potentialActionsComboBox = new JComboBox();
 
     /** Reference to root network. */
     private final RootNetwork network;
@@ -62,28 +68,18 @@ public class UpdateManagerPanel extends JPanel {
     /**
      * Creates a new action list panel.
      */
-    public UpdateManagerPanel(RootNetwork network) {
+    public UpdateManagerPanel(final RootNetwork network) {
 
         super(new BorderLayout());
         this.network = network;
 
-        // // Listens for frame closing for removal of listener.
-        // couplingFrame.addWindowListener(new WindowAdapter() {
-        // public void windowClosing(final WindowEvent w) {
-        // desktop.getWorkspace().getCouplingManager().removeCouplingListener(UpdateManagerPanel.this);
-        // }
-        // });
-        // desktop.getWorkspace().getCouplingManager().addCouplingListener(this);
-
-        // Populates the action list with data.
-        final DefaultListModel model = new DefaultListModel();
-        for (UpdateAction action : network.getUpdateManager().getActionList()) {
-            model.addElement(action);
-        }
+        // Set up the list
         actionList.setModel(model);
         actionList.setDragEnabled(true);
         actionList.setTransferHandler(createTransferHandler());
         actionList.setDropMode(DropMode.INSERT);
+        updateList();
+        configureJList();
 
         // Scroll pane for showing lists larger than viewing window and setting
         // maximum size
@@ -96,62 +92,138 @@ public class UpdateManagerPanel extends JPanel {
         // Allows the user to delete couplings within the list frame.
         JPanel buttonPanel = new JPanel();
         JButton deleteActionsButton = new JButton(deleteActionsAction);
+        
         buttonPanel.add(deleteActionsButton);
-//        final JComboBox addActionsBox = new JComboBox();
-//        addActionsBox.addItem("Update Root Network (buffered)");
-//        addActionsBox.addItem("Update Loose Neurons");
-//        addActionsBox.addItem("Update Neurons");
-//        addActionsBox.addItem("Update Synapses");
-//        addActionsBox.addItem("Update Groups");
-//        addActionsBox.addItem("Group...");
-//        addActionsBox.addItem("Neuron...");
-//        addActionsBox.addItem("Synapse...");
-//        addActionsBox.addItem("Script...");
-//        buttonPanel.add(addActionsBox);
-//        addActionsBox.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent arg0) {
-//                model.add(model.size(), addActionsBox.getSelectedItem());
-//            }
-//        });
+        buttonPanel.add(potentialActionsComboBox);
+        updatePotentialActionList();
+        potentialActionsComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                network.getUpdateManager().addAction(
+                        (UpdateAction) potentialActionsComboBox
+                                .getSelectedItem());
+            }
+        });
         
-        // Below not needed because it is currently displayed in a modal dialog
-        
-//
-//        // TODO: When disposed remove listener.
-//        // Update panel when groups added.  TODO: Feels a bit indirect.
-//        //  Should listen for changes in the update
-//        network.addGroupListener(new GroupListener() {
-//
-//            public void groupAdded(NetworkEvent<Group> e) {
-//                repaint();
-//            }
-//
-//            public void groupRemoved(NetworkEvent<Group> e) {
-//                repaint();
-//            }
-//
-//            public void groupChanged(NetworkEvent<Group> networkEvent,
-//                    String changeDescription) {
-//            }
-//
-//            public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
-//            }
-//            
-//        });
-//        
 
         // Add scroll pane to JPanel
         add(listScroll, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
-    }
-
-    /**
-     * Set the frame.
-     */
-    private void setFrame(final GenericFrame frame) {
-        parentFrame = frame;
+        
+        // Listen for network updates
+        network.getUpdateManager().addListener(listener);
+        
+        // TODO: Handle closing event
+        // Should remove listener from update manager when this is closed
+                
     }
     
+    /**
+     * Configure the JList.
+     */
+    private void configureJList() {
+        actionList.setCellRenderer(new ListCellRenderer() {
+            public Component getListCellRendererComponent(JList list,
+                    Object updateAction, int index, boolean isSelected,
+                    boolean cellHasFocus) {
+                
+                JLabel label = new JLabel((index + 1) + ": "
+                        + ((UpdateAction) updateAction).getDescription());
+                if (isSelected) {
+                    label.setBackground(list.getSelectionBackground());
+                    label.setForeground(list.getSelectionForeground());
+                } else {
+                    label.setForeground(list.getForeground());
+                    label.setBackground(list.getBackground());
+                }
+                label.setEnabled(list.isEnabled());
+                label.setFont(list.getFont());
+                label.setOpaque(true);
+                return label;
+            }
+        });
+    }
+    
+    
+    /** Action which deletes selected actions. */
+    Action deleteActionsAction = new AbstractAction() {
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+            putValue(NAME, "Delete actions");
+            putValue(SHORT_DESCRIPTION, "Delete selected actions");
+            UpdateManagerPanel.this.getInputMap(
+                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                    KeyStroke.getKeyStroke("BACK_SPACE"), this);
+            UpdateManagerPanel.this.getInputMap(
+                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                    KeyStroke.getKeyStroke("DELETE"), this);
+            UpdateManagerPanel.this.getActionMap().put(this, this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            for (Object action : actionList.getSelectedValues()) {
+                network.getUpdateManager().removeAction((UpdateAction) action);
+            }
+        }
+    };
+
+    
+    /**
+     * Update the JList's model.
+     */
+    private void updateList() {
+        model.clear();
+        for (UpdateAction action : network.getUpdateManager().getActionList()) {
+            model.addElement(action);
+        }
+        repaint();
+    }
+    
+    /**
+     * Update the combo box showing potential actions.
+     */
+    private void updatePotentialActionList() {
+        potentialActionsComboBox.removeAllItems();
+        for (UpdateAction action : network.getUpdateManager().getPotentialActionList()) {
+            potentialActionsComboBox.addItem(action);
+        }
+        repaint();
+    }
+    
+    /**
+     * Listener for update manager changes.
+     */
+    private UpdateManagerListener listener = new UpdateManagerListener() {
+
+        public void actionAdded(UpdateAction action) {
+            updateList();
+        }
+
+        public void actionRemoved(UpdateAction action) {
+            updateList();
+        }
+
+        public void actionOrderChanged() {
+            updateList();
+        }
+
+        public void potentialActionAdded(UpdateAction action) {
+            updatePotentialActionList();
+        }
+
+        public void potentialActionRemoved(UpdateAction action) {
+            updatePotentialActionList();
+        }
+        
+    };
+
+    /**
+     * Handle drag and drop events
+     * @return
+     */
     private TransferHandler createTransferHandler() {
         return new TransferHandler() {
 
@@ -176,8 +248,6 @@ public class UpdateManagerPanel extends JPanel {
 
                 JList.DropLocation dl = (JList.DropLocation) info
                         .getDropLocation();
-                DefaultListModel listModel = (DefaultListModel) actionList
-                        .getModel();
                 int index = dl.getIndex();
 
                 // Get the string that is being dropped.
@@ -191,12 +261,12 @@ public class UpdateManagerPanel extends JPanel {
                 }
 
                 // Perform the actual import.
-                if (index < listModel.size()) {
-                    listModel.removeElement(data);
-                    listModel.add(index, data);
+                if (index < model.size()) {
+                    model.removeElement(data);
+                    model.add(index, data);
                 } else {
-                    listModel.removeElement(data);
-                    listModel.addElement(data);
+                    model.removeElement(data);
+                    model.addElement(data);
                 }
                 return true;
             }
@@ -223,35 +293,6 @@ public class UpdateManagerPanel extends JPanel {
         };
     }
 
-    /** Action which deletes selected actions. */
-    Action deleteActionsAction = new AbstractAction() {
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-            putValue(NAME, "Delete actions");
-            putValue(SHORT_DESCRIPTION, "Delete selected actions");
-            UpdateManagerPanel.this.getInputMap(
-                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                    KeyStroke.getKeyStroke("BACK_SPACE"), this);
-            UpdateManagerPanel.this.getInputMap(
-                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                    KeyStroke.getKeyStroke("DELETE"), this);
-            UpdateManagerPanel.this.getActionMap().put(this, this);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            DefaultListModel listModel = (DefaultListModel) actionList
-                    .getModel();
-            // TODO: This should directly modify the update manager, which should fire
-            //      an event which this listens to
-            for (int i = 0; i < actionList.getSelectedIndices().length; i++) {
-                listModel.remove(actionList.getSelectedIndices()[i]);
-            }
-        }
-    };
 
 //    /**
 //     * Test panel.

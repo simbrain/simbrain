@@ -25,6 +25,8 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.update_actions.BufferedUpdate;
+import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
 
 /**
@@ -40,9 +42,19 @@ public class UpdateManager {
      */
     private final List<UpdateAction> actionList = new ArrayList<UpdateAction>();
 
+    /**
+     * The list of possible update actions that can be added to the main list.
+     */
+    private final List<UpdateAction> potentialActionList = new ArrayList<UpdateAction>();
+
+    /**
+     * List of listeners on this update manager
+     */
+    private final List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
+
     /** Reference to parent network. */
     private final RootNetwork network;
-    
+        
     /**
      * Construct a new update manager
      *
@@ -50,7 +62,16 @@ public class UpdateManager {
      */
     public UpdateManager(RootNetwork network) {
         this.network = network;
-        
+        addPotentialAction(new BufferedUpdate(network));        
+        addPotentialAction(new PriorityUpdate(network));        
+        addListeners();
+
+    }
+
+    /**
+     * Update manager should listene for relevant changes in network.
+     */
+    private void addListeners() {
         // Group are automatically listened for, and added.  Possibly
         //  Make it possible to override this default behavior.
         network.addGroupListener(new GroupListener() {
@@ -58,12 +79,14 @@ public class UpdateManager {
             public void groupAdded(NetworkEvent<Group> e) {
                 if (e.getObject() instanceof UpdatableGroup) {
                     addAction(new UpdateGroup(e.getObject()));
+                    addPotentialAction(new UpdateGroup(e.getObject()));
                 }            
             }
 
             public void groupRemoved(NetworkEvent<Group> e) {
                 if (e.getObject() instanceof UpdatableGroup) {
                     removeAction(new UpdateGroup(e.getObject()));
+                    removePotentialAction(new UpdateGroup(e.getObject()));
                 }            
             }
 
@@ -75,9 +98,26 @@ public class UpdateManager {
             public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
             }
             
-        });
-    }
+        });    }
 
+    /**
+     * Listen for updates to the update manager.
+     *
+     * @param listener the listener to add
+     */
+    public void addListener(UpdateManagerListener listener) {
+        listeners.add(listener);
+    }
+    
+    /**
+     * Remove listener.
+     *
+     * @param listener the listener to remove
+     */
+    public void removeListener(UpdateManagerListener listener) {
+        listeners.remove(listener);
+    }
+    
     /**
      * @return the actionList
      */
@@ -90,8 +130,11 @@ public class UpdateManager {
      *
      * @param action the action to add.
      */
-    protected void addAction(UpdateAction action) {
+    public void addAction(UpdateAction action) {
         actionList.add(action);
+        for(UpdateManagerListener listener : listeners) {
+            listener.actionAdded(action);
+        }
     }
     
     /**
@@ -99,8 +142,63 @@ public class UpdateManager {
      *
      * @param action the action to remove
      */
-    protected void removeAction(UpdateAction action) {
+    public void removeAction(UpdateAction action) {
         actionList.remove(action);
+        for(UpdateManagerListener listener : listeners) {
+            listener.actionRemoved(action);
+        }
+    }
+    
+    /**
+     * Add an action to the list.
+     *
+     * @param action the action to add.
+     */
+    protected void addPotentialAction(UpdateAction action) {
+        potentialActionList.add(action);
+        for(UpdateManagerListener listener : listeners) {
+            listener.potentialActionAdded(action);
+        }
+    }
+    
+    /**
+     * Remove a potential action from the list.
+     *
+     * @param action the action to remove
+     */
+    public void removePotentialAction(UpdateAction action) {
+        potentialActionList.remove(action);
+        for(UpdateManagerListener listener : listeners) {
+            listener.potentialActionRemoved(action);
+        }
+    }
+    
+    /**
+     * Listen from changes to update manager.
+     */
+    public interface UpdateManagerListener {
+
+        /** An action was added. */
+        public void actionAdded(UpdateAction action);
+
+        /** An action was removed. */
+        public void actionRemoved(UpdateAction action);
+
+        /** A potential action was added. */
+        public void potentialActionAdded(UpdateAction action);
+
+        /** An potential action was removed. */
+        public void potentialActionRemoved(UpdateAction action);
+
+        /** The action order was changed. */
+        public void actionOrderChanged();
+    }
+
+    /**
+     * @return the potentialActionList
+     */
+    public List<UpdateAction> getPotentialActionList() {
+        return potentialActionList;
     }
 
 }

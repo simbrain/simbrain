@@ -44,7 +44,7 @@ public class SubnetGroupNode extends GroupNode {
     
     @Override
     public void updateBounds() {
-
+        
         PBounds bounds = new PBounds();
         for (PNode node : getOutlinedObjects()) {
             bounds.add(node.getGlobalBounds());

@@ -88,7 +88,7 @@ public final class ShowTrainerAction extends AbstractAction {
                 networkPanel.getSourceModelNeurons(),
                 networkPanel.getSelectedModelNeurons(), new Backprop());
         TrainerPanel trainerPanel = new TrainerPanel(networkPanel, trainer);
-        GenericFrame frame = networkPanel.displayPanel(trainerPanel);
+        GenericFrame frame = networkPanel.displayPanel(trainerPanel, "Trainer panel");
         trainerPanel.setFrame(frame);
     }
 }

@@ -22,9 +22,9 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.simbrain.network.groups.Competitive;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.networks.Competitive;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;

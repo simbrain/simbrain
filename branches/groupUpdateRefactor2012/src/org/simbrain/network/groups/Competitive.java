@@ -16,12 +16,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.networks;
+package org.simbrain.network.groups;
 
 import java.util.Iterator;
 
-import org.simbrain.network.groups.SubnetworkGroup;
-import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -143,6 +141,7 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
             Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
             n.getAverageInput();
+            System.out.println(n.getFanIn().size());
             if (n.getActivation() > max) {
                 max = n.getActivation();
                 winner = i;

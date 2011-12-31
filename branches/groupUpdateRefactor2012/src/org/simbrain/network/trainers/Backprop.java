@@ -130,8 +130,8 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
 
         // Update RMS error
         rmsError = Math.sqrt(rmsError / (numRows * trainer.getOutputLayer().size()));
+        iteration++;
         trainer.fireErrorUpdated();
-        iteration += this.getIteration();
     }
 
     /**

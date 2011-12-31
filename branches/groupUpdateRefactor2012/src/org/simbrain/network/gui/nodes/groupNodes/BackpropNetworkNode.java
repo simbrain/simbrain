@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -30,6 +31,7 @@ import org.simbrain.network.groups.BackpropNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.DataViewer;
+import org.simbrain.network.gui.trainer.ErrorPlotPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.trainers.Trainer;
@@ -66,25 +68,29 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
             super(net, BackpropNetworkNode.this);
         }
 
-//        @Override
-//        protected JDialog getPropertyDialog() {
-//            return super.getPropertyDialog();
-//        }
-
         @Override
-        protected String getToolTipText() {
-            return "Backprop...";
+        protected JDialog getPropertyDialog() {
+            TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
+                    getTrainer());
+            JDialog dialog = new JDialog();
+            dialog.setContentPane(panel);
+            return dialog;
         }
+        
+      @Override
+      protected boolean hasPropertyDialog() {
+          return true;
+      }
 
 //        @Override
-//        protected boolean hasPropertyDialog() {
+//        protected String getToolTipText() {
+//            return "Backprop...";
+//        }
+//
+//        @Override
+//        protected boolean hasToolTipText() {
 //            return true;
 //        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
-        }
 
     };
 
@@ -99,7 +105,7 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
                 TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
                         getTrainer());
                 GenericFrame frame = getNetworkPanel().displayPanel(
-                        trainerPanel);
+                        trainerPanel, "Trainer");
                 trainerPanel.setFrame(frame);
             }
         };
@@ -110,7 +116,7 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
                         getTrainer());
                 JPanel inputDataPanel = DataViewer.getDataViewerPanel(
                         trainerPanel, TrainerDataType.Input);
-                getNetworkPanel().displayPanel(inputDataPanel);
+                getNetworkPanel().displayPanel(inputDataPanel, "Training Data");
             }
         };
         menu.add(showInputData);
@@ -120,10 +126,18 @@ public class BackpropNetworkNode extends LayeredNetworkNode {
                         getTrainer());
                 JPanel inputDataPanel = DataViewer.getDataViewerPanel(
                         trainerPanel, TrainerDataType.Trainer);
-                getNetworkPanel().displayPanel(inputDataPanel);
+                getNetworkPanel().displayPanel(inputDataPanel, "Input data");
             }
         };
         menu.add(showTrainingData);
+        Action showErrorPlot = new AbstractAction("Show Error Plot") {
+            public void actionPerformed(final ActionEvent event) {
+                ErrorPlotPanel errorPanel = new ErrorPlotPanel(
+                        getNetworkPanel(), getTrainer());
+                getNetworkPanel().displayPanel(errorPanel, "Error plot");
+            }
+        };
+        menu.add(showErrorPlot);
         setConextMenu(menu);
     }
 

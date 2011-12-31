@@ -26,10 +26,10 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.groups.Hopfield;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.networks.Hopfield;
 
 /**
  * PNode representation of Hopfield Network.

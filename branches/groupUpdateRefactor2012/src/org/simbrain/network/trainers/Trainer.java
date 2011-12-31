@@ -117,11 +117,7 @@ public class Trainer {
         Collections.sort(outputLayer, Comparators.X_ORDER);
 
         setTrainingMethod(method);
-
-        // SimnetUtils.printLayers(SimnetUtils.getIntermedateLayers(network,
-        // inputLayer, outputLayer));
     }
-
 
     /**
      * @return the inputData

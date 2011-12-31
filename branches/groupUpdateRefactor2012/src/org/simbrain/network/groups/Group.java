@@ -74,7 +74,7 @@ public abstract class Group {
      * 
      * @param neuron neuron to delete
      */
-    public void removeNeuron(Neuron neuron) {};
+    public void deleteNeuron(Neuron neuron) {};
     
     /**
      * Remove a synapse.  Subclasses with synapse lists should override this.

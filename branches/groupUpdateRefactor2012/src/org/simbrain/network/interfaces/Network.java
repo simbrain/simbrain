@@ -497,7 +497,7 @@ public abstract class Network {
         // Remove the neuron itself. Either from a parent group that holds it,
         // or from the root network.
         if(toDelete.getParentGroup() != null) {
-            toDelete.getParentGroup().removeNeuron(toDelete);
+            toDelete.getParentGroup().deleteNeuron(toDelete);
             if (toDelete.getParentGroup().isEmpty()) {
                 deleteGroup(toDelete.getParentGroup());
             }

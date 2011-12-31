@@ -24,10 +24,10 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.Hopfield;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.networks.Hopfield;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 

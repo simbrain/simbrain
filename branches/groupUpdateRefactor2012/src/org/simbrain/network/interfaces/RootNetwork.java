@@ -136,7 +136,7 @@ public class RootNetwork extends Network {
      * The update manager for this network.
      */
     private final UpdateManager updateManager;
-
+    
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
 

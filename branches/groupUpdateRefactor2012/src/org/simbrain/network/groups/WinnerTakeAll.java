@@ -16,12 +16,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.networks;
+package org.simbrain.network.groups;
 
 import java.util.Random;
 
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.Layout;

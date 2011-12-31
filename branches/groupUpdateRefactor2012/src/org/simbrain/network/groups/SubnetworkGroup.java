@@ -142,8 +142,8 @@ public class SubnetworkGroup extends Group {
     }
 
     @Override
-    public void removeNeuron(Neuron toDelete) {
-        neuronGroup.removeNeuron(toDelete);
+    public void deleteNeuron(Neuron toDelete) {
+        neuronGroup.deleteNeuron(toDelete);
         //REDO
         //getParent().fireGroupChanged(this, this);
     }

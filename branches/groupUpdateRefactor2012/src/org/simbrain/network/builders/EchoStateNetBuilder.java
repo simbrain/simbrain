@@ -27,7 +27,6 @@ import org.simbrain.network.interfaces.CustomUpdateRule;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -191,8 +190,8 @@ public final class EchoStateNetBuilder {
 //        initializeLayer(outputLayer, outputNeuronType,
 //                LayerType.Output, numOutputNodes);
 
-        network.setUpdateMethod(UpdateMethod.CUSTOM);
-        network.setCustomUpdateRule(update);
+//        network.setUpdateMethod(UpdateMethod.CUSTOM);
+//        network.setCustomUpdateRule(update);
 
         LineLayout layerLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);

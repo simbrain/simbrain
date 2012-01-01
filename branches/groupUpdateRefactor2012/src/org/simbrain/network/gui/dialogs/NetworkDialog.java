@@ -41,7 +41,6 @@ import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.RootNetwork.UpdateMethod;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
@@ -104,17 +103,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     /** Graphics tab. */
     private JPanel tabGraphics = new JPanel();
 
-    /** Logic tab. */
-    private JPanel tabLogic = new JPanel();
-
     /** Miscellaneous tab. */
     private JPanel tabMisc = new JPanel();
 
     /** Grahpics panel. */
     private LabelledItemPanel graphicsPanel = new LabelledItemPanel();
-
-    /** Logic panel. */
-    private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
     /** Miscellaneous panel. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
@@ -150,14 +143,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
-
-    /** Root network update method combo box. */
-    private JComboBox cbUpdateMethod = new JComboBox(new Object[] {
-            RootNetwork.UpdateMethod.BUFFERED,
-            RootNetwork.UpdateMethod.PRIORITYBASED });
-
-    /** If true, then the user has manually changed the update method. */
-    private boolean updateMethodChanged = false;
     
     /** Update manager panel. */
     private UpdateManagerPanel updatePanel;
@@ -201,7 +186,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         weightSizeMinSlider.addChangeListener(this);
         cbChangeColor.addActionListener(this);
         cbChangeColor.setActionCommand("moveSelector");
-        cbUpdateMethod.addActionListener(this);
 
         // Set up color pane
         colorPanel.add(cbChangeColor);
@@ -216,14 +200,10 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
         graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
         graphicsPanel.addItem("Show time", showTimeBox);
-        
-        // Set up logic panel
-        logicPanel.addItem("Round off neuron values", isRoundingBox);
-        logicPanel.addItem("Precision of round-off", precisionField);
-        logicPanel.addItem("Network Update Method", cbUpdateMethod);
-        //logicPanel.addItem("Set Script", scriptButton);
 
         // Set up Misc Panel
+        miscPanel.addItem("Round off neuron values", isRoundingBox);
+        miscPanel.addItem("Precision of round-off", precisionField);
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
 
         // UpdatePanel
@@ -231,10 +211,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
         // Set up tab panels
         tabGraphics.add(graphicsPanel);
-        tabLogic.add(logicPanel);
         tabMisc.add(miscPanel);
         tabbedPane.addTab("Graphics", tabGraphics);
-        tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Update", updatePanel);
         tabbedPane.addTab("Misc.", tabMisc);
         setContentPane(tabbedPane);
@@ -353,8 +331,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         } else if (o == showSubnetOutlineBox) {
             networkPanel
                     .setShowSubnetOutline(showSubnetOutlineBox.isSelected());
-        } else if (o == cbUpdateMethod) {
-            updateMethodChanged = true;
         }
     }
 
@@ -372,7 +348,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
                 .getRoundingOff());
         weightSizeMaxSlider.setValue(NetworkGuiSettings.getMaxDiameter());
         weightSizeMinSlider.setValue(NetworkGuiSettings.getMinDiameter());
-        cbUpdateMethod.setSelectedItem(networkPanel.getRootNetwork().getUpdateMethod());
     }
 
     /**
@@ -383,13 +358,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
                 .getText()));
         networkPanel.getRootNetwork().setPrecision(
                 Integer.parseInt(precisionField.getText()));
-
-        // Don't change the update method unless the user explicitly selected an
-        // update method (otherwise custom update overridden).
-        if (updateMethodChanged ) {
-            networkPanel.getRootNetwork().setUpdateMethod(
-                    (UpdateMethod) cbUpdateMethod.getSelectedItem());
-        }
     }
 
     /**

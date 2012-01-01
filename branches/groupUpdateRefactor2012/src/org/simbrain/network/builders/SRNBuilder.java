@@ -75,7 +75,7 @@ public final class SRNBuilder {
     /** Default constructor. */
     public SRNBuilder() {
         this.network = new RootNetwork();
-        network.setCustomUpdateRule(update);
+        // network.setCustomUpdateRule(update);
     }
 
     /**
@@ -88,7 +88,7 @@ public final class SRNBuilder {
     public SRNBuilder(final RootNetwork network, int numInputNodes,
             int numHiddenNodes, int numOutputNodes) {
         this.network = network;
-        network.setCustomUpdateRule(update);
+        //network.setCustomUpdateRule(update);
         this.numInputNodes = numInputNodes;
         this.numHiddenNodes = numHiddenNodes;
         this.numOutputNodes = numOutputNodes;

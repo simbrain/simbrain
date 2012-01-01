@@ -85,37 +85,6 @@ public class RootNetwork extends Network {
 
     /** Whether this is a discrete or continuous time network. */
     private TimeType timeType = TimeType.DISCRETE;
-    
-    /**
-     * Enumeration for the update methods. BUFFER: Default update method; based
-     * on buffering PRIORITYBASED: User sets the priority for each neuron,
-     * sub-neuron and synapse (but currently just neurons). Default priority
-     * value is 0. Elements with smaller priority value are updated first.
-     * CUSTOM: User has provided a custom update script.
-     */
-    public enum UpdateMethod {
-        BUFFERED {
-            @Override
-            public String toString() {
-                return "Buffered";
-            }
-        },
-        PRIORITYBASED {
-            @Override
-            public String toString() {
-                return "Priority-based";
-            }
-        },
-        CUSTOM {
-            @Override
-            public String toString() {
-                return "Custom";
-            }
-        }
-    }
-
-    /** Current update method. */
-    private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
 
     /** Text objects. */
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
@@ -129,9 +98,6 @@ public class RootNetwork extends Network {
     /** Comparator used for sorting the priority sorted neuron list. */
     private PriorityComparator priorityComparator = new PriorityComparator();
 
-    /** Custom update rule. */
-    private CustomUpdateRule customRule;
-    
     /**
      * The update manager for this network.
      */
@@ -327,19 +293,15 @@ public class RootNetwork extends Network {
      * Update the priority list used for priority based update.
      */
     void updatePriorityList() {
-        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-            prioritySortedNeuronList = this.getFlatNeuronList();
-            resortPriorities();
-        }
+        prioritySortedNeuronList = this.getFlatNeuronList();
+        resortPriorities();
     }
 
     /**
      * Resort the neurons according to their update priorities.
      */
     void resortPriorities() {
-        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-            Collections.sort(prioritySortedNeuronList, priorityComparator);
-        }
+        Collections.sort(prioritySortedNeuronList, priorityComparator);
     }
 
     /**
@@ -360,17 +322,6 @@ public class RootNetwork extends Network {
             neuron.setActivation(neuron.getBuffer());
             // System.out.println("Priority:" + neuron.getUpdatePriority());
         }
-    }
-
-    /**
-     * Loads a new custom update rule in. Called from network scripts, which are
-     * used to create these rules.
-     * 
-     * @param newRule new rule to set
-     */
-    public void setCustomUpdateRule(CustomUpdateRule newRule) {
-        customRule = newRule;
-        this.setUpdateMethod(UpdateMethod.CUSTOM);
     }
 
     /**
@@ -533,16 +484,6 @@ public class RootNetwork extends Network {
     public void fireNetworkChanged() {
         for (NetworkListener listener : networkListeners) {
             listener.networkChanged();
-        }
-    }
-
-    /**
-     * Fire a network update method changed event to all registered model
-     * listeners.
-     */
-    private void fireNetworkUpdateMethodChanged() {
-        for (NetworkListener listener : networkListeners) {
-            listener.networkUpdateMethodChanged();
         }
     }
 
@@ -848,36 +789,11 @@ public class RootNetwork extends Network {
         this.fireNeuronClampToggle();
     }
 
-    /**
-     * @return the updateMethod
-     */
-    public UpdateMethod getUpdateMethod() {
-        return updateMethod;
-    }
-
-    /**
-     * @param updateMethod to set
-     */
-    public void setUpdateMethod(final UpdateMethod updateMethod) {
-
-        // Set the method
-        this.updateMethod = updateMethod;
-
-        // If switching to priority updating, update the priority lists
-        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-            updatePriorityList();
-        }
-
-        // Notify listeners
-        this.fireNetworkUpdateMethodChanged();
-    }
 
     @Override
     public String toString() {
 
         String ret = "Root Network \n================= \n";
-        ret += "Update method: " + this.getUpdateMethod() + "\t Iterations:"
-                + this.getTime() + "\n";
 
         for (Neuron n : this.getNeuronList()) {
             ret += (getIndents() + n + "\n");

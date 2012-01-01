@@ -33,12 +33,6 @@ public interface NetworkListener {
     void networkChanged();
 
     /**
-     * Invoked when the network update method is changed (e.g. from default
-     * update to priority based update)
-     */
-    void networkUpdateMethodChanged();
-
-    /**
      * Notify listeners that all neurons have been clamped or un-clamped.
      */
     void neuronClampToggled();

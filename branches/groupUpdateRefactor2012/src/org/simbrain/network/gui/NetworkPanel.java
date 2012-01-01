@@ -20,7 +20,6 @@ package org.simbrain.network.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Point;
@@ -163,9 +162,6 @@ public class NetworkPanel extends JPanel {
 
     /** Label which displays current time. */
     private TimeLabel timeLabel;
-
-    /** Label which displays current update script. */
-    private UpdateStatusLabel updateStatusLabel;
 
     /** Reference to bottom NetworkPanelToolBar. */
     private CustomToolBar southBar;
@@ -313,21 +309,8 @@ public class NetworkPanel extends JPanel {
         // canvas.getCamera().addChild(timeLabel);
         timeLabel.update();
 
-        // Format the update method label
-        updateStatusLabel = new UpdateStatusLabel(this);
-        // updateStatusLabel.offset(TIME_LABEL_H_OFFSET,
-        // canvas.getCamera().getHeight()
-        // - UPDATE_LABEL_OFFSET);
-        // canvas.getCamera().addChild(updateStatusLabel);
-        // getCamera().setScale(.8); // Cheating to offset the toolbar
-        updateStatusLabel.update();
-        if (rootNetwork.getUpdateMethod() == RootNetwork.UpdateMethod.PRIORITYBASED) {
-            setPrioritiesVisible(true);
-        }
         JToolBar statusBar = new JToolBar();
         statusBar.add(timeLabel);
-        statusBar.addSeparator(new Dimension(20, 20));
-        statusBar.add(updateStatusLabel);
         this.add("South", statusBar);
 
         // Register support for tool tips
@@ -388,18 +371,6 @@ public class NetworkPanel extends JPanel {
              */
             public void synapseClampToggled() {
                 syncSynapseClampState();
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void networkUpdateMethodChanged() {
-                updateStatusLabel.update();
-                if (rootNetwork.getUpdateMethod() == RootNetwork.UpdateMethod.PRIORITYBASED) {
-                    setPrioritiesVisible(true);
-                } else {
-                    setPrioritiesVisible(false);
-                }
             }
 
         });
@@ -2285,13 +2256,6 @@ public class NetworkPanel extends JPanel {
      */
     public JPopupMenu getContextMenuAlt() {
         return contextMenuAlt;
-    }
-
-    /**
-     * @return the updateStatusLabel.
-     */
-    public UpdateStatusLabel getUpdateStatusLabel() {
-        return updateStatusLabel;
     }
 
     /**

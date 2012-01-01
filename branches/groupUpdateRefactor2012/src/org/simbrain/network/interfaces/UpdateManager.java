@@ -26,7 +26,6 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
-import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
 
@@ -83,8 +82,9 @@ public class UpdateManager {
             }
 
             public void groupRemoved(NetworkEvent<Group> e) {
+                // Find corresponding group update action and remove it
                 if (e.getObject() instanceof UpdatableGroup) {
-                    removeAction(new UpdateGroup(e.getObject()));
+                    removeGroupAction((UpdatableGroup)e.getObject());
                 }            
             }
 
@@ -97,6 +97,26 @@ public class UpdateManager {
             }
             
         });    }
+    
+    /**
+     * Remove action (if one exists) associated with the provided group.
+     *
+     * @param group 
+     */
+    private void removeGroupAction(UpdatableGroup group) {
+        UpdateAction toDelete = null;
+        for (UpdateAction action : actionList) {
+            if (action instanceof UpdateGroup) {
+                if (((UpdateGroup)action).getGroup() == group) {
+                    toDelete = action;                                                        
+                }
+            }
+        }
+        if (toDelete != null) {
+            removeActionCompletely(toDelete);
+        }
+
+    }
 
     /**
      * Listen for updates to the update manager.
@@ -138,7 +158,7 @@ public class UpdateManager {
     }
     
     /**
-     * Add an action to the list.
+     * Add an action to the list.  (Takes it off the available list)
      *
      * @param action the action to add.
      */
@@ -151,7 +171,7 @@ public class UpdateManager {
     }
     
     /**
-     * Remove an action from the list.
+     * Remove an action from the list. (But adds it it to the available list)
      *
      * @param action the action to remove
      */
@@ -161,6 +181,19 @@ public class UpdateManager {
             listener.actionRemoved(action);
         }
         addAvailableAction(action);
+    }
+    
+    /**
+     * Completely remove an action (from both current and available lists).
+     *
+     * @param action the action to completely remove
+     */
+    public void removeActionCompletely(UpdateAction action) {
+        actionList.remove(action);
+        availableActionList.remove(action);
+        for(UpdateManagerListener listener : listeners) {
+            listener.actionRemoved(action);
+        }
     }
     
     /**

@@ -18,6 +18,7 @@ import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.listeners.NetworkEvent;
 
 /**
  * REDO: Rename to subnetwork?
@@ -156,6 +157,9 @@ public class SubnetworkGroup extends Group {
     public void addSynapse(Synapse synapse) {
         synapseGroup.addSynapse(synapse);
         getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
+        NetworkEvent<Group> event = new NetworkEvent<Group>(getParentNetwork(), this, this);
+        event.setAuxiliaryObject(synapse);
+        getParentNetwork().fireGroupChanged(event,"synapseAdded"); 
     }
 
     @Override
@@ -163,23 +167,6 @@ public class SubnetworkGroup extends Group {
         synapseGroup.removeSynapse(toDelete);
         getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
     }
-
-//
-//    /**
-//     * @return a list of neurons
-//     */
-//    public List<Neuron> getNeuronList() {
-//        return neuronList;
-//    }
-//
-//    /**
-//     * Update all neurons.
-//     */
-//    public void updateNeurons() {
-//        for (Neuron neuron : neuronList) {
-//            neuron.update();
-//        }
-//    }
 
     @Override
     public boolean isEmpty() {
@@ -201,18 +188,10 @@ public class SubnetworkGroup extends Group {
      * Update group. Override for special updating.
      */
     public void invoke() {
-        neuronGroup.updateNeurons(); // TODO: Justmake it update in neurons, and dump the whole update interface
+     // TODO: Justmake it update in neurons, and dump the whole update interface
+        neuronGroup.updateNeurons(); 
         synapseGroup.update();
     }
-
-//    /**
-//     * Update all synapses.
-//     */
-//    public void updateAllSynapses() {
-//        for (Synapse synapse : synapseList) {
-//            synapse.update();
-//        }
-//    }
 
     
     @Override

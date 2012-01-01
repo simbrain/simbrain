@@ -548,6 +548,11 @@ public abstract class Network {
         this.getRootNetwork().fireSynapseDeleted(toDelete);
 
     }
+    
+
+    public void deleteSynapseShallow(Synapse synapse) {
+        synapseList.remove(synapse);
+    }
 
     /**
      * Set the activation level of all neurons to zero.

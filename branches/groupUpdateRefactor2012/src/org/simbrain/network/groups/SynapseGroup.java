@@ -73,9 +73,6 @@ public class SynapseGroup extends Group {
         synapseList.add(synapse);
         synapse.setParentGroup(this);
         getParentNetwork().fireSynapseAdded(synapse);
-        NetworkEvent<Group> event = new NetworkEvent<Group>(getParentNetwork(), this, this);
-        event.setAuxiliaryObject(synapse);
-        getParentNetwork().fireGroupChanged(event,"synapseAdded"); 
     }
     
     @Override

@@ -94,10 +94,19 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
         public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
             Synapse synapse = networkEvent.getObject();
             if (getNeuronGroup().inFanInOfSomeNode(synapse)) {
-                getParentNetwork().deleteSynapse(synapse); // remove from root net
-                //synapse.setTarget(synapse.getTarget());
-                System.out.println(synapse.getTarget().getFanIn().size());
-                addSynapse(synapse); // add synapse to group
+                
+                // TODO: This is way top much to expect client to know.  Fold in to 
+                //  API! And make simpler...
+                
+                getParentNetwork().deleteSynapseShallow(synapse); // remove from root net
+                synapse.setParentGroup(getSynapseGroup());
+                getSynapseGroup().getSynapseList().add(synapse); // Add to this list
+                
+                // Fire Event
+                NetworkEvent<Group> event = new NetworkEvent<Group>(
+                        getParentNetwork(), Competitive.this, Competitive.this);
+                event.setAuxiliaryObject(synapse);
+                getParentNetwork().fireGroupChanged(event,"synapseAdded"); 
             }
         }
 
@@ -144,7 +153,6 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
         for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
             Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
             n.getAverageInput();
-            System.out.println(n.getFanIn().size());
             if (n.getActivation() > max) {
                 max = n.getActivation();
                 winner = i;

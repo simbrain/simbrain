@@ -31,7 +31,7 @@ import org.simbrain.network.interfaces.UpdateAction;
 public class UpdateGroup implements UpdateAction {
 
     /** Reference to group. */
-    private Group group;
+    private final Group group;
     
     /**
      * @param group group to update
@@ -53,6 +53,13 @@ public class UpdateGroup implements UpdateAction {
      */
     public String getDescription() {
         return "Update " + group.getLabel();
+    }
+
+    /**
+     * @return the group
+     */
+    public Group getGroup() {
+        return group;
     }
 
 }

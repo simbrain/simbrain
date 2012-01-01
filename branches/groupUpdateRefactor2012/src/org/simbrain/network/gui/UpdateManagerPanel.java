@@ -101,7 +101,7 @@ public class UpdateManagerPanel extends JPanel {
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         availableListScroll
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        availableListScroll.setBorder(BorderFactory.createTitledBorder("Available Update Actions"));
+        availableListScroll.setBorder(BorderFactory.createTitledBorder("Unused Update Actions"));
 
         // Add lists
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -198,7 +198,7 @@ public class UpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("minus.png"));
-            putValue(NAME, "Delete update actions");
+            putValue(NAME, "Remove update actions");
             putValue(SHORT_DESCRIPTION, "Delete selected actions");
             UpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(

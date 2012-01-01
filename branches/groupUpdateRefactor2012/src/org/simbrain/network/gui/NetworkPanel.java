@@ -48,6 +48,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.BackpropNetwork;
+import org.simbrain.network.groups.Competitive;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Hopfield;
 import org.simbrain.network.groups.LayeredNetwork;
@@ -507,14 +508,13 @@ public class NetworkPanel extends JPanel {
                 // of group change are supported. For now a single case is
                 // handled: adding synapses to a synapse group               
                 Group group = e.getObject();                
-                if (group instanceof SynapseGroup) {
+                if (group instanceof Competitive) {
                     if (description.equalsIgnoreCase("synapseAdded")) {
-                        SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap
-                                .get(group);
+                        SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap.get(((Competitive) group).getSynapseGroup());
                         SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e.getAuxiliaryObject());
                         if (synapseNode != null) {
-                            synapseGroupNode.addPNode(synapseNode);
-                            synapseGroupNode.updateBounds();                            
+                            sgn.addPNode(synapseNode);
+                            sgn.updateBounds();                            
                         }
                     }
                 }
@@ -810,35 +810,9 @@ public class NetworkPanel extends JPanel {
             objectNodeMap.put(group, subnetNode);
             subnetNode.updateBounds();
         }
-        
-        
 
-        //        GroupNode modelGroup = this.findModelGroupNode(group);
-//        if (modelGroup != null) {
-//            return;
-//        }
-//
-//        canvas.getLayer().addChild(modelGroup);
-//        modelGroup.moveToFront();
+        clearSelection();
         
-//        //REDO (IS THIS METHOD USED?)
-//        if (group instanceof NeuronGroup) {
-//            for (Neuron neuron : ((NeuronGroup)group).getNeuronList()) {
-//                NeuronNode  = (NeuronNode) objectNodeMap.get(neuron);
-//                System.out.println(neuronNode);
-//                if (neuronNode != null) {
-//                    modelGroup.addReference(neuronNode);
-//                }
-//            }
-//            
-//        }
-//        for (Synapse synapse : group.getSynapseList()) {
-//            SynapseNode synapseNode = findSynapseNode(synapse);
-//            if (synapseNode != null) {
-//                modelGroup.addReference(synapseNode);
-//            }
-//        }
-
     }
 
     /**

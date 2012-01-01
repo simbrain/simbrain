@@ -21,6 +21,7 @@ package org.simbrain.network.gui.nodes.groupNodes;
 import org.simbrain.network.groups.SubnetworkGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
+import org.simbrain.network.gui.nodes.InteractionBox;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;

@@ -16,13 +16,17 @@ package org.simbrain.network.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -32,7 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
-import javax.swing.border.Border;
+import javax.swing.TransferHandler;
 
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.UpdateAction;
@@ -74,6 +78,9 @@ public class UpdateManagerPanel extends JPanel {
         currentActionJList.setModel(currentActionListModel);
         updateCurrentActionsList();
         configureCurrentJList();
+        currentActionJList.setDragEnabled(true);
+        currentActionJList.setTransferHandler(createTransferHandler());
+        currentActionJList.setDropMode(DropMode.INSERT);
         JScrollPane currentListScroll = new JScrollPane(currentActionJList);
         currentListScroll
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -280,78 +287,56 @@ public class UpdateManagerPanel extends JPanel {
         
     };
 
-//    /**
-//     * Handle drag and drop events
-//     * @return
-//     */
-//    private TransferHandler createTransferHandler() {
-//        return new TransferHandler() {
-//
-//            public boolean canImport(TransferHandler.TransferSupport info) {
-//                // we only import Strings
+    /**
+     * Handle drag and drop events
+     * @return
+     */
+    private TransferHandler createTransferHandler() {
+        return new TransferHandler() {
+
+            public boolean canImport(TransferHandler.TransferSupport info) {
 //                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 //                    return false;
 //                }
-//
-//                JList.DropLocation dl = (JList.DropLocation) info
-//                        .getDropLocation();
-//                if (dl.getIndex() == -1) {
-//                    return false;
-//                }
-//                return true;
-//            }
-//
-//            public boolean importData(TransferHandler.TransferSupport info) {
-//                // if (!info.isDrop()) {
-//                // return false;
-//                // }
-//
-//                JList.DropLocation dl = (JList.DropLocation) info
-//                        .getDropLocation();
-//                int index = dl.getIndex();
-//
-//                // Get the string that is being dropped.
-//                Transferable t = info.getTransferable();
-//                String data;
-//                try {
-//                    data = (String) t.getTransferData(DataFlavor.stringFlavor);
-//                } catch (Exception e) {
-//                    System.out.println("NO!!!");
-//                    return false;
-//                }
-//
-//                // Perform the actual import.
-//                if (index < model.size()) {
-//                    model.removeElement(data);
-//                    model.add(index, data);
-//                } else {
-//                    model.removeElement(data);
-//                    model.addElement(data);
-//                }
-//                return true;
-//            }
-//
-//            public int getSourceActions(JComponent c) {
-//                return TransferHandler.MOVE;
-//            }
-//
-//            protected Transferable createTransferable(JComponent c) {
-//                Object[] values = actionList.getSelectedValues();
-//
-//                StringBuffer buff = new StringBuffer();
-//
-//                for (int i = 0; i < values.length; i++) {
-//                    Object val = values[i];
-//                    buff.append(val == null ? "" : val.toString());
-//                    if (i != values.length - 1) {
-//                        buff.append("\n");
-//                    }
-//                }
-//                return new StringSelection(buff.toString());
-//            }
-//
-//        };
-//    }
+
+                JList.DropLocation dl = (JList.DropLocation) info
+                        .getDropLocation();
+                if (dl.getIndex() == -1) {
+                    return false;
+                }
+                return true;
+            }
+
+            public boolean importData(TransferHandler.TransferSupport info) {
+                // if (!info.isDrop()) {
+                // return false;
+                // }
+
+                JList.DropLocation dl = (JList.DropLocation) info
+                        .getDropLocation();
+                int targetIndex = dl.getIndex();
+                int sourceIndex = currentActionJList.getSelectedIndex();
+                int listSize = network.getUpdateManager().getActionList().size();
+                if (targetIndex == listSize) {
+                    targetIndex--;
+                }
+                if (sourceIndex == listSize) {
+                    sourceIndex--;
+                }                
+                network.getUpdateManager().swapElements(sourceIndex, targetIndex);
+                return true;
+            }
+
+            public int getSourceActions(JComponent c) {
+                return TransferHandler.MOVE;
+            }
+
+            protected Transferable createTransferable(JComponent c) {
+                return new StringSelection("");
+            }
+
+        };
+    }
 
 
 //    /**

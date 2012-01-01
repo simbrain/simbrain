@@ -19,6 +19,7 @@
 package org.simbrain.network.interfaces;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.groups.Group;
@@ -120,6 +121,20 @@ public class UpdateManager {
      */
     public List<UpdateAction> getActionList() {
         return actionList;
+    }
+
+    /**
+     * Swap elements at the specified location.
+     *
+     * @param index1 index of first element
+     * @param index2 index of second element
+     */
+    public void swapElements(final int index1, final int index2) {
+        //TODO: Handle case where indices don't make sense
+        Collections.swap(actionList, index1, index2);
+        for(UpdateManagerListener listener : listeners) {
+            listener.actionOrderChanged();
+        }
     }
     
     /**

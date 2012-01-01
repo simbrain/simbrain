@@ -37,6 +37,7 @@ import javax.swing.event.ChangeListener;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.UpdateManagerPanel;
+import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -237,6 +238,13 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         tabbedPane.addTab("Update", updatePanel);
         tabbedPane.addTab("Misc.", tabMisc);
         setContentPane(tabbedPane);
+        
+        // Add help button
+        JButton helpButton = new JButton("Help");
+        ShowHelpAction helpAction = new ShowHelpAction();
+        helpAction.setTheURL("Network/network_prefs.html");
+        helpButton.setAction(helpAction);
+        this.addButton(helpButton);
     }
 
     @Override

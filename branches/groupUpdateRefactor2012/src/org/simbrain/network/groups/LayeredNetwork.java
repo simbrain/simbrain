@@ -18,8 +18,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -30,13 +28,18 @@ import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
+ * A special type of subnetwork where network groups and synapse groups are organized
+ * into layers, as in a feedforwad network.
+ * 
+ * TODO: Rename to feed-forward?
+ * 
  * Adds a layered object to a network. The topology is specified by an array of
  * integers I1...In which correspond to the number of nodes in layers L1...Ln,
  * and where L1 is the input layer and Ln is the output layer.
  * 
  * @author Jeff Yoshimi
  */
-public class LayeredNetwork extends Group implements UpdatableGroup {
+public class LayeredNetwork extends SubnetworkGroup {
 
     // TODO: Default neurons, synapses (input / output special?). upper /lower
     // bounds
@@ -53,9 +56,6 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
     // */
     // private int[] nodesPerLayer = { 5, 3, 5 };
 
-    private final List<NeuronGroup> layers = new ArrayList<NeuronGroup>();
-
-    private final List<SynapseGroup> connections = new ArrayList<SynapseGroup>();
 
     /** Enumeration of layer types. */
     public enum LayerType {
@@ -79,7 +79,7 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
      */
     public LayeredNetwork(final RootNetwork network, int[] nodesPerLayer,
             Point2D.Double initialPosition) {
-        super(network);
+        super(network, nodesPerLayer.length, nodesPerLayer.length - 1);
         
         this.initialPosition = initialPosition;
         setLabel("Layered Network");
@@ -97,7 +97,7 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
             inputLayer.add(neuron);
         }
         NeuronGroup layer = new NeuronGroup(network, inputLayer);
-        addLayer(layer);
+        addNeuronGroup(layer);
         if (initialPosition == null) {
             initialPosition = new Point2D.Double(0,0);
             
@@ -129,7 +129,7 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
                     - layerWidth / 2, (int) initialPosition.getY()
                     - (betweenLayerInterval * i)));
             layout.layoutNeurons(hiddenLayer);
-            addLayer(new NeuronGroup(network, hiddenLayer));
+            addNeuronGroup(new NeuronGroup(network, hiddenLayer));
 
             // Connect input layer to hidden layer
             List<Synapse> synapseList = new ArrayList<Synapse>();
@@ -145,8 +145,7 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
             }
 
             // Create synapse group
-            addSynapseLayer(new SynapseGroup(this.getParentNetwork(),
-                    synapseList));
+            addSynapseGroup(new SynapseGroup(this.getParentNetwork(), synapseList));
 
             // Reset last layer
             lastLayer = hiddenLayer;
@@ -161,51 +160,17 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
         } else {
             setMarkedForDeletion(true);
         }
-        for (NeuronGroup layer : layers) {
-            layer.setDeleteWhenEmpty(true);
-            getParentNetwork().deleteGroup(layer);            
-        }
-        for (SynapseGroup weightLayer : connections) {
-            weightLayer.setDeleteWhenEmpty(true);
-            getParentNetwork().deleteGroup(weightLayer);            
-        }        
+        //TODO: Call super?
+//        for (NeuronGroup layer : layers) {
+//            layer.setDeleteWhenEmpty(true);
+//            getParentNetwork().deleteGroup(layer);            
+//        }
+//        for (SynapseGroup weightLayer : connections) {
+//            weightLayer.setDeleteWhenEmpty(true);
+//            getParentNetwork().deleteGroup(weightLayer);            
+//        }        
     }
     
-    /**
-     * Add a weight layer.
-     *
-     * @param group the weight layer to add.
-     */
-    private void addSynapseLayer(SynapseGroup group) {
-        group.setLabel("Weights " + (connections.size() + 1) + " > "
-                + (connections.size() + 2));
-        connections.add(group);
-        group.setParentGroup(this);
-    }
-    
-    
-    /**
-     * Add a layer.
-     *
-     * @param group the layer to add
-     */
-    private void addLayer(NeuronGroup group) {
-        group.setLabel("Layer " + (layers.size() + 1));
-        layers.add(group);
-        group.setParentGroup(this);
-    }
-    
-    //REDO: Don't like this being public...
-    public void removeLayer(NeuronGroup layer) {
-        layers.remove(layer);
-        // REDO: group changed?
-    }
-    
-    //REDO: Naming... weight layer / neuron layer
-    public void removeWeightLayer(SynapseGroup weightLayer) {
-        connections.remove(weightLayer);
-    }
-
 
     /**
      * Return the width of the specified layer, in pixels.
@@ -258,29 +223,7 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
     public void setInitialPosition(Point2D.Double initialPosition) {
         this.initialPosition = initialPosition;
     }
-    
-    @Override
-    public String toString() {
-        String ret = new String();
-        ret += ("Layered network with " + layers.size() + " layers.");
-        return ret;
-    }
 
-    /**
-     * @return the layers
-     */
-    public List<NeuronGroup> getLayers() {
-        return layers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void update() {
-        for (NeuronGroup layer : layers) {
-            layer.updateNeurons();
-        }
-    }
 
     public boolean getEnabled() {
         // TODO Auto-generated method stub
@@ -291,27 +234,6 @@ public class LayeredNetwork extends Group implements UpdatableGroup {
         // TODO Auto-generated method stub
         
     }
-    
 
-    //TODO
-    public List <Neuron> getFlatNeuronList() {
-        List<Neuron> ret = new ArrayList<Neuron>();
-        for (NeuronGroup layer : layers) {
-            ret.addAll(layer.getNeuronList());            
-        }
-        return ret;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return layers.isEmpty();
-    }
-
-    /**
-     * @return the connections
-     */
-    public List<SynapseGroup> getWeightLayer() {
-        return connections;
-    }
 
 }

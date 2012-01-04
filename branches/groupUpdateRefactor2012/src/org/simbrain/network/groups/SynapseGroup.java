@@ -13,6 +13,7 @@
 package org.simbrain.network.groups;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Neuron;
@@ -55,13 +56,19 @@ public class SynapseGroup extends Group {
         if (getParentGroup() != null) {
             if (getParentGroup() instanceof LayeredNetwork) {
                 Group parentGroup = getParentGroup();
-                ((LayeredNetwork) parentGroup).removeWeightLayer(this);
+                ((LayeredNetwork) parentGroup).removeSynapseGroup(this);
             } 
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().deleteGroup(getParentGroup());
             }            
         }
     }
+    
+    @Override
+    public List<Synapse> getFlatSynapseList() {
+        return Collections.unmodifiableList(synapseList);
+    }
+
 
     /**
      * Add synapse.

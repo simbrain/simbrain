@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.groups;
 
+import java.util.List;
+
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -177,6 +179,20 @@ public abstract class Group {
      */
     protected void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
+    }
+    
+    /**
+     * Override to produce a list of all neurons contained in a group.
+     */
+    public List<Neuron> getFlatNeuronList() {
+        return null;
+    }
+
+    /**
+     * Override to produce a list of all synapses contained in a group.
+     */
+    public List<Synapse> getFlatSynapseList() {
+        return null;
     }
 
     /**

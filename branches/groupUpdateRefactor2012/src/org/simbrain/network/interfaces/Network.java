@@ -939,10 +939,10 @@ public abstract class Network {
             // Special creation steps associated with particular group types
             // REDO: Move below to overrided creation method in group
             if (group instanceof LayeredNetwork) {
-                for (NeuronGroup layer : ((LayeredNetwork)group).getLayers()) {
+                for (NeuronGroup layer : ((LayeredNetwork)group).getNeuronGroupList()) {
                     addGroup(layer);
                 }
-                for (SynapseGroup weightLayer : ((LayeredNetwork)group).getWeightLayer()) {
+                for (SynapseGroup weightLayer : ((LayeredNetwork)group).getSynapseGroupList()) {
                     addGroup(weightLayer);
                 }
             } else if (group instanceof SubnetworkGroup) {
@@ -1045,16 +1045,14 @@ public abstract class Network {
      *
      * @return the flat list
      */
-    public ArrayList<Synapse> getFlatSynapseList() {
-        ArrayList<Synapse> ret = new ArrayList<Synapse>();
+    public List<Synapse> getFlatSynapseList() {
+        List<Synapse> ret = new ArrayList<Synapse>();
         ret.addAll(synapseList);
 
         for (int i = 0; i < networkList.size(); i++) {
             Network net = (Network) networkList.get(i);
-            ArrayList<Synapse> toAdd;
-
+            List<Synapse> toAdd;
             toAdd = net.getFlatSynapseList();
-
             ret.addAll(toAdd);
         }
 

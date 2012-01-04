@@ -19,18 +19,28 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.trainers.*;
 
 /**
+ * Backprop network.
+ *
  * @author Jeff Yoshimi
  */
 public class BackpropNetwork extends LayeredNetwork {
 
+    /** Reference to parent trainer. */
     private final Trainer trainer;
 
+    /**
+     * Construct a new backprop network.
+     *
+     * @param network reference to root network
+     * @param nodesPerLayer number of layers
+     * @param initialPosition initial position in network
+     */
     public BackpropNetwork(RootNetwork network, int[] nodesPerLayer,
             Double initialPosition) {
         super(network, nodesPerLayer, initialPosition);
-        int numLayers = getLayers().size();
-        trainer = new Trainer(network, this.getLayers().get(0).getNeuronList(),
-                this.getLayers().get(numLayers - 1).getNeuronList(),
+        int numLayers = getNeuronGroupCount();
+        trainer = new Trainer(network, this.getNeuronGroup(0).getNeuronList(),
+                this.getNeuronGroup(numLayers - 1).getNeuronList(),
                 new Backprop());
         setLabel("Backprop");
 

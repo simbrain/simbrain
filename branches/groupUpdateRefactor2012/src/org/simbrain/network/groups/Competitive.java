@@ -73,9 +73,9 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
      * @param root reference to RootNetwork.
      */
     public Competitive(final RootNetwork root, final int numNeurons, final Layout layout) {
-        super(root);
+        super(root, 1, 1);
         for (int i = 0; i < numNeurons; i++) {
-            addNeuron(new Neuron(root, new LinearNeuron()));
+            getNeuronGroup().addNeuron(new Neuron(root, new LinearNeuron()));
         }
         layout.layoutNeurons(this.getNeuronGroup().getNeuronList());
         root.addSynapseListener(synapseListener);
@@ -132,7 +132,7 @@ public class Competitive extends SubnetworkGroup implements UpdatableGroup  {
      * @param oldNet old network.
      */
     public Competitive(RootNetwork newRoot, Competitive oldNet) {
-        super(newRoot, null);
+        super(newRoot);
         setEpsilon(oldNet.getEpsilon());
         setLeakyEpsilon(oldNet.getLeakyEpsilon());
         setLoseValue(oldNet.getLoseValue());

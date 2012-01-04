@@ -775,7 +775,7 @@ public class NetworkPanel extends JPanel {
         } else if (group instanceof LayeredNetwork) {
 
             // Find layers (neuron groups) which should already have been added
-            for(NeuronGroup layer : ((LayeredNetwork)group).getLayers()) {
+            for(NeuronGroup layer : ((LayeredNetwork)group).getNeuronGroupList()) {
                 GroupNode neuronGroupNode = (GroupNode) objectNodeMap.get(layer);
                 nodes.add(neuronGroupNode);
             }

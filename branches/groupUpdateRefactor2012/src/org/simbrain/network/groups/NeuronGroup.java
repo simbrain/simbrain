@@ -64,12 +64,17 @@ public class NeuronGroup extends Group {
         if (getParentGroup() != null) {
             if (getParentGroup() instanceof LayeredNetwork) {
                 Group parentGroup = getParentGroup();
-                ((LayeredNetwork) parentGroup).removeLayer(this);
+                ((LayeredNetwork) parentGroup).removeNeuronGroup(this);
             }
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().deleteGroup(getParentGroup());
             }
         }
+    }
+    
+    @Override
+    public List<Neuron> getFlatNeuronList() {
+        return Collections.unmodifiableList(neuronList);
     }
     
     /**
@@ -181,6 +186,36 @@ public class NeuronGroup extends Group {
 //  */
 // public boolean containsNeuron(final Neuron n) {
 //     return neuronList.contains(n);
+// }
+    
+//  /**
+//  * Randomize fan-in for all neurons in group.
+//  */
+// public void randomizeIncomingWeights() {
+//     for (Neuron neuron : neuronList) {
+//         neuron.randomizeFanIn();
+//     }
+// }
+//
+// /**
+//  * Randomize all neurons in group.
+//  */
+// public void randomize() {
+//     for (Neuron neuron : neuronList) {
+//         neuron.randomize();
+//     }
+// }
+//
+// /**
+//  * Randomize bias for all neurons in group.
+//  * 
+//  * @param lower lower bound for randomization.
+//  * @param upper upper bound for randomization.
+//  */
+// public void randomizeBiases(double lower, double upper) {
+//     for (Neuron neuron : neuronList) {
+//         neuron.randomizeBias(lower, upper);
+//     }
 // }
 
 }

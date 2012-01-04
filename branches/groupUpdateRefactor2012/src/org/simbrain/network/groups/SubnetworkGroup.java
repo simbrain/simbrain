@@ -12,24 +12,27 @@
  */
 package org.simbrain.network.groups;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.listeners.NetworkEvent;
 
 /**
+ * A collection of neuron groups and synapse groups.
+ * 
  * REDO: Rename to subnetwork?
  */
-public class SubnetworkGroup extends Group {
+public class SubnetworkGroup extends Group implements UpdatableGroup {
     
-    /** List of neurons. */
-    private final NeuronGroup neuronGroup;
+    /** List of neuron groups. */
+    private final List<NeuronGroup> neuronGroupList = new ArrayList<NeuronGroup>();
 
-    /** List of synapses. */
-    private final SynapseGroup synapseGroup;
+    /** List of synapse groups. */
+    private final List<SynapseGroup> synapseGroupList = new ArrayList<SynapseGroup>();
 
     /**
      * Create subnetwork group.
@@ -38,36 +41,25 @@ public class SubnetworkGroup extends Group {
      */
     public SubnetworkGroup(final RootNetwork net) {
         super(net);
-        neuronGroup = new NeuronGroup(net);
-        synapseGroup = new SynapseGroup(net);
         init();
     }
-
+    
     /**
-     * Create subnetwork group with a set of neurons.
+     * Create subnetwork group with a specified numbers of neuron groups and synapse groups.
      *
      * @param net parent network
-     * @param neurons initial set of neurons
+     * @param numNeuronGroups number of neuron groups
+     * @param numSynapseGroups number of synapse groups
      */
-    public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons) {
+    public SubnetworkGroup(final RootNetwork net, int numNeuronGroups, int numSynapseGroups) {
         super(net);
-        neuronGroup = new NeuronGroup(net, neurons);      
-        synapseGroup = new SynapseGroup(net);
         init();
-    }
-
-    /**
-     * Create a subnetwork group with a set of neurons and weights.
-     *
-     * @param net parent network
-     * @param neurons initial neurons
-     * @param synapses initial weights
-     */
-    public SubnetworkGroup(final RootNetwork net, final List<Neuron> neurons, final List<Synapse> synapses) {
-        super(net);
-        neuronGroup = new NeuronGroup(net, neurons);      
-        synapseGroup = new SynapseGroup(net, synapses);
-        init();
+        for (int i = 0; i < numNeuronGroups; i++) {
+            addNeuronGroup(new NeuronGroup(net));
+        }
+        for (int i = 0; i < numSynapseGroups; i++) {
+            addSynapseGroup(new SynapseGroup(net));
+        }
     }
     
     @Override
@@ -77,142 +69,173 @@ public class SubnetworkGroup extends Group {
         } else {
             setMarkedForDeletion(true);
         }
-        neuronGroup.setDeleteWhenEmpty(true);
-        getParentNetwork().deleteGroup(neuronGroup);
-        synapseGroup.setDeleteWhenEmpty(true);
-        getParentNetwork().deleteGroup(synapseGroup);        
+//      for (NeuronGroup layer : layers) {
+//      layer.setDeleteWhenEmpty(true);
+//      getParentNetwork().deleteGroup(layer);            
+//  }
+//  for (SynapseGroup weightLayer : connections) {
+//      weightLayer.setDeleteWhenEmpty(true);
+//      getParentNetwork().deleteGroup(weightLayer);            
+//  }        
+
+        
+//        neuronGroup.setDeleteWhenEmpty(true);
+//        getParentNetwork().deleteGroup(neuronGroup);
+//        synapseGroup.setDeleteWhenEmpty(true);
+//        getParentNetwork().deleteGroup(synapseGroup);        
     }
 
     /**
-     * Initialize the subnet.
+     * Initialize the subnetwork;
      */
     private void init() {
         setLabel("Subnetwork");
-        neuronGroup.setLabel("Neuron group");
-        neuronGroup.setParentGroup(this);
-        synapseGroup.setLabel("Synapse group");
-        synapseGroup.setParentGroup(this);
-        synapseGroup.setDeleteWhenEmpty(false);
+        //TODO: Think about below
+//        neuronGroup.setLabel("Neuron group");
+//        neuronGroup.setParentGroup(this);
+//        synapseGroup.setLabel("Synapse group");
+//        synapseGroup.setParentGroup(this);
+//        synapseGroup.setDeleteWhenEmpty(false);
     }
-
-    
-//    /**
-//     * Randomize fan-in for all neurons in group.
-//     */
-//    public void randomizeIncomingWeights() {
-//        for (Neuron neuron : neuronList) {
-//            neuron.randomizeFanIn();
-//        }
-//    }
-//
-//    /**
-//     * Randomize all neurons in group.
-//     */
-//    public void randomize() {
-//        for (Neuron neuron : neuronList) {
-//            neuron.randomize();
-//        }
-//    }
-//
-//    /**
-//     * Randomize bias for all neurons in group.
-//     * 
-//     * @param lower lower bound for randomization.
-//     * @param upper upper bound for randomization.
-//     */
-//    public void randomizeBiases(double lower, double upper) {
-//        for (Neuron neuron : neuronList) {
-//            neuron.randomizeBias(lower, upper);
-//        }
-//    }
-
+   
     /** @Override. */
     public Network duplicate() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /**
-     * Add neuron.
-     * 
-     * @param neuron neuron to add
-     */
-    public void addNeuron(Neuron neuron) {
-        neuronGroup.addNeuron(neuron);
-        //neuron.setParentGroup(this); REDO: Think... Is this the parent?
-    }
-
-    @Override
-    public void deleteNeuron(Neuron toDelete) {
-        neuronGroup.deleteNeuron(toDelete);
-        //REDO
-        //getParent().fireGroupChanged(this, this);
-    }
-    
-    /**
-     * Add synapse.
-     * 
-     * @param synapse synapse to add
-     */
-    public void addSynapse(Synapse synapse) {
-        synapseGroup.addSynapse(synapse);
-        getParentNetwork().fireGroupChanged(this, this, "synapseAdded");
-        NetworkEvent<Group> event = new NetworkEvent<Group>(getParentNetwork(), this, this);
-        event.setAuxiliaryObject(synapse);
-        getParentNetwork().fireGroupChanged(event,"synapseAdded"); 
-    }
-
-    @Override
-    public void removeSynapse(Synapse toDelete) {
-        synapseGroup.removeSynapse(toDelete);
-        getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
-    }
-
     @Override
     public boolean isEmpty() {
-        boolean neuronsGone = neuronGroup.isEmpty();
-        boolean synapsesGone = synapseGroup.isEmpty();
-        return (neuronsGone && synapsesGone);
+        boolean neuronGroupsEmpty = neuronGroupList.isEmpty();
+        boolean synapseGroupsEmpty = synapseGroupList.isEmpty();
+        return (neuronGroupsEmpty && synapseGroupsEmpty);
     }
 
     /**
-     * Returns the number of neurons and synapses in this group.
-     * 
-     * @return the number of neurons and synapses in this group.
+     * Add a synapse group
+     *
+     * @param group the synapse group to add
      */
-    public int getElementCount() {
-        return neuronGroup.getNeuronList().size() + synapseGroup.getSynapseList().size();
+    public void addSynapseGroup(SynapseGroup group) {
+//        group.setLabel("Weights " + (connections.size() + 1) + " > "
+//                + (connections.size() + 2));
+        synapseGroupList.add(group);
+        group.setParentGroup(this);
+    }
+    
+    
+    /**
+     * Add a neuron group.
+     *
+     * @param group the neuron group to add
+     */
+    public void addNeuronGroup(NeuronGroup group) {
+        neuronGroupList.add(group);
+        group.setParentGroup(this);
+    }
+    
+    /**
+     * Remove a neuron group.
+     *
+     * @param neuronGroup group to remove
+     */
+    public void removeNeuronGroup(NeuronGroup neuronGroup) {
+        neuronGroupList.remove(neuronGroup);
+        // TODO: Fire event?
     }
 
     /**
-     * Update group. Override for special updating.
+     * Remove a synapse group.
+     *
+     * @param synapseGroup group to remove
+     */
+    public void removeSynapseGroup(SynapseGroup synapseGroup) {
+        synapseGroupList.remove(synapseGroup);
+        // TODO: Fire event?
+    }
+
+    /**
+     * Update subnetwork. Override for special updating.
      */
     public void invoke() {
-     // TODO: Justmake it update in neurons, and dump the whole update interface
-        neuronGroup.updateNeurons(); 
-        synapseGroup.update();
+        for (NeuronGroup layer : neuronGroupList) {
+            layer.updateNeurons();
+        }
+    }
+    
+    // TODO: Javadocs
+    
+    public NeuronGroup getNeuronGroup(int index) {
+        return neuronGroupList.get(index);
+    }
+    public NeuronGroup getNeuronGroup() {
+        return neuronGroupList.get(0);
+    }
+    public int getNeuronGroupCount() {
+        return neuronGroupList.size();
+    }
+    public List<NeuronGroup> getNeuronGroupList() {
+        return Collections.unmodifiableList(neuronGroupList);
+    }
+    
+    public SynapseGroup getSynapseGroup(int index) {
+        return synapseGroupList.get(index);
+    }
+    public SynapseGroup getSynapseGroup() {
+        return synapseGroupList.get(0);
+    }
+    public int getSynapseGroupCount() {
+        return synapseGroupList.size();
+    }
+    public List<SynapseGroup> getSynapseGroupList() {
+        return Collections.unmodifiableList(synapseGroupList);
     }
 
-    
+    @Override
+    public List<Neuron> getFlatNeuronList() {
+        List<Neuron> ret = new ArrayList<Neuron>();
+        for(NeuronGroup group : neuronGroupList) {
+            ret.addAll(group.getFlatNeuronList());
+        }
+        return Collections.unmodifiableList(ret);
+    }
+
+    @Override
+    public List<Synapse> getFlatSynapseList() {
+        List<Synapse> ret = new ArrayList<Synapse>();
+        for(SynapseGroup group : synapseGroupList) {
+            ret.addAll(group.getFlatSynapseList());
+        }
+        return Collections.unmodifiableList(ret);
+    }
+
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Subnetwork with " + neuronGroup.getNeuronList().size() + " neuron(s),");
-        ret += (" " + synapseGroup.getSynapseList().size() + " synapse(s).");
+        ret += ("Subnetwork with " + neuronGroupList.size() + " neuron list(s),");
+        ret += (" " + synapseGroupList.size() + " synapse list(s).");
         return ret;
     }
 
     /**
-     * @return the neuronGroup
+     * {@inheritDoc}
      */
-    public NeuronGroup getNeuronGroup() {
-        return neuronGroup;
+    public boolean getEnabled() {
+        return false;
     }
 
     /**
-     * @return the synapseGroup
+     * {@inheritDoc}
      */
-    public SynapseGroup getSynapseGroup() {
-        return synapseGroup;
+    public void setEnabled(boolean enabled) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void update() {
+        for (NeuronGroup neuronGroup : neuronGroupList) {
+            neuronGroup.updateNeurons();
+        }
     }
 }

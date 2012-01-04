@@ -73,7 +73,7 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
      * @param root reference to RootNetwork.
      */
     public Hopfield(final RootNetwork root, final int numNeurons, final Layout layout) {
-        super(root);
+        super(root, 1, 1);
         setLabel("Hopfield network");
 
         //Create the neurons
@@ -84,7 +84,7 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
             n.setUpperBound(1);
             n.setLowerBound(0);
             n.setIncrement(1);
-            addNeuron(n);
+            getNeuronGroup().addNeuron(n);
         }
 
         // Layout the neurons
@@ -96,7 +96,7 @@ public class Hopfield extends SubnetworkGroup implements UpdatableGroup{
                 if (source != target) {
                     Synapse newSynapse = new Synapse(source, target, new ClampedSynapse()); 
                     newSynapse.setStrength(0);
-                    addSynapse(newSynapse);
+                    getSynapseGroup().addSynapse(newSynapse);
                 }
             }
         }

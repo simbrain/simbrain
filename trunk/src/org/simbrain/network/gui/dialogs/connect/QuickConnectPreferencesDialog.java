@@ -105,7 +105,7 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
             mainPanel.add(optionsPanel);
         } else if (connection instanceof Sparse) {
             clearOptionPanel();
-            optionsPanel = new SparsePanel((Sparse) connection);
+           //optionsPanel = new SparsePanel((Sparse) connection);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         }

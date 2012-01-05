@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.util.RandomSource;
 
 /**
  * Subclasses create connections (collections of synapses) between groups of
@@ -45,6 +47,33 @@ public abstract class ConnectNeurons {
      */
     protected List<? extends Neuron> targetNeurons;
 
+    /** The default percent excitatory/inhibitory. */
+	protected static double DEFAULT_RATIO = 0.5;
+	
+	/** The default excitatory strength. */
+	protected static double DEFAULT_EXCITATORY_STRENGTH = 1;
+	
+	/** The default inhibitory strength. */
+	protected static double DEFAULT_INHIBITORY_STRENGTH = -1;
+    
+    /** Percent of connections which are excitatory. */
+	protected double percentExcitatory = DEFAULT_RATIO;
+	
+	/** Percent of connections which are inhibitory */
+	protected double percentInhibitory = 1-DEFAULT_RATIO;
+    
+    /** Template synapse for excitatory synapses. */
+    protected Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
+
+    /** Template synapse for inhibitory synapses. */
+    protected Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
+
+    /** A source of random numbers for inhibitory connections. */
+    protected RandomSource inhibitoryRand;
+    
+    /** A source of random numbers for excitatory connections. */
+    protected RandomSource excitatoryRand;
+    
     /**
      * Default constructor.
      *
@@ -52,7 +81,9 @@ public abstract class ConnectNeurons {
      * @param neurons source neurons
      * @param neurons2 target neurons
      */
-    public ConnectNeurons(final Network network, final List<? extends Neuron> neurons, final List<? extends Neuron> neurons2) {
+    public ConnectNeurons(final Network network,
+    		final List<? extends Neuron> neurons,
+    		final List<? extends Neuron> neurons2) {
         this.network = network;
         sourceNeurons = neurons;
         targetNeurons = neurons2;
@@ -86,5 +117,143 @@ public abstract class ConnectNeurons {
      * Connect the source to the target neurons using some method.
      */
     public abstract void connectNeurons();
+
+    /**
+     * An accessor for the parent network.
+     * @return the parent network.
+     */
+    public Network getNetwork(){
+    	return network;
+    }
+    
+    /**
+     * @return the baseExcitatorySynapse
+     */
+    public Synapse getBaseExcitatorySynapse() {
+        return baseExcitatorySynapse;
+    }
+
+    /**
+     * @param baseExcitatorySynapse the baseExcitatorySynapse to set
+     */
+    public void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
+        this.baseExcitatorySynapse = baseExcitatorySynapse;
+    }
+
+    /**
+     * @return the baseInhibitorySynapse
+     */
+    public Synapse getBaseInhibitorySynapse() {
+        return baseInhibitorySynapse;
+    }
+
+    /**
+     * @param baseInhibitorySynapse the baseInhibitorySynapse to set
+     */
+    public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
+        this.baseInhibitorySynapse = baseInhibitorySynapse;
+    }
+    
+    /**
+     * Returns the percent of connections which are excitatory.
+     * @return the percent of excitatory connections.
+     */
+    public double getPercentExcitatory() {
+		return percentExcitatory;
+	}
+
+    /**
+     * Sets the percent of connections which are excitatory and 
+     * simultaneously sets the percent of connections which are
+     * inhibitory (1-percentExcitatory)
+     * @param percentExcitatory percent of connections to be made excitatory
+     */
+	public void setPercentExcitatory(double percentExcitatory) {
+		if(percentExcitatory < 0 || percentExcitatory > 1.0){
+			throw new IllegalArgumentException("Invalid excitatory percent value");
+		}
+		this.percentExcitatory = percentExcitatory;
+		percentInhibitory = 1 - percentExcitatory;
+	}
+
+	/**
+	 * Sets the percent of connections which are inhibitory and 
+     * simultaneously sets the percent of connections which are
+     * excitatory (1-percentInhibitory)
+	 * @param percentInhibitory percent of connections to be made inhibitory
+	 */
+	public void setPercentInhibitory(double percentInhibitory) {
+		if(percentInhibitory < 0 || percentExcitatory > 1.0){
+			throw new IllegalArgumentException("Invalid Inhibitory percent value");
+		}
+		this.percentInhibitory = percentInhibitory;
+		percentExcitatory = 1 - percentInhibitory;
+	}
+	
+	public double getPercentInhibitory() {
+		return percentInhibitory;
+	}
+
+	public static double getDefaultRatio() {
+		return DEFAULT_RATIO;
+	}
+
+	public RandomSource getInhibitoryRand() {
+		return inhibitoryRand;
+	}
+
+	public void setInhibitoryRand(RandomSource inhibitoryRand) {
+		this.inhibitoryRand = inhibitoryRand;
+	}
+
+	public RandomSource getExcitatoryRand() {
+		return excitatoryRand;
+	}
+
+	public void setExcitatoryRand(RandomSource excitatoryRand) {
+		this.excitatoryRand = excitatoryRand;
+	}
+
+	public List<? extends Neuron> getSourceNeurons() {
+		return sourceNeurons;
+	}
+
+	public void setSourceNeurons(List<? extends Neuron> sourceNeurons) {
+		this.sourceNeurons = sourceNeurons;
+	}
+
+	public List<? extends Neuron> getTargetNeurons() {
+		return targetNeurons;
+	}
+
+	public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
+		this.targetNeurons = targetNeurons;
+	}
+
+	public static double getDEFAULT_RATIO() {
+		return DEFAULT_RATIO;
+	}
+
+	public static void setDEFAULT_RATIO(double dEFAULTRATIO) {
+		DEFAULT_RATIO = dEFAULTRATIO;
+	}
+
+	public static double getDEFAULT_EXCITATORY_STRENGTH() {
+		return DEFAULT_EXCITATORY_STRENGTH;
+	}
+
+	public static void setDEFAULT_EXCITATORY_STRENGTH(
+			double dEFAULTEXCITATORYSTRENGTH) {
+		DEFAULT_EXCITATORY_STRENGTH = dEFAULTEXCITATORYSTRENGTH;
+	}
+
+	public static double getDEFAULT_INHIBITORY_STRENGTH() {
+		return DEFAULT_INHIBITORY_STRENGTH;
+	}
+
+	public static void setDEFAULT_INHIBITORY_STRENGTH(
+			double dEFAULTINHIBITORYSTRENGTH) {
+		DEFAULT_INHIBITORY_STRENGTH = dEFAULTINHIBITORYSTRENGTH;
+	}
 
 }

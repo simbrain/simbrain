@@ -25,7 +25,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.connections.Sparse2;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.NeuronLayer;
 import org.simbrain.network.groups.NeuronLayer.LayerType;
 import org.simbrain.network.interfaces.CustomUpdateRule;
@@ -268,10 +268,9 @@ public final class EchoStateNetBuilder {
      */
     private void connectSparse(List<Neuron> src, List<Neuron> tar,
             double sparsity) {
-        Sparse2 sparseConnections = new Sparse2(network, src, tar);
-        // TODO: More elegant way to do this?
-
-        sparseConnections.connectNeurons(sparsity);
+        Sparse sparseConnections = new Sparse(network, src, tar);
+    	sparseConnections.setSparsity(sparsity);
+        sparseConnections.connectNeurons();
     }
 
     /**

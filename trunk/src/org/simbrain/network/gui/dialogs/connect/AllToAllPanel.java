@@ -18,6 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -25,22 +30,27 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
  * <b>AllToAllPanel</b> creates a dialog for setting preferences of all to all
  * neuron connections.
+ * 
+ * @author ztosi
+ * @author jyoshimi
+ * 
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 
     /** Allow self connection check box. */
     private JCheckBox allowSelfConnect = new JCheckBox();
-
-    /** Connection Label. */
-    private JLabel baseSynapseLabel = new JLabel("");
 
     /**
      * This method is the default constructor.
@@ -48,41 +58,124 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      */
     public AllToAllPanel(final AllToAll connection) {
         super(connection);
-        this.addItem("Make Self Connections", allowSelfConnect);
-        JButton setSynapseType = new JButton("Set...");
-        setSynapseType.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Synapse> list = new ArrayList<Synapse>();
-                list.add(connection.getBaseSynapse());
-                SynapseDialog dialog = new SynapseDialog(list);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                Synapse synapse = dialog.getSynapseList().get(0);
-                connection.setBaseSynapse(synapse);
-                baseSynapseLabel.setText(synapse.getType());
-            }
-        });
-        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
-        this.addItem("Base Synapse Type:", baseSynapseLabel);
-        this.addItem("Set Base Synapse Type:", setSynapseType);
+        initializeLayout();
+    }
+    
+    /**
+     * Initializes the custom layout for the all to all panel
+     */
+    public void initializeLayout(){ 	
+    	
+    	this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(10, 10, 0, 10);
+        
+        this.add(new JLabel("Excitatory/Inhibitory:"), gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        this.add(ratioSlider, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        this.add(new JLabel("% Excitatory"), gbc);
+        
+        gbc.gridx = 1;
+        Dimension tRatioSize = tRatio.getPreferredSize();
+        tRatioSize.width = 30;
+        tRatio.setPreferredSize(tRatioSize);
+        
+        //the ratio text field gets its own panel to prevent distortion
+        JPanel tRatioPanel = new JPanel();
+        tRatioPanel.setLayout(new BorderLayout());
+        tRatioPanel.add(tRatio, BorderLayout.WEST);
+        this.add(tRatioPanel, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        this.add(new JLabel("Allow Self-Connection: "), gbc);
+        
+        gbc.gridx = 1;
+        this.add(allowSelfConnect, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 3;
+        this.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
+        
+        gbc.gridwidth = 1;
+        gbc.gridy = 5;
+        this.add(new JLabel("Excitatory Synapse Type: "), gbc);
+        
+        gbc.gridx = 1;
+        this.add(excitatorySynType, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        this.add(new JLabel("Inhibitory Synapse Type: "), gbc);
+        
+        gbc.gridx = 1;
+        this.add(inhibitorySynType, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 3;
+        this.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
+        
+        gbc.gridy = 8;
+        gbc.gridwidth = 1;
+        this.add(new JLabel("Randomize Excitatory Weights: "), gbc);
+        
+        gbc.gridx = 1;
+        this.add(randExcite, gbc);
+        
+        gbc.gridx = 2;
+        this.add(randExButton, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 9;
+        this.add(new JLabel("Randomize Inhibitory Weights: "), gbc);
+        
+        gbc.gridx = 1;
+        this.add(randInhib, gbc);
+        
+        gbc.gridx = 2;
+        this.add(randInButton, gbc);
+        
     }
 
     /**
      * {@inheritDoc}
      */
     public void commitChanges() {
-        ((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
+        connection.setPercentExcitatory(((Number)tRatio.getValue()).doubleValue() / 100);
+        Synapse e = Synapse.getTemplateSynapse(excitatorySynType.getText());
+    	connection.setBaseExcitatorySynapse(e);
+    	Synapse i = Synapse.getTemplateSynapse(inhibitorySynType.getText());
+    	connection.setBaseInhibitorySynapse(i);
+    	if(randInhib.isSelected()) {
+    		connection.setInhibitoryRand(inhibRS);
+    	}
+    	if(randExcite.isSelected()) {
+    		connection.setExcitatoryRand(exciteRS);
+    	}
+    	((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
                 .isSelected());
     }
+    
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        allowSelfConnect.setSelected(((AllToAll) connection)
-                .isAllowSelfConnection());
+       
     }
 
 }

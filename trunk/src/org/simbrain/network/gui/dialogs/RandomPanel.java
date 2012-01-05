@@ -201,11 +201,11 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
             rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
         }
 
-        if (!tfStandardDeviation.getText().equals(nullString)) {
+        if (!tfStandardDeviation.getText().equals(nullString) && tfStandardDeviation.isEnabled()) {
             rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation.getText()));
         }
 
-        if (!tfMean.getText().equals(nullString)) {
+        if (!tfMean.getText().equals(nullString) && tfMean.isEnabled()) {
             rand.setMean(Double.parseDouble(tfMean.getText()));
         }
 

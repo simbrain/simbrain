@@ -96,14 +96,10 @@ import org.simbrain.world.game.GameComponent;
 import org.simbrain.world.game.GameDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
-import org.simbrain.world.oscworld.OscWorldComponent;
-import org.simbrain.world.oscworld.OscWorldDesktopComponent;
 import org.simbrain.world.textworld.DisplayComponent;
 import org.simbrain.world.textworld.DisplayComponentDesktopGui;
 import org.simbrain.world.textworld.ReaderComponent;
 import org.simbrain.world.textworld.ReaderComponentDesktopGui;
-import org.simbrain.world.threedee.ThreeDeeComponent;
-import org.simbrain.world.threedee.gui.MainConsole;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
@@ -349,12 +345,10 @@ public class SimbrainDesktop {
 //        registerComponent(MidiWorldComponent.class, MidiWorldDesktopComponent.class);
         registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
         registerComponent(OdorWorldComponent.class, OdorWorldDesktopComponent.class);
-        registerComponent(OscWorldComponent.class, OscWorldDesktopComponent.class);
         registerComponent(PieChartComponent.class, PieChartGui.class);
         registerComponent(ProjectionComponent.class, ProjectionGui.class);
         registerComponent(ReaderComponent.class, ReaderComponentDesktopGui.class);
         registerComponent(ScatterPlotComponent.class, ScatterPlotGui.class);
-        registerComponent(ThreeDeeComponent.class, MainConsole.class);
         registerComponent(TimeSeriesPlotComponent.class, TimeSeriesPlotGui.class);
         registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
         registerComponent(GameComponent.class, GameDesktopComponent.class);

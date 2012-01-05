@@ -238,11 +238,13 @@ public class ReservoirComputingUtils {
         return (noiseMax - noiseMin) * Math.random() + noiseMin;
     }
 
+    
     /**
      * Test methods.
      *
      * @param args not used
      */
+    /*
     public static void main(String[] args) {
 
         RootNetwork network = testReservoirNetwork();
@@ -259,13 +261,14 @@ public class ReservoirComputingUtils {
         }
 
     }
-
-
+	*/
+	
     /**
      * Train a simple reservoir network using the data generator and LMSOffline.
      *
      * @return trained root network
      */
+    /*
     private static RootNetwork testReservoirNetwork() {
 
         RootNetwork network = new RootNetwork();
@@ -365,6 +368,8 @@ public class ReservoirComputingUtils {
         // trainer.train(1000);
         return network;
     }
+    
+    */
 
     public static void setNoise(boolean addNoise) {
         ReservoirComputingUtils.noise = addNoise;

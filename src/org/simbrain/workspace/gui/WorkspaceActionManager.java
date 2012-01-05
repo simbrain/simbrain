@@ -41,9 +41,7 @@ import org.simbrain.workspace.actions.NewGameWorldAction;
 import org.simbrain.workspace.actions.NewMidiWorldAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
-import org.simbrain.workspace.actions.NewOscWorldAction;
 import org.simbrain.workspace.actions.NewReaderWorldAction;
-import org.simbrain.workspace.actions.NewThreeDeeWorldAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
 import org.simbrain.workspace.actions.OpenCouplingListAction;
 import org.simbrain.workspace.actions.OpenCouplingManagerAction;
@@ -91,9 +89,6 @@ public class WorkspaceActionManager {
     private final Action newOdorWorldAction;
 
     /** New odor world action. */
-    private final Action newThreeDeeWorldAction;
-
-    /** New odor world action. */
     private final Action newGameWorldAction;
 
     /** New data world action. */
@@ -101,9 +96,6 @@ public class WorkspaceActionManager {
 
     /** New MIDI world action. */
     private final Action newMidiWorldAction;
-
-    /** New OSC world action. */
-    private final Action newOscWorldAction;
 
     /** New text world action. */
     private final Action newReaderWorldAction;
@@ -221,8 +213,6 @@ public class WorkspaceActionManager {
         newDataWorldAction = new NewDataWorldAction(workspace);
         newMidiWorldAction = new NewMidiWorldAction(workspace);
         newOdorWorldAction = new NewOdorWorldAction(workspace);
-        newOscWorldAction = new NewOscWorldAction(workspace);
-        newThreeDeeWorldAction = new NewThreeDeeWorldAction(workspace);
         newGameWorldAction = new NewGameWorldAction(workspace);
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);

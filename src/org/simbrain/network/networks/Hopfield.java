@@ -102,7 +102,8 @@ public class Hopfield extends Network {
         Synapse templateSynapse = Synapse
                 .getTemplateSynapse(new ClampedSynapse());
         templateSynapse.setStrength(0);
-        connection.setBaseSynapse(templateSynapse);
+        connection.setBaseExcitatorySynapse(templateSynapse);
+        connection.setBaseInhibitorySynapse(templateSynapse);
         connection.connectNeurons();
     }
 

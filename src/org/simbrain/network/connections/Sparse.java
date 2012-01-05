@@ -17,11 +17,14 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
  * Connect neurons sparsely with some probabilities.
@@ -33,24 +36,19 @@ import org.simbrain.network.interfaces.Synapse;
  */
 public class Sparse extends ConnectNeurons {
 
-    /** Probability connection will be an excitatory weight. */
-    public double excitatoryProbability = .1;
+	/** The default sparsity. */
+	private static double DEFAULT_SPARSITY = 0.1;
 
-    /** Probability connection will be an inhibitory weight. */
-    public double inhibitoryProbability = .1;
+	/** The overall sparsity of the connections. */
+    private double sparsity = DEFAULT_SPARSITY;
+    
+    /**  Whether or not sparsity applies a constant number of synapses to each
+     * source neuron. */
+    private boolean sparseSpecific;
 
-    /** Template synapse for excitatory synapses. */
-    private Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
-
-    /** Template synapse for inhibitory synapses. */
-    private Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
-
-    // Initialize base synapses
-    {
-        baseExcitatorySynapse.setStrength(10);
-        baseInhibitorySynapse.setStrength(-10);
-    }
-
+    /** A switch determining if self connections are possible. */
+    private boolean allowSelfConnection;
+    
     /**
      * See super class description.
      *
@@ -72,86 +70,122 @@ public class Sparse extends ConnectNeurons {
 
     /** @inheritDoc */
     public void connectNeurons() {
-        for (Neuron source : sourceNeurons) {
-
-            for (Neuron target : targetNeurons) {
-               
-
-                // Don't add a connection if there is already one present
-                //  TODO: Add option to turn this off?
-                if (Network.getSynapse(source, target) != null) {
-                    continue;
-                }
-
-                if (Math.random() < excitatoryProbability) {
-                    Synapse synapse = baseExcitatorySynapse
-                            .instantiateTemplateSynapse(source, target, network);
-                    network.addSynapse(synapse);
-                    continue;
-                }
-                if (Math.random() < inhibitoryProbability) {
-                    Synapse synapse = baseInhibitorySynapse
-                            .instantiateTemplateSynapse(source, target, network);
-                    network.addSynapse(synapse);
-                }
-            }
-        }
+    	
+    	//TODO: percent excititory currently not guaranteed for recurrent
+        //connections (source list == target list) when self connection is
+        //not allowed
+    	
+    	int numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons.size());
+    	int numExcite = (int) (percentExcitatory * numSyns);
+    	Neuron source;
+    	Neuron target;
+    	Synapse synapse;
+    	Random randGen = new Random();
+    	
+    	if (!sparseSpecific) {
+    		
+	    	for (int i = 0; i < numSyns; i++) {
+	    		do {
+	    		source = sourceNeurons
+	    			.get(randGen.nextInt(sourceNeurons.size()));
+	    		target = targetNeurons
+	    			.get(randGen.nextInt(targetNeurons.size()));
+	    		} while (Network.getSynapse(source, target) != null ||
+	    				(!allowSelfConnection && (source == target)));
+	    		
+	    		if(i < numExcite){
+	    			synapse = baseExcitatorySynapse
+	                	.instantiateTemplateSynapse(source, target, network);
+	    			if(excitatoryRand != null){
+	    				synapse.setStrength(excitatoryRand.getRandom());
+	    			} else {
+	    				synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
+	    			}
+	    		} else {
+	    			synapse = baseInhibitorySynapse
+	                	.instantiateTemplateSynapse(source, target, network);
+	    			if(inhibitoryRand != null) {
+	    				synapse.setStrength(inhibitoryRand.getRandom());
+	    			} else {
+	    				synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
+	    			}
+	    		}
+	    		
+	    		network.addSynapse(synapse);
+	    	}
+    	} else {
+    		int synsPerSource = numSyns / sourceNeurons.size();
+    		Random rGen = new Random();
+    		int numEx = (int) (percentExcitatory * numSyns);
+    		int numIn = numSyns - numEx;
+    		
+    		for (int i = 0; i < sourceNeurons.size(); i++) {
+    			source = sourceNeurons.get(i);
+    			for (int j = 0; j < synsPerSource; j++) {
+    				
+    				do { 
+    					target = targetNeurons.get(randGen.nextInt(targetNeurons.size()));
+    				} while (Network.getSynapse(source, target) != null || 
+    	    				(!allowSelfConnection && (source == target)));
+    				int ex = rGen.nextInt(numEx + numIn);
+    				if(ex < numEx){
+    					numEx--;
+    					synapse = baseExcitatorySynapse
+	                		.instantiateTemplateSynapse(source, target, network);
+    					if(excitatoryRand != null) {
+    						synapse.setStrength(excitatoryRand.getRandom());
+    					} else {
+    						synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
+    					}
+    					
+    				} else {
+    					numIn--;
+    					synapse = baseInhibitorySynapse
+	                		.instantiateTemplateSynapse(source, target, network);
+    					if(inhibitoryRand != null) {
+    						synapse.setStrength(inhibitoryRand.getRandom());
+    					} else {
+    						synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
+    					}
+    				}
+    				network.addSynapse(synapse);
+    			}
+    			
+    		}
+    		
+    	}
     }
 
-    /**
-     * @return the excitatoryProbability
-     */
-    public double getExcitatoryProbability() {
-        return excitatoryProbability;
-    }
+	public static double getDEFAULT_SPARSITY() {
+		return DEFAULT_SPARSITY;
+	}
 
-    /**
-     * @param excitatoryProbability the excitatoryProbability to set
-     */
-    public void setExcitatoryProbability(final double excitatoryProbability) {
-        this.excitatoryProbability = excitatoryProbability;
-    }
+	public static void setDEFAULT_SPARSITY(double dEFAULTSPARSITY) {
+		DEFAULT_SPARSITY = dEFAULTSPARSITY;
+	}
 
-    /**
-     * @return the inhibitoryProbability
-     */
-    public double getInhibitoryProbability() {
-        return inhibitoryProbability;
-    }
+	public double getSparsity() {
+		return sparsity;
+	}
 
-    /**
-     * @param inhibitoryProbability the inhibitoryProbability to set
-     */
-    public void setInhibitoryProbability(
-            final double inhibitoryProbability) {
-        this.inhibitoryProbability = inhibitoryProbability;
-    }
+	public void setSparsity(double sparsity) {
+		this.sparsity = sparsity;
+	}
 
-    /**
-     * @return the baseExcitatorySynapse
-     */
-    public Synapse getBaseExcitatorySynapse() {
-        return baseExcitatorySynapse;
-    }
+	public boolean isSparseSpecific() {
+		return sparseSpecific;
+	}
 
-    /**
-     * @param baseExcitatorySynapse the baseExcitatorySynapse to set
-     */
-    public void setBaseExcitatorySynapse(Synapse baseExcitatorySynapse) {
-        this.baseExcitatorySynapse = baseExcitatorySynapse;
-    }
+	public void setSparseSpecific(boolean sparseSpecific) {
+		this.sparseSpecific = sparseSpecific;
+	}
 
-    /**
-     * @return the baseInhibitorySynapse
-     */
-    public Synapse getBaseInhibitorySynapse() {
-        return baseInhibitorySynapse;
-    }
+	public boolean isAllowSelfConnection() {
+		return allowSelfConnection;
+	}
 
-    /**
-     * @param baseInhibitorySynapse the baseInhibitorySynapse to set
-     */
-    public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
-        this.baseInhibitorySynapse = baseInhibitorySynapse;
-    }
+	public void setAllowSelfConnection(boolean allowSelfConnection) {
+		this.allowSelfConnection = allowSelfConnection;
+	}
+
 }

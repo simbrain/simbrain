@@ -12,7 +12,11 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
@@ -25,11 +29,6 @@ import org.simbrain.network.interfaces.Synapse;
  * @author ztosi
  */
 public class AllToAll extends ConnectNeurons {
-
-    /**
-     * "Template" synapse to be used when applying the connection.
-     */
-    private Synapse baseSynapse = Synapse.getTemplateSynapse();
 
     /** Allows neurons to have a self connection. */
     private boolean allowSelfConnection = true;
@@ -47,6 +46,12 @@ public class AllToAll extends ConnectNeurons {
         super(network, neurons, neurons2);
     }
 
+    /**
+     * Construct all to all connection object specifying only
+     * the parent network
+     * 
+     * @param network parent network
+     */
     public AllToAll(final Network network) {
         this.network = network;
     }
@@ -62,110 +67,48 @@ public class AllToAll extends ConnectNeurons {
 
     /** {@inheritDoc} */
     public void connectNeurons() {
-        for (Neuron source : sourceNeurons) {
-            for (Neuron target : targetNeurons) {
-                // Don't add a connection if there is already one present
-                if (Network.getSynapse(source, target) != null) {
-                    continue;
-                }
-                if (!allowSelfConnection) {
-                    if (source != target) {
-                        Synapse synapse = baseSynapse
-                                .instantiateTemplateSynapse(source, target,
-                                        network);
-                        network.addSynapse(synapse);
-                    }
-                } else {
-                    Synapse synapse = baseSynapse.instantiateTemplateSynapse(
-                            source, target, network);
-                    network.addSynapse(synapse);
-                }
-            }
+    	Random rGen = new Random();
+    	int numConnects = 0;
+ 
+    	numConnects = sourceNeurons.size() * targetNeurons.size();
+    	
+        int numEx = (int) (percentExcitatory * numConnects);
+        int numIn = numConnects - numEx;
+    	
+        //TODO: percent excititory currently not guaranteed for recurrent
+        //connections (source list == target list) when self connection is
+        //not allowed
+        
+        for(Neuron source : sourceNeurons) {
+        	for(Neuron target : targetNeurons) {
+        		if(!(!(Network.getSynapse(source, target) == null) ||
+        				(!allowSelfConnection && (source == target)))) {
+        			Synapse synapse = null;
+        			int ex = rGen.nextInt(numEx + numIn);
+        			if(ex < numEx) {
+        				numEx--;
+        				synapse = baseExcitatorySynapse.
+        					instantiateTemplateSynapse(source, target, network);
+        				if(excitatoryRand != null){
+    	    				synapse.setStrength(excitatoryRand.getRandom());
+    	    			} else {
+    	    				synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
+    	    			}
+        			} else {
+        				numIn--;
+        				synapse = baseInhibitorySynapse.
+    						instantiateTemplateSynapse(source, target, network);
+        				if(inhibitoryRand != null){
+        					synapse.setStrength(inhibitoryRand.getRandom());
+        				} else {
+        					synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
+        				}
+        			}
+        			network.addSynapse(synapse);
+        		}
+        	}
         }
-    }
-
-    /**
-     * Fully connects two sets of neurons, with weights between min and max.
-     *
-     * @param sourceNeurons sources
-     * @param targetNeurons targets
-     * @param min minimum weight value, must be less than zero
-     * @param max maximum weight value, must be greater than zero
-     * @param exciteProb probability the synapse is excititory (strength on [0,
-     *            max)).
-     */
-    public void connectNeurons(List<Neuron> sourceNeurons,
-            List<Neuron> targetNeurons, double min, double max,
-            double exciteProb) {
-        errorCheck(min, max, exciteProb);
-        for (Neuron source : sourceNeurons) {
-            for (Neuron target : targetNeurons) {
-                // Don't add a connection if there is already one present
-                if (Network.getSynapse(source, target) != null) {
-                    continue;
-                }
-
-                double wt;
-                if (Math.random() < exciteProb) {
-                    wt = max * Math.random();
-                } else {
-                    wt = min * Math.random();
-                }
-
-                if (!allowSelfConnection) {
-                    if (source != target) {
-                        Synapse synapse = baseSynapse
-                                .instantiateTemplateSynapse(source, target,
-                                        network);
-                        synapse.setStrength(wt);
-                        network.addSynapse(synapse);
-                    }
-                } else {
-                    Synapse synapse = baseSynapse.instantiateTemplateSynapse(
-                            source, target, network);
-                    synapse.setStrength(wt);
-                    network.addSynapse(synapse);
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks to see if weight parameters are within acceptable ranges.
-     *
-     * @param min minimum weight value, must be less than zero
-     * @param max maximum weight value, must be greater than zero
-     * @param exciteProb probability the synapse is excititory (strength on [0,
-     *            max)).
-     */
-    public void errorCheck(double min, double max, double exciteProb) {
-        if (!(max >= 0 && min <= 0)) {
-            throw new IllegalArgumentException("Max weight must be greater"
-                    + " than zero or equal to and min weight must be less than"
-                    + " or equal to zero.");
-        }
-        if (min == 0 && max == 0) {
-            throw new IllegalArgumentException("Min and max cannot both be"
-                    + " equal to zero");
-        }
-        if (exciteProb < 0 || exciteProb > 1) {
-            throw new IllegalArgumentException("Excitatory probability is"
-                    + " not on [0,1]");
-        }
-    }
-
-    /**
-     * @return the baseSynapse
-     */
-    public Synapse getBaseSynapse() {
-        return baseSynapse;
-    }
-
-    /**
-     * @param baseSynapse the baseSynapse to set
-     */
-    public void setBaseSynapse(final Synapse theSynapse) {
-        baseSynapse = theSynapse;
+    	
     }
 
     /**

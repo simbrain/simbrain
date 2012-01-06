@@ -772,43 +772,30 @@ public class NetworkPanel extends JPanel {
             canvas.getLayer().addChild(synapseGroupNode);
             objectNodeMap.put(group, synapseGroupNode);
             synapseGroupNode.updateBounds();       
-        } else if (group instanceof FeedForward) {
+        } else if (group instanceof Subnetwork) {
 
-            // Find layers (neuron groups) which should already have been added
-            for(NeuronGroup layer : ((FeedForward)group).getNeuronGroupList()) {
-                GroupNode neuronGroupNode = (GroupNode) objectNodeMap.get(layer);
+            // Find neuron group nodes (which should already have been added)
+            for(NeuronGroup neuronGroup : ((Subnetwork)group).getNeuronGroupList()) {
+                GroupNode neuronGroupNode = (GroupNode) objectNodeMap.get(neuronGroup);
                 nodes.add(neuronGroupNode);
             }
-            //Add layers to layered network node
-            GroupNode layeredNetworkNode = createGroupNode(group);
-            for (PNode node : nodes) {
-                layeredNetworkNode.addPNode(node);                            
+
+            // Find synapse group nodes 
+            for(SynapseGroup synapseGroup : ((Subnetwork)group).getSynapseGroupList()) {
+                GroupNode synapseGroupNode = (GroupNode) objectNodeMap.get(synapseGroup);
+                nodes.add(synapseGroupNode);
             }
-            // Add layered network node to canvas
-            canvas.getLayer().addChild(layeredNetworkNode);
-            objectNodeMap.put(group, layeredNetworkNode);
-            layeredNetworkNode.updateBounds();
 
-        } else if (group instanceof Subnetwork) {
-            
-            // Create subnet node
-            Subnetwork subnet = (Subnetwork) group;
-            GroupNode subnetNode = createGroupNode(subnet);
-            
-            // Add neuron group node
-            NeuronGroup neuronGroup = subnet.getNeuronGroup();
-            GroupNode neuronGroupNode = (GroupNode) objectNodeMap.get(neuronGroup);
-            subnetNode.addPNode(neuronGroupNode);                            
-
-            // Add synapse group node
-            SynapseGroup synapseGroup = subnet.getSynapseGroup();
-            GroupNode synapseGroupNode = (GroupNode) objectNodeMap.get(synapseGroup);
-            subnetNode.addPNode(synapseGroupNode);                            
+            //Add neuron and synapse group nodes to subnetwork node 
+            GroupNode groupNode = createGroupNode(group);
+            for (PNode node : nodes) {
+                groupNode.addPNode(node);                            
+            }
 
             // Add subnetwork node to canvas
-            canvas.getLayer().addChild(subnetNode);
-            objectNodeMap.put(group, subnetNode);
-            subnetNode.updateBounds();
+            canvas.getLayer().addChild(groupNode);
+            objectNodeMap.put(group, groupNode);
+            groupNode.updateBounds();
         }
 
         clearSelection();

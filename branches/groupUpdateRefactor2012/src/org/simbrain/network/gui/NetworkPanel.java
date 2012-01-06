@@ -51,9 +51,9 @@ import org.simbrain.network.groups.BackpropNetwork;
 import org.simbrain.network.groups.Competitive;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Hopfield;
-import org.simbrain.network.groups.LayeredNetwork;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SubnetworkGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
@@ -564,20 +564,20 @@ public class NetworkPanel extends JPanel {
         GroupNode ret = null;
         if (group instanceof SynapseGroup) {
             ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
-        } else if (group instanceof LayeredNetwork) {
+        } else if (group instanceof FeedForward) {
             if (group instanceof BackpropNetwork) {
                 ret = new BackpropNetworkNode(NetworkPanel.this,
                         (BackpropNetwork) group);
             } else {
                 ret = new LayeredNetworkNode(NetworkPanel.this,
-                        (LayeredNetwork) group);
+                        (FeedForward) group);
             }
-        } else if (group instanceof SubnetworkGroup) {
+        } else if (group instanceof Subnetwork) {
             if (group instanceof Hopfield) {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
             } else {
                 ret = new SubnetGroupNode(NetworkPanel.this,
-                        (SubnetworkGroup) group);
+                        (Subnetwork) group);
             }
 
         } else {
@@ -772,10 +772,10 @@ public class NetworkPanel extends JPanel {
             canvas.getLayer().addChild(synapseGroupNode);
             objectNodeMap.put(group, synapseGroupNode);
             synapseGroupNode.updateBounds();       
-        } else if (group instanceof LayeredNetwork) {
+        } else if (group instanceof FeedForward) {
 
             // Find layers (neuron groups) which should already have been added
-            for(NeuronGroup layer : ((LayeredNetwork)group).getNeuronGroupList()) {
+            for(NeuronGroup layer : ((FeedForward)group).getNeuronGroupList()) {
                 GroupNode neuronGroupNode = (GroupNode) objectNodeMap.get(layer);
                 nodes.add(neuronGroupNode);
             }
@@ -789,10 +789,10 @@ public class NetworkPanel extends JPanel {
             objectNodeMap.put(group, layeredNetworkNode);
             layeredNetworkNode.updateBounds();
 
-        } else if (group instanceof SubnetworkGroup) {
+        } else if (group instanceof Subnetwork) {
             
             // Create subnet node
-            SubnetworkGroup subnet = (SubnetworkGroup) group;
+            Subnetwork subnet = (Subnetwork) group;
             GroupNode subnetNode = createGroupNode(subnet);
             
             // Add neuron group node

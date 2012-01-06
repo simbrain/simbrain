@@ -89,8 +89,8 @@ public class Trainer {
         this.outputLayer = outputLayer;
         
         // TODO: Allow for vertical sorting... Or just document this.
-        Collections.sort(inputLayer, Comparators.X_ORDER);
-        Collections.sort(outputLayer, Comparators.X_ORDER);
+//        Collections.sort(inputLayer, Comparators.X_ORDER);
+//        Collections.sort(outputLayer, Comparators.X_ORDER);
 
         setTrainingMethod(method);
 
@@ -112,9 +112,9 @@ public class Trainer {
         this.inputLayer = inputLayer;
         this.outputLayer = outputLayer;
         
-        // TODO: Allow for vertical sorting... Or just document this.
-        Collections.sort(inputLayer, Comparators.X_ORDER);
-        Collections.sort(outputLayer, Comparators.X_ORDER);
+//        // TODO: Allow for vertical sorting... Or just document this.
+//        Collections.sort(inputLayer, Comparators.X_ORDER);
+//        Collections.sort(outputLayer, Comparators.X_ORDER);
 
         setTrainingMethod(method);
     }

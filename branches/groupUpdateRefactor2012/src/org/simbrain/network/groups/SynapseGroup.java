@@ -16,10 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.listeners.NetworkEvent;
 
 /**
  * A group of synapses.
@@ -29,16 +27,24 @@ public class SynapseGroup extends Group {
     /** Set of synapses. */
     private final List<Synapse> synapseList = new ArrayList<Synapse>();
     
-    /** @see Group */
+    /**
+     * Construct a synapse group from a list of synapses.
+     *
+     * @param net parent network
+     * @param list list of synapses
+     */
     public SynapseGroup(final RootNetwork net, final List<Synapse> list) {
         super(net);
         for (Synapse synapse : list) {
             addSynapse(synapse);
-        }
-        
+        }        
     }
-    
-    /** @see Group */
+
+    /**
+     * Construct a new synapse group.
+     *
+     * @param net parent network
+     */
     public SynapseGroup(final RootNetwork net) {
         super(net);
     }
@@ -54,9 +60,9 @@ public class SynapseGroup extends Group {
             getParentNetwork().deleteSynapse(synapse);
         }
         if (getParentGroup() != null) {
-            if (getParentGroup() instanceof LayeredNetwork) {
+            if (getParentGroup() instanceof Subnetwork) {
                 Group parentGroup = getParentGroup();
-                ((LayeredNetwork) parentGroup).removeSynapseGroup(this);
+                ((Subnetwork) parentGroup).removeSynapseGroup(this);
             } 
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().deleteGroup(getParentGroup());
@@ -64,22 +70,35 @@ public class SynapseGroup extends Group {
         }
     }
     
-    @Override
-    public List<Synapse> getFlatSynapseList() {
+    /**
+     * @return a list of weights
+     */
+    public List<Synapse> getSynapseList() {
         return Collections.unmodifiableList(synapseList);
     }
 
-
     /**
-     * Add synapse.
+     * Add a synapse.
      * 
      * @param synapse synapse to add
+     * @param fireEvent whether to fire a synapse added event
      */
-    public void addSynapse(Synapse synapse) {
+    protected void addSynapse(final Synapse synapse, final boolean fireEvent) {
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapseList.add(synapse);
         synapse.setParentGroup(this);
-        getParentNetwork().fireSynapseAdded(synapse);
+        if (fireEvent) {
+            getParentNetwork().fireSynapseAdded(synapse);            
+        }
+    }
+
+    /**
+     * Add a synapse.
+     * 
+     * @param synapse synapse to add
+     */
+    public void addSynapse(final Synapse synapse) {
+        addSynapse(synapse, true);
     }
     
     @Override
@@ -87,14 +106,9 @@ public class SynapseGroup extends Group {
         synapseList.remove(toDelete);
         getParentNetwork().fireSynapseDeleted(toDelete);
         getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
-    }
-
-
-    /**
-     * @return a list of weights
-     */
-    public List<Synapse> getSynapseList() {
-        return synapseList;
+        if (isEmpty() && isDeleteWhenEmpty()) {
+            delete();
+        }
     }
 
     /**
@@ -113,12 +127,11 @@ public class SynapseGroup extends Group {
         }
     }
 
-    //REDO: Add label / id info below
-    
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Synapse group with " + this.getSynapseList().size() + " synapse(s),");
+        ret += ("(" + getLabel() + ") Synapse group with "
+                + this.getSynapseList().size() + " synapse(s),");
         return ret;
     }
     

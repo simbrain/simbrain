@@ -20,13 +20,14 @@ package org.simbrain.network.interfaces;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.LayeredNetwork;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SubnetworkGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.update_actions.UpdateGroup;
@@ -339,12 +340,10 @@ public abstract class Network {
     /**
      * Returns the group list.
      *
-     * TODO: getFlatGroupList? (not currently adding groups to subnets)
-     *
      * @return the groupList
      */
     public List<? extends Group> getGroupList() {
-        return groupList;
+        return Collections.unmodifiableList(groupList);
     }
 
     /**
@@ -935,19 +934,15 @@ public abstract class Network {
             if (group.getLabel() == null) {
                 group.setLabel(id.replaceAll("_"," "));                
             }
-            
-            // Special creation steps associated with particular group types
-            // REDO: Move below to overrided creation method in group
-            if (group instanceof LayeredNetwork) {
-                for (NeuronGroup layer : ((LayeredNetwork)group).getNeuronGroupList()) {
-                    addGroup(layer);
+
+            // Special creation for subnetworks
+            if (group instanceof Subnetwork) {
+                for (NeuronGroup neuronGroup : ((Subnetwork)group).getNeuronGroupList()) {
+                    addGroup(neuronGroup);
                 }
-                for (SynapseGroup weightLayer : ((LayeredNetwork)group).getSynapseGroupList()) {
-                    addGroup(weightLayer);
+                for (SynapseGroup synapseGroup : ((Subnetwork)group).getSynapseGroupList()) {
+                    addGroup(synapseGroup);
                 }
-            } else if (group instanceof SubnetworkGroup) {
-                addGroup(((SubnetworkGroup)group).getNeuronGroup());
-                addGroup(((SubnetworkGroup)group).getSynapseGroup());
             }
             
             groupList.add(group);
@@ -1030,8 +1025,8 @@ public abstract class Network {
             if (groupList.get(i) instanceof NeuronGroup) {
                 NeuronGroup group = (NeuronGroup) groupList.get(i);
                 ret.addAll(group.getNeuronList());
-            } else if (groupList.get(i) instanceof LayeredNetwork) { 
-                LayeredNetwork group = (LayeredNetwork) groupList.get(i);
+            } else if (groupList.get(i) instanceof FeedForward) { 
+                FeedForward group = (FeedForward) groupList.get(i);
                 ret.addAll(group.getFlatNeuronList());                
             }
         }

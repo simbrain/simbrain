@@ -23,7 +23,7 @@ import org.simbrain.network.trainers.*;
  *
  * @author Jeff Yoshimi
  */
-public class BackpropNetwork extends LayeredNetwork {
+public class BackpropNetwork extends FeedForward {
 
     /** Reference to parent trainer. */
     private final Trainer trainer;

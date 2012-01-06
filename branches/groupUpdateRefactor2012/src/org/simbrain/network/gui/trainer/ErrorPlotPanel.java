@@ -27,7 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.LayeredNetwork;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Network;

@@ -28,34 +28,12 @@ import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**
- * A special type of subnetwork where network groups and synapse groups are organized
- * into layers, as in a feedforwad network.
- * 
- * TODO: Rename to feed-forward?
- * 
- * Adds a layered object to a network. The topology is specified by an array of
- * integers I1...In which correspond to the number of nodes in layers L1...Ln,
- * and where L1 is the input layer and Ln is the output layer.
+ * A standard feed-forward network, where a succession of neuron groups and
+ * synapse groups are organized into layers.
  * 
  * @author Jeff Yoshimi
  */
-public class LayeredNetwork extends SubnetworkGroup {
-
-    // TODO: Default neurons, synapses (input / output special?). upper /lower
-    // bounds
-    // TODO: Possibly add "justification" (right, left, center) field
-    // TODO: Allow Horizontal vs. vertical layout
-    // TODO: Option: within layer recurrence?
-
-    // /**
-    // * Array of integers which determines the number of layers and nodes in
-    // each
-    // * layer. Integers 1...n in the array correspond to the number of nodes in
-    // * layers L1...Ln, and where L1 is the input layer and Ln is the output
-    // * layer.
-    // */
-    // private int[] nodesPerLayer = { 5, 3, 5 };
-
+public class FeedForward extends Subnetwork {
 
     /** Enumeration of layer types. */
     public enum LayerType {
@@ -72,14 +50,19 @@ public class LayeredNetwork extends SubnetworkGroup {
     Point2D.Double initialPosition = new Point2D.Double(0, 0);
 
     /**
-     * Add the layered network to the specified network.
+     * Add the layered network to the specified network, with a specified number
+     * of layers and nodes in each layer.
      * 
      * @param network the parent network to which the layered network is being
      *            added
+     * @param nodesPerLayer an array of integers which determines the number of
+     *            layers and neurons in each layer. Integers 1...n in the array
+     *            correspond to the number of nodes in layers 1...n.
+     * @param initialPosition upper left corner where network will be placed.
      */
-    public LayeredNetwork(final RootNetwork network, int[] nodesPerLayer,
+    public FeedForward(final RootNetwork network, int[] nodesPerLayer,
             Point2D.Double initialPosition) {
-        super(network, nodesPerLayer.length, nodesPerLayer.length - 1);
+        super(network);
         
         this.initialPosition = initialPosition;
         setLabel("Layered Network");
@@ -137,8 +120,6 @@ public class LayeredNetwork extends SubnetworkGroup {
                 for (Neuron target : hiddenLayer) {
                     Synapse newSynapse = synapse.instantiateTemplateSynapse(
                             source, target, network);
-                    //network.addSynapse(newSynapse); 
-                    //Redo: think about what's lost by not calling the above. E.g. id generation.
                     newSynapse.randomize();
                     synapseList.add(newSynapse);
                 }
@@ -160,17 +141,7 @@ public class LayeredNetwork extends SubnetworkGroup {
         } else {
             setMarkedForDeletion(true);
         }
-        //TODO: Call super?
-//        for (NeuronGroup layer : layers) {
-//            layer.setDeleteWhenEmpty(true);
-//            getParentNetwork().deleteGroup(layer);            
-//        }
-//        for (SynapseGroup weightLayer : connections) {
-//            weightLayer.setDeleteWhenEmpty(true);
-//            getParentNetwork().deleteGroup(weightLayer);            
-//        }        
     }
-    
 
     /**
      * Return the width of the specified layer, in pixels.
@@ -217,22 +188,24 @@ public class LayeredNetwork extends SubnetworkGroup {
         return initialPosition;
     }
 
-    /**
-     * @param initialPosition the initialPosition to set
-     */
-    public void setInitialPosition(Point2D.Double initialPosition) {
-        this.initialPosition = initialPosition;
-    }
-
-
     public boolean getEnabled() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public void setEnabled(boolean enabled) {
-        // TODO Auto-generated method stub
-        
+    }
+
+    @Override
+    public void addSynapseGroup(SynapseGroup group) {
+        super.addSynapseGroup(group);
+        group.setLabel("Weights " + (getSynapseGroupCount() + 1) + " > "
+                + (getSynapseGroupCount() + 2));
+    }
+
+    @Override
+    public void addNeuronGroup(NeuronGroup group) {
+        super.addNeuronGroup(group);
+        group.setLabel("Layer " + getNeuronGroupCount());
     }
 
 

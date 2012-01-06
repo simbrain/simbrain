@@ -26,7 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.LayeredNetwork;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.Network;
@@ -478,7 +478,7 @@ public class TrainerPanel extends JPanel {
     public static void main(String[] args) {
         RootNetwork network = new RootNetwork();
         int[] topology = new int[] { 2, 2, 1 };
-        network.addGroup(new LayeredNetwork(network, topology, null));
+        network.addGroup(new FeedForward(network, topology, null));
         NeuronGroup inputs = (NeuronGroup) network.getGroup("Group_2");
         NeuronGroup outputs = (NeuronGroup) network.getGroup("Group_4");
         Trainer trainer = new Trainer(network, inputs.getNeuronList(),

@@ -22,7 +22,7 @@ import java.awt.Color;
 
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.SubnetworkGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;

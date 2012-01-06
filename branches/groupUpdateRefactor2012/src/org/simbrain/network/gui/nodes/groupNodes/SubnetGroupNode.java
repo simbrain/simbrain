@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.nodes.groupNodes;
 
-import org.simbrain.network.groups.SubnetworkGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
@@ -39,7 +39,7 @@ public class SubnetGroupNode extends GroupNode {
      * @param networkPanel parent panel
      * @param group the layered network
      */
-    public SubnetGroupNode(NetworkPanel networkPanel, SubnetworkGroup group) {
+    public SubnetGroupNode(NetworkPanel networkPanel, Subnetwork group) {
         super(networkPanel, group);
     }
     

@@ -18,21 +18,13 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.List;
-
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 
-
 /**
- * <b>Group</b>: a logical group of neurons and synapses (and perhaps other
- * items later). In some cases this is useful for custom updating. In other
- * cases it is useful simply as a logical grouping of nodes (e.g. to represent
- * the "layers" of a feedforward network) Its gui representation is
- * {@link org.simbrain.network.gui.nodes.GroupNode}.
- *
- * Possibly add a flag to have the group visible or not.
+ * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
+ * representation is {@link org.simbrain.network.gui.nodes.GroupNode}.
  */
 public abstract class Group {
 
@@ -96,7 +88,6 @@ public abstract class Group {
      * Perform necessary deletion cleanup.
      */
     public abstract void delete();
-
 
 //
 //    /**
@@ -179,20 +170,6 @@ public abstract class Group {
      */
     protected void setParentGroup(Group parentGroup) {
         this.parentGroup = parentGroup;
-    }
-    
-    /**
-     * Override to produce a list of all neurons contained in a group.
-     */
-    public List<Neuron> getFlatNeuronList() {
-        return null;
-    }
-
-    /**
-     * Override to produce a list of all synapses contained in a group.
-     */
-    public List<Synapse> getFlatSynapseList() {
-        return null;
     }
 
     /**

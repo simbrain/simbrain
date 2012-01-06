@@ -33,8 +33,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.LayeredNetwork;
-import org.simbrain.network.groups.SubnetworkGroup;
+import org.simbrain.network.groups.FeedForward;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 
 import edu.umd.cs.piccolo.PNode;
@@ -287,8 +287,8 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     protected void selectAllNodes() {
         //System.out.println(group.getLabel());
         // REDO: Can't this happen in subclass overrides?
-        if ((group instanceof LayeredNetwork)
-                || (group instanceof SubnetworkGroup)) {
+        if ((group instanceof FeedForward)
+                || (group instanceof Subnetwork)) {
             networkPanel.setSelection(getChildrenNeuronNodes(this));
         } else {
             networkPanel.setSelection(outlinedObjects);

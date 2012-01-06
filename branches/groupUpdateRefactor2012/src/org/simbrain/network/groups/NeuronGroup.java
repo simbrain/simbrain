@@ -16,29 +16,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.util.Comparators;
 
 /**
- * Generic group of neurons. TODO: Make horizontal and vertical orientation
- * possible for group ordering.
+ * A group of neurons.
  */
 public class NeuronGroup extends Group {
 
-    /** Set of neurons. */
+    /** The neurons in this group. */
     private final List<Neuron> neuronList = new ArrayList<Neuron>();
     
-
     /** @see Group */
     public NeuronGroup(final RootNetwork net, final List<Neuron> neurons) {
         super(net);
         for (Neuron neuron : neurons) {
             addNeuron(neuron);
         }
-        //REDO: Why this?  Think.
         Collections.sort(neuronList, Comparators.X_ORDER);
     }
 
@@ -62,18 +58,20 @@ public class NeuronGroup extends Group {
             getParentNetwork().deleteNeuron(neuron);
         }
         if (getParentGroup() != null) {
-            if (getParentGroup() instanceof LayeredNetwork) {
+            if (getParentGroup() instanceof Subnetwork) {
                 Group parentGroup = getParentGroup();
-                ((LayeredNetwork) parentGroup).removeNeuronGroup(this);
+                ((Subnetwork) parentGroup).removeNeuronGroup(this);
             }
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().deleteGroup(getParentGroup());
-            }
+            }            
         }
     }
     
-    @Override
-    public List<Neuron> getFlatNeuronList() {
+    /**
+     * @return a list of neurons
+     */
+    public List<Neuron> getNeuronList() {
         return Collections.unmodifiableList(neuronList);
     }
     
@@ -124,12 +122,6 @@ public class NeuronGroup extends Group {
         }
     }
 
-    /** @Override. */
-    public Network duplicate() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     /**
      * Add neuron.
      * 
@@ -145,15 +137,11 @@ public class NeuronGroup extends Group {
     public void deleteNeuron(Neuron toDelete) {
   
         neuronList.remove(toDelete);
+        if (isEmpty() && isDeleteWhenEmpty()) {
+            delete();
+        }
         //REDO
         //getParent().fireGroupChanged(this, this);
-    }
-
-    /**
-     * @return a list of neurons
-     */
-    public List<Neuron> getNeuronList() {
-        return neuronList;
     }
 
     //REDO: Possibly change below to update if update goes to parent
@@ -165,11 +153,11 @@ public class NeuronGroup extends Group {
         getParentNetwork().updateNeurons(neuronList);
     }
     
-    //REDO: Add label / id info below    
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Neuron group with " + this.getNeuronList().size() + " neuron(s),");
+        ret += ("(" + getLabel() + ") Neuron group with "
+                + this.getNeuronList().size() + " neuron(s),");
         return ret;
     }   
 
@@ -178,44 +166,14 @@ public class NeuronGroup extends Group {
         return neuronList.isEmpty();
     }
     
-    //    /**
-//  * True if the group contains the specified neuron.
-//  *
-//  * @param n neuron to check for.
-//  * @return true if the group contains this neuron, false otherwise
-//  */
-// public boolean containsNeuron(final Neuron n) {
-//     return neuronList.contains(n);
-// }
+    /**
+     * True if the group contains the specified neuron.
+     * 
+     * @param n neuron to check for.
+     * @return true if the group contains this neuron, false otherwise
+     */
+    public boolean containsNeuron(final Neuron n) {
+        return neuronList.contains(n);
+    }
     
-//  /**
-//  * Randomize fan-in for all neurons in group.
-//  */
-// public void randomizeIncomingWeights() {
-//     for (Neuron neuron : neuronList) {
-//         neuron.randomizeFanIn();
-//     }
-// }
-//
-// /**
-//  * Randomize all neurons in group.
-//  */
-// public void randomize() {
-//     for (Neuron neuron : neuronList) {
-//         neuron.randomize();
-//     }
-// }
-//
-// /**
-//  * Randomize bias for all neurons in group.
-//  * 
-//  * @param lower lower bound for randomization.
-//  * @param upper upper bound for randomization.
-//  */
-// public void randomizeBiases(double lower, double upper) {
-//     for (Neuron neuron : neuronList) {
-//         neuron.randomizeBias(lower, upper);
-//     }
-// }
-
 }

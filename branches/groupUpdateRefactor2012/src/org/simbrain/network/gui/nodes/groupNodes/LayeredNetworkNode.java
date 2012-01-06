@@ -20,7 +20,7 @@ package org.simbrain.network.gui.nodes.groupNodes;
 
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.LayeredNetwork;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.InteractionBox;
@@ -41,7 +41,7 @@ public class LayeredNetworkNode extends GroupNode {
      * @param networkPanel parent panel
      * @param group the layered network
      */
-    public LayeredNetworkNode(NetworkPanel networkPanel, LayeredNetwork group) {
+    public LayeredNetworkNode(NetworkPanel networkPanel, FeedForward group) {
         super(networkPanel, group);
         setInteractionBox(new LayeredNetworkInteractionBox(networkPanel));
         setContextMenu();

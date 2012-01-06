@@ -18,9 +18,7 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 
 /**
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
@@ -60,23 +58,7 @@ public abstract class Group {
     public Group(final RootNetwork net) {
         parentNetwork = net;
     }
-       
-    //REDO: Kind of weird that removeNeuron/Synapse are here but not add... 
-    
-    /**
-     * Remove a neuron.  Subclasses with neuron lists should override this.
-     * 
-     * @param neuron neuron to delete
-     */
-    public void deleteNeuron(Neuron neuron) {};
-    
-    /**
-     * Remove a synapse.  Subclasses with synapse lists should override this.
-     * 
-     * @param synapse synapse to delete
-     */
-    public void removeSynapse(Synapse synapse) {};
-        
+
     /**
      * Whether this group is empty or not.
      *

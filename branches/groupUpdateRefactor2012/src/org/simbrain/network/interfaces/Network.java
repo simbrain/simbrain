@@ -496,7 +496,9 @@ public abstract class Network {
         // Remove the neuron itself. Either from a parent group that holds it,
         // or from the root network.
         if(toDelete.getParentGroup() != null) {
-            toDelete.getParentGroup().deleteNeuron(toDelete);
+            if (toDelete.getParentGroup() instanceof NeuronGroup) {
+                ((NeuronGroup) toDelete.getParentGroup()).deleteNeuron(toDelete);                
+            }
             if (toDelete.getParentGroup().isEmpty()) {
                 deleteGroup(toDelete.getParentGroup());
             }
@@ -535,7 +537,9 @@ public abstract class Network {
         // If this synapse has a parent group, delete that group
         if(toDelete.getParentGroup() != null) {
             Group parentGroup = toDelete.getParentGroup();
-            parentGroup.removeSynapse(toDelete);
+            if (parentGroup instanceof SynapseGroup) {
+                ((SynapseGroup)parentGroup).removeSynapse(toDelete);                
+            }
             if (parentGroup.isEmpty() && parentGroup.isDeleteWhenEmpty()) {
                 deleteGroup(toDelete.getParentGroup());
             }

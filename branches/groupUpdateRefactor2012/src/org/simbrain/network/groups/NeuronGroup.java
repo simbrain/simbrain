@@ -133,7 +133,11 @@ public class NeuronGroup extends Group {
         neuron.setParentGroup(this);
     }
 
-    @Override
+    /**
+     * Delete the provided neuron.
+     *
+     * @param toDelete the neuron to delete
+     */
     public void deleteNeuron(Neuron toDelete) {
   
         neuronList.remove(toDelete);

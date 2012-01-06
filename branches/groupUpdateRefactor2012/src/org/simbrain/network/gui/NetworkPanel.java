@@ -49,9 +49,9 @@ import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.BackpropNetwork;
 import org.simbrain.network.groups.Competitive;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Hopfield;
-import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -73,7 +73,6 @@ import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
-import org.simbrain.network.gui.nodes.groupNodes.LayeredNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SubnetGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.network.interfaces.Network;
@@ -569,7 +568,7 @@ public class NetworkPanel extends JPanel {
                 ret = new BackpropNetworkNode(NetworkPanel.this,
                         (BackpropNetwork) group);
             } else {
-                ret = new LayeredNetworkNode(NetworkPanel.this,
+                ret = new SubnetGroupNode(NetworkPanel.this,
                         (FeedForward) group);
             }
         } else if (group instanceof Subnetwork) {

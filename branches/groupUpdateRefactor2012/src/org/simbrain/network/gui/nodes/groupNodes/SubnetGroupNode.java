@@ -21,13 +21,12 @@ package org.simbrain.network.gui.nodes.groupNodes;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
-import org.simbrain.network.gui.nodes.InteractionBox;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
- * REDO: Rename to subnet node when subnetworks dismantled.
+ * REDO: Rename to SubnetworkNode when subnetworks dismantled.
  * 
  * @author jyoshimi
  */

@@ -101,7 +101,11 @@ public class SynapseGroup extends Group {
         addSynapse(synapse, true);
     }
     
-    @Override
+    /**
+     * Remove the provided synapse.
+     *
+     * @param toDelete the synapse to delete
+     */
     public void removeSynapse(Synapse toDelete) {
         synapseList.remove(toDelete);
         getParentNetwork().fireSynapseDeleted(toDelete);

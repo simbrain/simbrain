@@ -42,7 +42,7 @@ import org.simbrain.util.genericframe.GenericFrame;
  * 
  * @author jyoshimi
  */
-public class BackpropNetworkNode extends LayeredNetworkNode {
+public class BackpropNetworkNode extends SubnetGroupNode {
     
     /**
      * Create a layered network

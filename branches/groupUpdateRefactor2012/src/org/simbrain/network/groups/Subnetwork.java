@@ -259,9 +259,18 @@ public class Subnetwork extends Group implements UpdatableGroup {
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("(" + getLabel() + ") Subnetwork with "
-                + neuronGroupList.size() + " neuron list(s),");
-        ret += (" " + synapseGroupList.size() + " synapse list(s).");
+        ret += ("Subnetwork Group [" + getLabel() + "] Subnetwork with "
+                + neuronGroupList.size() + " neuron group(s) and ");
+        ret += (synapseGroupList.size() + " synapse group(s)");
+        if ((getNeuronGroupCount() + getSynapseGroupCount()) > 0) {
+            ret += "\n";
+        }
+        for (NeuronGroup neuronGroup : neuronGroupList) {
+            ret += "   " + neuronGroup.toString() + "\n";
+        }
+        for (SynapseGroup synapseGroup : synapseGroupList) {
+            ret += "   " + synapseGroup.toString() + "\n";
+        }
         return ret;
     }
 

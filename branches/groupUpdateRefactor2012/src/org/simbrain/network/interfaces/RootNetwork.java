@@ -816,8 +816,6 @@ public class RootNetwork extends Network {
 
         for (int i = 0; i < getGroupList().size(); i++) {
             Group group = (Group) getGroupList().get(i);
-            ret += ("\n" + getIndents() + "Group " + (i + 1));
-            ret += (getIndents() + "--------------------------------\n");
             ret += group.toString();
         }
 

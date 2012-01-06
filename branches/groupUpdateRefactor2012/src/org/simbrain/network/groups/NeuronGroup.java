@@ -156,8 +156,8 @@ public class NeuronGroup extends Group {
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("(" + getLabel() + ") Neuron group with "
-                + this.getNeuronList().size() + " neuron(s),");
+        ret += ("Neuron Group [" + getLabel() + "] Neuron group with "
+                + this.getNeuronList().size() + " neuron(s)");
         return ret;
     }   
 

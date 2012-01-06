@@ -130,8 +130,8 @@ public class SynapseGroup extends Group {
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("(" + getLabel() + ") Synapse group with "
-                + this.getSynapseList().size() + " synapse(s),");
+        ret += ("Synapse Group [" + getLabel() + "] Synapse group with "
+                + this.getSynapseList().size() + " synapse(s)");
         return ret;
     }
     

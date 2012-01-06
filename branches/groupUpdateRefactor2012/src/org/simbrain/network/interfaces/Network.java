@@ -945,7 +945,9 @@ public abstract class Network {
                 }
             }
             
-            groupList.add(group);
+            if (group.getParentGroup() == null) {
+                groupList.add(group);                
+            }
             rootNetwork.fireGroupAdded(group);
         }
     }

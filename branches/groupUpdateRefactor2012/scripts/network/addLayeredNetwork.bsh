@@ -33,12 +33,9 @@ import javax.swing.*;
         return; // User pressed cancel
     }
 
-    // Get last clicked position in the panel
-    Point2D lastClicked = networkPanel.getLastClickedPosition();
-
     // Create the layered network
-    networkPanel.getRootNetwork().addGroup(new LayeredNetwork(networkPanel.getRootNetwork(), 
-            topology, lastClicked));
+    networkPanel.getRootNetwork().addGroup(new FeedForward(networkPanel.getRootNetwork(), 
+            topology, networkPanel.getLastClickedPosition()));
     
     // Ensures network will display properly
     networkPanel.repaint();

@@ -23,20 +23,13 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
@@ -58,6 +51,7 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      */
     public AllToAllPanel(final AllToAll connection) {
         super(connection);
+        fillFieldValues();
         initializeLayout();
     }
     
@@ -156,10 +150,8 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      */
     public void commitChanges() {
         connection.setPercentExcitatory(((Number)tRatio.getValue()).doubleValue() / 100);
-        Synapse e = Synapse.getTemplateSynapse(excitatorySynType.getText());
-    	connection.setBaseExcitatorySynapse(e);
-    	Synapse i = Synapse.getTemplateSynapse(inhibitorySynType.getText());
-    	connection.setBaseInhibitorySynapse(i);
+        connection.setEnableInRand(randInhib.isSelected());
+        connection.setEnableExRand(randExcite.isSelected());
     	if(randInhib.isSelected()) {
     		connection.setInhibitoryRand(inhibRS);
     	}
@@ -175,7 +167,10 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-       
+       	Synapse e = Synapse.getTemplateSynapse(excitatorySynType.getText());
+       	connection.setBaseExcitatorySynapse(e);
+   		Synapse i = Synapse.getTemplateSynapse(inhibitorySynType.getText());
+   		connection.setBaseInhibitorySynapse(i);
     }
 
 }

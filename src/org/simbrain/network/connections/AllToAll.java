@@ -89,7 +89,7 @@ public class AllToAll extends ConnectNeurons {
         				numEx--;
         				synapse = baseExcitatorySynapse.
         					instantiateTemplateSynapse(source, target, network);
-        				if(excitatoryRand != null){
+        				if(enableExRand){
     	    				synapse.setStrength(excitatoryRand.getRandom());
     	    			} else {
     	    				synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
@@ -98,7 +98,7 @@ public class AllToAll extends ConnectNeurons {
         				numIn--;
         				synapse = baseInhibitorySynapse.
     						instantiateTemplateSynapse(source, target, network);
-        				if(inhibitoryRand != null){
+        				if(enableInRand){
         					synapse.setStrength(inhibitoryRand.getRandom());
         				} else {
         					synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);

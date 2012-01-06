@@ -364,12 +364,9 @@ public class SparsePanel extends AbstractConnectionPanel {
     	((Sparse)connection).setSparseSpecific(sparseSpecific.isSelected());
     	((Sparse)connection).setSparsity(((Number)sparsity.getValue()).doubleValue());
     	double percentEx = ((Number)tRatio.getValue()).doubleValue() / 100.0;
-    	
     	connection.setPercentExcitatory(percentEx);
-    	Synapse e = Synapse.getTemplateSynapse(excitatorySynType.getText());
-    	connection.setBaseExcitatorySynapse(e);
-    	Synapse i = Synapse.getTemplateSynapse(inhibitorySynType.getText());
-    	connection.setBaseInhibitorySynapse(i);
+    	connection.setEnableInRand(randInhib.isSelected());
+        connection.setEnableExRand(randExcite.isSelected());
     	if(randInhib.isSelected()) {
     		connection.setInhibitoryRand(inhibRS);
     	}
@@ -383,11 +380,14 @@ public class SparsePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-    	
     	sparsity.setValue(new Double(Sparse.getDEFAULT_SPARSITY()));
     	synsPerSource.setValue(new Integer((int) (numTargs * ((Number)sparsity.
 				getValue()).doubleValue())));
         synsPerSource.setEnabled(false);
+       	Synapse e = Synapse.getTemplateSynapse(excitatorySynType.getText());
+       	connection.setBaseExcitatorySynapse(e);
+   		Synapse i = Synapse.getTemplateSynapse(inhibitorySynType.getText());
+   		connection.setBaseInhibitorySynapse(i);
     }
 
 }

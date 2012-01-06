@@ -74,6 +74,12 @@ public abstract class ConnectNeurons {
     /** A source of random numbers for excitatory connections. */
     protected RandomSource excitatoryRand;
     
+    /** A switch for enabling randomized excitatory connections. */
+    protected boolean enableExRand;
+    
+    /** A switch for enabling randomized inhibitory connections. */
+    protected boolean enableInRand;
+    
     /**
      * Default constructor.
      *
@@ -254,6 +260,22 @@ public abstract class ConnectNeurons {
 	public static void setDEFAULT_INHIBITORY_STRENGTH(
 			double dEFAULTINHIBITORYSTRENGTH) {
 		DEFAULT_INHIBITORY_STRENGTH = dEFAULTINHIBITORYSTRENGTH;
+	}
+
+	public boolean isEnableExRand() {
+		return enableExRand;
+	}
+
+	public void setEnableExRand(boolean enableExRand) {
+		this.enableExRand = enableExRand;
+	}
+
+	public boolean isEnableInRand() {
+		return enableInRand;
+	}
+
+	public void setEnableInRand(boolean enableInRand) {
+		this.enableInRand = enableInRand;
 	}
 
 }

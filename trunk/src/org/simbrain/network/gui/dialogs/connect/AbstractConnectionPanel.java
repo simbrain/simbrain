@@ -203,14 +203,14 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
     	excitatorySynType.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> excitatoryList = new ArrayList<Synapse>();
-                excitatoryList.add(((Sparse)connection).getBaseExcitatorySynapse());
+                excitatoryList.add(connection.getBaseExcitatorySynapse());
                 SynapseDialog dialog = new SynapseDialog(excitatoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 Synapse excitatorySynapse = dialog.getSynapseList().get(0);
-                ((Sparse)connection).setBaseExcitatorySynapse(excitatorySynapse);
-               excitatorySynType.setText(excitatorySynapse.getType());
+                connection.setBaseExcitatorySynapse(excitatorySynapse);
+                excitatorySynType.setText(excitatorySynapse.getType());
             }
 
         });
@@ -218,13 +218,13 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
   	  	inhibitorySynType.addActionListener(new ActionListener() {
   		  public void actionPerformed(ActionEvent e) {
                 ArrayList<Synapse> inhibitoryList = new ArrayList<Synapse>();
-                inhibitoryList.add(((Sparse) connection).getBaseInhibitorySynapse());
+                inhibitoryList.add(connection.getBaseInhibitorySynapse());
                 SynapseDialog dialog = new SynapseDialog(inhibitoryList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
                 Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
-                ((Sparse) connection).setBaseInhibitorySynapse(inhibitorySynapse);
+                connection.setBaseInhibitorySynapse(inhibitorySynapse);
                 inhibitorySynType.setText(inhibitorySynapse.getType());
             }
         });
@@ -235,8 +235,10 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
   	  			if(arg0.getSource() == randInhib){
   	  				if(randInhib.isSelected()){
   	  					randInButton.setEnabled(true);
+  	  					connection.setEnableInRand(true);
   	  				} else {
   	  					randInButton.setEnabled(false);
+  	  					connection.setEnableInRand(false);
   	  				}
   	  			}
   	  		}
@@ -248,8 +250,10 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
 	 			if(arg0.getSource() == randExcite){
 	 				if(randExcite.isSelected()){
 	 					randExButton.setEnabled(true);
+	 					connection.setEnableExRand(true);
 	 				} else {
 	 					randExButton.setEnabled(false);
+	 					connection.setEnableExRand(false);
 	 				}
 	 			}
 	 		}

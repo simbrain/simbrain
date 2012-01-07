@@ -271,7 +271,6 @@ public class SparsePanel extends AbstractConnectionPanel {
     private void addChangeListeners(){
         
     	sparsitySlider.addChangeListener(new ChangeListener(){
-    		@Override
     		public void stateChanged(ChangeEvent e) {
     			JSlider source = (JSlider)e.getSource();
     			if(!source.getValueIsAdjusting() && source == sparsitySlider){
@@ -292,7 +291,6 @@ public class SparsePanel extends AbstractConnectionPanel {
     	});
     	
         synsPerSource.addPropertyChangeListener("value", new PropertyChangeListener(){
-			@Override
 			public void propertyChange(PropertyChangeEvent arg0) {
 				if(arg0.getSource() == synsPerSource && 
 						sparseSpecific.isSelected()){
@@ -313,7 +311,6 @@ public class SparsePanel extends AbstractConnectionPanel {
         });   
         
         sparsity.addPropertyChangeListener("value", new PropertyChangeListener () {
-			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(evt.getSource() == sparsity) {
 					int sps;
@@ -343,7 +340,6 @@ public class SparsePanel extends AbstractConnectionPanel {
     private void addActionListeners(){
     	
     	 sparseSpecific.addActionListener(new ActionListener(){
- 			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				if(arg0.getSource() == sparseSpecific){
  					if(sparseSpecific.isSelected()){
@@ -388,6 +384,8 @@ public class SparsePanel extends AbstractConnectionPanel {
        	connection.setBaseExcitatorySynapse(e);
    		Synapse i = Synapse.getTemplateSynapse(inhibitorySynType.getText());
    		connection.setBaseInhibitorySynapse(i);
+   		inRandPanel.fillDefaultValues();
+   		exRandPanel.fillDefaultValues();
     }
 
 }

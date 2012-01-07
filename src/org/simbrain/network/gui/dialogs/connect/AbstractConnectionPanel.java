@@ -174,7 +174,7 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
     public void initializeChangeListeners(){
     	
     	tRatio.addPropertyChangeListener(new PropertyChangeListener(){
-			@Override
+
 			public void propertyChange(PropertyChangeEvent arg0) {
 				if(arg0.getSource() == tRatio) {
 					ratioSlider.setValue(((Number)tRatio.getValue()).intValue());
@@ -183,7 +183,6 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
         });
     	
     	ratioSlider.addChangeListener(new ChangeListener(){
-			@Override
 			public void stateChanged(ChangeEvent e) {
 				JSlider source = (JSlider)e.getSource();
 				if(!source.getValueIsAdjusting() && source == ratioSlider){
@@ -230,7 +229,6 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
         });
   	  
   	  	randInhib.addActionListener(new ActionListener(){
-  	  		@Override
   	  		public void actionPerformed(ActionEvent arg0) {
   	  			if(arg0.getSource() == randInhib){
   	  				if(randInhib.isSelected()){
@@ -245,7 +243,6 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
   	  	});
 	 
 		randExcite.addActionListener(new ActionListener(){
-	 		@Override
 	 		public void actionPerformed(ActionEvent arg0) {
 	 			if(arg0.getSource() == randExcite){
 	 				if(randExcite.isSelected()){
@@ -262,7 +259,6 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
 		 randExButton.addActionListener(new ActionListener(){
 			
 			@SuppressWarnings("serial")
-			@Override
 			 public void actionPerformed(ActionEvent arg0) {
 				 StandardDialog exRSD = new StandardDialog(){	 
 					 @Override
@@ -282,7 +278,6 @@ public abstract class AbstractConnectionPanel extends LabelledItemPanel {
 		 randInButton.addActionListener(new ActionListener() {
 	
 			 @SuppressWarnings("serial")
-			 @Override
 			 public void actionPerformed(ActionEvent arg0) {
 				 StandardDialog inRSD = new StandardDialog(){	 
 					 @Override

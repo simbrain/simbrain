@@ -102,8 +102,8 @@ public final class ApplyConnectionAction extends AbstractAction {
             helpAction.setTheURL("Network/connections.html");
             dialog.addButton(new JButton(helpAction));
             dialog.setContentPane(optionsPanel);
-            dialog.setLocationRelativeTo(null);
             dialog.pack();
+            dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
 
         }

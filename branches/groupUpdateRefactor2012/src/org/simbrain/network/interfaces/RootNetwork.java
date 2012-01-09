@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NetworkListener;
@@ -210,14 +209,14 @@ public class RootNetwork extends Network {
             } else {
                 System.out.println("Warning:" + synapse.getId()
                         + " has null fanIn");
-                deleteSynapse(synapse);
+                removeSynapse(synapse);
             }
             if (synapse.getSource().getFanOut() != null) {
                 synapse.getSource().getFanOut().add(synapse);
             } else {
                 System.out.println("Warning:" + synapse.getId()
                         + " has null fanOut");
-                deleteSynapse(synapse);
+                removeSynapse(synapse);
             }
         }
         return this;
@@ -280,11 +279,8 @@ public class RootNetwork extends Network {
     public void updateAllGroups() {
         // Update group lists
         if (getGroupList() != null) {
-            
             for (Group group : getGroupList()) {
-                if (group instanceof UpdatableGroup) {
-                    ((UpdatableGroup)group).update();                    
-                }
+                group.update();
             }
         }
     }

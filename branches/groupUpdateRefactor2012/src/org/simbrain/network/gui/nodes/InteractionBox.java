@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.awt.Paint;
+
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
@@ -179,6 +181,12 @@ public class InteractionBox extends ScreenElement {
      */
     public void setBoxOffset_X(float boxOffset_X) {
         this.boxOffset_X = boxOffset_X;
+    }
+
+    @Override
+    public void setPaint(Paint arg0) {
+        super.setPaint(arg0);
+        box.setPaint(arg0);
     }
 
 }

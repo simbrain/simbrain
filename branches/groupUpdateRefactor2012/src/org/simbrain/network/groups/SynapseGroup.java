@@ -57,15 +57,15 @@ public class SynapseGroup extends Group {
             setMarkedForDeletion(true);
         }
         for(Synapse synapse : synapseList) {
-            getParentNetwork().deleteSynapse(synapse);
+            getParentNetwork().removeSynapse(synapse);
         }
-        if (getParentGroup() != null) {
+        if (isTopLevelGroup()) {
             if (getParentGroup() instanceof Subnetwork) {
                 Group parentGroup = getParentGroup();
                 ((Subnetwork) parentGroup).removeSynapseGroup(this);
             } 
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
-                getParentNetwork().deleteGroup(getParentGroup());
+                getParentNetwork().removeGroup(getParentGroup());
             }            
         }
     }

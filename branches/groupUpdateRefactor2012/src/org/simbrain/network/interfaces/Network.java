@@ -24,13 +24,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.FeedForward;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.groups.UpdatableGroup;
-import org.simbrain.network.update_actions.UpdateGroup;
 import org.simbrain.network.util.CopyPaste;
 
 /**
@@ -474,7 +472,7 @@ public abstract class Network {
      *
      * @param toDelete neuron to delete
      */
-    public void deleteNeuron(final Neuron toDelete) {
+    public void removeNeuron(final Neuron toDelete) {
 
         // Update priority list
         rootNetwork.updatePriorityList();
@@ -483,24 +481,24 @@ public abstract class Network {
         while (toDelete.getFanOut().size() > 0) {
             List<Synapse> fanOut = toDelete.getFanOut();
             Synapse s = fanOut.get(fanOut.size() - 1);
-            deleteSynapse(s);
+            removeSynapse(s);
         }
 
         // Remove incoming synapses
         while (toDelete.getFanIn().size() > 0) {
             List<Synapse> fanIn = toDelete.getFanIn();
             Synapse s = fanIn.get(fanIn.size() - 1);
-            deleteSynapse(s);
+            removeSynapse(s);
         }
 
         // Remove the neuron itself. Either from a parent group that holds it,
         // or from the root network.
         if(toDelete.getParentGroup() != null) {
             if (toDelete.getParentGroup() instanceof NeuronGroup) {
-                ((NeuronGroup) toDelete.getParentGroup()).deleteNeuron(toDelete);                
+                ((NeuronGroup) toDelete.getParentGroup()).removeNeuron(toDelete);                
             }
             if (toDelete.getParentGroup().isEmpty()) {
-                deleteGroup(toDelete.getParentGroup());
+                removeGroup(toDelete.getParentGroup());
             }
         } else {
             toDelete.getParentNetwork().getNeuronList().remove(toDelete);            
@@ -524,7 +522,7 @@ public abstract class Network {
      * @param toDelete the weight to delete
      * @param notify whether to fire a synapse deleted event
      */
-    public void deleteSynapse(final Synapse toDelete) {
+    public void removeSynapse(final Synapse toDelete) {
 
         // Remove references to this synapse from parent neurons
         if (toDelete.getSource() != null) {
@@ -541,7 +539,7 @@ public abstract class Network {
                 ((SynapseGroup)parentGroup).removeSynapse(toDelete);                
             }
             if (parentGroup.isEmpty() && parentGroup.isDeleteWhenEmpty()) {
-                deleteGroup(toDelete.getParentGroup());
+                removeGroup(toDelete.getParentGroup());
             }
         } else {
             synapseList.remove(toDelete);
@@ -552,8 +550,12 @@ public abstract class Network {
 
     }
     
-
-    public void deleteSynapseShallow(Synapse synapse) {
+    /**
+     * Remove the synapse only from the synapse list.
+     * 
+     * @param synapse
+     */
+    public void removeSynapseShallow(Synapse synapse) {
         synapseList.remove(synapse);
     }
 
@@ -899,7 +901,7 @@ public abstract class Network {
 
         // Remove all neurons (and the synapses with them)
         while (toDelete.getNeuronList().size() > 0) {
-            toDelete.deleteNeuron(toDelete.getNeuron(0));
+            toDelete.removeNeuron(toDelete.getNeuron(0));
         }
 
         // Remove all subnets
@@ -949,7 +951,7 @@ public abstract class Network {
                 }
             }
             
-            if (group.getParentGroup() == null) {
+            if (!group.isTopLevelGroup()) {
                 groupList.add(group);                
             }
             rootNetwork.fireGroupAdded(group);
@@ -961,7 +963,7 @@ public abstract class Network {
      *
      * @param toDelete the group to delete.
      */
-    public void deleteGroup(final Group toDelete) {
+    public void removeGroup(final Group toDelete) {
         
         // Remove from the group list
         groupList.remove(toDelete);

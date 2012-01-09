@@ -34,7 +34,7 @@ import org.simbrain.network.synapses.ClampedSynapse;
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
  */
-public class Hopfield extends Subnetwork implements UpdatableGroup{
+public class Hopfield extends Subnetwork {
 
     //TODO: Generalize to capture a greater variety of Hopfield type networks.
 
@@ -143,9 +143,7 @@ public class Hopfield extends Subnetwork implements UpdatableGroup{
         getParentNetwork().fireNetworkChanged();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update() {
 
         if (getParentNetwork().getClampNeurons()) {

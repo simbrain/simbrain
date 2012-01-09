@@ -29,7 +29,7 @@ import org.simbrain.network.listeners.SynapseListener;
  * A collection of neuron groups and synapse groups which essentially functions
  * as a subnetwork within the main root network, with it's own update rules.
  */
-public class Subnetwork extends Group implements UpdatableGroup {
+public class Subnetwork extends Group {
     
     /** List of neuron groups. */
     private final List<NeuronGroup> neuronGroupList = new ArrayList<NeuronGroup>();
@@ -85,11 +85,11 @@ public class Subnetwork extends Group implements UpdatableGroup {
         }
         for (NeuronGroup neuronGroup : neuronGroupList) {
             neuronGroup.setDeleteWhenEmpty(true);
-            getParentNetwork().deleteGroup(neuronGroup);
+            getParentNetwork().removeGroup(neuronGroup);
         }
         for (SynapseGroup synapseGroup: synapseGroupList) {
             synapseGroup.setDeleteWhenEmpty(true);
-            getParentNetwork().deleteGroup(synapseGroup);
+            getParentNetwork().removeGroup(synapseGroup);
         }
         if (usingGrowingSynapseGroups) {
             removeSynapseListener();
@@ -141,15 +141,6 @@ public class Subnetwork extends Group implements UpdatableGroup {
     public void removeSynapseGroup(SynapseGroup synapseGroup) {
         synapseGroupList.remove(synapseGroup);
         // TODO: Fire event?
-    }
-
-    /**
-     * Update subnetwork. Override for special updating.
-     */
-    public void invoke() {
-        for (NeuronGroup layer : neuronGroupList) {
-            layer.updateNeurons();
-        }
     }
 
     /**
@@ -287,12 +278,10 @@ public class Subnetwork extends Group implements UpdatableGroup {
     public void setEnabled(boolean enabled) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update() {
         for (NeuronGroup neuronGroup : neuronGroupList) {
-            neuronGroup.updateNeurons();
+            neuronGroup.update();
         }
     }
     
@@ -386,7 +375,7 @@ public class Subnetwork extends Group implements UpdatableGroup {
                 SynapseGroup synapseGroup = neuronGroupToSyanpseGroupMap.get(parentGroup);
 
                 // Move the synapse from the root network over to this subnet
-                getParentNetwork().deleteSynapseShallow(synapse); // remove from root net
+                getParentNetwork().removeSynapseShallow(synapse); // remove from root net
                 synapseGroup.addSynapse(synapse, false); // Add to appropriate synapse group
                 
                 // Fire Event so network panel knows to add this synapse to appropriate

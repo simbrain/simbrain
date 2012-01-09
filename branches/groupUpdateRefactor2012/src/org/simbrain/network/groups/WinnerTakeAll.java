@@ -32,7 +32,7 @@ import org.simbrain.network.neurons.LinearNeuron;
  * the lower value. In case of a tie the node which wins is arbitrary (the first
  * in an internally maintained list).
  */
-public class WinnerTakeAll extends NeuronGroup implements UpdatableGroup {
+public class WinnerTakeAll extends NeuronGroup {
 
     /** Default initial number of units. */
     private static final int DEFAULT_NUM_UNITS = 5;
@@ -84,9 +84,7 @@ public class WinnerTakeAll extends NeuronGroup implements UpdatableGroup {
         setLabel("Winner take all network");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update() {
         
         if (getParentNetwork().getClampNeurons()) {

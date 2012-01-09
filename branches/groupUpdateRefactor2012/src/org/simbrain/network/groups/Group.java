@@ -67,6 +67,11 @@ public abstract class Group {
     public abstract boolean isEmpty();
 
     /**
+     * Update this group.
+     */
+    public abstract void update();
+    
+    /**
      * Perform necessary deletion cleanup.
      */
     public abstract void delete();
@@ -159,6 +164,34 @@ public abstract class Group {
      */
     public boolean isDeleteWhenEmpty() {
         return deleteWhenEmpty;
+    }
+    
+    /**
+     * Returns true if this group has a parent group (i.e. it is a sub-group
+     * within a larger group).
+     * 
+     * @return true if this group has a parent, false otherwise.
+     */
+    public boolean hasParentGroup() {
+        if (parentGroup == null) {
+            return false;
+        } else {
+            return true;
+        }        
+    }
+
+    /**
+     * Returns true if this group is "top level" (has no parent group).
+     * Basically a convenience wrapper around hasParentGroup().
+     *
+     * @return true if this has a parent group, false otherwise.
+     */
+    public boolean isTopLevelGroup() {
+        if (hasParentGroup()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**

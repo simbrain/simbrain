@@ -55,17 +55,22 @@ public class NeuronGroup extends Group {
             setMarkedForDeletion(true);
         }
         for(Neuron neuron : neuronList) {
-            getParentNetwork().deleteNeuron(neuron);
+            getParentNetwork().removeNeuron(neuron);
         }
-        if (getParentGroup() != null) {
+        if (isTopLevelGroup()) {
             if (getParentGroup() instanceof Subnetwork) {
                 Group parentGroup = getParentGroup();
                 ((Subnetwork) parentGroup).removeNeuronGroup(this);
             }
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
-                getParentNetwork().deleteGroup(getParentGroup());
+                getParentNetwork().removeGroup(getParentGroup());
             }            
         }
+    }
+    
+    @Override
+    public void update() {
+        getParentNetwork().updateNeurons(neuronList);
     }
     
     /**
@@ -138,7 +143,7 @@ public class NeuronGroup extends Group {
      *
      * @param toDelete the neuron to delete
      */
-    public void deleteNeuron(Neuron toDelete) {
+    public void removeNeuron(Neuron toDelete) {
   
         neuronList.remove(toDelete);
         if (isEmpty() && isDeleteWhenEmpty()) {
@@ -146,15 +151,6 @@ public class NeuronGroup extends Group {
         }
         //REDO
         //getParent().fireGroupChanged(this, this);
-    }
-
-    //REDO: Possibly change below to update if update goes to parent
-    
-    /**
-     * Update all neurons.
-     */
-    public void updateNeurons() {
-        getParentNetwork().updateNeurons(neuronList);
     }
     
     @Override

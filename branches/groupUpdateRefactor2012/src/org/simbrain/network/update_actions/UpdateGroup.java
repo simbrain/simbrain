@@ -19,7 +19,6 @@
 package org.simbrain.network.update_actions;
 
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.interfaces.UpdateAction;
 
 /**
@@ -37,7 +36,6 @@ public class UpdateGroup implements UpdateAction {
      * @param group group to update
      */
     public UpdateGroup(Group group) {
-        // TODO: If group not instanceof updateable throw exception
         this.group = group;
     }
 
@@ -45,7 +43,7 @@ public class UpdateGroup implements UpdateAction {
      * {@inheritDoc}
      */
     public void invoke() {
-        ((UpdatableGroup)group).update();
+        group.update();
     }
 
     /** 

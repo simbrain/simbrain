@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.UpdatableGroup;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.update_actions.PriorityUpdate;
@@ -68,7 +67,7 @@ public class UpdateManager {
     }
 
     /**
-     * Update manager should listene for relevant changes in network.
+     * Update manager should listen for relevant changes in network.
      */
     private void addListeners() {
         // Group are automatically listened for, and added.  Possibly
@@ -76,16 +75,14 @@ public class UpdateManager {
         network.addGroupListener(new GroupListener() {
 
             public void groupAdded(NetworkEvent<Group> e) {
-                if (e.getObject() instanceof UpdatableGroup) {
-                    addAction(new UpdateGroup(e.getObject()));
-                }            
+                if (e.getObject().isTopLevelGroup()) {
+                    addAction(new UpdateGroup(e.getObject()));                    
+                }
             }
 
             public void groupRemoved(NetworkEvent<Group> e) {
                 // Find corresponding group update action and remove it
-                if (e.getObject() instanceof UpdatableGroup) {
-                    removeGroupAction((UpdatableGroup)e.getObject());
-                }            
+                removeGroupAction(e.getObject());
             }
 
             public void groupChanged(NetworkEvent<Group> networkEvent,
@@ -103,7 +100,7 @@ public class UpdateManager {
      *
      * @param group 
      */
-    private void removeGroupAction(UpdatableGroup group) {
+    private void removeGroupAction(Group group) {
         UpdateAction toDelete = null;
         for (UpdateAction action : actionList) {
             if (action instanceof UpdateGroup) {

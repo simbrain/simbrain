@@ -717,7 +717,7 @@ public class Neuron  {
      */
     public void deleteFanIn() {
         for (Synapse synapse : fanIn) {
-            synapse.getParentNetwork().deleteSynapse(synapse);
+            synapse.getParentNetwork().removeSynapse(synapse);
         }
     }
 
@@ -726,7 +726,7 @@ public class Neuron  {
      */
     public void deleteFanOut() {
         for (Synapse synapse : fanOut) {
-            synapse.getParentNetwork().deleteSynapse(synapse);
+            synapse.getParentNetwork().removeSynapse(synapse);
         }
     }
 

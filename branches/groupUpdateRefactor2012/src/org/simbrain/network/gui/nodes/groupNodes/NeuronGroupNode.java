@@ -18,49 +18,38 @@
  */
 package org.simbrain.network.gui.nodes.groupNodes;
 
-import org.simbrain.network.groups.Subnetwork;
+import java.awt.BasicStroke;
+import java.awt.Color;
+
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PBounds;
-
 /**
- * REDO: Rename to SubnetworkNode when subnetworks dismantled.
+ * PNode representation of a group of neurons.
  * 
  * @author jyoshimi
  */
-public class SubnetGroupNode extends GroupNode {
+public class NeuronGroupNode extends GroupNode {
     
     /**
-     * Create a subnetwork node
+     * Stroke for neuron groups when they are in a subnet. Somewhat lighter than
+     * general groups to distinguish these from subnetworks.
+     */
+    private static final BasicStroke LAYER_OUTLINE_STROKE = new BasicStroke(.5f);
+    
+    /**
+     * Create a Neuron Group PNode.
      *
      * @param networkPanel parent panel
-     * @param group the layered network
+     * @param group the neuron group
      */
-    public SubnetGroupNode(NetworkPanel networkPanel, Subnetwork group) {
+    public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
         super(networkPanel, group);
+        if (!group.isTopLevelGroup()) {
+            setStroke(LAYER_OUTLINE_STROKE);
+            setStrokePaint(Color.gray);            
+        }
     }
     
-    @Override
-    public void updateBounds() {
-        
-        PBounds bounds = new PBounds();
-        for (PNode node : getOutlinedObjects()) {
-            bounds.add(node.getGlobalBounds());
-        }
-        
-        // Add a little extra height at top
-        double inset = getOutlinePadding();
-        bounds.setRect(bounds.getX() - inset,
-                bounds.getY() - inset - 15,
-                bounds.getWidth() + (2 * inset),
-                bounds.getHeight() + (2 * inset) + 15);
-
-        setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                            (float) bounds.getWidth(), (float) bounds.getHeight());
-
-        updateInteractionBox();
-    }
-
 }

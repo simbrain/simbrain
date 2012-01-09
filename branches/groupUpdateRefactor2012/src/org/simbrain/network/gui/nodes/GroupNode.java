@@ -57,9 +57,8 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     /** References to outlined objects. */
     private ArrayList<PNode> outlinedObjects = new ArrayList<PNode>();
 
-    /** Default stroke (dashed line). */
-    private static final BasicStroke DEFAULT_STROKE = new BasicStroke(1.0f,
-            BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f}, 0.0f);
+    /** Default stroke.  Light gray line. */
+    private static final BasicStroke DEFAULT_STROKE = new BasicStroke(1f);
 
     /** Default outline padding. */
     private final double DEFAULT_PADDING = 2.0d;
@@ -88,7 +87,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         this.networkPanel = networkPanel;
         this.group = group;
         setStroke(DEFAULT_STROKE);
-        setStrokePaint(Color.yellow);
+        setStrokePaint(Color.gray);
         InteractionBox box = new InteractionBox(networkPanel, this);
         setInteractionBox(box);
         this.setConextMenu(getDefaultContextMenu());
@@ -140,7 +139,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         };
         Action removeGroup = new AbstractAction("Remove group") {
             public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().getRootNetwork().deleteGroup(group);
+                getNetworkPanel().getRootNetwork().removeGroup(group);
             }
         };
         Action editGroupName = new AbstractAction("Edit group name...") {
@@ -229,17 +228,19 @@ public class GroupNode extends PPath implements PropertyChangeListener {
                             (float) bounds.getWidth(), (float) bounds.getHeight());
 
         updateInteractionBox();
-        moveToBack();
     }
 
     /**
      * Update location of interaction box.
      */
     protected void updateInteractionBox() {
+        // System.out.println(getGroup().getLabel()); TODO: Uncomment this to see just how often
+        //  this method is called.  Too much!s
         interactionBox.setOffset(
                 getBounds().getX() + interactionBox.getBoxOffset_X(),
                 getBounds().getY() - interactionBox.getHeight()
                         + interactionBox.getBoxOffset_Y());
+        interactionBox.moveToFront();
     }
 
     /**

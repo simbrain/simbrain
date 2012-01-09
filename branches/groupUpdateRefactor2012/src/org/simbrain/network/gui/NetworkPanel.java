@@ -73,6 +73,7 @@ import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
+import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SubnetGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.network.interfaces.Network;
@@ -528,7 +529,7 @@ public class NetworkPanel extends JPanel {
                     node.removeFromParent();
                     objectNodeMap.remove(group);
                     // If this is a child group, then update the parent group node
-                    if (group.getParentGroup() != null) {
+                    if (group.isTopLevelGroup()) {
                         GroupNode parentGroupNode = (GroupNode) objectNodeMap
                                 .get(group.getParentGroup());
                         if (parentGroupNode != null) {
@@ -563,6 +564,8 @@ public class NetworkPanel extends JPanel {
         GroupNode ret = null;
         if (group instanceof SynapseGroup) {
             ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
+        } else if (group instanceof NeuronGroup) {
+            ret = new NeuronGroupNode(NetworkPanel.this, (NeuronGroup)group);
         } else if (group instanceof FeedForward) {
             if (group instanceof BackpropNetwork) {
                 ret = new BackpropNetworkNode(NetworkPanel.this,
@@ -742,7 +745,7 @@ public class NetworkPanel extends JPanel {
                 nodes.add((NeuronNode) objectNodeMap.get(neuron));
             }
             // Add neuron nodes to group node
-            GroupNode neuronGroup = new GroupNode(NetworkPanel.this, group);
+            GroupNode neuronGroup = createGroupNode(group);
             for (PNode node : nodes) {
                 neuronGroup.addPNode(node);
             }
@@ -1069,10 +1072,10 @@ public class NetworkPanel extends JPanel {
         for (PNode selectedNode : getSelection()) {
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
-                rootNetwork.deleteNeuron(selectedNeuronNode.getNeuron());
+                rootNetwork.removeNeuron(selectedNeuronNode.getNeuron());
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
-                rootNetwork.deleteSynapse(selectedSynapseNode.getSynapse());
+                rootNetwork.removeSynapse(selectedSynapseNode.getSynapse());
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 rootNetwork.deleteText(selectedTextNode.getTextObject());

@@ -20,9 +20,6 @@ package org.simbrain.network.gui.nodes.groupNodes;
 
 import java.awt.Color;
 
-import javax.swing.JPopupMenu;
-
-import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.GroupNode;
@@ -47,79 +44,51 @@ public class SynapseGroupNode extends GroupNode {
      */
     public SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
-        setStrokePaint(Color.gray);
-        setPaint(Color.gray);
-        setTransparency(.2f);
-        setInteractionBox(new SynapseInteractionBox(networkPanel));
-        setContextMenu();
-        setOutlinePadding(-5);
+        setStroke(null); // Remove this to see first-pass ellipse based outline
+        getInteractionBox().setPaint(Color.white);
+        setOutlinePadding(-30);
         setPickable(false);
     }
-    
-    /**
-     * Custom interaction box for Synapse group node.
-     */
-    private class SynapseInteractionBox extends InteractionBox {
-        public SynapseInteractionBox(NetworkPanel net) {
-            super(net, SynapseGroupNode.this);
-        }
-
-    };
-    
-    
-    /**
-     * Sets custom menu.
-     */
-    private void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
-//        menu.addSeparator();
-//        Action trainNet = new AbstractAction("Train Hopfield Network...") {
-//            public void actionPerformed(final ActionEvent event) {
-//                ((Hopfield) getGroup()).train();
-//            }
-//        };
-//        menu.add(new JMenuItem(trainNet));
-//        Action randWeights = new AbstractAction("Randomize Weights...") {
-//            public void actionPerformed(final ActionEvent event) {
-//                ((Hopfield) getGroup()).randomizeWeights();
-//            }
-//        };
-//        menu.add(new JMenuItem(randWeights));
-        setConextMenu(menu);
-    }
-
+   
     
     @Override
     public void updateBounds() {
-
         PBounds bounds = new PBounds();
-
-        for (PNode node : getOutlinedObjects()) {
-            PBounds childBounds = node.getGlobalBounds();
-            bounds.add(childBounds);
-            if (node instanceof SynapseNode) {
-                bounds.add(((SynapseNode) node).getLine().getBounds());
+        if (getOutlinedObjects().size() > 0) {
+            for (PNode node : getOutlinedObjects()) {
+                PBounds childBounds = node.getGlobalBounds();
+                bounds.add(childBounds);
+                if (node instanceof SynapseNode) {
+                    bounds.add(((SynapseNode) node).getLine().getBounds());
+                }
             }
+
+            double inset = getOutlinePadding();
+            bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
+                    bounds.getWidth() + (2 * inset), bounds.getHeight()
+                            + (2 * inset));
+
+            setPathToEllipse((float) bounds.getX(), (float) bounds.getY(),
+                    (float) bounds.getWidth(), (float) bounds.getHeight());            
+
+
+        } else {
+            // TODO Need to get reference to parent nodes.
+            bounds = null;            
         }
 
-        double inset = getOutlinePadding();
-        bounds.setRect(bounds.getX() - inset, bounds.getY() - inset,
-                bounds.getWidth() + (2 * inset), bounds.getHeight()
-                        + (2 * inset));
-
-        setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                (float) bounds.getWidth(), (float) bounds.getHeight());
 
         updateInteractionBox();
-        moveToBack();
     }
 
     @Override
     protected void updateInteractionBox() {
         InteractionBox interactionBox = getInteractionBox();
-        interactionBox.setOffset(
-                getBounds().getX() - interactionBox.getFullBounds().width,
-                getBounds().getCenterY() - interactionBox.getHeight() / 2);
+        interactionBox.setOffset(this.getBounds().getCenterX()
+               - interactionBox.getWidth()*2, this.getBounds().getCenterY()
+                - interactionBox.getHeight());    
+        interactionBox.moveToFront();
     }    
-
+    
+    
 }

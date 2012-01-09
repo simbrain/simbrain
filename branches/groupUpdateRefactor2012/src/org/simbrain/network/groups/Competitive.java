@@ -33,7 +33,7 @@ import org.simbrain.network.neurons.LinearNeuron;
  *
  * @author Jeff Yoshimi
  */
-public class Competitive extends Subnetwork implements UpdatableGroup  {
+public class Competitive extends Subnetwork {
 
     /** Learning rate. */
     private double epsilon = .1;
@@ -95,12 +95,10 @@ public class Competitive extends Subnetwork implements UpdatableGroup  {
         setNormalizeInputs(oldNet.getNormalizeInputs());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void update() {
 
-        getNeuronGroup().updateNeurons();
+        getNeuronGroup().update();
         max = 0;
         winner = 0;
 

@@ -133,15 +133,6 @@ public class FeedForward extends Subnetwork {
         }
 
     }
-    
-    @Override
-    public void delete() {
-        if (isMarkedForDeletion()) {
-            return;
-        } else {
-            setMarkedForDeletion(true);
-        }
-    }
 
     /**
      * Return the width of the specified layer, in pixels.

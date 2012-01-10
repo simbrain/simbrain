@@ -52,10 +52,10 @@ public abstract class Network {
     private String id;
 
     /** Array list of neurons. */
-    private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
+    private List<Neuron> neuronList = new ArrayList<Neuron>();
 
     /** Array list of synapses. */
-    private ArrayList<Synapse> synapseList = new ArrayList<Synapse>();
+    private List<Synapse> synapseList = new ArrayList<Synapse>();
 
     /** Array list of sub-networks. */
     private ArrayList<Network> networkList = new ArrayList<Network>();
@@ -227,7 +227,7 @@ public abstract class Network {
     /**
      * @return List of synapses in network.
      */
-    public ArrayList<Synapse> getSynapseList() {
+    public List<Synapse> getSynapseList() {
         return this.synapseList;
     }
 
@@ -505,7 +505,7 @@ public abstract class Network {
         }
 
         // Notify listeners that this neuron has been deleted
-        rootNetwork.fireNeuronDeleted(toDelete);
+        rootNetwork.fireNeuronRemoved(toDelete);
 
         //If we just removed the last neuron of a network, remove that network
         Network parent = toDelete.getParentNetwork();
@@ -546,17 +546,36 @@ public abstract class Network {
         }
 
         // Notify listeners that this synapse has been deleted
-        this.getRootNetwork().fireSynapseDeleted(toDelete);
+        this.getRootNetwork().fireSynapseRemoved(toDelete);
 
     }
     
     /**
-     * Remove the synapse only from the synapse list.
+     * Remove the given neurons from the neuron list (without firing an event)
+     * and add them to the provided group.
      * 
-     * @param synapse
+     * @param list the list of neurons to transfer
+     * @param group the group to transfer them to
      */
-    public void removeSynapseShallow(Synapse synapse) {
-        synapseList.remove(synapse);
+    public void transferNeuronsToGroup(List<Neuron> list, NeuronGroup group) {
+        for (Neuron neuron : list) {
+            neuronList.remove(neuron);
+            group.addNeuron(neuron, false);
+        }
+    }
+    
+    /**
+     * Remove the given synapses from the synapse list (without firing an event)
+     * and add them to the provided group.
+     * 
+     * @param list the list of synapses to transfer
+     * @param group the group to transfer them to
+     */
+    public void transferSynapsesToGroup(List<Synapse> list, SynapseGroup group) {
+        for (Synapse synapse : list) {
+            synapseList.remove(synapse);
+            group.addSynapse(synapse, false);
+        }
     }
 
     /**
@@ -951,7 +970,7 @@ public abstract class Network {
                 }
             }
             
-            if (!group.isTopLevelGroup()) {
+            if (group.isTopLevelGroup()) {
                 groupList.add(group);                
             }
             rootNetwork.fireGroupAdded(group);
@@ -972,7 +991,7 @@ public abstract class Network {
         toDelete.delete();
         
         // Notify listeners that this group has been deleted.
-        rootNetwork.fireGroupDeleted(toDelete);
+        rootNetwork.fireGroupRemoved(toDelete);
     }
 
 

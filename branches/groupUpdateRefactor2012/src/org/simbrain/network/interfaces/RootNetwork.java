@@ -468,7 +468,7 @@ public class RootNetwork extends Network {
      * 
      * @param deleted neuron which has been deleted
      */
-    public void fireNeuronDeleted(final Neuron deleted) {
+    public void fireNeuronRemoved(final Neuron deleted) {
         for (NeuronListener listener : neuronListeners) {
             listener.neuronRemoved(new NetworkEvent<Neuron>(this, deleted));
         }
@@ -566,7 +566,7 @@ public class RootNetwork extends Network {
      * 
      * @param deleted synapse which was deleted
      */
-    public void fireSynapseDeleted(final Synapse deleted) {
+    public void fireSynapseRemoved(final Synapse deleted) {
         for (SynapseListener listener : synapseListeners) {
             listener.synapseRemoved(new NetworkEvent<Synapse>(this, deleted));
         }
@@ -613,7 +613,7 @@ public class RootNetwork extends Network {
      * 
      * @param deleted text which was deleted
      */
-    public void fireTextDeleted(final NetworkTextObject deleted) {
+    public void fireTextRemoved(final NetworkTextObject deleted) {
         for (TextListener listener : textListeners) {
             listener.textRemoved(deleted);
         }
@@ -701,7 +701,7 @@ public class RootNetwork extends Network {
      * 
      * @param deleted Group to be deleted
      */
-    public void fireGroupDeleted(final Group deleted) {
+    public void fireGroupRemoved(final Group deleted) {
         for (GroupListener listener : groupListeners) {
             listener.groupRemoved(new NetworkEvent<Group>(this, deleted));
         }
@@ -992,7 +992,7 @@ public class RootNetwork extends Network {
      */
     public void deleteText(final NetworkTextObject text) {
         textList.remove(text);
-        this.fireTextDeleted(text);
+        this.fireTextRemoved(text);
     }
 
     /**

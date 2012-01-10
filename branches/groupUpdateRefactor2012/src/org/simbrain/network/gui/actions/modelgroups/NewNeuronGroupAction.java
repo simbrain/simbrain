@@ -58,11 +58,10 @@ public final class NewNeuronGroupAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        NeuronGroup group = new NeuronGroup(networkPanel.getRootNetwork(),
-                (List<Neuron>) networkPanel.getSelectedModelNeurons());
-
-        if (group.getNeuronList().size() > 0) {
+        List<Neuron> neuronList = (List<Neuron>) networkPanel.getSelectedModelNeurons();
+        if (neuronList.size() > 0) {
+            NeuronGroup group = new NeuronGroup(networkPanel.getRootNetwork());
+                       networkPanel.getRootNetwork().transferNeuronsToGroup(neuronList, group);
             networkPanel.getRootNetwork().addGroup(group);
         }
     }

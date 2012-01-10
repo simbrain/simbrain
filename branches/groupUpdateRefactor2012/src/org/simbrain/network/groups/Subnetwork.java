@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -32,10 +33,10 @@ import org.simbrain.network.listeners.SynapseListener;
 public class Subnetwork extends Group {
     
     /** List of neuron groups. */
-    private final List<NeuronGroup> neuronGroupList = new ArrayList<NeuronGroup>();
+    private final List<NeuronGroup> neuronGroupList = new CopyOnWriteArrayList<NeuronGroup>();
 
     /** List of synapse groups. */
-    private final List<SynapseGroup> synapseGroupList = new ArrayList<SynapseGroup>();
+    private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
 
     /**
      * Associates neuron groups with the "growing" synapse groups that are
@@ -130,7 +131,7 @@ public class Subnetwork extends Group {
      */
     public void removeNeuronGroup(NeuronGroup neuronGroup) {
         neuronGroupList.remove(neuronGroup);
-        // TODO: Fire event?
+        getParentNetwork().fireGroupRemoved(neuronGroup);            
     }
 
     /**
@@ -140,7 +141,7 @@ public class Subnetwork extends Group {
      */
     public void removeSynapseGroup(SynapseGroup synapseGroup) {
         synapseGroupList.remove(synapseGroup);
-        // TODO: Fire event?
+        getParentNetwork().fireGroupRemoved(synapseGroup);            
     }
 
     /**
@@ -257,10 +258,10 @@ public class Subnetwork extends Group {
             ret += "\n";
         }
         for (NeuronGroup neuronGroup : neuronGroupList) {
-            ret += "   " + neuronGroup.toString() + "\n";
+            ret += "   " + neuronGroup.toString();
         }
         for (SynapseGroup synapseGroup : synapseGroupList) {
-            ret += "   " + synapseGroup.toString() + "\n";
+            ret += "   " + synapseGroup.toString();
         }
         return ret;
     }
@@ -375,8 +376,9 @@ public class Subnetwork extends Group {
                 SynapseGroup synapseGroup = neuronGroupToSyanpseGroupMap.get(parentGroup);
 
                 // Move the synapse from the root network over to this subnet
-                getParentNetwork().removeSynapseShallow(synapse); // remove from root net
-                synapseGroup.addSynapse(synapse, false); // Add to appropriate synapse group
+                getParentNetwork().transferSynapsesToGroup(
+                        (List<Synapse>) Collections.singletonList(synapse),
+                        synapseGroup);
                 
                 // Fire Event so network panel knows to add this synapse to appropriate
                 //  PNode

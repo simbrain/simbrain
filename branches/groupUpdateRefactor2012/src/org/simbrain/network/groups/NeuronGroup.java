@@ -12,9 +12,9 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -27,7 +27,7 @@ import org.simbrain.network.util.Comparators;
 public class NeuronGroup extends Group {
 
     /** The neurons in this group. */
-    private final List<Neuron> neuronList = new ArrayList<Neuron>();
+    private final List<Neuron> neuronList = new CopyOnWriteArrayList<Neuron>();
     
     /** @see Group */
     public NeuronGroup(final RootNetwork net, final List<Neuron> neurons) {
@@ -35,7 +35,7 @@ public class NeuronGroup extends Group {
         for (Neuron neuron : neurons) {
             addNeuron(neuron);
         }
-        Collections.sort(neuronList, Comparators.X_ORDER);
+        //Collections.sort(neuronList, Comparators.X_ORDER);
     }
 
     /**
@@ -54,13 +54,12 @@ public class NeuronGroup extends Group {
         } else {
             setMarkedForDeletion(true);
         }
-        for(Neuron neuron : neuronList) {
+        for (Neuron neuron : neuronList) {
             getParentNetwork().removeNeuron(neuron);
         }
-        if (isTopLevelGroup()) {
+        if (hasParentGroup()) {
             if (getParentGroup() instanceof Subnetwork) {
-                Group parentGroup = getParentGroup();
-                ((Subnetwork) parentGroup).removeNeuronGroup(this);
+                ((Subnetwork) getParentGroup()).removeNeuronGroup(this);
             }
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().removeGroup(getParentGroup());
@@ -128,14 +127,27 @@ public class NeuronGroup extends Group {
     }
 
     /**
-     * Add neuron.
+     * Add a neuron to group.
+     * 
+     * @param neuron neuron to add
+     * @param fireEvent whether to fire a neuron added event
+     */
+    public void addNeuron(Neuron neuron, boolean fireEvent) {
+        neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
+        neuronList.add(neuron);
+        neuron.setParentGroup(this);
+        if (fireEvent) {
+            getParentNetwork().fireNeuronAdded(neuron);            
+        }
+    }
+
+    /**
+     * Add neuron to group.
      * 
      * @param neuron neuron to add
      */
     public void addNeuron(Neuron neuron) {
-        neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
-        neuronList.add(neuron);
-        neuron.setParentGroup(this);
+        addNeuron(neuron, true);
     }
 
     /**
@@ -157,7 +169,7 @@ public class NeuronGroup extends Group {
     public String toString() {
         String ret = new String();
         ret += ("Neuron Group [" + getLabel() + "] Neuron group with "
-                + this.getNeuronList().size() + " neuron(s)");
+                + this.getNeuronList().size() + " neuron(s)\n");
         return ret;
     }   
 

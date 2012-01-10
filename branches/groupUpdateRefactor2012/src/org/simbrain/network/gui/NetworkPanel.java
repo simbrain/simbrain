@@ -529,7 +529,7 @@ public class NetworkPanel extends JPanel {
                     node.removeFromParent();
                     objectNodeMap.remove(group);
                     // If this is a child group, then update the parent group node
-                    if (group.isTopLevelGroup()) {
+                    if (!group.isTopLevelGroup()) {
                         GroupNode parentGroupNode = (GroupNode) objectNodeMap
                                 .get(group.getParentGroup());
                         if (parentGroupNode != null) {

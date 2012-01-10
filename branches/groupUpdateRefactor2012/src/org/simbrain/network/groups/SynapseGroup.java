@@ -12,9 +12,9 @@
  */
 package org.simbrain.network.groups;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -25,7 +25,7 @@ import org.simbrain.network.interfaces.Synapse;
 public class SynapseGroup extends Group {
 
     /** Set of synapses. */
-    private final List<Synapse> synapseList = new ArrayList<Synapse>();
+    private final List<Synapse> synapseList = new CopyOnWriteArrayList<Synapse>();
     
     /**
      * Construct a synapse group from a list of synapses.
@@ -59,10 +59,9 @@ public class SynapseGroup extends Group {
         for(Synapse synapse : synapseList) {
             getParentNetwork().removeSynapse(synapse);
         }
-        if (isTopLevelGroup()) {
+        if (hasParentGroup()) {
             if (getParentGroup() instanceof Subnetwork) {
-                Group parentGroup = getParentGroup();
-                ((Subnetwork) parentGroup).removeSynapseGroup(this);
+                ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
             } 
             if (getParentGroup().isEmpty() && getParentGroup().isDeleteWhenEmpty()) {
                 getParentNetwork().removeGroup(getParentGroup());
@@ -83,7 +82,7 @@ public class SynapseGroup extends Group {
      * @param synapse synapse to add
      * @param fireEvent whether to fire a synapse added event
      */
-    protected void addSynapse(final Synapse synapse, final boolean fireEvent) {
+    public void addSynapse(final Synapse synapse, final boolean fireEvent) {
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapseList.add(synapse);
         synapse.setParentGroup(this);
@@ -108,7 +107,7 @@ public class SynapseGroup extends Group {
      */
     public void removeSynapse(Synapse toDelete) {
         synapseList.remove(toDelete);
-        getParentNetwork().fireSynapseDeleted(toDelete);
+        getParentNetwork().fireSynapseRemoved(toDelete);
         getParentNetwork().fireGroupChanged(this, this, "synapseRemoved");
         if (isEmpty() && isDeleteWhenEmpty()) {
             delete();
@@ -135,7 +134,7 @@ public class SynapseGroup extends Group {
     public String toString() {
         String ret = new String();
         ret += ("Synapse Group [" + getLabel() + "] Synapse group with "
-                + this.getSynapseList().size() + " synapse(s)");
+                + this.getSynapseList().size() + " synapse(s)\n");
         return ret;
     }
     

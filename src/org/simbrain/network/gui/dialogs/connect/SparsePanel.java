@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,33 +27,21 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Hashtable;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.RandomPanel;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.util.RandomSource;
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SimpleFrame;
-import org.simbrain.util.StandardDialog;
+
 
 
 /**
@@ -66,6 +53,8 @@ import org.simbrain.util.StandardDialog;
  */
 public class SparsePanel extends AbstractConnectionPanel {
 
+	private final ExcitatoryInhibitoryPropertiesPanel eipPanel;
+	
 	/** A slider for setting the sparsity of the connections. */
     private JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100,
     		10);
@@ -96,7 +85,6 @@ public class SparsePanel extends AbstractConnectionPanel {
      */
     private boolean userFlag = true;
     
-
     /**
      * This method is the default constructor.
      *
@@ -104,6 +92,7 @@ public class SparsePanel extends AbstractConnectionPanel {
      */
     public SparsePanel(final Sparse connection, final NetworkPanel networkPanel) {
     	super(connection);  
+    	eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
         numTargs = networkPanel.getSelectedModelNeurons().size();
         fillFieldValues();
         initializeSparseSlider();
@@ -128,123 +117,76 @@ public class SparsePanel extends AbstractConnectionPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 4;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        sparseContainer.add(initializeSparseSubPanel(), gbc);
+        
+        gbc.gridy = 5;
+        gbc.gridheight = 9;
+        sparseContainer.add(eipPanel, gbc);
+        
+        gbc.insets = new Insets(10, 10, 0, 10);
+        gbc.gridy = 14;
+        gbc.gridheight = 1;
+        sparseContainer.add(new JSeparator(), gbc);
+        
+        gbc.gridy = 15;
+        gbc.gridwidth = 1;
+        sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
+        
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        gbc.gridx = 2;
+        sparseContainer.add(allowSelfConnect, gbc);
+        
+    }
+    
+    private JPanel initializeSparseSubPanel(){
+    	JPanel ssp = new JPanel();
+    	ssp.setLayout((new GridBagLayout()));
+    	GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(10, 10, 0, 10);
-        sparseContainer.add(new JLabel("Percent Connectivity:"), gbc);
-        
+        ssp.add(new JLabel("Percent Connectivity:"), gbc);
+         
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        sparseContainer.add(sparsitySlider, gbc);
-        
+        ssp.add(sparsitySlider, gbc);
+         
+        gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.weightx = 0;
         gbc.weighty = 0;
-        sparseContainer.add(new JLabel("Connectivity: "), gbc);
+        ssp.add(new JLabel("Connectivity: "), gbc);
         
         gbc.gridx = 2;
-        sparseContainer.add(sparsity, gbc);
-        
+        ssp.add(sparsity, gbc);
+         
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        sparseContainer.add(new JLabel("Equalize Connections/Source:"), gbc);
-        
+        ssp.add(new JLabel("Equalize Connections/Source:"), gbc);
+         
         gbc.gridx = 1;
-        gbc.gridwidth = 1;
-        sparseContainer.add(sparseSpecific, gbc);
-        
+        ssp.add(sparseSpecific, gbc);
+         
         gbc.gridx = 2;
-        sparseContainer.add(synsPerSource, gbc);
+        ssp.add(synsPerSource, gbc);
         
         gbc.gridx = 0;
         gbc.gridy = 4;
-        sparseContainer.add(new JLabel("Allow Self-Connection:"), gbc);
-        
-        gbc.gridx = 1;
-        sparseContainer.add(allowSelfConnect, gbc);
-       
-        gbc.gridx = 0;
-        gbc.gridy = 5;
         gbc.gridwidth = 3;
-        sparseContainer.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
+        ssp.add(new JSeparator(), gbc);
         
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        gbc.gridwidth = 1;
-        sparseContainer.add(new JLabel("Excitatory/Inhibitory:"), gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 7;
-        gbc.gridwidth = 3;
-        sparseContainer.add(ratioSlider, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 8;
-        gbc.gridwidth = 1;
-        sparseContainer.add(new JLabel("% Excitatory"), gbc);
-        
-        gbc.gridx = 1;
-        Dimension tRatioSize = tRatio.getPreferredSize();
-        tRatioSize.width = 30;
-        tRatio.setPreferredSize(tRatioSize);
-        
-        //The ratio text field was given its own panel to prevent distortion
-        //by gridbaglayout
-        JPanel tRatioPanel = new JPanel();
-        tRatioPanel.setLayout(new BorderLayout());
-        tRatioPanel.add(tRatio, BorderLayout.WEST);
-        sparseContainer.add(tRatioPanel, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 9;
-        gbc.gridwidth = 3;
-        sparseContainer.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-        
-        gbc.gridwidth = 1;
-        gbc.gridy = 10;
-        sparseContainer.add(new JLabel("Excitatory Synapse Type: "), gbc);
-        
-        gbc.gridx = 1;
-        sparseContainer.add(excitatorySynType, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 11;
-        sparseContainer.add(new JLabel("Inhibitory Synapse Type: "), gbc);
-        
-        gbc.gridx = 1;
-        sparseContainer.add(inhibitorySynType, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 12;
-        gbc.gridwidth = 3;
-        sparseContainer.add(new JSeparator(JSeparator.HORIZONTAL), gbc);
-        
-        gbc.gridy = 13;
-        gbc.gridwidth = 1;
-        sparseContainer.add(new JLabel("Randomize Excitatory Weights: "), gbc);
-        
-        gbc.gridx = 1;
-        sparseContainer.add(randExcite, gbc);
-        
-        gbc.gridx = 2;
-        sparseContainer.add(randExButton, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 14;
-        sparseContainer.add(new JLabel("Randomize Inhibitory Weights: "), gbc);
-        
-        gbc.gridx = 1;
-        sparseContainer.add(randInhib, gbc);
-        
-        gbc.gridx = 2;
-        sparseContainer.add(randInButton, gbc);
- 
+        return ssp;
     }
     
     /**
@@ -271,6 +213,7 @@ public class SparsePanel extends AbstractConnectionPanel {
     private void addChangeListeners(){
         
     	sparsitySlider.addChangeListener(new ChangeListener(){
+
     		public void stateChanged(ChangeEvent e) {
     			JSlider source = (JSlider)e.getSource();
     			if(!source.getValueIsAdjusting() && source == sparsitySlider){
@@ -291,6 +234,7 @@ public class SparsePanel extends AbstractConnectionPanel {
     	});
     	
         synsPerSource.addPropertyChangeListener("value", new PropertyChangeListener(){
+
 			public void propertyChange(PropertyChangeEvent arg0) {
 				if(arg0.getSource() == synsPerSource && 
 						sparseSpecific.isSelected()){
@@ -311,6 +255,7 @@ public class SparsePanel extends AbstractConnectionPanel {
         });   
         
         sparsity.addPropertyChangeListener("value", new PropertyChangeListener () {
+
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(evt.getSource() == sparsity) {
 					int sps;
@@ -340,6 +285,7 @@ public class SparsePanel extends AbstractConnectionPanel {
     private void addActionListeners(){
     	
     	 sparseSpecific.addActionListener(new ActionListener(){
+
  			public void actionPerformed(ActionEvent arg0) {
  				if(arg0.getSource() == sparseSpecific){
  					if(sparseSpecific.isSelected()){
@@ -359,17 +305,8 @@ public class SparsePanel extends AbstractConnectionPanel {
     public void commitChanges() {
     	((Sparse)connection).setSparseSpecific(sparseSpecific.isSelected());
     	((Sparse)connection).setSparsity(((Number)sparsity.getValue()).doubleValue());
-    	double percentEx = ((Number)tRatio.getValue()).doubleValue() / 100.0;
-    	connection.setPercentExcitatory(percentEx);
-    	connection.setEnableInRand(randInhib.isSelected());
-        connection.setEnableExRand(randExcite.isSelected());
-    	if(randInhib.isSelected()) {
-    		connection.setInhibitoryRand(inhibRS);
-    	}
-    	if(randExcite.isSelected()) {
-    		connection.setExcitatoryRand(exciteRS);
-    	}
     	((Sparse)connection).setAllowSelfConnection(allowSelfConnect.isSelected());
+    	eipPanel.commitChanges();
     }
 
     /**
@@ -380,10 +317,6 @@ public class SparsePanel extends AbstractConnectionPanel {
     	synsPerSource.setValue(new Integer((int) (numTargs * ((Number)sparsity.
 				getValue()).doubleValue())));
         synsPerSource.setEnabled(false);
-       	Synapse e = Synapse.getTemplateSynapse(excitatorySynType.getText());
-       	connection.setBaseExcitatorySynapse(e);
-   		Synapse i = Synapse.getTemplateSynapse(inhibitorySynType.getText());
-   		connection.setBaseInhibitorySynapse(i);
    		inRandPanel.fillDefaultValues();
    		exRandPanel.fillDefaultValues();
     }

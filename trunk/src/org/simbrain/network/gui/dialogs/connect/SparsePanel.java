@@ -317,8 +317,6 @@ public class SparsePanel extends AbstractConnectionPanel {
     	synsPerSource.setValue(new Integer((int) (numTargs * ((Number)sparsity.
 				getValue()).doubleValue())));
         synsPerSource.setEnabled(false);
-   		inRandPanel.fillDefaultValues();
-   		exRandPanel.fillDefaultValues();
     }
 
 }

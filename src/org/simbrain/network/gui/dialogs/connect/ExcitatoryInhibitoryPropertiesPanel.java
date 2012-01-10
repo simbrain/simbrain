@@ -206,7 +206,6 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
     private void initializeChangeListeners(){
     	
     	tRatio.addPropertyChangeListener(new PropertyChangeListener(){
-			@Override
 			public void propertyChange(PropertyChangeEvent arg0) {
 				if(arg0.getSource() == tRatio) {
 					ratioSlider.setValue(((Number)tRatio.getValue()).intValue());
@@ -215,7 +214,6 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
         });
     	
     	ratioSlider.addChangeListener(new ChangeListener(){
-			@Override
 			public void stateChanged(ChangeEvent e) {
 				JSlider source = (JSlider)e.getSource();
 				if(!source.getValueIsAdjusting() && source == ratioSlider){

@@ -528,14 +528,9 @@ public final class NetworkActionManager {
     public JMenu getConnectionMenu() {
         // Connection menu
         JMenu connectionsMenu = new JMenu("Connect Neurons");
-        connectionsMenu.add(getClearSourceNeuronsAction());
-        connectionsMenu.add(getSetSourceNeuronsAction());
-        JMenu connectMenu = new JMenu("Connect Neurons");
         for (Action action : getConnectionActions()) {
-            connectMenu.add(action);
+            connectionsMenu.add(action);
         }
-        connectionsMenu.add(connectMenu);
-        connectionsMenu.add(getShowQuickConnectDialogAction());
         return connectionsMenu;
     }
 

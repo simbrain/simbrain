@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -122,6 +123,12 @@ public class SparsePanel extends AbstractConnectionPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         sparseContainer.add(initializeSparseSubPanel(), gbc);
         
+        gbc.insets = new Insets(10, 10, 0, 10);
+        gbc.gridy = 4;
+        gbc.gridheight = 1;
+        sparseContainer.add(new JSeparator(), gbc);
+        
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridy = 5;
         gbc.gridheight = 9;
         sparseContainer.add(eipPanel, gbc);
@@ -135,7 +142,6 @@ public class SparsePanel extends AbstractConnectionPanel {
         gbc.gridwidth = 1;
         sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
         
-        gbc.anchor = GridBagConstraints.NORTHEAST;
         gbc.gridx = 2;
         sparseContainer.add(allowSelfConnect, gbc);
         
@@ -168,9 +174,12 @@ public class SparsePanel extends AbstractConnectionPanel {
         gbc.weighty = 0;
         ssp.add(new JLabel("Connectivity: "), gbc);
         
-        gbc.gridx = 2;
+        gbc.gridx = 1;
+        Dimension sSize = sparsity.getPreferredSize();
+        sSize.width = 40;
+        sparsity.setPreferredSize(sSize);
         ssp.add(sparsity, gbc);
-         
+        
         gbc.gridx = 0;
         gbc.gridy = 3;
         ssp.add(new JLabel("Equalize Connections/Source:"), gbc);
@@ -179,12 +188,10 @@ public class SparsePanel extends AbstractConnectionPanel {
         ssp.add(sparseSpecific, gbc);
          
         gbc.gridx = 2;
+        sSize = synsPerSource.getPreferredSize();
+        sSize.width = 40;
+        synsPerSource.setPreferredSize(sSize);
         ssp.add(synsPerSource, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 3;
-        ssp.add(new JSeparator(), gbc);
         
         return ssp;
     }

@@ -22,7 +22,6 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
@@ -112,30 +111,44 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(10, 10, 0, 10);
+        this.add(new JLabel("Full Inhibitory"), gbc);
         
-        this.add(new JLabel("Excitatory/Inhibitory:"), gbc);
+        gbc.gridx = 2;
+        this.add(new JLabel("Full Excitatory"), gbc);
         
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 3;
         this.add(ratioSlider, gbc);
         
+        
+        
+        
+//        tRatio.setMaximumSize(tRatioSize);
+//        //the ratio text field gets its own panel to prevent distortion
+//        JPanel tRatioPanel = new JPanel();
+//        tRatioPanel.setLayout(new BorderLayout());
+//        tRatioPanel.add(new JLabel("% Excitatory: "), BorderLayout.WEST);
+//        tRatioPanel.add(tRatio, BorderLayout.CENTER);
+//        JPanel tRatioContainer = new JPanel();
+//        tRatioContainer.add(tRatioPanel);
+//        this.add(tRatioContainer, gbc);
+        
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
-        this.add(new JLabel("% Excitatory"), gbc);
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.WEST;
+        this.add(new JLabel("%Excitatory: "), gbc);
         
         gbc.gridx = 1;
         Dimension tRatioSize = tRatio.getPreferredSize();
-        tRatioSize.width = 30;
+        tRatioSize.width = 40;
         tRatio.setPreferredSize(tRatioSize);
+        this.add(tRatio, gbc);
         
-        //the ratio text field gets its own panel to prevent distortion
-        JPanel tRatioPanel = new JPanel();
-        tRatioPanel.setLayout(new BorderLayout());
-        tRatioPanel.add(tRatio, BorderLayout.WEST);
-        this.add(tRatioPanel, gbc);
-        
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 3;
@@ -164,21 +177,39 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
         gbc.gridwidth = 1;
         this.add(new JLabel("Randomize Excitatory Weights: "), gbc);
         
-        gbc.gridx = 1;
-        this.add(randExcite, gbc);
-        
-        gbc.gridx = 2;
-        this.add(randExButton, gbc);
-        
-        gbc.gridx = 0;
         gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.CENTER;
         this.add(new JLabel("Randomize Inhibitory Weights: "), gbc);
         
-        gbc.gridx = 1;
-        this.add(randInhib, gbc);
         
-        gbc.gridx = 2;
-        this.add(randInButton, gbc);
+        
+        JPanel randomTempContainer = new JPanel();
+        randomTempContainer.setLayout(new GridBagLayout());
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        randomTempContainer.add(randExcite, gbc);
+        
+        gbc.gridx = 1;
+        randomTempContainer.add(randExButton, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        randomTempContainer.add(randInhib, gbc);
+        
+        gbc.gridx = 1;
+        randomTempContainer.add(randInButton, gbc);
+        
+        gbc.gridy = 7;
+        gbc.gridx = 1;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        
+        this.add(randomTempContainer, gbc);
+        
     }
     
     /**

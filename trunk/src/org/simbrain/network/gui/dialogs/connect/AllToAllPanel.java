@@ -74,9 +74,10 @@ public class AllToAllPanel extends AbstractConnectionPanel {
         
         gbc.gridy = 10;
         gbc.gridwidth = 1;
-        this.add(new JLabel("Allow Self-Connection"), gbc);
+        this.add(new JLabel("Allow Self-Connections: "), gbc);
         
-        gbc.gridx = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 1;
         this.add(allowSelfConnect, gbc); 
     }
     

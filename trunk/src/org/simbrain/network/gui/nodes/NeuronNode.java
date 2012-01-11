@@ -313,7 +313,15 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // Add Connection Actions
         contextMenu.add(getNetworkPanel().getActionManager()
+                .getClearSourceNeuronsAction());
+        contextMenu.add(getNetworkPanel().getActionManager()
+                .getSetSourceNeuronsAction());
+        contextMenu.addSeparator();
+        contextMenu.add(getNetworkPanel().getActionManager()
                 .getConnectionMenu());
+        contextMenu.addSeparator();
+        contextMenu.add(getNetworkPanel().getActionManager()
+                .getShowQuickConnectDialogAction());
         contextMenu.addSeparator();
 
         // Layout actions

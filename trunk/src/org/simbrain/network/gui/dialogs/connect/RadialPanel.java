@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.connections.Radial;
@@ -47,11 +46,12 @@ public class RadialPanel extends AbstractConnectionPanel {
     /** Allow self connections check box. */
     private JCheckBox allowSelfConnect = new JCheckBox();
 
-    /** Label showing current excitatory type of synapse. */
-    private JLabel baseExcitatorySynapseLabel = new JLabel("");
+    /** Set the inhibitory synapse type. */
+    private JButton setInhibitorySynapseType = new JButton();
 
-    /** Label showing current inhibitory type of synapse. */
-    private JLabel baseInhibitorySynapseLabel = new JLabel("");
+    /** Set the excitatory synapse type. */
+    private JButton setExcitatorySynapseType = new JButton();
+
 
     /**
      * This method is the default constructor.
@@ -60,10 +60,13 @@ public class RadialPanel extends AbstractConnectionPanel {
      */
     public RadialPanel(final Radial connection) {
         super(connection);
-        this.addItem("Excitatory Radius", tfExciteRadius);
-        this.addItem("Excitatory Probability", tfExciteProbability);
 
-        JButton setExcitatorySynapseType = new JButton("Set...");
+        setExcitatorySynapseType.setText(connection.getBaseExcitatorySynapse()
+                .getType());
+        this.addItem("Excitatory Radius:", tfExciteRadius);
+        this.addItem("Excitatory Probability:", tfExciteProbability);
+        this.addItem("Excitatory Synapse Type:", setExcitatorySynapseType);
+
         setExcitatorySynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -75,21 +78,17 @@ public class RadialPanel extends AbstractConnectionPanel {
                 dialog.setVisible(true);
                 Synapse excitatorySynapse = dialog.getSynapseList().get(0);
                 connection.setBaseExcitatorySynapse(excitatorySynapse);
-                baseExcitatorySynapseLabel.setText(excitatorySynapse.getType());
+                setExcitatorySynapseType.setText(excitatorySynapse.getType());
             }
 
         });
-        baseExcitatorySynapseLabel.setText(connection
-                .getBaseExcitatorySynapse().getType());
-        this.addItem("Base Excitatory Synapse Type:",
-                baseExcitatorySynapseLabel);
-        this.addItem("Set Base Excitatory Synapse Type:",
-                setExcitatorySynapseType);
 
-        this.addItem("Inhibitory Radius", tfInhibitRadius);
-        this.addItem("Inhibitory Probability", tfInhibitProbability);
+        setInhibitorySynapseType.setText(connection.getBaseInhibitorySynapse()
+                .getType());
+        this.addItem("Inhibitory Radius:", tfInhibitRadius);
+        this.addItem("Inhibitory Probability:", tfInhibitProbability);
+        this.addItem("Inhibitory Synapse Type:", setInhibitorySynapseType);
 
-        JButton setInhibitorySynapseType = new JButton("Set...");
         setInhibitorySynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -101,18 +100,12 @@ public class RadialPanel extends AbstractConnectionPanel {
                 dialog.setVisible(true);
                 Synapse inhibitorySynapse = dialog.getSynapseList().get(0);
                 connection.setBaseInhibitorySynapse(inhibitorySynapse);
-                baseInhibitorySynapseLabel.setText(inhibitorySynapse.getType());
+                setInhibitorySynapseType.setText(inhibitorySynapse.getType());
             }
 
         });
-        baseInhibitorySynapseLabel.setText(connection
-                .getBaseInhibitorySynapse().getType());
-        this.addItem("Base Inhibitory Synapse Type:",
-                baseInhibitorySynapseLabel);
-        this.addItem("Set Inhibitory Base Synapse Type:",
-                setInhibitorySynapseType);
 
-        this.addItem("Allow Self Connections", allowSelfConnect);
+        this.addItem("Allow Self Connections:", allowSelfConnect);
     }
 
     /**

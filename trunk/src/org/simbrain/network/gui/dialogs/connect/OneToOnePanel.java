@@ -33,14 +33,14 @@ import org.simbrain.network.interfaces.Synapse;
  */
 public class OneToOnePanel extends AbstractConnectionPanel {
 
-    /** Label showing current type of synapse. */
-    private JLabel baseSynapseLabel = new JLabel("");
-
     /** Sets the connection orientation. */
     private JComboBox orientationBox;
 
     /** Sets whether connections are bidirectional. */
     private JCheckBox bidirectionalConnection = new JCheckBox();
+
+    /** Set base synapse type. */
+    private JButton setSynapseType = new JButton();
 
     /**
      * Default constructor.
@@ -48,7 +48,6 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     public OneToOnePanel(final OneToOne connection) {
         super(connection);
         orientationBox = new JComboBox(OneToOne.getOrientationTypes());
-        JButton setSynapseType = new JButton("Set...");
         setSynapseType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -61,15 +60,14 @@ public class OneToOnePanel extends AbstractConnectionPanel {
                 dialog.setVisible(true);
                 Synapse synapse = dialog.getSynapseList().get(0);
                 connection.setBaseSynapse(synapse);
-                baseSynapseLabel.setText(synapse.getType());
+                setSynapseType.setText(synapse.getType());
             }
 
         });
-        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
-        this.addItem("Base Synapse Type:", baseSynapseLabel);
-        this.addItem("Set Base Synapse Type:", setSynapseType);
-        this.addItem("Connection Orientation: ", orientationBox);
-        this.addItem("Bidirectional Connection: ", bidirectionalConnection);
+        setSynapseType.setText(connection.getBaseSynapse().getType());
+        addItem("Synapse Type:", setSynapseType);
+        addItem("Orientation: ", orientationBox);
+        addItem("Bidirectional Connections: ", bidirectionalConnection);
     }
 
     /**

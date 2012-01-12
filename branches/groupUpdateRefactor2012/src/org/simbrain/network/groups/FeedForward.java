@@ -72,22 +72,22 @@ public class FeedForward extends Subnetwork {
                 LineOrientation.HORIZONTAL);
 
         // Set up input layer
-        List<Neuron> inputLayer = new ArrayList<Neuron>();
+        List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
             Neuron neuron = new Neuron(network, new ClampedNeuron());
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
-            inputLayer.add(neuron);
+            inputLayerNeurons.add(neuron);
         }
-        NeuronGroup layer = new NeuronGroup(network, inputLayer);
-        addNeuronGroup(layer);
+        NeuronGroup inputLayer = new NeuronGroup(network, inputLayerNeurons);
+        addNeuronGroup(inputLayer);
         if (initialPosition == null) {
             initialPosition = new Point2D.Double(0,0);
             
         }
-        layout.setInitialLocation(new Point((int) initialPosition.getX()
-                - getWidth(inputLayer) / 2, (int) initialPosition.getY()));
-        layout.layoutNeurons(inputLayer);
+        layout.setInitialLocation(new Point((int) initialPosition.getX(), (int)
+                initialPosition.getY()));
+        layout.layoutNeurons(inputLayerNeurons);
 
         // Prepare base synapse for connecting layers
         Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapse());
@@ -95,29 +95,27 @@ public class FeedForward extends Subnetwork {
         synapse.setUpperBound(10);
 
         // Memory of last layer created
-        List<Neuron> lastLayer = inputLayer;
+        NeuronGroup lastLayer = inputLayer;
 
         // Make hidden layers and output layer
         for (int i = 1; i < nodesPerLayer.length; i++) {
-            List<Neuron> hiddenLayer = new ArrayList<Neuron>();
+            List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
             for (int j = 0; j < nodesPerLayer[i]; j++) {
                 Neuron neuron = new Neuron(network, new SigmoidalNeuron());
                 neuron.setLowerBound(0);
                 neuron.setUpdatePriority(i);
-                hiddenLayer.add(neuron);
+                hiddenLayerNeurons.add(neuron);
             }
 
-            int layerWidth = getWidth(hiddenLayer);
-            layout.setInitialLocation(new Point((int) initialPosition.getX()
-                    - layerWidth / 2, (int) initialPosition.getY()
-                    - (betweenLayerInterval * i)));
-            layout.layoutNeurons(hiddenLayer);
-            addNeuronGroup(new NeuronGroup(network, hiddenLayer));
+            layout.layoutNeurons(hiddenLayerNeurons);
+            NeuronGroup hiddenLayer = new NeuronGroup(network, hiddenLayerNeurons); 
+            addNeuronGroup(hiddenLayer);
+            offsetNeuronGroup(lastLayer, hiddenLayer, "North", betweenLayerInterval);
 
             // Connect input layer to hidden layer
             List<Synapse> synapseList = new ArrayList<Synapse>();
-            for (Neuron source : lastLayer) {
-                for (Neuron target : hiddenLayer) {
+            for (Neuron source : lastLayer.getNeuronList()) {
+                for (Neuron target : hiddenLayerNeurons) {
                     Synapse newSynapse = synapse.instantiateTemplateSynapse(
                             source, target, network);
                     newSynapse.randomize();
@@ -132,16 +130,6 @@ public class FeedForward extends Subnetwork {
             lastLayer = hiddenLayer;
         }
 
-    }
-
-    /**
-     * Return the width of the specified layer, in pixels.
-     * 
-     * @param layer layer to "measure"
-     * @return width of layer
-     */
-    private int getWidth(List<Neuron> layer) {
-        return layer.size() * betweenNeuronInterval;
     }
 
     /**
@@ -189,8 +177,8 @@ public class FeedForward extends Subnetwork {
     @Override
     public void addSynapseGroup(SynapseGroup group) {
         super.addSynapseGroup(group);
-        group.setLabel("Weights " + (getSynapseGroupCount() + 1) + " > "
-                + (getSynapseGroupCount() + 2));
+        group.setLabel("Weights " + (getSynapseGroupCount()) + " > "
+                + (getSynapseGroupCount() + 1));
     }
 
     @Override

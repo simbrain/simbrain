@@ -44,9 +44,9 @@ public class SynapseGroupNode extends GroupNode {
      */
     public SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
-        setStroke(null); // Remove this to see first-pass ellipse based outline
+        setStroke(null); // Comment this out to see outline
         getInteractionBox().setPaint(Color.white);
-        setOutlinePadding(-30);
+        //setOutlinePadding(-30);
         setPickable(false);
     }
    
@@ -68,12 +68,14 @@ public class SynapseGroupNode extends GroupNode {
                     bounds.getWidth() + (2 * inset), bounds.getHeight()
                             + (2 * inset));
 
-            setPathToEllipse((float) bounds.getX(), (float) bounds.getY(),
+            // Can also use setPathToEllipse...
+            setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
                     (float) bounds.getWidth(), (float) bounds.getHeight());            
 
 
         } else {
             // TODO Need to get reference to parent nodes.
+            System.err.println("Bounds are null");
             bounds = null;            
         }
 
@@ -89,6 +91,5 @@ public class SynapseGroupNode extends GroupNode {
                 - interactionBox.getHeight());    
         interactionBox.moveToFront();
     }    
-    
     
 }

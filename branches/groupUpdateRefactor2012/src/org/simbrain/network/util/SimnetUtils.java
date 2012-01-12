@@ -211,7 +211,7 @@ public class SimnetUtils {
      * @param objects list of objects
      * @return the point corresponding to the upper left corner of the objects
      */
-    public static Point2D getUpperLeft(final ArrayList objects) {
+    public static Point2D getUpperLeft(final List<Object> objects) {
         double x = Double.MAX_VALUE;
         double y = Double.MAX_VALUE;
 

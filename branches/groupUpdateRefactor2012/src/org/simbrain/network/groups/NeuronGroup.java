@@ -188,4 +188,99 @@ public class NeuronGroup extends Group {
         return neuronList.contains(n);
     }
     
+    //TODO: Below don't take account of the actual width of neurons themselves.  Treats them as points.
+    
+    /**
+     * Get the central x coordinate of this group, based on the positions of the neurons that
+     * comprise it.
+     *
+     * @return the center x coordinate.
+     */
+    public double getCenterX() {
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        for(Neuron neuron : neuronList) {
+            if (neuron.getX() < min) {
+                min = neuron.getX();
+            }
+            if (neuron.getX() > max ) {
+                max = neuron.getX();
+            }
+        }
+        return min + (max - min) / 2;
+    }
+
+    /**
+     * Get the central y coordinate of this group, based on the positions of the neurons that
+     * comprise it.
+     *
+     * @return the center y coordinate.
+     */
+    public double getCenterY() {
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        for(Neuron neuron : neuronList) {
+            if (neuron.getY() < min) {
+                min = neuron.getY();
+            }
+            if (neuron.getY() > max ) {
+                max = neuron.getY();
+            }
+        }
+        return min + (max - min) / 2;
+    }
+    
+    /**
+     * Return the width of this group, based on the positions of the neurons that
+     * comprise it.
+     *
+     * @return the width of the group
+     */    
+    public double getWidth() {
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        for(Neuron neuron : neuronList) {
+            if (neuron.getX() < min) {
+                min = neuron.getX();
+            }
+            if (neuron.getX() > max ) {
+                max = neuron.getX();
+            }
+        }
+        return max - min;
+    }
+
+    /**
+     * Return the height of this group, based on the positions of the neurons that
+     * comprise it.
+     *
+     * @return the height of the group
+     */    
+    public double getHeight() {
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        for(Neuron neuron : neuronList) {
+            if (neuron.getY() < min) {
+                min = neuron.getY();
+            }
+            if (neuron.getY() > max ) {
+                max = neuron.getY();
+            }
+        }
+        return max - min;
+    }
+    
+    /**
+     * Translate all neurons (the only objects with position information).
+     *
+     * @param offsetX x offset for translation.
+     * @param offsetY y offset for translation.
+     */
+    public void offset(final double offsetX, final double offsetY) {
+        for (Neuron neuron : neuronList) {
+            neuron.setX(neuron.getX() + offsetX);
+            neuron.setY(neuron.getY() + offsetY);
+        }
+    }
+    
 }

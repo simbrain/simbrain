@@ -4,6 +4,10 @@
 
 
 
+
+
+
+
   
 
   
@@ -30,7 +34,7 @@ Simbrain.&nbsp;&nbsp;&nbsp; The basics of building a network and other
 simple examples are covered in the <a href="QuickStart.html">quick-start</a>.<br>
 </p>
 
-<p><span class="heading">Plot the activation of a node over time.<br>
+<p><span class="heading">Plot the activation of a node over time with a time-series plot.<br>
 </span></p>
 <p>Create a <a href="Network.html">neural network</a> and a <a href="Plot/time_series.html">time series plot</a>.&nbsp;&nbsp; You will now creating&nbsp; a <a href="Workspace/Couplings.html">coupling</a>
 from a node in the neural network to a time series in the
@@ -46,8 +50,41 @@ once. &nbsp;If you want to add more time series beyond the default 5, click "add
 <p>Now run your simulation and you should see a plot of the changing
 activation of the neuron.&nbsp; For some purposes it helps to turn
 "auto range" off in the time series preferences, and manually set&nbsp;
-upper and lower bounds.<br>
+upper and lower bounds.</p><br>
+<p><span class="heading">Plot the activation of a set of nodes using a project plot and the coupling manager<br>
+</span></p>
+<p>(There are other ways to do this, some of them simpler in some cases, but this technique also shows you how to use the <a href="Workspace/Couplings.html">coupling manager</a>).&nbsp; This assumes a network component is open in the desktop.<br>
+<br>
+1) Open a <a href="Plot/projection.html">projection plot</a>.&nbsp; To
+do this either press on the plot button in the
+desktop toolbar, which opens up a drop down menu with different plot
+components, or use the menu&nbsp;<span class="command">Insert &gt; New Plot &gt;...</span>&nbsp;
+Then select projection plot.&nbsp; The will add a projection plot to
+your desktop with a default name like "Projection 1".<br>
+2) Open the coupling manager using the <span class="command">Couplings &gt; Open Coupling Manager </span>button.<br>
+3) On the left panel of the coupling manager, use the top drop down box
+(which allows you to select components) to select the network whose
+activity you want to plot.<br>
+4) On right panel of the coupling manager, select the plot component you added to the desktop in step 1, e.g. "Projection 1".<br>
+5) In the left panel, highlight rows corresponding the neurons whose
+activity you are
+interested in plotting (do this by clicking on rows while holding the
+shift key down). &nbsp; Neurons are labelled by ids.&nbsp; To
+find the neurons' ids in the network window you can hover over them and
+look at the tooltip.<br>
+6) In the right panel of the coupling manager,&nbsp; highlight all the
+"dimension" attributes either using the mouse or by pressing command-a
+while that panel is in focus.<br>
+7) Click "add couplings" at the bottom of the coupling manager window.<br>
 </p>
+<p>Now when you run the workspace each new network state should produce a point in the projection plot.</p>
+<p>
+Note that if you plot more than 25 neurons you will have to add more
+dimensions to the projection plot using the add dimension button in the
+projection plot, or the menu&nbsp;<span class="command">Edit &gt; Set dimensions...</span>&nbsp;&nbsp; If you use less than 25 neurons you don't have to reset the projection plot but you can if you'd like.<br>
+</p>
+
+
 <p><span class="heading">Train a 2-layer network on a pattern association task<br>
 </span></p>
 <p>For now see the preliminary <a href="Network/trainers.html">trainer</a> docs.  </p>

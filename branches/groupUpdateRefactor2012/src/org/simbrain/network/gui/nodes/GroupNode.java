@@ -55,7 +55,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class GroupNode extends PPath implements PropertyChangeListener {
 
     /** References to outlined objects. */
-    private ArrayList<PNode> outlinedObjects = new ArrayList<PNode>();
+    private List<PNode> outlinedObjects = new ArrayList<PNode>();
 
     /** Default stroke.  Light gray line. */
     private static final BasicStroke DEFAULT_STROKE = new BasicStroke(1f);

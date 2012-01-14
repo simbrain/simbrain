@@ -31,34 +31,35 @@ import edu.umd.cs.piccolo.util.PBounds;
  * @author jyoshimi
  */
 public class SubnetGroupNode extends GroupNode {
-    
+
     /**
      * Create a subnetwork node
-     *
+     * 
      * @param networkPanel parent panel
      * @param group the layered network
      */
     public SubnetGroupNode(NetworkPanel networkPanel, Subnetwork group) {
         super(networkPanel, group);
     }
-    
+
     @Override
     public void updateBounds() {
-        
+
         PBounds bounds = new PBounds();
         for (PNode node : getOutlinedObjects()) {
-            bounds.add(node.getGlobalBounds());
+            if (node.getVisible()) {
+                bounds.add(node.getGlobalBounds());
+            }
         }
-        
+
         // Add a little extra height at top
         double inset = getOutlinePadding();
-        bounds.setRect(bounds.getX() - inset,
-                bounds.getY() - inset - 15,
-                bounds.getWidth() + (2 * inset),
-                bounds.getHeight() + (2 * inset) + 15);
+        bounds.setRect(bounds.getX() - inset, bounds.getY() - inset - 15,
+                bounds.getWidth() + (2 * inset), bounds.getHeight()
+                        + (2 * inset) + 15);
 
         setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                            (float) bounds.getWidth(), (float) bounds.getHeight());
+                (float) bounds.getWidth(), (float) bounds.getHeight());
 
         updateInteractionBox();
     }

@@ -1616,7 +1616,16 @@ public class NetworkPanel extends JPanel {
 
         // TODO: Add a check to see if network is running
         if (autoZoomMode && editMode.isSelection()) {
-            PBounds filtered = canvas.getLayer().getFullBounds();
+            PBounds filtered = new PBounds();
+            // Must manually ensure that invisible nodes are not used in
+            // computing bounds. Not sure why!?
+            Iterator iterator = canvas.getLayer().getChildrenIterator(); 
+            while (iterator.hasNext()){
+                PNode node = (PNode) iterator.next();
+                if (node.getVisible()) {
+                    filtered.add(node.getFullBounds());
+                }
+            }
             PBounds adjustedFiltered = new PBounds(filtered.getX() - 10,
                     filtered.getY() - 10, filtered.getWidth() + 20,
                     filtered.getHeight() + 20);

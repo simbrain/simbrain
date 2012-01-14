@@ -25,6 +25,7 @@ import java.util.List;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
+import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
 
@@ -61,6 +62,8 @@ public class UpdateManager {
      */
     public UpdateManager(RootNetwork network) {
         this.network = network;
+        // Default update method
+        addAction(new BufferedUpdate(network));
         addAvailableAction(new PriorityUpdate(network));        
         addListeners();
 

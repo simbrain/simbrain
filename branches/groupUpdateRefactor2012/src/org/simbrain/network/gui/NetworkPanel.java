@@ -734,6 +734,11 @@ public class NetworkPanel extends JPanel {
      */
     private void addGroup(Group group) {
 
+        // If the object has already been added don't keep going.
+        if(objectNodeMap.get(group) != null) {
+            return;
+        }
+        
         // Make a list of neuron and synapse nodes
         List<PNode> nodes = new ArrayList<PNode>();
 
@@ -754,15 +759,13 @@ public class NetworkPanel extends JPanel {
             objectNodeMap.put(group, neuronGroup);
             neuronGroup.updateBounds();                    
         } else if (group instanceof SynapseGroup) {
-            // Add synapse nodes to canvas.. ?
+            // Add synapse nodes to canvas
             for (Synapse synapse : ((SynapseGroup) group)
                     .getSynapseList()) {
                 addSynapse(synapse);
                 SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
-                if (node != null) {
-                    canvas.getLayer().addChild(node);
-                    nodes.add(node);
-                }
+                canvas.getLayer().addChild(node);
+                nodes.add(node);
             }
             // Add synapse nodes to group node
             GroupNode synapseGroupNode = createGroupNode(group);
@@ -776,16 +779,18 @@ public class NetworkPanel extends JPanel {
             synapseGroupNode.updateBounds();       
         } else if (group instanceof Subnetwork) {
 
-            // Find neuron group nodes (which should already have been added)
+            // Add neuron groups
             for(NeuronGroup neuronGroup : ((Subnetwork)group).getNeuronGroupList()) {
+                addGroup(neuronGroup);
                 GroupNode neuronGroupNode = (GroupNode) objectNodeMap.get(neuronGroup);
-                nodes.add(neuronGroupNode);
+                nodes.add(neuronGroupNode);                    
             }
 
-            // Find synapse group nodes 
+            // Add synapse groups 
             for(SynapseGroup synapseGroup : ((Subnetwork)group).getSynapseGroupList()) {
+                addGroup(synapseGroup);
                 GroupNode synapseGroupNode = (GroupNode) objectNodeMap.get(synapseGroup);
-                nodes.add(synapseGroupNode);
+                nodes.add(synapseGroupNode);                                        
             }
 
             //Add neuron and synapse group nodes to subnetwork node 

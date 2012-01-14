@@ -33,7 +33,8 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.update_actions.BufferedUpdate;
+import org.simbrain.network.trainers.Trainer;
+import org.simbrain.network.update_actions.UpdateGroup;
 import org.simbrain.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
@@ -100,7 +101,7 @@ public class RootNetwork extends Network {
     /**
      * The update manager for this network.
      */
-    private final UpdateManager updateManager;
+    private UpdateManager updateManager;
     
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
@@ -139,17 +140,8 @@ public class RootNetwork extends Network {
      */
     public RootNetwork() {
         updateManager = new UpdateManager(this);
-        init();
-    }
-
-    /**
-     * Local initialization.
-     */
-    private void init() {
         setRootNetwork(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
-        // Default update method
-        updateManager.addAction(new BufferedUpdate(this));
     }
 
     /**
@@ -170,6 +162,7 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "synapseListeners");
         xstream.omitField(RootNetwork.class, "textListeners");
         xstream.omitField(RootNetwork.class, "updateCompleted");
+        xstream.omitField(RootNetwork.class, "updateManager");
         xstream.omitField(RootNetwork.class, "networkThread");
         xstream.omitField(Network.class, "logger");
         xstream.omitField(Neuron.class, "fanOut");
@@ -177,6 +170,7 @@ public class RootNetwork extends Network {
         xstream.omitField(Neuron.class, "readOnlyFanOut");
         xstream.omitField(Neuron.class, "readOnlyFanIn");
         xstream.omitField(SigmoidalNeuron.class, "implementationIndex"); // Backwards compatibility issue
+        xstream.omitField(Trainer.class, "listeners"); 
         return xstream;
     }
 
@@ -189,13 +183,22 @@ public class RootNetwork extends Network {
      */
     private Object readResolve() {
         logger = Logger.getLogger(RootNetwork.class);
+        
+        // Initialize listeners
         networkListeners = new ArrayList<NetworkListener>();
         neuronListeners = new ArrayList<NeuronListener>();
         synapseListeners = new ArrayList<SynapseListener>();
         subnetworkListeners = new ArrayList<SubnetworkListener>();
         textListeners = new ArrayList<TextListener>();
         groupListeners = new ArrayList<GroupListener>();
+        
+        // Initialize update manager
+        updateManager = new UpdateManager(this);
+        for (Group group : this.getGroupList()) {
+            updateManager.addAction(new UpdateGroup(group));
+        }
 
+        // Initialize neurons
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.postUnmarshallingInit();
         }
@@ -219,6 +222,9 @@ public class RootNetwork extends Network {
                 removeSynapse(synapse);
             }
         }
+        
+        prioritySortedNeuronList = new ArrayList<Neuron>();
+
         return this;
     }
 

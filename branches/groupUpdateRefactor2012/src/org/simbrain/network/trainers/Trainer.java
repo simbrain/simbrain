@@ -48,7 +48,7 @@ public class Trainer {
     private final List<Neuron> outputLayer;
 
     /** Listener list. */
-    private final List<TrainerListener> listeners = new ArrayList<TrainerListener>();
+    private List<TrainerListener> listeners = new ArrayList<TrainerListener>();
     
     /**
      * A reference to the training method, which actually computes the weight
@@ -259,6 +259,9 @@ public class Trainer {
      * @param trainerListener the listener to add
      */
     public void addListener(TrainerListener trainerListener) {
+        if (listeners == null) {
+            listeners = new ArrayList<TrainerListener>();
+        }
         listeners.add(trainerListener);
     }
 

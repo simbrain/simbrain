@@ -52,16 +52,16 @@ public abstract class Network {
     private String id;
 
     /** Array list of neurons. */
-    private List<Neuron> neuronList = new ArrayList<Neuron>();
+    private final List<Neuron> neuronList = new ArrayList<Neuron>();
 
     /** Array list of synapses. */
-    private List<Synapse> synapseList = new ArrayList<Synapse>();
+    private final List<Synapse> synapseList = new ArrayList<Synapse>();
 
     /** Array list of sub-networks. */
     private ArrayList<Network> networkList = new ArrayList<Network>();
 
     /** Since groups span all levels of the hierarchy they are stored here. */
-    private List<Group> groupList = new ArrayList<Group>();
+    private final List<Group> groupList = new ArrayList<Group>();
 
     /** Time step. */
     private double timeStep = DEFAULT_TIME_STEP;
@@ -781,20 +781,6 @@ public abstract class Network {
     }
 
     /**
-     * @param neuronList The neuronList to set.
-     */
-    public void setNeuronList(final ArrayList<Neuron> neuronList) {
-        this.neuronList = neuronList;
-    }
-
-    /**
-     * @param weightList The weightList to set.
-     */
-    public void setWeightList(final ArrayList<Synapse> weightList) {
-        this.synapseList = weightList;
-    }
-
-    /**
      * Add an array of neurons and set their parents to this.
      *
      * @param neurons list of neurons to add
@@ -1052,8 +1038,8 @@ public abstract class Network {
             if (groupList.get(i) instanceof NeuronGroup) {
                 NeuronGroup group = (NeuronGroup) groupList.get(i);
                 ret.addAll(group.getNeuronList());
-            } else if (groupList.get(i) instanceof FeedForward) { 
-                FeedForward group = (FeedForward) groupList.get(i);
+            } else if (groupList.get(i) instanceof Subnetwork) { 
+                Subnetwork group = (Subnetwork) groupList.get(i);
                 ret.addAll(group.getFlatNeuronList());                
             }
         }

@@ -16,13 +16,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.networks;
+package org.simbrain.network.groups;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.Layout;
@@ -36,7 +35,7 @@ import org.simbrain.network.neurons.PointNeuron;
  * Computational Explorations in Cognitive Neuroscience, p. 110. All page
  * references below are are to this book.
  */
-public class KWTA extends Network {
+public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
 
     //TODO: Make q settable
     //      Add average based version 
@@ -55,23 +54,23 @@ public class KWTA extends Network {
      * subnetwork.
      */
     private double inhibitoryConductance;
+    
+    /** The Neuron Group. */
+    private NeuronGroup neuronGroup;
 
-    /**
-     * Default constructor.
-     */
-    public KWTA() {
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param newRoot new root network
-     * @param oldNet old network.
-     */
-    public KWTA(RootNetwork newRoot, KWTA oldNet) {
-        super(newRoot, oldNet);
-        setK(oldNet.getK());
-    }
+    
+    //REDO
+//
+//    /**
+//     * Copy constructor.
+//     *
+//     * @param newRoot new root network
+//     * @param oldNet old network.
+//     */
+//    public KWTA(RootNetwork newRoot, KWTA oldNet) {
+//        super(newRoot, oldNet);
+//        setK(oldNet.getK());
+//    }
 
     /**
      * Default constructor.
@@ -81,23 +80,21 @@ public class KWTA extends Network {
      * @param root reference to RootNetwork.
      */
     public KWTA(final RootNetwork root, final int k, final Layout layout) {
-        super();
-        this.setRootNetwork(root);
+        super(root, 1, 1);
         for (int i = 0; i < k; i++) {
-            addNeuron(new Neuron(this, new PointNeuron()));
+            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuron()));
         }
-        layout.layoutNeurons(this);
+        layout.layoutNeurons(getNeuronGroup().getNeuronList());
+        attachSynapseGroupToNeuronGroup(getSynapseGroup(), getNeuronGroup());
+        setLabel("K-Winner Take All");
     }
 
-    /**
-     * Update the kwta network. Sort the neurons by excitatory conductance,
-     * determine the threshold conductance, apply this conductance to all point
-     * neurons, and update the point neurons.
-     */
+
+    @Override
     public void update() {
         sortNeurons();
-        setCurrentThresholdCurrent();
-        bufferedUpdateAllNeurons();
+        //setCurrentThresholdCurrent();
+        neuronGroup.update();
     }
 
     /**
@@ -105,9 +102,9 @@ public class KWTA extends Network {
      */
     private void setCurrentThresholdCurrent() {
 
-        double highest = ((PointNeuron) this.getNeuronList().get(k).getUpdateRule())
+        double highest = ((PointNeuron) neuronGroup.getNeuronList().get(k).getUpdateRule())
               .getInhibitoryThresholdConductance();
-        double secondHighest = ((PointNeuron) this.getNeuronList().get(k-1).getUpdateRule())
+        double secondHighest = ((PointNeuron) neuronGroup.getNeuronList().get(k-1).getUpdateRule())
             .getInhibitoryThresholdConductance();
 
         inhibitoryConductance = secondHighest + q * (highest - secondHighest);
@@ -116,7 +113,7 @@ public class KWTA extends Network {
         //  + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
 
         // Set inhibitory conductances in the layer
-        for (Neuron neuron : this.getNeuronList()) {
+        for (Neuron neuron : neuronGroup.getNeuronList()) {
             ((PointNeuron) neuron.getUpdateRule())
                     .setInhibitoryConductance(inhibitoryConductance);
         }
@@ -126,7 +123,9 @@ public class KWTA extends Network {
      * Sort neurons by their excitatory conductance. See p. 101.
      */
     private void sortNeurons() {
-        Collections.sort(this.getNeuronList(), new PointNeuronComparator());
+        
+        //REDO
+//        Collections.sort(this.getNeuronList(), new PointNeuronComparator());
     }
 
     /**
@@ -144,11 +143,6 @@ public class KWTA extends Network {
         }
     }
 
-    @Override
-    public ArrayList<Neuron> getNeuronList() {
-        return (ArrayList<Neuron>) super.getNeuronList();
-    }
-
     /**
      * Returns the initial number of neurons.
      *
@@ -164,8 +158,8 @@ public class KWTA extends Network {
     public void setK(final int k) {
         if (k < 1) {
             this.k = 1;
-        } else if (k >= getNeuronCount()) {
-            this.k = getNeuronCount() - 1;
+        } else if (k >= neuronGroup.getNeuronList().size()) {
+            this.k = neuronGroup.getNeuronList().size() - 1;
         } else {
             this.k = k;
         }

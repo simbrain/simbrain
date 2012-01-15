@@ -7,8 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.SOM;
 import org.simbrain.network.gui.actions.ShowHelpAction;
-import org.simbrain.network.networks.SOM;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;

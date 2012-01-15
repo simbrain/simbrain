@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.SOM;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -32,7 +33,6 @@ import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.networks.SOM;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -102,7 +102,7 @@ public class SOMDialog extends StandardDialog implements ActionListener {
         som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
         som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
         som.setNeighborhoodDecayAmount(Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
-        networkPanel.getRootNetwork().addNetwork(som);
+        networkPanel.getRootNetwork().addGroup(som);
         networkPanel.repaint();
         super.closeDialogOk();
     }
@@ -146,13 +146,13 @@ public class SOMDialog extends StandardDialog implements ActionListener {
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        SOM som = new SOM();
-        tfAlpha.setText(Double.toString(som.getInitAlpha()));
-        tfNeighborhoodSize.setText(Double.toString(som.getInitNeighborhoodSize()));
-        tfNumNeurons.setText(Integer.toString(som.getNumNeurons()));
-        tfNumInputVectors.setText(Integer.toString(som.getNumInputVectors()));
-        tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
-        tfNeigborhoodDecayAmount.setText(Double.toString(som.getNeighborhoodDecayAmount()));
+        //SOM som = new SOM();
+        tfAlpha.setText("" + .6);
+        tfNeighborhoodSize.setText("" + 100);
+        tfNumNeurons.setText("" + 25);
+        tfNumInputVectors.setText("" + 10);
+        tfAlphaDecayRate.setText("" + .2);
+        tfNeigborhoodDecayAmount.setText("" + .9);
     }
 
 }

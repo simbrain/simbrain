@@ -33,7 +33,7 @@ import org.simbrain.network.neurons.LinearNeuron;
  *
  * @author Jeff Yoshimi
  */
-public class Competitive extends Subnetwork {
+public class Competitive extends Subnetwork implements GrowableSynapseLayer {
 
     /** Learning rate. */
     private double epsilon = .1;
@@ -80,20 +80,20 @@ public class Competitive extends Subnetwork {
     }
    
         
-    /**
-     * Copy constructor.
-     *
-     * @param newParent new root network
-     * @param oldNet old network.
-     */
-    public Competitive(RootNetwork newRoot, Competitive oldNet) {
-        super(newRoot);
-        setEpsilon(oldNet.getEpsilon());
-        setLeakyEpsilon(oldNet.getLeakyEpsilon());
-        setLoseValue(oldNet.getLoseValue());
-        setWinValue(oldNet.getWinValue());
-        setNormalizeInputs(oldNet.getNormalizeInputs());
-    }
+//    /**
+//     * Copy constructor.
+//     *
+//     * @param newParent new root network
+//     * @param oldNet old network.
+//     */
+//    public Competitive(RootNetwork newRoot, Competitive oldNet) {
+//        super(newRoot);
+//        setEpsilon(oldNet.getEpsilon());
+//        setLeakyEpsilon(oldNet.getLeakyEpsilon());
+//        setLoseValue(oldNet.getLoseValue());
+//        setWinValue(oldNet.getWinValue());
+//        setNormalizeInputs(oldNet.getNormalizeInputs());
+//    }
 
     @Override
     public void update() {

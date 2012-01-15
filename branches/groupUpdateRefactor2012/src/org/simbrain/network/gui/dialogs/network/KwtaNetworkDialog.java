@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.KWTA;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -29,7 +30,6 @@ import org.simbrain.network.gui.dialogs.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.networks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -80,7 +80,7 @@ public class KwtaNetworkDialog extends StandardDialog {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
         KWTA kWTA = new KWTA(networkPanel.getRootNetwork(), Integer.parseInt(tfK.getText()), layout);
-        networkPanel.getRootNetwork().addNetwork(kWTA);
+        networkPanel.getRootNetwork().addGroup(kWTA);
         networkPanel.repaint();
         super.closeDialogOk();
     }
@@ -113,8 +113,8 @@ public class KwtaNetworkDialog extends StandardDialog {
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        KWTA kw = new KWTA();
-        //tfK.setText(Integer.toString(kw.getK()));
+        //KWTA kw = new KWTA();
+        tfK.setText("5");
 
     }
 

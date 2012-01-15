@@ -3,10 +3,10 @@ package org.simbrain.network.gui.nodes.subnetworks;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.groups.KWTA;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.KwtaPropertiesDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.networks.KWTA;
 
 /**
  * <b>KwtaNetworkNode</b> takes care of initialization of a Kwta network.
@@ -27,7 +27,7 @@ public class KwtaNetworkNode extends SubnetworkNode {
                                      final double x,
                                      final double y) {
 
-        super(networkPanel, network, x, y);
+        super(networkPanel, null, x, y);
     }
 
     /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
@@ -60,7 +60,7 @@ public class KwtaNetworkNode extends SubnetworkNode {
 
     /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     public KWTA getKwtaSubnetwork() {
-        return ((KWTA) getSubnetwork());
+        return null; 
     }
 
     /** @inheritDoc org.simbrain.network.nodes.ScreenElement */

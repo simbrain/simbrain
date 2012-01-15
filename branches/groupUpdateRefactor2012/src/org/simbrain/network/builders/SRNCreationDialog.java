@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
+import org.simbrain.network.groups.SimpleRecurrentNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -144,16 +145,16 @@ public class SRNCreationDialog extends StandardDialog {
      * Fills the fields with default values.
      */
     public void fillFieldValues() {
-        tfNumInputs.setText("" + 24);
-        tfNumHidden.setText("" + 20);
-        tfNumOutputs.setText("" + 24);
+        tfNumInputs.setText("" + 12);
+        tfNumHidden.setText("" + 10);
+        tfNumOutputs.setText("" + 12);
     }
 
     @Override
     public void closeDialogOk() {
         try {
 
-            SRNBuilder srnBuild = new SRNBuilder(panel.getRootNetwork(),
+            SimpleRecurrentNetwork srnBuild = new SimpleRecurrentNetwork(panel.getRootNetwork(),
                     Integer.parseInt(tfNumInputs.getText()), Integer
                             .parseInt(tfNumHidden.getText()), Integer
                             .parseInt(tfNumOutputs.getText()));

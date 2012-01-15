@@ -48,9 +48,9 @@ import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.BackpropNetwork;
-import org.simbrain.network.groups.Competitive;
 import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.GrowableSynapseLayer;
 import org.simbrain.network.groups.Hopfield;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -508,9 +508,9 @@ public class NetworkPanel extends JPanel {
                 // of group change are supported. For now a single case is
                 // handled: adding synapses to a synapse group               
                 Group group = e.getObject();                
-                if (group instanceof Competitive) {
+                if (group instanceof GrowableSynapseLayer) {
                     if (description.equalsIgnoreCase("synapseAdded")) {
-                        SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap.get(((Competitive) group).getSynapseGroup());
+                        SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap.get(((Subnetwork) group).getSynapseGroup());
                         SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e.getAuxiliaryObject());
                         if (synapseNode != null) {
                             sgn.addPNode(synapseNode);

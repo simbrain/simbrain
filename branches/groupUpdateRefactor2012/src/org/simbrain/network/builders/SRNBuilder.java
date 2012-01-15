@@ -55,22 +55,23 @@ public final class SRNBuilder {
 
     /** space between neurons within layers */
     private int betweenNeuronInterval = 50;
-
-    /** Custom update rule for SRN "copy-back" of hidden layer values to the
-     * context layer at the end of each network iteration. */
-    private CustomUpdateRule update = new CustomUpdateRule() {
-        public void update(RootNetwork network) {
-            network.bufferedUpdateAllNeurons();
-            network.updateAllSynapses();
-            network.updateAllNetworks();
-            network.updateAllGroups();
-            for (Neuron n : hiddenLayer) {
-                double act = n.getActivation();
-                int index = hiddenLayer.indexOf(n);
-                contextLayer.get(index).setActivation(act);
-            }
-        }
-    };
+    
+//
+//    /** Custom update rule for SRN "copy-back" of hidden layer values to the
+//     * context layer at the end of each network iteration. */
+//    private CustomUpdateRule update = new CustomUpdateRule() {
+//        public void update(RootNetwork network) {
+//            network.bufferedUpdateAllNeurons();
+//            network.updateAllSynapses();
+//            network.updateAllNetworks();
+//            network.updateAllGroups();
+//            for (Neuron n : hiddenLayer) {
+//                double act = n.getActivation();
+//                int index = hiddenLayer.indexOf(n);
+//                contextLayer.get(index).setActivation(act);
+//            }
+//        }
+//    };
 
     /** Default constructor. */
     public SRNBuilder() {
@@ -286,14 +287,6 @@ public final class SRNBuilder {
 
     public void setBetweenNeuronInterval(int betweenNeuronInterval) {
         this.betweenNeuronInterval = betweenNeuronInterval;
-    }
-
-    public CustomUpdateRule getUpdate() {
-        return update;
-    }
-
-    public void setUpdate(CustomUpdateRule update) {
-        this.update = update;
     }
 
 }

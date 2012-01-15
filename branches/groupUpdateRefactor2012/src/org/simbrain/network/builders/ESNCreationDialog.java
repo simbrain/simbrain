@@ -34,15 +34,16 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.simbrain.network.groups.EchoStateNetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.trainers.LMSOffline.SolutionType;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
+import org.simbrain.network.trainers.LMSOffline.SolutionType;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 /**
  * Creates a GUI dialog for the creation of an arbitrary echo-state network.
@@ -217,7 +218,7 @@ public class ESNCreationDialog extends StandardDialog {
         gbc.gridx = 0;
         gbc.gridy = esnPanel.getMyNextItemRow();
 
-        sectionSeparator("Training Parameters", gbc, row);
+        //sectionSeparator("Training Parameters", gbc, row);
 
         final JFileChooser fc = new JFileChooser();
 
@@ -246,12 +247,13 @@ public class ESNCreationDialog extends StandardDialog {
 
         }
 
-        esnPanel.addItem("Regression Type: ", linearRegressionSol, 2);
-        esnPanel.addItem("Input Data: ", inputDataButton);
-        esnPanel.addItem("Maximum Noise: ", noiseMax, 2);
-        esnPanel.addItem("Teacher Data:", teacherDataButton);
-        esnPanel.addItem("Minimum Noise: ", noiseMin, 2);
-        esnPanel.addItem("Noise: ", noise);
+        //REDO
+//        esnPanel.addItem("Regression Type: ", linearRegressionSol, 2);
+//        esnPanel.addItem("Input Data: ", inputDataButton);
+//        esnPanel.addItem("Maximum Noise: ", noiseMax, 2);
+//        esnPanel.addItem("Teacher Data:", teacherDataButton);
+//        esnPanel.addItem("Minimum Noise: ", noiseMin, 2);
+//        esnPanel.addItem("Noise: ", noise);
 
         setContentPane(esnPanel);
         fillFieldValues();
@@ -327,15 +329,15 @@ public class ESNCreationDialog extends StandardDialog {
      * Populate fields with default data.
      */
     public void fillFieldValues() {
-        tfNumInputs.setText("" + 1);
-        tfNumReservoir.setText("" + 50);
-        tfNumOutputs.setText("" + 1);
+        tfNumInputs.setText("" + 5);
+        tfNumReservoir.setText("" + 25);
+        tfNumOutputs.setText("" + 7);
         recurrentOutputWeights.setSelected(false);
         directInOutWeights.setSelected(false);
         backWeights.setSelected(false);
         resSparsity.setText("" + 0.01);
         inResSparsity.setText("" + 1.0);
-        backSparsity.setText(" " + 1.0);
+        backSparsity.setText(" " + .5);
         maxEigenValue.setText("" + 0.98);
     }
 
@@ -355,7 +357,7 @@ public class ESNCreationDialog extends StandardDialog {
             }
 
             //Initialize logical network builder
-            EchoStateNetBuilder builder = new EchoStateNetBuilder(
+            EchoStateNetwork builder = new EchoStateNetwork(
                     panel.getRootNetwork(),
                     //Get layer size values from fields...
                     Integer.parseInt(tfNumInputs.getText()),
@@ -398,24 +400,26 @@ public class ESNCreationDialog extends StandardDialog {
             //Build network
             builder.buildNetwork();
 
+            dispose();
             panel.repaint();
 
-            int dialogOpts = JOptionPane.showConfirmDialog(new JPanel(),
-                    "Network Construction Complete. \nBegin training "
-                    + "procedure?\n(Warning: This may a while)\n");
-
-            if (dialogOpts == JOptionPane.YES_OPTION) {
-                builder.train(inputData, teacherData);
-                esnPanel.setVisible(false);
-                dispose();
-                panel.repaint();
-            } else if (dialogOpts == JOptionPane.NO_OPTION) {
-                panel.clearPanel();
-            } else {
-                panel.clearPanel();
-                esnPanel.setVisible(false);
-                dispose();
-            }
+            //REDO
+//            int dialogOpts = JOptionPane.showConfirmDialog(new JPanel(),
+//                    "Network Construction Complete. \nBegin training "
+//                    + "procedure?\n(Warning: This may a while)\n");
+//
+//            if (dialogOpts == JOptionPane.YES_OPTION) {
+//                builder.train(inputData, teacherData);
+//                esnPanel.setVisible(false);
+//                dispose();
+//                panel.repaint();
+//            } else if (dialogOpts == JOptionPane.NO_OPTION) {
+//                panel.clearPanel();
+//            } else {
+//                panel.clearPanel();
+//                esnPanel.setVisible(false);
+//                dispose();
+//            }
 
 
         } catch (NumberFormatException nfe) {

@@ -1,14 +1,14 @@
-package org.simbrain.network.networks;
+package org.simbrain.network.groups;
 
 import java.io.File;
 import java.util.Iterator;
 
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neurons.PointNeuron;
 
 /**
  * <b>SOM</b> implements a Self-Organizing Map network.
@@ -17,7 +17,7 @@ import org.simbrain.network.neurons.LinearNeuron;
  * 
  * TODO: Move all "training" functions over to trainer
  */
-public class SOM extends Network {
+public class SOM extends Subnetwork implements GrowableSynapseLayer {
 
     /** Default alpha. */
     private static final double DEFAULT_ALPHA = 0.6;
@@ -47,10 +47,10 @@ public class SOM extends Network {
     private static final int DEFAULT_BATCH_SIZE = 100;
 
     /** The default alphaDecayRate. */
-    private static final double DEFAULT_DECAY_RATE = 0.05;
+    private static final double DEFAULT_DECAY_RATE = 0.005;
 
     /** The default neighborhoodDecayAmount. */
-    private static final double DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = 5;
+    private static final double DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = .05;
 
     /** Initial Learning Rate. */
     private double initAlpha = DEFAULT_ALPHA;
@@ -106,11 +106,9 @@ public class SOM extends Network {
     /** The amount that the neighborhood decrements. */
     private double neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
-    /**
-     * Default constructor.
-     */
-    public SOM() {
-    }
+    /** The Neuron Group. */
+    private NeuronGroup neuronGroup;
+
 
     /**
      * Constructs an SOM network with specified number of neurons.
@@ -120,27 +118,28 @@ public class SOM extends Network {
      * @param root reference to RootNetwork.
      */
     public SOM(final RootNetwork root, final int numNeurons, final Layout layout) {
-        super();
-        this.setRootNetwork(root);
+        super(root, 1, 1);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(getDefaultSOMNeuron());
+            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuron()));
         }
-        layout.layoutNeurons(this);
+        layout.layoutNeurons(getNeuronGroup().getNeuronList());
+        attachSynapseGroupToNeuronGroup(getSynapseGroup(), getNeuronGroup());
+        setLabel("SOM");
     }
 
-    /**
-     * Copy constructor.
-     *
-     * @param newRoot new root net
-     * @param oldNet old network
-     */
-    public SOM(RootNetwork newRoot, SOM oldNet) {
-        super(newRoot, oldNet);
-        this.setAlphaDecayRate(oldNet.getAlphaDecayRate());
-        this.setInitAlpha(oldNet.getInitAlpha());
-        this.setNeighborhoodDecayAmount(oldNet.getNeighborhoodDecayAmount());
-        this.setInitNeighborhoodSize(oldNet.getInitNeighborhoodSize());
-    }
+//    /**
+//     * Copy constructor.
+//     *
+//     * @param newRoot new root net
+//     * @param oldNet old network
+//     */
+//    public SOM(RootNetwork newRoot, SOM oldNet) {
+//        super(newRoot, oldNet);
+//        this.setAlphaDecayRate(oldNet.getAlphaDecayRate());
+//        this.setInitAlpha(oldNet.getInitAlpha());
+//        this.setNeighborhoodDecayAmount(oldNet.getNeighborhoodDecayAmount());
+//        this.setInitNeighborhoodSize(oldNet.getInitNeighborhoodSize());
+//    }
 
     /**
      * Discovers the current index of the SOM neuron which is closest to the
@@ -149,8 +148,8 @@ public class SOM extends Network {
      * @return winner
      */
     private int calculateWinnerIndex() {
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = (Neuron) getNeuronList().get(i);
+        for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+            Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
             distance = findDistance(n);
             if (distance < winDistance) {
                 winDistance = distance;
@@ -206,8 +205,8 @@ public class SOM extends Network {
 
             // Determine Winner: The SOM Neuron with the lowest distance between
             // it's weight vector and the input neurons's weight vector.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron n = (Neuron) getNeuronList().get(i);
+            for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+                Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
                 distance = 0;
                 counter = 0;
                 for (Synapse incoming : n.getFanIn()) {
@@ -220,12 +219,12 @@ public class SOM extends Network {
                     winner = i;
                 }
             }
-            Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
+            Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
 
             // Update Weights of the neurons within the radius of the winning
             // neuron.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron neuron = ((Neuron) getNeuronList().get(i));
+            for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+                Neuron neuron = ((Neuron) neuronGroup.getNeuronList().get(i));
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
 
                 // The center of the neuron is within the update region.
@@ -243,7 +242,7 @@ public class SOM extends Network {
             }
         } // end this training vector
 
-        alpha *= alphaDecayRate;
+        alpha = (alpha - alphaDecayRate * alpha);
         if (neighborhoodSize - neighborhoodDecayAmount > 0) {
             neighborhoodSize -= neighborhoodDecayAmount;
         } else {
@@ -257,7 +256,7 @@ public class SOM extends Network {
      * between 0 and the upper bound of each synapse.
      */
     public void randomizeIncomingWeights() {
-        for (Iterator i = getNeuronList().iterator(); i.hasNext();) {
+        for (Iterator i = neuronGroup.getNeuronList().iterator(); i.hasNext();) {
             Neuron n = (Neuron) i.next();
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getUpperBound() * Math.random());
@@ -270,14 +269,14 @@ public class SOM extends Network {
      */
     public void recall() {
         winDistance = 0;
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = (Neuron) getNeuronList().get(i);
+        for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+            Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
             if (n.getActivation() > winDistance) {
                 winDistance = n.getActivation();
                 winner = i;
             }
         }
-        Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
+        Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
         for (Synapse incoming : winningNeuron.getFanIn()) {
             incoming.getSource().setActivation(incoming.getStrength());
         }
@@ -313,8 +312,8 @@ public class SOM extends Network {
                 // Determine Winner: The SOM Neuron with the lowest distance
                 // between
                 // it's weight vector and the input neurons's weight vector.
-                for (int i = 0; i < getNeuronList().size(); i++) {
-                    Neuron n = (Neuron) getNeuronList().get(i);
+                for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+                    Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
                     distance = 0;
                     counter = 0;
                     for (Synapse incoming : n.getFanIn()) {
@@ -327,12 +326,12 @@ public class SOM extends Network {
                         winner = i;
                     }
                 }
-                Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
+                Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
 
                 // Update Weights of the neurons within the radius of the
                 // winning neuron.
-                for (int i = 0; i < getNeuronList().size(); i++) {
-                    Neuron neuron = ((Neuron) getNeuronList().get(i));
+                for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+                    Neuron neuron = ((Neuron) neuronGroup.getNeuronList().get(i));
                     physicalDistance = findPhysicalDistance(neuron,
                             winningNeuron);
 
@@ -351,7 +350,7 @@ public class SOM extends Network {
                 }
             } // end this training vector
 
-            alpha *= alphaDecayRate;
+            alpha = (alpha - alphaDecayRate * alpha);
             if (neighborhoodSize - neighborhoodDecayAmount > 0) {
                 neighborhoodSize -= neighborhoodDecayAmount;
             } else {
@@ -375,6 +374,7 @@ public class SOM extends Network {
      * the SOM neuron with highest activation. Set the activations of input
      * neurons according to the SOM weights.
      */
+    @Override
     public void update() {
 
         winDistance = Double.MAX_VALUE;
@@ -385,15 +385,15 @@ public class SOM extends Network {
         // its weight vector and the input neurons's weight vector.
 
         winner = calculateWinnerIndex();
-        Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
+        Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
 
         // Neuron update
-        if (!getRootNetwork().getClampNeurons()) {
+        if (!getParentNetwork().getClampNeurons()) {
             if (updateMethod == STANDARD) {
-                this.bufferedUpdateAllNeurons();
+                neuronGroup.update();
             } else {
-                for (int i = 0; i < getNeuronList().size(); i++) {
-                    Neuron n = (Neuron) getNeuronList().get(i);
+                for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+                    Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
                     if (n == winningNeuron) {
                         n.setActivation(1);
                     } else {
@@ -405,9 +405,9 @@ public class SOM extends Network {
 
         // Update Synapses of the neurons within the radius of the winning
         // neuron.
-        if (!getRootNetwork().getClampWeights()) {
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron neuron = ((Neuron) getNeuronList().get(i));
+        if (!getParentNetwork().getClampWeights()) {
+            for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
+                Neuron neuron = ((Neuron) neuronGroup.getNeuronList().get(i));
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
                 // The center of the neuron is within the update region.
                 if (physicalDistance <= neighborhoodSize) {
@@ -420,7 +420,7 @@ public class SOM extends Network {
                     }
                 }
             }
-            alpha *= (1 - alphaDecayRate);
+            alpha = (alpha - alphaDecayRate * alpha);
             // TODO: Now reducing decay rate as
             // percentage. Document and make
             // others consistent with this.
@@ -465,7 +465,7 @@ public class SOM extends Network {
      * @return ret default som neuron
      */
     private Neuron getDefaultSOMNeuron() {
-        Neuron ret = new Neuron(this, new LinearNeuron());
+        Neuron ret = new Neuron(getParentNetwork(), new LinearNeuron());
         ret.setIncrement(1);
         ret.setLowerBound(0);
         return ret;

@@ -2,6 +2,7 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -175,40 +176,31 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
         
         gbc.gridy = 7;
         gbc.gridwidth = 1;
-        this.add(new JLabel("Randomize Excitatory Weights: "), gbc);
+        gbc.insets = new Insets(10, 5, 0, 10);
         
-        gbc.gridy = 8;
-        gbc.anchor = GridBagConstraints.CENTER;
-        this.add(new JLabel("Randomize Inhibitory Weights: "), gbc);
+        JPanel tempExRandPanel = new JPanel();
+        FlowLayout RPFL = new FlowLayout(FlowLayout.LEFT);
         
+        tempExRandPanel.setLayout(RPFL);
+        tempExRandPanel.add(new JLabel("Randomize Excitatory Weights: "));
+        tempExRandPanel.add(randExcite);
+        tempExRandPanel.add(randExButton);
         
-        
-        JPanel randomTempContainer = new JPanel();
-        randomTempContainer.setLayout(new GridBagLayout());
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        randomTempContainer.add(randExcite, gbc);
-        
-        gbc.gridx = 1;
-        randomTempContainer.add(randExButton, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        randomTempContainer.add(randInhib, gbc);
-        
-        gbc.gridx = 1;
-        randomTempContainer.add(randInButton, gbc);
+        JPanel tempInRandPanel = new JPanel();
+        tempInRandPanel.setLayout(RPFL);
+        tempInRandPanel.add(new JLabel("Randomize Inhibitory Weights: "));
+        tempInRandPanel.add(randInhib);
+        tempInRandPanel.add(randInButton);
         
         gbc.gridy = 7;
-        gbc.gridx = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.gridheight = 1;
         
-        this.add(randomTempContainer, gbc);
+        this.add(tempExRandPanel, gbc);
+        
+        gbc.gridy = 8;
+        this.add(tempInRandPanel, gbc);
         
     }
     

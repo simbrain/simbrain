@@ -20,6 +20,7 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -72,13 +73,18 @@ public class AllToAllPanel extends AbstractConnectionPanel {
         gbc.gridheight = 1;
         this.add(new JSeparator(), gbc);
         
-        gbc.gridy = 10;
-        gbc.gridwidth = 1;
-        this.add(new JLabel("Allow Self-Connections: "), gbc);
         
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx = 1;
-        this.add(allowSelfConnect, gbc); 
+        gbc.gridy = 10;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(10, 5, 0, 10);
+        
+        JPanel allowSelfConnectPanel = new JPanel();
+        FlowLayout ASCPFL = new FlowLayout(FlowLayout.LEFT);
+        allowSelfConnectPanel.setLayout(ASCPFL);
+        allowSelfConnectPanel.add(new JLabel("Allow Self-Connections: "));
+        allowSelfConnectPanel.add(allowSelfConnect);
+        
+        this.add(allowSelfConnectPanel, gbc);
     }
     
     /**

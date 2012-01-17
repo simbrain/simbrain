@@ -114,7 +114,7 @@ public class GroupNode extends CustomOutline implements PropertyChangeListener {
      */
     public void addReference(final PNode node) {
         node.addPropertyChangeListener(this);
-        node.getParent().addPropertyChangeListener(this);
+        //node.getParent().addPropertyChangeListener(this);
         addOutlinedObject(node);
     }
 

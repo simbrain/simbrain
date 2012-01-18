@@ -17,15 +17,16 @@
  */
 package org.simbrain.network.groups;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Sparse2;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -47,9 +48,9 @@ import org.simbrain.network.util.SimnetUtils;
  */
 public class EchoStateNetwork extends Subnetwork {
 
-    /** Size of the input, reservoir, and output layers */
-    private int numInputNodes, numReservoirNodes, numOutputNodes;
-
+    /** Number of input nodes, reservoirNodes, and output nodes. */
+    private int numInputs, numResNodes, numOutputs;
+    
     /**
      * ESN parameters: reservoir sparsity, sparsity of the weights from the
      * input layer to the reservoir, the sparsity of back weights from output to
@@ -92,13 +93,7 @@ public class EchoStateNetwork extends Subnetwork {
     private SolutionType solType;
 
     /** Initial position of network (from bottom left). */
-    private Point2D.Double initialPosition = new Point2D.Double(0, 0);
-
-    /** Initial position of reservoir grid */
-    private Point2D.Double initialGridPostion;
-
-    /** Initial position of output layer */
-    private Point2D.Double initialOutPosition;
+    private Point2D initialPosition;
 
     /** Default space between layers */
     private static final int DEFAULT_LAYER_INTERVAL = 100;
@@ -112,10 +107,13 @@ public class EchoStateNetwork extends Subnetwork {
     /** space between neurons within layers */
     private int betweenNeuronInterval = DEFAULT_NEURON_INTERVAL;
 
+    /** Noise. */
     private boolean noise;
     
+    /** Max noise. */
     private double noiseMax;
     
+    /** Min noise. */
     private double noiseMin;
     
     /**
@@ -127,12 +125,13 @@ public class EchoStateNetwork extends Subnetwork {
      * @param outputNodes number of output nodes
      */
     public EchoStateNetwork(final RootNetwork network, int inputNodes,
-            int reservoirNodes, int outputNodes) {
+            int reservoirNodes, int outputNodes, Point2D initialPosition) {
         super(network);
-        setNumInputNodes(inputNodes);
-        setNumReservoirNodes(reservoirNodes);
-        setNumOutputNodes(outputNodes);
-
+        this.initialPosition = initialPosition;
+        this.numInputs = inputNodes;
+        this.numResNodes = reservoirNodes;
+        this.numOutputs = outputNodes;
+        setLabel("Echo State Network");
     }
     
     @Override
@@ -141,7 +140,6 @@ public class EchoStateNetwork extends Subnetwork {
         reservoirLayer.update();
         outputLayer.update();
     }
-
 
     /**
      * Builds an echo-state network ready to be trained based on the parameters
@@ -153,61 +151,87 @@ public class EchoStateNetwork extends Subnetwork {
         List<Neuron> inputLayerNeurons  = new ArrayList<Neuron>();
         List<Neuron> reservoirLayerNeurons  = new ArrayList<Neuron>();
         List<Neuron> outputLayerNeurons  = new ArrayList<Neuron>();
-        initializeLayer(inputLayerNeurons, new LinearNeuron(),
-                numInputNodes);
+        initializeLayer(inputLayerNeurons, new ClampedNeuron(),
+                numInputs);
         initializeLayer(reservoirLayerNeurons, reservoirNeuronType,
-                numReservoirNodes);
+                numResNodes);
         initializeLayer(outputLayerNeurons, outputNeuronType,
-                numOutputNodes);
-
-
-        // Input Layer
-        LineLayout layerLayout = new LineLayout(betweenNeuronInterval,
-                LineOrientation.HORIZONTAL);
-        layerLayout.setInitialLocation(new Point((int) initialPosition.getX()
-                - getWidth(inputLayerNeurons) / 2, (int) initialPosition.getY()));
-        layerLayout.layoutNeurons(inputLayerNeurons);
-        inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
-        addNeuronGroup(inputLayer);
-
-        GridLayout reservoirLayout = new GridLayout(betweenNeuronInterval,
-                betweenNeuronInterval, (int) Math.sqrt(numReservoirNodes));
-        initialGridPostion = new Point2D.Double((int) inputLayer.getNeuronList().get(0).getX()
-               , (int) initialPosition.getY()
-                - betweenLayerInterval - (int) Math.sqrt(numReservoirNodes)
-                * reservoirLayout.getVSpacing());
-        reservoirLayout.setInitialLocation(initialGridPostion);
-        reservoirLayout.layoutNeurons(reservoirLayerNeurons);
-        reservoirLayer = new NeuronGroup(getParentNetwork(), reservoirLayerNeurons);
-        addNeuronGroup(reservoirLayer);
-
+                numOutputs);
+        
         // Output Layer
-        initialOutPosition = new Point2D.Double((int) initialPosition.getX()
-                - getWidth(outputLayerNeurons) / 2, (int) initialPosition.getY()
-                - (2 * betweenLayerInterval + Math.sqrt(numReservoirNodes)
-                        * reservoirLayout.getVSpacing()));
-        layerLayout.setInitialLocation(initialOutPosition);
-        layerLayout.layoutNeurons(outputLayerNeurons);
+        LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
+                LineOrientation.HORIZONTAL);
+        lineLayout.setInitialLocation(initialPosition);
+        lineLayout.layoutNeurons(outputLayerNeurons);
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
+        outputLayer.setLabel("Outputs");
         addNeuronGroup(outputLayer);
 
-        // Connect layers which do not undergo training
-        connectSparse(inputLayerNeurons, reservoirLayerNeurons, inSparsity);
-        connectSparse(reservoirLayerNeurons, reservoirLayerNeurons, resSparsity);
-        connectSparse(reservoirLayerNeurons, outputLayerNeurons, resSparsity);
+        // Reservoir Layer
+        GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
+                betweenNeuronInterval, (int) Math.sqrt(numResNodes));
+        gridLayout.layoutNeurons(reservoirLayerNeurons);
+        reservoirLayer = new NeuronGroup(getParentNetwork(), reservoirLayerNeurons);
+        addNeuronGroup(reservoirLayer);
+        reservoirLayer.setLabel("Reservoir");
+        offsetNeuronGroup(outputLayer, reservoirLayer, "South", betweenLayerInterval);
+
+        // Input Layer
+        lineLayout.layoutNeurons(inputLayerNeurons);
+        inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
+        inputLayer.setLabel("Inputs");
+        addNeuronGroup(inputLayer);
+        offsetNeuronGroup(reservoirLayer, inputLayer, "South", betweenLayerInterval);
+        
+        // Weights: Input layer to reservoir layer
+        List<Synapse> synapseList = new ArrayList<Synapse>();
+        Sparse2 sparseConnections = new Sparse2(getParentNetwork(), inputLayerNeurons, reservoirLayerNeurons);
+        synapseList = sparseConnections.connectNeurons(inSparsity);
+        SynapseGroup inputToReservoir = new SynapseGroup(this.getParentNetwork());
+        // TODO: Ugly. Should be a way to directly connect neuron groups and create a synapse group between them
+        getParentNetwork().transferSynapsesToGroup(synapseList,
+                inputToReservoir); 
+        inputToReservoir.setLabel("Input to Reservoir");
+        addSynapseGroup(inputToReservoir);
+
+        // Weights: reservoir layer to itself
+        // TODO: Adding this synapse group throws the parent boundary off 
+        sparseConnections = new Sparse2(getParentNetwork(), reservoirLayerNeurons, reservoirLayerNeurons);
+        synapseList = sparseConnections.connectNeurons(resSparsity);
+        SynapseGroup reservoirSynapses = new SynapseGroup(this.getParentNetwork());
+        getParentNetwork().transferSynapsesToGroup(synapseList,
+                reservoirSynapses); 
+        reservoirSynapses.setLabel("Reservoir Synapses");
+        addSynapseGroup(reservoirSynapses);
+
+        // Weights: reservoir layer to output layer
+        AllToAll allToAll  = new AllToAll(getParentNetwork(), reservoirLayerNeurons, outputLayerNeurons);
+        synapseList = allToAll.connectNeurons();
+        SynapseGroup reservoirToOutput = new SynapseGroup(this.getParentNetwork());
+        getParentNetwork().transferSynapsesToGroup(synapseList,
+                reservoirToOutput); 
+        reservoirToOutput.setLabel("Classifier weights");
+        addSynapseGroup(reservoirToOutput);
+
+        // Weights: output to reservoir
         if (backWeights) {
-            connectSparse(outputLayerNeurons, reservoirLayerNeurons, backSparsity);
+            sparseConnections = new Sparse2(getParentNetwork(), outputLayerNeurons, reservoirLayerNeurons);
+            synapseList = sparseConnections.connectNeurons(backSparsity);
+            SynapseGroup outputToReservoir = new SynapseGroup(this.getParentNetwork());
+            getParentNetwork().transferSynapsesToGroup(synapseList,
+                    outputToReservoir); 
+            outputToReservoir.setLabel("Output to reservoir Synapses");
+            addSynapseGroup(outputToReservoir);
         }
 
         // Scale the reservoir's weights to have the desired spectral radius
         SimnetUtils.scaleEigenvalue(reservoirLayerNeurons, reservoirLayerNeurons,
                 spectralRadius);
         
-        getParentNetwork().addGroup(this);
-        
+        // Add the group to the network
+        getParentNetwork().addGroup(this);        
     }
 
-    //REDO
     /**
      * Initializes a layer.
      * @param layer
@@ -226,23 +250,6 @@ public class EchoStateNetwork extends Subnetwork {
             node.setIncrement(1); //TODO: Reasonable?
             layer.add(node);
         }
-    }
-
-    /**
-     * Sparsely connects two layers (or one recurrently).
-     * @param src
-     *            the source layer
-     * @param tar
-     *            the target layer
-     * @param sparsity
-     *            the desired sparsity of the weights from src to tar
-     */
-    private void connectSparse(List<Neuron> src, List<Neuron> tar,
-            double sparsity) {
-        Sparse2 sparseConnections = new Sparse2(getParentNetwork(), src, tar);
-        // TODO: More elegant way to do this?
-
-        sparseConnections.connectNeurons(sparsity);
     }
 
     /**
@@ -328,34 +335,6 @@ public class EchoStateNetwork extends Subnetwork {
      */
     private int getWidth(List<Neuron> layer) {
         return layer.size() * betweenNeuronInterval;
-    }
-
-    /**
-     * @param inputNodes
-     *            number of input nodes
-     */
-    public void setNumInputNodes(int inputNodes) {
-        this.numInputNodes = inputNodes;
-    }
-
-    public int getNumInputNodes() {
-        return numInputNodes;
-    }
-
-    public void setNumReservoirNodes(int reservoirNodes) {
-        this.numReservoirNodes = reservoirNodes;
-    }
-
-    public int getNumReservoirNodes() {
-        return numReservoirNodes;
-    }
-
-    public void setNumOutputNodes(int outputNodes) {
-        this.numOutputNodes = outputNodes;
-    }
-
-    public int getNumOutputNodes() {
-        return numOutputNodes;
     }
 
     public void setResSparsity(double resSparsity) {

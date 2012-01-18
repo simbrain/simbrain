@@ -12,6 +12,7 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
@@ -60,8 +61,9 @@ public class AllToAll extends ConnectNeurons {
         return "All to all";
     }
 
-    /** {@inheritDoc} */
-    public void connectNeurons() {
+    @Override
+    public List<Synapse> connectNeurons() {
+        List<Synapse> ret = new ArrayList<Synapse>();
         for (Neuron source : sourceNeurons) {
             for (Neuron target : targetNeurons) {
                 // Don't add a connection if there is already one present
@@ -74,14 +76,17 @@ public class AllToAll extends ConnectNeurons {
                                 .instantiateTemplateSynapse(source, target,
                                         network);
                         network.addSynapse(synapse);
+                        ret.add(synapse);
                     }
                 } else {
                     Synapse synapse = baseSynapse.instantiateTemplateSynapse(
                             source, target, network);
                     network.addSynapse(synapse);
+                    ret.add(synapse);
                 }
             }
         }
+        return ret;
     }
 
     /**

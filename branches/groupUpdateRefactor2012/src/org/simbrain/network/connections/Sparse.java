@@ -17,6 +17,7 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
@@ -70,10 +71,10 @@ public class Sparse extends ConnectNeurons {
         return "Sparse";
     }
 
-    /** @inheritDoc */
-    public void connectNeurons() {
+    @Override
+    public List<Synapse> connectNeurons() {
+        List<Synapse> ret = new ArrayList<Synapse>(); 
         for (Neuron source : sourceNeurons) {
-
             for (Neuron target : targetNeurons) {
                
 
@@ -87,15 +88,18 @@ public class Sparse extends ConnectNeurons {
                     Synapse synapse = baseExcitatorySynapse
                             .instantiateTemplateSynapse(source, target, network);
                     network.addSynapse(synapse);
+                    ret.add(synapse);
                     continue;
                 }
                 if (Math.random() < inhibitoryProbability) {
                     Synapse synapse = baseInhibitorySynapse
                             .instantiateTemplateSynapse(source, target, network);
                     network.addSynapse(synapse);
+                    ret.add(synapse);
                 }
             }
         }
+        return ret;
     }
 
     /**

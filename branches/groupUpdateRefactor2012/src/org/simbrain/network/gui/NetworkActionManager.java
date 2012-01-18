@@ -25,6 +25,8 @@ import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
+import org.simbrain.network.builders.ESNCreationDialog;
+import org.simbrain.network.builders.SRNCreationDialog;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.FixedFanout;
 import org.simbrain.network.connections.OneToOne;
@@ -85,8 +87,14 @@ import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
+import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
+import org.simbrain.network.gui.dialogs.network.CompetitiveDialog;
+import org.simbrain.network.gui.dialogs.network.HopfieldDialog;
+import org.simbrain.network.gui.dialogs.network.KwtaNetworkDialog;
+import org.simbrain.network.gui.dialogs.network.SOMDialog;
+import org.simbrain.network.gui.dialogs.network.WTADialog;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -540,12 +548,30 @@ public final class NetworkActionManager {
      * @return a list of the network types.
      */
     public List<Action> getNewNetworkActions() {
-        return Arrays.asList(new Action[] { newCompetitiveNetworkAction,
-                newHopfieldNetworkAction, newKwtaNetworkAction,
-                newSOMNetworkAction,
-                newWTANetworkAction });
+        return Arrays.asList(new Action[] { 
+                new AddGroupAction(networkPanel, new CompetitiveDialog(networkPanel), "Competitive"),
+                new AddGroupAction(networkPanel, new ESNCreationDialog(networkPanel), "Echo State Network"),
+                new AddGroupAction(networkPanel, new HopfieldDialog(networkPanel), "Hopfield"),
+                new AddGroupAction(networkPanel, new KwtaNetworkDialog(networkPanel), "KWTA"),
+                new AddGroupAction(networkPanel, new SOMDialog(networkPanel), "SOM (Self organizing map)"),
+                new AddGroupAction(networkPanel, new SRNCreationDialog(networkPanel), "SRN (Simple Recurrent Network)"),
+                new AddGroupAction(networkPanel, new WTADialog(networkPanel), "WTA (Winner take all)")
+        });
     }
-
+    
+    /**
+     * Return a JManue for creating new networks.
+     *
+     * @return the new JMenu.
+     */
+    public JMenu getNewNetworkMenu() {
+        JMenu ret = new JMenu("Insert Network");
+        for(Action action : getNewNetworkActions()) {
+            ret.add(action);
+        }
+        return ret;
+    }
+        
     // public List<JToggleButton> getClampBarActions() {
     // return Arrays.asList(new JToggleButton[] {getClampNeuronsBarItem(),
     // getClampWeightsBarItem()});

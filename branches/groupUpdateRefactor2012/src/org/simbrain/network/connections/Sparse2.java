@@ -17,6 +17,7 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -82,7 +83,9 @@ public class Sparse2 extends ConnectNeurons {
     }
 
     /** @inheritDoc */
-    public void connectNeurons(double prob) {
+    public List<Synapse> connectNeurons(double prob) {
+        
+        List<Synapse> ret = new ArrayList<Synapse>(); 
 
         for (Neuron source : sourceNeurons) {
 
@@ -97,10 +100,12 @@ public class Sparse2 extends ConnectNeurons {
             			 synapse.setStrength(inhibitoryRand());
             		 
             		 network.addSynapse(synapse);
+            		 ret.add(synapse);
             		
             	}
             }
         }
+        return ret;
     }
 
 	/**
@@ -179,10 +184,11 @@ public class Sparse2 extends ConnectNeurons {
 		return ceiling;
 	}
 
-	@Override
-	public void connectNeurons() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public List<Synapse> connectNeurons() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 
 }

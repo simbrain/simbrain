@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -553,6 +554,8 @@ public class NetworkPanel extends JPanel {
 
     }
 
+
+    
     /**
      * Returns the appropriate PNode given the kind of group it is.
      * 
@@ -566,17 +569,15 @@ public class NetworkPanel extends JPanel {
             ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
         } else if (group instanceof NeuronGroup) {
             ret = new NeuronGroupNode(NetworkPanel.this, (NeuronGroup)group);
-        } else if (group instanceof FeedForward) {
-            if (group instanceof BackpropNetwork) {
-                ret = new BackpropNetworkNode(NetworkPanel.this,
-                        (BackpropNetwork) group);
-            } else {
-                ret = new SubnetGroupNode(NetworkPanel.this,
-                        (FeedForward) group);
-            }
         } else if (group instanceof Subnetwork) {
+            
             if (group instanceof Hopfield) {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
+            } else if (group instanceof FeedForward) {
+                if (group instanceof BackpropNetwork) {
+                    ret = new BackpropNetworkNode(NetworkPanel.this,
+                            (BackpropNetwork) group);
+                }
             } else {
                 ret = new SubnetGroupNode(NetworkPanel.this,
                         (Subnetwork) group);
@@ -841,22 +842,6 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Creates a new rootNetwork JMenu.
-     *
-     * @return the new rootNetwork menu
-     */
-    protected JMenu createNewNetworkMenu() {
-        JMenu newNetMenu = new JMenu("Add Network");
-        newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
-        newNetMenu.add(actionManager.getNewHopfieldNetworkAction());
-        newNetMenu.add(actionManager.getNewKwtaNetworkAction());
-        newNetMenu.add(actionManager.getNewSOMNetworkAction());
-        newNetMenu.add(actionManager.getNewWTANetworkAction());
-
-        return newNetMenu;
-    }
-
-    /**
      * Create a new context menu for this rootNetwork panel.
      */
     public JPopupMenu createContextMenu() {
@@ -866,7 +851,7 @@ public class NetworkPanel extends JPanel {
         // Insert actions
         contextMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(new AddNeuronsAction(this));
-        contextMenu.add(createNewNetworkMenu());
+        contextMenu.add(actionManager.getNewNetworkMenu());
 
         // Clipboard actions
         contextMenu.addSeparator();

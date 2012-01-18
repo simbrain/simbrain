@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import java.awt.Color;
 import java.awt.Paint;
 
 import javax.swing.JDialog;
@@ -64,7 +65,9 @@ public class InteractionBox extends ScreenElement {
         super(net);
         groupNode = node;
         box = PPath.createRectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        box.setPaint(java.awt.Color.LIGHT_GRAY);
+        Color color = new Color(248, 252, 184);
+        box.setPaint(color);
+        //box.setTransparency(.2f);
         box.setStrokePaint(java.awt.Color.GRAY);
         setBounds(box.getBounds());
         addChild(box);

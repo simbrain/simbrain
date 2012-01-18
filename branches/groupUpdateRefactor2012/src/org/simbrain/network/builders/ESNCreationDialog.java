@@ -335,7 +335,7 @@ public class ESNCreationDialog extends StandardDialog {
         recurrentOutputWeights.setSelected(false);
         directInOutWeights.setSelected(false);
         backWeights.setSelected(false);
-        resSparsity.setText("" + 0.01);
+        resSparsity.setText("" + 0.1);
         inResSparsity.setText("" + 1.0);
         backSparsity.setText(" " + .5);
         maxEigenValue.setText("" + 0.98);
@@ -362,7 +362,8 @@ public class ESNCreationDialog extends StandardDialog {
                     //Get layer size values from fields...
                     Integer.parseInt(tfNumInputs.getText()),
                     Integer.parseInt(tfNumReservoir.getText()),
-                    Integer.parseInt(tfNumOutputs.getText()));
+                    Integer.parseInt(tfNumOutputs.getText()),
+                    panel.getLastClickedPosition());
 
             //Get connection parameters from fields
             builder.setInSparsity(Double.parseDouble(inResSparsity.getText()));
@@ -401,7 +402,6 @@ public class ESNCreationDialog extends StandardDialog {
             builder.buildNetwork();
 
             dispose();
-            panel.repaint();
 
             //REDO
 //            int dialogOpts = JOptionPane.showConfirmDialog(new JPanel(),

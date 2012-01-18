@@ -85,11 +85,13 @@ public class Radial extends ConnectNeurons {
     }
 
     /** @inheritDoc */
-    public void connectNeurons() {
+    @Override
+    public List<Synapse> connectNeurons() {
         for (Neuron source : sourceNeurons) {
             makeExcitatory(source);
             makeInhibitory(source);
         }
+        return null;
     }
 
     /**

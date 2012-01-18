@@ -157,7 +157,8 @@ public class SRNCreationDialog extends StandardDialog {
             SimpleRecurrentNetwork srnBuild = new SimpleRecurrentNetwork(panel.getRootNetwork(),
                     Integer.parseInt(tfNumInputs.getText()), Integer
                             .parseInt(tfNumHidden.getText()), Integer
-                            .parseInt(tfNumOutputs.getText()));
+                            .parseInt(tfNumOutputs.getText()),
+                            panel.getLastClickedPosition());
 
             NeuronUpdateRule nur0 = boxMap.get(hiddenNeuronTypes
                     .getSelectedItem());

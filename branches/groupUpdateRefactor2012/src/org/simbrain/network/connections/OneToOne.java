@@ -85,8 +85,10 @@ public class OneToOne extends ConnectNeurons {
         return list;
     }
 
-    /** @inheritDoc */
-    public void connectNeurons() {
+    @Override
+    public List<Synapse> connectNeurons() {
+        
+        List<Synapse> ret = new ArrayList<Synapse>(); 
 
         // TODO: Flags for which comparator to use, including no comparator
         // (Some users might want random but 1-1 couplings)
@@ -102,6 +104,7 @@ public class OneToOne extends ConnectNeurons {
                 Synapse synapse = baseSynapse.instantiateTemplateSynapse(
                         source, target, network);
                 network.addSynapse(synapse);
+                ret.add(synapse);
                 // Allow neurons to be connected back to source.
                 if (useBidirectionalConnections) {
                     Synapse synapse2 = baseSynapse.instantiateTemplateSynapse(
@@ -109,11 +112,13 @@ public class OneToOne extends ConnectNeurons {
                     synapse2.setSource(target);
                     synapse2.setTarget(source);
                     network.addSynapse(synapse2);
+                    ret.add(synapse2);
                 }
             } else {
-                return;
+                return ret;
             }
         }
+        return ret;
     }
 
     /**

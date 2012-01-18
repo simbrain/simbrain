@@ -36,7 +36,7 @@ public class NeuronGroupNode extends GroupNode {
      * Stroke for neuron groups when they are in a subnet. Somewhat lighter than
      * general groups to distinguish these from subnetworks.
      */
-    private static final BasicStroke LAYER_OUTLINE_STROKE = new BasicStroke(.5f);
+    private static final BasicStroke LAYER_OUTLINE_STROKE = new BasicStroke(1f);
     
     /**
      * Create a Neuron Group PNode.

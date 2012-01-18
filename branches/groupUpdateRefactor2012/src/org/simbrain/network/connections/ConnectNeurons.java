@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.Synapse;
 
 /**
  * Subclasses create connections (collections of synapses) between groups of
@@ -73,18 +74,19 @@ public abstract class ConnectNeurons {
      * @param network reference to parent network
      * @param neurons source neurons
      * @param neurons2 target neurons
+     * @return the resulting set of synapses
      */
-    public void connectNeurons(final Network network,
+    public List<Synapse> connectNeurons(final Network network,
             final List<Neuron> neurons, final List<Neuron> neurons2) {
         this.network = network;
         sourceNeurons = neurons;
         targetNeurons = neurons2;
-        connectNeurons();
+        return connectNeurons();
     }
 
     /**
      * Connect the source to the target neurons using some method.
      */
-    public abstract void connectNeurons();
+    public abstract List<Synapse> connectNeurons();
 
 }

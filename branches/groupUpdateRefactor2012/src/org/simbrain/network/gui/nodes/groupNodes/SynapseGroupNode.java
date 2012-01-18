@@ -45,7 +45,7 @@ public class SynapseGroupNode extends GroupNode {
     public SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
         setStroke(null); // Comment this out to see outline
-        getInteractionBox().setPaint(Color.white);
+        //getInteractionBox().setPaint(Color.white);
         //setOutlinePadding(-30);
         setPickable(false);
     }

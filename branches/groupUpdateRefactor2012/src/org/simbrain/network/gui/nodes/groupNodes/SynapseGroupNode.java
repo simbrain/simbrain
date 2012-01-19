@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.nodes.groupNodes;
 
-import java.awt.Color;
+import java.awt.Rectangle;
 
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -55,11 +55,17 @@ public class SynapseGroupNode extends GroupNode {
     public void updateBounds() {
         PBounds bounds = new PBounds();
         if (getOutlinedObjects().size() > 0) {
+
             for (PNode node : getOutlinedObjects()) {
                 PBounds childBounds = node.getGlobalBounds();
                 bounds.add(childBounds);
                 if (node instanceof SynapseNode) {
-                    bounds.add(((SynapseNode) node).getLine().getBounds());
+                    // Recurrent synapses screw things up when they have area 0
+                    Rectangle synapseBounds = ((SynapseNode) node).getLine().getBounds();
+                    double area = synapseBounds.getHeight() * synapseBounds.getWidth();
+                    if (area > 0) {
+                        bounds.add(((SynapseNode) node).getLine().getBounds());                        
+                    }
                 }
             }
 
@@ -68,7 +74,7 @@ public class SynapseGroupNode extends GroupNode {
                     bounds.getWidth() + (2 * inset), bounds.getHeight()
                             + (2 * inset));
 
-            // Can also use setPathToEllipse...
+            // Can also use setPathToEllipse
             setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
                     (float) bounds.getWidth(), (float) bounds.getHeight());            
 

@@ -55,10 +55,6 @@ public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
      */
     private double inhibitoryConductance;
     
-    /** The Neuron Group. */
-    private NeuronGroup neuronGroup;
-
-    
     //REDO
 //
 //    /**
@@ -94,7 +90,7 @@ public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
     public void update() {
         sortNeurons();
         //setCurrentThresholdCurrent();
-        neuronGroup.update();
+        getNeuronGroup().update();
     }
 
     /**
@@ -102,9 +98,9 @@ public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
      */
     private void setCurrentThresholdCurrent() {
 
-        double highest = ((PointNeuron) neuronGroup.getNeuronList().get(k).getUpdateRule())
+        double highest = ((PointNeuron) getNeuronGroup().getNeuronList().get(k).getUpdateRule())
               .getInhibitoryThresholdConductance();
-        double secondHighest = ((PointNeuron) neuronGroup.getNeuronList().get(k-1).getUpdateRule())
+        double secondHighest = ((PointNeuron) getNeuronGroup().getNeuronList().get(k-1).getUpdateRule())
             .getInhibitoryThresholdConductance();
 
         inhibitoryConductance = secondHighest + q * (highest - secondHighest);
@@ -113,7 +109,7 @@ public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
         //  + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
 
         // Set inhibitory conductances in the layer
-        for (Neuron neuron : neuronGroup.getNeuronList()) {
+        for (Neuron neuron : getNeuronGroup().getNeuronList()) {
             ((PointNeuron) neuron.getUpdateRule())
                     .setInhibitoryConductance(inhibitoryConductance);
         }
@@ -158,8 +154,8 @@ public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
     public void setK(final int k) {
         if (k < 1) {
             this.k = 1;
-        } else if (k >= neuronGroup.getNeuronList().size()) {
-            this.k = neuronGroup.getNeuronList().size() - 1;
+        } else if (k >= getNeuronGroup().getNeuronList().size()) {
+            this.k = getNeuronGroup().getNeuronList().size() - 1;
         } else {
             this.k = k;
         }

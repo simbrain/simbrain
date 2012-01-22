@@ -195,7 +195,6 @@ public class EchoStateNetwork extends Subnetwork {
         addSynapseGroup(inputToReservoir);
 
         // Weights: reservoir layer to itself
-        // TODO: Adding this synapse group throws the parent boundary off 
         sparseConnections = new Sparse2(getParentNetwork(), reservoirLayerNeurons, reservoirLayerNeurons);
         synapseList = sparseConnections.connectNeurons(resSparsity);
         SynapseGroup reservoirSynapses = new SynapseGroup(this.getParentNetwork());
@@ -325,16 +324,6 @@ public class EchoStateNetwork extends Subnetwork {
         ((LMSOffline) trainer.getTrainingMethod()).setSolutionType(solType);
         trainer.update();
 
-    }
-
-    /**
-     * Return the width of the specified layer, in pixels.
-     * @param layer
-     *            layer to "measure"
-     * @return width of layer
-     */
-    private int getWidth(List<Neuron> layer) {
-        return layer.size() * betweenNeuronInterval;
     }
 
     public void setResSparsity(double resSparsity) {

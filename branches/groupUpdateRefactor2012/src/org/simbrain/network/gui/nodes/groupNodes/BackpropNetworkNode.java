@@ -68,19 +68,19 @@ public class BackpropNetworkNode extends SubnetGroupNode {
             super(net, BackpropNetworkNode.this);
         }
 
-        @Override
-        protected JDialog getPropertyDialog() {
-            TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
-                    getTrainer());
-            JDialog dialog = new JDialog();
-            dialog.setContentPane(panel);
-            return dialog;
-        }
-        
-      @Override
-      protected boolean hasPropertyDialog() {
-          return true;
-      }
+//        @Override
+//        protected JDialog getPropertyDialog() {
+//            TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
+//                    getTrainer());
+//            JDialog dialog = new JDialog();
+//            dialog.setContentPane(panel);
+//            return dialog;
+//        }
+//        
+//      @Override
+//      protected boolean hasPropertyDialog() {
+//          return true;
+//      }
 
 //        @Override
 //        protected String getToolTipText() {

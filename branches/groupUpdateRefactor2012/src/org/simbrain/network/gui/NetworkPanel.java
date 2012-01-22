@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -54,6 +53,7 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.GrowableSynapseLayer;
 import org.simbrain.network.groups.Hopfield;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SOM;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
@@ -75,6 +75,7 @@ import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.SOMNode;
 import org.simbrain.network.gui.nodes.groupNodes.SubnetGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.network.interfaces.Network;
@@ -421,11 +422,13 @@ public class NetworkPanel extends JPanel {
         rootNetwork.addSynapseListener(new SynapseListener() {
 
             public void synapseChanged(final NetworkEvent<Synapse> e) {
-                SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e.getObject());
-                if (synapseNode != null) {
-                    synapseNode.updateColor();
-                    synapseNode.updateDiameter();                    
-                }
+                // TODO: Below seemed to cause crashes with Subnets that have GrowableSynapseLayers.
+                //      No functionality seems to be lost by commenting this out but I'm not sure. JKY - (1/21/12).
+                // SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e.getObject());
+                // if (synapseNode != null) {
+                //    synapseNode.updateColor();
+                //    synapseNode.updateDiameter();                    
+                // }
             }
 
             public void synapseTypeChanged(
@@ -553,11 +556,11 @@ public class NetworkPanel extends JPanel {
         });
 
     }
-
-
     
     /**
      * Returns the appropriate PNode given the kind of group it is.
+     * 
+     * TODO: Use a map to associate group types with group nodes
      * 
      * @param group the model group
      * @return the appropriate PNode.
@@ -573,6 +576,8 @@ public class NetworkPanel extends JPanel {
             
             if (group instanceof Hopfield) {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
+            } else if (group instanceof SOM) { 
+                ret = new SOMNode(NetworkPanel.this, (SOM) group);
             } else if (group instanceof FeedForward) {
                 if (group instanceof BackpropNetwork) {
                     ret = new BackpropNetworkNode(NetworkPanel.this,

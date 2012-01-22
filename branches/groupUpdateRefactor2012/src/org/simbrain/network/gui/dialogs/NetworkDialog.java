@@ -40,7 +40,6 @@ import org.simbrain.network.gui.UpdateManagerPanel;
 import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;

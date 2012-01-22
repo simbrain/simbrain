@@ -47,7 +47,7 @@ public class FeedForward extends Subnetwork {
     private int betweenNeuronInterval = 50;
 
     /** Initial position of network (from bottom left). */
-    Point2D.Double initialPosition = new Point2D.Double(0, 0);
+    Point2D initialPosition = new Point2D.Double(0, 0);
 
     /**
      * Add the layered network to the specified network, with a specified number
@@ -61,7 +61,7 @@ public class FeedForward extends Subnetwork {
      * @param initialPosition upper left corner where network will be placed.
      */
     public FeedForward(final RootNetwork network, int[] nodesPerLayer,
-            Point2D.Double initialPosition) {
+            Point2D initialPosition) {
         super(network);
         
         this.initialPosition = initialPosition;
@@ -158,13 +158,6 @@ public class FeedForward extends Subnetwork {
      */
     public void setBetweenNeuronInterval(int betweenNeuronInterval) {
         this.betweenNeuronInterval = betweenNeuronInterval;
-    }
-
-    /**
-     * @return the initialPosition
-     */
-    public Point2D.Double getInitialPosition() {
-        return initialPosition;
     }
 
     public boolean getEnabled() {

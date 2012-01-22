@@ -13,6 +13,7 @@
  */
 package org.simbrain.network.groups;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 
 import org.simbrain.network.interfaces.RootNetwork;
@@ -36,7 +37,7 @@ public class BackpropNetwork extends FeedForward {
      * @param initialPosition initial position in network
      */
     public BackpropNetwork(RootNetwork network, int[] nodesPerLayer,
-            Double initialPosition) {
+            Point2D initialPosition) {
         super(network, nodesPerLayer, initialPosition);
         int numLayers = getNeuronGroupCount();
         trainer = new Trainer(network, this.getNeuronGroup(0).getNeuronList(),

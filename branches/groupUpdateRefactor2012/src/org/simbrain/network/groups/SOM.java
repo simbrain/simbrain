@@ -106,10 +106,6 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
     /** The amount that the neighborhood decrements. */
     private double neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
-    /** The Neuron Group. */
-    private NeuronGroup neuronGroup;
-
-
     /**
      * Constructs an SOM network with specified number of neurons.
      *
@@ -148,8 +144,8 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
      * @return winner
      */
     private int calculateWinnerIndex() {
-        for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-            Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
+        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+            Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
             distance = findDistance(n);
             if (distance < winDistance) {
                 winDistance = distance;
@@ -205,8 +201,8 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
 
             // Determine Winner: The SOM Neuron with the lowest distance between
             // it's weight vector and the input neurons's weight vector.
-            for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-                Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
+            for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+                Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
                 distance = 0;
                 counter = 0;
                 for (Synapse incoming : n.getFanIn()) {
@@ -219,12 +215,12 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
                     winner = i;
                 }
             }
-            Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
+            Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
 
             // Update Weights of the neurons within the radius of the winning
             // neuron.
-            for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-                Neuron neuron = ((Neuron) neuronGroup.getNeuronList().get(i));
+            for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+                Neuron neuron = ((Neuron) getNeuronGroup().getNeuronList().get(i));
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
 
                 // The center of the neuron is within the update region.
@@ -256,8 +252,7 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
      * between 0 and the upper bound of each synapse.
      */
     public void randomizeIncomingWeights() {
-        for (Iterator i = neuronGroup.getNeuronList().iterator(); i.hasNext();) {
-            Neuron n = (Neuron) i.next();
+        for (Neuron n : getNeuronGroup().getNeuronList()) {
             for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getUpperBound() * Math.random());
             }
@@ -269,14 +264,14 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
      */
     public void recall() {
         winDistance = 0;
-        for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-            Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
+        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+            Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
             if (n.getActivation() > winDistance) {
                 winDistance = n.getActivation();
                 winner = i;
             }
         }
-        Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
+        Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
         for (Synapse incoming : winningNeuron.getFanIn()) {
             incoming.getSource().setActivation(incoming.getStrength());
         }
@@ -312,8 +307,8 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
                 // Determine Winner: The SOM Neuron with the lowest distance
                 // between
                 // it's weight vector and the input neurons's weight vector.
-                for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-                    Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
+                for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+                    Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
                     distance = 0;
                     counter = 0;
                     for (Synapse incoming : n.getFanIn()) {
@@ -326,12 +321,11 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
                         winner = i;
                     }
                 }
-                Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
+                Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
 
                 // Update Weights of the neurons within the radius of the
                 // winning neuron.
-                for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-                    Neuron neuron = ((Neuron) neuronGroup.getNeuronList().get(i));
+                for(Neuron neuron: getNeuronGroup().getNeuronList()) {
                     physicalDistance = findPhysicalDistance(neuron,
                             winningNeuron);
 
@@ -385,15 +379,15 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
         // its weight vector and the input neurons's weight vector.
 
         winner = calculateWinnerIndex();
-        Neuron winningNeuron = (Neuron) neuronGroup.getNeuronList().get(winner);
+        Neuron winningNeuron = (Neuron) getNeuronGroup().getNeuronList().get(winner);
 
         // Neuron update
         if (!getParentNetwork().getClampNeurons()) {
             if (updateMethod == STANDARD) {
-                neuronGroup.update();
+                getNeuronGroup().update();
             } else {
-                for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-                    Neuron n = (Neuron) neuronGroup.getNeuronList().get(i);
+                for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+                    Neuron n = (Neuron) getNeuronGroup().getNeuronList().get(i);
                     if (n == winningNeuron) {
                         n.setActivation(1);
                     } else {
@@ -406,8 +400,8 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
         // Update Synapses of the neurons within the radius of the winning
         // neuron.
         if (!getParentNetwork().getClampWeights()) {
-            for (int i = 0; i < neuronGroup.getNeuronList().size(); i++) {
-                Neuron neuron = ((Neuron) neuronGroup.getNeuronList().get(i));
+            for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
+                Neuron neuron = ((Neuron) getNeuronGroup().getNeuronList().get(i));
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
                 // The center of the neuron is within the update region.
                 if (physicalDistance <= neighborhoodSize) {

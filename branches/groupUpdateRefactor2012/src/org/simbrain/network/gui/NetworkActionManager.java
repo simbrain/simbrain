@@ -90,6 +90,7 @@ import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
+import org.simbrain.network.gui.dialogs.network.BackpropDialog;
 import org.simbrain.network.gui.dialogs.network.CompetitiveDialog;
 import org.simbrain.network.gui.dialogs.network.HopfieldDialog;
 import org.simbrain.network.gui.dialogs.network.KwtaNetworkDialog;
@@ -549,6 +550,7 @@ public final class NetworkActionManager {
      */
     public List<Action> getNewNetworkActions() {
         return Arrays.asList(new Action[] { 
+                new AddGroupAction(networkPanel, new BackpropDialog(networkPanel), "Backprop"),
                 new AddGroupAction(networkPanel, new CompetitiveDialog(networkPanel), "Competitive"),
                 new AddGroupAction(networkPanel, new ESNCreationDialog(networkPanel), "Echo State Network"),
                 new AddGroupAction(networkPanel, new HopfieldDialog(networkPanel), "Hopfield"),

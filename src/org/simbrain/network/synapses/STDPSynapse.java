@@ -37,6 +37,9 @@ import org.simbrain.network.interfaces.SynapseUpdateRule;
  */
 public class STDPSynapse extends SynapseUpdateRule {
 
+    //TODO: Document default ranges for all vals
+    
+    // 
     /** Default tau plus. */
     private static final double TAU_PLUS_DEFAULT = 30;
 
@@ -107,23 +110,16 @@ public class STDPSynapse extends SynapseUpdateRule {
                     .getSource().getUpdateRule();
             SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
                     .getTarget().getUpdateRule();
-            if (tar.hasSpiked()) {
-                delta_t = tar.getLastSpikeTime() - src.getLastSpikeTime();
-                if (delta_t > 0) {
-                    double timeStep = synapse.getRootNetwork().getTimeStep();
-                    delta_w = W_plus * Math.exp(-delta_t / tau_plus);
-                    delta_w *= learningRate;
+            if (tar.hasSpiked() || src.hasSpiked()) {
+                delta_t = src.getLastSpikeTime() - tar.getLastSpikeTime();
+                //double timeStep = synapse.getRootNetwork().getTimeStep();
+                if (delta_t < 0) {
+                    delta_w = W_plus * Math.exp(-delta_t / tau_plus) * learningRate;
                     System.out.println("LTP: " + delta_t + "/" + delta_w);
                     synapse.setStrength(synapse.clip(synapse.getStrength()
                             + delta_w));
-                }
-            }
-            if (src.hasSpiked()) {
-                delta_t = tar.getLastSpikeTime() - src.getLastSpikeTime();
-                if (delta_t < 0) {
-                    double timeStep = synapse.getRootNetwork().getTimeStep();
-                    delta_w = -W_minus * Math.exp(delta_t / tau_minus);
-                    delta_w *= learningRate;
+                } else {
+                    delta_w = -W_minus * Math.exp(delta_t / tau_minus) * learningRate;
                     System.out.println("LTD: " + delta_t + "/" + delta_w);
                     synapse.setStrength(synapse.clip(synapse.getStrength()
                             + delta_w));

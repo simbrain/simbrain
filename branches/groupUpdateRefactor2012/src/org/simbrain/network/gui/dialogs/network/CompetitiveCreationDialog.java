@@ -26,7 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.Competitive;
+import org.simbrain.network.groups.subnetworks.Competitive;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -40,7 +40,7 @@ import org.simbrain.util.StandardDialog;
  * <b>CompetitiveDialog</b> is used as an assistant to create competitive networks.
  *
  */
-public class CompetitiveDialog extends StandardDialog implements ActionListener {
+public class CompetitiveCreationDialog extends StandardDialog implements ActionListener {
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -85,7 +85,7 @@ public class CompetitiveDialog extends StandardDialog implements ActionListener 
      *
      * @param networkPanel Network panel
      */
-    public CompetitiveDialog(final NetworkPanel networkPanel) {
+    public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
         init();

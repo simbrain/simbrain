@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.CompetitiveDialog;
+import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
 
 /**
  * New competitive network action.
@@ -56,7 +56,7 @@ public final class NewCompetitiveNetworkAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        CompetitiveDialog dialog = new CompetitiveDialog(networkPanel);
+        CompetitiveCreationDialog dialog = new CompetitiveCreationDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

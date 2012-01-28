@@ -15,13 +15,11 @@ package org.simbrain.network.trainers;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.util.Comparators;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.Utils;
 
@@ -67,6 +65,10 @@ public class Trainer {
      * data.
      */
     private double[][] trainingData;
+    
+    /** Flag used for iterative training methods. */
+    private boolean updateCompleted = true;
+
 
     /** List of Trainer types. */
     private static final ClassDescriptionPair[] RULE_LIST = {
@@ -364,5 +366,23 @@ public class Trainer {
     public void randomize() {
         trainingMethod.randomize(this);        
     }
+    
+
+    /**
+     * @return boolean updated completed.
+     */
+    public boolean isUpdateCompleted() {
+        return updateCompleted;
+    }
+
+    /**
+     * Sets updated completed value.
+     *
+     * @param updateCompleted Updated completed value to be set
+     */
+    public void setUpdateCompleted(final boolean updateCompleted) {
+        this.updateCompleted = updateCompleted;
+    }
+
 
 }

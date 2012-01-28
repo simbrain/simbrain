@@ -1,8 +1,10 @@
-package org.simbrain.network.groups;
+package org.simbrain.network.groups.subnetworks;
 
 import java.io.File;
 import java.util.Iterator;
 
+import org.simbrain.network.groups.GrowableSynapseLayer;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;

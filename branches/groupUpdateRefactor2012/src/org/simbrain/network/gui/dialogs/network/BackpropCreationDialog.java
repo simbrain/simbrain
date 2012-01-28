@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.BackpropNetwork;
+import org.simbrain.network.groups.subnetworks.BackpropNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -31,7 +31,7 @@ import org.simbrain.util.StandardDialog;
 /**
  * <b>BackpropDialog</b> is a dialog box for creating a Backprop network
  */
-public class BackpropDialog extends StandardDialog {
+public class BackpropCreationDialog extends StandardDialog {
 
     /** Network Topology. */
     private JTextField networkTopology = new JTextField();
@@ -43,7 +43,7 @@ public class BackpropDialog extends StandardDialog {
      * This method is the default constructor.
      * @param np Network panel
      */
-    public BackpropDialog(final NetworkPanel np) {
+    public BackpropCreationDialog(final NetworkPanel np) {
         networkPanel = np;
         init();
     }

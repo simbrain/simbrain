@@ -11,40 +11,36 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.groups;
+package org.simbrain.network.groups.subnetworks;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.trainers.*;
+import org.simbrain.network.trainers.LMSIterative;
+import org.simbrain.network.trainers.Trainer;
 
 /**
- * Backprop network.
- *
+ * An LMS Network
+ * 
  * @author Jeff Yoshimi
  */
-public class BackpropNetwork extends FeedForward {
+public class LMSNetwork extends FeedForward {
+
 
     /** Reference to parent trainer. */
     private final Trainer trainer;
 
-    /**
-     * Construct a new backprop network.
-     *
-     * @param network reference to root network
-     * @param nodesPerLayer number of layers
-     * @param initialPosition initial position in network
-     */
-    public BackpropNetwork(RootNetwork network, int[] nodesPerLayer,
-            Point2D initialPosition) {
-        super(network, nodesPerLayer, initialPosition);
-        int numLayers = getNeuronGroupCount();
-        trainer = new Trainer(network, this.getNeuronGroup(0).getNeuronList(),
-                this.getNeuronGroup(numLayers - 1).getNeuronList(),
-                new Backprop());
-        setLabel("Backprop");
 
+    public LMSNetwork(final RootNetwork network, int numInputNeurons,
+            int numOutputNeurons, Point2D initialPosition) {
+        super(network, new int[] { numInputNeurons, numOutputNeurons },
+                initialPosition);
+        setLabel("LMS Network");
+        trainer = new Trainer(network, this.getNeuronGroup(0).getNeuronList(),
+                this.getNeuronGroup(1).getNeuronList(),
+                new LMSIterative());
+        
     }
 
     /**

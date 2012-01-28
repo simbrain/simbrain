@@ -26,7 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.WinnerTakeAll;
+import org.simbrain.network.groups.subnetworks.WinnerTakeAll;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -41,7 +41,7 @@ import org.simbrain.util.StandardDialog;
 /**
  * <b>WTADialog</b> is a dialog box for setting the properties of the  Network GUI.
  */
-public class WTADialog extends StandardDialog {
+public class WTACreationDialog extends StandardDialog {
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -80,7 +80,7 @@ public class WTADialog extends StandardDialog {
      * This method is the default constructor.
      * @param np Network panel
      */
-    public WTADialog(final NetworkPanel np) {
+    public WTACreationDialog(final NetworkPanel np) {
         networkPanel = np;
         layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(),
                            new HexagonalGridLayoutPanel(), new GridLayoutPanel()});

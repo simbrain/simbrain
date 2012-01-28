@@ -3,7 +3,7 @@ package org.simbrain.network.gui.nodes.subnetworks;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.KWTA;
+import org.simbrain.network.groups.subnetworks.KWTA;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.KwtaPropertiesDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;

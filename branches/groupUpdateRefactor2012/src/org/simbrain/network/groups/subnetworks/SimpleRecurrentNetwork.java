@@ -1,4 +1,4 @@
-package org.simbrain.network.groups;
+package org.simbrain.network.groups.subnetworks;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;

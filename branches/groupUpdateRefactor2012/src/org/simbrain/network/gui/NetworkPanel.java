@@ -47,15 +47,16 @@ import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
-import org.simbrain.network.groups.BackpropNetwork;
 import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.GrowableSynapseLayer;
-import org.simbrain.network.groups.Hopfield;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SOM;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.groups.subnetworks.BackpropNetwork;
+import org.simbrain.network.groups.subnetworks.Hopfield;
+import org.simbrain.network.groups.subnetworks.LMSNetwork;
+import org.simbrain.network.groups.subnetworks.SOM;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesDialog;
@@ -74,6 +75,7 @@ import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
+import org.simbrain.network.gui.nodes.groupNodes.LMSNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SOMNode;
 import org.simbrain.network.gui.nodes.groupNodes.SubnetGroupNode;
@@ -557,6 +559,7 @@ public class NetworkPanel extends JPanel {
 
     }
     
+    
     /**
      * Returns the appropriate PNode given the kind of group it is.
      * 
@@ -572,8 +575,7 @@ public class NetworkPanel extends JPanel {
             ret = new SynapseGroupNode(NetworkPanel.this, (SynapseGroup) group);
         } else if (group instanceof NeuronGroup) {
             ret = new NeuronGroupNode(NetworkPanel.this, (NeuronGroup)group);
-        } else if (group instanceof Subnetwork) {
-            
+        } else if (group instanceof Subnetwork) {            
             if (group instanceof Hopfield) {
                 ret = new HopfieldNode(NetworkPanel.this, (Hopfield) group);
             } else if (group instanceof SOM) { 
@@ -582,6 +584,12 @@ public class NetworkPanel extends JPanel {
                 if (group instanceof BackpropNetwork) {
                     ret = new BackpropNetworkNode(NetworkPanel.this,
                             (BackpropNetwork) group);
+                } else if (group instanceof LMSNetwork) {
+                    ret = new LMSNetworkNode(NetworkPanel.this,
+                            (LMSNetwork) group);                                    
+                } else {
+                    ret = new SubnetGroupNode(NetworkPanel.this,
+                            (Subnetwork) group);                
                 }
             } else {
                 ret = new SubnetGroupNode(NetworkPanel.this,
@@ -802,7 +810,7 @@ public class NetworkPanel extends JPanel {
             //Add neuron and synapse group nodes to subnetwork node 
             GroupNode groupNode = createGroupNode(group);
             for (PNode node : nodes) {
-                groupNode.addPNode(node);                            
+                groupNode.addPNode(node);
             }
 
             // Add subnetwork node to canvas

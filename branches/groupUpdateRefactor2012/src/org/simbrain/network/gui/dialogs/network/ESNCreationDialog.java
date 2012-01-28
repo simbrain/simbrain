@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.builders;
+package org.simbrain.network.gui.dialogs.network;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -34,7 +34,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.simbrain.network.groups.EchoStateNetwork;
+import org.simbrain.network.groups.subnetworks.EchoStateNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -188,17 +188,17 @@ public class ESNCreationDialog extends StandardDialog {
         sectionSeparator("Connectivity Parameters", gbc, row);
 
         //Add connectivity parameter check-boxes and text fields
-        esnPanel.addItem("Input-Reservoir Sparsity:", inResSparsity, 2);
+        esnPanel.addItem("Input- reservoir connectivity:", inResSparsity, 2);
         esnPanel.addItem("Recurrent output weights:", recurrentOutputWeights);
-        esnPanel.addItem("Reservoir Sparsity: ", resSparsity, 2);
+        esnPanel.addItem("Reservoir connectivity: ", resSparsity, 2);
         esnPanel.addItem("Direct input to output weights:", directInOutWeights);
-        esnPanel.addItem("Back Weight Sparsity: ", backSparsity, 2);
+        esnPanel.addItem("Back weight connectivity: ", backSparsity, 2);
         //Default is disabled
         backSparsity.setEnabled(false);
-        esnPanel.addItem("Back Weights:", backWeights);
+        esnPanel.addItem("Back weights:", backWeights);
         row = esnPanel.getMyNextItemRow();
         esnPanel.setMyNextItemRow(row++);
-        esnPanel.addItem("Spectral Radius:", maxEigenValue, 2);
+        esnPanel.addItem("Spectral radius:", maxEigenValue, 2);
 
         //Creates action listener which enables the text field for back weight
         //sparsity based on if back weights are desired given the state of

@@ -35,11 +35,6 @@ import org.simbrain.network.synapses.ClampedSynapse;
  */
 public class FeedForward extends Subnetwork {
 
-    /** Enumeration of layer types. */
-    public enum LayerType {
-        Input, Hidden, Output;
-    }
-
     /** Space to put between layers. */
     private int betweenLayerInterval = 100;
 
@@ -170,7 +165,7 @@ public class FeedForward extends Subnetwork {
     @Override
     public void addSynapseGroup(SynapseGroup group) {
         super.addSynapseGroup(group);
-        group.setLabel("Weights " + (getSynapseGroupCount()) + " > "
+        group.setLabel("Weights " + (getSynapseGroupCount()) + " -> "
                 + (getSynapseGroupCount() + 1));
     }
 
@@ -178,6 +173,24 @@ public class FeedForward extends Subnetwork {
     public void addNeuronGroup(NeuronGroup group) {
         super.addNeuronGroup(group);
         group.setLabel("Layer " + getNeuronGroupCount());
+    }
+    
+    /**
+     * Returns the input layer.
+     *
+     * @return the input layer
+     */
+    public NeuronGroup getInputLayer() {
+        return getNeuronGroup(0);
+    }
+    
+    /**
+     * Returns the output layer.
+     *
+     * @return the output layer
+     */
+    public NeuronGroup getOutputLayer() {
+        return getNeuronGroup(getNeuronGroupCount()-1);
     }
 
 

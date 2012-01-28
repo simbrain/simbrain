@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.KwtaNetworkDialog;
+import org.simbrain.network.gui.dialogs.network.KwtaCreationDialog;
 
 /**
  * New Kwta network action.
@@ -56,7 +56,7 @@ public final class NewKwtaNetworkAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        KwtaNetworkDialog dialog = new KwtaNetworkDialog(networkPanel);
+        KwtaCreationDialog dialog = new KwtaCreationDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

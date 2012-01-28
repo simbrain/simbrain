@@ -7,7 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.Competitive;
+import org.simbrain.network.groups.subnetworks.Competitive;
 import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;

@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.KWTA;
+import org.simbrain.network.groups.subnetworks.KWTA;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -37,7 +37,7 @@ import org.simbrain.util.StandardDialog;
  * <b>KwtaDialog</b> is used as an assistant to create Kwta networks.
  *
  */
-public class KwtaNetworkDialog extends StandardDialog {
+public class KwtaCreationDialog extends StandardDialog {
 
      /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -66,7 +66,7 @@ public class KwtaNetworkDialog extends StandardDialog {
      *
      * @param networkPanel Network panel
      */
-    public KwtaNetworkDialog(final NetworkPanel networkPanel) {
+    public KwtaCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(),
                            new HexagonalGridLayoutPanel(), new GridLayoutPanel()});

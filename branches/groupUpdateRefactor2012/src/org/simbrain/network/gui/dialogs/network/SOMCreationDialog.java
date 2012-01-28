@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.SOM;
+import org.simbrain.network.groups.subnetworks.SOM;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
@@ -40,7 +40,7 @@ import org.simbrain.util.StandardDialog;
  * <b>SOMDialog</b> is used as an assistant to create SOM networks.
  *
  */
-public class SOMDialog extends StandardDialog implements ActionListener {
+public class SOMCreationDialog extends StandardDialog implements ActionListener {
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -82,7 +82,7 @@ public class SOMDialog extends StandardDialog implements ActionListener {
      *
      * @param networkPanel Network panel
      */
-    public SOMDialog(final NetworkPanel networkPanel) {
+    public SOMCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
                 new HexagonalGridLayoutPanel(), new GridLayoutPanel(),

@@ -15,16 +15,19 @@ package org.simbrain.network.gui.trainer;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.trainers.Trainer;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.table.DefaultNumericTable;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -47,26 +50,24 @@ public class DataViewer extends SimbrainJTableScrollPanel {
     private TrainerDataType type;
 
     /**
-     * Reference to parent trainer panel, which in turn has a reference to the
-     * trainer.
+     * Reference to parent trainer;
      */
-    private TrainerPanel parent;
+    private Trainer trainer;
 
     /** Default number of rows to open new table with. */
     private static final int DEFAULT_NUM_ROWS = 5;
 
     /**
-     * Create a panel for viewing the matrices connecting a set of source and
-     * target neuron lists.
+     * Create a panel for viewing input or training data in a trainer.
      *
-     * @param panel the panel from which to draw the matrix.
+     * @param trainer the trainer
+     * @param type whether this is input or training data
      */
-    public DataViewer(final TrainerPanel trainerPanel,
+    public DataViewer(final Trainer trainer, 
             final TrainerDataType type) {
 
         this.type = type;
-        this.parent = trainerPanel;
-        Trainer trainer = trainerPanel.getTrainer();
+        this.trainer = trainer;
 
         // Create names for column headings
         List<String> colHeaders = new ArrayList<String>();
@@ -157,10 +158,10 @@ public class DataViewer extends SimbrainJTableScrollPanel {
      */
     private void updateTrainerData() {
         if (type == TrainerDataType.Input) {
-            parent.getTrainer().setInputData(
+            trainer.setInputData(
                     ((NumericTable) table.getData()).asArray());
         } else {
-            parent.getTrainer().setTrainingData(
+            trainer.setTrainingData(
                     ((NumericTable) table.getData()).asArray());
         }
     }
@@ -172,9 +173,16 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         return table;
     }
     
-    public static JPanel getDataViewerPanel(final TrainerPanel trainerPanel,
+    /**
+     * Factory method for creating a data viewer panel.
+     *
+     * @param trainerPanel parent trainer panel.
+     * @param type whether this is input or training data.
+     * @return the panel
+     */
+    public static JPanel createDataViewerPanel(final Trainer trainer,
             final TrainerDataType type) {
-        final DataViewer viewer = new DataViewer(trainerPanel, type);
+        final DataViewer viewer = new DataViewer(trainer, type);
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add("Center", viewer);
 
@@ -184,7 +192,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         // Open / Save Tools
         JToolBar fileToolBar = new JToolBar();
         fileToolBar
-                .add(TrainerGuiActions.getOpenCSVAction(trainerPanel, viewer.getTable(), type));
+                .add(TrainerGuiActions.getOpenCSVAction(trainer, viewer.getTable(), type));
         fileToolBar.add(TableActionManager
                 .getSaveCSVAction((NumericTable) viewer.getTable().getData()));
         toolbars.add(fileToolBar);
@@ -203,5 +211,4 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         mainPanel.add("North", toolbars);
         return mainPanel;
     }
-
 }

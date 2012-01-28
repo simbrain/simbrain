@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.groups;
+package org.simbrain.network.groups.subnetworks;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Sparse2;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -436,6 +439,37 @@ public class EchoStateNetwork extends Subnetwork {
 
     public double getNoiseMin() {
         return noiseMin;
+    }
+
+    public int getNumReservoirNodes() {
+        return numResNodes;
+    }
+    public int getNumInputNodes() {
+        return numInputs;
+    }
+    public int getNumOutputNodes() {
+        return numOutputs;
+    }
+
+    /**
+     * @return the inputLayer
+     */
+    public NeuronGroup getInputLayer() {
+        return inputLayer;
+    }
+
+    /**
+     * @return the reservoirLayer
+     */
+    public NeuronGroup getReservoirLayer() {
+        return reservoirLayer;
+    }
+
+    /**
+     * @return the outputLayer
+     */
+    public NeuronGroup getOutputLayer() {
+        return outputLayer;
     }
 
     /*

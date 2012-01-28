@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.Hopfield;
+import org.simbrain.network.groups.subnetworks.Hopfield;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.layouts.GridLayout;
@@ -35,7 +35,7 @@ import org.simbrain.util.StandardDialog;
  * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete Hopfield
  * networks.
  */
-public class HopfieldDialog extends StandardDialog {
+public class HopfieldCreationDialog extends StandardDialog {
 
     /** File system separator. */
     private static final String FS = System.getProperty("file.separator");
@@ -79,7 +79,7 @@ public class HopfieldDialog extends StandardDialog {
      *
      * @param net Network panel
      */
-    public HopfieldDialog(final NetworkPanel net) {
+    public HopfieldCreationDialog(final NetworkPanel net) {
         networkPanel = net;
         // layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
         // new GridLayoutPanel(), new HexagonalGridLayoutPanel(),

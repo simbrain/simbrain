@@ -1,4 +1,4 @@
-package org.simbrain.network.builders;
+package org.simbrain.network.gui.dialogs.network;
 
 import java.awt.GridBagConstraints;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.SimpleRecurrentNetwork;
+import org.simbrain.network.groups.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.neurons.LinearNeuron;

@@ -22,20 +22,15 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.subnetworks.BackpropNetwork;
+import org.simbrain.network.groups.subnetworks.LMSNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.DataViewer;
-import org.simbrain.network.gui.trainer.ErrorPlotPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
-import org.simbrain.network.trainers.Backprop;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainer;
@@ -43,34 +38,34 @@ import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
- * PNode representation of a group of a backprop network
+ * PNode representation of a group of a LMS network
  * 
  * @author jyoshimi
  */
-public class BackpropNetworkNode extends SubnetGroupNode {
-    
+public class LMSNetworkNode extends SubnetGroupNode {
+
     /**
      * Create a layered network
      *
      * @param networkPanel parent panel
      * @param group the layered network
      */
-    public BackpropNetworkNode(NetworkPanel networkPanel, BackpropNetwork group) {
+    public LMSNetworkNode(NetworkPanel networkPanel, LMSNetwork group) {
         super(networkPanel, group);
-        setInteractionBox(new BackpropInteractionBox(networkPanel));
+        setInteractionBox(new LMSInteractionBox(networkPanel));
         setContextMenu();
     }
     
     private Trainer getTrainer() {
-        return ((BackpropNetwork) getGroup()).getTrainer();
+        return ((LMSNetwork) getGroup()).getTrainer();
     }
     
     /**
-     * Custom interaction box for Synapse group node.
+     * Custom interaction box for LMS group node.
      */
-    private class BackpropInteractionBox extends InteractionBox {
-        public BackpropInteractionBox(NetworkPanel net) {
-            super(net, BackpropNetworkNode.this);
+    private class LMSInteractionBox extends InteractionBox {
+        public LMSInteractionBox(NetworkPanel net) {
+            super(net, LMSNetworkNode.this);
         }
 
 //        @Override
@@ -87,15 +82,15 @@ public class BackpropNetworkNode extends SubnetGroupNode {
 //          return true;
 //      }
 
-//        @Override
-//        protected String getToolTipText() {
-//            return "Backprop...";
-//        }
-//
-//        @Override
-//        protected boolean hasToolTipText() {
-//            return true;
-//        }
+        @Override
+        protected String getToolTipText() {
+            return "LMS...";
+        }
+
+        @Override
+        protected boolean hasToolTipText() {
+            return true;
+        }
 
     };
 
@@ -108,7 +103,8 @@ public class BackpropNetworkNode extends SubnetGroupNode {
         Action trainNet = new AbstractAction("Show Training Controls...") {
             public void actionPerformed(final ActionEvent event) {
                 ClassDescriptionPair[] rules = {
-                        new ClassDescriptionPair(Backprop.class, "Backprop")};
+                        new ClassDescriptionPair(LMSIterative.class, "LMS-Iterative"),
+                        new ClassDescriptionPair(LMSOffline.class, "LMS-Offline") };
                 TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
                         getTrainer(), rules);
                 GenericFrame frame = getNetworkPanel().displayPanel(
@@ -124,5 +120,6 @@ public class BackpropNetworkNode extends SubnetGroupNode {
         menu.add(TrainerGuiActions.getShowPlotAction(getNetworkPanel(), getTrainer()));
         setConextMenu(menu);
     }
+    
 
 }

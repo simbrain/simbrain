@@ -13,12 +13,8 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -26,21 +22,18 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
 
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.trainers.InvalidDataException;
 import org.simbrain.network.trainers.IterableAlgorithm;
+import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.TrainingMethod;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.util.table.TableActionManager;
 
 /**
  * Contains actions for use in Trainer GUI.
@@ -64,12 +57,12 @@ public class TrainerGuiActions {
      * Action invoked when pressing the input or training data button on the
      * trainer panel.
      * 
-     * @param trainerPanel the parent trainer panel
+     * @param networkPanel the parent network panel
      * @param type whether this is input or training data
      * @return the action
      */
-    public static Action getEditDataAction(final TrainerPanel trainerPanel,
-            final TrainerDataType type) {
+    public static Action getEditDataAction(final NetworkPanel networkPanel,
+            final Trainer trainer, final TrainerDataType type) {
         return new AbstractAction() {
 
             // Initialize
@@ -87,85 +80,12 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                TrainerGuiActions.displayDataInViewerPanel(trainerPanel, type);
+                networkPanel.displayPanel(
+                        DataViewer.createDataViewerPanel(trainer, type),
+                        type.name() + " Data");
             }
 
         };
-    }
-
-    /**
-     * Display the relevant type of data in a data viewer panel with its own
-     * buttons.
-     * 
-     * @param trainerPanel the parent trainer panel
-     * @param type whether this is input or training data
-     * @param theFile the File associated with this data
-     */
-    public static void displayDataInViewerPanel(
-            final TrainerPanel trainerPanel, final TrainerDataType type) {
-
-        // Set up frame and main panel
-        final DataViewer viewer = new DataViewer(trainerPanel, type);
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add("Center", viewer);
-
-        // Toolbars
-        JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        // Open / Save Tools
-        JToolBar fileToolBar = new JToolBar();
-        fileToolBar
-                .add(getOpenCSVAction(trainerPanel, viewer.getTable(), type));
-        fileToolBar.add(TableActionManager
-                .getSaveCSVAction((NumericTable) viewer.getTable().getData()));
-        toolbars.add(fileToolBar);
-
-        // Edit tools
-        JToolBar editToolBar = new JToolBar();
-        editToolBar
-                .add(TableActionManager.getInsertRowAction(viewer.getTable()));
-        editToolBar
-                .add(TableActionManager.getDeleteRowAction(viewer.getTable()));
-        toolbars.add(editToolBar);
-
-        // Randomize tools
-        toolbars.add(viewer.getTable().getToolbarRandomize());
-
-        mainPanel.add("North", toolbars);
-        
-        // Set up frame
-        GenericFrame frame = null;
-        int xposition = 0;
-        int yposition = 0;
-        
-        if(trainerPanel.getNetworkPanel() != null) {
-            frame = trainerPanel.getNetworkPanel().displayPanel(
-                    mainPanel, "Trainer");
-            
-        } else {
-            frame = (GenericFrame) new GenericJDialog();
-            frame.setContentPane(mainPanel);
-            xposition = (int) (Toolkit.getDefaultToolkit().getScreenSize()
-                    .getWidth() / 2);
-            yposition = (int) (Toolkit.getDefaultToolkit().getScreenSize()
-                    .getHeight() / 2)
-                    - (mainPanel.getHeight() / 2);
-            // Set position of frame based on whether it is input or training data
-            int buffer = 10;
-            if (type == TrainerDataType.Input) {
-                xposition = xposition - mainPanel.getWidth() - buffer;
-            } else {
-                xposition = xposition + buffer;
-            }
-        }
-
-        frame.pack();
-        // System.out.println(mainPanel.getWidth() + " " + yposition);
-        frame.setLocation(xposition, yposition);
-        
-        // Display the frame
-        frame.setVisible(true);
-        // frame.setTitle(theFile.getName());
     }
 
     /**
@@ -195,7 +115,7 @@ public class TrainerGuiActions {
      * @param table table to load data in to
      * @return the action
      */
-    public static Action getOpenCSVAction(final TrainerPanel trainer,
+    public static Action getOpenCSVAction(final Trainer trainer,
             final SimbrainJTable table, final TrainerDataType type) {
         return new AbstractAction() {
 
@@ -220,7 +140,7 @@ public class TrainerGuiActions {
                 if (theFile != null) {
                     if (type == TrainerDataType.Input) {
                         try {
-                            trainer.getTrainer().setInputData(theFile);
+                            trainer.setInputData(theFile);
                             ((NumericTable) table.getData()).readData(theFile);
                             ((JFrame) table.getTopLevelAncestor())
                                     .setTitle(theFile.getName());
@@ -231,7 +151,7 @@ public class TrainerGuiActions {
                         }
                     } else {
                         try {
-                            trainer.getTrainer().setTrainingData(theFile);
+                            trainer.setTrainingData(theFile);
                             ((NumericTable) table.getData()).readData(theFile);
                             ((JFrame) table.getTopLevelAncestor())
                                     .setTitle(theFile.getName());
@@ -247,119 +167,14 @@ public class TrainerGuiActions {
 
         };
     }
-
-    /**
-     * Returns a "play" action, that can be used to repeatedly iterate iterable
-     * training algorithms.
-     * 
-     * @param trainerGui reference to trainer gui
-     * @return the action
-     */
-    public static Action getRunAction(final TrainerPanel trainerGui) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
-                // putValue(NAME, "Open (.csv)");
-                // putValue(SHORT_DESCRIPTION, "Import table from .csv");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                if (trainerGui.isUpdateCompleted()) {
-                    // Start running
-                    trainerGui.setUpdateCompleted(false);
-                    Executors.newSingleThreadExecutor().submit(new Runnable() {
-                        public void run() {
-                            while (!trainerGui.isUpdateCompleted()) {
-                                trainerGui.iterate();
-                                // TODO: Make below an option?
-                                // trainerGui.getTrainer().getNetwork().getRootNetwork().fireNetworkChanged();
-                            }
-                            {
-                                putValue(SMALL_ICON, ResourceManager
-                                        .getImageIcon("Play.png"));
-                            }
-                        }
-                    });
-                    putValue(SMALL_ICON,
-                            ResourceManager.getImageIcon("Stop.png"));
-                } else {
-                    // Stop running
-                    trainerGui.setUpdateCompleted(true);
-                    putValue(SMALL_ICON,
-                            ResourceManager.getImageIcon("Play.png"));
-                }
-
-            }
-
-        };
-    }
-
-    /**
-     * Returns a step action, for iterating iteratable learning algorithms one
-     * time.
-     * 
-     * @param trainerGui reference to trainer gui
-     * @return the action
-     */
-    public static Action getStepAction(final TrainerPanel trainerGui) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
-                // putValue(NAME, "Open (.csv)");
-                // putValue(SHORT_DESCRIPTION, "Import table from .csv");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                trainerGui.iterate();
-            }
-
-        };
-    }
-
-    /**
-     * Batch train network.
-     * 
-     * @param trainerGui reference to trainer gui
-     * @return the action
-     */
-    public static Action getBatchTrainAction(final TrainerPanel trainerGui) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON,
-                        ResourceManager.getImageIcon("BatchPlay.png"));
-                // putValue(NAME, "Batch");
-                putValue(SHORT_DESCRIPTION, "Batch train network");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                trainerGui.batchTrain();
-            }
-
-        };
-    }
-
+    
     /**
      * Randomizes network.
      * 
-     * @param trainerGui reference to trainer gui
+     * @param trainer reference to trainer
      * @return the action
      */
-    public static Action getRandomizeNetworkAction(final TrainerPanel trainerGui) {
+    public static Action getRandomizeNetworkAction(final Trainer trainer) {
         return new AbstractAction() {
 
             // Initialize
@@ -373,14 +188,14 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                if (trainerGui.getTrainer() != null) {
-                    if (trainerGui.getTrainer().getTrainingMethod() instanceof IterableAlgorithm) {
-                        trainerGui.getTrainer().randomize();
+                if (trainer != null) {
+                    if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
+                        trainer.randomize();
                         // trainerGui.setUpdateCompleted(true); // Stop trainer
                         // if it's running
 
                         // Update Display
-                        trainerGui.getTrainer().getNetwork().getRootNetwork()
+                        trainer.getNetwork().getRootNetwork()
                                 .fireNetworkChanged();
                     }
                 }
@@ -389,39 +204,15 @@ public class TrainerGuiActions {
         };
     }
 
-    /**
-     * Clear the error graph.
-     * 
-     * @param trainerGui reference to trainer gui
-     * @return the action
-     */
-    public static Action getClearGraphAction(final TrainerPanel trainerGui) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-                putValue(SHORT_DESCRIPTION, "Clear graph data");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                // trainerGui.clearGraph();
-            }
-
-        };
-    }
 
     /**
      * Show properties dialog for currently selected trainer.
      * 
-     * @param trainerGui trainer panel
+     * @param trainer the trainer
      * @return the action
      */
     public static AbstractAction getPropertiesDialogAction(
-            final TrainerPanel trainerGui) {
+            final Trainer trainer) {
         return new AbstractAction() {
 
             // Initialize
@@ -435,8 +226,7 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                TrainingMethod method = trainerGui.getTrainer()
-                        .getTrainingMethod();
+                TrainingMethod method = trainer.getTrainingMethod();
                 ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
                 editor.setUseSuperclass(false);
                 editor.setObject(method);
@@ -445,6 +235,36 @@ public class TrainerGuiActions {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
+            }
+
+        };
+    }
+    
+    /**
+     * Show an error plot for this trainer.
+     * 
+     * @param panel the network panel in which to display the plot
+     * @param trainer the trainer
+     * @return the action
+     */
+    public static AbstractAction getShowPlotAction(final NetworkPanel panel,
+            final Trainer trainer) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("CurveChart.png"));
+                putValue(NAME, "Show error plot");
+                putValue(SHORT_DESCRIPTION, "Show error plot");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                ErrorPlotPanel errorPanel = new ErrorPlotPanel(
+                        panel, trainer);
+                panel.displayPanel(errorPanel, "Error plot");
             }
 
         };

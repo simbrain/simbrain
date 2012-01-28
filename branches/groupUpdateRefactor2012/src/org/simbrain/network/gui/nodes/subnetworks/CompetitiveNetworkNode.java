@@ -7,7 +7,7 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.Competitive;
+import org.simbrain.network.groups.subnetworks.Competitive;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;

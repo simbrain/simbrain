@@ -3,7 +3,7 @@ package org.simbrain.network.gui.nodes.subnetworks;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.WinnerTakeAll;
+import org.simbrain.network.groups.subnetworks.WinnerTakeAll;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.WTAPropertiesDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;

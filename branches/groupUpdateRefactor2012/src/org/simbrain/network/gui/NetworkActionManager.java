@@ -25,8 +25,6 @@ import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 
-import org.simbrain.network.builders.ESNCreationDialog;
-import org.simbrain.network.builders.SRNCreationDialog;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.FixedFanout;
 import org.simbrain.network.connections.OneToOne;
@@ -90,12 +88,15 @@ import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
-import org.simbrain.network.gui.dialogs.network.BackpropDialog;
-import org.simbrain.network.gui.dialogs.network.CompetitiveDialog;
-import org.simbrain.network.gui.dialogs.network.HopfieldDialog;
-import org.simbrain.network.gui.dialogs.network.KwtaNetworkDialog;
-import org.simbrain.network.gui.dialogs.network.SOMDialog;
-import org.simbrain.network.gui.dialogs.network.WTADialog;
+import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
+import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
+import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
+import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
+import org.simbrain.network.gui.dialogs.network.KwtaCreationDialog;
+import org.simbrain.network.gui.dialogs.network.LMSCreationDialog;
+import org.simbrain.network.gui.dialogs.network.SOMCreationDialog;
+import org.simbrain.network.gui.dialogs.network.SRNCreationDialog;
+import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -542,22 +543,22 @@ public final class NetworkActionManager {
         connectionsMenu.add(getShowQuickConnectDialogAction());
         return connectionsMenu;
     }
-
-    //REDO
     
     /**
      * @return a list of the network types.
      */
     public List<Action> getNewNetworkActions() {
         return Arrays.asList(new Action[] { 
-                new AddGroupAction(networkPanel, new BackpropDialog(networkPanel), "Backprop"),
-                new AddGroupAction(networkPanel, new CompetitiveDialog(networkPanel), "Competitive"),
+                new AddGroupAction(networkPanel, new BackpropCreationDialog(networkPanel), "Backprop"),
+                new AddGroupAction(networkPanel, new CompetitiveCreationDialog(networkPanel), "Competitive"),
                 new AddGroupAction(networkPanel, new ESNCreationDialog(networkPanel), "Echo State Network"),
-                new AddGroupAction(networkPanel, new HopfieldDialog(networkPanel), "Hopfield"),
-                new AddGroupAction(networkPanel, new KwtaNetworkDialog(networkPanel), "KWTA"),
-                new AddGroupAction(networkPanel, new SOMDialog(networkPanel), "SOM (Self organizing map)"),
+                new AddGroupAction(networkPanel, new HopfieldCreationDialog(networkPanel), "Hopfield"),
+                new AddGroupAction(networkPanel, new LMSCreationDialog(networkPanel),
+                        "LMS (Least Mean Squares)"),
+                new AddGroupAction(networkPanel, new KwtaCreationDialog(networkPanel), "KWTA"),
+                new AddGroupAction(networkPanel, new SOMCreationDialog(networkPanel), "SOM (Self organizing map)"),
                 new AddGroupAction(networkPanel, new SRNCreationDialog(networkPanel), "SRN (Simple Recurrent Network)"),
-                new AddGroupAction(networkPanel, new WTADialog(networkPanel), "WTA (Winner take all)")
+                new AddGroupAction(networkPanel, new WTACreationDialog(networkPanel), "WTA (Winner take all)")
         });
     }
     

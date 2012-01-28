@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.builders.EchoStateNetBuilder;
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.groups.subnetworks.EchoStateNetwork;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -146,7 +146,7 @@ public class ReservoirComputingUtils {
      *            training data used for teacher-forcing if required
      * @return a matrix of data to be used for offline training
      */
-    public static double[][] generateData(EchoStateNetBuilder esn,
+    public static double[][] generateData(EchoStateNetwork esn,
             double[][] inputData, double[][] teacherData) {
         // The minimum number of state matrix columns
         int columnNumber = esn.getNumReservoirNodes();
@@ -168,7 +168,7 @@ public class ReservoirComputingUtils {
             int col = 0;
 
             //Clamp input neurons based on input data
-            for (Neuron neuron : esn.getInputLayer()) {
+            for (Neuron neuron : esn.getInputLayer().getNeuronList()) {
                 double clampValue = inputData[row][col];
                 neuron.setActivation(clampValue);
                 if (esn.hasDirectInOutWeights()) {
@@ -184,7 +184,7 @@ public class ReservoirComputingUtils {
             if (esn.hasBackWeights()) {
                 int count = 0;
                 double clampValue = 0.5;
-                for (Neuron neuron : esn.getOutputLayer()) {
+                for (Neuron neuron : esn.getOutputLayer().getNeuronList()) {
                     // Teacher forcing
                     if (row > 0) {
                         if (neuron.getUpdateRule() instanceof SigmoidalNeuron) {
@@ -202,10 +202,10 @@ public class ReservoirComputingUtils {
             }
 
             //Update the reservoir: handles teacher-forced back-weights
-            for (Neuron n : esn.getReservoirLayer()) {
+            for (Neuron n : esn.getReservoirLayer().getNeuronList()) {
                 n.update();
             }
-            for (Neuron n : esn.getReservoirLayer()) {
+            for (Neuron n : esn.getReservoirLayer().getNeuronList()) {
                 double val = n.getBuffer();
                 if (noise) {
                     n.setActivation(val + reservoirNoise());

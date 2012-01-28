@@ -25,7 +25,7 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.SOM;
+import org.simbrain.network.groups.subnetworks.SOM;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;

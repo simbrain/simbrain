@@ -85,13 +85,14 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getCutAction());
         editMenu.add(actionManager.getCopyAction());
         editMenu.add(actionManager.getPasteAction());
-        editMenu.addSeparator();
         editMenu.add(actionManager.getDeleteAction());
-        editMenu.add(createSelectionMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getZeroSelectedObjectsAction());
+        editMenu.add(actionManager.getClearSourceNeuronsAction());
+        editMenu.add(actionManager.getSetSourceNeuronsAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getConnectionMenu());
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getShowQuickConnectDialogAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getLayoutMenu());
         editMenu.addSeparator();
@@ -111,8 +112,12 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.add(actionManager.getSetAutoZoomMenuItem());
         editMenu.addSeparator();
         editMenu.add(new ShowEditModeDialogAction(this));
+        editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getZeroSelectedObjectsAction());
+        editMenu.add(createSelectionMenu());
 
         return editMenu;
     }

@@ -178,7 +178,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns a properly initialized xstream object.
-     * 
+     *
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -200,7 +200,10 @@ public class RootNetwork extends Network {
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");
         xstream.omitField(Neuron.class, "readOnlyFanIn");
+        xstream.omitField(Neuron.class, "lastActivation");
+        xstream.omitField(Neuron.class, "useActivationHistory");
         xstream.omitField(SigmoidalNeuron.class, "implementationIndex"); // Backwards compatibility issue
+        xstream.omitField(SigmoidalNeuron.class, "clipping"); // Backwards compatibility issue
         return xstream;
     }
 
@@ -362,7 +365,9 @@ public class RootNetwork extends Network {
 
     /**
      * Returns the group, if any, a specified object is contained in.
-     * 
+     *
+     * TODO: If used a lot set a flag on these things
+     *
      * @param object the object to check
      * @return the group, if any, containing that object
      */
@@ -406,7 +411,7 @@ public class RootNetwork extends Network {
 
     /**
      * Set the current time.
-     * 
+     *
      * @param i the current time
      */
     public void setTime(final double i) {
@@ -427,7 +432,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns the precision of the current time step.
-     * 
+     *
      * @return the precision of the current time step.
      */
     private int getTimeStepPrecision() {

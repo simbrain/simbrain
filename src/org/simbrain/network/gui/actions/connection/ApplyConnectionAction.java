@@ -78,6 +78,7 @@ public final class ApplyConnectionAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+        ShowHelpAction helpAction = new ShowHelpAction();
         if (isSelfConnect) {
             // Not used..
             connection.connectNeurons(networkPanel.getRootNetwork(),
@@ -87,19 +88,21 @@ public final class ApplyConnectionAction extends AbstractAction {
             if (connection instanceof AllToAll) {
                 optionsPanel = new AllToAllPanel((AllToAll) connection);
                 optionsPanel.fillFieldValues();
+                helpAction.setTheURL("Network/connections/alltoall.html");
             } else if (connection instanceof OneToOne) {
                 optionsPanel = new OneToOnePanel((OneToOne) connection);
                 optionsPanel.fillFieldValues();
+                helpAction.setTheURL("Network/connections/onetoone.html");
             } else if (connection instanceof Radial) {
                 optionsPanel = new RadialPanel((Radial) connection);
                 optionsPanel.fillFieldValues();
+                helpAction.setTheURL("Network/connections/radial.html");
             } else if (connection instanceof Sparse) {
                 optionsPanel = new SparsePanel((Sparse) connection, networkPanel);
                 optionsPanel.fillFieldValues();
+                helpAction.setTheURL("Network/connections/sparse.html");
             }
             ConnectionDialog dialog = new ConnectionDialog();
-            ShowHelpAction helpAction = new ShowHelpAction();
-            helpAction.setTheURL("Network/connections.html");
             dialog.addButton(new JButton(helpAction));
             dialog.setContentPane(optionsPanel);
             dialog.pack();

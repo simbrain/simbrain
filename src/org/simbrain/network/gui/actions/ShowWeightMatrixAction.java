@@ -53,16 +53,6 @@ public final class ShowWeightMatrixAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
-
-        updateAction();
-        // add a selection listener to update state based on selection
-        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-
-            /** @see NetworkSelectionListener */
-            public void selectionChanged(final NetworkSelectionEvent event) {
-                updateAction();
-            }
-        });
     }
 
     /**

@@ -18,29 +18,35 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
 /**
  * <b>AllToAllPanel</b> creates a dialog for setting preferences of all to all
  * neuron connections.
+ * 
+ * @author ztosi
+ * @author jyoshimi
+ * 
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 
+	private ExcitatoryInhibitoryPropertiesPanel eipPanel; 
+	
     /** Allow self connection check box. */
     private JCheckBox allowSelfConnect = new JCheckBox();
-
-    /** Connection Label. */
-    private JLabel baseSynapseLabel = new JLabel("");
 
     /**
      * This method is the default constructor.
@@ -48,41 +54,54 @@ public class AllToAllPanel extends AbstractConnectionPanel {
      */
     public AllToAllPanel(final AllToAll connection) {
         super(connection);
-        this.addItem("Make Self Connections", allowSelfConnect);
-        JButton setSynapseType = new JButton("Set...");
-        setSynapseType.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Synapse> list = new ArrayList<Synapse>();
-                list.add(connection.getBaseSynapse());
-                SynapseDialog dialog = new SynapseDialog(list);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                Synapse synapse = dialog.getSynapseList().get(0);
-                connection.setBaseSynapse(synapse);
-                baseSynapseLabel.setText(synapse.getType());
-            }
-        });
-        baseSynapseLabel.setText(connection.getBaseSynapse().getType());
-        this.addItem("Base Synapse Type:", baseSynapseLabel);
-        this.addItem("Set Base Synapse Type:", setSynapseType);
+        eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 9;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        this.add(eipPanel, gbc);
+        
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 0, 10);
+        gbc.gridy = 9;
+        gbc.gridheight = 1;
+        this.add(new JSeparator(), gbc);
+        
+        
+        gbc.gridy = 10;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(10, 5, 0, 10);
+        
+        JPanel allowSelfConnectPanel = new JPanel();
+        FlowLayout ASCPFL = new FlowLayout(FlowLayout.LEFT);
+        allowSelfConnectPanel.setLayout(ASCPFL);
+        allowSelfConnectPanel.add(new JLabel("Allow Self-Connections: "));
+        allowSelfConnectPanel.add(allowSelfConnect);
+        
+        this.add(allowSelfConnectPanel, gbc);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     public void commitChanges() {
-        ((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
+    	((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
                 .isSelected());
+    	eipPanel.commitChanges();
     }
+    
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        allowSelfConnect.setSelected(((AllToAll) connection)
-                .isAllowSelfConnection());
+       
     }
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -109,9 +110,9 @@ public class Subnetwork extends Group {
      *
      * @param group the synapse group to add
      */
-    public void addSynapseGroup(SynapseGroup group) {
+    private void addSynapseGroup(SynapseGroup group) {
         synapseGroupList.add(group);
-        group.setParentGroup(this);
+        group.setParentGroup(this);  
     }
     
     /**
@@ -122,6 +123,51 @@ public class Subnetwork extends Group {
     public void addNeuronGroup(NeuronGroup group) {
         neuronGroupList.add(group);
         group.setParentGroup(this);
+    }
+    
+    /**
+     * Connects two groups of neurons according to some connection style.
+     * @param source the source group
+     * @param target the target group
+     * @param connection the type of connection desired between the two groups
+     */
+    public void connectNeuronGroups(NeuronGroup source, NeuronGroup target,
+    		ConnectNeurons connection) {
+    	List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
+    			source.getNeuronList(),target.getNeuronList());
+    	SynapseGroup newGroup = new SynapseGroup(getParentNetwork(), synapses);
+    	addSynapseGroup(newGroup);
+    	if(!source.equals(target)) {
+    		newGroup.setLabel("Weights " + (indexOfNeuronGroup(source) + 1) + " "
+    			+ new Character('\u2192') + " " + (indexOfNeuronGroup(target) + 1));
+    	} else {
+    		newGroup.setLabel("Weights " + (indexOfNeuronGroup(source) + 1) + " "
+        			+ new Character('\u21BA'));
+    	}
+    }
+    
+    /**
+     * Connects two groups of neurons according to some connection style, and 
+     * allows for custom labels of the neuron groups within the weights label.
+     * @param source the source group
+     * @param target the target group
+     * @param sourceLabel the name of the source group in the weights label
+     * @param targetLabel the name of the target group in the weights label
+     * @param connection the type of connection desired between the two groups
+     */
+    public void connectNeuronGroups(NeuronGroup source, NeuronGroup target,
+    		String sourceLabel, String targetLabel, ConnectNeurons connection) {
+    	List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
+    			source.getNeuronList(),target.getNeuronList());
+    	SynapseGroup newGroup = new SynapseGroup(getParentNetwork(), synapses);
+    	addSynapseGroup(newGroup);
+    	if(!source.equals(target)) {
+    		newGroup.setLabel("Weights " + sourceLabel + " "
+    			+ new Character('\u2192') + " " + targetLabel);
+    	} else {
+    		newGroup.setLabel("Weights " + sourceLabel + " "
+        			+ new Character('\u21BA'));
+    	}
     }
     
     /**
@@ -180,6 +226,15 @@ public class Subnetwork extends Group {
      */
     public List<NeuronGroup> getNeuronGroupList() {
         return Collections.unmodifiableList(neuronGroupList);
+    }
+    
+    /**
+     * Returns the index of a neuron group.
+     * @param group the group being queried.
+     * @return the index of the group in the list.
+     */
+    public int indexOfNeuronGroup(NeuronGroup group){
+    	return getNeuronGroupList().indexOf(group);
     }
     
     /**
@@ -266,6 +321,7 @@ public class Subnetwork extends Group {
         return ret;
     }
     
+    //TODO: Move this to another class? Perhaps make a "network layout manager".
     /**
      * Group1 stays fixed. Group2 is moved with respect to group 1 and is centered with 
      * respect to it in the relevant direction.

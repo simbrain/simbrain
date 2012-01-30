@@ -370,14 +370,8 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
         layout.setInitialLocation(new Point(10, initialYPosition - layerInterval*3));
         layout.layoutNeurons(outputLayer);
 
-        // Prepare base synapse for connecting layers
-        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
-        synapse.setLowerBound(-.5);
-        synapse.setUpperBound(.5);
-
         // Connect input layer to hidden layer
         AllToAll connection = new AllToAll(network, inputLayer, hiddenLayer);
-        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // Connect hidden layer to hidden layer2

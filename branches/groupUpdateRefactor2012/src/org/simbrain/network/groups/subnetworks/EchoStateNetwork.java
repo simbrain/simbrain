@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.Sparse2;
+import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -161,15 +161,21 @@ public class EchoStateNetwork extends Subnetwork {
         initializeLayer(outputLayerNeurons, outputNeuronType,
                 numOutputs);
         
-        // Output Layer
+        Sparse connector = new Sparse();
+        connector.setEnableExRand(true);
+        connector.setEnableInRand(true);
+        
         LineLayout lineLayout = new LineLayout(betweenNeuronInterval,
                 LineOrientation.HORIZONTAL);
-        lineLayout.setInitialLocation(initialPosition);
-        lineLayout.layoutNeurons(outputLayerNeurons);
-        outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
-        outputLayer.setLabel("Outputs");
-        addNeuronGroup(outputLayer);
+        
 
+        // Input Layer
+        lineLayout.layoutNeurons(inputLayerNeurons);
+        inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
+        inputLayer.setLabel("Inputs");
+        addNeuronGroup(inputLayer);
+
+        
         // Reservoir Layer
         GridLayout gridLayout = new GridLayout(betweenNeuronInterval,
                 betweenNeuronInterval, (int) Math.sqrt(numResNodes));
@@ -177,53 +183,33 @@ public class EchoStateNetwork extends Subnetwork {
         reservoirLayer = new NeuronGroup(getParentNetwork(), reservoirLayerNeurons);
         addNeuronGroup(reservoirLayer);
         reservoirLayer.setLabel("Reservoir");
-        offsetNeuronGroup(outputLayer, reservoirLayer, "South", betweenLayerInterval);
+        offsetNeuronGroup(inputLayer, reservoirLayer, "North", betweenLayerInterval);
 
-        // Input Layer
-        lineLayout.layoutNeurons(inputLayerNeurons);
-        inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
-        inputLayer.setLabel("Inputs");
-        addNeuronGroup(inputLayer);
-        offsetNeuronGroup(reservoirLayer, inputLayer, "South", betweenLayerInterval);
+        // Output Layer
+        lineLayout.setInitialLocation(initialPosition);
+        lineLayout.layoutNeurons(outputLayerNeurons);
+        outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
+        outputLayer.setLabel("Outputs");
+        addNeuronGroup(outputLayer);
+        offsetNeuronGroup(reservoirLayer, outputLayer, "North", betweenLayerInterval);
         
         // Weights: Input layer to reservoir layer
-        List<Synapse> synapseList = new ArrayList<Synapse>();
-        Sparse2 sparseConnections = new Sparse2(getParentNetwork(), inputLayerNeurons, reservoirLayerNeurons);
-        synapseList = sparseConnections.connectNeurons(inSparsity);
-        SynapseGroup inputToReservoir = new SynapseGroup(this.getParentNetwork());
-        // TODO: Ugly. Should be a way to directly connect neuron groups and create a synapse group between them
-        getParentNetwork().transferSynapsesToGroup(synapseList,
-                inputToReservoir); 
-        inputToReservoir.setLabel("Input to Reservoir");
-        addSynapseGroup(inputToReservoir);
+        connector.setSparsity(inSparsity);
+        connectNeuronGroups(inputLayer, reservoirLayer, connector);
 
         // Weights: reservoir layer to itself
-        sparseConnections = new Sparse2(getParentNetwork(), reservoirLayerNeurons, reservoirLayerNeurons);
-        synapseList = sparseConnections.connectNeurons(resSparsity);
-        SynapseGroup reservoirSynapses = new SynapseGroup(this.getParentNetwork());
-        getParentNetwork().transferSynapsesToGroup(synapseList,
-                reservoirSynapses); 
-        reservoirSynapses.setLabel("Reservoir Synapses");
-        addSynapseGroup(reservoirSynapses);
+        connector.setSparsity(resSparsity);
+        connectNeuronGroups(reservoirLayer, reservoirLayer, connector);
 
         // Weights: reservoir layer to output layer
+        //TODO: These don't usually exist prior to training
         AllToAll allToAll  = new AllToAll(getParentNetwork(), reservoirLayerNeurons, outputLayerNeurons);
-        synapseList = allToAll.connectNeurons();
-        SynapseGroup reservoirToOutput = new SynapseGroup(this.getParentNetwork());
-        getParentNetwork().transferSynapsesToGroup(synapseList,
-                reservoirToOutput); 
-        reservoirToOutput.setLabel("Classifier weights");
-        addSynapseGroup(reservoirToOutput);
+        connectNeuronGroups(reservoirLayer, outputLayer, allToAll);
 
         // Weights: output to reservoir
         if (backWeights) {
-            sparseConnections = new Sparse2(getParentNetwork(), outputLayerNeurons, reservoirLayerNeurons);
-            synapseList = sparseConnections.connectNeurons(backSparsity);
-            SynapseGroup outputToReservoir = new SynapseGroup(this.getParentNetwork());
-            getParentNetwork().transferSynapsesToGroup(synapseList,
-                    outputToReservoir); 
-            outputToReservoir.setLabel("Output to reservoir Synapses");
-            addSynapseGroup(outputToReservoir);
+          connector.setSparsity(backSparsity);
+          connectNeuronGroups(outputLayer, reservoirLayer, connector);
         }
 
         // Scale the reservoir's weights to have the desired spectral radius

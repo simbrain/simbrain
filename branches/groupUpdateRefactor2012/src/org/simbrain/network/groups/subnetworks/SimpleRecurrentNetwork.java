@@ -79,7 +79,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
 
     /** Builds a simple recurrent network. */
     public void build() {
-
+    	//TODO: implement new connectNeuronGroups method
         // Initialize layers
         List<Neuron> inputLayerNeurons  = new ArrayList<Neuron>();
         List<Neuron> hiddenLayerNeurons  = new ArrayList<Neuron>();
@@ -144,9 +144,9 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
         connect.setAllowSelfConnection(false);
         // TODO: Way to set weight ranges and excitatory probability?
         //REDO: Add as a group
-        connect.connectNeurons(inputLayer.getNeuronList(), hiddenLayer.getNeuronList(), -1.0, 1.0, 0.5);
-        connect.connectNeurons(contextLayer.getNeuronList(), hiddenLayer.getNeuronList(), -1.0, 1.0, 0.5);
-        connect.connectNeurons(hiddenLayer.getNeuronList(), outputLayer.getNeuronList(), -1.0, 1.0, 0.5);
+        connect.connectNeurons(getParentNetwork(), inputLayer.getNeuronList(), hiddenLayer.getNeuronList());
+        connect.connectNeurons(getParentNetwork(), contextLayer.getNeuronList(), hiddenLayer.getNeuronList());
+        connect.connectNeurons(getParentNetwork(), hiddenLayer.getNeuronList(), outputLayer.getNeuronList());
     }
 
     /**

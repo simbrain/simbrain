@@ -314,27 +314,15 @@ public class ReservoirComputingUtils {
         }
 
         // Connect clamped to hidden layer
-        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
-        synapse.setLowerBound(0);
-        synapse.setUpperBound(1);
         AllToAll connection = new AllToAll(network, clampedLayer, outputLayer);
-        connection.setBaseSynapse(synapse);
         connection.connectNeurons();
 
         // Connect clamped to output layer
-        synapse = new Synapse(null, null, new ClampedSynapse());
-        synapse.setLowerBound(0);
-        synapse.setUpperBound(1);
         AllToAll connection2 = new AllToAll(network, clampedLayer, hiddenLayer);
-        connection2.setBaseSynapse(synapse);
         connection2.connectNeurons();
 
         // Connect hidden to output layer
-        synapse = new Synapse(null, null, new ClampedSynapse());
-        synapse.setLowerBound(0);
-        synapse.setUpperBound(1);
         AllToAll connection3 = new AllToAll(network, hiddenLayer, outputLayer);
-        connection3.setBaseSynapse(synapse);
         connection3.connectNeurons();
 
         // Randomize synapses

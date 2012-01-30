@@ -171,6 +171,19 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     }
 
     /**
+     * Fills fields with values from a Random Source.
+     * @param rand
+     */
+    public void fillFieldValues(RandomSource rand) {
+        cbDistribution.setSelectedIndex(rand.getDistributionIndex());
+        tsClipping.setSelected(rand.getClipping());
+        tfLowBound.setText(Double.toString(rand.getLowerBound()));
+        tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        tfMean.setText(Double.toString(rand.getMean()));
+    }
+    
+    /**
      * Fills fields with default values.
      */
     public void fillDefaultValues() {
@@ -201,11 +214,11 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
             rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
         }
 
-        if (!tfStandardDeviation.getText().equals(nullString)) {
+        if (!tfStandardDeviation.getText().equals(nullString) && tfStandardDeviation.isEnabled()) {
             rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation.getText()));
         }
 
-        if (!tfMean.getText().equals(nullString)) {
+        if (!tfMean.getText().equals(nullString) && tfMean.isEnabled()) {
             rand.setMean(Double.parseDouble(tfMean.getText()));
         }
 

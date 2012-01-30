@@ -18,6 +18,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -107,19 +108,9 @@ public class FeedForward extends Subnetwork {
             addNeuronGroup(hiddenLayer);
             offsetNeuronGroup(lastLayer, hiddenLayer, "North", betweenLayerInterval);
 
-            // Connect input layer to hidden layer
-            List<Synapse> synapseList = new ArrayList<Synapse>();
-            for (Neuron source : lastLayer.getNeuronList()) {
-                for (Neuron target : hiddenLayerNeurons) {
-                    Synapse newSynapse = synapse.instantiateTemplateSynapse(
-                            source, target, network);
-                    newSynapse.randomize();
-                    synapseList.add(newSynapse);
-                }
-            }
-
-            // Create synapse group
-            addSynapseGroup(new SynapseGroup(this.getParentNetwork(), synapseList));
+            AllToAll connection  = new AllToAll(getParentNetwork());
+            
+            connectNeuronGroups(lastLayer, hiddenLayer, connection);
 
             // Reset last layer
             lastLayer = hiddenLayer;
@@ -160,13 +151,6 @@ public class FeedForward extends Subnetwork {
     }
 
     public void setEnabled(boolean enabled) {
-    }
-
-    @Override
-    public void addSynapseGroup(SynapseGroup group) {
-        super.addSynapseGroup(group);
-        group.setLabel("Weights " + (getSynapseGroupCount()) + " -> "
-                + (getSynapseGroupCount() + 1));
     }
 
     @Override

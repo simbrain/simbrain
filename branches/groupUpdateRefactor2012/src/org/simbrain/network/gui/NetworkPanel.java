@@ -1234,7 +1234,7 @@ public class NetworkPanel extends JPanel {
      * Creates and displays the connect properties dialog.
      */
     public void showConnectProperties() {
-        QuickConnectPreferencesDialog dialog = new QuickConnectPreferencesDialog();
+        QuickConnectPreferencesDialog dialog = new QuickConnectPreferencesDialog(this);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

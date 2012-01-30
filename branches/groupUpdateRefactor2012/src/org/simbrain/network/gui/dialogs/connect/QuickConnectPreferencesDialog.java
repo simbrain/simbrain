@@ -26,6 +26,7 @@ import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -50,10 +51,14 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
     /** Panel for setting connection properties. */
     private AbstractConnectionPanel optionsPanel;
 
+    /** Reference to network panel. */
+    private NetworkPanel panel;
+
     /**
      * Connection dialog default constructor.
      */
-    public QuickConnectPreferencesDialog() {
+    public QuickConnectPreferencesDialog(NetworkPanel panel) {
+        this.panel = panel;
         init();
     }
 
@@ -105,7 +110,7 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
             mainPanel.add(optionsPanel);
         } else if (connection instanceof Sparse) {
             clearOptionPanel();
-            optionsPanel = new SparsePanel((Sparse) connection);
+            optionsPanel = new SparsePanel((Sparse) connection, panel);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         }

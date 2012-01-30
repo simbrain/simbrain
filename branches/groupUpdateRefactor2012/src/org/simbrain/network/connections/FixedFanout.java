@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -64,11 +63,8 @@ public class FixedFanout extends ConnectNeurons {
         return "Fixed Fanout";
     }
 
-    @Override
-    public List<Synapse> connectNeurons() {
-        
-        List<Synapse> ret = new ArrayList<Synapse>(); 
-
+    /** {@inheritDoc} */
+    public void connectNeurons() {
         for (Neuron source : sourceNeurons) {
             Random generator = new Random();
 
@@ -97,12 +93,10 @@ public class FixedFanout extends ConnectNeurons {
                 synapse.setTarget(target);
                 synapse.setStrength(outboundWeights[i]);
                 network.addSynapse(synapse);
-                ret.add(synapse);
                 i++;
             }
         }
 
-        return ret;
     }
 
     private double[] getOutboundWeights() {

@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.util.Comparators;
 
 /**
  * A group of neurons.
@@ -78,7 +78,18 @@ public class NeuronGroup extends Group {
     public List<Neuron> getNeuronList() {
         return Collections.unmodifiableList(neuronList);
     }
-    
+
+    /**
+     * Set the update rule for the neurons in this group.
+     *
+     * @param base the neuron update rule to set.
+     */
+    public void setNeuronType(NeuronUpdateRule base) {
+        for(Neuron neuron : neuronList) {
+            neuron.setUpdateRule(base.deepCopy());
+        }
+    }
+
     /**
      * Returns true if the provided synapse is in the fan-in weight vector of
      * some node in this neuron group.

@@ -127,40 +127,36 @@ public class Subnetwork extends Group {
     
     /**
      * Connects two groups of neurons according to some connection style.
+     *
      * @param source the source group
      * @param target the target group
      * @param connection the type of connection desired between the two groups
      */
-    public void connectNeuronGroups(NeuronGroup source, NeuronGroup target,
+    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target,
     		ConnectNeurons connection) {
-    	List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
-    			source.getNeuronList(),target.getNeuronList());
-    	SynapseGroup newGroup = new SynapseGroup(getParentNetwork(), synapses);
-    	addSynapseGroup(newGroup);
-    	if(!source.equals(target)) {
-    		newGroup.setLabel("Weights " + (indexOfNeuronGroup(source) + 1) + " "
-    			+ new Character('\u2192') + " " + (indexOfNeuronGroup(target) + 1));
-    	} else {
-    		newGroup.setLabel("Weights " + (indexOfNeuronGroup(source) + 1) + " "
-        			+ new Character('\u21BA'));
-    	}
+        SynapseGroup newGroup = connectNeuronGroups(source, target, ""
+                + (indexOfNeuronGroup(source) + 1), ""
+                + (indexOfNeuronGroup(target) + 1), connection);
+    	return newGroup;
     }
     
     /**
      * Connects two groups of neurons according to some connection style, and 
      * allows for custom labels of the neuron groups within the weights label.
+     *
      * @param source the source group
      * @param target the target group
      * @param sourceLabel the name of the source group in the weights label
      * @param targetLabel the name of the target group in the weights label
      * @param connection the type of connection desired between the two groups
      */
-    public void connectNeuronGroups(NeuronGroup source, NeuronGroup target,
+    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target,
     		String sourceLabel, String targetLabel, ConnectNeurons connection) {
-    	List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
-    			source.getNeuronList(),target.getNeuronList());
-    	SynapseGroup newGroup = new SynapseGroup(getParentNetwork(), synapses);
-    	addSynapseGroup(newGroup);
+        List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
+                source.getNeuronList(),target.getNeuronList());
+        SynapseGroup newGroup = new SynapseGroup(getParentNetwork());
+        getParentNetwork().transferSynapsesToGroup(synapses, newGroup);
+        addSynapseGroup(newGroup);
     	if(!source.equals(target)) {
     		newGroup.setLabel("Weights " + sourceLabel + " "
     			+ new Character('\u2192') + " " + targetLabel);
@@ -168,6 +164,7 @@ public class Subnetwork extends Group {
     		newGroup.setLabel("Weights " + sourceLabel + " "
         			+ new Character('\u21BA'));
     	}
+        return newGroup;
     }
     
     /**

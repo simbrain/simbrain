@@ -32,7 +32,7 @@ import org.simbrain.util.Utils;
 
 /**
  * Component for representing error in a trainer.
- *
+ * 
  * @author Jeff Yoshimi
  */
 public class ErrorPlotPanel extends JPanel {
@@ -41,7 +41,7 @@ public class ErrorPlotPanel extends JPanel {
     private Trainer trainer;
 
     /** Data for the error graph. */
-    private TimeSeriesModel model;
+    private final TimeSeriesModel model;
 
     /** Error label. */
     private JLabel rmsError = new JLabel("Error: ----- ");
@@ -51,73 +51,65 @@ public class ErrorPlotPanel extends JPanel {
 
     /**
      * Construct a trainer panel around a trainer object.
-     *
+     * 
      * @param networkPanel the parent network panel
      * @param trainer the trainer this panel represents
      */
     public ErrorPlotPanel(final NetworkPanel networkPanel, final Trainer trainer) {
 
         this.trainer = trainer;
-        JPanel mainPanel = new JPanel();        
-        mainPanel.add(createGraphPanel());
-        add(mainPanel);
+        JPanel mainPanel = new JPanel();
         
+        // Configure time series plot
+        model = new TimeSeriesModel(1);
+        model.setRangeLowerBound(0);
+        model.setRangeUpperBound(1);
+        model.setAutoRange(false);
+        model.setWindowSize(1000);
+        TimeSeriesPlotPanel graphPanel = new TimeSeriesPlotPanel(model);
+        graphPanel.getChartPanel().getChart().setTitle("");
+        graphPanel.getChartPanel().getChart().getXYPlot().getDomainAxis()
+                .setLabel("Iterations");
+        graphPanel.getChartPanel().getChart().getXYPlot().getRangeAxis()
+                .setLabel("Error");
+        graphPanel.getChartPanel().getChart().removeLegend();
+        graphPanel.setPreferredSize(new Dimension(
+                graphPanel.getPreferredSize().width, 250));
+
+        // Customize button panel; first remove all buttons
+        graphPanel.removeAllButtonsFromToolBar();
+        graphPanel.addClearGraphDataButton();
+        graphPanel.addPreferencesButton();
+        graphPanel.getButtonPanel().add(rmsError);
+        graphPanel.getButtonPanel().add(runningLabel);
+        mainPanel.add(graphPanel);
+        add(mainPanel);
+
         trainer.addListener(new TrainerListener() {
 
             public void errorUpdated() {
                 if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
                     if (model != null) {
                         model.update();
-                        IterableAlgorithm theTrainer = (IterableAlgorithm) trainer.getTrainingMethod();
+                        IterableAlgorithm theTrainer = (IterableAlgorithm) trainer
+                                .getTrainingMethod();
                         model.addData(0, theTrainer.getIteration(),
                                 theTrainer.getError());
                     }
                     updateErrorField();
                 }
-           }
+            }
 
             public void inputDataChanged(double[][] inputData) {
             }
 
             public void trainingDataChanged(double[][] trainingData) {
             }
-            
+
         });
 
     }
-    
-    /**
-     * Create the Graph panel.
-     *
-     * @return the panel
-     */
-    private JPanel createGraphPanel() {
 
-         model = new TimeSeriesModel(1);
-         model.setRangeLowerBound(0);
-         model.setRangeUpperBound(1);
-         model.setAutoRange(false);
-         model.setWindowSize(1000);
-         //Configure time series plot
-         TimeSeriesPlotPanel graphPanel = new TimeSeriesPlotPanel(model);
-         graphPanel.getChartPanel().getChart().setTitle("");
-         graphPanel.getChartPanel().getChart().getXYPlot().getDomainAxis()
-         .setLabel("Iterations");
-         graphPanel.getChartPanel().getChart().getXYPlot().getRangeAxis()
-         .setLabel("Error");
-         graphPanel.getChartPanel().getChart().removeLegend();
-         graphPanel.setPreferredSize(new Dimension(graphPanel.getPreferredSize().width, 250));
-
-         //Customize button panel; first remove all buttons
-         graphPanel.removeAllButtonsFromToolBar();
-         //Add clear and prefs button
-         graphPanel.addClearGraphDataButton();
-         graphPanel.addPreferencesButton();
-         graphPanel.getButtonPanel().add(rmsError);
-         graphPanel.getButtonPanel().add(runningLabel);
-
-        return graphPanel;
-    }
 
     /**
      * Update error text field.
@@ -128,34 +120,6 @@ public class ErrorPlotPanel extends JPanel {
                     + Utils.round(((IterableAlgorithm) trainer
                             .getTrainingMethod()).getError(), 4));
         }
-    }
-    
-    
-    //TODO
-
-    /**
-     * Clear the error graph.
-     * 
-     * @param trainerGui reference to trainer gui
-     * @return the action
-     */
-    public static Action getClearGraphAction(final TrainerPanel trainerGui) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-                putValue(SHORT_DESCRIPTION, "Clear graph data");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                // trainerGui.clearGraph();
-            }
-
-        };
     }
 
 }

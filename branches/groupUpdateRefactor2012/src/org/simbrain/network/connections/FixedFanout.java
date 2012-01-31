@@ -64,7 +64,7 @@ public class FixedFanout extends ConnectNeurons {
         return "Fixed Fanout";
     }
 
-    /** {@inheritDoc} */
+    @Override
     public List<Synapse> connectNeurons() {
         ArrayList<Synapse> syns = new ArrayList<Synapse>();
         for (Neuron source : sourceNeurons) {
@@ -99,7 +99,7 @@ public class FixedFanout extends ConnectNeurons {
                 i++;
             }
         }
-        return synapse;
+        return syns;
     }
 
     private double[] getOutboundWeights() {

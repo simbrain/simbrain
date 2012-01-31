@@ -1,8 +1,9 @@
 # 
-# File: xor_in.csv
+# File: xor_in_binary.csv
 # 
 
 1.0,1.0
 0.0,1.0
 1.0,0.0
+0,0
 

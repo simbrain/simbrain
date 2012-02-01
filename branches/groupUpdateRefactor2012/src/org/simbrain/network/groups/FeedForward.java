@@ -27,6 +27,8 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.util.NetworkLayoutManager;
+import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
  * A standard feed-forward network, where a succession of neuron groups and
@@ -106,7 +108,7 @@ public class FeedForward extends Subnetwork {
             layout.layoutNeurons(hiddenLayerNeurons);
             NeuronGroup hiddenLayer = new NeuronGroup(network, hiddenLayerNeurons); 
             addNeuronGroup(hiddenLayer);
-            offsetNeuronGroup(lastLayer, hiddenLayer, "North", betweenLayerInterval);
+            NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
 
             AllToAll connection  = new AllToAll(getParentNetwork());
             

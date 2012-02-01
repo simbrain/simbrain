@@ -25,11 +25,9 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -41,6 +39,8 @@ import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.ReservoirComputingUtils;
 import org.simbrain.network.trainers.Trainer;
+import org.simbrain.network.util.NetworkLayoutManager;
+import org.simbrain.network.util.NetworkLayoutManager.Direction;
 import org.simbrain.network.util.SimnetUtils;
 
 /**
@@ -183,7 +183,7 @@ public class EchoStateNetwork extends Subnetwork {
         reservoirLayer = new NeuronGroup(getParentNetwork(), reservoirLayerNeurons);
         addNeuronGroup(reservoirLayer);
         reservoirLayer.setLabel("Reservoir");
-        offsetNeuronGroup(inputLayer, reservoirLayer, "North", betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, reservoirLayer, Direction.NORTH, betweenLayerInterval);
 
         // Output Layer
         lineLayout.setInitialLocation(initialPosition);
@@ -191,7 +191,7 @@ public class EchoStateNetwork extends Subnetwork {
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         outputLayer.setLabel("Outputs");
         addNeuronGroup(outputLayer);
-        offsetNeuronGroup(reservoirLayer, outputLayer, "North", betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
         
         // Weights: Input layer to reservoir layer
         connector.setSparsity(inSparsity);

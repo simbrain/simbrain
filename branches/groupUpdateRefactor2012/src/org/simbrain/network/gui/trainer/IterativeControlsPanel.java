@@ -80,6 +80,10 @@ public class IterativeControlsPanel extends JPanel {
         // Randomize (de-activate depending...)
         mainPanel.add(new JButton(TrainerGuiActions
                 .getRandomizeNetworkAction(trainer)));
+        JButton newPlot = new JButton(TrainerGuiActions
+                .getShowPlotAction(networkPanel, trainer));
+        newPlot.setHideActionText(true);
+        mainPanel.add(newPlot);
         add(mainPanel);
         
         // Add listener

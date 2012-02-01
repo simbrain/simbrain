@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -38,7 +39,7 @@ public class Subnetwork extends Group {
 
     /** List of synapse groups. */
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
-
+    
     /**
      * Associates neuron groups with the "growing" synapse groups that are
      * "attached" to them.
@@ -123,6 +124,20 @@ public class Subnetwork extends Group {
     public void addNeuronGroup(NeuronGroup group) {
         neuronGroupList.add(group);
         group.setParentGroup(this);
+    }
+
+    /**
+     * Connects one group of neurons all to all to another group of neurons.
+     *
+     * @param source the source group
+     * @param target the target group
+     */
+    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target) {
+        AllToAll connection = new AllToAll(getParentNetwork(),
+                source.getNeuronList(), target.getNeuronList());
+        //connection.setPercentExcitatory(1);
+        SynapseGroup newGroup = connectNeuronGroups(source, target, connection);
+        return newGroup;
     }
     
     /**
@@ -318,47 +333,7 @@ public class Subnetwork extends Group {
         return ret;
     }
     
-    //TODO: Move this to another class? Perhaps make a "network layout manager".
-    /**
-     * Group1 stays fixed. Group2 is moved with respect to group 1 and is centered with 
-     * respect to it in the relevant direction.
-     * 
-     * Must be used after all the subgroups have been added.
-     * 
-     * @param group1 the reference group
-     * @param group2 the group to offset
-     * @param direction String indication of absolute direction. Must be one of
-     *            "North", "South", "East", or "West".
-     * @param amount the amount by which to offset the second group 
-     */
-    protected void offsetNeuronGroup(NeuronGroup group1, NeuronGroup group2,  String direction, double amount) {
 
-        double targetX = 0;
-        double targetY = 0;
-
-        if (direction.equals("North")) {
-            targetX = group1.getCenterX();
-            targetY = group1.getCenterY() - (group1.getHeight() / 2) - amount
-                    - (group2.getHeight() / 2);
-        } else if (direction.equals("South")) {
-            targetX = group1.getCenterX();
-            targetY = group1.getCenterY() + (group1.getHeight() / 2) + amount
-                    + (group2.getHeight() / 2);
-        } else if (direction.equals("East")) {
-            targetX = group1.getCenterX() + (group1.getWidth() / 2) + amount
-                    + (group2.getWidth() / 2);
-            targetY = group1.getCenterY();
-        } else if (direction.equals("West")) {
-            targetX = group1.getCenterX() - (group1.getWidth() / 2) - amount
-                    - (group2.getWidth() / 2);
-            targetY = group1.getCenterY();
-        }
-
-        double offsetX = targetX - group2.getCenterX();
-        double offsetY = targetY - group2.getCenterY();            
-        group2.offset(offsetX, offsetY);
-    }
-    
     
 
     /**

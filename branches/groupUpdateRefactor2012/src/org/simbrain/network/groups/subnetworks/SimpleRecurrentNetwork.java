@@ -14,6 +14,8 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;
+import org.simbrain.network.util.NetworkLayoutManager;
+import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
  * Builds a simple recurrent network from the specified parameters.
@@ -108,7 +110,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
                 hiddenLayerNeurons);
         hiddenLayer.setLabel("Hidden layer");
         addNeuronGroup(hiddenLayer);
-        offsetNeuronGroup(inputLayer, hiddenLayer, "North", betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
         
         // Context Layer
         // Initial context layer values set to 0.5 (as in Elman 1991)
@@ -120,7 +122,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
         for (Neuron n : contextLayer.getNeuronList()) {
             n.setActivation(0.5); //TODO: Make helper method
         }
-        offsetNeuronGroup(inputLayer, contextLayer, "East", betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST, betweenLayerInterval);
 
         // Output layer
         layerLayout.layoutNeurons(outputLayerNeurons);
@@ -128,7 +130,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
                 outputLayerNeurons);
         addNeuronGroup(outputLayer);
         outputLayer.setLabel("Output layer");
-        offsetNeuronGroup(hiddenLayer, outputLayer, "North", betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
+
         // Connect the laid-out layers
         connect();
 
@@ -140,13 +143,12 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
     private void connect() {
         // Standard all to all connections
         AllToAll connect = new AllToAll(this.getParentNetwork());
-        // No self connection
         connect.setAllowSelfConnection(false);
-        // TODO: Way to set weight ranges and excitatory probability?
-        //REDO: Add as a group
-        connect.connectNeurons(getParentNetwork(), inputLayer.getNeuronList(), hiddenLayer.getNeuronList());
-        connect.connectNeurons(getParentNetwork(), contextLayer.getNeuronList(), hiddenLayer.getNeuronList());
-        connect.connectNeurons(getParentNetwork(), hiddenLayer.getNeuronList(), outputLayer.getNeuronList());
+        connect.setPercentExcitatory(.5);
+        //connect.setBaseExcitatorySynapse(null);
+        connectNeuronGroups(inputLayer, hiddenLayer, connect);
+        connectNeuronGroups(contextLayer, hiddenLayer, connect);
+        connectNeuronGroups(hiddenLayer, outputLayer, connect);
     }
 
     /**

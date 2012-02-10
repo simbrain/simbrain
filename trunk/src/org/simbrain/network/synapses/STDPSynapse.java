@@ -24,22 +24,16 @@ import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
  * <b>STDPSynapse</b> models spike time dependent plasticity.
- *
+ * 
  * Only works if source and target neurons are spiking neurons.
- *
- * Drew on: Jean-Philippe Thivierge
- * and Paul Cisek (2008), Journal of Neuroscience. Nonperiodic Synchronization
- * in Heterogeneous Networks of Spiking Neurons
  * 
- * Also scholarpedia article
+ * Drew on: Jean-Philippe Thivierge and Paul Cisek (2008), Journal of
+ * Neuroscience. Nonperiodic Synchronization in Heterogeneous Networks of
+ * Spiking Neurons. Also drew on the Scholarpedia article.
  * 
- * TODO: there are multiple ways to implement. Triple rule.  Decay param.  Implement?
  */
 public class STDPSynapse extends SynapseUpdateRule {
-
-    //TODO: Document default ranges for all vals
     
-    // 
     /** Default tau plus. */
     private static final double TAU_PLUS_DEFAULT = 30;
 
@@ -55,27 +49,24 @@ public class STDPSynapse extends SynapseUpdateRule {
     /** Default Learning rate. */
     private static final double LEARNING_RATE_DEFAULT = .01;
 
-    /** Time constant for LTP case.*/
+    /** Time constant for LTP.*/
     private double tau_plus = TAU_PLUS_DEFAULT;
 
-    /** Time constant for LTD case. */
+    /** Time constant for LTD. */
     private double tau_minus = TAU_MINUS_DEFAULT;
 
     /**
-     * Learning rate for LTP case. Can tweak this separately from W_minus to
-     * allow more LTP than LTD
+     * Learning rate for LTP case. Controls magnitude of LTP changes.
      */
     private double W_plus = W_PLUS_DEFAULT;
 
     /**
-     * Learning rate for LTP case. Can tweak this separately from W_minus to
-     * allow more LTP than LTD.   Default in paper is 100.
+     * Learning rate for LTP case. Controls magnitude of LTD changes.
      */
     private double W_minus = W_MINUS_DEFAULT;
 
     /** General learning rate. */
     private double learningRate = LEARNING_RATE_DEFAULT;
-
 
     @Override
     public void init(Synapse synapse) {
@@ -110,20 +101,24 @@ public class STDPSynapse extends SynapseUpdateRule {
                     .getSource().getUpdateRule();
             SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
                     .getTarget().getUpdateRule();
-            if (tar.hasSpiked() || src.hasSpiked()) {
-                delta_t = src.getLastSpikeTime() - tar.getLastSpikeTime();
-                //double timeStep = synapse.getRootNetwork().getTimeStep();
-                if (delta_t < 0) {
-                    delta_w = W_plus * Math.exp(-delta_t / tau_plus) * learningRate;
-                    System.out.println("LTP: " + delta_t + "/" + delta_w);
-                    synapse.setStrength(synapse.clip(synapse.getStrength()
-                            + delta_w));
-                } else {
-                    delta_w = -W_minus * Math.exp(delta_t / tau_minus) * learningRate;
-                    System.out.println("LTD: " + delta_t + "/" + delta_w);
-                    synapse.setStrength(synapse.clip(synapse.getStrength()
-                            + delta_w));
-                }
+            if (tar.hasSpiked() ) {
+				delta_t = synapse.getRootNetwork().getTime()
+						- src.getLastSpikeTime();
+				delta_w = W_plus * Math.exp(-delta_t / tau_plus) * learningRate;
+				//System.out.println("LTP: " + delta_t + "/" + delta_w);
+				synapse.setStrength(synapse.clip(synapse.getStrength()
+						+ delta_w));
+            	
+            }
+            if (src.hasSpiked()) {
+				delta_t = tar.getLastSpikeTime()
+						- synapse.getRootNetwork().getTime();
+				delta_w = -W_minus * Math.exp(delta_t / tau_minus)
+						* learningRate;
+				//System.out.println("LTD: " + delta_t + "/" + delta_w);
+				synapse.setStrength(synapse.clip(synapse.getStrength()
+						+ delta_w));
+            
             }
         }
 

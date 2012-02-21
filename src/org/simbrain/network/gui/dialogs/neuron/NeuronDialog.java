@@ -63,7 +63,7 @@ public class NeuronDialog extends StandardDialog {
     /** Neuron type combo box. */
     private JComboBox cbNeuronType = new JComboBox(Neuron.getRulelist());
 
-    /** Id Field. */
+    /** Id Label. */
     private JLabel idLabel = new JLabel();
 
     /** Activation field. */

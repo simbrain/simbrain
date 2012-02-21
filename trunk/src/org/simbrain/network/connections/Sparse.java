@@ -17,22 +17,18 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
  * Connect neurons sparsely with some probabilities.
  *
+ * @author ztosi
  * @author jyoshimi
- *
- * TODO:    - Rename this class; it does not necessarily produce "sparse" connectivity.
- *          - Set weights strengths.
  */
 public class Sparse extends ConnectNeurons {
 
@@ -71,12 +67,12 @@ public class Sparse extends ConnectNeurons {
     /** @inheritDoc */
     public void connectNeurons() {
     	
-    	//TODO: percent excititory currently not guaranteed for recurrent
+    	//TODO: percent excitatory currently not guaranteed for recurrent
         //connections (source list == target list) when self connection is
         //not allowed
     	
     	int numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons.size());
-    	int numExcite = (int) (percentExcitatory * numSyns);
+    	int numExcite = (int) ((percentExcitatory / 100) * numSyns);
     	Neuron source;
     	Neuron target;
     	Synapse synapse;
@@ -116,7 +112,7 @@ public class Sparse extends ConnectNeurons {
     	} else {
     		int synsPerSource = numSyns / sourceNeurons.size();
     		Random rGen = new Random();
-    		int numEx = (int) (percentExcitatory * numSyns);
+    		int numEx = (int) ((percentExcitatory / 100) * numSyns);
     		int numIn = numSyns - numEx;
     		
     		for (int i = 0; i < sourceNeurons.size(); i++) {

@@ -65,6 +65,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     /** Synapse panel. */
     private AbstractSynapsePanel synapsePanel = new ClampedSynapsePanel();
 
+    /** Id Label. */
+    private JLabel idLabel = new JLabel();
+
     /** Strength field. */
     private JTextField tfStrength = new JTextField();
 
@@ -130,6 +133,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
         cbSynapseType.addActionListener(this);
+        topPanel.addItem("Id:", idLabel);
         topPanel.addItem("Strength", tfStrength);
         topPanel.addItem("Increment", tfIncrement);
 
@@ -292,6 +296,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      */
     private void fillFieldValues() {
         Synapse synapseRef = (Synapse) synapseList.get(0);
+
+        if (synapseList.size() == 1) {
+            idLabel.setText(synapseRef.getId());
+        } else {
+            idLabel.setText(NULL_STRING);
+        }
         tfStrength.setText(Double.toString(synapseRef.getStrength()));
         tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
         tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));

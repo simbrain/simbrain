@@ -113,24 +113,7 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
     public ExcitatoryInhibitoryPropertiesPanel(final ConnectNeurons connection) {
         this.connection = connection;
         fillFieldValues();
-        initializeContent();
         initializeLayout();
-    }
-
-    /**
-     * Initializes the ratio field, sliders, change listeners, action listeners,
-     * and random buttons/checkboxes.
-     */
-    private void initializeContent() {
-        tRatio.setValue(((Number) (ConnectNeurons.getDefaultRatio() * 100))
-                .intValue());
-        initializeRatioSlider();
-        initializeChangeListeners();
-        initializeActionListeners();
-        randExButton.setIcon(ResourceManager.getImageIcon("ExRand.png"));
-        randInButton.setIcon(ResourceManager.getImageIcon("InRand.png"));
-        randExButton.setEnabled(false);
-        randInButton.setEnabled(false);
     }
 
     private void initializeLayout() {
@@ -143,7 +126,6 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(10, 10, 0, 10);
         this.add(new JLabel("Full Inhibitory"), gbc);
-
         gbc.gridx = 2;
         this.add(new JLabel("Full Excitatory"), gbc);
 
@@ -381,7 +363,7 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
 
     public void commitChanges() {
         connection.setPercentExcitatory(((Number) tRatio.getValue())
-                .doubleValue() / 100);
+                .doubleValue());
         connection.setEnableInRand(randInhib.isSelected());
         connection.setEnableExRand(randExcite.isSelected());
         if (randInhib.isSelected()) {
@@ -399,6 +381,16 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
         connection.setBaseInhibitorySynapse(i);
         inRandPanel.fillDefaultValues();
         exRandPanel.fillDefaultValues();
+        tRatio.setValue(((Number) (connection.getPercentExcitatory()))
+                .intValue());
+        initializeRatioSlider();
+        initializeChangeListeners();
+        initializeActionListeners();
+        randExButton.setIcon(ResourceManager.getImageIcon("ExRand.png"));
+        randInButton.setIcon(ResourceManager.getImageIcon("InRand.png"));
+        randExButton.setEnabled(false);
+        randInButton.setEnabled(false);
+
     }
 
     public JSlider getRatioSlider() {

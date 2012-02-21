@@ -12,9 +12,6 @@
  */
 package org.simbrain.network.connections;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -72,7 +69,7 @@ public class AllToAll extends ConnectNeurons {
  
     	numConnects = sourceNeurons.size() * targetNeurons.size();
     	
-        int numEx = (int) (percentExcitatory * numConnects);
+        int numEx = (int) ((percentExcitatory / 100) * numConnects);
         int numIn = numConnects - numEx;
     	
         //TODO: percent excititory currently not guaranteed for recurrent

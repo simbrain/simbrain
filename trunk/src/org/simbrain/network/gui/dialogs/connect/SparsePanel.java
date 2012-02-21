@@ -222,7 +222,7 @@ public class SparsePanel extends AbstractConnectionPanel {
                         double val = (double) (sparsitySlider.getValue());
                         tfSparsity.setValue(new Double(val));
                         int sps = (int) ((val / 100) * numTargs);
-                        synapsesPerSource.setValue(new Integer(sps));
+                        synapsesPerSource.setValue(sps);
 
                     } else {
                         userFlag = true;
@@ -243,11 +243,10 @@ public class SparsePanel extends AbstractConnectionPanel {
                             if (userFlag) {
                                 userFlag = false;
                                 if (synapsesPerSource != null) {
-                                    sparse = ((Number) synapsesPerSource.getValue())
-                                            .doubleValue() / numTargs;
-                                    tfSparsity.setValue(new Double(sparse));
-                                    int sVal = (int) (sparse * 100);
-                                    sparsitySlider.setValue(new Integer(sVal));
+                                    sparse = (((Number) synapsesPerSource.getValue())
+                                            .doubleValue() / numTargs) * 100;
+                                    tfSparsity.setValue(sparse);
+                                    sparsitySlider.setValue((int) sparse);
                                 }
                             } else {
                                 userFlag = true;
@@ -268,9 +267,9 @@ public class SparsePanel extends AbstractConnectionPanel {
                                     sps = (int) ((((Number) tfSparsity.getValue())
                                             .doubleValue() /100) * numTargs);
                                     synapsesPerSource.setValue(new Integer(sps));
-                                    int sVal = (int) (((Number) tfSparsity
-                                            .getValue()).doubleValue() * 100);
-                                    sparsitySlider.setValue(new Integer(sVal));
+                                    int sliderVal = (int) (((Number) tfSparsity
+                                            .getValue()).doubleValue());
+                                    sparsitySlider.setValue(sliderVal);
                                 }
                             } else {
                                 userFlag = true;
@@ -280,7 +279,7 @@ public class SparsePanel extends AbstractConnectionPanel {
                 });
 
     }
-
+    
     /**
      * Adds action listeners specific to sparse panel: sparse specific check
      * box.
@@ -318,9 +317,10 @@ public class SparsePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-        tfSparsity.setValue(new Double(((Sparse) connection).getSparsity()) * 100);
-        synapsesPerSource.setValue(new Integer((int) (numTargs * ((Number) tfSparsity
-                .getValue()).doubleValue()/100)));
+    	double sparsityVal = new Double(((Sparse) connection).getSparsity()) * 100; 
+        tfSparsity.setValue(sparsityVal);
+        sparsitySlider.setValue((int) sparsityVal);
+        synapsesPerSource.setValue(new Integer((int) ((numTargs *  sparsityVal)/100)));
         synapsesPerSource.setEnabled(false);
     }
 

@@ -16,3 +16,4 @@ localist
 toolbar
 csv
 uncomment
+sparsity

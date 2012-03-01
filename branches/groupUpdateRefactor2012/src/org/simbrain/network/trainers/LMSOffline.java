@@ -93,13 +93,15 @@ public class LMSOffline extends TrainingMethod {
     @Override
     public void apply(Trainer trainer) {
     	
+    	
+    	
     	//TODO: Clean up? Currently ONLY works for ESNs
     	if(trainer.isStateHarvester()) {
     		trainer.setInputData(ReservoirComputingUtils.generateData
     				(trainer.getInputData(), trainer.getTrainingData()));
-    		System.out.println("DO I happen");
+    		
     	}
-    	
+
     	int index = 0;
     	for(Neuron n : trainer.getOutputLayer()) {
     		if(n.getUpdateRule() instanceof SigmoidalNeuron) {
@@ -112,7 +114,6 @@ public class LMSOffline extends TrainingMethod {
     		index++;
     	}
     	
-    	System.out.println("I happen");
     	
         if (solutionType == SolutionType.WIENER_HOPF) {
             weinerHopfSolution(trainer);

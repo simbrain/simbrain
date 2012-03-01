@@ -71,6 +71,7 @@ public class TrainerProgressBar extends JPanel
 	
 	class Task extends SwingWorker<Void, Void> {
 
+		
 		Trainer trainer;
 		
 		public Task (Trainer trainer) {
@@ -79,7 +80,8 @@ public class TrainerProgressBar extends JPanel
 		
 		@Override
 		protected Void doInBackground() throws Exception {
-
+			setProgress(0);
+	
 			((LMSOffline) trainer.getTrainingMethod()).apply(trainer);
 			
 			return null;
@@ -106,9 +108,8 @@ public class TrainerProgressBar extends JPanel
 			multiplier = 100;
 		}
 		
-		
-		
 		if(arg0.getPropertyName() == "StateHarvesting"){
+			
 			newVal = (int) (((Number) arg0.getNewValue()).doubleValue() *
 					multiplier);
 			oldVal = (int) (((Number) arg0.getOldValue()).doubleValue() *
@@ -118,6 +119,7 @@ public class TrainerProgressBar extends JPanel
 			} 
 		}
 		if(arg0.getPropertyName() == "Training") {
+
 			newVal = (int) (((Number) arg0.getNewValue()).doubleValue() *
 					multiplier);
 			oldVal = (int) (((Number) arg0.getOldValue()).doubleValue() *
@@ -138,6 +140,7 @@ public class TrainerProgressBar extends JPanel
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource() == initButton) {
 			initButton.setEnabled(false);
+
 			Task task = new Task(trainer);
 			task.execute();
 		}

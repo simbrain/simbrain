@@ -156,6 +156,7 @@ public class ReservoirComputingUtils {
      * @return a matrix of data to be used for offline training
      */
     public static double[][] generateData(double[][] inputData, double[][] teacherData) {
+
         // The minimum number of state matrix columns
         int columnNumber = esn.getNumReservoirNodes();
 

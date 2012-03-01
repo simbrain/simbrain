@@ -138,11 +138,12 @@ public class Trainer {
      */
     public final void setInputData(double[][] newData) {
         if (newData != null) {
-            if (newData[0].length != inputLayer.size()) {
-                throw new InvalidDataException("Data mismatch: selected data has "
-                        + newData[0].length + " columns; input layer has "
-                        + inputLayer.size() + " neurons");
-            }
+        	// TODO: Causes probelms with state harvesting temporarily commented out, but some sort of check is needed
+//            if (newData[0].length != inputLayer.size()) {
+//                throw new InvalidDataException("Data mismatch: selected data has "
+//                        + newData[0].length + " columns; input layer has "
+//                        + inputLayer.size() + " neurons");
+//            }
             // System.out.println("Input Data: \n" +
             // Utils.doubleMatrixToString(newData));
             this.inputData = newData;

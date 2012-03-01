@@ -229,11 +229,11 @@ public class EchoStateNetwork extends Subnetwork {
 //        	trainingInputs.addAll(outputLayerNeurons);
 //        }
         
+        
         trainer = new Trainer(getParentNetwork(),
         		inputLayerNeurons, outputLayerNeurons, new LMSOffline());
         trainer.setStateHarvester(true);
         
-        //TODO:
         ReservoirComputingUtils.setEsn(this);
     }
 

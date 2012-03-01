@@ -79,10 +79,6 @@ public class ESNCreationDialog extends StandardDialog {
     /**Text field: reads in the desired sparsity between the output and
      * reservoir*/
     private JTextField backSparsity = new JTextField();
-
-    private JTextField noiseMax = new JTextField();
-    
-    private JTextField noiseMin = new JTextField();
     
     /** A check-box which determines whether or not this ESN will have recurrent
      * output weights*/
@@ -105,19 +101,6 @@ public class ESNCreationDialog extends StandardDialog {
     private HashMap<String, NeuronUpdateRule> boxMap =
         new HashMap<String, NeuronUpdateRule>();
 
-    /**A button which brings up a file chooser for input data used for
-     * training*/
-    private JButton inputDataButton = new JButton();
-
-    /**A button which brings up a file chooser for teacher data used for
-     * training*/
-    private JButton teacherDataButton = new JButton();
-
-    /**Input data for training*/
-    private double [][] inputData;
-
-    /**Teacher data for training*/
-    private double [][] teacherData;
 
     //Mapping of Strings to NeuronUpdateRules, currently only Logisitc, Tanh,
     //and Linear neurons are allowed.
@@ -213,84 +196,9 @@ public class ESNCreationDialog extends StandardDialog {
             }
         });
 
-        //Moves everything down
-        esnPanel.setMyNextItemRow(row);
-        gbc.gridx = 0;
-        gbc.gridy = esnPanel.getMyNextItemRow();
-
-        //sectionSeparator("Training Parameters", gbc, row);
-
-        final JFileChooser fc = new JFileChooser();
-
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "CSV files", "csv");
-        fc.setFileFilter(filter);
-
-        instantiateFileOpeners(fc);
-
-        inputDataButton.setText("...");
-        teacherDataButton.setText("...");
-
-        noise.addActionListener(new ActionListener(){
-
-            public void actionPerformed(ActionEvent e) {
-                if (noise.isSelected()) {
-                    noiseMax.setEnabled(true);
-                    noiseMin.setEnabled(true);
-                } else {
-                    noiseMax.setEnabled(false);
-                    noiseMin.setEnabled(false);
-                }
-            }
-
-        }); {
-
-        }
-
-        //REDO
-//        esnPanel.addItem("Regression Type: ", linearRegressionSol, 2);
-//        esnPanel.addItem("Input Data: ", inputDataButton);
-//        esnPanel.addItem("Maximum Noise: ", noiseMax, 2);
-//        esnPanel.addItem("Teacher Data:", teacherDataButton);
-//        esnPanel.addItem("Minimum Noise: ", noiseMin, 2);
-//        esnPanel.addItem("Noise: ", noise);
-
         setContentPane(esnPanel);
         fillFieldValues();
 
-    }
-
-    /**
-     * Instantiates the action listeners for the buttons responsible for
-     * opening file-chooser dialog boxes
-     * @param fc
-     *          the file chooser dialog for the buttons
-     */
-    private void instantiateFileOpeners(final JFileChooser fc) {
-
-        inputDataButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == inputDataButton) {
-                    int returnVal = fc.showOpenDialog(new JPanel());
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        setInputData(Utils.getDoubleMatrix(
-                                fc.getSelectedFile()));
-                    }
-                }
-            }
-        });
-
-        teacherDataButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == teacherDataButton) {
-                    int returnVal = fc.showOpenDialog(new JPanel());
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        setTeacherData(Utils.getDoubleMatrix(
-                                fc.getSelectedFile()));
-                    }
-                }
-            }
-        });
     }
 
     //TODO: put this in a more public class?
@@ -386,40 +294,10 @@ public class ESNCreationDialog extends StandardDialog {
                 boxMap.get(outputNeuronTypes.getSelectedItem());
             builder.setOutputNeuronType(outUp);
 
-            if (linearRegressionSol.getSelectedItem() == "Weiner-Hopf") {
-                builder.setSolType(SolutionType.WIENER_HOPF);
-            } else {
-                builder.setSolType(SolutionType.MOORE_PENROSE);
-            }
-
-            if (noise.isSelected()) {
-                builder.setNoise(true);
-                builder.setNoiseMax(Double.parseDouble(noiseMax.getText()));
-                builder.setNoiseMin(Double.parseDouble(noiseMin.getText()));
-            }
-
             //Build network
             builder.buildNetwork();
 
             dispose();
-
-            //REDO
-//            int dialogOpts = JOptionPane.showConfirmDialog(new JPanel(),
-//                    "Network Construction Complete. \nBegin training "
-//                    + "procedure?\n(Warning: This may a while)\n");
-//
-//            if (dialogOpts == JOptionPane.YES_OPTION) {
-//                builder.train(inputData, teacherData);
-//                esnPanel.setVisible(false);
-//                dispose();
-//                panel.repaint();
-//            } else if (dialogOpts == JOptionPane.NO_OPTION) {
-//                panel.clearPanel();
-//            } else {
-//                panel.clearPanel();
-//                esnPanel.setVisible(false);
-//                dispose();
-//            }
 
 
         } catch (NumberFormatException nfe) {
@@ -429,38 +307,6 @@ public class ESNCreationDialog extends StandardDialog {
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
 
-    }
-
-    public void setInputButton(JButton inputData) {
-        this.inputDataButton = inputData;
-    }
-
-    public JButton getInputButton() {
-        return inputDataButton;
-    }
-
-    public void setTeacherButton(JButton teacherData) {
-        this.teacherDataButton = teacherData;
-    }
-
-    public JButton getTeacherButton() {
-        return teacherDataButton;
-    }
-
-    public void setInputData(double [][] inputData) {
-        this.inputData = inputData;
-    }
-
-    public double [][] getInputData() {
-        return inputData;
-    }
-
-    public void setTeacherData(double [][] teacherData) {
-        this.teacherData = teacherData;
-    }
-
-    public double [][] getTeacherData() {
-        return teacherData;
     }
 
 }

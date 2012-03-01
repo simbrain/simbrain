@@ -18,19 +18,26 @@
  */
 package org.simbrain.network.trainers;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.gui.trainer.TrainerProgressBar;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Matrices;
@@ -46,6 +53,13 @@ import Jama.Matrix;
  */
 public class LMSOffline extends TrainingMethod {
 
+	/** A listener that tracks progress of training.  */
+	private ArrayList<PropertyChangeListener> progressListeners =
+			new ArrayList<PropertyChangeListener>();
+	
+	/** The percent of the task which has been completed. */
+	private double percentComplete = 0;
+	
     /**
      * Solution methods for offline LMS.
      */
@@ -78,6 +92,28 @@ public class LMSOffline extends TrainingMethod {
 
     @Override
     public void apply(Trainer trainer) {
+    	
+    	//TODO: Clean up? Currently ONLY works for ESNs
+    	if(trainer.isStateHarvester()) {
+    		trainer.setInputData(ReservoirComputingUtils.generateData
+    				(trainer.getInputData(), trainer.getTrainingData()));
+    		System.out.println("DO I happen");
+    	}
+    	
+    	int index = 0;
+    	for(Neuron n : trainer.getOutputLayer()) {
+    		if(n.getUpdateRule() instanceof SigmoidalNeuron) {
+    			for(int i = 0; i < trainer.getTrainingData().length; i++) {
+    				trainer.getTrainingData()[i][index] = 
+    						((SigmoidalNeuron) n.getUpdateRule())
+    						.getInverse(trainer.getTrainingData()[i][index], n);
+    			}
+    		} 
+    		index++;
+    	}
+    	
+    	System.out.println("I happen");
+    	
         if (solutionType == SolutionType.WIENER_HOPF) {
             weinerHopfSolution(trainer);
         } else if (solutionType == SolutionType.MOORE_PENROSE) {
@@ -95,15 +131,35 @@ public class LMSOffline extends TrainingMethod {
         Matrix inputMatrix = new Matrix(trainer.getInputData());
         Matrix trainingMatrix = new Matrix(trainer.getTrainingData());
 
+        fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
         trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
+        
+        fireProgressUpdate("Cross-Correlating States with Teacher data (P = S'D)...", 0.15);
+        setPercentComplete(0.15);
         inputMatrix = inputMatrix.transpose().times(inputMatrix);
 
-        inputMatrix = inputMatrix.inverse();
-
+        fireProgressUpdate("Computing Inverse Correlation Matrix...", 0.3);
+        setPercentComplete(0.3);
+        try {
+        	inputMatrix = inputMatrix.inverse();
+        	
+        fireProgressUpdate("Computing Weights...", 0.8);
+        setPercentComplete(0.8);
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
+        fireProgressUpdate("Setting Weights...", 0.95);
+        setPercentComplete(0.95);
         SimnetUtils.setWeightsFillBlanks(trainer.getNetwork(), trainer.getInputLayer(),
                 trainer.getOutputLayer(), wOut);
-
+        fireProgressUpdate("Done!", 1.0);
+        
+        //TODO: What error does JAMA actually throw for singular Matrices?
+        } catch (RuntimeException e) {
+        	JOptionPane.showMessageDialog(new JFrame(), "" +
+        			"State Correlation Matrix is Singular", "Training Failed",
+        			JOptionPane.ERROR_MESSAGE);
+        	fireProgressUpdate("Training Failed", 0);
+        }
+        
         trainingMatrix = null;
         inputMatrix = null;
     }
@@ -115,16 +171,48 @@ public class LMSOffline extends TrainingMethod {
         Matrix inputMatrix = new Matrix(trainer.getInputData());
         Matrix trainingMatrix = new Matrix(trainer.getTrainingData());
 
+        fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", Double.NaN);
         // Computes Moore-Penrose Pseudoinverse
         inputMatrix = Matrices.pinv(inputMatrix);
 
+        fireProgressUpdate("Computing Weights...", 0.8);
+        setPercentComplete(0.8);
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
+        
+        fireProgressUpdate("Setting Weights...", 0.95);
+        setPercentComplete(0.95);
         SimnetUtils.setWeightsFillBlanks(trainer.getNetwork(), trainer.getInputLayer(),
                 trainer.getOutputLayer(), wOut);
+        fireProgressUpdate("Done!", 1.0);
+        
         inputMatrix = null;
         trainingMatrix = null;
     }
 
+    private void fireProgressUpdate (String progressUpdate, double percentComplete) {
+    	for(PropertyChangeListener pcl : progressListeners){
+    			if(pcl instanceof TrainerProgressBar){
+    				pcl.propertyChange(new PropertyChangeEvent(this,
+    					"Training", getPercentComplete(), percentComplete));
+    			} else {
+    				pcl.propertyChange(new PropertyChangeEvent(this,
+    						progressUpdate, null, null));
+    			}
+    	}
+    }
+    
+    private double getPercentComplete () {
+    	return percentComplete;
+    }
+    
+    private void setPercentComplete (double percentComplete) {
+    	this.percentComplete = percentComplete;
+    }
+    
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+    	progressListeners.add(pcl);
+    }
+    
     /**
      * Set solution type.
      *

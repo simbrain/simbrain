@@ -15,6 +15,7 @@ package org.simbrain.network.trainers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 import org.simbrain.network.interfaces.BiasedNeuron;
@@ -46,7 +47,7 @@ public class Trainer {
     private final List<Neuron> outputLayer;
 
     /** Listener list. */
-    private List<TrainerListener> listeners = new ArrayList<TrainerListener>();
+    private List<EventListener> listeners = new ArrayList<EventListener>();
     
     /**
      * A reference to the training method, which actually computes the weight
@@ -68,6 +69,9 @@ public class Trainer {
     
     /** Flag used for iterative training methods. */
     private boolean updateCompleted = true;
+    
+    /** Flag used if methods' inputs are the result of state harvesting. */ 
+    private boolean stateHarvester;
 
 
     /** List of Trainer types. */
@@ -220,8 +224,10 @@ public class Trainer {
      * for iterable methods.
      */
     public void fireErrorUpdated() {
-        for (TrainerListener listener : listeners) {
-            listener.errorUpdated();
+        for (EventListener listener : listeners) {
+            if (listener instanceof TrainerListener) {
+            		((TrainerListener) listener).errorUpdated();
+            }
         }
     }
 
@@ -229,8 +235,10 @@ public class Trainer {
      * Notify listeners that the input data has changed
      */
     private void fireInputDataChanged(double[][] inputData) {
-        for (TrainerListener listener : listeners) {
-            listener.inputDataChanged(inputData);
+        for (EventListener listener : listeners) {
+        	if(listener instanceof TrainerListener) {
+            ((TrainerListener) listener).inputDataChanged(inputData);
+        	}
         }
     }
 
@@ -238,8 +246,10 @@ public class Trainer {
      * Notify listeners that the training data was changed.
      */
     private void fireTrainingDataChanged(double[][] trainingData) {
-        for (TrainerListener listener : listeners) {
-            listener.trainingDataChanged(inputData);
+        for (EventListener listener : listeners) {
+            if(listener instanceof TrainerListener) {
+            	((TrainerListener) listener).trainingDataChanged(inputData);
+            }
         }
     }
 
@@ -260,11 +270,11 @@ public class Trainer {
      *
      * @param trainerListener the listener to add
      */
-    public void addListener(TrainerListener trainerListener) {
+    public void addListener(EventListener eventListener) {
         if (listeners == null) {
-            listeners = new ArrayList<TrainerListener>();
+            listeners = new ArrayList<EventListener>();
         }
-        listeners.add(trainerListener);
+        listeners.add(eventListener);
     }
 
     /**
@@ -311,7 +321,7 @@ public class Trainer {
     /**
      * @return the listeners
      */
-    public List<TrainerListener> getListeners() {
+    public List<EventListener> getListeners() {
         return listeners;
     }
 
@@ -383,6 +393,20 @@ public class Trainer {
     public void setUpdateCompleted(final boolean updateCompleted) {
         this.updateCompleted = updateCompleted;
     }
+
+    /**
+     * @return whether or not the trainer uses harvested data.
+     */
+	public boolean isStateHarvester() {
+		return stateHarvester;
+	}
+
+	/**
+	 * @param stateHarvester flags this as a trainer that harvests states.
+	 */
+	public void setStateHarvester(boolean stateHarvester) {
+		this.stateHarvester = stateHarvester;
+	}
 
 
 }

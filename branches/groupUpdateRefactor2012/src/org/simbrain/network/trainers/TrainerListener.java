@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.trainers;
 
+import java.util.EventListener;
 import java.util.List;
 
 import org.simbrain.network.interfaces.Network;
@@ -28,7 +29,7 @@ import org.simbrain.network.interfaces.Neuron;
  *
  * @author jyoshimi
  */
-public interface TrainerListener {
+public interface TrainerListener extends EventListener {
 
     /**
      * Called when the error value is updated.  Only applies to iterable methods.

@@ -54,6 +54,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.groups.subnetworks.BackpropNetwork;
+import org.simbrain.network.groups.subnetworks.EchoStateNetwork;
 import org.simbrain.network.groups.subnetworks.Hopfield;
 import org.simbrain.network.groups.subnetworks.LMSNetwork;
 import org.simbrain.network.groups.subnetworks.SOM;
@@ -74,6 +75,7 @@ import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.BackpropNetworkNode;
+import org.simbrain.network.gui.nodes.groupNodes.ESNNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.LMSNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
@@ -591,6 +593,9 @@ public class NetworkPanel extends JPanel {
                     ret = new SubnetGroupNode(NetworkPanel.this,
                             (Subnetwork) group);                
                 }
+            } else if (group instanceof EchoStateNetwork) {
+            	ret = new ESNNetworkNode(NetworkPanel.this,
+            			(EchoStateNetwork) group);
             } else {
                 ret = new SubnetGroupNode(NetworkPanel.this,
                         (Subnetwork) group);

@@ -1,9 +1,12 @@
 package org.simbrain.network.trainers;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
@@ -23,11 +26,17 @@ public class ReservoirComputingUtils {
     // required when setting the reservoir states.
     // TODO: Functions for setting trained ESN weights may not function
     // properly for recurrent output weights
+	// TODO: These methods and variables should be made dynamic 
     
     
     private static boolean noise;
     private static double noiseMax;
     private static double noiseMin;
+    private static double percentComplete;
+    private static PropertyChangeListener stateListener;
+    
+    //TODO: Generalize
+    private static EchoStateNetwork esn;
     
     /**
      * Create data to be used in training a reservoir based network, as follows:
@@ -146,8 +155,7 @@ public class ReservoirComputingUtils {
      *            training data used for teacher-forcing if required
      * @return a matrix of data to be used for offline training
      */
-    public static double[][] generateData(EchoStateNetwork esn,
-            double[][] inputData, double[][] teacherData) {
+    public static double[][] generateData(double[][] inputData, double[][] teacherData) {
         // The minimum number of state matrix columns
         int columnNumber = esn.getNumReservoirNodes();
 
@@ -180,21 +188,14 @@ public class ReservoirComputingUtils {
 
             }
 
-
+            
             if (esn.hasBackWeights()) {
                 int count = 0;
                 double clampValue = 0.5;
                 for (Neuron neuron : esn.getOutputLayer().getNeuronList()) {
                     // Teacher forcing
                     if (row > 0) {
-                        if (neuron.getUpdateRule() instanceof SigmoidalNeuron) {
-                            clampValue =
-                                ((SigmoidalNeuron) neuron.getUpdateRule()).
-                                    getInverse(teacherData[row - 1][count],
-                                            neuron);
-                        } else {
-                            clampValue = teacherData[row - 1][count];
-                        }
+                        clampValue = teacherData[row - 1][count];
                     }
                     neuron.setActivation(clampValue);
                     count++;
@@ -224,12 +225,38 @@ public class ReservoirComputingUtils {
                     col++;
                 }
             }
+            
+            firePropertyChange((double) row/inputData.length);
+            setPercentComplete((double) row/inputData.length); 
 
         }
 
         return returnMatrix;
     }
 
+
+    public static void setStateListener(PropertyChangeListener pcl) {
+    	stateListener = pcl;
+    }
+    
+    private static void firePropertyChange(double percentComplete){
+    	stateListener.propertyChange(new PropertyChangeEvent (
+    			ReservoirComputingUtils.class, "State Harvesting", 
+    			getPercentComplete(), percentComplete));
+    }
+    
+    private static class StateHarvestEvent extends PropertyChangeEvent{
+
+		public StateHarvestEvent(Object source, String propertyName,
+				Object oldValue, Object newValue) {
+			super(source, propertyName, oldValue, newValue);
+			// TODO Auto-generated constructor stub
+		}
+
+
+
+    }
+    
     /**
      *  Adds noise to the reservoir's part of the state matrix.
      * @return noise
@@ -377,6 +404,22 @@ public class ReservoirComputingUtils {
     public static double getNoiseMin() {
         return noiseMin;
     }
+
+	public static double getPercentComplete() {
+		return percentComplete;
+	}
+
+	public static void setPercentComplete(double percentComplete) {
+		ReservoirComputingUtils.percentComplete = percentComplete;
+	}
+
+	public static EchoStateNetwork getEsn() {
+		return esn;
+	}
+
+	public static void setEsn(EchoStateNetwork esn) {
+		ReservoirComputingUtils.esn = esn;
+	}
 
    
 }

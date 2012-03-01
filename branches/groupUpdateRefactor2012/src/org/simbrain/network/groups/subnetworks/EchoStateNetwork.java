@@ -92,9 +92,6 @@ public class EchoStateNetwork extends Subnetwork {
     /** Default output neuron type */
     private NeuronUpdateRule outputNeuronType = new LinearNeuron();
 
-    /** The type method of Linear Regression used in training*/
-    private SolutionType solType;
-
     /** Initial position of network (from bottom left). */
     private Point2D initialPosition;
 
@@ -118,6 +115,8 @@ public class EchoStateNetwork extends Subnetwork {
     
     /** Min noise. */
     private double noiseMin;
+    
+    private Trainer trainer;
     
     /**
      * Constructor with size of layers specified.
@@ -202,7 +201,7 @@ public class EchoStateNetwork extends Subnetwork {
         connectNeuronGroups(reservoirLayer, reservoirLayer, connector);
 
         // Weights: reservoir layer to output layer
-        //TODO: These don't usually exist prior to training
+        //TODO: These only exist for the as yet unimplemented RLMS algorithm
         AllToAll allToAll  = new AllToAll(getParentNetwork(), reservoirLayerNeurons, outputLayerNeurons);
         connectNeuronGroups(reservoirLayer, outputLayer, allToAll);
 
@@ -217,7 +216,25 @@ public class EchoStateNetwork extends Subnetwork {
                 spectralRadius);
         
         // Add the group to the network
-        getParentNetwork().addGroup(this);        
+        getParentNetwork().addGroup(this);
+        
+//        //TODO: Re-think if RLMS is implemented...
+//        ArrayList<Neuron> trainingInputs = new ArrayList<Neuron>();
+//        if(directInOutWeights) {
+//        	trainingInputs.addAll(inputLayerNeurons);
+//        }
+//        trainingInputs.addAll(reservoirLayerNeurons);
+//        
+//        if(recurrentOutWeights) {
+//        	trainingInputs.addAll(outputLayerNeurons);
+//        }
+        
+        trainer = new Trainer(getParentNetwork(),
+        		inputLayerNeurons, outputLayerNeurons, new LMSOffline());
+        trainer.setStateHarvester(true);
+        
+        //TODO:
+        ReservoirComputingUtils.setEsn(this);
     }
 
     /**
@@ -240,12 +257,13 @@ public class EchoStateNetwork extends Subnetwork {
         }
     }
 
-    /**
+/*    //TODO: When LSM is implemented move the special methods related to state harvesting to another class?
+    *//**
      * Train the ESN using the provided data.
      *
      * @param inputData input data for input nodes
      * @param trainingData training data
-     */
+     *//*
     public void train(double[][] inputData,
             double[][] trainingData) {
 
@@ -314,6 +332,7 @@ public class EchoStateNetwork extends Subnetwork {
         trainer.update();
 
     }
+*/
 
     public void setResSparsity(double resSparsity) {
         this.resSparsity = resSparsity;
@@ -387,14 +406,6 @@ public class EchoStateNetwork extends Subnetwork {
         return directInOutWeights;
     }
 
-    public void setSolType(SolutionType solType) {
-        this.solType = solType;
-    }
-
-    public SolutionType getSolType() {
-        return solType;
-    }
-
     public static int getDEFAULT_LAYER_INTERVAL() {
         return DEFAULT_LAYER_INTERVAL;
     }
@@ -457,6 +468,14 @@ public class EchoStateNetwork extends Subnetwork {
     public NeuronGroup getOutputLayer() {
         return outputLayer;
     }
+
+    /**
+     * @return the trainer
+     */
+	public Trainer getTrainer() {
+		
+		return trainer;
+	}
 
     /*
 

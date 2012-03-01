@@ -205,6 +205,7 @@ public class TrainerPanel extends JPanel {
         String name = ((ClassDescriptionPair) cbTrainingAlgorithm
                 .getSelectedItem()).getSimpleName();
         trainer.setTrainingMethod(name);
+        
         if (cbDataFormat.getSelectedItem() != DataFormat.SINGLE_STEP) {
             trainer.getNetwork().clearActivations();
             trainer.getNetwork().clearBiases();
@@ -266,16 +267,11 @@ public class TrainerPanel extends JPanel {
      */
     private JPanel createRunPanelNonIterable() {
         JPanel runPanel = new JPanel();
+        runPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 25, 5));
         JButton apply = new JButton("Apply");
-        apply.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent arg0) {
-                trainer.update();
-                trainer.getNetwork().getRootNetwork().fireNetworkChanged();
-            }
-
-        });
+        TrainerProgressBar tpb = new TrainerProgressBar(trainer, apply);
         runPanel.add(apply);
+        runPanel.add(tpb);
         return runPanel;
     }
 

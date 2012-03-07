@@ -50,7 +50,7 @@ public final class RunScriptAction extends WorkspaceAction {
      */
     public RunScriptAction(SimbrainDesktop desktop) {
         super("Run Script...", desktop.getWorkspace());
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Script.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("RunScript.png"));
         this.desktop = desktop;
     }
 

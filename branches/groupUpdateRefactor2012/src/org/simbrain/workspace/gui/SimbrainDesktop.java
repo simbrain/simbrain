@@ -534,6 +534,7 @@ public class SimbrainDesktop {
     private JMenu createScriptMenu() {
         JMenu scriptMenu = new JMenu("Scripts");
         scriptMenu.add(actionManager.getRunScriptAction());
+        scriptMenu.add(actionManager.getShowScriptEditorAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
         for (Action action : actionManager.getScriptActions(this)) {

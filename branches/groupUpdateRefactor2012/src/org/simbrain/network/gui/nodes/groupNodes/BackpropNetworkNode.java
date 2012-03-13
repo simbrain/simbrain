@@ -22,22 +22,16 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.subnetworks.BackpropNetwork;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.DataViewer;
-import org.simbrain.network.gui.trainer.ErrorPlotPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.trainers.Backprop;
-import org.simbrain.network.trainers.LMSIterative;
-import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.genericframe.GenericFrame;

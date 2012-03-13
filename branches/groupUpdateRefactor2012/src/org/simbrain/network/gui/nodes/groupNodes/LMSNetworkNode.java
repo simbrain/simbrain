@@ -25,7 +25,7 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.subnetworks.LMSNetwork;
+import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;

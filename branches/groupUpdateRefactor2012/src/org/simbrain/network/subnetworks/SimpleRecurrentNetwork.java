@@ -1,4 +1,4 @@
-package org.simbrain.network.groups.subnetworks;
+package org.simbrain.network.subnetworks;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;

@@ -34,7 +34,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.simbrain.network.groups.subnetworks.EchoStateNetwork;
+import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.neurons.LinearNeuron;

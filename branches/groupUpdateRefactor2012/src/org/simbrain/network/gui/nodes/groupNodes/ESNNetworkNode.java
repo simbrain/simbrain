@@ -7,14 +7,12 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.subnetworks.EchoStateNetwork;
-import org.simbrain.network.groups.subnetworks.LMSNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
-import org.simbrain.network.trainers.LMSIterative;
+import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.util.ClassDescriptionPair;

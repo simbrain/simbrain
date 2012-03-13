@@ -17,7 +17,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.subnetworks.LMSNetwork;
+import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;

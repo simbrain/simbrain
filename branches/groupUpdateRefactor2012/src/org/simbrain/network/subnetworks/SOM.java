@@ -1,4 +1,4 @@
-package org.simbrain.network.groups.subnetworks;
+package org.simbrain.network.subnetworks;
 
 import java.io.File;
 import java.util.Iterator;

@@ -26,7 +26,7 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.subnetworks.Hopfield;
+import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldPropertiesDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;

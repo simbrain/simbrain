@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.groups.subnetworks;
+package org.simbrain.network.subnetworks;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;

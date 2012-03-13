@@ -15,7 +15,6 @@ package org.simbrain.network.gui.trainer;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,10 +25,9 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.subnetworks.BackpropNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.IterableAlgorithm;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.TrainerListener;

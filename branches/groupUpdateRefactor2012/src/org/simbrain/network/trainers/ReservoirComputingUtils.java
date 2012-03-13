@@ -6,19 +6,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.groups.subnetworks.EchoStateNetwork;
+import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 
 public class ReservoirComputingUtils {

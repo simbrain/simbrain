@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.subnetworks.KWTA;
+import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;

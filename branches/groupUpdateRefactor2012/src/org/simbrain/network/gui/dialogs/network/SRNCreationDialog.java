@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import org.simbrain.network.groups.subnetworks.SimpleRecurrentNetwork;
+import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.neurons.LinearNeuron;

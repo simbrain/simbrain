@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.groups.subnetworks;
+package org.simbrain.network.subnetworks;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.network.trainers.ReservoirComputingUtils;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.util.NetworkLayoutManager;

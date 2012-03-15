@@ -5,6 +5,7 @@
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="lib" location="lib" />
+	<property name="etc" location="etc" />
 	<property name="dist" location="dist" /> <!-- Put final products here -->
 	<property name="build" location="build" /> 	<!-- Staging area -->
 	<property name="build.main" location="${build}/main" /> 
@@ -19,7 +20,6 @@
 	<property name="util" value="org/simbrain/util" />
 	<property name="temp" location="temp" />
 	<property name="removelogger" location="${temp}/removelogger" />
-	<property name="etc" location="etc" />
 	<property name="jarfile" location="${build.main}/${ant.project.name}.jar" />
 	<property name="compile.debug" value="true" />
 
@@ -91,6 +91,7 @@
 		</copy>
 		<copy todir="${build.main}" file="${etc}/Readme.rtf" />
 		<copy todir="${build.main}" file="${etc}/License.rtf" />
+		<copy todir="${build.main}/etc" file="${etc}/config.properties" />
 		<zip destfile="${version}.zip" basedir="${build.main}" />
 		<mkdir dir="${dist}"/>
 		<move todir="${dist}" file="${version}.zip" />

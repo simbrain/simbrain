@@ -27,8 +27,8 @@ import org.simbrain.workspace.*;
     layout.layoutNeurons(network);
     Sparse connection = new Sparse(network, network.getFlatNeuronList(),
             network.getFlatNeuronList());
-    connection.setExcitatoryProbability(.05);
-    connection.setInhibitoryProbability(.1);
+    connection.setSparsity(.4);
+    connection.setPercentExcitatory(60);
     connection.connectNeurons();    
     network.randomizeNeurons();
     desktop.getDesktopComponent(networkComponent).postAddInit();

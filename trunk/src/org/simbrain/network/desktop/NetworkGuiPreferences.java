@@ -383,7 +383,7 @@ public class NetworkGuiPreferences {
         Properties prop = new Properties();
         int retVal = 20;
         try {
-            prop.load(new FileInputStream("config.properties"));
+            prop.load(new FileInputStream("." + FS + "etc" + FS + "config.properties"));
             if (prop.containsKey("maxWeightDiameter")) {
                 retVal = Integer
                         .parseInt(prop.getProperty("maxWeightDiameter"));
@@ -422,7 +422,7 @@ public class NetworkGuiPreferences {
         Properties prop = new Properties();
         int retVal = 7;
         try {
-            prop.load(new FileInputStream("config.properties"));
+            prop.load(new FileInputStream("." + FS + "etc" + FS + "config.properties"));
             if (prop.containsKey("minWeightDiameter")) {
                 retVal = Integer
                         .parseInt(prop.getProperty("minWeightDiameter"));

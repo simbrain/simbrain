@@ -83,7 +83,7 @@ import org.simbrain.plot.projection.*;
 
 
     // Add Recurrent network
-    source("./scripts/scriptmenu/sparseNetwork3.bsh");
+    source("./scripts/scriptmenu/sparseNetwork.bsh");
     NetworkComponent networkComponent = workspace.getComponent("Recurrent Network");
     RootNetwork network = networkComponent.getRootNetwork();
     List targetNeurons = network.getFlatNeuronList();
@@ -101,11 +101,11 @@ import org.simbrain.plot.projection.*;
     layout.layoutNeurons(sourceNeurons);
     ((NetworkDesktopComponent)desktop.getDesktopComponent(networkComponent)).getNetworkPanel().centerCamera();
 
-    // Connect input layer to output layer with Hebbian synapses
+    // Connect input layer to main network
     Sparse sparseConnect = new Sparse(network, sourceNeurons, targetNeurons);
     //sparseConnect.setBaseExcitatorySynapse(new Hebbian(null, null));
-    sparseConnect.setInhibitoryProbability(0);
-    sparseConnect.setExcitatoryProbability(.2);
+    sparseConnect.setSparsity(.4);
+    sparseConnect.setPercentExcitatory(100);
     sparseConnect.connectNeurons();
 
     // Couple odor world to network

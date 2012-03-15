@@ -1,5 +1,7 @@
 SIMBRAIN SCRIPTING
 
+(If you are downloading from svn then some of these folders will be incomplete.   More sample scripts can be obtained by downloading Simbrain_2_AlphaX.zip).
+
 This directory and its subdirectories hold beanshell scripts.  You are encouraged to add your own scripts.  This is your entry point for customizing Simbrain.
 
 The syntax for these scripts is java (with some modifications).  In each case some base object is made available that you can modify using java commands. The best way to learn how to write these scripts is probably to just look (and modify)  existing scripts.  Also see http://www.beanshell.org/docs.html

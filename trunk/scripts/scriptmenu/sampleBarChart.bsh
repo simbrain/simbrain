@@ -31,8 +31,8 @@ import java.awt.Color;
     // CREATE SYNAPSES 
     Sparse connection = new Sparse(network, network.getFlatNeuronList(),
             network.getFlatNeuronList());
-    connection.setExcitatoryProbability(.2);
-    connection.setInhibitoryProbability(.5);
+    connection.setSparsity(.6);
+    connection.setPercentExcitatory(80);
     connection.connectNeurons();    
     network.randomizeNeurons();
     networkComponent.update();

@@ -1,0 +1,15 @@
+import org.simbrain.network.interfaces.*;
+
+/**
+ * Remove selected synapses whose absolute value is below the specified
+ * threshold.
+ */
+{
+    double THRESHOLD = .5;
+
+    for (Synapse synapse: networkPanel.getSelectedModelSynapses()) {
+        if (Math.abs(synapse.getStrength()) < THRESHOLD) {
+            network.deleteSynapse(synapse);
+        }
+    }
+}

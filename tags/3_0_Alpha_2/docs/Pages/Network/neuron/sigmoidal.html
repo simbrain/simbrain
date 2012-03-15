@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Sigmoidal</p>
+  </div>
+  <p></p><h1>Sigmoidal Neuron</h1>
+  <p>The activation level <em>a </em>of this type of node is a sigmoidal function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em> with a bias term <em>b</em>.  <em>m</em> represents the slope at the inflection point, and <em>u</em> and <em>l</em> represent the upper and lower asymptotes (implied by the <a href="../neuron.html#UpBound">upper bound</a> and  <a href="../neuron.html#LowBound">lower bound</a> fields).</p>
+<p><span class="heading">Implementation</span><br>
+</p>
+
+  <p>Several standard forms of the sigmoidal function are
+used.&nbsp;&nbsp; All are scaled using upper and lower bounds and the
+slope.<br>
+ </p>
+  <blockquote>
+    <p><span class="heading2">Arctan</span> </p>
+    <p><img src="../equations/sig_arctan.gif" height="81" width="376"></p>
+    <p>&nbsp;</p><p><span class="heading2">Logistic</span><br>
+</p>
+  <p>A scaled version of the standard sigmoid function 1 / (1 + e<sup>-t</sup> ) ("sgm" below).&nbsp;&nbsp; Not to be confused with the <a href="logistic.html">logistic</a> neuron-type.<br>
+  </p>
+
+    
+    
+  <p><img src="../equations/sig_sigmoid.png" height="79" width="324"></p>
+  <p><span class="heading2">Tanh</span>&nbsp;<br>
+  </p>
+
+  <p>A scaled version of a sigmoidal implementation using a hyperbolic tangent function.</p>
+
+  <p><br>
+  </p>
+
+</blockquote><p class="subtitle"><span class="heading">Bias</span></p>
+<blockquote>
+  <p>The bias is a fixed amount of input to the node, denoted by <em>b</em> above. This shifts the inflection point to the left or right of the origin. </p>
+</blockquote>
+<p class="heading">Slope</p>
+<blockquote>
+  <p>The slope at the inflection point is denoted by <em>m</em> above. This represents how steep the sigmoidal is.</p>
+</blockquote>
+<p class="heading">Use Clipping</p>
+<blockquote>
+  <p> See <a href="../common.html#clipping">clipping</a>. </p>
+</blockquote>
+<p class="heading">Add Noise</p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. The random values are added after the sigmoidal activation function is applied.</p>
+</blockquote>
+</div>
+</body></html>

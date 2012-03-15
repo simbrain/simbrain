@@ -1,0 +1,316 @@
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.desktop.*;
+import org.simbrain.network.layouts.*;
+import org.simbrain.network.networks.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.synapses.*;
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.*;
+import javax.swing.JInternalFrame;
+import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.environment.SmellSource;
+import org.simbrain.world.odorworld.*;
+import org.simbrain.world.odorworld.behaviors.*;
+import org.simbrain.world.odorworld.entities.*;
+import java.util.*;
+import org.jgap.*;
+import org.jgap.impl.*;
+
+/**
+ * Evolve an agent to pursue cheese and avoid poison.
+ * 
+ * TODO: Spawns threads but does not clean them up.
+ */
+{
+    /** Sample size. */
+    private final static int SAMPLE_SIZE = 5;
+
+    /** Number of evolutions to run the evolver. */
+    private final static int NUM_EVOLUTIONS = 10; // 50
+
+    /** Number of times to iterate workspace per evolution step. */
+    private final static int NUM_ITERATIONS_PER_EVOLUTION = 100;
+    
+    /** Maximum fitness. */
+    private final static int MAX_FITNESS = 100000;
+
+    // Sample chromosome, population size, and desired fitness function.
+    Configuration defaultConfig = new DefaultConfiguration();
+    Configuration.reset();
+    defaultConfig.setPreservFittestIndividual(true);
+    defaultConfig.setKeepPopulationSizeConstant(false);
+
+    // Initialize genotype
+    Genotype genotype = null;
+    try {
+
+        // Chromosome is a set of genes that specify:
+        //      number of neurons
+        //      parameters of a sparse connection on them
+        
+        //  Each gene has a minimum and maximum value
+        Gene[] genes = new Gene[7];
+        genes[0] = new IntegerGene(defaultConfig, 11, 50); // Neurons
+        genes[1] = new DoubleGene(defaultConfig, 10, 200); // Grid space
+        genes[2] = new DoubleGene(defaultConfig, .2, 1); // Inhibitory prob
+        genes[3] = new DoubleGene(defaultConfig, 10, 200); // Inhibitory radius
+        genes[4] = new DoubleGene(defaultConfig, .2, 1); // Excitatory prob
+        genes[5] = new DoubleGene(defaultConfig, 10, 100); // Excitatory radius
+        genes[6] = new IntegerGene(defaultConfig, 0, 3); // Neuron Type
+
+        IChromosome sampleChromosome = new Chromosome(defaultConfig, genes);
+        defaultConfig.setSampleChromosome(sampleChromosome);
+        defaultConfig.setPopulationSize(SAMPLE_SIZE);
+        defaultConfig.setFitnessFunction(new NetworkEvaluationFunction());
+        genotype = Genotype.randomInitialGenotype(defaultConfig);
+    } catch (InvalidConfigurationException e) {
+        e.printStackTrace();
+
+        System.exit(-2);
+    }
+
+    for (int i = 0; i < NUM_EVOLUTIONS; i++) {
+        genotype.evolve();
+        IChromosome fittest = genotype.getFittestChromosome();
+        double fitness = fittest.getFitnessValue();
+        System.out.println("Currently fittest Chromosome has fitness "
+                + fitness);
+        if (fitness >= MAX_FITNESS) {
+            break;
+        }
+    }
+
+    // Display winning network
+    IChromosome fittest = genotype.getFittestChromosome();
+    System.out.println("Fittest Chromosome has fitness "
+            + fittest.getFitnessValue() + "  number of neurons: "
+            + ((IntegerGene) fittest.getGene(0)).intValue());
+
+    RootNetwork network = (RootNetwork) fittest.getApplicationData();
+
+    // Initialize network component
+    NetworkComponent networkComponent = new NetworkComponent("Evolved network", network );
+    workspace.addWorkspaceComponent(networkComponent);
+    desktop.getDesktopComponent(networkComponent).postAddInit();
+    
+    // Add coupled world
+    NetworkEvaluationFunction.addCoupledWorld(workspace, networkComponent, desktop);
+    
+
+    // Evaluation function, which creates a workspace with a world and network
+    //  and tries to find an agent which maximizes reward.  Highly provisional!
+    private class NetworkEvaluationFunction extends FitnessFunction {
+
+        // TODO: Base Synapse Types for inhib and excit...
+        private static final String rootDir = "static"
+                + System.getProperty("file.separator");
+
+        /** Reference to parent network. */
+        RootNetwork network;
+
+        protected double evaluate(IChromosome chromosome) {
+
+            network = new RootNetwork();
+            chromosome.setApplicationData(network);
+
+            Workspace evolverWorkspace = new Workspace();
+
+            // Add network
+            NetworkComponent networkComponent = new NetworkComponent( "Evolved network",network);
+            evolverWorkspace.addWorkspaceComponent(networkComponent);
+
+            // The basic description of the network using a chromosome
+            // Currently the emphasis is on networks with radial connections
+            int numNeurons = ((IntegerGene) chromosome.getGene(0)).intValue();
+            double gridSpace = ((DoubleGene) chromosome.getGene(1)).doubleValue();
+            double inhibProb = ((DoubleGene) chromosome.getGene(2)).doubleValue();
+            double inhibRadius = ((DoubleGene) chromosome.getGene(3)).doubleValue();
+            double excitProb = ((DoubleGene) chromosome.getGene(4)).doubleValue();
+            double excitRadius = ((DoubleGene) chromosome.getGene(5)).doubleValue();
+            int neuronType = ((IntegerGene) chromosome.getGene(6)).intValue();
+
+            // Build the network based on the current chromosome
+            for (int i = 0; i < numNeurons; i++) {
+                Neuron neuron = getNeuron(neuronType);
+                neuron.setUpperBound(5);
+                neuron.setLowerBound(-5);
+                network.addNeuron(neuron);
+            }
+            GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math
+                    .sqrt(numNeurons));
+            layout.layoutNeurons(network);
+            Radial connection = new Radial(network, network.getFlatNeuronList(),
+                    network.getFlatNeuronList());
+            connection.setExcitatoryProbability(excitProb);
+            connection.setInhibitoryProbability(inhibProb);
+            connection.setExcitatoryRadius(excitRadius);
+            connection.setInhibitoryRadius(inhibRadius);
+            connection.setBaseExcitatorySynapse(Synapse.getTemplateSynapse());
+            connection.setBaseInhibitorySynapse(Synapse.getTemplateSynapse());
+            connection.connectNeurons();
+
+            // Label neurons
+            network.getNeuron("Neuron_2").setLabel("Left Reward");
+            network.getNeuron("Neuron_3").setLabel("Right Reward");
+            network.getNeuron("Neuron_4").setLabel("Left Poison");
+            network.getNeuron("Neuron_5").setLabel("Right Poison");
+            network.getNeuron("Neuron_9").setLabel("Left Cheese");
+            network.getNeuron("Neuron_10").setLabel("Right Cheese");           
+            network.getNeuron("Neuron_6").setLabel("Left");
+            network.getNeuron("Neuron_7").setLabel("Straight");
+            network.getNeuron("Neuron_8").setLabel("Right");
+
+            // Add reward Neuron
+            Neuron rewardNeuron = new Neuron(network, new ClampedNeuron());
+            rewardNeuron.setLowerBound(-50);
+            rewardNeuron.setUpperBound(100);
+            rewardNeuron.setLabel("Reward");
+            rewardNeuron.setLocation(0,0);
+            network.addNeuron(rewardNeuron);
+
+            // Create the world with coupled agent
+            NetworkEvaluationFunction.addCoupledWorld(evolverWorkspace, networkComponent, null);
+
+            // Run the simulation, compute fitness
+            double totalReward = 0;
+            for(int i = 0; i < NUM_ITERATIONS_PER_EVOLUTION; i++) {
+                evolverWorkspace.iterate();
+                totalReward += rewardNeuron.getActivation();
+            }
+            if (totalReward < 0) {
+                totalReward = 0;
+            }
+            System.out.println(totalReward);
+            return totalReward;
+        }
+
+        /**
+         * Helper method which returns a neuron type based on an integer value. More
+         * options can obviously be added here.
+         *
+         * @param neuronType
+         *            integer value
+         * @return a neuron of the corresponding type
+         */
+        private Neuron getNeuron(int neuronType) {
+
+            switch (neuronType) {
+            case 0:
+                return new Neuron(network, new BinaryNeuron());
+            case 1:
+                return new Neuron(network, new LinearNeuron());
+            case 2:
+                return new Neuron(network, new SigmoidalNeuron());
+            case 3:
+                return new Neuron(network, new DecayNeuron());
+            default:
+                return new Neuron(network, new NakaRushtonNeuron());
+            }
+        }
+
+        public static addCoupledWorld(Workspace theWorkspace, NetworkComponent networkComponent, SimbrainDesktop desktop) {
+
+            // Create the world
+            OdorWorld world = new OdorWorld();
+            OdorWorldComponent world2d = new OdorWorldComponent("World", world);
+            theWorkspace.addWorkspaceComponent(world2d);
+            if (desktop != null) {
+                desktop.getDesktopComponent(world2d).getParentFrame().setBounds(500, 40, 400, 400);                
+            }
+
+            // Add agent to environment
+            RotatingEntity mouse = new RotatingEntity(world);
+            mouse.setLocation(110, 210);
+            world.addAgent(mouse);
+            world.setObjectsBlockMovement(false);
+
+            // Add good objects
+            int NUM_GOOD_OBJECTS = 1;
+            for (int i = 0; i < NUM_GOOD_OBJECTS; i++) {
+                BasicEntity object1 = new BasicEntity(world);
+                float scaleFactor = 400;
+                object1.setLocation((float) Math.random() * scaleFactor, (float) Math.random() * scaleFactor);
+                object1.setSmellSource(new SmellSource(SimbrainMath.multVector(
+                        new double[] {.5, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, 100),
+                        SmellSource.DecayFunction.GAUSSIAN, object1.getLocation()));
+                object1.setVelocityX(5f);
+                object1.setVelocityY(5f);
+                object1.setBehavior(new NewtonianBouncer(object1));
+                world.addEntity(object1);            
+            }
+            
+            int NUM_BAD_OBJECTS = 1;
+            for (int i = 0; i < NUM_BAD_OBJECTS; i++) {
+                BasicEntity object1 = new BasicEntity(world);
+                float scaleFactor = 10;
+                object1.setLocation((float) Math.random() * scaleFactor*40, (float) Math.random() * scaleFactor*40);
+                object1.setVelocityX(-5f);
+                object1.setVelocityY(-5f);
+                //object1.setVelocityX((float)( -scaleFactor/2 + Math.random()*scaleFactor));
+                //object1.setVelocityY((float)( -scaleFactor/2 + Math.random()*scaleFactor));
+                object1.setSmellSource(new SmellSource(SimbrainMath.multVector(
+                        new double[] {-.5, 1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, 100),
+                        SmellSource.DecayFunction.GAUSSIAN, object1.getLocation()));
+                object1.setBehavior(new NewtonianBouncer(object1));
+                object1.setImage("Poison.gif");
+                world.addEntity(object1);            
+            }
+                        
+            
+            // TODO: Rewrite below so that labels are created and used and show up nicely in result
+            // TODO: Add more inputs
+
+            RootNetwork network = networkComponent.getRootNetwork();
+
+            // Make the sensory couplings
+            String mouseId = mouse.getId();
+            String leftSensorId = "Sensor_1";
+            String rightSensorId = "Sensor_3";            
+            Producer leftWhisker1 = world2d.getAttributeManager().createProducer(world.getSensor(mouseId,leftSensorId), "getCurrentValue", double.class, int.class, 0, "Left 1"); 
+            Producer rightWhisker1 = world2d.getAttributeManager().createProducer(world.getSensor(mouseId,rightSensorId), "getCurrentValue", double.class, int.class, 0,  "Right 1"); 
+            Producer leftWhisker2 = world2d.getAttributeManager().createProducer(world.getSensor(mouseId,leftSensorId), "getCurrentValue", double.class, int.class, 1,  "Left 2"); 
+            Producer rightWhisker2 = world2d.getAttributeManager().createProducer(world.getSensor(mouseId,rightSensorId), "getCurrentValue", double.class,int.class, 1,  "Right 2"); 
+            Producer leftCheese = world2d.getAttributeManager().createProducer(world.getSensor(mouseId,leftSensorId), "getCurrentValue", double.class, int.class, 2, "Left Cheese"); 
+            Producer rightCheese = world2d.getAttributeManager().createProducer(world.getSensor(mouseId,rightSensorId), "getCurrentValue", double.class,int.class, 2,  "Right Cheese"); 
+
+            Consumer inputNeuron1 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_2"), "setInputValue", double.class, "Input Neuron 1"); 
+            Consumer inputNeuron2 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_3"), "setInputValue", double.class, "Input Neuron 2"); 
+            Consumer inputNeuron3 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_4"), "setInputValue", double.class, "Input Neuron 3"); 
+            Consumer inputNeuron4 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_5"), "setInputValue", double.class, "Input Neuron 4"); 
+            Consumer inputNeuron5 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_9"), "setInputValue", double.class, "Input Neuron 5"); 
+            Consumer inputNeuron6 = networkComponent.getAttributeManager().createConsumer(network.getNeuron("Neuron_10"), "setInputValue", double.class, "Input Neuron 6"); 
+            
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(leftWhisker1, inputNeuron1));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(rightWhisker1, inputNeuron2));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(leftWhisker2, inputNeuron3));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(rightWhisker2, inputNeuron4));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(leftCheese, inputNeuron5));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(rightCheese, inputNeuron6));
+
+            //Couple Output Neurons to motion
+            Producer actor1 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_6"), "getActivation", double.class, "Actor 1"); 
+            Producer actor2 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_7"), "getActivation", double.class, "Actor 2"); 
+            Producer actor3 = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_8"), "getActivation", double.class, "Actor 3"); 
+            Consumer turnLeft = world2d.getAttributeManager().createConsumer(mouse, "turnLeft", double.class);
+            Consumer turnRight = world2d.getAttributeManager().createConsumer(mouse, "turnRight", double.class);
+            Consumer goStraight = world2d.getAttributeManager().createConsumer(mouse, "goStraight", double.class);
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(actor1, turnLeft));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(actor2, goStraight));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(actor3, turnRight));
+
+            //Couple left and right Reward sensors to ... ?
+            Neuron rewardNeuron = network.getNeuronByLabel("reward");
+            Consumer rewardNeuronAttribute = networkComponent.getAttributeManager().createConsumer(rewardNeuron, "setActivation", double.class, "Reward neuron");
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(leftWhisker1, rewardNeuronAttribute));
+            theWorkspace.getCouplingManager().addCoupling(new Coupling(rightWhisker1, rewardNeuronAttribute));
+        }
+        
+        
+    }
+
+
+}
+
+

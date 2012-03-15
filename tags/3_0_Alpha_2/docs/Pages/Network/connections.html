@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+
+  
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<br>
+
+<a href="../../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Connections</p>
+</div>
+<div id="menu">
+<p class="menubold">Connection Types</p>
+<blockquote>
+  <p><a href="./connections/alltoall.html">All to All</a><br>
+	<a href="./connections/onetoone.html">One to One</a><br>
+	<a href="./connections/radial.html">Radial<br>
+</a><a href="connections/sparse.html">Sparse</a><br>
+  </p>
+</blockquote></div>
+<p> </p>
+<h1>Connecting Neurons<br>
+</h1><br>
+<p>Perhaps one of the most essential parts of building a network aside
+from creating the neurons is connecting those neurons to other neurons
+(and sometimes the same neurons). Connections embody the GUI component
+of <a href="./synapse.html">synapses</a> in Simbrain, and therefore
+graphically allow the one to manipulate the parameters of the synapses
+connecting one set of neurons to another. In addition to granting
+access to underlying synapses, connections and their related GUI
+components allow one to determine the topology of how (out of a
+multitude of ways) one set of neurons can connect to another. In the
+side menu are pages dedicated to each of the standard ways neurons can
+be connected in Simbrain.
+</p>
+<br>
+
+<p class="heading"><a name="sourceTarget"></a>Source and Target Neurons<br>
+</p>
+
+<blockquote>Varous commands in Simbrain (e.g: connecing nodes, training
+weights, viewing weight matrices) require you to specify a set of
+source and target neurons.&nbsp;&nbsp; Source neurons are surrounded by
+red squares and target neurons are surrounded by the standard green
+selection squares.&nbsp;&nbsp; Here is an example.<br>
+  <br>
+  <div style="text-align: center;"><img style="border: 1px solid ; width: 253px; height: 184px;" alt="source / target neurons" src="../../Images/sourceTarget.png"><br>
+  </div>
+  <br>
+  <span class="heading2">To set target neurons</span>: simply select as usual<br>
+  <span class="heading2">To set source neurons</span>: select a group of neurons and either (1) press the "1" key, (2) right click and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>, or (3) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>.<br>
+  <span class="heading2">To clear all source neurons</span>: unselect all neurons (but clicking outside of any neuron), and (1) press the "1" key or  (2) right click and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>, or (3) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Set Source Neuron(s)</span>.<br>
+  <span class="heading2">To clear specific source neurons</span>: select the neurons of interest and (1) right click and select&nbsp;<span class="command">Connect &gt; Clear Source Neuron(s)</span>, or (2) use the Edit menu and select&nbsp;<span class="command">Connect &gt; Clear Source Neuron(s)</span>.<br>
+
+  <br>
+Note that the same neurons can be source and target neurons.<br>
+
+</blockquote>
+
+
+<p class="heading"><a name="ConnectNodes"></a>Connecting nodes.</p>
+
+<blockquote><br>
+  <span class="heading2">Keyboard shortcut method</span><br>
+  <br>
+To quckly connect neurons:<br>
+  <br>
+&nbsp;&nbsp;&nbsp; 1) Set source neurons (select and then keyboard 1)<br>
+&nbsp;&nbsp;&nbsp; 2) Set target neurons (using the standad selection
+mechanism / the green lasso)<br>
+&nbsp;&nbsp;&nbsp; 3) Connect (keyboard 2)<br>
+  <br>
+This method works well.&nbsp; You wil get used to it quickly and then
+use it: select source &gt; 1 &gt; select&nbsp; target &gt; 2.&nbsp; It
+goes fast.&nbsp; <br>
+  <br>
+  <span class="heading2">Menu method</span><br>
+  <br>
+&nbsp;&nbsp;&nbsp; - select source neurons<br>
+&nbsp;&nbsp;&nbsp; - menu connect &gt; set as source<br>
+&nbsp;&nbsp;&nbsp; - select target<br>
+&nbsp;&nbsp;&nbsp; - menu connect &gt; connect-source-target &gt; all
+to all<br>
+  <br><span class="heading2">Connection objects</span><br>
+  <br>
+For this and the next method you can set properties of connection
+object using the &#8220;Set Connection Properties...&#8221; dialog.&nbsp; You can
+make some very fancy and complex patterns of synaptic connection using
+this.&nbsp; You can also add your own custom connection style.<br>
+  <br>
+  <span class="heading2">Simple Connect Method<br>
+  <br>
+  </span>
+  <p><b>To connect a group of source nodes to one
+target node</b>: Select one or more "source" nodes, then right-click
+on a target neuron and select <span class="command">connect nodes</span>
+from the pop-up menu. </p>
+  <p><b>To connect a chain of nodes, one to another</b>:
+Enter build mode, and single click in the following pattern: source,
+target 1, target 1, target 2, target 2, target 3,...</p>
+
+<br><span class="heading2">Selecting Weights via Connections</span><br>
+Connections can be selected in 3 different ways via the selection methods laid out in the <a href="./buildingnets.html">Building and Editing Networks</a> page.<br>
+&nbsp;&nbsp;&nbsp;1) By selecting the weights directly using the lasso etc. (shown below)<br>
+&nbsp;&nbsp;&nbsp;2) By right clicking on a neuron and selecting <span class="command">Select &gt; Select incoming weights</span><br>
+&nbsp;&nbsp;&nbsp;3) By right clicking on a neuron and selecting <span class="command">Select &gt; Select outgoing weights</span>
+<br><br>
+<div style="text-align: center;"><img style="border: 1px solid ; width: 340px; height: 244px;" src="../../Images/selectWeights.png"></div>
+</blockquote><br><br>
+<p class="heading">View Connections as a Weight Matrix<br><br>
+</p>
+
+<p>
+<img style="width: 406px; height: 232px;" src="../../Images/weightmatrixviewer.png" align="right"></p><p align="left">The <span class="command">Show Weight Matrix</span>
+option can be selected after right clicking any neuron or group of
+neurons. The window itself represents the selected neurons as columns
+and all source neurons to these neurons as rows. This equates all
+selected neurons to target neurons as far as the weight matrix viewer
+is concerned. All non-zero entries in the viewer represent the strength
+of the connection between the neuron in the cell's row and the neuron
+represented in its column. Likewise a zero entry represents that no
+connection exists between the neurons designated by the row and coulumn
+of the cell (though there can be a GUI connection with a value of zero
+in rare cases).</p> <br><br>
+
+<blockquote>
+<span class="heading2">Weight Matrix Viewer Toolbar<br>
+  <br>
+  </span>
+Additionally one can manipulate the strength of connections through the
+weight matrix viewer. Clicking on a cell allows one to manipulate the
+synaptic strength of the connection represented by the cell. One can
+also randomize the values in the matrix, set values from a .csv file or
+save values to a .csv file.<br>
+
+<table style="margin-left: 40px;" border="0">
+<tbody>
+<tr>
+
+<td width="6%"><img src="../../Images/Rand.png" height="18" width="18"></td>
+<td width="94%"> Pressing the Random button will uniformly randomize
+the strength of all conections represented in the weight matrix viewer
+between two numbers (default (1,-1))</td></tr>
+<tr>
+<td><img src="../../Images/Prefs.gif" height="18" width="18"></td>
+<td>Pressing the Preferences button will allow one to set the upper and lower bounds on the viewer's randomize function.</td></tr>
+<tr><td><img src="../../Images/Open.png" height="18" width="18"></td>
+<td>Pressing the Open button allows one to open a .csv file and set the
+values of the connections represented by the viewer to the values
+specified in the file. Files representing matrices different from the
+dimensions of the weight matrix shown in the viewer are unsuitable for
+this task.</td></tr>
+<tr><td><img src="../../Images/Save.png" height="18" width="18"></td>
+<td>Pressing the Save button allows one to save the weight matrix as a .csv file, which can be opened later (as above).</td>
+</tr>
+</tbody>
+</table>
+<br>
+
+</blockquote>
+</div>
+
+</body></html>

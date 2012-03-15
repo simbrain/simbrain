@@ -1,0 +1,48 @@
+package org.simbrain;
+
+import java.awt.Point;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.plot.projection.*;
+import org.simbrain.workspace.*;
+
+{
+
+    // Make Network
+    NetworkComponent networkComponent = new NetworkComponent("Attractor Network");
+    workspace.addWorkspaceComponent(networkComponent);
+    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 500);
+    RootNetwork network = networkComponent.getRootNetwork();
+    GridLayout layout = new GridLayout(50.0, 50.0, 5);
+    int numNeurons = 25;
+    layout.setInitialLocation(new Point(10, 10));
+    for (int i = 0; i < numNeurons; i++) {
+        Neuron neuron = new Neuron(network, "NakaRushtonNeuron");
+        network.addNeuron(neuron);
+    }
+    layout.layoutNeurons(network);
+    Sparse connection = new Sparse(network, network.getFlatNeuronList(),
+            network.getFlatNeuronList());
+    connection.setSparsity(.4);
+    connection.setPercentExcitatory(60);
+    connection.connectNeurons();    
+    network.randomizeNeurons();
+    desktop.getDesktopComponent(networkComponent).postAddInit();
+
+    //Make a projection component
+    ProjectionComponent chart = new ProjectionComponent("Projection of Attractor Network");
+    workspace.addWorkspaceComponent(chart);
+    desktop.getDesktopComponent(chart).getParentFrame().setBounds(500, 20, 500, 500);
+
+    // Make Couplings
+    for (int i = 1; i <= numNeurons; i++) {
+        Producer neuronAttribute = networkComponent.getAttributeManager().createProducer(network.getNeuron("Neuron_" + i), "getActivation", double.class, "Neuron " + i); 
+        Consumer chartAttribute = chart.getAttributeManager().createConsumer(chart.getDimension(i-1), "setValue", double.class, "Dimension " + i);
+        workspace.getCouplingManager().addCoupling(new Coupling(neuronAttribute, chartAttribute));
+    }
+
+}

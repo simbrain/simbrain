@@ -1,0 +1,8 @@
+import org.simbrain.network.*;
+import org.simnet.interfaces.*;
+
+WorkspaceComponent getComponent(String name) {
+
+	return ((WorkspaceComponent) workspace.getComponent(name));
+}
+

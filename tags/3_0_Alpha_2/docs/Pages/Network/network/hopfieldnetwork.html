@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Hopfield</p>
+  </div>
+  <p><h1>Hopfield Network</h1></p>
+  <p>A discrete hopfield network is a collection of <a href="../neuron/binary.html">binary neurons</a> that are fully connected to all neurons but themselves. The Hopfield Network exists as a subnetwork in Simbrain because it updates asynchronously, unlike the synchronized updating method of a <a href="standardnetwork.html">standard network</a>. Hopfield networks must be updated in this way in order to be guaranteed to converge on a stable state. </p>
+  <p>The synapses in a Hopfield networks are trained by the Hebb rule. Note that if you open these synapses,  however, you will see that they are clamped; the synapse values are changed by  Hopfield subnetwork. To train a Hopfield network set the neurons to some desired level and select &quot;train&quot; from <a href="subnetwork_tab.html">subnetwork tab</a> context menu. You may want to begin by clearing the networks. </p>
+  <p>To create a continuous Hopfield networks see below. </p>
+  <p class="heading">Initialization</p>
+  <blockquote>
+    <p>Hopfield networks are initialized with some number of units, and are by default laid out as a grid. They are fully interconnected with no self connections. </p>
+  </blockquote>
+  <p class="heading">Parameters</p>
+  <blockquote>
+    <p><span class="heading2">Update Order: </span>This can be set to random or sequential. If set to random, the neuronns are updated in random order. This is the standard assumption of Hopfield networks. if sequential is used, neurons are updated in the same sequence each time, making it possible to reproduce chains of behavior.</p>
+  </blockquote>
+  <p class="heading">Randomize</p>
+  <blockquote>
+    <p>Randomizes so that all connections remain symmetric. </p>
+  </blockquote>
+  <p class="heading">Train</p>
+  <blockquote>
+    <p>Trains the hopfield network using the Hebb rule to learn the current pattern of activity across its nodes.<br>
+</p>
+  </blockquote>
+<p class="heading"> Continuous Hopfield Networks</p>
+<blockquote>
+<p>To create a continuous Hopfield network use a set of <a href="../neuron/additive.html">Additive neurons</a> in a standard network. These can be connected appropriately and trained by using <a href="../synapse/hebbian.html">Hebbian synapses</a>. The user then clamps all neurons, iterates to train the synapses, then clamps all weights. On clamping, see <a href="../toolbar.html">toolbar</a>. </p>
+
+</blockquote>
+</div>
+</body>
+</html>

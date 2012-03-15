@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+  
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div></a>
+<div id="main_docs">
+<div class="navi">
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Trainers</p>
+</div>
+<div id="menu">
+<p class="menubold">Trainers<br>
+</p>
+<blockquote>
+  <p>Backprop<br>
+
+LMS-Iterative<br>
+LMS-Offline<br>
+  <br>
+  </p>
+</blockquote>
+</div>
+<h1>Trainers</h1>
+
+<p>Trainers can be used to train weights connecting layers of neurons
+using various forms of supervised learning. There are currently three
+trainers: backprop, Least-Mean-Squares (LMS)-iterative, and LMS-offline.<br>
+</p>
+<p>The trainer dialog can be used to set the weights connecting a given set of <a href="buildingnets.html#sourceTarget">source and target neurons</a>. &nbsp;
+By using this dialog you can modify the weights connecting the source
+and target neurons, or (for some training algorithms) also create the
+weights.<br>
+
+</p>
+
+
+<p>To call up and use a trainer:</p>
+<ol><li>Make sure you have an appropriate network to train.&nbsp; You <a href="buildingnets.html">build a network</a> by hand but one quick trick is to build a feed-forward network appropriate for&nbsp; pattern association tasksis to use the <a href="scripting.html#buildLayered">buildLayeredNetwork</a> script.<br>
+</li>
+  <li>Select the <a href="buildingnets.html#sourceTarget">source and target neurons</a> of this network.<br>
+  </li>
+<li>Open up a trainer by (1) right clicking and selecting&nbsp;<span class="command">Show Trainer</span>, or (2) going to the Edit menu and
+selecting&nbsp;<span class="command">Show Trainer</span>.&nbsp; This
+action has this chalk / chalkboard icon, <img style="width: 18px; height: 18px;" alt="trainer icon" src="../../Images/Trainer.png">.</li><li>Select source and target data by clicking on the input data and
+training data buttons.&nbsp;&nbsp; The first time you click these
+buttons you will be prompted to select a .csv file with the relevant
+data.&nbsp; Thereafter it will open that data up.&nbsp; You can edit the data if you like.</li>
+  <li>Select what kind of training algorithm you want to use.&nbsp;
+Some algorithms only work with some kinds of networks.&nbsp; For
+example, LMS only works for 2-layer networks.&nbsp; The preference
+button can be used to set parameters of the training session.<br>
+  </li>
+  <li>When you're ready to go, click on the "play" button for iterative
+learning algorithms, or just click the "apply" button for non-iterative
+algorithms.&nbsp; For iterative algorithms you will see the current
+error as it changes in time.<br>
+  </li>
+</ol>
+<p>Note that once you close a trainer object the link to the input and training data is lost.&nbsp; <br>
+</p>
+<p>When you are done training, the source neurons should produce the correct target values.&nbsp; To test, you can open up a <a href="../Worlds/DataWorld/DataWorld.html">data world</a>, load the input data in to that data world, and <a href="../Workspace/Couplings.html">couple</a> it to the source neurons, to see if it worked.<br>
+</p>
+
+<p>Also note that an older version of the trainer is stil available by pressing the&nbsp;<img style="width: 18px; height: 18px;" alt="trainer icon" src="../../Images/Trainer.png"> button in the main desktop toolbar.&nbsp; This will be removed eventually but is there so you can see an alternative design.<br></p>
+
+</div>
+</body></html>

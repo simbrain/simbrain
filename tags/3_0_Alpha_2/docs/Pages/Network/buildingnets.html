@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Simbrain Documentation</title>
+
+
+
+  
+
+  
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+  
+  <link href="../../Styles.css" rel="stylesheet" type="text/css"></head><body>
+<a href="../../SimbrainDocs.html">
+<div class="logo">
+<p><span></span></p>
+</div>
+</a>
+<div class="text" id="main_docs">
+<div class="navi">
+<p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Basics of Building and Editing Networks</p>
+</div>
+<!--  -->
+<h1>Building and Editing Networks<br>
+</h1>
+
+<br>
+<p>Network
+editing in Simbrain is modeled on a familiar "draw" interface which
+involves creating screen elements, copying, and pasting.</p>
+
+<p class="heading"><a name="NewNode"></a>Creating nodes. </p>
+<blockquote>
+  <p><span class="heading2">Creating a node:</span> Nodes are created
+by pressing "P" or by pressing the new node button <img src="../../Images/AddNeuron.png" height="18" width="18"> in the toolbar.
+Any new nodes will be created at the last position clicked on-screen. </p>
+  <p><span class="heading2">Creating a line of nodes:</span>
+Repeatedly pressing "P" or the new node buttuon results in a line of
+nodes being created beginning at the last clicked position.</p>
+  <p><span class="heading2">Creating specific types of neurons:</span>
+By default, new nodes are <a href="./neuron/linear.html">Linear</a>.
+The default node type cannot
+currently be changed, though this is planned. To create a node of a
+specific type, simply create a new node, right click the node, then go
+to "Edit 1 Selected Neuron". From there one can select any neuron type
+in Simbrain from a dropdown menu.</p>
+<p><span class="heading2">Creating many nodes:</span> To create many nodes at once one can go to <span class="command">Insert &gt; Add Neurons</span>
+and instantly create an arbitrary number of neurons specified in the
+Add Neurons window. Upon closing windows requesting information on the
+type and layout of the neurons will appear. Information on laying out
+groups of neurons can be found on the <a href="./layouts.html">Layouts</a> page. Alternately, to create many nodes of a specific type one can: <br></p><blockquote> Create a node, set its type (as specified above), and then copy and paste repeatedly.<br> &nbsp; OR<br> Create many default nodes, select all of them with the cursor (see <b>Selecting Nodes and Weights</b> below), right click any of them, and change their type from: <span class="command">Edit <b>N</b> Selected Neurons</span>, where N is the number of selected neurons.</blockquote> 
+  <p><span class="heading2">Creating networks or groups of nodes:</span>
+Subnets are created using <span class="command">Insert &gt; Add Network</span>.
+<a href="./subnetwork.html">Subnetworks</a> and small groups of neurons can be created, copied, and
+repeatedly pasted to quickly create many sets of similar elements.
+</p><br>
+
+</blockquote><p class="heading"><a name="SelectNodes"></a>Selecting nodes and weights<br>
+</p>
+<p> Neurons and weights can be selected so that operations can be
+performed on the selected group of items (e.g., randomizing selected
+items, adjusting them up or down, etc.). Selecting neurons and weights
+is important, because many Simbrain operations apply to selected sets
+of weights and/or nodes. The selection interface basically works the
+way most computer drawing programs work. Use the left-click button to
+"lasso" or "rubberband" screen items. Once some items are selected, you
+can hold down the shift key and single-click to fine tune your
+selection. </p>
+<blockquote>
+  <p><span class="heading2">Selection mode</span>: All
+selection operations must be done in selection mode, the default mode,
+which is entered by pressing "S" or the selection button <img src="../../Images/Arrow.gif" height="18" width="18">.</p>
+  <p><span class="heading2">Lasso</span>: Left-click and drag the lasso
+around screen items you want to select. As items are selected a box
+appears around them.</p>
+  <p><span class="heading2">Single click</span>: Single left-click on
+nodes and weights to select individual screen items. Zooming in on
+items can facilitate this.</p>
+  <p><span class="heading2">Shift key </span>:
+Once some items are selected, you can hold down the shift key to add
+more items to your selection. Hold down Shift while lassoing to add or
+remove groups items; hold down Shift while single-clicking to add or
+remove single items. </p>
+</blockquote>
+
+
+<p class="heading"><a name="SettingPref"></a>Setting Properties</p>
+<p>Some detailed properties are set using a dialog box. Other
+properties, e.g. activation values for neurons and strengths for
+weights, can be set using keyboard and toolbar commands.</p>
+<blockquote>
+  <p><span class="heading2">Calling set properties dialog:</span>
+Select the neurons or weights you want to change and:</p>
+  <p>1) double-click on of the selected items<br>
+2) right-click and select <span class="command">set properties</span>
+in the popup menu<br>
+3) select <span class="command">network &gt; edit &gt; set neurons</span>
+or <span class="command">network &gt; edit &gt; set weights</span></p>
+  <p><span class="heading2">Setting properties of multiple objects</span>.
+Select the objects you want to modify. If you select both weights and
+neurons, which preference dialog comes up depends on which kind of item
+you click on. </p>
+  <p><span class="heading2">Set activation values</span>:
+The activation value (and hence color) of neurons and the excitatory or
+inhibitory strength (and hence color and size) of weights can be
+manually adjusted. To do so, select one or more neurons and weights
+(both can be adjusted at the same time), and press the up and down
+arrow keys to increase or decrease these values. The amount increased
+or decreased is set by the "increment" field. Right and left arrow keys
+can also be used to increase or decrease these value. </p>
+  <p><span class="heading2">Clearing and randomizing values</span>:
+Note that while screen items are selected, neuron values can also be
+set to zero by pressing "C" on the keyboard (weight values are not then
+set to zero, because this is equivalent to deleting them, which can be
+done with the delete key). Pressing "R" will randomize all selected
+screen items, neurons and weights.</p>
+</blockquote>
+<p class="heading">Moving Nodes </p>
+<p>Simply left click and drag the selected items, as you would a window
+or any other screen item. Groups of items can be moved by selecting and
+left-click dragging them. For fine tuning, users can also use the arrow
+keys (with Shift held down) to "nudge" selected items. </p>
+<p class="heading"><a name="CopyPaste"></a>Smart copy and paste<br>
+</p>
+<p>Selected items can be copied, cut, and paste similarly to the way
+they are on most contemporary GUI's. Lasso select groups of items, then
+fine tune your selection using SHIFT to add or remove items. Simbrain
+will automatically select all valid subnetworks (all nodes and all
+selected connections which couple selected nodes; i.e. "free-floating"
+connections will not be selected). </p>
+<blockquote>
+  <p> Copy, copy, and paste in one of the following ways </p>
+  <p>1) Use standard shortcuts: control-C (copy), control-X (cut),
+control-V (paste).<br>
+2) Use the network menu and select copy, cut, or paste. <br>
+3) Right-click on one of the selected items and select copy or cut</p>
+</blockquote>
+<p>Smart copy/paste: Copy neurons, paste, move, and re-paste, and the
+new paste&#8217;s follow the rule. In this way you can quickly build big
+networks.</p>
+
+</div>
+
+</body></html>

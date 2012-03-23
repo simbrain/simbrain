@@ -19,32 +19,17 @@
 package org.simbrain.network.trainers;
 
 /**
- * Classes with implement this interface fire events indicating 
- * changes in the status of a trainer.
+ * Classes which implement this interface fire events indicating 
+ * changes in the error associated with an iterable trainer.
  *
  * @author jyoshimi
  */
-public interface TrainerListener {
+public interface ErrorListener {
 
-	/**
-	 * Called when training begins. Useful for forms of training that take a
-	 * while, where indication of progress is useful.
-	 */
-	public void beginTraining();
-
-	/**
-	 * Called when training ends. Useful for forms of training that take a
-	 * while, where indication of progress is useful.
-	 */
-    public void endTraining();
-    
     /**
-	 * Called for updates on the progress of a trainer. Used currently for
-	 * progress bars.
-	 * 
-	 * @param progressUpdate a string message about the  current progress on an update.
-	 * @param percentComplete how far along an operation is.
-	 */
-    public void progressUpdated(String progressUpdate, int percentComplete);
+     * Called when the error value is updated.
+     */
+    public void errorUpdated();
+    
 
 }

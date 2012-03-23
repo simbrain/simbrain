@@ -18,20 +18,24 @@ import java.awt.geom.Point2D;
 import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.trainers.LMSIterative;
-import org.simbrain.network.trainers.Trainer;
+import org.simbrain.network.trainers.Trainable;
 
 /**
  * An LMS Network
  * 
  * @author Jeff Yoshimi
  */
-public class LMSNetwork extends FeedForward {
+public class LMSNetwork extends FeedForward implements Trainable {
 
-
-    /** Reference to parent trainer. */
-    private final Trainer trainer;
-
+	/**
+	 * Input data.
+	 */
+	private double[][] inputData;
+	
+	/**
+	 * Training Data
+	 */
+	private double[][] trainingData;
 
     public LMSNetwork(final RootNetwork network, int numInputNeurons,
             int numOutputNeurons, Point2D initialPosition) {
@@ -39,17 +43,38 @@ public class LMSNetwork extends FeedForward {
                 initialPosition);
         getOutputLayer().setNeuronType(new LinearNeuron());
         setLabel("LMS Network");
-        trainer = new Trainer(network, this.getNeuronGroup(0).getNeuronList(),
-                this.getNeuronGroup(1).getNeuronList(),
-                new LMSIterative());
         
     }
 
-    /**
-     * @return the trainer
-     */
-    public Trainer getTrainer() {
-        return trainer;
-    }
+	@Override
+	public double[][] getInputData() {
+		return inputData;	
+	}
+
+	@Override
+	public double[][] getTrainingData() {
+		return trainingData;
+	}
+
+	/**
+	 * Set the input data.
+	 *
+	 * @param inputData the data to set.
+	 */
+	public void setInputData(double[][] inputData) {
+		this.inputData = inputData;
+		
+	}
+
+	/**
+	 * Set the training data.
+	 *
+	 * @param trainingData the data to set
+	 */
+	public void setTrainingData(double[][] trainingData) {
+		this.trainingData = trainingData;		
+	}
+
+
 
 }

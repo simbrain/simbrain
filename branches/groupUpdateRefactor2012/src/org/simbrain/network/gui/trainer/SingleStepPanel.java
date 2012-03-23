@@ -18,17 +18,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.trainers.Trainer;
-import org.simbrain.util.Utils;
+
 
 /**
- * Component for training a network using the current data only.
+ * Component for training a network using current data only.
  * 
  * @author Jeff Yoshimi
  */
@@ -51,16 +48,16 @@ public class SingleStepPanel extends JPanel {
         this.add(currentTraining);
         setDataButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                double[] inputVector = Network
-                        .getActivationVector(trainer.getInputLayer());
-                double[] trainingVector = Network
-                        .getActivationVector(trainer.getOutputLayer());
-                currentInput.setText("Input: "
-                        + Utils.getVectorString(inputVector, ","));
-                currentTraining.setText("Target:  "
-                        + Utils.getVectorString(trainingVector, ","));
-                trainer.setInputData(new double[][] { inputVector});
-                trainer.setTrainingData(new double[][] { trainingVector});
+//                double[] inputVector = Network
+//                        .getActivationVector(trainer.getInputLayer());
+//                double[] trainingVector = Network
+//                        .getActivationVector(trainer.getOutputLayer());
+//                currentInput.setText("Input: "
+//                        + Utils.getVectorString(inputVector, ","));
+//                currentTraining.setText("Target:  "
+//                        + Utils.getVectorString(trainingVector, ","));
+//                trainer.setInputData(new double[][] { inputVector});
+//                trainer.setTrainingData(new double[][] { trainingVector});
                 //parentFrame.pack();
             }
         });

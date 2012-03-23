@@ -15,6 +15,7 @@ package org.simbrain.network.gui.trainer;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -24,11 +25,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
+import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.trainers.InvalidDataException;
-import org.simbrain.network.trainers.IterableAlgorithm;
+import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainer;
-import org.simbrain.network.trainers.TrainingMethod;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
@@ -52,27 +53,32 @@ public class TrainerGuiActions {
     /** The main user preference object. */
     private static final Preferences THE_PREFS = Preferences.userRoot().node(
             "org/simbrain/network/trainer");
-
+    
     /**
-     * Action invoked when pressing the input or training data button on the
-     * trainer panel.
-     * 
-     * @param networkPanel the parent network panel
-     * @param type whether this is input or training data
-     * @return the action
-     */
-    public static Action getEditDataAction(final NetworkPanel networkPanel,
-            final Trainer trainer, final TrainerDataType type) {
+	 * Action for viewing data in a table that correlate with a set of neurons.
+	 * It's a bit of a pain, but to use this you must create an instanceof a
+	 * DataHolder, which is basically just a reference to an object with getData
+	 * and setData methods.
+	 * 
+	 * @param networkPanel
+	 *            the parent network panel
+	 * @param neurons
+	 *            the list of neurons to which the columns correspond
+	 * @param dataHolder
+	 *            the object that holds the data (with a getData and setData
+	 *            method)
+	 * @param name
+	 *            the name of the data (for use in display)
+	 * @return an action for opening this table
+	 */
+    public static Action getEditDataAction(final NetworkPanel networkPanel, final List<Neuron> neurons,
+            final DataHolder dataHolder, final String name) {
         return new AbstractAction() {
 
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
-                if (type == TrainerDataType.Input) {
-                    putValue(NAME, "Input data");
-                } else {
-                    putValue(NAME, "Training data");
-                }
+                putValue(NAME, name);
                 putValue(SHORT_DESCRIPTION, "Edit data");
             }
 
@@ -80,9 +86,9 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                networkPanel.displayPanel(
-                        DataViewer.createDataViewerPanel(trainer, type),
-                        type.name() + " Data");
+				networkPanel.displayPanel(
+						DataViewer.createDataViewerPanel(neurons, dataHolder, name),
+						"Edit " + name);
             }
 
         };
@@ -108,105 +114,52 @@ public class TrainerGuiActions {
     }
 
     /**
-     * Action for opening from comma separated value file. Replaces the default
-     * simbrainjtable action for this, so that the trainer and trainer panel can
-     * be updated as appropriate.
-     * 
-     * @param table table to load data in to
-     * @return the action
+ 	 * Action for opening data comma separated value file. Replaces the default
+	 * simbrainjtable action for this, so that the trainer and trainer panel can
+	 * be updated as appropriate.
+	 * 
+     * @param table the simbrain jtable
+     * @param dataHolder the object holding the data
+     * @return the action for opening csv files
      */
-    public static Action getOpenCSVAction(final Trainer trainer,
-            final SimbrainJTable table, final TrainerDataType type) {
-        return new AbstractAction() {
+	public static Action getOpenCSVAction(final SimbrainJTable table, final DataHolder dataHolder) {
+		return new AbstractAction() {
 
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-                if (type == TrainerDataType.Input) {
-                    putValue(NAME, "Open input data (.csv)");
-                } else {
-                    putValue(NAME, "Open training data (.csv)");
-                }
-                putValue(SHORT_DESCRIPTION, "Open .csv data...");
-            }
+			// Initialize
+			{
+				putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+				putValue(NAME, "Open data (.csv)");
+				putValue(SHORT_DESCRIPTION, "Open .csv data...");
+			}
 
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                SFileChooser chooser = new SFileChooser(getDataDirectory(),
-                        "comma-separated-values (csv)", "csv");
-                File theFile = chooser.showOpenDialog();
-                if (theFile != null) {
-                    if (type == TrainerDataType.Input) {
-                        try {
-                            trainer.setInputData(theFile);
-                            ((NumericTable) table.getData()).readData(theFile);
-                            ((JFrame) table.getTopLevelAncestor())
-                                    .setTitle(theFile.getName());
-                        } catch (InvalidDataException exception) {
-                            JOptionPane.showMessageDialog(null,
-                                    exception.getMessage(), "Error",
-                                    JOptionPane.ERROR_MESSAGE);
-                        }
-                    } else {
-                        try {
-                            trainer.setTrainingData(theFile);
-                            ((NumericTable) table.getData()).readData(theFile);
-                            ((JFrame) table.getTopLevelAncestor())
-                                    .setTitle(theFile.getName());
-                        } catch (InvalidDataException exception) {
-                            JOptionPane.showMessageDialog(null,
-                                    exception.getMessage(), "Error",
-                                    JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                    setDataDirectory(chooser.getCurrentLocation());
-                }
-            }
+			/**
+			 * {@inheritDoc}
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				SFileChooser chooser = new SFileChooser(getDataDirectory(),
+						"comma-separated-values (csv)", "csv");
+				File theFile = chooser.showOpenDialog();
+				if (theFile != null) {
+					try {
+						((NumericTable) table.getData()).readData(theFile);
+						dataHolder.setData(((NumericTable) table.getData())
+								.asArray());
+						((JFrame) table.getTopLevelAncestor()).setTitle(theFile
+								.getName());
+					} catch (InvalidDataException exception) {
+						JOptionPane.showMessageDialog(null,
+								exception.getMessage(), "Error",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
+				setDataDirectory(chooser.getCurrentLocation());
+			}
 
-        };
-    }
-    
-    /**
-     * Randomizes network.
-     * 
-     * @param trainer reference to trainer
-     * @return the action
-     */
-    public static Action getRandomizeNetworkAction(final Trainer trainer) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-                // putValue(NAME, "Show properties");
-                putValue(SHORT_DESCRIPTION, "Randomize network");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                if (trainer != null) {
-                    if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
-                        trainer.randomize();
-                        // trainerGui.setUpdateCompleted(true); // Stop trainer
-                        // if it's running
-
-                        // Update Display
-                        trainer.getNetwork().getRootNetwork()
-                                .fireNetworkChanged();
-                    }
-                }
-            }
-
-        };
-    }
-
+		};
+	}
 
     /**
-     * Show properties dialog for currently selected trainer.
+     * Show properties dialog for the indicated trainer.
      * 
      * @param trainer the trainer
      * @return the action
@@ -218,7 +171,7 @@ public class TrainerGuiActions {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-                // putValue(NAME, "Show properties");
+                putValue(NAME, "Show properties");
                 putValue(SHORT_DESCRIPTION, "Show properties");
             }
 
@@ -226,10 +179,9 @@ public class TrainerGuiActions {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                TrainingMethod method = trainer.getTrainingMethod();
                 ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
                 editor.setUseSuperclass(false);
-                editor.setObject(method);
+                editor.setObject(trainer);
                 JDialog dialog = editor.getDialog();
                 dialog.setModal(true);
                 dialog.pack();
@@ -248,26 +200,26 @@ public class TrainerGuiActions {
      * @return the action
      */
     public static AbstractAction getShowPlotAction(final NetworkPanel panel,
-            final Trainer trainer) {
-        return new AbstractAction() {
+			final IterableTrainer trainer) {
+		return new AbstractAction() {
 
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("CurveChart.png"));
-                putValue(NAME, "Show error plot");
-                putValue(SHORT_DESCRIPTION, "Show error plot");
-            }
+			// Initialize
+			{
+				putValue(SMALL_ICON,
+						ResourceManager.getImageIcon("CurveChart.png"));
+				putValue(NAME, "Show error plot");
+				putValue(SHORT_DESCRIPTION, "Show error plot");
+			}
 
-            /**
-             * {@inheritDoc}
-             */
-            public void actionPerformed(ActionEvent arg0) {
-                ErrorPlotPanel errorPanel = new ErrorPlotPanel(
-                        panel, trainer);
-                panel.displayPanel(errorPanel, "Error plot");
-            }
+			/**
+			 * {@inheritDoc}
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				ErrorPlotPanel errorPanel = new ErrorPlotPanel(trainer);
+				panel.displayPanel(errorPanel, "Error plot");
+			}
 
-        };
-    }
+		};
+	}
 
 }

@@ -1,15 +1,20 @@
 /*
- * Part of Simbrain--a java-based neural network kit Copyright (C) 2005,2007 The
- * Authors. See http://www.simbrain.net/credits This program is free software;
- * you can redistribute it and/or modify it under the terms of the GNU General
- * Public License as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. This program is
- * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
- * should have received a copy of the GNU General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
- * - Suite 330, Boston, MA 02111-1307, USA.
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.simbrain.network.gui.trainer;
 
@@ -23,9 +28,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.trainers.IterableAlgorithm;
-import org.simbrain.network.trainers.Trainer;
-import org.simbrain.network.trainers.TrainerListener;
+import org.simbrain.network.trainers.ErrorListener;
+import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
@@ -38,7 +42,7 @@ import org.simbrain.util.Utils;
 public class IterativeControlsPanel extends JPanel {
 
     /** Reference to trainer object. */
-    private final Trainer trainer;
+    private final IterableTrainer trainer;
 
     /** Current number of iterations. */
     private JLabel iterationsLabel = new JLabel("  ");
@@ -55,7 +59,7 @@ public class IterativeControlsPanel extends JPanel {
      * @param networkPanel the parent network panel
      * @param trainer the trainer this panel represents
      */
-    public IterativeControlsPanel(final NetworkPanel networkPanel, final Trainer trainer) {
+    public IterativeControlsPanel(final NetworkPanel networkPanel, final IterableTrainer trainer) {
 
         this.trainer = trainer;
         JPanel mainPanel = new JPanel();
@@ -77,32 +81,25 @@ public class IterativeControlsPanel extends JPanel {
         // Error
         mainPanel.add(rmsError);
 
-        // Randomize (de-activate depending...)
-        mainPanel.add(new JButton(TrainerGuiActions
-                .getRandomizeNetworkAction(trainer)));
-        JButton newPlot = new JButton(TrainerGuiActions
-                .getShowPlotAction(networkPanel, trainer));
-        newPlot.setHideActionText(true);
-        mainPanel.add(newPlot);
+		// Randomize (de-activate depending...)
+		// mainPanel.add(new JButton(TrainerGuiActions
+		// .getRandomizeNetworkAction(trainer)));
+		// // JButton newPlot = new JButton(TrainerGuiActions
+		// // .getShowPlotAction(networkPanel, trainer));
+		// newPlot.setHideActionText(true);
+		// mainPanel.add(newPlot);
         add(mainPanel);
         
         // Add listener
-        trainer.addListener(new TrainerListener() {
+        trainer.addErrorListener(new ErrorListener() {
 
             public void errorUpdated() {
                 iterations++;
                 iterationsLabel.setText("" + iterations + " ");
                 updateError();
             }
-
-            public void inputDataChanged(double[][] inputData) {
-            }
-
-            public void trainingDataChanged(double[][] trainingData) {
-            }
             
         });
-
 
     }
     
@@ -111,8 +108,7 @@ public class IterativeControlsPanel extends JPanel {
      */
     private void updateError() {
         rmsError.setText("Error:"
-                + Utils.round(((IterableAlgorithm) trainer
-                        .getTrainingMethod()).getError(), 4));
+                + Utils.round(trainer.getError(), 4));
     }
 
     /**
@@ -139,7 +135,7 @@ public class IterativeControlsPanel extends JPanel {
                     Executors.newSingleThreadExecutor().submit(new Runnable() {
                         public void run() {
                             while (!trainer.isUpdateCompleted()) {
-                                trainer.update();
+                                trainer.apply();
                                 // TODO: Make below an option?
                                 // trainerGui.getTrainer().getNetwork().getRootNetwork().fireNetworkChanged();
                             }
@@ -179,7 +175,7 @@ public class IterativeControlsPanel extends JPanel {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                trainer.update();
+                trainer.apply();
             }
 
         };
@@ -205,5 +201,6 @@ public class IterativeControlsPanel extends JPanel {
             }
 
         };
+    
 
 }

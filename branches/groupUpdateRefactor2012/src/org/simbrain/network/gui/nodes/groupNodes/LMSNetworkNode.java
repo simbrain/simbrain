@@ -25,16 +25,19 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.subnetworks.LMSNetwork;
+import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.gui.trainer.LMSIterativePanel;
+import org.simbrain.network.gui.trainer.LMSOfflinePanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
-import org.simbrain.network.gui.trainer.TrainerPanel;
+import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
 import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
+import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.network.trainers.Trainer;
-import org.simbrain.util.ClassDescriptionPair;
+import org.simbrain.network.trainers.Trainable;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
@@ -56,10 +59,6 @@ public class LMSNetworkNode extends SubnetGroupNode {
         setContextMenu();
     }
     
-    private Trainer getTrainer() {
-        return ((LMSNetwork) getGroup()).getTrainer();
-    }
-    
     /**
      * Custom interaction box for LMS group node.
      */
@@ -67,21 +66,7 @@ public class LMSNetworkNode extends SubnetGroupNode {
         public LMSInteractionBox(NetworkPanel net) {
             super(net, LMSNetworkNode.this);
         }
-
-//        @Override
-//        protected JDialog getPropertyDialog() {
-//            TrainerPanel panel = new TrainerPanel(getNetworkPanel(),
-//                    getTrainer());
-//            JDialog dialog = new JDialog();
-//            dialog.setContentPane(panel);
-//            return dialog;
-//        }
-//        
-//      @Override
-//      protected boolean hasPropertyDialog() {
-//          return true;
-//      }
-
+        
         @Override
         protected String getToolTipText() {
             return "LMS...";
@@ -100,26 +85,86 @@ public class LMSNetworkNode extends SubnetGroupNode {
     private void setContextMenu() {
         JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
-        Action trainNet = new AbstractAction("Show Training Controls...") {
-            public void actionPerformed(final ActionEvent event) {
-                ClassDescriptionPair[] rules = {
-                        new ClassDescriptionPair(LMSIterative.class, "LMS-Iterative"),
-                        new ClassDescriptionPair(LMSOffline.class, "LMS-Offline") };
-                TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
-                        getTrainer(), rules);
-                GenericFrame frame = getNetworkPanel().displayPanel(
-                        trainerPanel, "Trainer");
-                trainerPanel.setFrame(frame);
-            }
-        };
-        menu.add(new JMenuItem(trainNet));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), getTrainer(),
-                TrainerDataType.Input));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), getTrainer(), 
-                TrainerDataType.Trainer));
-        menu.add(TrainerGuiActions.getShowPlotAction(getNetworkPanel(), getTrainer()));
+        menu.add(new JMenuItem(trainIterativelyAction));
+        menu.add(new JMenuItem(trainOfflineAction));
+        menu.addSeparator();
+        
+        final LMSNetwork lms = (LMSNetwork) getGroup();
+        
+		// Reference to the input data in the LMS
+		DataHolder inputData = new DataHolder() {
+			@Override
+			public void setData(double[][] data) {
+				lms.setTrainingData(data);
+			}
+
+			@Override
+			public double[][] getData() {
+				return lms.getTrainingData();
+			}
+
+		};
+		// Reference to the training data in the LMS
+		DataHolder trainingData = new DataHolder() {
+			@Override
+			public void setData(double[][] data) {
+				lms.setTrainingData(data);
+			}
+
+			@Override
+			public double[][] getData() {
+				return lms.getTrainingData();
+			}
+
+		};
+		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+				lms.getInputNeurons(), inputData, "Input"));
+		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+				lms.getOutputNeurons(), trainingData, "Training"));
         setConextMenu(menu);
     }
+
+    /**
+     * Action to train LMS Iteratively
+     */
+	Action trainIterativelyAction = new AbstractAction() {
+
+		// Initialize
+		{
+			putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+			putValue(NAME, "Train iteratively...");
+			putValue(SHORT_DESCRIPTION, "Train iteratively...");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			LMSNetwork network = (LMSNetwork) getGroup();
+			LMSIterativePanel trainingPanel = new LMSIterativePanel(
+					getNetworkPanel(), new LMSIterative(network));
+            GenericFrame frame = getNetworkPanel().displayPanel(trainingPanel, "Trainer");
+            trainingPanel.setFrame(frame);
+		}
+	};
+	
+    /**
+     * Action to train LMS Offline
+     */
+	Action trainOfflineAction = new AbstractAction() {
+
+		// Initialize
+		{
+			putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+			putValue(NAME, "Train offline...");
+			putValue(SHORT_DESCRIPTION, "Train offline...");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			LMSNetwork network = (LMSNetwork) getGroup();
+        	LMSOfflinePanel trainingPanel = new LMSOfflinePanel(new LMSOffline(network, network.getSynapseGroup()));
+            getNetworkPanel().displayPanel(trainingPanel, "Trainer");
+		}
+	};
     
 
 }

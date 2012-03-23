@@ -13,26 +13,41 @@
  */
 package org.simbrain.network.trainers;
 
+import java.util.List;
+
+import org.simbrain.network.interfaces.Neuron;
+
 /**
- * Interface for trainer subclasses that use iterative supervised learning
- * techniques.
+ * Interface that must be implemented by any object that can be trained by a Trainer.
+ *  
+ * @author Jeff Yoshimi
+ * @author Zach Tosi
  *
- * @author jyoshimi
  */
-public interface IterableAlgorithm {
+public interface Trainable {
 
+	/**
+	 * Returns the list of input neurons.
+	 *
+	 * @return
+	 */
+	public List<Neuron> getInputNeurons();
+
+	/**
+	 * Returns the list of output neurons
+	 *
+	 * @return
+	 */
+	public List<Neuron> getOutputNeurons();
+	
     /**
-     * Get the current iteration number.
-     *
-     * @return the current iteration.
+     * Return input data.  Must be same number of columns as input neurons. 
      */
-    public int getIteration();
-
+	public double[][] getInputData();
+	
     /**
-     * Get the current error.
-     *
-     * @return the current error
+     * Return training data.  Must be same number of columns as output neurons. 
      */
-    public double getError();
-
+	public double[][] getTrainingData();	
+	
 }

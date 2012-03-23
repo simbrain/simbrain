@@ -33,7 +33,6 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.update_actions.UpdateGroup;
 import org.simbrain.util.SimpleId;
 
@@ -170,7 +169,6 @@ public class RootNetwork extends Network {
         xstream.omitField(Neuron.class, "readOnlyFanOut");
         xstream.omitField(Neuron.class, "readOnlyFanIn");
         xstream.omitField(SigmoidalNeuron.class, "implementationIndex"); // Backwards compatibility issue
-        xstream.omitField(Trainer.class, "listeners"); 
         return xstream;
     }
 

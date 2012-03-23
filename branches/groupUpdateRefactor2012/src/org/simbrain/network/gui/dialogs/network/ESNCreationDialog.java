@@ -237,9 +237,9 @@ public class ESNCreationDialog extends StandardDialog {
      * Populate fields with default data.
      */
     public void fillFieldValues() {
-        tfNumInputs.setText("" + 5);
+        tfNumInputs.setText("" + 1);
         tfNumReservoir.setText("" + 25);
-        tfNumOutputs.setText("" + 7);
+        tfNumOutputs.setText("" + 1);
         recurrentOutputWeights.setSelected(false);
         directInOutWeights.setSelected(false);
         backWeights.setSelected(false);
@@ -265,7 +265,7 @@ public class ESNCreationDialog extends StandardDialog {
             }
 
             //Initialize logical network builder
-            EchoStateNetwork builder = new EchoStateNetwork(
+            EchoStateNetwork esn = new EchoStateNetwork(
                     panel.getRootNetwork(),
                     //Get layer size values from fields...
                     Integer.parseInt(tfNumInputs.getText()),
@@ -274,28 +274,28 @@ public class ESNCreationDialog extends StandardDialog {
                     panel.getLastClickedPosition());
 
             //Get connection parameters from fields
-            builder.setInSparsity(Double.parseDouble(inResSparsity.getText()));
-            builder.setResSparsity(Double.parseDouble(resSparsity.getText()));
-            builder.setBackWeights(backWeights.isSelected());
+            esn.setInSparsity(Double.parseDouble(inResSparsity.getText()));
+            esn.setResSparsity(Double.parseDouble(resSparsity.getText()));
+            esn.setBackWeights(backWeights.isSelected());
             if (backWeights.isSelected()) {
-                builder.setBackSparsity(Double.parseDouble(
+                esn.setBackSparsity(Double.parseDouble(
                         backSparsity.getText()));
             }
-            builder.setSpectralRadius(
+            esn.setSpectralRadius(
                     Double.parseDouble(maxEigenValue.getText()));
-            builder.setRecurrentOutWeights(
+            esn.setRecurrentOutWeights(
                     recurrentOutputWeights.isSelected());
-            builder.setDirectInOutWeights(
+            esn.setDirectInOutWeights(
                     directInOutWeights.isSelected());
             NeuronUpdateRule resUp =
                 boxMap.get(reservoirNeuronTypes.getSelectedItem());
-            builder.setReservoirNeuronType(resUp);
+            esn.setReservoirNeuronType(resUp);
             NeuronUpdateRule outUp =
                 boxMap.get(outputNeuronTypes.getSelectedItem());
-            builder.setOutputNeuronType(outUp);
+            esn.setOutputNeuronType(outUp);
 
             //Build network
-            builder.buildNetwork();
+            esn.buildNetwork();
 
             dispose();
 

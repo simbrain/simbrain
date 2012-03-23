@@ -25,16 +25,11 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.trainer.TrainerGuiActions;
-import org.simbrain.network.gui.trainer.TrainerPanel;
-import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.Backprop;
-import org.simbrain.network.trainers.Trainer;
 import org.simbrain.util.ClassDescriptionPair;
-import org.simbrain.util.genericframe.GenericFrame;
 
 /**
  * PNode representation of a group of a backprop network
@@ -53,10 +48,6 @@ public class BackpropNetworkNode extends SubnetGroupNode {
         super(networkPanel, group);
         setInteractionBox(new BackpropInteractionBox(networkPanel));
         setContextMenu();
-    }
-    
-    private Trainer getTrainer() {
-        return ((BackpropNetwork) getGroup()).getTrainer();
     }
     
     /**
@@ -103,19 +94,19 @@ public class BackpropNetworkNode extends SubnetGroupNode {
             public void actionPerformed(final ActionEvent event) {
                 ClassDescriptionPair[] rules = {
                         new ClassDescriptionPair(Backprop.class, "Backprop")};
-                TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
-                        getTrainer(), rules);
-                GenericFrame frame = getNetworkPanel().displayPanel(
-                        trainerPanel, "Trainer");
-                trainerPanel.setFrame(frame);
+//                TrainerPanel trainerPanel = new TrainerPanel(getNetworkPanel(),
+//                        getTrainer(), rules);
+//                GenericFrame frame = getNetworkPanel().displayPanel(
+//                        trainerPanel, "Trainer");
+//                trainerPanel.setFrame(frame);
             }
         };
         menu.add(new JMenuItem(trainNet));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), getTrainer(),
-                TrainerDataType.Input));
-        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), getTrainer(), 
-                TrainerDataType.Trainer));
-        menu.add(TrainerGuiActions.getShowPlotAction(getNetworkPanel(), getTrainer()));
+//        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), getTrainer(),
+//                TrainerDataType.Input));
+//        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), getTrainer(), 
+//                TrainerDataType.Trainer));
+//        menu.add(TrainerGuiActions.getShowPlotAction(getNetworkPanel(), getTrainer()));
         setConextMenu(menu);
     }
 

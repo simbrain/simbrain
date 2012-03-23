@@ -29,6 +29,7 @@ import java.util.List;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Differentiable;
+import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
@@ -45,7 +46,7 @@ import org.simbrain.network.util.SimnetUtils;
  *
  * @author jyoshimi
  */
-public class Backprop extends TrainingMethod implements IterableAlgorithm {
+public class Backprop extends IterableTrainer {
 
     /** Iteration number. */
     private int iteration;
@@ -71,13 +72,18 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
     /** Internal representation of network. */
     private List<List<Neuron>> layers;
     
-    @Override
-    public void init(Trainer trainer) {
+    // Give this a constructor with the layers in it.
+    
+    public Backprop(Trainable network, List<List<Neuron>> layers) {
+    	super(network);
+    	this.layers = layers;
+    }
+    
+    //TODO
+    public void init(Trainable network) {
         errorMap = new HashMap<Neuron, Double>();
         weightDeltaMap = new HashMap<Synapse, Double>();
         biasDeltaMap = new HashMap<Neuron, Double>();
-        layers = SimnetUtils.getIntermedateLayers(trainer.getNetwork(),
-                trainer.getInputLayer(), trainer.getOutputLayer());
         iteration = 0;
         rmsError = 0;
         //SimnetUtils.printLayers(layers);
@@ -86,10 +92,10 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
 
     // One pass through the training data
     @Override
-    public void apply(Trainer trainer) {
+    public void apply() {
         rmsError = 0;
-        int numRows = getMinimumNumRows(trainer);
-        int numInputs = trainer.getInputLayer().size();
+        int numRows = getMinimumNumRows(network);
+        int numInputs = network.getInputNeurons().size();
         //System.out.println("Data:" + numInputs + "/" + numRows);
 
         if ((numRows == 0) || (numInputs == 0)) {
@@ -100,14 +106,14 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
 
             // Set activations on input layer
             for (int i = 0; i < numInputs; i++) {
-                trainer.getInputLayer().get(i).setActivation(trainer.getInputData()[row][i]);
+            	network.getInputNeurons().get(i).setActivation(network.getInputData()[row][i]);
             }
 
             // Update network
-            updateNetwork(trainer);
+            updateNetwork(network);
 
             // Set weight and bias deltas by backpropagating error
-            backpropagateError(trainer, row);
+            backpropagateError(network, row);
 
             // Update weights
             for (Synapse synapse : weightDeltaMap.keySet()) {
@@ -129,9 +135,9 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
         }
 
         // Update RMS error
-        rmsError = Math.sqrt(rmsError / (numRows * trainer.getOutputLayer().size()));
+        rmsError = Math.sqrt(rmsError / (numRows * network.getOutputNeurons().size()));
         iteration++;
-        trainer.fireErrorUpdated();
+        //network.fireErrorUpdated();
     }
 
     /**
@@ -139,8 +145,8 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
      *
      * @param row current row of training data
      */
-    private void backpropagateError(Trainer trainer, int row) {
-        int numOutputs = trainer.getOutputLayer().size();
+    private void backpropagateError(Trainable network, int row) {
+        int numOutputs = network.getOutputNeurons().size();
 
         // Iterate through layers from the output to the input layer.
         // For each layer, update weight-deltas, bias-deltas, and errors
@@ -151,8 +157,8 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
             // Special update for output layer
             if (i == layers.size() - 1) {
                 for (int j = 0; j < numOutputs; j++) {
-                    Neuron outputNeuron = trainer.getOutputLayer().get(j);
-                    double targetValue = trainer.getTrainingData()[row][j];
+                    Neuron outputNeuron = network.getOutputNeurons().get(j);
+                    double targetValue = network.getTrainingData()[row][j];
                     double outputError = targetValue
                             - outputNeuron.getActivation();
                     storeErrorAndDeltas(outputNeuron, outputError);
@@ -212,8 +218,8 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
         }
     }
 
-    @Override
-    public void randomize(Trainer trainer) {
+    // TODO: Here?
+    public void randomize(Trainable network) {
         for (List<Neuron> layer : layers) {
             // Don't update input layer
             if (layers.indexOf(layer) > 0) {
@@ -256,10 +262,10 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
     /**
      * Update internally constructed network.
      */
-    private void updateNetwork(Trainer trainer) {
+    private void updateNetwork(Trainable network) {
         for (List<Neuron> layer : layers) {
             if (layers.indexOf(layer) != 0) {
-                trainer.getNetwork().updateNeurons(layer);
+            	Network.updateNeurons(layer);
             }
         }
     }
@@ -285,12 +291,12 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
      *
      * @return least number of rows
      */
-    private int getMinimumNumRows(Trainer trainer) {
-        if ((trainer.getInputData() == null) || (trainer.getTrainingData() == null)) {
+    private int getMinimumNumRows(Trainable network) {
+        if ((network.getInputData() == null) || (network.getTrainingData() == null)) {
             return 0;
         }
-        int inputRows = trainer.getInputData().length;
-        int targetRows = trainer.getTrainingData().length;
+        int inputRows = network.getInputData().length;
+        int targetRows = network.getTrainingData().length;
         if (inputRows < targetRows) {
             return inputRows;
         } else {
@@ -389,7 +395,7 @@ public class Backprop extends TrainingMethod implements IterableAlgorithm {
         // Initialize the trainer
         // REDO
 //        Backprop trainer = new Backprop(network, inputLayer, outputLayer);
-//        trainer.setLearningRate(.9);
+//        network.setLearningRate(.9);
 //        trainer.setInputData(inputData);
 //        trainer.setTrainingData(trainingData);
 //        trainer.init();

@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.trainers;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,16 +28,13 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.gui.trainer.TrainerProgressBar;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.synapses.ClampedSynapse;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Matrices;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
@@ -51,15 +46,26 @@ import Jama.Matrix;
  * @author ztosi
  * @author jyoshimi
  */
-public class LMSOffline extends TrainingMethod {
+public class LMSOffline extends Trainer {
+	
+	/** Reference to the synapse group to be trained. */
+	private final SynapseGroup synapseGroup;
+	
+    /** Current solution type. */
+    private SolutionType solutionType = SolutionType.MOORE_PENROSE;
 
-	/** A listener that tracks progress of training.  */
-	private ArrayList<PropertyChangeListener> progressListeners =
-			new ArrayList<PropertyChangeListener>();
-	
-	/** The percent of the task which has been completed. */
-	private double percentComplete = 0;
-	
+	/**
+	 * Construct the LMSOOffline object, with a trainable network the
+	 * Synapse group where the new synapses will be placed.
+	 *
+	 * @param network the network to train
+	 * @param group the synapse group where the synpases will go.
+	 */
+	public LMSOffline(Trainable network, SynapseGroup group) {
+		super(network);
+		this.synapseGroup = group;
+	}
+
     /**
      * Solution methods for offline LMS.
      */
@@ -86,132 +92,92 @@ public class LMSOffline extends TrainingMethod {
 
     };
 
-    /** Current solution type. */
-    private SolutionType solutionType = SolutionType.MOORE_PENROSE;
-
-
     @Override
-    public void apply(Trainer trainer) {
+    public void apply() {
     	
-    	
-    	
-    	//TODO: Clean up? Currently ONLY works for ESNs
-    	if(trainer.isStateHarvester()) {
-    		trainer.setInputData(ReservoirComputingUtils.generateData
-    				(trainer.getInputData(), trainer.getTrainingData()));
-    		
-    	}
+    	fireTrainingBegin();
 
     	int index = 0;
-    	for(Neuron n : trainer.getOutputLayer()) {
+    	for(Neuron n : network.getOutputNeurons()) {
     		if(n.getUpdateRule() instanceof SigmoidalNeuron) {
-    			for(int i = 0; i < trainer.getTrainingData().length; i++) {
-    				trainer.getTrainingData()[i][index] = 
+    			for(int i = 0; i < network.getTrainingData().length; i++) {
+    				network.getTrainingData()[i][index] = 
     						((SigmoidalNeuron) n.getUpdateRule())
-    						.getInverse(trainer.getTrainingData()[i][index], n);
+    						.getInverse(network.getTrainingData()[i][index], n);
     			}
     		} 
     		index++;
     	}
     	
-    	
         if (solutionType == SolutionType.WIENER_HOPF) {
-            weinerHopfSolution(trainer);
+            weinerHopfSolution(network, synapseGroup);
         } else if (solutionType == SolutionType.MOORE_PENROSE) {
-            moorePenroseSolution(trainer);
+            moorePenroseSolution(network, synapseGroup);
         } else {
             throw new IllegalArgumentException("Solution type must be "
                     + "'MoorePenrose' or 'WeinerHopf'.");
         }
+        
+    	fireTrainingEnd();
+
     }
 
     /**
      * Implements the Wiener-Hopf solution to LMS linear regression.
      */
-    public void weinerHopfSolution(Trainer trainer) {
-        Matrix inputMatrix = new Matrix(trainer.getInputData());
-        Matrix trainingMatrix = new Matrix(trainer.getTrainingData());
+    public void weinerHopfSolution(Trainable network, SynapseGroup group) {
+        Matrix inputMatrix = new Matrix(network.getInputData());
+		Matrix trainingMatrix = new Matrix(network.getTrainingData());
 
-        fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
-        trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
-        
-        fireProgressUpdate("Cross-Correlating States with Teacher data (P = S'D)...", 0.15);
-        setPercentComplete(0.15);
-        inputMatrix = inputMatrix.transpose().times(inputMatrix);
+		fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
+		trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
 
-        fireProgressUpdate("Computing Inverse Correlation Matrix...", 0.3);
-        setPercentComplete(0.3);
-        try {
-        	inputMatrix = inputMatrix.inverse();
-        	
-        fireProgressUpdate("Computing Weights...", 0.8);
-        setPercentComplete(0.8);
-        double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
-        fireProgressUpdate("Setting Weights...", 0.95);
-        setPercentComplete(0.95);
-        SimnetUtils.setWeightsFillBlanks(trainer.getNetwork(), trainer.getInputLayer(),
-                trainer.getOutputLayer(), wOut);
-        fireProgressUpdate("Done!", 1.0);
-        
-        //TODO: What error does JAMA actually throw for singular Matrices?
-        } catch (RuntimeException e) {
-        	JOptionPane.showMessageDialog(new JFrame(), "" +
-        			"State Correlation Matrix is Singular", "Training Failed",
-        			JOptionPane.ERROR_MESSAGE);
-        	fireProgressUpdate("Training Failed", 0);
-        }
-        
-        trainingMatrix = null;
-        inputMatrix = null;
+		fireProgressUpdate(
+				"Cross-Correlating States with Teacher data (P = S'D)...", 15);
+		inputMatrix = inputMatrix.transpose().times(inputMatrix);
+
+		fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
+		try {
+			inputMatrix = inputMatrix.inverse();
+
+			fireProgressUpdate("Computing Weights...", 80);
+			double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
+			fireProgressUpdate("Setting Weights...", 95);
+			connectInputOutput(wOut, group);
+			fireProgressUpdate("Done!", 100);
+
+			// TODO: What error does JAMA actually throw for singular Matrices?
+		} catch (RuntimeException e) {
+			JOptionPane.showMessageDialog(new JFrame(), ""
+					+ "State Correlation Matrix is Singular",
+					"Training Failed", JOptionPane.ERROR_MESSAGE);
+			fireProgressUpdate("Training Failed", 0);
+		}
+
+		trainingMatrix = null;
+		inputMatrix = null;
     }
 
     /**
      * Moore penrose.
      */
-    public void moorePenroseSolution(Trainer trainer) {
-        Matrix inputMatrix = new Matrix(trainer.getInputData());
-        Matrix trainingMatrix = new Matrix(trainer.getTrainingData());
+    public void moorePenroseSolution(Trainable network, SynapseGroup group) {
+        Matrix inputMatrix = new Matrix(network.getInputData());
+        Matrix trainingMatrix = new Matrix(network.getTrainingData());
 
-        fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", Double.NaN);
+        fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", 0);
         // Computes Moore-Penrose Pseudoinverse
         inputMatrix = Matrices.pinv(inputMatrix);
 
-        fireProgressUpdate("Computing Weights...", 0.8);
-        setPercentComplete(0.8);
+        fireProgressUpdate("Computing Weights...", 50);
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
         
-        fireProgressUpdate("Setting Weights...", 0.95);
-        setPercentComplete(0.95);
-        SimnetUtils.setWeightsFillBlanks(trainer.getNetwork(), trainer.getInputLayer(),
-                trainer.getOutputLayer(), wOut);
-        fireProgressUpdate("Done!", 1.0);
+        fireProgressUpdate("Setting Weights...", 75);
+        connectInputOutput(wOut, group);
+        fireProgressUpdate("Done!", 100);
         
         inputMatrix = null;
         trainingMatrix = null;
-    }
-
-    private void fireProgressUpdate (String progressUpdate, double percentComplete) {
-    	for(PropertyChangeListener pcl : progressListeners){
-    			if(pcl instanceof TrainerProgressBar){
-    				pcl.propertyChange(new PropertyChangeEvent(this,
-    					"Training", getPercentComplete(), percentComplete));
-    			} else {
-    				pcl.propertyChange(new PropertyChangeEvent(this,
-    						progressUpdate, null, null));
-    			}
-    	}
-    }
-    
-    private double getPercentComplete () {
-    	return percentComplete;
-    }
-    
-    private void setPercentComplete (double percentComplete) {
-    	this.percentComplete = percentComplete;
-    }
-    
-    public void addPropertyChangeListener(PropertyChangeListener pcl) {
-    	progressListeners.add(pcl);
     }
     
     /**

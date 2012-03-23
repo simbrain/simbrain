@@ -13,11 +13,9 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.trainers.Trainer;
 
 /**
@@ -32,10 +30,10 @@ public class LoadDataPanel extends JPanel {
      */
     public LoadDataPanel(final NetworkPanel panel, final Trainer trainer) {
         super();
-        add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer,
-                TrainerDataType.Input)));
-        add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer, 
-                TrainerDataType.Trainer)));
+//        add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer,
+//                TrainerDataType.Input)));
+//        add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer, 
+//                TrainerDataType.Trainer)));
     }
 
 }

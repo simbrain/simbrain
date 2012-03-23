@@ -148,13 +148,6 @@ public class FeedForward extends Subnetwork {
         this.betweenNeuronInterval = betweenNeuronInterval;
     }
 
-    public boolean getEnabled() {
-        return false;
-    }
-
-    public void setEnabled(boolean enabled) {
-    }
-
     @Override
     public void addNeuronGroup(NeuronGroup group) {
         super.addNeuronGroup(group);
@@ -178,6 +171,25 @@ public class FeedForward extends Subnetwork {
     public NeuronGroup getOutputLayer() {
         return getNeuronGroup(getNeuronGroupCount()-1);
     }
+    
+    /**
+	 * Convenience method for getting the neurons associated with the input
+	 * group. Also allows all feed-forward networks to implement Trainable.
+	 * 
+	 * @return the input layer neurons as a list.
+	 */
+	public List<Neuron> getInputNeurons() {
+		return getInputLayer().getNeuronList();
+	}
 
+    /**
+	 * Convenience method for getting the neurons associated with the output
+	 * group. Also allows all feed-forward networks to implement Trainable.
+	 * 
+	 * @return the output layer neurons as a list.
+	 */
+	public List<Neuron> getOutputNeurons() {
+		return getOutputLayer().getNeuronList();
+	}
 
 }

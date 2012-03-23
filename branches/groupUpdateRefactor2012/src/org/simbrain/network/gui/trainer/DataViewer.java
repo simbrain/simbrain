@@ -15,19 +15,13 @@ package org.simbrain.network.gui.trainer;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.trainers.Trainer;
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.genericframe.GenericJDialog;
 import org.simbrain.util.table.DefaultNumericTable;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -46,79 +40,45 @@ public class DataViewer extends SimbrainJTableScrollPanel {
     /** JTable contained in scroller. */
     private SimbrainJTable table;
 
-    /** Does this represent training or input data. */
-    private TrainerDataType type;
-
-    /**
-     * Reference to parent trainer;
-     */
-    private Trainer trainer;
-
     /** Default number of rows to open new table with. */
     private static final int DEFAULT_NUM_ROWS = 5;
 
     /**
+     * @return the table
+     */
+    private SimbrainJTable getTable() {
+        return table;
+    }
+    
+    /**
      * Create a panel for viewing input or training data in a trainer.
      *
-     * @param trainer the trainer
+     * @param network the network to be trained
      * @param type whether this is input or training data
      */
-    public DataViewer(final Trainer trainer, 
-            final TrainerDataType type) {
+    public DataViewer(final List<Neuron> neurons,
+            final DataHolder data, final String name) {
+    	
+    	// If no data exists, create it!
+    	if (data.getData() == null)  {
+            table = new SimbrainJTable(new DefaultNumericTable(
+                    DEFAULT_NUM_ROWS, neurons.size()));    		
+    	} else {
+    		table = new SimbrainJTable(new DefaultNumericTable(data.getData()));
+    	}
 
-        this.type = type;
-        this.trainer = trainer;
 
-        // Create names for column headings
+        // Set up column headings 
         List<String> colHeaders = new ArrayList<String>();
         int i = 0;
-
-        // Populate data in simbrain table
-        if (type == TrainerDataType.Input) {
-            if (trainer.getInputData() == null) {
-                //System.out.println("Input data is null");
-                table = new SimbrainJTable(new DefaultNumericTable(
-                        DEFAULT_NUM_ROWS, trainer.getInputLayer().size()));
-            } else {
-                table = new SimbrainJTable(new DefaultNumericTable(
-                        trainer.getInputData()));
-            }
-            for (Neuron neuron : trainer.getInputLayer()) {
-                colHeaders.add(new String("" + (i++ + 1) + " ("
-                        + neuron.getId())
-                        + ")");
-            }
-        } else {
-            if (trainer.getTrainingData() == null) {
-                //System.out.println("Training data is null");
-                table = new SimbrainJTable(new DefaultNumericTable(
-                        DEFAULT_NUM_ROWS, trainer.getOutputLayer().size()));
-            } else {
-                table = new SimbrainJTable(new DefaultNumericTable(
-                        trainer.getTrainingData()));
-            }
-            for (Neuron neuron : trainer.getOutputLayer()) {
-                colHeaders.add(new String("" + (i++ + 1) + " ("
-                        + neuron.getId())
-                        + ")");
-            }
-        }
+		for (Neuron neuron : neurons) {
+			colHeaders.add(new String("" + (i++ + 1) + " (" + neuron.getId())
+					+ ")");
+		}
         table.setColumnHeadings(colHeaders);
         table.getData().fireTableStructureChanged();
 
         // Initialize listener
-        initListener();
-
-        // Set the table
-        this.setTable(table);
-
-    }
-
-    /**
-     * Listen for changes in the data, and update the trainer data as they
-     * occur.
-     */
-    private void initListener() {
         table.getData().addListener(new SimbrainTableListener() {
 
             public void columnAdded(int column) {
@@ -130,49 +90,31 @@ public class DataViewer extends SimbrainJTableScrollPanel {
             }
 
             public void rowAdded(int row) {
-                updateTrainerData();
-            }
+				data.setData(((NumericTable) table.getData()).asArray());
+           }
 
             public void rowRemoved(int row) {
-                updateTrainerData();
+				data.setData(((NumericTable) table.getData()).asArray());
             }
 
             public void cellDataChanged(int row, int column) {
-                updateTrainerData();
+				data.setData(((NumericTable) table.getData()).asArray());
             }
 
             public void tableDataChanged() {
-                updateTrainerData();
+				data.setData(((NumericTable) table.getData()).asArray());
             }
 
             public void tableStructureChanged() {
-                updateTrainerData();
+				data.setData(((NumericTable) table.getData()).asArray());
             }
 
         });
+        // Set the table
+        this.setTable(table);
 
     }
 
-    /**
-     * Update the trainer data.
-     */
-    private void updateTrainerData() {
-        if (type == TrainerDataType.Input) {
-            trainer.setInputData(
-                    ((NumericTable) table.getData()).asArray());
-        } else {
-            trainer.setTrainingData(
-                    ((NumericTable) table.getData()).asArray());
-        }
-    }
-
-    /**
-     * @return the table
-     */
-    public SimbrainJTable getTable() {
-        return table;
-    }
-    
     /**
      * Factory method for creating a data viewer panel.
      *
@@ -180,9 +122,9 @@ public class DataViewer extends SimbrainJTableScrollPanel {
      * @param type whether this is input or training data.
      * @return the panel
      */
-    public static JPanel createDataViewerPanel(final Trainer trainer,
-            final TrainerDataType type) {
-        final DataViewer viewer = new DataViewer(trainer, type);
+    public static JPanel createDataViewerPanel(final List<Neuron> neurons,
+            final DataHolder data, final String name) {
+        final DataViewer viewer = new DataViewer(neurons, data, name);
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add("Center", viewer);
 
@@ -192,7 +134,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         // Open / Save Tools
         JToolBar fileToolBar = new JToolBar();
         fileToolBar
-                .add(TrainerGuiActions.getOpenCSVAction(trainer, viewer.getTable(), type));
+                .add(TrainerGuiActions.getOpenCSVAction(viewer.getTable(), data));
         fileToolBar.add(TableActionManager
                 .getSaveCSVAction((NumericTable) viewer.getTable().getData()));
         toolbars.add(fileToolBar);
@@ -211,4 +153,28 @@ public class DataViewer extends SimbrainJTableScrollPanel {
         mainPanel.add("North", toolbars);
         return mainPanel;
     }
+    
+    /**
+     * Interface that indicates where the data is held in a class, and allows it to be used
+     * with the data viewer.
+     *
+     */
+    public interface DataHolder {
+    	
+    	/**
+    	 * Set the data
+    	 *
+    	 * @param data the data to set
+    	 */
+    	public void setData(double[][] data);
+    	
+    	/**
+    	 * Get the data
+    	 *
+    	 * @return the data to get
+    	 */
+    	public double[][] getData();
+    }
+    
+    
 }

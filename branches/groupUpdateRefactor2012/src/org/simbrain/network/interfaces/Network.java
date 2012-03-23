@@ -1124,7 +1124,7 @@ public abstract class Network {
      *
      * @param neuronList the list of neurons to be updated
      */
-    public void updateNeurons(List<Neuron> neuronList) {
+    public static void updateNeurons(List<Neuron> neuronList) {
         // TODO: Update by priority if priority based update?
         for (Neuron neuron : neuronList) {
             neuron.update();

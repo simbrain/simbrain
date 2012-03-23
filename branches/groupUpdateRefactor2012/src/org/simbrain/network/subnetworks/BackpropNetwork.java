@@ -15,6 +15,7 @@ package org.simbrain.network.subnetworks;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+import java.util.List;
 
 import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -25,10 +26,7 @@ import org.simbrain.network.trainers.*;
  *
  * @author Jeff Yoshimi
  */
-public class BackpropNetwork extends FeedForward {
-
-    /** Reference to parent trainer. */
-    private final Trainer trainer;
+public class BackpropNetwork extends FeedForward implements Trainable {
 
     /**
      * Construct a new backprop network.
@@ -41,18 +39,21 @@ public class BackpropNetwork extends FeedForward {
             Point2D initialPosition) {
         super(network, nodesPerLayer, initialPosition);
         int numLayers = getNeuronGroupCount();
-        trainer = new Trainer(network, this.getNeuronGroup(0).getNeuronList(),
-                this.getNeuronGroup(numLayers - 1).getNeuronList(),
-                new Backprop());
         setLabel("Backprop");
 
     }
 
-    /**
-     * @return the trainer
-     */
-    public Trainer getTrainer() {
-        return trainer;
-    }
+
+	@Override
+	public double[][] getInputData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double[][] getTrainingData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

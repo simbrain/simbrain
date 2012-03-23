@@ -14,20 +14,14 @@
 package org.simbrain.network.gui.trainer;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.trainers.IterableAlgorithm;
-import org.simbrain.network.trainers.Trainer;
-import org.simbrain.network.trainers.TrainerListener;
+import org.simbrain.network.trainers.ErrorListener;
+import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
@@ -38,7 +32,7 @@ import org.simbrain.util.Utils;
 public class ErrorPlotPanel extends JPanel {
 
     /** Reference to trainer object. */
-    private Trainer trainer;
+    private IterableTrainer trainer;
 
     /** Data for the error graph. */
     private final TimeSeriesModel model;
@@ -52,10 +46,9 @@ public class ErrorPlotPanel extends JPanel {
     /**
      * Construct a trainer panel around a trainer object.
      * 
-     * @param networkPanel the parent network panel
      * @param trainer the trainer this panel represents
      */
-    public ErrorPlotPanel(final NetworkPanel networkPanel, final Trainer trainer) {
+    public ErrorPlotPanel(final IterableTrainer trainer) {
 
         this.trainer = trainer;
         JPanel mainPanel = new JPanel();
@@ -79,47 +72,32 @@ public class ErrorPlotPanel extends JPanel {
         // Customize button panel; first remove all buttons
         graphPanel.removeAllButtonsFromToolBar();
         graphPanel.addClearGraphDataButton();
-        graphPanel.addPreferencesButton();
-        graphPanel.getButtonPanel().add(rmsError);
-        graphPanel.getButtonPanel().add(runningLabel);
-        mainPanel.add(graphPanel);
-        add(mainPanel);
+		graphPanel.addPreferencesButton();
+		graphPanel.getButtonPanel().add(rmsError);
+		graphPanel.getButtonPanel().add(runningLabel);
+		mainPanel.add(graphPanel);
+		add(mainPanel);
 
-        trainer.addListener(new TrainerListener() {
-
-            public void errorUpdated() {
-                if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
-                    if (model != null) {
-                        model.update();
-                        IterableAlgorithm theTrainer = (IterableAlgorithm) trainer
-                                .getTrainingMethod();
-                        model.addData(0, theTrainer.getIteration(),
-                                theTrainer.getError());
-                    }
-                    updateErrorField();
-                }
-            }
-
-            public void inputDataChanged(double[][] inputData) {
-            }
-
-            public void trainingDataChanged(double[][] trainingData) {
-            }
-
-        });
+		trainer.addErrorListener(new ErrorListener() {
+			@Override
+			public void errorUpdated() {
+				if (model != null) {
+					model.update();
+					model.addData(0, trainer.getIteration(),
+							trainer.getError());
+					updateErrorField();
+				}
+			}
+		});
 
     }
-
 
     /**
      * Update error text field.
      */
     private void updateErrorField() {
-        if (trainer.getTrainingMethod() instanceof IterableAlgorithm) {
             rmsError.setText("Error:"
-                    + Utils.round(((IterableAlgorithm) trainer
-                            .getTrainingMethod()).getError(), 4));
-        }
+                    + Utils.round(trainer.getError(), 4));
     }
 
 }

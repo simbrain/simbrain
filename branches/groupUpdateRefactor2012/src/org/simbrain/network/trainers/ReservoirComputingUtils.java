@@ -134,103 +134,6 @@ public class ReservoirComputingUtils {
 
     }
 
-    /**
-     * A general method for harvesting state data for an arbitrary Echo-State
-     * Network. This method iterates through each row of input and teacher data
-     * (if the network possesses back weights and/or recurrent output weights),
-     * and updates the reservoir. Depending on the ESN's un-frozen connectivity
-     * the resulting return matrix will have rows consisting of concatenated
-     * input, reservoir, and (teacher-forced) output states in that order.
-     * 
-     * @param esn
-     *            The ESN builder from which parameters for state harvesting are
-     *            inferred
-     * @param inputData
-     *            data input to the ESN
-     * @param teacherData
-     *            training data used for teacher-forcing if required
-     * @return a matrix of data to be used for offline training
-     */
-    public static double[][] generateData(double[][] inputData, double[][] teacherData) {
-
-        // The minimum number of state matrix columns
-        int columnNumber = esn.getNumReservoirNodes();
-
-        if (esn.hasDirectInOutWeights()) {
-            //Add columns for the input layer states
-            columnNumber += esn.getNumInputNodes();
-        }
-        if (esn.hasRecurrentOutWeights()) {
-            //Add columns for output layer states
-            columnNumber += esn.getNumOutputNodes();
-        }
-        //State matrix
-        double[][] returnMatrix = new double[inputData.length][columnNumber];
-
-        //Iterate through each row of input data
-        for (int row = 0; row < inputData.length; row++) {
-
-            int col = 0;
-
-            //Clamp input neurons based on input data
-            for (Neuron neuron : esn.getInputLayer().getNeuronList()) {
-                double clampValue = inputData[row][col];
-                neuron.setActivation(clampValue);
-                if (esn.hasDirectInOutWeights()) {
-                    //Add input states to state matrix if direct in to out
-                    //connections are desired
-                    returnMatrix[row][col] = neuron.getActivation();
-                    col++;
-                }
-
-            }
-
-            
-            if (esn.hasBackWeights()) {
-                int count = 0;
-                double clampValue = 0.5;
-                for (Neuron neuron : esn.getOutputLayer().getNeuronList()) {
-                    // Teacher forcing
-                    if (row > 0) {
-                        clampValue = teacherData[row - 1][count];
-                    }
-                    neuron.setActivation(clampValue);
-                    count++;
-                }
-            }
-
-            //Update the reservoir: handles teacher-forced back-weights
-            for (Neuron n : esn.getReservoirLayer().getNeuronList()) {
-                n.update();
-            }
-            for (Neuron n : esn.getReservoirLayer().getNeuronList()) {
-                double val = n.getBuffer();
-                if (noise) {
-                    n.setActivation(val + reservoirNoise());
-                } else {
-                    n.setActivation(val);
-                }
-                returnMatrix[row][col] = n.getActivation();
-                col++;
-            }
-
-            //Add output states to state matrix if there are recurrent outputs
-            if (esn.hasRecurrentOutWeights()) {
-                for (int i = 0; i < teacherData[0].length; i++) {
-                    //Teacher-forcing
-                    returnMatrix[row][col] = teacherData[row][i];
-                    col++;
-                }
-            }
-            
-            firePropertyChange((double) row/inputData.length);
-            setPercentComplete((double) row/inputData.length); 
-
-        }
-
-        return returnMatrix;
-    }
-
 
     public static void setStateListener(PropertyChangeListener pcl) {
     	stateListener = pcl;
@@ -368,12 +271,12 @@ public class ReservoirComputingUtils {
 
         // Initialize the trainer (comment / uncomment below for different
         // configurations)
-        Trainer trainer = new Trainer(network, inputLayer, outputLayer, new LMSOffline());
-        trainer.setInputData(inputData);
-        trainer.setTrainingData(trainingData);
-        ((LMSOffline) trainer.getTrainingMethod())
-                .setSolutionType(SolutionType.MOORE_PENROSE);
-        trainer.update();
+//        Trainer trainer = new Trainer(network, inputLayer, outputLayer, new LMSOffline());
+//        trainer.setInputData(inputData);
+//        trainer.setTrainingData(trainingData);
+//        ((LMSOffline) trainer.getTrainingMethod())
+//                .setSolutionType(SolutionType.MOORE_PENROSE);
+//        trainer.update();
         // trainer.train(1000);
         return network;
     }

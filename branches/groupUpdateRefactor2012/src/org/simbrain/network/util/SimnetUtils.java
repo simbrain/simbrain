@@ -87,7 +87,8 @@ public class SimnetUtils {
             }
         }
     }
-
+    
+    //TODO: Think about this in light of groups / subnetworks
     /**
      * Set the weights connecting two lists of neurons using a weight matrix.
      * Assumes that each row of the matrix corresponds to a source neuron's

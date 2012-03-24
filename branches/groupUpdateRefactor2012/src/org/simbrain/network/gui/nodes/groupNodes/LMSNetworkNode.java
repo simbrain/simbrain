@@ -95,12 +95,12 @@ public class LMSNetworkNode extends SubnetGroupNode {
 		DataHolder inputData = new DataHolder() {
 			@Override
 			public void setData(double[][] data) {
-				lms.setTrainingData(data);
+				lms.setInputData(data);
 			}
 
 			@Override
 			public double[][] getData() {
-				return lms.getTrainingData();
+				return lms.getInputData();
 			}
 
 		};

@@ -50,7 +50,6 @@ import org.simbrain.network.util.SimnetUtils;
  */
 public class EchoStateNetwork extends Subnetwork {
 	
-
 	/** Number of input nodes. */
     private int numInputs;
     
@@ -75,13 +74,13 @@ public class EchoStateNetwork extends Subnetwork {
 	 */
     private double spectralRadius;
     
-    /** Whether the network has weights from the output to the reservoir */
+    /** Whether the network has weights from the output to the reservoir (not trained.) */
     private boolean backWeights = true;
 
-    /** Whether the network has recurrent output weights */
+    /** Whether the network has recurrent output weights (trained). */
     private boolean recurrentOutWeights;
 
-    /** Whether the network has direct input to output connections */
+    /** Whether the network has direct input to output connections (trained). */
     private boolean directInOutWeights;
 
     /** Reservoir neuron type */
@@ -276,6 +275,12 @@ public class EchoStateNetwork extends Subnetwork {
      */
     public Trainer getTrainer() {
 
+        // Exception if training data is not set properly at this point
+        if (trainingData[0].length != outputLayer.getNeuronList().size()) {
+            throw new IllegalArgumentException("Output data length does not "
+                    + "match the number of output nodes");
+        }
+
     	// Build the network to be used in state harvesting
         final ArrayList<Neuron> full = new ArrayList<Neuron>();
         if (directInOutWeights) {
@@ -292,12 +297,10 @@ public class EchoStateNetwork extends Subnetwork {
             }
         }
         
-        // Exception if training data is not set properly at this point
-        if (trainingData[0].length != outputLayer.getNeuronList().size()) {
-            throw new IllegalArgumentException("Output data length does not "
-                    + "match the number of output nodes");
-        }
-        // TODO
+        // Handle non-linearities in the outputs.
+        // If output layer neurons are sigmoidal, transform the desired
+        //  output to the inverse of the sigmoidal, so that when it's put
+        //  in to the sigmoidal it will produce the desired output.
         for (Neuron n : outputLayer.getNeuronList()) {
             if (n.getUpdateRule() instanceof SigmoidalNeuron) {
                 for (int i = 0; i < trainingData.length; i++) {
@@ -309,12 +312,12 @@ public class EchoStateNetwork extends Subnetwork {
             }
         }
 
-        // Wrap network in Trainable object
+        // Make Trainable object
         Trainable trainable = new Trainable() {
 
 			@Override
 			public List<Neuron> getInputNeurons() {
-				return getInputLayer().getNeuronList();
+				return full;
 			}
 
 			@Override
@@ -325,14 +328,14 @@ public class EchoStateNetwork extends Subnetwork {
 			@Override
 			public double[][] getInputData() {
 		        // Harvest the reservoir states
-				final double[][] mainInputData = harvestData();
-		        if (mainInputData[0].length != full.size()) {
+				final double[][] harvestedData = harvestData();
+		        if (harvestedData[0].length != full.size()) {
 		            throw new IllegalArgumentException("Input data length does not "
 		                    + "match training node set");
 		        }
 		        //System.out.println("-------");
 		        //System.out.println(Utils.doubleMatrixToString(mainInputData));
-				return mainInputData;
+				return harvestedData;
 			}
 
 			@Override
@@ -570,6 +573,53 @@ public class EchoStateNetwork extends Subnetwork {
 	public void setTrainingData(double[][] trainingData) {
 		this.trainingData = trainingData;
 	}
+
+	
+	//TODO: Integrate random panel
+	
+	/**
+	 * @return the noise
+	 */
+	public boolean getUseNoise() {
+		return noise;
+	}
+
+	/**
+	 * @param noise the noise to set
+	 */
+	public void setUseNoise(boolean noise) {
+		this.noise = noise;
+	}
+
+	/**
+	 * @return the noiseMax
+	 */
+	public double getNoiseMax() {
+		return noiseMax;
+	}
+
+	/**
+	 * @param noiseMax the noiseMax to set
+	 */
+	public void setNoiseMax(double noiseMax) {
+		this.noiseMax = noiseMax;
+	}
+
+	/**
+	 * @return the noiseMin
+	 */
+	public double getNoiseMin() {
+		return noiseMin;
+	}
+
+	/**
+	 * @param noiseMin the noiseMin to set
+	 */
+	public void setNoiseMin(double noiseMin) {
+		this.noiseMin = noiseMin;
+	}
+	
+	
 	
     /* public static void main (String args []) {
         final RootNetwork network = new RootNetwork();

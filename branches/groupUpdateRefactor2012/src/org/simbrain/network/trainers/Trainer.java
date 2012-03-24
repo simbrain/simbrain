@@ -118,6 +118,8 @@ public abstract class Trainer {
 	/**
 	 * Connect the input neurons to the output neurons using a specified weight matrix, and
 	 * add those to the specified synapse groups.
+	 * 
+	 * TODO: Currently assumes the synapse group exists and breaks if not.
 	 *
 	 * @param w the matrix of weights to set
 	 * @param group the synapse group to add weights to

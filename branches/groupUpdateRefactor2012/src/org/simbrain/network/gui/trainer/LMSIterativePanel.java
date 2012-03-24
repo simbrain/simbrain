@@ -55,7 +55,9 @@ public class LMSIterativePanel extends JPanel {
 			LMSIterative trainer) {
     	this.trainer = trainer;
     	add(new IterativeControlsPanel(networkPanel, trainer));
-    	add(new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer)));
+    	JButton propertiesButton = new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer));
+    	propertiesButton.setHideActionText(true);
+    	add(propertiesButton);
     	add(new JButton(randomizeAction));
     	JButton plotButton = new JButton(TrainerGuiActions.getShowPlotAction(networkPanel, trainer));
     	plotButton.setHideActionText(true);

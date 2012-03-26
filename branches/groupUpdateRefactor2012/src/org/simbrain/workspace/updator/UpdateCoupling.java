@@ -16,27 +16,49 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace.updator;
+
+import org.simbrain.workspace.Coupling;
 
 /**
- * Listener for coupling related events.
- *
+ * Updates a coupling
+ * 
+ * @author jyoshimi
  */
-public interface CouplingListener {
+public class UpdateCoupling implements UpdateAction {
 
-
+    /**  of couplings to update. */
+    private final Coupling<?> coupling;
+    
     /**
-     * Called when a coupling is added.
+     * Construct the action.
      *
-     * @param coupling the new coupling
+     * @param coupling  coupling  to update
      */
-    public void couplingAdded(Coupling<?> coupling);
+    public UpdateCoupling(Coupling<?> coupling) {
+        this.coupling = coupling;
+    }
 
-    /**
-     * Called when a coupling is removed.
-     *
-     * @param coupling the coupling that is being removed
+    /** 
+     * {@inheritDoc}
      */
-    public void couplingRemoved(Coupling<?> coupling);
+    public void invoke() {
+    	coupling.setBuffer();
+    	coupling.update();
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public String getDescription() {
+		return "Update coupling ("
+				+ coupling.getConsumer().getParentComponent().getName() + ">"
+				+ coupling.getProducer().getParentComponent().getName() + ")";
+    }
+    
+	@Override
+	public String getLongDescription() {
+        return coupling.toString();
+	}
 
 }

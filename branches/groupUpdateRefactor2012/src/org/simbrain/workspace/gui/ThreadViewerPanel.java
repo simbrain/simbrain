@@ -28,6 +28,7 @@ import java.util.Vector;
 import javax.swing.AbstractListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -37,11 +38,8 @@ import javax.swing.JToolBar;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.updator.BufferedUpdator;
 import org.simbrain.workspace.updator.ComponentUpdateListener;
-import org.simbrain.workspace.updator.PriorityUpdator;
-import org.simbrain.workspace.updator.WorkspaceUpdator;
-import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
+import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
 
 /**
  * Display updator and thread information.
@@ -57,11 +55,11 @@ public class ThreadViewerPanel extends JPanel {
     /** Thread viewer panel. */
 	private JToolBar topStatsPanel= new JToolBar();
 
-	/** List of update types to be used as model for the updator combo box. */
+	/** List of update types to be used as model for the updater combo box. */
     private Vector updateTypes = new Vector();
 
 	/** Update types. */
-    private JComboBox updatorComboBox = new JComboBox(updateTypes);
+    private JComboBox updaterComboBox = new JComboBox(updateTypes);
 
     /** List. */
     private JList list = new JList();
@@ -76,7 +74,7 @@ public class ThreadViewerPanel extends JPanel {
     private Workspace workspace;
 
     /** Number of update threads. */
-    private JTextField updatorNumThreads = new JTextField();
+    private JTextField updaterNumThreads = new JTextField();
 
     /**
      * Constructor for viewer panel.
@@ -94,29 +92,46 @@ public class ThreadViewerPanel extends JPanel {
         threadViewer.add(scrollPane);
 
         // Update Type Selector
-        topStatsPanel.add(new JLabel("Update type:"));
-        topStatsPanel.add(updatorComboBox);
-        updatorComboBox.setMaximumSize(new Dimension(150,100));
-        setUpdatorComboBoxToDefaults();
-        updatorComboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                if (updatorComboBox.getSelectedItem() == WorkspaceUpdator.TYPE.BUFFERED) {
-                    workspace.setUpdateController(new BufferedUpdator());
-                } else if (updatorComboBox.getSelectedItem() == WorkspaceUpdator.TYPE.PRIORITY) {
-                    workspace.setUpdateController(new PriorityUpdator());
-                }
-            }
+//        topStatsPanel.add(new JLabel("Update type:"));
+//        topStatsPanel.add(updatorComboBox);
+//        updatorComboBox.setMaximumSize(new Dimension(150,100));
+//        setUpdatorComboBoxToDefaults();
+        
+        JButton showUpdateManager = new JButton("Update Manager");
+        showUpdateManager.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+		    	JDialog dialog = new JDialog();
+		    	dialog.setContentPane(new UpdateManagerPanel(workspace));
+		        dialog.setModal(true);
+		        dialog.pack();
+		        dialog.setLocationRelativeTo(null);
+		        dialog.setVisible(true);
+			}
         });
+        
+        topStatsPanel.add(showUpdateManager);
+        
+        //REDO
+//        updatorComboBox.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent arg0) {
+//                if (updatorComboBox.getSelectedItem() == WorkspaceUpdator.TYPE.BUFFERED) {
+//                    workspace.setUpdateController(new BufferedUpdator());
+//                } else if (updatorComboBox.getSelectedItem() == WorkspaceUpdator.TYPE.PRIORITY) {
+//                    workspace.setUpdateController(new PriorityUpdator());
+//                }
+//            }
+//        });
 
         topStatsPanel.addSeparator();
         topStatsPanel.add(new JLabel("Number of Threads: "));
-        updatorNumThreads.setMaximumSize(new Dimension(100,100));
-        topStatsPanel.add(updatorNumThreads);
+        updaterNumThreads.setMaximumSize(new Dimension(100,100));
+        topStatsPanel.add(updaterNumThreads);
         JButton setThreadsButton = new JButton("Set");
         setThreadsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-                workspace.getUpdator().setNumThreads(
-                        Integer.parseInt(updatorNumThreads.getText()));
+                workspace.getUpdater().setNumThreads(
+                        Integer.parseInt(updaterNumThreads.getText()));
 			}
 
         });
@@ -130,8 +145,8 @@ public class ThreadViewerPanel extends JPanel {
         this.add("North", topStatsPanel);
         this.add("Center", threadViewer);
 
-        // Add updator component listener
-        workspace.getUpdator().addComponentListener(
+        // Add updater component listener
+        workspace.getUpdater().addComponentListener(
                 new ComponentUpdateListener() {
 
                 	/**
@@ -159,9 +174,9 @@ public class ThreadViewerPanel extends JPanel {
                     }
                 });
 
-        // Add updator listener
-        workspace.getUpdator().addUpdatorListener(
-                new WorkspaceUpdatorListener() {
+        // Add updater listener
+        workspace.getUpdater().addUpdatorListener(
+                new WorkspaceUpdaterListener() {
 
                     /**
                      * {@inheritDoc}
@@ -207,46 +222,47 @@ public class ThreadViewerPanel extends JPanel {
      */
     private void updateList() {
     	listModel = new ThreadListModel<ListItem>();
-    	for (int i = 1; i <= workspace.getUpdator().getNumThreads(); i++) {
+    	for (int i = 1; i <= workspace.getUpdater().getNumThreads(); i++) {
             ListItem label = new ListItem("Thread " + i);
             listModel.add(label);
         }
         list.setModel(listModel);
-        updatorNumThreads.setText("" + workspace.getUpdator().getNumThreads());
+        updaterNumThreads.setText("" + workspace.getUpdater().getNumThreads());
     }
 
     /**
-     * Re-populate the updator combo box.
+     * Re-populate the updater combo box.
      */ 
-    private void updateUpdatorComboBox() {
-        if (workspace.getUpdator().getType() == WorkspaceUpdator.TYPE.CUSTOM) {
-            setUpdatorComboBoxToDefaults();
-            String name = workspace.getUpdator().getCurrentUpdatorName();
-            updateTypes.add(name);
-            updatorComboBox.setSelectedItem(name);
-        } else {
-            updatorComboBox.setSelectedItem(workspace.getUpdator().getType());
-            if (updatorComboBox.getItemCount() > 2) {
-                setUpdatorComboBoxToDefaults();
-            }
-        }
+    private void updateUpdaterComboBox() {
+    	//REDO
+//        if (workspace.getUpdater().getType() == WorkspaceUpdater.TYPE.CUSTOM) {
+//            setUpdaterComboBoxToDefaults();
+////            String name = workspace.getUpdater().getCurrentUpdaterName();
+////            updateTypes.add(name);
+//            updaterComboBox.setSelectedItem(name);
+//        } else {
+//            updaterComboBox.setSelectedItem(workspace.getUpdater().getType());
+//            if (updaterComboBox.getItemCount() > 2) {
+//                setUpdaterComboBoxToDefaults();
+//            }
+//        }
     }
 
     /**
-     * Remove all items from combo box and add default updator types.
+     * Remove all items from combo box and add default updater types.
      */
-    private void setUpdatorComboBoxToDefaults() {
+    private void setUpdaterComboBoxToDefaults() {
         updateTypes.removeAllElements();
-        updateTypes.add(WorkspaceUpdator.TYPE.BUFFERED);
-        updateTypes.add(WorkspaceUpdator.TYPE.PRIORITY);
+//        updateTypes.add(WorkspaceUpdater.TYPE.BUFFERED);
+//        updateTypes.add(WorkspaceUpdater.TYPE.PRIORITY);
     }
 
 	/**
 	 * Update various labels and components reflecting update stats.
 	 */
     private void updateStats() {
-        updateUpdatorComboBox();
-        updatorNumThreads.setText("" + workspace.getUpdator().getNumThreads());
+        updateUpdaterComboBox();
+        updaterNumThreads.setText("" + workspace.getUpdater().getNumThreads());
     }
 
     /**

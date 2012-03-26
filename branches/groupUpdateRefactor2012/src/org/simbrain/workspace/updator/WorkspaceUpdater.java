@@ -18,6 +18,8 @@
  */
 package org.simbrain.workspace.updator;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -30,47 +32,48 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * This class manages the workspace updates, possibly using multiple threads.
- * The main part of the default update can be found in the DEFAULT_CONTROLLER
- * instance. Each component update call is fed to an executor service which uses
- * as many threads as it's configured to use (it defaults to the number of
- * available processors which can be changed.) Then the executing thread waits
- * on a countdown latch. Each component update decrements the latch so that
- * after the last update is complete, the thread waiting on the latch wakes up
- * and updates all the couplings. There's a second executor service that's only
- * there to execute event updates. This is to support the need for a view on
- * threads. The thread factory is used to create a custom thread class that will
- * be generated inside the executor. This allows for a clean way to capture the
- * events using the thread instances themselves which 'know' their thread
- * number.
- *
+ * This class manages workspace updates. "Running" and "Stepping" the simulation
+ * happen here, in a way that allows for concurrent update (in some cases) and
+ * also interacts properly with single threaded guis using a
+ * "task synchronization manager". Notification events about workspace events
+ * are fired from here. Every time the workspace is updated, a list of actions
+ * in the UpdateActionManager is invoked. By default one single action, a
+ * "buffered update", occurs, in which components are updated in parallel, and
+ * when they have all finished updating, couplings are updated. The update
+ * action manager can also be used to customize update. Three executor services
+ * are here, one for workspace updates (a single thread), one for event
+ * notification updates (a single thread), and one for component updates (a
+ * thread pool with multiple threads that can be configured), for cases when
+ * component updating happens concurrently.
+ * 
  * @author Matt Watson
+ * @author Jeff Yoshimi
  */
-public class WorkspaceUpdator {
+public class WorkspaceUpdater {
 
     /** The static logger for the class. */
-    static final Logger LOGGER = Logger.getLogger(WorkspaceUpdator.class);
+    static final Logger LOGGER = Logger.getLogger(WorkspaceUpdater.class);
 
     /** The parent workspace. */
     private final Workspace workspace;
 
-    /** The executor service for managing updates. */
-    private final ExecutorService updates;
+    /** The executor service for managing workspace updates. */
+    private final ExecutorService workspaceUpdates;
 
-    /** The executor service for doing updates. */
-    private ExecutorService service;
+    /** The executor service for doing the component updates. */
+    private ExecutorService componentUpdates;
 
     /** The executor service for notifying listeners. */
-    private final ExecutorService events;
+    private final ExecutorService notificationEvents;
 
     /** Component listeners. */
     private final List<ComponentUpdateListener> componentListeners = new CopyOnWriteArrayList<ComponentUpdateListener>();
 
     /** Updator listeners. */
-    private final List<WorkspaceUpdatorListener> updatorListeners = new CopyOnWriteArrayList<WorkspaceUpdatorListener>();
+    private final List<WorkspaceUpdaterListener> updatorListeners = new CopyOnWriteArrayList<WorkspaceUpdaterListener>();
 
-    /** creates a default synch-manager that does nothing. */
-    private volatile TaskSynchronizationManager snychManager = NO_ACTION_SYNCH_MANAGER;
+    /** Creates a default synch-manager that does nothing. */
+    private volatile TaskSynchronizationManager synchManager = NO_ACTION_SYNCH_MANAGER;
 
     /** Whether updates should continue to run. */
     private volatile boolean run = false;
@@ -81,39 +84,9 @@ public class WorkspaceUpdator {
     /** Number of threads used in the update service. */
     private int numThreads;
 
-    /** The default update controls. */
-    private final DefaultUpdateControls controls;
-
-    /** The default controller. */
-    public static final UpdateController DEFAULT_CONTROLLER = new BufferedUpdator();
-
-    /** The Update Controller. */
-    private UpdateController updateController;
-
-    /**
-     * Types of update controller.
-     */
-    public enum TYPE {
-        BUFFERED {
-            @Override
-            public String toString() {
-                return "Buffered";
-            }
-        },
-        PRIORITY {
-            @Override
-            public String toString() {
-                return "Priority-based";
-            }
-        },
-        CUSTOM {
-            @Override
-            public String toString() {
-                return "Custom";
-            }
-        }
-    }
-
+    /** The update Manager. */
+    private UpdateActionManager updateActionManager;
+    
     /**
      * Constructor for the updator that uses the provided controller and
      * threads.
@@ -122,16 +95,24 @@ public class WorkspaceUpdator {
      * @param controller The update controller.
      * @param threads The number of threads for component updates.
      */
-    public WorkspaceUpdator(final Workspace workspace,
-            final UpdateController controller, final int threads) {
-        this.workspace = workspace;
-        this.updateController = controller;
-        this.updates = Executors.newSingleThreadExecutor();
-        this.service = Executors.newFixedThreadPool(threads,
-                new UpdatorThreadFactory());
-        this.events = Executors.newSingleThreadExecutor();
+    public WorkspaceUpdater(final Workspace workspace, final int threads) {
+
+    	this.workspace = workspace;
         this.numThreads = threads;
-        controls = new DefaultUpdateControls(workspace, service);
+        
+        // A single thread updates the workspace
+        workspaceUpdates = Executors.newSingleThreadExecutor();
+        
+		// In some cases components can be updated in parallel. So
+		// a thread pool with a configurable number of threads is used
+        componentUpdates = Executors.newFixedThreadPool(threads,
+                new UpdatorThreadFactory());
+        
+        // A single thread to fire notification events
+        notificationEvents = Executors.newSingleThreadExecutor();
+        
+        // Instantiate the update action manager
+        updateActionManager = new UpdateActionManager(this);
 
     }
 
@@ -140,28 +121,10 @@ public class WorkspaceUpdator {
      * number of threads.
      *
      * @param workspace The parent workspace.
-     * @param controller The update controller.
      */
-    public WorkspaceUpdator(final Workspace workspace, final UpdateController controller) {
-        this(workspace, controller, Runtime.getRuntime().availableProcessors());
-    }
-
-    /**
-     * Constructor for the updator that uses the default controller and default
-     * number of threads.
-     *
-     * @param workspace The parent workspace.
-     */
-    public WorkspaceUpdator(final Workspace workspace) {
-        this(workspace, DEFAULT_CONTROLLER, Runtime.getRuntime()
+    public WorkspaceUpdater(final Workspace workspace) {
+        this(workspace, Runtime.getRuntime()
                 .availableProcessors());
-    }
-
-    /**
-     * Reset the update controller to DEFAUT_CONTROLLER.
-     */
-    public void resetController() {
-        setUpdateController(DEFAULT_CONTROLLER);
     }
 
     /**
@@ -172,9 +135,9 @@ public class WorkspaceUpdator {
     public void setTaskSynchronizationManager(
             final TaskSynchronizationManager manager) {
         if (manager == null) {
-            snychManager = NO_ACTION_SYNCH_MANAGER;
+            synchManager = NO_ACTION_SYNCH_MANAGER;
         } else {
-            snychManager = manager;
+            synchManager = manager;
         }
     }
 
@@ -211,16 +174,17 @@ public class WorkspaceUpdator {
     }
 
     /**
-     * Starts the update thread.
+     * Starts the update thread.  Used when "running" the workspace
+     * by pressing the play button in the gui.
      */
     public void run() {
         run = true;
 
-        updates.submit(new Runnable() {
+        workspaceUpdates.submit(new Runnable() {
             public void run() {
                 notifyWorkspaceUpdateStarted();
 
-                snychManager.queueTasks();
+                synchManager.queueTasks();
 
                 while (run) {
                     try {
@@ -231,8 +195,8 @@ public class WorkspaceUpdator {
                     }
                 }
 
-                snychManager.releaseTasks();
-                snychManager.runTasks();
+                synchManager.releaseTasks();
+                synchManager.runTasks();
 
                 notifyWorkspaceUpdateCompleted();
             }
@@ -242,14 +206,15 @@ public class WorkspaceUpdator {
 
     /**
      * Submits a single task to the queue, and counts down a latch when done.
+     * Used when iterating the workspace for a set number of times.
      *
      * @param latch the latch to count down.
      */
     public void runOnce(final CountDownLatch latch) {
-        updates.submit(new Runnable() {
+        workspaceUpdates.submit(new Runnable() {
             public void run() {
                 notifyWorkspaceUpdateStarted();
-                snychManager.queueTasks();
+                synchManager.queueTasks();
 
                 try {
                     doUpdate();
@@ -258,8 +223,8 @@ public class WorkspaceUpdator {
                     e.printStackTrace();
                 }
 
-                snychManager.releaseTasks();
-                snychManager.runTasks();
+                synchManager.releaseTasks();
+                synchManager.runTasks();
                 notifyWorkspaceUpdateCompleted();
                 latch.countDown();
 
@@ -271,10 +236,10 @@ public class WorkspaceUpdator {
      * Submits a single task to the queue.
      */
     public void runOnce() {
-        updates.submit(new Runnable() {
+        workspaceUpdates.submit(new Runnable() {
             public void run() {
                 notifyWorkspaceUpdateStarted();
-                snychManager.queueTasks();
+                synchManager.queueTasks();
 
                 try {
                     doUpdate();
@@ -283,8 +248,8 @@ public class WorkspaceUpdator {
                     e.printStackTrace();
                 }
 
-                snychManager.releaseTasks();
-                snychManager.runTasks();
+                synchManager.releaseTasks();
+                synchManager.runTasks();
 
                 notifyWorkspaceUpdateCompleted();
 
@@ -293,7 +258,7 @@ public class WorkspaceUpdator {
     }
 
     /**
-     * Executes the updates using the set controller.
+     * Executes the main workspace update.
      */
     private void doUpdate() {
         time++;
@@ -306,9 +271,11 @@ public class WorkspaceUpdator {
             e.printStackTrace();
         }
 
-        updateController.doUpdate(controls);
+        for(UpdateAction action : updateActionManager.getActionList()) {
+            action.invoke();
+        }        
 
-        snychManager.runTasks(); 
+        synchManager.runTasks(); 
 
         notifyWorkspaceUpdated();
 
@@ -348,7 +315,7 @@ public class WorkspaceUpdator {
      *
      * @param listener updator component listener to add.
      */
-    public void addUpdatorListener(final WorkspaceUpdatorListener listener) {
+    public void addUpdatorListener(final WorkspaceUpdaterListener listener) {
         updatorListeners.add(listener);
     }
 
@@ -357,7 +324,7 @@ public class WorkspaceUpdator {
      *
      * @return list of updator listeners;
      */
-    public List<WorkspaceUpdatorListener> getUpdatorListeners() {
+    public List<WorkspaceUpdaterListener> getUpdatorListeners() {
         return updatorListeners;
     }
 
@@ -366,7 +333,7 @@ public class WorkspaceUpdator {
      *
      * @param listener The updator listener to add.
      */
-    public void removeUpdatorListener(final WorkspaceUpdatorListener listener) {
+    public void removeUpdatorListener(final WorkspaceUpdaterListener listener) {
         updatorListeners.remove(listener);
     }
 
@@ -380,7 +347,7 @@ public class WorkspaceUpdator {
             final int thread) {
         final int time = this.time;
 
-        events.submit(new Runnable() {
+        notificationEvents.submit(new Runnable() {
             public void run() {
                 for (ComponentUpdateListener listener : componentListeners) {
                     listener.startingComponentUpdate(component, time, thread);
@@ -399,7 +366,7 @@ public class WorkspaceUpdator {
             final int thread) {
         final int time = this.time;
 
-        events.submit(new Runnable() {
+        notificationEvents.submit(new Runnable() {
             public void run() {
                 for (ComponentUpdateListener listener : componentListeners) {
                     listener.finishedComponentUpdate(component, time, thread);
@@ -414,9 +381,9 @@ public class WorkspaceUpdator {
     protected void notifyCouplingsUpdated() {
         final int time = this.time;
 
-        events.submit(new Runnable() {
+        notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updatorListeners) {
                     listener.updatedCouplings(time);
                 }
             }
@@ -427,9 +394,9 @@ public class WorkspaceUpdator {
      * Called when the workspace update begins.
      */
     private void notifyWorkspaceUpdateStarted() {
-        events.submit(new Runnable() {
+        notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updatorListeners) {
                     listener.updatingStarted();
                 }
             }
@@ -440,9 +407,9 @@ public class WorkspaceUpdator {
      * Called when workspace update finishes.
      */
     private void notifyWorkspaceUpdateCompleted() {
-        events.submit(new Runnable() {
+        notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updatorListeners) {
                     listener.updatingFinished();
                 }
             }
@@ -454,9 +421,9 @@ public class WorkspaceUpdator {
      */
     private void notifyWorkspaceUpdated() {
 
-        events.submit(new Runnable() {
+        notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updatorListeners) {
                     listener.workspaceUpdated();
                 }
             }
@@ -468,9 +435,9 @@ public class WorkspaceUpdator {
      */
     private void notifyUpdateControllerChanged() {
 
-        events.submit(new Runnable() {
+        notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdatorListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updatorListeners) {
                     listener.changedUpdateController();
                 }
             }
@@ -494,34 +461,25 @@ public class WorkspaceUpdator {
             stop();
         }
         this.numThreads = numThreads;
-        this.service = Executors.newFixedThreadPool(numThreads,
+        this.componentUpdates = Executors.newFixedThreadPool(numThreads,
                 new UpdatorThreadFactory());
-        for (WorkspaceUpdatorListener listener : updatorListeners) {
+        for (WorkspaceUpdaterListener listener : updatorListeners) {
             listener.changeNumThreads();
         }
 
     }
 
     /**
-     * Returns the name of the current UpdateController.
-     *
-     * @return the name of the current update method.
-     */
-    public String getCurrentUpdatorName() {
-        return updateController.getName();
-    }
-    
-    /**
      * Iterate the updator for a specified number of iterations.
      *
      * @param numIterations number of times to iterate updator.
      */
     public void iterate(final int numIterations) {
-        updates.submit(new Runnable() {
+        workspaceUpdates.submit(new Runnable() {
             public void run() {
                 notifyWorkspaceUpdateStarted();
                 for (int i = 0; i < numIterations; i++) {
-                    snychManager.queueTasks();
+                    synchManager.queueTasks();
 
                     try {
                         doUpdate();
@@ -529,8 +487,8 @@ public class WorkspaceUpdator {
                         // TODO exception handler
                         e.printStackTrace();
                     }
-                    snychManager.releaseTasks();
-                    snychManager.runTasks();
+                    synchManager.releaseTasks();
+                    synchManager.runTasks();
                 }
                 notifyWorkspaceUpdateCompleted();
             }
@@ -552,7 +510,12 @@ public class WorkspaceUpdator {
         }
     };
 
-    /** Creates the threads used in the ExecutorService. */
+	/**
+	 * Creates the threads used in the ExecutorService. Used to create a custom
+	 * thread class that will be generated inside the executor. This allows for
+	 * a clean way to capture the events using the thread instances themselves
+	 * which 'know' their thread number.
+	 */
     private class UpdatorThreadFactory implements ThreadFactory {
         /** Numbers the threads sequentially. */
         private int nextThread = 1;
@@ -564,41 +527,104 @@ public class WorkspaceUpdator {
          */
         public Thread newThread(final Runnable runnable) {
             synchronized (this) {
-                return new UpdateThread(WorkspaceUpdator.this, runnable,
+                return new UpdateThread(WorkspaceUpdater.this, runnable,
                         nextThread++);
             }
         }
     }
+    
+    /**
+     * Returns a reference to the update manager.
+     * 
+     * @return the update manager
+     */
+	public UpdateActionManager getUpdateManager() {
+		return updateActionManager;
+	}
+	
 
+	/**
+	 * Get a synchronized list of component.
+	 *
+	 * @return the synchronized list of components
+	 */
+    public List<? extends WorkspaceComponent> getComponents() {
+        List<? extends WorkspaceComponent> components = workspace
+                .getComponentList();
+        synchronized (components) {
+            components = new ArrayList<WorkspaceComponent>(components);
+        }
+
+        return components;
+    }
 
     /**
-     * @return the updateType
+     * Update the provided workspace component.
+     *
+     * @param component the component to update.
+     * @param signal completion signal
      */
-    public TYPE getType() {
-        // Set the type of this controller
-        if (updateController instanceof BufferedUpdator) {
-            return TYPE.BUFFERED;
-        } else if (updateController instanceof PriorityUpdator) {
-            return TYPE.PRIORITY;
-        } else {
-            return TYPE.CUSTOM;
+    public void updateComponent(final WorkspaceComponent component,
+            final CompletionSignal signal) {
+
+        // If update is turned off on this component, return
+        if (component.getUpdateOn() == false) {
+            signal.done();
+            return;
+        }
+
+        Collection<ComponentUpdatePart> parts = component.getUpdateParts();
+
+        final LatchCompletionSignal partsSignal = new LatchCompletionSignal(
+                parts.size()) {
+            public void done() {
+                super.done();
+
+                /*
+                 * I'm not 100% sure this is safe. The JavaDocs don't say it
+                 * isn't but they don't say it is either. If a deadlock occurs
+                 * in the caller to updateComponent, this may be the issue.
+                 */
+                if (getLatch().getCount() <= 0) {
+                    signal.done();
+                }
+            }
+        };
+
+        for (ComponentUpdatePart part : parts) {
+            componentUpdates.submit(part.getUpdate(partsSignal));
         }
     }
 
     /**
-     * @return the updateController
+     * Update couplings.
      */
-    public UpdateController getUpdateController() {
-        return updateController;
+    public void updateCouplings() {
+        workspace.getCouplingManager().updateAllCouplings();
+        LOGGER.trace("couplings updated");
+        workspace.getUpdater().notifyCouplingsUpdated();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateOutgoingCouplings(WorkspaceComponent component) {
+        workspace.getCouplingManager().updateOutgoingCouplings(component);
     }
 
     /**
-     * @param updateController the updateController to set
+     * {@inheritDoc}
      */
-    public void setUpdateController(final UpdateController updateController) {
-        this.updateController = updateController;
-        notifyUpdateControllerChanged();
+    public void updateIncomingCouplings(WorkspaceComponent component) {
+        workspace.getCouplingManager().updateIncomingCouplings(component);
     }
 
+	/**
+	 * @return the workspace
+	 */
+	public Workspace getWorkspace() {
+		return workspace;
+	}
 
 }

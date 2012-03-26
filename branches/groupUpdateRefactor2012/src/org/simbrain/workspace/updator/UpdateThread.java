@@ -8,7 +8,7 @@ package org.simbrain.workspace.updator;
  */
 class UpdateThread extends Thread {
     /** */
-    private final WorkspaceUpdator updator;
+    private final WorkspaceUpdater updator;
     /** The thread number. */
     final int thread;
 
@@ -19,7 +19,7 @@ class UpdateThread extends Thread {
      * @param runnable The runnable instance.
      * @param thread The thread number.
      */
-    UpdateThread(final WorkspaceUpdator updator, final Runnable runnable, final int thread) {
+    UpdateThread(final WorkspaceUpdater updator, final Runnable runnable, final int thread) {
         super(runnable);
         this.updator = updator;
         this.thread = thread;

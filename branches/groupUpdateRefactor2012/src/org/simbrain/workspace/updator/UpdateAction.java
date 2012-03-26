@@ -16,27 +16,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace.updator;
 
 /**
- * Listener for coupling related events.
+ * Classes that implement this interface describe individual actions that together
+ * comprise a workspace update.
+ *
+ * @author jyoshimi
  *
  */
-public interface CouplingListener {
-
-
-    /**
-     * Called when a coupling is added.
-     *
-     * @param coupling the new coupling
-     */
-    public void couplingAdded(Coupling<?> coupling);
+public interface UpdateAction {
 
     /**
-     * Called when a coupling is removed.
-     *
-     * @param coupling the coupling that is being removed
+     * Invoke this action. 
      */
-    public void couplingRemoved(Coupling<?> coupling);
+    public void invoke();
+    
+    /**
+     * Provide a String description of this update method.
+     *
+     * @return the update description
+     */
+    public String getDescription();
+    
+    /**
+     * Provide a longer description for tooltips, etc.
+     *
+     * @return the update description
+     */
+    public String getLongDescription();
 
 }

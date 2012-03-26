@@ -33,10 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.updator.BufferedUpdator;
 import org.simbrain.workspace.updator.TaskSynchronizationManager;
-import org.simbrain.workspace.updator.UpdateController;
-import org.simbrain.workspace.updator.WorkspaceUpdator;
+import org.simbrain.workspace.updator.WorkspaceUpdater;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -95,14 +93,14 @@ public class Workspace {
     /**
      * The updator used to manage component updates.
      */
-    private final WorkspaceUpdator updator;
+    private final WorkspaceUpdater updator;
 
     /**
      * Construct a workspace.
      */
     public Workspace() {
         manager = new CouplingManager(this);
-        updator = new WorkspaceUpdator(this);
+        updator = new WorkspaceUpdater(this);
     }
 
     /**
@@ -343,7 +341,6 @@ public class Workspace {
         this.setWorkspaceChanged(false);
         currentFile = null;
         fireWorkspaceCleared();
-        updator.resetController();
         manager.clearCouplings();
     }
 
@@ -576,30 +573,6 @@ public class Workspace {
         manager.removeCoupling(coupling);
     }
 
-
-    /**
-     * By default, the workspace is updated as followed: 1) Update couplings 2)
-     * Call "update" on all workspacecomponents Sometimes this way of updating
-     * is not sufficient, and the user will want updates (in the GUI, presses of
-     * the iterate and play buttons) to update components and couplings in a
-     * different way. For an example, see the script in
-     * {SimbrainDir}/scripts/scriptmenu/addBackpropSim.bsh
-     *
-     * @param controller The number of threads to use.
-     */
-    public void setUpdateController(final UpdateController controller) {
-        synchronized (updatorLock) {
-            if (updator.isRunning()) {
-                throw new RuntimeException("Cannot change update controller while running.");
-            }
-            updator.setUpdateController(controller);
-            if (updator.getType() == WorkspaceUpdator.TYPE.PRIORITY) {
-                resortPriorities();
-            }
-        }
-    }
-
-
     /**
      * Returns all components of the specified type, e.g. all
      * WorkspaceComponents of type NetworkComponent.class.
@@ -639,7 +612,7 @@ public class Workspace {
      *
      * @return reference to workspace updator.
      */
-    public WorkspaceUpdator getUpdator() {
+    public WorkspaceUpdater getUpdater() {
         return updator;
     }
 

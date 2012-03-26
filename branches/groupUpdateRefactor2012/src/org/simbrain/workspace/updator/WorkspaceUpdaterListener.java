@@ -19,26 +19,40 @@
 package org.simbrain.workspace.updator;
 
 /**
- * Interface for controllers to receive the controls required to run custom
- * updates. Implement this interface for customized update. See
- * scripts/scriptmenu for examples.
- *
- * @author Matt Watson
+ * The listener interface for observers interested in events related to
+ * the workspace updator.
  */
-public interface UpdateController {
+public interface WorkspaceUpdaterListener {
 
     /**
-     * Starts an update the provided controls should be used to manage the
-     * update.
+     * Called when the couplings are updated.
      *
-     * @param controls controls required to run custom updates.
+     * @param update The number of the update.
      */
-    void doUpdate(UpdateControls controls);
+    void updatedCouplings(int update);
 
     /**
-     * Returns the name of this updator. Useful in the GUI representation.
-     *
-     * @return the updator name.
+     * Called when the update controller is changed.
      */
-    String getName();
+    void changedUpdateController();
+
+    /**
+     * Called when the number of threads on an update controller is changed.
+     */
+    void changeNumThreads();
+
+    /**
+     * Called every time the workspace is updated.
+     */
+    void workspaceUpdated();
+
+    /**
+     * Called when workspace "run" begins.
+     */
+    void updatingStarted();
+
+    /**
+     * Called when workspace "run" ends.
+     */
+    void updatingFinished();
 }

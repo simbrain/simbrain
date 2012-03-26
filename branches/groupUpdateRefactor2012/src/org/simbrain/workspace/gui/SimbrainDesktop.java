@@ -92,7 +92,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.workspace.updator.InterceptingEventQueue;
-import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
+import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.game.GameComponent;
@@ -228,7 +228,7 @@ public class SimbrainDesktop {
     };
 
     /** Listens for workspace updator events. */
-    private final WorkspaceUpdatorListener updatorListener = new WorkspaceUpdatorListener() {
+    private final WorkspaceUpdaterListener updatorListener = new WorkspaceUpdaterListener() {
 
         /**
          * {@inheritDoc}
@@ -291,7 +291,7 @@ public class SimbrainDesktop {
         wsToolBar = createToolBar();
         createContextMenu();
         workspace.addListener(workspaceListener);
-        workspace.getUpdator().addUpdatorListener(updatorListener);
+        workspace.getUpdater().addUpdatorListener(updatorListener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET,
@@ -315,7 +315,7 @@ public class SimbrainDesktop {
         bottomDock.addTab("Couplings", null, new CouplingListPanel(this,
                 couplings), "Show current couplings");
         bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
-        bottomDock.addTab("Updator", null, new ThreadViewerPanel(this
+        bottomDock.addTab("Updater", null, new ThreadViewerPanel(this
                 .getWorkspace()), "Simbrain thread viewer");
         // Set up the main panel
         horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -499,7 +499,7 @@ public class SimbrainDesktop {
             // Reset time if user double clicks on label.
             public void mousePressed(final MouseEvent event) {
                 if (event.getClickCount() == 2) {
-                    workspace.getUpdator().resetTime();
+                    workspace.getUpdater().resetTime();
                     updateTimeLabel();
                 }
             }
@@ -1137,7 +1137,7 @@ public class SimbrainDesktop {
      */
     public void updateTimeLabel() {
         timeLabel.setText("Time:" + workspace.getTime());
-        if (workspace.getUpdator().isRunning()) {
+        if (workspace.getUpdater().isRunning()) {
             runningLabel.setVisible(true);
             // SimbrainDesktop.this.desktop.setBackground(Color.red);
         } else {

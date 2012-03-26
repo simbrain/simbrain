@@ -21,7 +21,7 @@ package org.simbrain.workspace.gui;
 import javax.swing.JButton;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
+import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
 
 /**
  * A JButton which is automatically disabled when the workspace is running.
@@ -41,8 +41,8 @@ public final class SimbrainButton extends JButton {
 
         // Listen to workspace updator so that this button can be enabled or
         // disabled depending on whether the workspace is running or not.
-        workspace.getUpdator().addUpdatorListener(
-                new WorkspaceUpdatorListener() {
+        workspace.getUpdater().addUpdatorListener(
+                new WorkspaceUpdaterListener() {
 
                     public void changeNumThreads() {
                     }

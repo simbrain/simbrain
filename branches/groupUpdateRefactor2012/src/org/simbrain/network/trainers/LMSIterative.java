@@ -121,6 +121,7 @@ public class LMSIterative extends IterableTrainer {
 	 */
     public void randomize() {
         for (Neuron neuron : network.getOutputNeurons()) {
+            neuron.clear(); // Looks nicer in the GUI
             neuron.randomizeFanIn();
             if (neuron.getUpdateRule() instanceof BiasedNeuron) {
                 ((BiasedNeuron) neuron.getUpdateRule()).setBias(Math.random());

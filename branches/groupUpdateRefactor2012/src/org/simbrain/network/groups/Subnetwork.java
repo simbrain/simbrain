@@ -241,6 +241,19 @@ public class Subnetwork extends Group {
     }
     
     /**
+     * Return neuron groups as a list.  Used in backprop trainer.
+     *
+     * @return layers list
+     */
+    public List<List<Neuron>> getNeuronGroupsAsList() {
+    	List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
+    	for (NeuronGroup group : neuronGroupList) {
+    		ret.add(group.getNeuronList());    	
+    	}
+    	return ret;
+    }
+    
+    /**
      * Returns the index of a neuron group.
      * @param group the group being queried.
      * @return the index of the group in the list.

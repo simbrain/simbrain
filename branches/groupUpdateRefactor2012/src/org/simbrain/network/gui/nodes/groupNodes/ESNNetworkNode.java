@@ -114,7 +114,7 @@ public class ESNNetworkNode extends SubnetGroupNode {
 		menu.addSeparator();
 		menu.add(new JMenuItem(ReflectivePropertyEditor
 				.getPropertiesDialogAction((EchoStateNetwork) getGroup())));
-        setConextMenu(menu);
+        setContextMenu(menu);
     }
     
     /**

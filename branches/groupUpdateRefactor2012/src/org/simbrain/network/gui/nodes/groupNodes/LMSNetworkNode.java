@@ -25,18 +25,15 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
 import org.simbrain.network.gui.trainer.LMSIterativePanel;
 import org.simbrain.network.gui.trainer.LMSOfflinePanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
-import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
-import org.simbrain.network.gui.trainer.TrainerPanel.TrainerDataType;
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
-import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
@@ -121,7 +118,7 @@ public class LMSNetworkNode extends SubnetGroupNode {
 				lms.getInputNeurons(), inputData, "Input"));
 		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
 				lms.getOutputNeurons(), trainingData, "Training"));
-        setConextMenu(menu);
+        setContextMenu(menu);
     }
 
     /**

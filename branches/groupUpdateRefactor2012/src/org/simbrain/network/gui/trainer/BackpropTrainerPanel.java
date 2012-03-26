@@ -27,8 +27,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.network.trainers.ErrorListener;
-import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
@@ -38,13 +38,13 @@ import org.simbrain.util.genericframe.GenericFrame;
  * 
  * @author jeffyoshimi
  */
-public class LMSIterativePanel extends JPanel {
+public class BackpropTrainerPanel extends JPanel {
 	
     /** Parent frame. */
     private GenericFrame parentFrame;
     
     /** Reference to trainer object. */
-    private final LMSIterative trainer;
+    private final BackpropTrainer trainer;
     
     /** Reference to network panel. */
     private final NetworkPanel panel;
@@ -55,8 +55,8 @@ public class LMSIterativePanel extends JPanel {
      * @param networkPanel parent frame
      * @param trainer the trainer to control
      */
-    public LMSIterativePanel(NetworkPanel networkPanel,
-			LMSIterative trainer) {
+    public BackpropTrainerPanel(final NetworkPanel networkPanel,
+			BackpropTrainer trainer) {
     	this.trainer = trainer;
     	this.panel = networkPanel;
         setLayout(new BorderLayout());

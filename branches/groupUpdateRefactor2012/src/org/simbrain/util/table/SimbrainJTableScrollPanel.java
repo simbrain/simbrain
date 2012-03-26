@@ -85,7 +85,7 @@ public class SimbrainJTableScrollPanel extends JScrollPane {
      * Resize the panel based on the data. If below a set amount set size to
      * data, else set to fixed max size.
      */
-    protected void resize() {
+    public void resize() {
 
         int rowHeight = jtable.getRowHeight();
         jtable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);

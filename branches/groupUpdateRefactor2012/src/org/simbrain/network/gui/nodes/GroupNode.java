@@ -90,7 +90,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         setStrokePaint(Color.gray);
         InteractionBox box = new InteractionBox(networkPanel, this);
         setInteractionBox(box);
-        this.setConextMenu(getDefaultContextMenu());
+        this.setContextMenu(getDefaultContextMenu());
         this.setTextLabel(group.getLabel());
         updateVisibility();
     }
@@ -248,7 +248,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      *
      * @param menu the new menu.
      */
-    public void setConextMenu(final JPopupMenu menu) {
+    public void setContextMenu(final JPopupMenu menu) {
         interactionBox.setContextMenu(menu);
     }
 

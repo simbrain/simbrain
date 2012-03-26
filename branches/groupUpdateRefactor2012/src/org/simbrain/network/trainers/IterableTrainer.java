@@ -21,8 +21,6 @@ import java.util.List;
  * Superclass for all types of trainer which can be iterated and which return an
  * error when they are iterated.
  * 
- * TODO: IterateBelowTheshold(double error), Iterate(numIterations), etc.
- * 
  * @author jyoshimi
  */
 public abstract class IterableTrainer extends Trainer {
@@ -51,6 +49,35 @@ public abstract class IterableTrainer extends Trainer {
      * @return the current error
      */
     public abstract double getError();
+    
+    /**
+     * Iterate the trainer for a set number of iterations
+     * 
+     * @param iterations
+     */
+    public void iterate(int iterations) {
+    	fireTrainingBegin();
+    	for (int i = 0; i < iterations; i++) {
+    		apply();
+    	}
+    	fireTrainingEnd();
+    }
+    
+    /**
+     * Iterate the trainer until it is below a threshold.
+     * NOTE: Not yet used or tested.
+     * 
+     * @param iterations
+     */
+    public void iterateBelowThreshold(double threshold) {
+    	fireTrainingBegin();
+    	// TODO: Need some way of escaping... manually via a stop
+    	// button or through a pre-set max iterations
+    	while (getError() > threshold) {
+    		apply();
+    	}
+    	fireTrainingEnd();
+    }
     
     /**
      * Notify listeners that the error value has been updated. Only makes sense
@@ -129,6 +156,5 @@ public abstract class IterableTrainer extends Trainer {
     		errorListeners.remove(errorListener);	        	
         }
 	}
-
 
 }

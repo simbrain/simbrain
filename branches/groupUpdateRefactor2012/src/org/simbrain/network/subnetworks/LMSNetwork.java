@@ -44,6 +44,8 @@ public class LMSNetwork extends FeedForward implements Trainable {
         getOutputLayer().setNeuronType(new LinearNeuron());
         setLabel("LMS Network");
         
+        
+        
     }
 
 	@Override
@@ -74,7 +76,5 @@ public class LMSNetwork extends FeedForward implements Trainable {
 	public void setTrainingData(double[][] trainingData) {
 		this.trainingData = trainingData;		
 	}
-
-
 
 }

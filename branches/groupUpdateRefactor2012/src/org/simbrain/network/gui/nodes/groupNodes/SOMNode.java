@@ -25,11 +25,12 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SOMPropertiesDialog;
+import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.listeners.NetworkListener;
+import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.util.Utils;
 
 /**
@@ -130,17 +131,18 @@ public class SOMNode extends SubnetGroupNode {
             }
         }));
         menu.add(new JMenuItem(new AbstractAction("Train SOM Network") {
+        	//TODO: Integrate below in to training framework?
             public void actionPerformed(final ActionEvent event) {
-//                JDialog propertyDialog = new SOMTrainingDialog((SOM) getGroup());
-//                propertyDialog.pack();
-//                propertyDialog.setLocationRelativeTo(null);
-//                propertyDialog.setVisible(true);
-//                ((SOM)getGroup()).getParentNetwork().fireNetworkChanged();
+                JDialog propertyDialog = new SOMTrainingDialog((SOM) getGroup());
+                propertyDialog.pack();
+                propertyDialog.setLocationRelativeTo(null);
+                propertyDialog.setVisible(true);
+                ((SOM)getGroup()).getParentNetwork().fireNetworkChanged();
             }
         }));
 
 
-        setConextMenu(menu);
+        setContextMenu(menu);
     }
     
 

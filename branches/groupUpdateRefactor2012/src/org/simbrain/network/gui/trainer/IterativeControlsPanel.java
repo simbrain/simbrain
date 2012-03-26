@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.trainer;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
 
@@ -26,6 +27,8 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
@@ -50,6 +53,9 @@ public class IterativeControlsPanel extends JPanel {
     /** Error label. */
     private JLabel rmsError = new JLabel("Error: ----- ");
 
+    /** Batch iterations field. */
+    private JTextField tfIterations = new JTextField("1000");
+    
     /** Iterations thus far. */ 
     private int iterations = 0; //TODO: A way to set to 0
 
@@ -62,33 +68,34 @@ public class IterativeControlsPanel extends JPanel {
     public IterativeControlsPanel(final NetworkPanel networkPanel, final IterableTrainer trainer) {
 
         this.trainer = trainer;
-        JPanel mainPanel = new JPanel();
+        setLayout(new BorderLayout());
+        JTabbedPane tabbedPane = new JTabbedPane();
         
         // Run
-        mainPanel.add(new JButton(runAction));
-        mainPanel.add(new JButton(stepAction));
-        //runningLabel.setIcon(ResourceManager.getImageIcon("Throbber.gif"));
-        //mainPanel.add(runningLabel);
+        JPanel runPanel = new JPanel();
+        runPanel.add(new JButton(runAction));
+        runPanel.add(new JButton(stepAction));
+        tabbedPane.addTab("Run", runPanel);
 
-        // Batch
-        // iterationPanel.add(new
-        // JButton(TrainerGuiActions2.getBatchTrainAction(this)));
+		// Batch train
+		JPanel batchPanel = new JPanel();
+		batchPanel.add(tfIterations);
+		JButton batchButton = new JButton(batchTrain);
+		batchButton.setHideActionText(true);
+		batchPanel.add(batchButton);
+		tabbedPane.addTab("Batch", batchPanel);
 
-        // Iterations
-         mainPanel.add(new JLabel("Iterations:"));
-         mainPanel.add(iterationsLabel);
+        // South Panel
+		JPanel southPanel = new JPanel();
+		southPanel.add(new JLabel("Iterations:"));
+		southPanel.add(iterationsLabel);
+		southPanel.add(rmsError);
+    	JButton plotButton = new JButton(TrainerGuiActions.getShowPlotAction(networkPanel, trainer));
+    	plotButton.setHideActionText(true);
+    	southPanel.add(plotButton);
 
-        // Error
-        mainPanel.add(rmsError);
-
-		// Randomize (de-activate depending...)
-		// mainPanel.add(new JButton(TrainerGuiActions
-		// .getRandomizeNetworkAction(trainer)));
-		// // JButton newPlot = new JButton(TrainerGuiActions
-		// // .getShowPlotAction(networkPanel, trainer));
-		// newPlot.setHideActionText(true);
-		// mainPanel.add(newPlot);
-        add(mainPanel);
+        add("Center", tabbedPane);
+        add("South", southPanel);
         
         // Add listener
         trainer.addErrorListener(new ErrorListener() {
@@ -189,7 +196,7 @@ public class IterativeControlsPanel extends JPanel {
             {
                 putValue(SMALL_ICON,
                         ResourceManager.getImageIcon("BatchPlay.png"));
-                // putValue(NAME, "Batch");
+                putValue(NAME, "Batch");
                 putValue(SHORT_DESCRIPTION, "Batch train network");
             }
 
@@ -197,7 +204,7 @@ public class IterativeControlsPanel extends JPanel {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                // TODO
+                trainer.iterate(Integer.parseInt(tfIterations.getText()));
             }
 
         };

@@ -28,6 +28,16 @@ import org.simbrain.network.trainers.*;
  */
 public class BackpropNetwork extends FeedForward implements Trainable {
 
+	/**
+	 * Input data.
+	 */
+	private double[][] inputData;
+	
+	/**
+	 * Training Data
+	 */
+	private double[][] trainingData;
+
     /**
      * Construct a new backprop network.
      *
@@ -43,17 +53,33 @@ public class BackpropNetwork extends FeedForward implements Trainable {
 
     }
 
-
 	@Override
 	public double[][] getInputData() {
-		// TODO Auto-generated method stub
-		return null;
+		return inputData;	
 	}
 
 	@Override
 	public double[][] getTrainingData() {
-		// TODO Auto-generated method stub
-		return null;
+		return trainingData;
+	}
+
+	/**
+	 * Set the input data.
+	 *
+	 * @param inputData the data to set.
+	 */
+	public void setInputData(double[][] inputData) {
+		this.inputData = inputData;
+		
+	}
+
+	/**
+	 * Set the training data.
+	 *
+	 * @param trainingData the data to set
+	 */
+	public void setTrainingData(double[][] trainingData) {
+		this.trainingData = trainingData;		
 	}
 
 }

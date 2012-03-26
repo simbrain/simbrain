@@ -46,7 +46,7 @@ import org.simbrain.network.util.SimnetUtils;
  *
  * @author jyoshimi
  */
-public class Backprop extends IterableTrainer {
+public class BackpropTrainer extends IterableTrainer {
 
     /** Iteration number. */
     private int iteration;
@@ -71,16 +71,16 @@ public class Backprop extends IterableTrainer {
 
     /** Internal representation of network. */
     private List<List<Neuron>> layers;
-    
-    // Give this a constructor with the layers in it.
-    
-    public Backprop(Trainable network, List<List<Neuron>> layers) {
+
+    /**
+     * Construct the backprop trainer.
+     *
+     * @param network the network
+     * @param layers the layers to train
+     */
+    public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
     	super(network);
     	this.layers = layers;
-    }
-    
-    //TODO
-    public void init(Trainable network) {
         errorMap = new HashMap<Neuron, Double>();
         weightDeltaMap = new HashMap<Synapse, Double>();
         biasDeltaMap = new HashMap<Neuron, Double>();
@@ -137,7 +137,7 @@ public class Backprop extends IterableTrainer {
         // Update RMS error
         rmsError = Math.sqrt(rmsError / (numRows * network.getOutputNeurons().size()));
         iteration++;
-        //network.fireErrorUpdated();
+        fireErrorUpdated();
     }
 
     /**
@@ -218,12 +218,15 @@ public class Backprop extends IterableTrainer {
         }
     }
 
-    // TODO: Here?
-    public void randomize(Trainable network) {
+    /**
+     * Randomize the network.
+     */
+    public void randomize() {
         for (List<Neuron> layer : layers) {
             // Don't update input layer
             if (layers.indexOf(layer) > 0) {
                 for (Neuron neuron : layer) {
+                    neuron.clear(); // Looks nicer in the GUI
                     neuron.randomizeFanIn();
                     neuron.randomizeBias(-.5, .5);
                 }

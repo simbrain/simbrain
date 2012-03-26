@@ -46,7 +46,7 @@ public class DataViewer extends SimbrainJTableScrollPanel {
     /**
      * @return the table
      */
-    private SimbrainJTable getTable() {
+    SimbrainJTable getTable() {
         return table;
     }
     

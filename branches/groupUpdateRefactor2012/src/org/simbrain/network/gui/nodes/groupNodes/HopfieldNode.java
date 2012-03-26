@@ -103,7 +103,7 @@ public class HopfieldNode extends SubnetGroupNode {
             }
         };
         menu.add(new JMenuItem(randWeights));
-        setConextMenu(menu);
+        setContextMenu(menu);
     }
     
 

@@ -86,19 +86,23 @@ public final class ApplyConnectionAction extends AbstractAction {
                     networkPanel.getSelectedModelNeurons());
         } else {
             if (connection instanceof AllToAll) {
-                optionsPanel = new AllToAllPanel((AllToAll) connection);
+                optionsPanel = new AllToAllPanel((AllToAll) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
                 helpAction.setTheURL("Network/connections/alltoall.html");
             } else if (connection instanceof OneToOne) {
-                optionsPanel = new OneToOnePanel((OneToOne) connection);
+                optionsPanel = new OneToOnePanel((OneToOne) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
                 helpAction.setTheURL("Network/connections/onetoone.html");
             } else if (connection instanceof Radial) {
-                optionsPanel = new RadialPanel((Radial) connection);
+                optionsPanel = new RadialPanel((Radial) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
                 helpAction.setTheURL("Network/connections/radial.html");
             } else if (connection instanceof Sparse) {
-                optionsPanel = new SparsePanel((Sparse) connection, networkPanel);
+                optionsPanel = new SparsePanel((Sparse) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
                 helpAction.setTheURL("Network/connections/sparse.html");
             }

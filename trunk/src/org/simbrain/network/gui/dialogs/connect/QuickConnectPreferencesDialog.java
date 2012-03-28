@@ -95,17 +95,17 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
                 .getSelectedItem();
         if (connection instanceof AllToAll) {
             clearOptionPanel();
-            optionsPanel = new AllToAllPanel((AllToAll) connection);
+            optionsPanel = new AllToAllPanel((AllToAll) connection, panel);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         } else if (connection instanceof OneToOne) {
             clearOptionPanel();
-            optionsPanel = new OneToOnePanel((OneToOne) connection);
+            optionsPanel = new OneToOnePanel((OneToOne) connection, panel);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         } else if (connection instanceof Radial) {
             clearOptionPanel();
-            optionsPanel = new RadialPanel((Radial) connection);
+            optionsPanel = new RadialPanel((Radial) connection, panel);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         } else if (connection instanceof Sparse) {

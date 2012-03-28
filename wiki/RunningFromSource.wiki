@@ -36,7 +36,7 @@ See: http://ant.apache.org/manual/install.html
 
 == Subversion ==
 
-Download and install subversion [http://subversion.tigris.org/ here]. Windows users click on "windows binaries", Mac users click on "Mac OS X binaries", etc.
+Download and install subversion [http://subversion.apache.org/packages.html here]. Windows users click on "windows binaries", Mac users click on "Mac OS X binaries", etc.
 
 Checkout the latest version of Simbrain by following the directions [http://code.google.com/p/simbrain/source/checkout here]
 

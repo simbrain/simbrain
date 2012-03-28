@@ -2036,6 +2036,7 @@ public class NetworkPanel extends JPanel {
         for (NeuronNode node : sourceNeurons) {
             SourceHandle.removeSourceHandleFrom(node);
         }
+        sourceNeurons.clear();
     }
 
     /**

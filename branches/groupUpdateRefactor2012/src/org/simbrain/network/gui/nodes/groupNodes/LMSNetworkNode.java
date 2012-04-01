@@ -34,6 +34,7 @@ import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
+import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
@@ -114,6 +115,8 @@ public class LMSNetworkNode extends SubnetGroupNode {
 			}
 
 		};
+		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+				(Trainable) getGroup(), inputData, trainingData));
 		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
 				lms.getInputNeurons(), inputData, "Input"));
 		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),

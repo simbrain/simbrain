@@ -126,6 +126,8 @@ public class BackpropNetworkNode extends SubnetGroupNode {
 			}
 
 		};
+		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+				network, inputData, trainingData));
 		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
 				network.getInputNeurons(), inputData, "Input"));
 		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),

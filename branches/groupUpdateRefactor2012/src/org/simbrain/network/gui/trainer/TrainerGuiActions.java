@@ -23,12 +23,14 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.trainers.InvalidDataException;
 import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
@@ -56,7 +58,7 @@ public class TrainerGuiActions {
     
     /**
 	 * Action for viewing data in a table that correlate with a set of neurons.
-	 * It's a bit of a pain, but to use this you must create an instanceof a
+	 * It's a bit of a pain, but to use this you must create an instance of a
 	 * DataHolder, which is basically just a reference to an object with getData
 	 * and setData methods.
 	 * 
@@ -79,7 +81,7 @@ public class TrainerGuiActions {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
                 putValue(NAME, name);
-                putValue(SHORT_DESCRIPTION, "Edit data");
+                putValue(SHORT_DESCRIPTION, "Edit data...");
             }
 
             /**
@@ -89,6 +91,47 @@ public class TrainerGuiActions {
 				networkPanel.displayPanel(
 						DataViewer.createDataViewerPanel(neurons, dataHolder, name),
 						"Edit " + name);
+            }
+
+        };
+    }
+    
+
+    /**
+     * Action for viewing two datatables, one for input data; the other for training 
+     * data.
+     * 
+     * @param networkPanel the parent network panel.
+     * @param trainable the trainable object providing access to input and output neurons
+     * @param inputData access to input data via dataholder object
+     * @param trainingData access to trainig data via dataholder object 
+     * @return
+     */
+	public static Action getEditCombinedDataAction(
+			final NetworkPanel networkPanel, final Trainable trainable,
+			final DataHolder inputData, final DataHolder trainingData) {
+		return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
+                putValue(NAME, "Edit combined data...");
+                putValue(SHORT_DESCRIPTION, "Edit combined data...");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+				JPanel inputPanel = DataViewer.createDataViewerPanel(
+						trainable.getInputNeurons(), inputData, "Input data");
+				JPanel trainingPanel = DataViewer.createDataViewerPanel(
+						trainable.getOutputNeurons(), trainingData,
+						"Training data");
+				JPanel combinedPanel = DataViewer
+						.createCombinedDataViewerPanel(inputPanel,
+								trainingPanel);
+				networkPanel.displayPanel(combinedPanel, "Edit data");
             }
 
         };
@@ -171,8 +214,8 @@ public class TrainerGuiActions {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-                putValue(NAME, "Show properties");
-                putValue(SHORT_DESCRIPTION, "Show properties");
+                putValue(NAME, "Properties");
+                putValue(SHORT_DESCRIPTION, "Edit Properties");
             }
 
             /**

@@ -19,12 +19,14 @@
 package org.simbrain.network.gui.trainer;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -48,10 +50,10 @@ public class IterativeControlsPanel extends JPanel {
     private final IterableTrainer trainer;
 
     /** Current number of iterations. */
-    private JLabel iterationsLabel = new JLabel("  ");
+    private JLabel iterationsLabel = new JLabel("--- ");
     
     /** Error label. */
-    private JLabel rmsError = new JLabel("Error: ----- ");
+    private JLabel rmsError = new JLabel("Error: --- ");
 
     /** Batch iterations field. */
     private JTextField tfIterations = new JTextField("1000");
@@ -59,6 +61,12 @@ public class IterativeControlsPanel extends JPanel {
     /** Iterations thus far. */ 
     private int iterations = 0; //TODO: A way to set to 0
 
+    /** Reference to network panel. */
+    private final NetworkPanel panel;
+    
+    /** Flag for showing updates in GUI. */
+    private final JCheckBox showUpdates = new JCheckBox("Show updates");
+    
     /**
      * Construct a rule chooser panel.
      *
@@ -68,6 +76,7 @@ public class IterativeControlsPanel extends JPanel {
     public IterativeControlsPanel(final NetworkPanel networkPanel, final IterableTrainer trainer) {
 
         this.trainer = trainer;
+        this.panel = networkPanel;
         setLayout(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
         
@@ -75,6 +84,7 @@ public class IterativeControlsPanel extends JPanel {
         JPanel runPanel = new JPanel();
         runPanel.add(new JButton(runAction));
         runPanel.add(new JButton(stepAction));
+        runPanel.add(showUpdates);
         tabbedPane.addTab("Run", runPanel);
 
 		// Batch train
@@ -86,7 +96,7 @@ public class IterativeControlsPanel extends JPanel {
 		tabbedPane.addTab("Batch", batchPanel);
 
         // South Panel
-		JPanel southPanel = new JPanel();
+		JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		southPanel.add(new JLabel("Iterations:"));
 		southPanel.add(iterationsLabel);
 		southPanel.add(rmsError);
@@ -141,17 +151,28 @@ public class IterativeControlsPanel extends JPanel {
                     trainer.setUpdateCompleted(false);
                     Executors.newSingleThreadExecutor().submit(new Runnable() {
                         public void run() {
-                            while (!trainer.isUpdateCompleted()) {
-                                trainer.apply();
-                                // TODO: Make below an option?
-                                // trainerGui.getTrainer().getNetwork().getRootNetwork().fireNetworkChanged();
-                            }
-                            {
-                                putValue(SMALL_ICON, ResourceManager
-                                        .getImageIcon("Play.png"));
-                            }
-                        }
-                    });
+						while (!trainer.isUpdateCompleted()) {
+							trainer.apply();
+							if (showUpdates.isSelected()) {
+								panel.getRootNetwork()
+										.setUpdateCompleted(false);
+								panel.getRootNetwork().fireNetworkChanged();
+								while (panel.getRootNetwork()
+										.isUpdateCompleted() == false) {
+									try {
+										Thread.sleep(1);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
+							}
+						}
+						{
+							putValue(SMALL_ICON,
+									ResourceManager.getImageIcon("Play.png"));
+						}
+					}
+				});
                     putValue(SMALL_ICON,
                             ResourceManager.getImageIcon("Stop.png"));
                 } else {
@@ -183,6 +204,9 @@ public class IterativeControlsPanel extends JPanel {
              */
             public void actionPerformed(ActionEvent arg0) {
                 trainer.apply();
+                if (showUpdates.isSelected()) {
+                	panel.getRootNetwork().fireNetworkChanged();
+                }
             }
 
         };

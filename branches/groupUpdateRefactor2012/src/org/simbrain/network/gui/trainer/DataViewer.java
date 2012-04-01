@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
 import org.simbrain.network.interfaces.Neuron;
@@ -152,6 +153,21 @@ public class DataViewer extends SimbrainJTableScrollPanel {
 
         mainPanel.add("North", toolbars);
         return mainPanel;
+    }
+    
+    /**
+     * Create a combined data viewer panel, which shows two panels in a split pane.
+     */
+    public static JPanel createCombinedDataViewerPanel(JPanel viewer1,  JPanel viewer2) {
+    	// TODO:  Plenty of enhancements are planned for this.   As it matures it
+    	//	should probably be moved somewhere else.    	
+    	JPanel panel = new JPanel();
+    	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    	//split.setDividerLocation(.5);
+    	split.setLeftComponent(viewer1);
+    	split.setRightComponent(viewer2);
+    	panel.add(split);
+        return panel;
     }
     
     /**

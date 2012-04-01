@@ -25,6 +25,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
@@ -61,13 +63,17 @@ public class LMSIterativePanel extends JPanel {
     	this.panel = networkPanel;
         setLayout(new BorderLayout());
     	add("Center", new IterativeControlsPanel(networkPanel, trainer));
-    	JButton propertiesButton = new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer));
-    	propertiesButton.setHideActionText(true);
+    	
+    	// Put LMS specific controls at the bottom
+    	JPanel southPanel = new JPanel(new BorderLayout());
+    	southPanel.add("North", new JSeparator(SwingConstants.HORIZONTAL));
     	JPanel panel = new JPanel();
+    	JButton propertiesButton = new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer));
+    	//propertiesButton.setHideActionText(true);
     	panel.add(propertiesButton);
     	panel.add(new JButton(randomizeAction));
-    	add("South", panel);
-    	
+    	southPanel.add("Center", panel);
+    	add("South", southPanel);    	
         // Add listener
         trainer.addErrorListener(new ErrorListener() {
 
@@ -87,7 +93,7 @@ public class LMSIterativePanel extends JPanel {
 		// Initialize
 		{
 			putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-			// putValue(NAME, "Show properties");
+			putValue(NAME, "Randomize");
 			putValue(SHORT_DESCRIPTION, "Randomize network");
 		}
 

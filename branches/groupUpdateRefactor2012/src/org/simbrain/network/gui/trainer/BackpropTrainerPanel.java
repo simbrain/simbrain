@@ -19,12 +19,16 @@
 package org.simbrain.network.gui.trainer;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.BackpropTrainer;
@@ -60,13 +64,20 @@ public class BackpropTrainerPanel extends JPanel {
     	this.trainer = trainer;
     	this.panel = networkPanel;
         setLayout(new BorderLayout());
+        
+        // Use iterative controls for main panel
     	add("Center", new IterativeControlsPanel(networkPanel, trainer));
-    	JButton propertiesButton = new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer));
-    	propertiesButton.setHideActionText(true);
+    	
+    	// Put backprop specific controls at the bottom
+    	JPanel southPanel = new JPanel(new BorderLayout());
+    	southPanel.add("North", new JSeparator(SwingConstants.HORIZONTAL));
     	JPanel panel = new JPanel();
+    	JButton propertiesButton = new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer));
+    	//propertiesButton.setHideActionText(true);
     	panel.add(propertiesButton);
     	panel.add(new JButton(randomizeAction));
-    	add("South", panel);
+    	southPanel.add("Center", panel);
+    	add("South", southPanel);
     	
         // Add listener
         trainer.addErrorListener(new ErrorListener() {
@@ -87,7 +98,7 @@ public class BackpropTrainerPanel extends JPanel {
 		// Initialize
 		{
 			putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-			// putValue(NAME, "Show properties");
+			putValue(NAME, "Randomize");
 			putValue(SHORT_DESCRIPTION, "Randomize network");
 		}
 

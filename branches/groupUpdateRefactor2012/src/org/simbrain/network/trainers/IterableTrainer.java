@@ -62,7 +62,7 @@ public abstract class IterableTrainer extends Trainer {
     	}
     	fireTrainingEnd();
     }
-    
+        
     /**
      * Iterate the trainer until it is below a threshold.
      * NOTE: Not yet used or tested.

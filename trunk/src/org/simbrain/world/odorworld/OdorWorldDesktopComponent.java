@@ -53,7 +53,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
         setLayout(new BorderLayout());
         worldPanel = new OdorWorldPanel(component.getWorld());
         add("Center", worldPanel);
-        menu = new OdorWorldFrameMenu(this);
+        menu = new OdorWorldFrameMenu(this, component.getWorld());
         menu.setUpMenus();
         setGuiSizeToWorldSize();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
@@ -137,7 +137,7 @@ public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> 
 
     @Override
     public void postAddInit() {
-        menu = new OdorWorldFrameMenu(this);
+        menu = new OdorWorldFrameMenu(this, worldPanel.getWorld());
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
                                             // class?

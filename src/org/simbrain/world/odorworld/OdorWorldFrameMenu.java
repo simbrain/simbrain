@@ -18,10 +18,14 @@
  */
 package org.simbrain.world.odorworld;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
@@ -45,9 +49,6 @@ public class OdorWorldFrameMenu extends JMenuBar {
     /** File menu. */
     private JMenu fileMenu = new JMenu("File  ");
 
-    /** Preferences menu item. */
-    private JMenuItem prefsItem = new JMenuItem("World preferences");
-
     /** Edit menu. */
     private JMenu editMenu = new JMenu("Edit  ");
 
@@ -61,20 +62,24 @@ public class OdorWorldFrameMenu extends JMenuBar {
     private JMenuItem pasteItem = new JMenuItem("Paste");
 
     /** Clear all menu item. */
-    private JMenuItem clearAllItem = new JMenuItem("Clear all entities");
+    private JMenuItem clearAllItems = new JMenuItem("Clear all entities");
 
     /** Help menu. */
     private JMenu helpMenu = new JMenu("Help");
 
     /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("World Help");
+    
+    /** Reference to odor world. */
+    private final OdorWorld world;
 
     /**
      * Odor world frame menu constructor.
      * @param frame Frame to create menu
      */
-    public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame) {
+    public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame, OdorWorld world) {
         parent = frame;
+        this.world = world;
     }
 
     /**
@@ -84,10 +89,17 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
         setUpFileMenu();
         setUpEditMenu();
-        add(helpMenu);
-        helpMenu.add(helpItem);
+
+        // Coupling Menu
         add(new CouplingMenuComponent("Couple", parent.getWorkspaceComponent()
                 .getWorkspace(), parent.getWorkspaceComponent()));
+        
+        // Help Menu
+        add(helpMenu);
+        ShowHelpAction helpAction = new ShowHelpAction();
+        helpAction.setTheURL("Worlds/OdorWorld/OdorWorld.html");
+        helpItem.setAction(helpAction);
+        helpMenu.add(helpItem);
     }
 
     /**
@@ -113,8 +125,13 @@ public class OdorWorldFrameMenu extends JMenuBar {
         editMenu.add(copyItem);
         editMenu.add(pasteItem);
         editMenu.addSeparator();
-        editMenu.addSeparator();
-        editMenu.add(clearAllItem);
+        clearAllItems.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent e) {
+    			world.deleteAllEntities();
+    		}
+        });
+        editMenu.add(clearAllItems);
 
     }
+
 }

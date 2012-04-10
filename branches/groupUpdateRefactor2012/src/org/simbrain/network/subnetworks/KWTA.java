@@ -18,11 +18,8 @@
  */
 package org.simbrain.network.subnetworks;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
-import org.simbrain.network.groups.GrowableSynapseLayer;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -37,7 +34,7 @@ import org.simbrain.network.neurons.PointNeuron;
  * Computational Explorations in Cognitive Neuroscience, p. 110. All page
  * references below are are to this book.
  */
-public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
+public class KWTA extends Subnetwork  {
 
     //TODO: Make q settable
     //      Add average based version 
@@ -83,7 +80,8 @@ public class KWTA extends Subnetwork implements GrowableSynapseLayer  {
             getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuron()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
-        attachSynapseGroupToNeuronGroup(getSynapseGroup(), getNeuronGroup());
+        setUseSynapseRouting(true);
+        attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
         setLabel("K-Winner Take All");
     }
 

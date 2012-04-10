@@ -49,15 +49,9 @@ import javax.swing.ToolTipManager;
 
 import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.groups.GrowableSynapseLayer;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.subnetworks.BackpropNetwork;
-import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.network.subnetworks.Hopfield;
-import org.simbrain.network.subnetworks.LMSNetwork;
-import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.connect.QuickConnectPreferencesDialog;
@@ -97,6 +91,11 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.subnetworks.EchoStateNetwork;
+import org.simbrain.network.subnetworks.Hopfield;
+import org.simbrain.network.subnetworks.LMSNetwork;
+import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
@@ -441,6 +440,15 @@ public class NetworkPanel extends JPanel {
 
             public void synapseAdded(final NetworkEvent<Synapse> e) {
                 NetworkPanel.this.addSynapse(e.getObject());
+                Synapse synapse = e.getObject();
+                if (synapse.getParentGroup() != null) {
+                    GroupNode parentGroupNode = (GroupNode) objectNodeMap
+                            .get(synapse.getParentGroup());
+                    if (parentGroupNode != null) {
+                    	// For case where invisible node has turned visible
+                        parentGroupNode.setVisible(true);
+                    }
+                }
             }
 
             public void synapseRemoved(final NetworkEvent<Synapse> e) {
@@ -511,21 +519,21 @@ public class NetworkPanel extends JPanel {
 
             /** @see NetworkListener */
             public void groupChanged(final NetworkEvent<Group> e, final String description) {
-                
+
                 // This method may become more complex eventually, as more types
                 // of group change are supported. For now a single case is
-                // handled: adding synapses to a synapse group               
-                Group group = e.getObject();                
-                if (group instanceof GrowableSynapseLayer) {
-                    if (description.equalsIgnoreCase("synapseAdded")) {
-                        SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap.get(((Subnetwork) group).getSynapseGroup());
-                        SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e.getAuxiliaryObject());
-                        if (synapseNode != null) {
-                            sgn.addPNode(synapseNode);
-                            sgn.updateBounds();                            
-                        }
-                    }
-                }
+                // handled: adding synapses to an existing synapse group in a subnet               
+                Group group = e.getObject();            
+				if (description.equalsIgnoreCase("synapseAddedToGroup")) {
+					SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap
+					.get(((Subnetwork) group).getSynapseGroup());
+					SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e
+							.getAuxiliaryObject());
+					if (synapseNode != null) {
+						sgn.addPNode(synapseNode);
+						sgn.updateBounds();
+					}
+				}
 
             }
 

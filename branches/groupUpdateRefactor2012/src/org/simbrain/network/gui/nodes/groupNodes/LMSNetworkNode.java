@@ -161,7 +161,7 @@ public class LMSNetworkNode extends SubnetGroupNode {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			LMSNetwork network = (LMSNetwork) getGroup();
-        	LMSOfflinePanel trainingPanel = new LMSOfflinePanel(new LMSOffline(network, network.getSynapseGroup()));
+        	LMSOfflinePanel trainingPanel = new LMSOfflinePanel(new LMSOffline(network));
             getNetworkPanel().displayPanel(trainingPanel, "Trainer");
 		}
 	};

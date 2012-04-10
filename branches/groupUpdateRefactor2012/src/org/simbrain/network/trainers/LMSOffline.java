@@ -35,6 +35,7 @@ import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Matrices;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
@@ -48,10 +49,7 @@ import Jama.Matrix;
  */
 public class LMSOffline extends Trainer {
 	
-	/** Reference to the synapse group to be trained. */
-	private final SynapseGroup synapseGroup;
-	
-    /** Current solution type. */
+	/** Current solution type. */
     private SolutionType solutionType = SolutionType.MOORE_PENROSE;
 
 	/**
@@ -59,11 +57,9 @@ public class LMSOffline extends Trainer {
 	 * Synapse group where the new synapses will be placed.
 	 *
 	 * @param network the network to train
-	 * @param group the synapse group where the synpases will go.
 	 */
-	public LMSOffline(Trainable network, SynapseGroup group) {
+	public LMSOffline(Trainable network) {
 		super(network);
-		this.synapseGroup = group;
 	}
 
     /**
@@ -110,9 +106,9 @@ public class LMSOffline extends Trainer {
     	}
     	
         if (solutionType == SolutionType.WIENER_HOPF) {
-            weinerHopfSolution(network, synapseGroup);
+            weinerHopfSolution(network);
         } else if (solutionType == SolutionType.MOORE_PENROSE) {
-            moorePenroseSolution(network, synapseGroup);
+            moorePenroseSolution(network);
         } else {
             throw new IllegalArgumentException("Solution type must be "
                     + "'MoorePenrose' or 'WeinerHopf'.");
@@ -125,7 +121,7 @@ public class LMSOffline extends Trainer {
     /**
      * Implements the Wiener-Hopf solution to LMS linear regression.
      */
-    public void weinerHopfSolution(Trainable network, SynapseGroup group) {
+    public void weinerHopfSolution(Trainable network) {
         Matrix inputMatrix = new Matrix(network.getInputData());
 		Matrix trainingMatrix = new Matrix(network.getTrainingData());
 
@@ -143,7 +139,8 @@ public class LMSOffline extends Trainer {
 			fireProgressUpdate("Computing Weights...", 80);
 			double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
 			fireProgressUpdate("Setting Weights...", 95);
-			connectInputOutput(wOut, group);
+			SimnetUtils.setWeights(network.getInputNeurons(),
+					network.getOutputNeurons(), wOut);
 			fireProgressUpdate("Done!", 100);
 
 			// TODO: What error does JAMA actually throw for singular Matrices?
@@ -161,7 +158,7 @@ public class LMSOffline extends Trainer {
     /**
      * Moore penrose.
      */
-    public void moorePenroseSolution(Trainable network, SynapseGroup group) {
+    public void moorePenroseSolution(Trainable network) {
         Matrix inputMatrix = new Matrix(network.getInputData());
         Matrix trainingMatrix = new Matrix(network.getTrainingData());
 
@@ -173,7 +170,8 @@ public class LMSOffline extends Trainer {
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
         
         fireProgressUpdate("Setting Weights...", 75);
-        connectInputOutput(wOut, group);
+		SimnetUtils.setWeights(network.getInputNeurons(),
+				network.getOutputNeurons(), wOut);
         fireProgressUpdate("Done!", 100);
         
         inputMatrix = null;

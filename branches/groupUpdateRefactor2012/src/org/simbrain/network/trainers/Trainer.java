@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Synapse;
@@ -114,31 +115,5 @@ public abstract class Trainer {
     		listener.progressUpdated(progressUpdate, percentComplete);
     	}
     }
-	
-	/**
-	 * Connect the input neurons to the output neurons using a specified weight matrix, and
-	 * add those to the specified synapse groups.
-	 * 
-	 * TODO: Currently assumes the synapse group exists and breaks if not.
-	 *
-	 * @param w the matrix of weights to set
-	 * @param group the synapse group to add weights to
-	 */
-	public void connectInputOutput(final double[][] w, SynapseGroup group) {
-		for (int i = 0; i < network.getInputNeurons().size(); i++) {
-			for (int j = 0; j < network.getOutputNeurons().size(); j++) {
-				Synapse s = Network.getSynapse(network.getInputNeurons().get(i),
-						network.getOutputNeurons().get(j));
-				if (s != null) {
-					s.setStrength(w[i][j]);
-				} else {
-					Synapse newSynapse = new Synapse(network.getInputNeurons().get(i),
-							network.getOutputNeurons().get(j));
-					newSynapse.setStrength(w[i][j]);
-					group.addSynapse(newSynapse);
-				}
-			}
-		}
-	}
 
 }

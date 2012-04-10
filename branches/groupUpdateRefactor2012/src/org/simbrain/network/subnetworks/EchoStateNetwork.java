@@ -346,7 +346,7 @@ public class EchoStateNetwork extends Subnetwork {
         };
         
         // Create the offline trainer.
-        LMSOffline trainer = new LMSOffline(trainable, getSynapseGroup(1));
+        LMSOffline trainer = new LMSOffline(trainable);
         return trainer;
 
     }

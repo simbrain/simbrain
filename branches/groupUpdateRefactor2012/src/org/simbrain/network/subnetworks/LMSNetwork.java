@@ -43,8 +43,10 @@ public class LMSNetwork extends FeedForward implements Trainable {
                 initialPosition);
         getOutputLayer().setNeuronType(new LinearNeuron());
         setLabel("LMS Network");
-        
-        
+        // TODO: Do this at feed-forward level, so that all inter-level connections
+        //	are automatically added to the inter-level synapse groups?
+        attachSourceNeuronGroupToSynapseGroup(getInputLayer(), getSynapseGroup());
+        attachTargetNeuronGroupToSynapseGroup(getOutputLayer(), getSynapseGroup());
         
     }
 

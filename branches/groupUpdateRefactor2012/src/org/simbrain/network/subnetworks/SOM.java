@@ -1,16 +1,13 @@
 package org.simbrain.network.subnetworks;
 
 import java.io.File;
-import java.util.Iterator;
 
-import org.simbrain.network.groups.GrowableSynapseLayer;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.neurons.PointNeuron;
 
 /**
  * <b>SOM</b> implements a Self-Organizing Map network.
@@ -19,7 +16,7 @@ import org.simbrain.network.neurons.PointNeuron;
  * 
  * TODO: Move all "training" functions over to trainer
  */
-public class SOM extends Subnetwork implements GrowableSynapseLayer {
+public class SOM extends Subnetwork {
 
     /** Default alpha. */
     private static final double DEFAULT_ALPHA = 0.6;
@@ -118,10 +115,11 @@ public class SOM extends Subnetwork implements GrowableSynapseLayer {
     public SOM(final RootNetwork root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
         for (int i = 0; i < numNeurons; i++) {
-            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuron()));
+            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new LinearNeuron()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
-        attachSynapseGroupToNeuronGroup(getSynapseGroup(), getNeuronGroup());
+        setUseSynapseRouting(true);
+        attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
         setLabel("SOM");
     }
 

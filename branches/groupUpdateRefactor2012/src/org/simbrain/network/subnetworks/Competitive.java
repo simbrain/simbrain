@@ -20,7 +20,6 @@ package org.simbrain.network.subnetworks;
 
 import java.util.Iterator;
 
-import org.simbrain.network.groups.GrowableSynapseLayer;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
@@ -35,7 +34,7 @@ import org.simbrain.network.neurons.LinearNeuron;
  *
  * @author Jeff Yoshimi
  */
-public class Competitive extends Subnetwork implements GrowableSynapseLayer {
+public class Competitive extends Subnetwork {
 
     /** Learning rate. */
     private double epsilon = .1;
@@ -73,7 +72,8 @@ public class Competitive extends Subnetwork implements GrowableSynapseLayer {
      */
     public Competitive(final RootNetwork root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
-        attachSynapseGroupToNeuronGroup(getSynapseGroup(), getNeuronGroup());
+        setUseSynapseRouting(true);
+        attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(new Neuron(root, new LinearNeuron()));
         }

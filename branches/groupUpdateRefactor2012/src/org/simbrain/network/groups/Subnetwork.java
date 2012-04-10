@@ -29,8 +29,19 @@ import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
 
 /**
- * A collection of neuron groups and synapse groups which essentially functions
- * as a subnetwork within the main root network, with it's own update rules.
+ * A collection of neuron groups and synapse groups which functions as a
+ * subnetwork within the main root network, with its own update rules.
+ * 
+ * "Routing rules" can be created whereby synapses are automatically associated
+ * with synapse groups. See subclasses of subnetwork like Competitive and
+ * LMSNetwork for examples. First setUseSynapseRouting to true. Then call
+ * attachSourceNeuronGroupToSynapseGroup and / or
+ * attachTargetNeuronGroupToSynapseGroup. When new synapses are added to the
+ * network, they will automatically be added to a given synapse group, depending
+ * on which neuron group their source or target neurons are members of. For
+ * example, in a 2-layer network, a rule can be set up whereby any new synapse
+ * connecting the first to the second layer will be automatically routed to the
+ * synapse group connecting those layers.
  */
 public class Subnetwork extends Group {
     
@@ -40,16 +51,17 @@ public class Subnetwork extends Group {
     /** List of synapse groups. */
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
     
-    /**
-     * Associates neuron groups with the "growing" synapse groups that are
-     * "attached" to them.
-     */
-    private final Map<NeuronGroup, SynapseGroup> neuronGroupToSyanpseGroupMap = 
+    /** If true, then new synapses should be routed to appropriate synapse groupss. */
+    private boolean useSynapseRouting = false;
+
+    /** Associate a synapse group with a source neuron group. */
+    private final Map<NeuronGroup, SynapseGroup> sourceNeuronGroupToSynapseGroup = 
+            new HashMap<NeuronGroup, SynapseGroup>();
+
+    /** Associate a synapse group with a target neuron group. */
+    private final Map<NeuronGroup, SynapseGroup> targetNeuronGroupToSynapseGroup = 
             new HashMap<NeuronGroup, SynapseGroup>();
     
-    /** True if "growing synapse groups" are used. */
-    private boolean usingGrowingSynapseGroups = false;
-
     /**
      * Create subnetwork group.
      *
@@ -94,7 +106,7 @@ public class Subnetwork extends Group {
             synapseGroup.setDeleteWhenEmpty(true);
             getParentNetwork().removeGroup(synapseGroup);
         }
-        if (usingGrowingSynapseGroups) {
+        if (useSynapseRouting) {
             removeSynapseListener();
         }
     }
@@ -103,6 +115,18 @@ public class Subnetwork extends Group {
     public boolean isEmpty() {
         boolean neuronGroupsEmpty = neuronGroupList.isEmpty();
         boolean synapseGroupsEmpty = synapseGroupList.isEmpty();
+        
+		// If synapse groups exist but are empty, treat synapse groups as empty
+        boolean allAreEmpty = true;
+        for(SynapseGroup synapseGroup : synapseGroupList) {
+        	if (!synapseGroup.isEmpty()) {
+        		allAreEmpty = false;
+        	}
+        }
+        if (allAreEmpty) {
+        	synapseGroupsEmpty = true;
+        }
+        
         return (neuronGroupsEmpty && synapseGroupsEmpty);
     }
 
@@ -172,6 +196,7 @@ public class Subnetwork extends Group {
         SynapseGroup newGroup = new SynapseGroup(getParentNetwork());
         getParentNetwork().transferSynapsesToGroup(synapses, newGroup);
         addSynapseGroup(newGroup);
+        newGroup.setDeleteWhenEmpty(false);
     	if(!source.equals(target)) {
     		newGroup.setLabel("Weights " + sourceLabel + " "
     			+ new Character('\u2192') + " " + targetLabel);
@@ -369,114 +394,150 @@ public class Subnetwork extends Group {
         }
     }
     
-    /**
-     * Associates a synapse group with a neuron group. Any synapse that is added
-     * to neurons in that group are automatically added to the specified synapse
-     * group.
-     * 
-     * @param synapseGroup the synapse group to attach. It will now "grow"
-     *            automatically as neurons are added.
-     */
-    protected void attachSynapseGroupToNeuronGroup(final SynapseGroup synapseGroup,
-            final NeuronGroup neuronGroup) {
-
-        // TODO: If synapse group or neuron group does not exist fire exception
-        
-        // TODO: Also. Can't have a neuron group associated with multiple
-        // synapse groups (at least not now).
-
-        // If this is the first synapse group with a listener, add the listener
-        if (!usingGrowingSynapseGroups) {
-            usingGrowingSynapseGroups = true;
-            addSynapseListener();
-        }
-
-        // Don't delete this synapse group when it is empty.  It should grow and shrink
-        //  as synapses are added and deleted
+	/**
+	 * Set up a routing rule whereby synapses whose source neuron is a member of
+	 * the indicated NeuronGroup will be moved to the indicated SynapseGroup.
+	 * 
+	 * If both a source and target NeuronGroup are attached to the same
+	 * SynapseGroup then synapses connecting the two will be routed to that
+	 * SynapseGroup.
+	 * 
+	 * @param neuronGroup
+	 *            the source neuron group
+	 * @param synapseGroup
+	 *            the synapse group to route synapses to
+	 */
+    protected void attachSourceNeuronGroupToSynapseGroup(
+			 final NeuronGroup neuronGroup, final SynapseGroup synapseGroup) {
+		// Don't delete this synapse group when it is empty. It should grow and
+		// shrink as synapses are added and deleted
         synapseGroup.setDeleteWhenEmpty(false);
-        
-        // Create association between neuron group and synapse group
-        neuronGroupToSyanpseGroupMap.put(neuronGroup, synapseGroup);
-
+        sourceNeuronGroupToSynapseGroup.put(neuronGroup, synapseGroup);
     }
-        
+
+	/**
+	 * Set up a routing rule whereby synapses whose target neuron is a member of
+	 * the indicated NeuronGroup will be moved to the indicated SynapseGroup.
+	 * 
+	 * If both a source and target NeuronGroup are attached to the same
+	 * SynapseGroup then synapses connecting the two will be routed to that
+	 * SynapseGroup.
+	 * 
+	 * @param neuronGroup the target neuron group
+	 * @param synapseGroup the synapse group to route synapses to
+	 */
+    protected void attachTargetNeuronGroupToSynapseGroup(final NeuronGroup neuronGroup,
+            final SynapseGroup synapseGroup) {
+		// Don't delete this synapse group when it is empty. It should grow and
+		// shrink as synapses are added and deleted
+        synapseGroup.setDeleteWhenEmpty(false);
+        targetNeuronGroupToSynapseGroup.put(neuronGroup, synapseGroup);
+    }
+
     /**
-     * Add the synapse listener used for growing synapse groups.
+     * Add the synapse listener to parent network.
      */
     private void addSynapseListener() {
-        getParentNetwork().addSynapseListener(synapseListener);
-        
+        getParentNetwork().addSynapseListener(synapseListener);        
     }
     
     /**
-     * Remove the synapse listener used for growing synapse groups.
+     * Remove the synapse listener from parent network
      */
     private void removeSynapseListener() {
         getParentNetwork().removeSynapseListener(synapseListener);
     }
 
     /**
-     * Return the neuron group, if any, this synapse is associated with.
-     * Return null if there is no such group.
-     * 
-     * @param synapse the synapse to check
-     * @return the associated neuron group, or null if there is none 
-     */
-    private NeuronGroup getAssociatedNeuronGroup(final Synapse synapse) {
-
-        NeuronGroup ret = null;
-        // Check whether this synapse is contained in any of the neuron groups that
-        //  "growing" synapse groups are attached to
-        for (NeuronGroup neuronGroup : neuronGroupToSyanpseGroupMap.keySet()) {
-            if (neuronGroup.inFanInOfSomeNode(synapse)) {
-                ret = neuronGroup;
-            }
-        }
-        return ret;
-    }
-    
-    /**
      * Listen for synapse events and add new synapse when they arrive.
      */
     private final SynapseListener synapseListener = new SynapseListener() {
 
+    	@Override
         public void synapseRemoved(NetworkEvent<Synapse> networkEvent) {
             // This is handled elsewhere
         }
 
+    	@Override
         public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
             
-            // A synapse arrives
+        	if (!useSynapseRouting) {
+        		return;
+        	}
+        	
             Synapse synapse = networkEvent.getObject();
-
-            // Check if the synapse is attached to some neuron group in 
-            // this subnetwork
-            NeuronGroup parentGroup = getAssociatedNeuronGroup(synapse);
             
-            if (parentGroup != null) {
-                
-                // Find the appropriate synapseGroup
-                SynapseGroup synapseGroup = neuronGroupToSyanpseGroupMap.get(parentGroup);
-
-                // Move the synapse from the root network over to this subnet
-                getParentNetwork().transferSynapsesToGroup(
-                        (List<Synapse>) Collections.singletonList(synapse),
-                        synapseGroup);
-                
-                // Fire Event so network panel knows to add this synapse to appropriate
-                //  PNode
-                NetworkEvent<Group> event = new NetworkEvent<Group>(
-                        getParentNetwork(), Subnetwork.this, Subnetwork.this);
-                event.setAuxiliaryObject(synapse);
-                getParentNetwork().fireGroupChanged(event,"synapseAdded"); 
+            // Route synapses based on source and target neuron's memberships in groups
+            // and this subnetworks routing rules
+            Group sourceParentGroup = synapse.getSource().getParentGroup();            
+            Group targetParentGroup = synapse.getTarget().getParentGroup();
+            SynapseGroup synapseGroupAttachedToSource = null;                 
+            SynapseGroup synapseGroupAttachedToTarget = null;
+            if (sourceParentGroup != null) {
+            	synapseGroupAttachedToSource = sourceNeuronGroupToSynapseGroup.get(sourceParentGroup);
             }
+            if (targetParentGroup != null) {
+            	synapseGroupAttachedToTarget= targetNeuronGroupToSynapseGroup.get(targetParentGroup);
+            }
+            // Case where a synapse is attached to specified source and target groups
+            if ((synapseGroupAttachedToSource != null) && (synapseGroupAttachedToTarget != null)) {
+            	if (synapseGroupAttachedToSource == synapseGroupAttachedToTarget) {
+            		routeSynapse(synapse, synapseGroupAttachedToSource);
+                    return;
+				}
+			}
+			// Case where a synapse is attached to a source neuron group
+			if (synapseGroupAttachedToSource != null) {
+				routeSynapse(synapse, synapseGroupAttachedToSource);
+				return;
+			}
+			// Case where a synapse is attached to a target neuron group
+			if (synapseGroupAttachedToTarget != null) {
+				routeSynapse(synapse, synapseGroupAttachedToTarget);
+				return;
+			}
         }
 
+    	@Override
         public void synapseChanged(NetworkEvent<Synapse> networkEvent) {
         }
 
+    	@Override
         public void synapseTypeChanged(NetworkEvent<SynapseUpdateRule> networkEvent) {
         }
         
-    };   
+    };
+
+
+    /**
+     * Move a synapse to a synapse group.  Notify listeners this has happened
+     * and remove the synapse from where it previously was.
+     *
+     * @param synapse synpase to move
+     * @param synapseGroup synapse group to place the synapse in
+     */
+    private void routeSynapse(Synapse synapse, SynapseGroup synapseGroup) {
+        getParentNetwork().transferSynapsesToGroup(
+                (List<Synapse>) Collections.singletonList(synapse),
+                synapseGroup);
+        
+        // Fire Event so network panel knows to add this synapse to appropriate
+        //  PNode
+        NetworkEvent<Group> event = new NetworkEvent<Group>(
+                getParentNetwork(), Subnetwork.this, Subnetwork.this);
+        event.setAuxiliaryObject(synapse);
+        getParentNetwork().fireGroupChanged(event,"synapseAddedToGroup");                 	
+    	
+    }
+    
+    /**
+     * If true use synapse routing to automatically place synapses in
+     * groups according to a rule.
+     * 
+     * @param usingGrowingSynapseGroups whether to use synapse routing
+     */
+    public void setUseSynapseRouting(boolean usingGrowingSynapseGroups) {
+		this.useSynapseRouting = usingGrowingSynapseGroups;
+		addSynapseListener();
+	}   
 }

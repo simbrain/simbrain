@@ -120,19 +120,6 @@ public class ExcitatoryInhibitoryPropertiesPanel extends JPanel {
         gbc.gridwidth = 3;
         this.add(ratioSlider, gbc);
         
-        
-        
-        
-//        tRatio.setMaximumSize(tRatioSize);
-//        //the ratio text field gets its own panel to prevent distortion
-//        JPanel tRatioPanel = new JPanel();
-//        tRatioPanel.setLayout(new BorderLayout());
-//        tRatioPanel.add(new JLabel("% Excitatory: "), BorderLayout.WEST);
-//        tRatioPanel.add(tRatio, BorderLayout.CENTER);
-//        JPanel tRatioContainer = new JPanel();
-//        tRatioContainer.add(tRatioPanel);
-//        this.add(tRatioContainer, gbc);
-        
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;

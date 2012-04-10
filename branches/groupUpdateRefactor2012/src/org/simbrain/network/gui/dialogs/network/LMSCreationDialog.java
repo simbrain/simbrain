@@ -48,7 +48,7 @@ public class LMSCreationDialog extends StandardDialog {
      */
     private void init() {
         // Initialize Dialog
-        setTitle("New Backprop Network");
+        setTitle("New LMS Network");
 
         fillFieldValues();
 

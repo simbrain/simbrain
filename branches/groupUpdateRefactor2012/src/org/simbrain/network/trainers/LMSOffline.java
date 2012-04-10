@@ -50,8 +50,14 @@ import Jama.Matrix;
 public class LMSOffline extends Trainer {
 	
 	/** Current solution type. */
-    private SolutionType solutionType = SolutionType.MOORE_PENROSE;
+    private SolutionType solutionType = SolutionType.WIENER_HOPF;
 
+    /** Whether or not ridge regression is to be performed. */
+    private boolean ridgeRegression;
+    
+    /** The magnitude of the ridge regression. */
+    private double alpha;
+    
 	/**
 	 * Construct the LMSOOffline object, with a trainable network the
 	 * Synapse group where the new synapses will be placed.
@@ -134,7 +140,16 @@ public class LMSOffline extends Trainer {
 
 		fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
 		try {
+			
+			if(ridgeRegression) {
+				Matrix scaledIdentity = Matrix.identity(inputMatrix.
+						getRowDimension(), inputMatrix.getColumnDimension()).
+						times(alpha * alpha);
+				inputMatrix = inputMatrix.plus(scaledIdentity);
+			} 
+			
 			inputMatrix = inputMatrix.inverse();
+			
 
 			fireProgressUpdate("Computing Weights...", 80);
 			double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
@@ -214,7 +229,23 @@ public class LMSOffline extends Trainer {
         setSolutionType((SolutionType) solutionType.getCurrentObject());
     }
 
-    /**
+    public boolean isRidgeRegression() {
+		return ridgeRegression;
+	}
+
+	public void setRidgeRegression(boolean ridgeRegression) {
+		this.ridgeRegression = ridgeRegression;
+	}
+
+	public double getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(double alpha) {
+		this.alpha = alpha;
+	}
+
+	/**
      * Main method for testing.
      *
      * @param args not used

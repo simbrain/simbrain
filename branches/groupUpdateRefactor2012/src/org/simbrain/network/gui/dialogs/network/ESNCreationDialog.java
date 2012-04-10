@@ -37,6 +37,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.neurons.BinaryNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;

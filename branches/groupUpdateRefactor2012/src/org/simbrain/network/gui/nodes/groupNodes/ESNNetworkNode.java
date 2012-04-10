@@ -5,15 +5,21 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
+import org.simbrain.network.gui.trainer.LMSOfflinePanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
+import org.simbrain.network.subnetworks.LMSNetwork;
+import org.simbrain.network.trainers.LMSOffline;
+import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 
@@ -73,28 +79,26 @@ public class ESNNetworkNode extends SubnetGroupNode {
      * Sets custom menu.
      */
     private void setContextMenu() {
-        JPopupMenu menu = super.getDefaultContextMenu();
+    	JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
-        menu.add(new JMenuItem(trainESNAction));
+        menu.add(new JMenuItem(trainOfflineAction));
         menu.addSeparator();
-
-        final EchoStateNetwork esn = (EchoStateNetwork)getGroup();
         
-        // Reference to input data in the ESN
+        final EchoStateNetwork esn = (EchoStateNetwork) getGroup();
+        
+		// Reference to the input data in the ESN
 		DataHolder inputData = new DataHolder() {
 			@Override
 			public void setData(double[][] data) {
 				esn.setInputData(data);
 			}
+
 			@Override
 			public double[][] getData() {
 				return esn.getInputData();
 			}
+
 		};
-		menu.add(new JMenuItem(TrainerGuiActions.getEditDataAction(
-				getNetworkPanel(), esn.getInputLayer().getNeuronList(),
-				inputData, "Input Data")));
-		
 		// Reference to the training data in the ESN
 		DataHolder trainingData = new DataHolder() {
 			@Override
@@ -108,33 +112,41 @@ public class ESNNetworkNode extends SubnetGroupNode {
 			}
 
 		};
-		menu.add(new JMenuItem(TrainerGuiActions.getEditDataAction(
-				getNetworkPanel(), esn.getOutputLayer().getNeuronList(),
-				trainingData, "Training Data")));
-		menu.addSeparator();
-		menu.add(new JMenuItem(ReflectivePropertyEditor
-				.getPropertiesDialogAction((EchoStateNetwork) getGroup())));
+//		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+//				(Trainable) getGroup(), inputData, trainingData));
+		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+				esn.getInputLayer().getNeuronList(), inputData, "Input"));
+		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
+				esn.getOutputLayer().getNeuronList(), trainingData, "Training"));
         setContextMenu(menu);
     }
     
     /**
-     * Action to train ESNs.
+     * Action to train ESN Offline
      */
-	Action trainESNAction = new AbstractAction() {
+	Action trainOfflineAction = new AbstractAction() {
 
 		// Initialize
 		{
 			putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-			putValue(NAME, "Train esn...");
-			putValue(SHORT_DESCRIPTION, "Train esn...");
+			putValue(NAME, "Train offline...");
+			putValue(SHORT_DESCRIPTION, "Train offline...");
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			ESNTrainingPanel esnPanel = new ESNTrainingPanel((EchoStateNetwork) getGroup());
-            getNetworkPanel().displayPanel(esnPanel, "ESN Trainer");
+			try{ 
+				EchoStateNetwork network = (EchoStateNetwork) getGroup();
+	        	ESNTrainingPanel trainingPanel = new ESNTrainingPanel(network);
+	            trainingPanel.setGenericParent(getNetworkPanel()
+	            		.displayPanel(trainingPanel, "Trainer"));
+	            trainingPanel.init();
+			} catch (NullPointerException npe) {				
+				JOptionPane.showMessageDialog(new JFrame(), 
+						"Input and training data must\nbe entered prior to" +
+						" training.", "Warning", JOptionPane.WARNING_MESSAGE);
+				npe.printStackTrace();
+			}
 		}
 	};
     

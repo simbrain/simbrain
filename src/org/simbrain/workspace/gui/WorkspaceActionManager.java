@@ -145,9 +145,6 @@ public class WorkspaceActionManager {
     /** Save workspace as action. */
     private final Action saveWorkspaceAsAction;
 
-    /** Workspace help action. */
-    private final Action workspaceHelpAction;
-
     /** Quit workspace action. */
     private final Action quitWorkspaceAction;
 
@@ -217,8 +214,6 @@ public class WorkspaceActionManager {
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
-
-        workspaceHelpAction = new WorkspaceHelpAction();
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
 
@@ -436,13 +431,6 @@ public class WorkspaceActionManager {
      */
     public Action getSaveWorkspaceAsAction() {
         return saveWorkspaceAsAction;
-    }
-
-    /**
-     * @return the workspaceHelpAction.
-     */
-    public Action getWorkspaceHelpAction() {
-        return workspaceHelpAction;
     }
 
     /**

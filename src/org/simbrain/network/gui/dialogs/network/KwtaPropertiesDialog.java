@@ -21,9 +21,9 @@ package org.simbrain.network.gui.dialogs.network;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -44,7 +44,7 @@ public class KwtaPropertiesDialog extends StandardDialog {
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
-    private ShowHelpAction helpAction = new ShowHelpAction();
+    private ShowHelpAction helpAction;
 
     /**
      * Default constructor.
@@ -56,7 +56,7 @@ public class KwtaPropertiesDialog extends StandardDialog {
         setTitle("Set KWta Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
-        helpAction.setTheURL("Network/network/kwta.html");
+        helpAction = new ShowHelpAction("Pages/Network/network/kwta.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);

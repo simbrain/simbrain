@@ -31,13 +31,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
 import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -102,7 +102,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
-    private ShowHelpAction helpAction = new ShowHelpAction();
+    private ShowHelpAction helpAction;
 
     /**
      * Constructor for a list of SynapseNodes.
@@ -389,20 +389,20 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
       */
     public void updateHelp() {
         if (cbSynapseType.getSelectedItem() == NULL_STRING) {
-            helpAction.setTheURL("Network/synapse.html");
+            helpAction = new ShowHelpAction("Pages/Network/synapse.html");
         } else if (spikeResponsePanel != null) {
             String spacelessString = spikeResponsePanel.getResponseFunction()
                     .replace(" ", "");
             spacelessString = spacelessString.substring(0, 1).toLowerCase()
                     .concat(spacelessString.substring(1));
-            helpAction.setTheURL("Network/synapse/spikeresponders/"
+            helpAction = new ShowHelpAction("Pages/Network/synapse/spikeresponders/"
                     + spacelessString + ".html");
         } else {
             String name = ((ClassDescriptionPair) cbSynapseType
                     .getSelectedItem()).getSimpleName()
                     .replaceAll("Synapse", "");
             name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
-            helpAction.setTheURL("Network/synapse/" + name + ".html");
+            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name + ".html");
         }
     }
 

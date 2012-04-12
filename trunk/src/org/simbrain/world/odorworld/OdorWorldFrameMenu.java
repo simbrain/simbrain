@@ -96,8 +96,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
         
         // Help Menu
         add(helpMenu);
-        ShowHelpAction helpAction = new ShowHelpAction();
-        helpAction.setTheURL("Worlds/OdorWorld/OdorWorld.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/OdorWorld.html");
         helpItem.setAction(helpAction);
         helpMenu.add(helpItem);
     }

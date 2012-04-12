@@ -7,9 +7,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.SOM;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 
@@ -44,7 +44,7 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
-    private ShowHelpAction helpAction = new ShowHelpAction();
+    private ShowHelpAction helpAction;
 
     /** Information on current SOM */
 
@@ -61,7 +61,7 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
         setTitle("Set SOM Properties");
 
         fillFieldValues();
-        helpAction.setTheURL("Network/network/som.html");
+        helpAction  = new ShowHelpAction("Pages/Network/network/som.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);

@@ -24,6 +24,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import org.simbrain.util.ShowHelpAction;
+
 /**
  * Menu bar that appears inside of JPanel; for use in Applets.
  *
@@ -135,7 +137,7 @@ public class NetworkMenuBar {
         returnMenu.add(viewMenu);
 
         JMenu helpMenu = new JMenu("Help");
-        helpMenu.add(actionManager.getShowHelpAction());
+        helpMenu.add(new ShowHelpAction("Pages/Network.html"));
         returnMenu.add(helpMenu);
 
         return returnMenu;

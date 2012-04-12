@@ -27,27 +27,43 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
- * Show help action, opens help file in an external web browser.
+ * An action  that opens a help file in an external web browser.
  */
 public final class ShowHelpAction extends AbstractAction {
 
     /** Documentation URL. */
-    private String theURL;
+    private final String theURL;
 
     //TODO: Construct with URL; throw exceptions for bad pages
- 
-   /**
-     * Create a new show help action.
+
+    /**
+     * Create a help action that opens the specified URL (relative to Simbrain/docs).
+     *
+     * @param actionName the name associated with this action
+     * @param url the url to open.
      */
-    public ShowHelpAction() {
+    public ShowHelpAction(final String actionName, final String url) {
+        super(actionName);
+    	this.theURL = url;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
+    }
+
+    /**
+     * Create a help action that opens the specified URL (relative to the "Pages"
+     * directory in Simbrain/docs).
+     *
+     * @param url the url to open.
+     */
+    public ShowHelpAction(final String url) {
         super("Help");
+    	this.theURL = url;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
+    	
         SwingUtilities.invokeLater(new Runnable() {
                 /** @see Runnable */
                 public void run() {
@@ -57,18 +73,4 @@ public final class ShowHelpAction extends AbstractAction {
     }
 
 
-    /**
-     * @return Returns the theURL.
-     */
-    public String getTheURL() {
-        return theURL;
-    }
-
-
-    /**
-     * @param theURL The theURL to set.
-     */
-    public void setTheURL(String theURL) {
-        this.theURL = theURL;
-    }
 }

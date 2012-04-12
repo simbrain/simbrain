@@ -27,8 +27,8 @@ import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -72,8 +72,7 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
         typePanel.addItem("Connection Type", cbConnectionType);
         cbConnectionType.setSelectedItem(QuickConnectPreferences
                 .getCurrentConnection());
-        ShowHelpAction helpAction = new ShowHelpAction();
-        helpAction.setTheURL("Network/connections.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/connections.html");
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);

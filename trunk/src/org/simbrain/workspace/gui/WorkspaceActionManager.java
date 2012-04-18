@@ -57,7 +57,6 @@ import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
 import org.simbrain.workspace.actions.ShowPropertyDialogAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
-import org.simbrain.workspace.actions.WorkspaceHelpAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
 import org.simbrain.workspace.actions.chart.NewProjectionPlotAction;

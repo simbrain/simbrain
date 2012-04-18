@@ -72,8 +72,7 @@ public class Competitive extends Subnetwork {
      */
     public Competitive(final RootNetwork root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
-        setUseSynapseRouting(true);
-        attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
+        //attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(new Neuron(root, new LinearNeuron()));
         }

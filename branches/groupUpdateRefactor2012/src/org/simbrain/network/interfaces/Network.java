@@ -400,12 +400,15 @@ public abstract class Network {
         //TODO: Exception if synapse.getParentNetwork != this.
         synapse.initSpikeResponder();
         synapseList.add(synapse);
-        if ((rootNetwork != null)) {
+        if ((rootNetwork != null)) {            
             synapse.setId(rootNetwork.getSynapseIdGenerator().getId());
             rootNetwork.fireSynapseAdded(synapse);
+            // TODO: Possibly optimize so that this is only called if
+            //	at least one neuron group / or synapse group exists.
+            rootNetwork.getSynapseRouter().routeSynapse(synapse);
         }
+        
     }
-
 
     /**
      * Calls {@link Neuron#update} for each neuron.
@@ -566,16 +569,27 @@ public abstract class Network {
     
     /**
      * Remove the given synapses from the synapse list (without firing an event)
-     * and add them to the provided group.
+     * and add them to the specified group.
      * 
      * @param list the list of synapses to transfer
      * @param group the group to transfer them to
      */
     public void transferSynapsesToGroup(List<Synapse> list, SynapseGroup group) {
         for (Synapse synapse : list) {
-            synapseList.remove(synapse);
-            group.addSynapse(synapse, false);
-        }
+        	transferSynapseToGroup(synapse, group);
+        } 
+    }
+    
+    /**
+     * Remove the given synapse from the synapse list (without firing an event)
+     * and add it to the specified group.
+     * 
+     * @param list the synapse to transfer
+     * @param group the group to transfer them to
+     */
+    public void transferSynapseToGroup(Synapse synapse, SynapseGroup group) {
+		synapseList.remove(synapse);
+		group.addSynapse(synapse, false);
     }
 
     /**

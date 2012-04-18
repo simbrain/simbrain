@@ -77,7 +77,7 @@ public class SynapseGroup extends Group {
     }
 
     /**
-     * Add a synapse.
+     * Add a synapse to this synapse group.
      * 
      * @param synapse synapse to add
      * @param fireEvent whether to fire a synapse added event

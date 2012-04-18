@@ -118,8 +118,7 @@ public class SOM extends Subnetwork {
             getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new LinearNeuron()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
-        setUseSynapseRouting(true);
-        attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
+//        attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
         setLabel("SOM");
     }
 

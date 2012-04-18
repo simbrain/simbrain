@@ -526,7 +526,7 @@ public class NetworkPanel extends JPanel {
                 Group group = e.getObject();            
 				if (description.equalsIgnoreCase("synapseAddedToGroup")) {
 					SynapseGroupNode sgn = (SynapseGroupNode) objectNodeMap
-					.get(((Subnetwork) group).getSynapseGroup());
+					.get(group);
 					SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e
 							.getAuxiliaryObject());
 					if (synapseNode != null) {

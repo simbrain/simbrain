@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes.groupNodes;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -14,11 +15,9 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
-import org.simbrain.network.gui.trainer.LMSOfflinePanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
+import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
-import org.simbrain.network.subnetworks.LMSNetwork;
-import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
@@ -27,8 +26,7 @@ import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
  * PNode representation of an Echo State Network.
  */
 public class ESNNetworkNode extends SubnetGroupNode {
-	
-	
+		
 	/**
      * Create an ESN network
      *
@@ -112,8 +110,28 @@ public class ESNNetworkNode extends SubnetGroupNode {
 			}
 
 		};
-//		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-//				(Trainable) getGroup(), inputData, trainingData));
+		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+				new Trainable() {
+					@Override
+					public List<Neuron> getInputNeurons() {
+						return ((EchoStateNetwork)getGroup()).getInputLayer().getNeuronList();
+					}
+
+					@Override
+					public List<Neuron> getOutputNeurons() {
+						return ((EchoStateNetwork)getGroup()).getOutputLayer().getNeuronList();
+					}
+
+					@Override
+					public double[][] getInputData() {
+						return null;
+					}
+
+					@Override
+					public double[][] getTrainingData() {
+						return null;
+					}}, inputData, trainingData));
+
 		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
 				esn.getInputLayer().getNeuronList(), inputData, "Input"));
 		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
@@ -149,6 +167,5 @@ public class ESNNetworkNode extends SubnetGroupNode {
 			}
 		}
 	};
-    
 
 }

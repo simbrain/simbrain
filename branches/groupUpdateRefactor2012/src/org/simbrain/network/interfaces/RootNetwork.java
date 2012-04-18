@@ -34,6 +34,7 @@ import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.update_actions.UpdateGroup;
+import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
@@ -101,6 +102,9 @@ public class RootNetwork extends Network {
      * The update manager for this network.
      */
     private UpdateManager updateManager;
+
+    /** Object which routes synpases to synpase groups. */
+    private final SynapseRouter synapseRouter;
     
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
@@ -139,6 +143,7 @@ public class RootNetwork extends Network {
      */
     public RootNetwork() {
         updateManager = new UpdateManager(this);
+        synapseRouter  = new SynapseRouter();
         setRootNetwork(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
     }
@@ -1015,4 +1020,11 @@ public class RootNetwork extends Network {
     public UpdateManager getUpdateManager() {
         return updateManager;
     }
+
+	/**
+	 * @return the synapseRouter
+	 */
+	public SynapseRouter getSynapseRouter() {
+		return synapseRouter;
+	}
 }

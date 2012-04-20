@@ -36,7 +36,7 @@ public abstract class Group {
     private String id;
 
     /** Name of this group. */
-    private String label;
+    private String label = "-";
 
     /** Whether this group should be deleted when all its components are deleted. */
     private boolean deleteWhenEmpty = true;

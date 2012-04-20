@@ -105,7 +105,7 @@ public class Subnetwork extends Group {
      *
      * @param group the synapse group to add
      */
-    private void addSynapseGroup(SynapseGroup group) {
+    public void addSynapseGroup(SynapseGroup group) {
         synapseGroupList.add(group);
         group.setParentGroup(this);  
     }
@@ -126,7 +126,8 @@ public class Subnetwork extends Group {
      * @param source the source group
      * @param target the target group
      */
-    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target) {
+    public SynapseGroup connectNeuronGroups(NeuronGroup source,
+    		NeuronGroup target) {
         AllToAll connection = new AllToAll(getParentNetwork(),
                 source.getNeuronList(), target.getNeuronList());
         //connection.setPercentExcitatory(1);
@@ -141,8 +142,8 @@ public class Subnetwork extends Group {
      * @param target the target group
      * @param connection the type of connection desired between the two groups
      */
-    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target,
-    		ConnectNeurons connection) {
+    public SynapseGroup connectNeuronGroups(NeuronGroup source,
+    		NeuronGroup target, ConnectNeurons connection) {
         SynapseGroup newGroup = connectNeuronGroups(source, target, ""
                 + (indexOfNeuronGroup(source) + 1), ""
                 + (indexOfNeuronGroup(target) + 1), connection);
@@ -159,8 +160,9 @@ public class Subnetwork extends Group {
      * @param targetLabel the name of the target group in the weights label
      * @param connection the type of connection desired between the two groups
      */
-    public SynapseGroup connectNeuronGroups(NeuronGroup source, NeuronGroup target,
-    		String sourceLabel, String targetLabel, ConnectNeurons connection) {
+    public SynapseGroup connectNeuronGroups(NeuronGroup source,
+    		NeuronGroup target, String sourceLabel, String targetLabel,
+    		ConnectNeurons connection) {
         List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
                 source.getNeuronList(),target.getNeuronList());
         SynapseGroup newGroup = new SynapseGroup(getParentNetwork());

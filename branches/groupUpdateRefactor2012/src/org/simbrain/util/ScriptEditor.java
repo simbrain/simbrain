@@ -1,10 +1,13 @@
 package org.simbrain.util;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,18 +30,21 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;
 
 /**
- * An editor for beanshell scripts with syntax highlighting.  Based on RSyntaxTextArea
- * http://fifesoft.com/rsyntaxtextarea/
+ * An editor for beanshell scripts with syntax highlighting.  
+ * 
+ * Uses RSyntaxTextArea.  See http://fifesoft.com/rsyntaxtextarea/
  * 
  * @author jeffyoshimi
  */
-public class ScriptEditor extends GenericJInternalFrame {
+public class ScriptEditor extends JPanel {
 
-	//TODO: Possibly pull JPanel out to a separate class.
 	//TODO: Add save-as action
+
+	// TODO: Separate directory just for update templates?
 	
 	/** Script directory. */
 	private static final String SCRIPT_MENU_DIRECTORY = "."
@@ -47,54 +53,139 @@ public class ScriptEditor extends GenericJInternalFrame {
 
 	/** Reference to file (for saving). */
 	private File scriptFile;
-	
-	/** Main panel. */
-	private JPanel mainPanel; 
 
 	/** Main text area. */
 	private final RSyntaxTextArea textArea;
+	
+	/** Default width. */
+	private final int DEFAULT_WIDTH = 70;
+	
+	/** Default height. */
+	private final int DEFAULT_HEIGHT = 25;
 
 	/**
 	 * Construct the main frame.
 	 */
 	public ScriptEditor() {
-		textArea = new RSyntaxTextArea(20, 60);
+		textArea = new RSyntaxTextArea(DEFAULT_HEIGHT, DEFAULT_WIDTH);
+		initPanel();
+	}
+	
+	/**
+	 * Initialize the script editor panel with some initial text.
+	 *
+	 * @param initialText the initial text.
+	 */
+	public ScriptEditor(String initialText) {
+		textArea = new RSyntaxTextArea(DEFAULT_HEIGHT, DEFAULT_WIDTH);
+		initPanel();
+		textArea.setText(initialText);
+	}
+	
+	/**
+	 * Perform required initialization.
+	 */
+	private void initPanel() {
 		textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		textArea.setCodeFoldingEnabled(true);
 		textArea.setAntiAliasingEnabled(true);
-		RTextScrollPane sp = new RTextScrollPane(textArea);
+		final RTextScrollPane sp = new RTextScrollPane(textArea);
 		sp.setFoldIndicatorEnabled(true);
-		createAttachMenuBar();
-
-		mainPanel = new JPanel(new BorderLayout());
-		mainPanel.add("Center", sp);
-		JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		toolbar.add(getToolbarOpenClose());
-		mainPanel.add("North", toolbar);
-
-		setContentPane(mainPanel);
+		add(sp);
+		
+        // Force component to fill up parent panel
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Component component = e.getComponent();
+                sp.setPreferredSize(new Dimension(component.getWidth(), component.getHeight()));
+                sp.revalidate();
+            }
+        });
+		
+		
 	}
 
+	/**
+	 * @return the textArea
+	 */
+	public RSyntaxTextArea getTextArea() {
+		return textArea;
+	}
+	
+	/**
+	 * @return the scriptFile
+	 */
+	public File getScriptFile() {
+		return scriptFile;
+	}
 
+	/**
+	 * @param scriptFile the scriptFile to set
+	 */
+	public void setScriptFile(File scriptFile) {
+		this.scriptFile = scriptFile;
+	}
+	
+	////// Methods for obtaining frames which contain a Script Editor panel. /////
+	
+	/**
+	 * Returns an internal frame for editing a script.
+	 *
+	 * @return internal frame
+	 */
+	public static GenericJInternalFrame getInternalFrame() {
+		GenericJInternalFrame frame = new GenericJInternalFrame();
+		initFrame(frame, new ScriptEditor());
+		return frame;
+	}
+	
+	/**
+	 * Returns a standard dialog for editing a script.
+	 *
+	 * @param editor the panel to display in the dialog
+	 * @return the dialog
+	 */
+	public static StandardDialog getDialog(final ScriptEditor editor) {
+		StandardDialog dialog = new StandardDialog();
+		initFrame((GenericFrame) dialog, editor);
+		return dialog;
+	}
+
+	/**
+	 * Initialize the frame with the provided panel.
+	 *
+	 * @param frame frame to initialize
+	 * @param editor the panel to dispaly in the frame
+	 */
+	private static void initFrame(final GenericFrame frame, final ScriptEditor editor) {
+		final JPanel mainPanel = new JPanel(new BorderLayout());
+		createAttachMenuBar(frame, editor);
+		mainPanel.add("North", getToolbarOpenClose(frame, editor));
+		mainPanel.add("Center", editor);
+		frame.setContentPane(mainPanel);
+		
+	}
+	
 	/**
 	 * Creates the menu bar.
 	 */
-	private void createAttachMenuBar() {
+	protected static void createAttachMenuBar(final GenericFrame frame, final ScriptEditor editor) {
 		JMenuBar bar = new JMenuBar();
 
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem openItem = new JMenuItem("Open...");
-		openItem.setAction(getOpenScriptAction(this)); 		
+		openItem.setAction(getOpenScriptAction(frame, editor)); 		
 		fileMenu.add(openItem);
 		JMenuItem saveItem = new JMenuItem("Save");
-		saveItem.setAction(getSaveScriptAction(this));
+		saveItem.setAction(getSaveScriptAction(frame, editor));
 		fileMenu.add(saveItem);
 		fileMenu.addSeparator();
 		JMenuItem closeItem = new JMenuItem("Close");
 		closeItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				dispose();
+				frame.dispose();
 			}
 		});
 		fileMenu.add(closeItem);
@@ -106,7 +197,7 @@ public class ScriptEditor extends GenericJInternalFrame {
 
 		bar.add(fileMenu);
 		bar.add(editMenu);
-		setJMenuBar(bar);
+		frame.setJMenuBar(bar);
 	}
 
 	/**
@@ -114,17 +205,18 @@ public class ScriptEditor extends GenericJInternalFrame {
 	 * 
 	 * @return the toolbar
 	 */
-	private JToolBar getToolbarOpenClose() {
+	private static JToolBar getToolbarOpenClose(final GenericFrame frame, final ScriptEditor editor) {
 		JToolBar toolbar = new JToolBar();
-		toolbar.add(getOpenScriptAction(this));
-		toolbar.add(getSaveScriptAction(this));
+		toolbar.add(getOpenScriptAction(frame, editor));
+		toolbar.add(getSaveScriptAction(frame, editor));
 		return toolbar;
 	}
+
 	
 	/**
 	 * Returns the action for opening script files.
 	 */
-	private static Action getOpenScriptAction(final ScriptEditor frame) {
+	private static Action getOpenScriptAction(final GenericFrame frame, final ScriptEditor editor) {
 		return new AbstractAction() {
 
 			// Initialize
@@ -141,19 +233,20 @@ public class ScriptEditor extends GenericJInternalFrame {
 
 				SFileChooser fileChooser = new SFileChooser(
 						SCRIPT_MENU_DIRECTORY, "Edit Script", "bsh");
-				frame.scriptFile = fileChooser.showOpenDialog();
-				frame.setTitle(frame.scriptFile.getName());
+				final File scriptFile = fileChooser.showOpenDialog();
+				frame.setTitle(scriptFile.getName());
 
 				try {
 					BufferedReader r = new BufferedReader(new FileReader(
-							frame.scriptFile));
-					frame.textArea.read(r, null);
+							scriptFile));
+					editor.setScriptFile(scriptFile);
+					editor.getTextArea().read(r, null);
 					r.close();
-					frame.textArea.setCaretPosition(0);
+					editor.getTextArea().setCaretPosition(0);
 				} catch (IOException ioe) {
 					ioe.printStackTrace();
 					UIManager.getLookAndFeel().provideErrorFeedback(
-							frame.textArea);
+							editor);
 				}
 			}
 
@@ -164,7 +257,7 @@ public class ScriptEditor extends GenericJInternalFrame {
 	/**
 	 * Returns the action for saving script files.
 	 */
-	private static Action getSaveScriptAction(final ScriptEditor frame) {
+	private static Action getSaveScriptAction(final GenericFrame frame, final ScriptEditor editor) {
 		return new AbstractAction() {
 
 			// Initialize
@@ -178,16 +271,16 @@ public class ScriptEditor extends GenericJInternalFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (frame.scriptFile != null) {
+				if (editor.scriptFile != null) {
 					try {
 						BufferedWriter r = new BufferedWriter(new FileWriter(
-								frame.scriptFile));
-						frame.textArea.write(r);
+								editor.scriptFile));
+						editor.getTextArea().write(r);
 						r.close();
 					} catch (IOException ioe) {
 						ioe.printStackTrace();
 						UIManager.getLookAndFeel().provideErrorFeedback(
-								frame.textArea);
+								editor);
 					}
 
 				}

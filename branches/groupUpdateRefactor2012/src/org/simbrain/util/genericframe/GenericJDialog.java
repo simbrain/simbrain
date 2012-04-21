@@ -1,5 +1,7 @@
 package org.simbrain.util.genericframe;
 
+import java.awt.Dialog;
+import java.awt.Frame;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JDialog;
@@ -9,7 +11,16 @@ import javax.swing.JDialog;
  */
 public class GenericJDialog extends JDialog implements GenericFrame {
 
-    public void setIcon(boolean b) throws PropertyVetoException {
-    }        
+    public GenericJDialog(Frame parent, String title) {
+    	super(parent, title);
+	}
+
+	public GenericJDialog() {
+	}
+
+	public void setIcon(boolean b) throws PropertyVetoException {
+    }     
+    
+
 }
 

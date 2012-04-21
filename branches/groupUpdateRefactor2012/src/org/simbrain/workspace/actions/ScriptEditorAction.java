@@ -24,6 +24,7 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ScriptEditor;
+import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -48,7 +49,7 @@ public final class ScriptEditorAction extends AbstractAction {
     
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ScriptEditor frame = new ScriptEditor();
+        GenericJInternalFrame frame =  ScriptEditor.getInternalFrame();
         desktop.addInternalFrame(frame);
         frame.setResizable(true);
         frame.setClosable(true);

@@ -19,6 +19,12 @@ import java.awt.Component;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -37,8 +43,11 @@ import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.ScriptEditor;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updator.UpdateAction;
+import org.simbrain.workspace.updator.UpdateActionCustom;
 import org.simbrain.workspace.updator.UpdateActionManager.UpdateManagerListener;
 
 /**
@@ -71,7 +80,7 @@ public class UpdateManagerPanel extends JPanel {
 
         super(new BorderLayout());
         this.workspace = workspace;
-
+ 
         // Set up Current Action list
         currentActionJList.setModel(currentActionListModel);
         updateCurrentActionsList();
@@ -109,6 +118,8 @@ public class UpdateManagerPanel extends JPanel {
         
         // Buttons
         JPanel buttonPanel = new JPanel();
+        JButton customActionButton = new JButton(addCustomAction);       
+        buttonPanel.add(customActionButton);
         JButton addActionsButton = new JButton(addActionsAction);       
         buttonPanel.add(addActionsButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);       
@@ -182,7 +193,30 @@ public class UpdateManagerPanel extends JPanel {
                 label.setFont(list.getFont());
                 label.setOpaque(true);
                 return label;
-            }
+            }            
+        });
+        currentActionJList.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		if (e.getClickCount() == 2) {
+					UpdateAction action = (UpdateAction) currentActionJList
+							.getModel().getElementAt(
+									currentActionJList.locationToIndex(e
+											.getPoint()));
+					if (action instanceof UpdateActionCustom) {
+						ScriptEditor panel = new ScriptEditor(
+								((UpdateActionCustom) action).getScriptString());
+	        			StandardDialog dialog = ScriptEditor.getDialog(panel);
+	                    dialog.pack();
+	                    dialog.setLocationRelativeTo(null);
+	                    dialog.setVisible(true);
+	                    if (!dialog.hasUserCancelled()) {
+	                    	((UpdateActionCustom)action).setScriptString(panel.getTextArea().getText());
+	                    	((UpdateActionCustom)action).reinit();
+	                    }            
+					}        			
+        		}
+        		
+        	}
         });
     }    
     
@@ -217,7 +251,29 @@ public class UpdateManagerPanel extends JPanel {
                 return label;
             }
         });
-    }    
+        availableActionJList.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		if (e.getClickCount() == 2) {
+					UpdateAction action = (UpdateAction) availableActionJList
+							.getModel().getElementAt(
+									availableActionJList.locationToIndex(e
+											.getPoint()));
+					if (action instanceof UpdateActionCustom) {
+						ScriptEditor panel = new ScriptEditor(
+								((UpdateActionCustom) action).getScriptString());
+	        			StandardDialog dialog = ScriptEditor.getDialog(panel);
+	                    dialog.pack();
+	                    dialog.setLocationRelativeTo(null);
+	                    dialog.setVisible(true);
+	                    if (!dialog.hasUserCancelled()) {
+	                    	((UpdateActionCustom)action).setScriptString(panel.getTextArea().getText());
+	                    	((UpdateActionCustom)action).reinit();
+	                    }            
+					}        			
+        		}
+        		
+        	}
+        });    }    
     
     
     /** Action which deletes selected actions. */
@@ -225,7 +281,7 @@ public class UpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("minus.png"));
-            //putValue(NAME, "Remove update actions");
+            putValue(NAME, "Remove selected action(s)");
             putValue(SHORT_DESCRIPTION, "Delete selected actions");
             UpdateManagerPanel.this.getInputMap(
                     JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -251,7 +307,7 @@ public class UpdateManagerPanel extends JPanel {
         // Initialize
         {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            //putValue(NAME, "Add update actions");
+            putValue(NAME, "Add selected action(s)");
             putValue(SHORT_DESCRIPTION, "Add selected actions");
         }
 
@@ -262,6 +318,50 @@ public class UpdateManagerPanel extends JPanel {
             for (Object action : availableActionJList.getSelectedValues()) {
             	workspace.getUpdater().getUpdateManager().addAction((UpdateAction) action);
             }
+        }
+    };
+    
+    /** Action which allows for creation of custom action. */
+    Action addCustomAction = new AbstractAction() {
+        // Initialize
+        {
+            //putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
+            putValue(NAME, "Add custom action");
+            putValue(SHORT_DESCRIPTION, "Add custom action");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+        	Scanner scanner = null;
+        	File defaultScript = new File(System.getProperty("user.dir")
+					+ "/etc/customUpdateTemplate.bsh");
+        	StringBuilder scriptText = new StringBuilder();
+        	String NL = System.getProperty("line.separator");
+			try {
+				scanner = new Scanner(new FileInputStream(defaultScript));
+				while (scanner.hasNextLine()) {
+					scriptText.append(scanner.nextLine() + NL);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} finally {
+				scanner.close();
+			}
+        	
+			ScriptEditor panel = new ScriptEditor(scriptText.toString());
+			panel.setScriptFile(defaultScript);
+			StandardDialog dialog = ScriptEditor.getDialog(panel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            if (!dialog.hasUserCancelled()) {
+				UpdateActionCustom updateAction = new UpdateActionCustom(
+						workspace.getUpdater(), panel.getTextArea().getText());
+            	workspace.getUpdater().getUpdateManager().addAction(updateAction);
+            }            
+        	
         }
     };
     

@@ -8,7 +8,7 @@ private UpdateAction action;
  * Uses standard java commands.   You have access to workspace via "workspace"
  */
 {
-	// Just needed to do a standard update
+	// Object used for standard update.
 	UpdateAllBuffered bufferedUpdate = new UpdateAllBuffered(updater);
 
 	// Customize this
@@ -17,16 +17,13 @@ private UpdateAction action;
 
 			// Do a standard update
 			bufferedUpdate.invoke();
-			
-			// Use this to access a single workspace component
-			// Use this to access a coupling
-			
+						
 			// Do some custom thing
-			System.out.println("custom updating...");		
+			System.out.println("Custom updating...");		
 		}
 		// This is how the action appears in the update manager dialog
 		public String getDescription() {
-			return "Custom update name";
+			return "Custom update";
 		}
 		// This is a longer description for the tooltip
 		public String getLongDescription() {

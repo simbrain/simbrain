@@ -216,6 +216,7 @@ public class UpdateActionManager {
         availableActionList.remove(action);
         for(UpdateManagerListener listener : listeners) {
             listener.actionRemoved(action);
+            listener.availableActionRemoved(action);
         }
     }
     

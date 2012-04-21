@@ -198,6 +198,8 @@ public class UpdateManagerPanel extends JPanel {
         currentActionJList.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
         		if (e.getClickCount() == 2) {
+        			
+        			// When double clicking on custom actions open an editor
 					UpdateAction action = (UpdateAction) currentActionJList
 							.getModel().getElementAt(
 									currentActionJList.locationToIndex(e
@@ -299,6 +301,11 @@ public class UpdateManagerPanel extends JPanel {
             for (Object action : currentActionJList.getSelectedValues()) {
                 workspace.getUpdater().getUpdateManager().moveActionToAvailableList((UpdateAction) action);
             }
+            for (Object action : availableActionJList.getSelectedValues()) {
+            	if(((UpdateAction) action) instanceof UpdateActionCustom) {
+                    workspace.getUpdater().getUpdateManager().removeAction((UpdateAction) action);            		
+            	}
+            }
         }
     };
     
@@ -325,8 +332,8 @@ public class UpdateManagerPanel extends JPanel {
     Action addCustomAction = new AbstractAction() {
         // Initialize
         {
-            //putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
-            putValue(NAME, "Add custom action");
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
+            putValue(NAME, "Custom action");
             putValue(SHORT_DESCRIPTION, "Add custom action");
         }
 
@@ -353,6 +360,10 @@ public class UpdateManagerPanel extends JPanel {
 			ScriptEditor panel = new ScriptEditor(scriptText.toString());
 			panel.setScriptFile(defaultScript);
 			StandardDialog dialog = ScriptEditor.getDialog(panel);
+			// Setting script file to null prevents the template script from
+			// being saved. Forces "save as"
+			// if save button pressed.
+			panel.setScriptFile(null); 
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);

@@ -42,8 +42,6 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
  */
 public class ScriptEditor extends JPanel {
 
-	//TODO: Add save-as action
-
 	// TODO: Separate directory just for update templates?
 	
 	/** Script directory. */
@@ -164,7 +162,9 @@ public class ScriptEditor extends JPanel {
 		mainPanel.add("North", getToolbarOpenClose(frame, editor));
 		mainPanel.add("Center", editor);
 		frame.setContentPane(mainPanel);
-		
+		if(editor.getScriptFile() != null) {
+			frame.setTitle(editor.getScriptFile().getName());			
+		}
 	}
 	
 	/**
@@ -180,6 +180,9 @@ public class ScriptEditor extends JPanel {
 		JMenuItem saveItem = new JMenuItem("Save");
 		saveItem.setAction(getSaveScriptAction(frame, editor));
 		fileMenu.add(saveItem);
+		JMenuItem saveAsItem = new JMenuItem("Save");
+		saveAsItem.setAction(getSaveScriptAsAction(frame, editor));
+		fileMenu.add(saveAsItem);
 		fileMenu.addSeparator();
 		JMenuItem closeItem = new JMenuItem("Close");
 		closeItem.addActionListener(new ActionListener() {
@@ -189,14 +192,8 @@ public class ScriptEditor extends JPanel {
 			}
 		});
 		fileMenu.add(closeItem);
-		
-
-		JMenu editMenu = new JMenu("Edit");
-		JMenuItem preferences = new JMenuItem("Preferences...");
-		editMenu.add(preferences);
 
 		bar.add(fileMenu);
-		bar.add(editMenu);
 		frame.setJMenuBar(bar);
 	}
 
@@ -271,21 +268,66 @@ public class ScriptEditor extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (editor.scriptFile != null) {
-					try {
-						BufferedWriter r = new BufferedWriter(new FileWriter(
-								editor.scriptFile));
-						editor.getTextArea().write(r);
-						r.close();
-					} catch (IOException ioe) {
-						ioe.printStackTrace();
-						UIManager.getLookAndFeel().provideErrorFeedback(
-								editor);
-					}
+				File scriptFile = editor.getScriptFile();
+				if (scriptFile == null) {
+					SFileChooser fileChooser = new SFileChooser(
+							SCRIPT_MENU_DIRECTORY, "Edit Script", "bsh");
+					scriptFile = fileChooser.showSaveDialog();
+				 	if (scriptFile == null) {
+				 		return;
+				 	}
+					editor.setScriptFile(scriptFile);
+				 	frame.setTitle(editor.getScriptFile().getName());			
+				}
 
+				try {
+					BufferedWriter r = new BufferedWriter(new FileWriter(
+							scriptFile));
+					editor.getTextArea().write(r);
+					r.close();
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+					UIManager.getLookAndFeel().provideErrorFeedback(editor);
 				}
 			}
 
+		};
+	}
+
+	/**
+	 * Returns the action for saving script files.
+	 */
+	private static Action getSaveScriptAsAction(final GenericFrame frame, final ScriptEditor editor) {
+		return new AbstractAction() {
+
+			// Initialize
+			{
+				putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
+				putValue(SHORT_DESCRIPTION, "save");	
+				putValue(Action.NAME, "Save as...");
+			}
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SFileChooser fileChooser = new SFileChooser(
+						SCRIPT_MENU_DIRECTORY, "Edit Script", "bsh");
+				File scriptFile = fileChooser.showSaveDialog();
+			 	if (scriptFile == null) {
+			 		return;
+			 	}
+				editor.setScriptFile(scriptFile);
+				try {
+					BufferedWriter r = new BufferedWriter(new FileWriter(
+							scriptFile));
+					editor.getTextArea().write(r);
+					frame.setTitle(editor.getScriptFile().getName());
+					r.close();
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+					UIManager.getLookAndFeel().provideErrorFeedback(editor);
+				}
+
+			}
 
 		};
 	}

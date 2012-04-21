@@ -529,7 +529,7 @@ public class NetworkPanel extends JPanel {
 					.get(group);
 					SynapseNode synapseNode = (SynapseNode) objectNodeMap.get(e
 							.getAuxiliaryObject());
-					if (synapseNode != null) {
+					if ((synapseNode != null) && (sgn != null)) {
 						sgn.addPNode(synapseNode);
 						sgn.updateBounds();
 					}

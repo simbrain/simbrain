@@ -80,7 +80,9 @@ public class KWTA extends Subnetwork  {
             getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuron()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
-        //attachTargetNeuronGroupToSynapseGroup(getNeuronGroup(), getSynapseGroup());
+        getSynapseGroup().setDeleteWhenEmpty(false);
+		root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
+				getNeuronGroup(), getSynapseGroup());
         setLabel("K-Winner Take All");
     }
 

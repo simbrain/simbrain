@@ -82,13 +82,18 @@ public class SynapseGroup extends Group {
      * @param synapse synapse to add
      * @param fireEvent whether to fire a synapse added event
      */
-    public void addSynapse(final Synapse synapse, final boolean fireEvent) {
+    public boolean addSynapse(final Synapse synapse, final boolean fireEvent) {
+        // Don't add the synapse if it conflicts with an existing synapse.
+    	if (conflictsWithExistingSynapse(synapse)) {
+        	return false;
+        }
         synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
         synapseList.add(synapse);
         synapse.setParentGroup(this);
         if (fireEvent) {
             getParentNetwork().fireSynapseAdded(synapse);            
         }
+        return true;
     }
 
     /**
@@ -96,10 +101,29 @@ public class SynapseGroup extends Group {
      * 
      * @param synapse synapse to add
      */
-    public void addSynapse(final Synapse synapse) {
-        addSynapse(synapse, true);
+    public boolean addSynapse(final Synapse synapse) {
+        return addSynapse(synapse, true);
     }
     
+    /**
+	 * Returns true if a synapse with the same source and parent neurons already
+	 * exists in the synapse group.
+	 * 
+	 * @param toCheck the synapse to check
+	 * @return true if a synapse connecting the same neurons already exists,
+	 *         false otherwise
+	 */
+    private boolean conflictsWithExistingSynapse(final Synapse toCheck) {
+    	for(Synapse synapse : synapseList) {
+    		if (synapse.getSource() == toCheck.getSource()) {
+    			if (synapse.getTarget() == toCheck.getTarget()) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+
     /**
      * Remove the provided synapse.
      *

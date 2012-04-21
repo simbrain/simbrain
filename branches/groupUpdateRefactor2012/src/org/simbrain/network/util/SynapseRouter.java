@@ -25,14 +25,18 @@ import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 
 /**
- * TODO.
+ * Object which routes synapses to synapse groups, based on what neuron groups the synapses
+ * are connected to.
  * 
- * @author Zach Tosi (first author!)
+ * @author Zach Tosi
  * @author Jeff Yoshimi
- *
  */
 public class SynapseRouter {
 	
+	/** A routing map where group pairs are mapped to connecting synapse groups. */
+	private HashMap<NeuronGroupPair, SynapseGroup> routingMap =
+			new HashMap<NeuronGroupPair, SynapseGroup>();
+
 	/** A mapping of neuron groups to unified incoming synapse groups. */
 	private HashMap<NeuronGroup, SynapseGroup> incomingUnified =
 			new HashMap<NeuronGroup, SynapseGroup>();
@@ -41,52 +45,69 @@ public class SynapseRouter {
 	private HashMap<NeuronGroup, SynapseGroup> outgoingUnified =
 			new HashMap<NeuronGroup, SynapseGroup>();
 	
-	/** A routing map where group pairs are mapped to connecting synapse groups. */
-	private HashMap<NeuronGroupPair, SynapseGroup> routingMap =
-			new HashMap<NeuronGroupPair, SynapseGroup>();
-	
-	//TODO: Revise / fill in javadocs and code comments	
-	// TODO: Revise "null" policy to be a true wildcard (unafilliated or arbitrary neuron group)
-	// TODO: Add methods for associated synapsegroups specifically with loose or
-	// unaffiliated source or target neurons
-	
+	/** Set to true for auto-routing (not fully tested). */ 
+	private boolean autoRouting = false;
+
 	/**
 	 * Associates a pair of neuron groups and their connecting synapse group.
 	 * 
-	 * @param src the source neuron group 
-	 * @param targ the target neron group 
+	 * @param sourceNeuronGroup the source neuron group 
+	 * @param targetNeuronGroup the target neron group 
 	 * @param con the connecting synapse group 
 	 */
-	public void associateSynapseGroupWithNeuronGroupPair(NeuronGroup src, NeuronGroup targ,
+	public void associateSynapseGroupWithNeuronGroupPair(NeuronGroup sourceNeuronGroup, NeuronGroup targetNeuronGroup,
 			SynapseGroup con) {	
 		// Any values can be null. For instance if one wanted to register a
 		// neuron group pair with no connecting synapse group (perhaps awaiting a
 		// connecting group), the synapse group would simply be passed in as
-		// null. Likewise, if src or targ are null it would indicate that the source
+		// null. Likewise, if sourceNeuronGroup or targetNeuronGroup are null it would indicate that the source
 		// or target neurons were loose neurons respectively.	 
-		NeuronGroupPair gp = new NeuronGroupPair(src, targ);
+		NeuronGroupPair gp = new NeuronGroupPair(sourceNeuronGroup, targetNeuronGroup);
 		routingMap.put(gp, con);
 	}
 	
 	/**
+	 * Any synapse originating in this neuron group is routed to the specified synapse group.
+	 * 
+	 * @param sourceNeuronGroup the source neuron group
+	 * @param con the synapse group to route to
+	 */
+	public void associateSynapseGroupWithSourceNeuronGroup(NeuronGroup sourceNeuronGroup,
+			SynapseGroup con) {
+		associateSynapseGroupWithNeuronGroupPair(sourceNeuronGroup, null, con);
+	}
+
+	/**
+	 * Any synapse terminating in this neuron group is routed to the specified synapse group.
+	 * 
+	 * @param sourceNeuronGroup the target neuron group
+	 * @param con the synapse group to route to
+	 */
+	public void associateSynapseGroupWithTargetNeuronGroup(NeuronGroup targetNeuronGroup,
+			SynapseGroup con) {
+		associateSynapseGroupWithNeuronGroupPair(null, targetNeuronGroup, con);
+	}
+
+	/**
 	 * Unifies all the incoming SynapseGroups to a target NeuronGroup. That is,
-	 * if a synapse is added which has @param targ as a target group, then
+	 * if a synapse is added which has targetNeuronGroup as a target group, then
 	 * regardless of its source it will be added to the same SynapseGroup.
 	 * This function is quite expensive, which is why it is expected to be used
 	 * infrequently.
-	 * @param targ the target layer for which all incoming synapses are
+	 *
+	 * @param targetNeuronGroup the target layer for which all incoming synapses are
 	 * being unified into the same group.
 	 */
-	public void unifyIncomingSynapsesToNeuronGroup(NeuronGroup targ) {
-		SynapseGroup sg = new SynapseGroup(targ.getParentNetwork());
-		incomingUnified.put(targ, sg);
+	public void unifyIncomingSynapsesToNeuronGroup(NeuronGroup targetNeuronGroup) {
+		SynapseGroup sg = new SynapseGroup(targetNeuronGroup.getParentNetwork());
+		incomingUnified.put(targetNeuronGroup, sg);
 		HashSet<Subnetwork> parentNetworks = new HashSet<Subnetwork>();
-		if(targ.getParentGroup() instanceof Subnetwork) {
-			parentNetworks.add((Subnetwork)targ.getParentGroup());
-			((Subnetwork)targ.getParentGroup()).addSynapseGroup(sg);
+		if(targetNeuronGroup.getParentGroup() instanceof Subnetwork) {
+			parentNetworks.add((Subnetwork)targetNeuronGroup.getParentGroup());
+			((Subnetwork)targetNeuronGroup.getParentGroup()).addSynapseGroup(sg);
 		}	
 		for(NeuronGroupPair ngp : routingMap.keySet()) {		
-			if(ngp.getSourceGroup() == targ) {
+			if(ngp.getSourceGroup() == targetNeuronGroup) {
 				SynapseGroup current = routingMap.get(ngp);	
 				if(current != null) {
 					if(ngp.getSourceGroup().getParentGroup() instanceof
@@ -104,9 +125,7 @@ public class SynapseRouter {
 					current.getSynapseList().clear();
 					current.getParentNetwork().fireGroupRemoved(current);
 					current.delete();
-				}
-				
-				
+				}				
 			}
 		}
 		sg.getParentNetwork().fireGroupAdded(sg);
@@ -114,32 +133,33 @@ public class SynapseRouter {
 	
 	/**
 	 * Unifies all the outgoing SynapseGroups from a source NeuronGroup.
-	 * That is, if a synapse is added which has @param src as a source group,
+	 * That is, if a synapse is added which has @param sourceNeuronGroup as a source group,
 	 * then regardless of its target it will be added to the same SynapseGroup.
 	 * This function is quite expensive, which is why it is expected to be used
 	 * infrequently.
-	 * @param src the target layer for which all incoming synapses are
+	 *
+	 * @param sourceNeuronGroup the target layer for which all incoming synapses are
 	 * being unified into the same group.
 	 */
-	public void unifyOutgoingSynapsesToNeuronGroup(NeuronGroup src) {
+	public void unifyOutgoingSynapsesToNeuronGroup(NeuronGroup sourceNeuronGroup) {
 		//Create a single group which will subsume all synapses outgoing from
-		//src
-		SynapseGroup sg = new SynapseGroup(src.getParentNetwork());
+		//sourceNeuronGroup
+		SynapseGroup sg = new SynapseGroup(sourceNeuronGroup.getParentNetwork());
 		
 		//Bind this source group to the union synapse group
-		outgoingUnified.put(src, sg);
+		outgoingUnified.put(sourceNeuronGroup, sg);
 		
 		//If the sgs to be unified cross between subnets keep track of each
 		//subnet that sg will need to be added to
 		HashSet<Subnetwork> parentNetworks = new HashSet<Subnetwork>();
-		if(src.getParentGroup() instanceof Subnetwork) {
-			parentNetworks.add((Subnetwork)src.getParentGroup());
-			((Subnetwork)src.getParentGroup()).addSynapseGroup(sg);
+		if(sourceNeuronGroup.getParentGroup() instanceof Subnetwork) {
+			parentNetworks.add((Subnetwork)sourceNeuronGroup.getParentGroup());
+			((Subnetwork)sourceNeuronGroup.getParentGroup()).addSynapseGroup(sg);
 		}	
 		
 		//Iterate through ngp keys in the routing map...
 		for(NeuronGroupPair ngp : routingMap.keySet()) {		
-			if(ngp.getSourceGroup() == src) {
+			if(ngp.getSourceGroup() == sourceNeuronGroup) {
 				SynapseGroup current = routingMap.get(ngp);	
 				if(current != null) {
 					if(ngp.getTargetGroup().getParentGroup() instanceof
@@ -166,16 +186,17 @@ public class SynapseRouter {
 	}
 	
 	/**
-	 * Takes a target layer with a unified incoming synapse group and disjoins
+	 * Takes a target neuron group with a unified incoming synapse group and disjoins
 	 * that group such that each connected source-target pair is connected by
 	 * a different synapse group. 
-	 * @param targ the target 
+	 *
+	 * @param targetNeuronGroup the target 
 	 */
-	public void disjoinIncomingSynapses(NeuronGroup targ) {
-		if(!incomingUnified.containsKey(targ)) {
+	public void disjoinIncomingSynapses(NeuronGroup targetNeuronGroup) {
+		if(!incomingUnified.containsKey(targetNeuronGroup)) {
 			return;
 		}
-		SynapseGroup unifiedGroup = incomingUnified.remove(targ);
+		SynapseGroup unifiedGroup = incomingUnified.remove(targetNeuronGroup);
 		for(Synapse syn : unifiedGroup.getSynapseList()) {
 			routeSynapse(syn);
 		}
@@ -185,16 +206,17 @@ public class SynapseRouter {
 	}
 
 	/**
-	 * Takes a tsource layer with a unified outgoing synapse group and disjoins
+	 * Takes a source layer with a unified outgoing synapse group and disjoins
 	 * that group such that each connected source-target pair is connected by
-	 * a different synapse group. 
-	 * @param src
+	 * a different synapse group.
+	 *
+	 * @param sourceNeuronGroup
 	 */
-	public void disjoinOutgoingSynapses(NeuronGroup src) {
-		if(!outgoingUnified.containsKey(src)) {
+	public void disjoinOutgoingSynapses(NeuronGroup sourceNeuronGroup) {
+		if(!outgoingUnified.containsKey(sourceNeuronGroup)) {
 			return;
 		}
-		SynapseGroup unifiedGroup = outgoingUnified.remove(src);
+		SynapseGroup unifiedGroup = outgoingUnified.remove(sourceNeuronGroup);
 		for(Synapse syn : unifiedGroup.getSynapseList()) {
 			routeSynapse(syn);
 		}
@@ -202,130 +224,124 @@ public class SynapseRouter {
 		unifiedGroup.getSynapseList().clear();
 		unifiedGroup.delete();
 	}
-	
-	/**
-	 * Any synapse with this neuron group as source-parent is routed to the
-	 * specified synapse group.
-	 * 
-	 * @param src the source neuron group
-	 * @param con the synapse group to route to
-	 */
-	public void associateSynapseGroupWithSourceNeuronGroup(NeuronGroup src,
-			SynapseGroup con) {
-		associateSynapseGroupWithNeuronGroupPair(src, null, con);
-	}
 
 	/**
-	 * Any synapse with this neuron group as target-parent is routed to the
-	 * specified synapse group.
-	 * 
-	 * @param src the target neuron group
-	 * @param con the synapse group to route to
-	 */
-	public void associateSynapseGroupWithTargetNeuronGroup(NeuronGroup targ,
-			SynapseGroup con) {
-		associateSynapseGroupWithNeuronGroupPair(null, targ, con);
-	}
-
-	/**
-	 * Routes a synapse into the correct synapse group. If the neuron group
-	 * pair does not exist or if they do but map to a null synapse group
-	 * a neuron group pair comprised of the source and target groups
-	 * is mapped to a new synapse group and syn is added to that group.
+	 * Routes a synapse to the correct synapse groups.
 	 *
 	 * @param syn the synapse to be routed to the correct synapse group.
 	 */
 	public void routeSynapse(Synapse syn) {
-		NeuronGroup src = (NeuronGroup) syn.getSource().getParentGroup();
-		NeuronGroup targ = (NeuronGroup) syn.getTarget().getParentGroup();
+		NeuronGroup sourceNeuronGroup = (NeuronGroup) syn.getSource().getParentGroup();
+		NeuronGroup targetNeuronGroup = (NeuronGroup) syn.getTarget().getParentGroup();
 		
-		// If the synapse is not affiliated with any neuron group, no routing
-		// need be done.
-		if ((src == null) && (targ == null)) {
+		// If the synapse is not affiliated with any neuron group, no routing needed
+		if ((sourceNeuronGroup == null) && (targetNeuronGroup == null)) {
 			return;
 		}
-		NeuronGroupPair ngp = new NeuronGroupPair(src, targ);
-		SynapseGroup sg = null;
 		
+		NeuronGroupPair ngp = new NeuronGroupPair(sourceNeuronGroup, targetNeuronGroup);
+		SynapseGroup sg = null;
+
+		// Take care of unified cases
 		if(!(incomingUnified.isEmpty() || outgoingUnified.isEmpty())) {
-			if(incomingUnified.containsKey(targ)) {
-				sg = incomingUnified.get(targ);
-				sg.addSynapse(syn);
-				if(!((Subnetwork)src.getParentGroup()).
+			if(incomingUnified.containsKey(targetNeuronGroup)) {
+				sg = incomingUnified.get(targetNeuronGroup);
+				addSynapseToGroup(syn, sg);
+				if(!((Subnetwork)sourceNeuronGroup.getParentGroup()).
 						getSynapseGroupList().contains(sg) &&
-						src.getParentGroup() != null) {					
-					((Subnetwork)src.getParentGroup()).addSynapseGroup(sg);				
+						sourceNeuronGroup.getParentGroup() != null) {					
+					((Subnetwork)sourceNeuronGroup.getParentGroup()).addSynapseGroup(sg);				
 				}
 				routingMap.put(ngp, sg);
-			} else if (outgoingUnified.containsKey(src)) {
-				sg = outgoingUnified.get(src);
-				sg.addSynapse(syn);
-				if(!((Subnetwork)targ.getParentGroup()).
+			} else if (outgoingUnified.containsKey(sourceNeuronGroup)) {
+				sg = outgoingUnified.get(sourceNeuronGroup);
+				addSynapseToGroup(syn, sg);
+				if(!((Subnetwork)targetNeuronGroup.getParentGroup()).
 						getSynapseGroupList().contains(sg) &&
-						targ.getParentGroup() != null) {					
-					((Subnetwork)targ.getParentGroup()).addSynapseGroup(sg);
+						targetNeuronGroup.getParentGroup() != null) {					
+					((Subnetwork)targetNeuronGroup.getParentGroup()).addSynapseGroup(sg);
 				}
 				routingMap.put(ngp, sg);
 			}
 		} else {
 			
-			//If the neuron groups are associated with a synapse group (implies
-			//that it exists as a key...)
+			//If the neuron groups are associated with a synapse group 
+			// route the synapse to the associated synapse group
 			if(routingMap.get(ngp) != null) {
 				//get the associated synapse group and add the synapse to it
 				sg = routingMap.get(ngp); 
-				sg.addSynapse(syn);
+				addSynapseToGroup(syn, sg);
 				
 			} else {
-	
-				// TODO: Note to zach.  Including this caused some problems, and
-				// besides I took it from our conversation that we would just assume
-				// all synpase groups would be initially added.  But I'm leaving this here
-				// for reference
-				
-				//Is this synapse between subnetworks?
-				boolean interGroupSynapse = src.getParentGroup() !=
-						targ.getParentGroup();
-	
-				//Create the new synapse group (since its been shown that syn
-				//belongs to no bound SG)
-				sg = new SynapseGroup(syn.getRootNetwork());
-				syn.getRootNetwork().fireGroupAdded(sg);
-							
-				//If the parent subnet of src != null add our new synapse group
-				//to that subnet
-				if(src.getParentGroup() != null) {
-					((Subnetwork)src.getParentGroup()).addSynapseGroup(sg);
-					
+				if (autoRouting == true) {
+
+					// Is this synapse between subnetworks?
+					boolean interGroupSynapse = sourceNeuronGroup
+							.getParentGroup() != targetNeuronGroup
+							.getParentGroup();
+
+					// Create the new synapse group (since its been shown that
+					// syn belongs to no bound SG)
+					sg = new SynapseGroup(syn.getRootNetwork());
+					syn.getRootNetwork().fireGroupAdded(sg);
+
+					// If the parent subnet of sourceNeuronGroup != null add our
+					// new synapse group to that subnet
+					if (sourceNeuronGroup.getParentGroup() != null) {
+						((Subnetwork) sourceNeuronGroup.getParentGroup())
+								.addSynapseGroup(sg);
+
+					}
+					// If the target group is in a different subnet and not null
+					// add our new synapse group to that subnet as well.
+					if (targetNeuronGroup.getParentGroup() != null
+							&& interGroupSynapse) {
+						((Subnetwork) targetNeuronGroup.getParentGroup())
+								.addSynapseGroup(sg);
+					}
+
+					// Add our synapse to it
+					sg.addSynapse(syn);
+
+					// Put the group in the routing map with the associated
+					// synapse
+					// group
+					routingMap.put(ngp, sg);
 				}
-				//If the target group is in a different subnet and not null
-				//add our new synapse group to that subnet as well.
-				if(targ.getParentGroup() != null && interGroupSynapse) {		
-					((Subnetwork)targ.getParentGroup()).addSynapseGroup(sg);
-				}
-			
-				
-				//Add our synapse to it
-				sg.addSynapse(syn);
-				
-				//Put the group in the routing map with the associated synapse
-				//group
-				routingMap.put(ngp, sg);
 				
 			}
 		}
+
+	}
+		
+	/**
+	 * Helper method for placing a synapse in a synapse group, and firing the appropriate
+	 * notification event.
+	 *
+	 * @param synapse the synapse
+	 * @param synapseGroup the group to place the synapse in
+	 */
+	private void addSynapseToGroup(final Synapse synapse, final SynapseGroup synapseGroup) {
+		
+		// If the synapse already exists in that group, don't add it.
+		boolean wasAdded = synapseGroup.addSynapse(synapse);
+		if (wasAdded) {
 			// Fire Event so network panel knows to add this synapse to appropriate
 			// PNode
-			sg.getParentNetwork().transferSynapseToGroup(syn, sg);
+			synapseGroup.getParentNetwork().transferSynapseToGroup(synapse, synapseGroup);
 			NetworkEvent<Group> event = new NetworkEvent<Group>(
-			sg.getParentNetwork(), sg, sg);
-			event.setAuxiliaryObject(syn);
-			sg.getParentNetwork().fireGroupChanged(event,"synapseAddedToGroup");   		
+					synapseGroup.getParentNetwork(), synapseGroup, synapseGroup);
+			event.setAuxiliaryObject(synapse);
+			synapseGroup.getParentNetwork().fireGroupChanged(event,"synapseAddedToGroup");   								
+		}
+
 	}
 	
-	
-	//TODO: Doc//  mention web4j.
-	class NeuronGroupPair {
+	/**
+	 * Representation of a pair of neuron groups, which serve as a key for the routing map,
+	 * which associates pairs of neuron groups with synapse groups. 
+	 */
+	private class NeuronGroupPair {
 		
 		/** A seed for generating hash codes. */
 		public static final int HASH_SEED = 23;
@@ -337,19 +353,19 @@ public class SynapseRouter {
 		public static final int ODD_PRIME = 47;
 		
 		/** The source in the pair. */
-		private final NeuronGroup src;
+		private final NeuronGroup sourceNeuronGroup;
 		
 		/** The target in the pair. */
-		private final NeuronGroup targ;
+		private final NeuronGroup targetNeuronGroup;
 		
 		/**
 		 * A constructor specifying the source and target pair
-		 * @param src the source group
-		 * @param targ the target group
+		 * @param sourceNeuronGroup the source group
+		 * @param targetNeuronGroup the target group
 		 */
-		public NeuronGroupPair(NeuronGroup src, NeuronGroup targ) {
-			this.src = src;
-			this.targ = targ;
+		public NeuronGroupPair(NeuronGroup sourceNeuronGroup, NeuronGroup targetNeuronGroup) {
+			this.sourceNeuronGroup = sourceNeuronGroup;
+			this.targetNeuronGroup = targetNeuronGroup;
 		}
 		
 		/**
@@ -360,8 +376,8 @@ public class SynapseRouter {
 			if(!(obj instanceof NeuronGroupPair)){
 				return false;
 			} else {
-				if(((NeuronGroupPair) obj).getSourceGroup() == src
-						&& ((NeuronGroupPair) obj).getTargetGroup() == targ) {
+				if(((NeuronGroupPair) obj).getSourceGroup() == sourceNeuronGroup
+						&& ((NeuronGroupPair) obj).getTargetGroup() == targetNeuronGroup) {
 					return true;
 				} else {
 					return false;
@@ -372,29 +388,29 @@ public class SynapseRouter {
 		/**
 		 * If .equals(obj) is overridden then hashcode() must also be 
 		 * overridden. This method provides a unique hashcode based on the
-		 * source and target neuron group (as well as which one is src vs.
-		 * targ).
+		 * source and target neuron group (as well as which one is sourceNeuronGroup vs.
+		 * targetNeuronGroup).
 		 */
 		public int hashCode(){
 			int result = HASH_SEED;
-			if(src == null) {
+			if(sourceNeuronGroup == null) {
 				result = (result * ODD_PRIME) + 0;
 			} else {
-				result = (result * ODD_PRIME) + src.hashCode();
-			} if (targ == null) {
+				result = (result * ODD_PRIME) + sourceNeuronGroup.hashCode();
+			} if (targetNeuronGroup == null) {
 				result = (result * ODD_PRIME) + 0;
 			} else {
-				result = (result * ODD_PRIME) + targ.hashCode();
+				result = (result * ODD_PRIME) + targetNeuronGroup.hashCode();
 			}
 			return result;
 		}
 		
 		public NeuronGroup getSourceGroup() {
-			return src;
+			return sourceNeuronGroup;
 		}
 		
 		public NeuronGroup getTargetGroup() {
-			return targ;
+			return targetNeuronGroup;
 		}
 		
 	}

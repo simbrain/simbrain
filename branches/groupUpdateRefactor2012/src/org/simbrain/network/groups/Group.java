@@ -35,8 +35,8 @@ public abstract class Group {
     /** Name of this group. */
     private String id;
 
-    /** Name of this group. */
-    private String label = "-";
+    /** Name of this group.  Null strings lead to default labeling conventions.  */
+    private String label; 
 
     /** Whether this group should be deleted when all its components are deleted. */
     private boolean deleteWhenEmpty = true;
@@ -197,7 +197,7 @@ public abstract class Group {
     /**
      * @param deleteWhenEmpty the deleteWhenEmpty to set
      */
-    protected void setDeleteWhenEmpty(boolean deleteWhenEmpty) {
+    public void setDeleteWhenEmpty(boolean deleteWhenEmpty) {
         this.deleteWhenEmpty = deleteWhenEmpty;
     }
 

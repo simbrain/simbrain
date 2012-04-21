@@ -166,6 +166,7 @@ public class TimeSeriesPlotPanel extends JPanel {
      */
     public void addPreferencesButton() {
       JButton prefsButton = new JButton("Prefs");
+      prefsButton.setHideActionText(true);
       prefsButton.setAction(TimeSeriesPlotActions.getPropertiesDialogAction(this));
       buttonPanel.add(prefsButton);
     }

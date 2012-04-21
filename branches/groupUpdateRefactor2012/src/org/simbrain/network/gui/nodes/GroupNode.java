@@ -235,7 +235,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      */
     protected void updateInteractionBox() {
         // System.out.println(getGroup().getLabel()); TODO: Uncomment this to see just how often
-        //  this method is called.  Too much!s
+        //  this method is called.  Too much!
         interactionBox.setOffset(
                 getBounds().getX() + interactionBox.getBoxOffset_X(),
                 getBounds().getY() - interactionBox.getHeight()

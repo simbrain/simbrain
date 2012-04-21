@@ -169,18 +169,59 @@ public class Subnetwork extends Group {
         getParentNetwork().transferSynapsesToGroup(synapses, newGroup);
         addSynapseGroup(newGroup);
         newGroup.setDeleteWhenEmpty(false);
-    	if(!source.equals(target)) {
-    		newGroup.setLabel("Weights " + sourceLabel + " "
-    			+ new Character('\u2192') + " " + targetLabel);
-    	} else {
-    		newGroup.setLabel("Weights " + sourceLabel + " "
-        			+ new Character('\u21BA'));
-    	}
+        setSynapseGroupLabel(source, target, newGroup, sourceLabel, targetLabel);
+
     	// By default set up a synapse routing...
         getParentNetwork().getSynapseRouter()
 				.associateSynapseGroupWithNeuronGroupPair(source,
 						target, newGroup);
         return newGroup;
+    }
+    
+	/**
+	 * The source and target neuron groups are associated with a synapse group
+	 * that is initially empty. A routing rule is set up so that the synapse
+	 * group will be automatically populated when synapses are added which
+	 * connect the source and parent neuron group.
+	 * 
+	 * @param source the source neuron group
+	 * @param target the target neuron group
+	 */
+	public void addEmptySynapseGroup(NeuronGroup source, NeuronGroup target) {
+		SynapseGroup sg = new SynapseGroup(getParentNetwork());
+		addSynapseGroup(sg);
+		sg.setDeleteWhenEmpty(false);
+		setSynapseGroupLabel(source, target, sg, ""
+				+ (indexOfNeuronGroup(source) + 1), ""
+				+ (indexOfNeuronGroup(target) + 1));
+
+		getParentNetwork().getSynapseRouter()
+				.associateSynapseGroupWithNeuronGroupPair(source, target, sg);
+
+	}
+
+    /**
+     * Utility method for labeling synapse groups based on the neuron groups they connect.
+     * A forward arrow is used for feed-forward synapse groups, a circular arrow for 
+     * recurrent synapse groups. 
+     *
+     * @param source source neuron group
+     * @param target target neuron group
+     * @param sg synapse group
+     * @param sourceLabel source label
+     * @param targetLabel target  label
+     */
+	private void setSynapseGroupLabel(NeuronGroup source, NeuronGroup target,
+			final SynapseGroup sg, final String sourceLabel,
+			final String targetLabel) {
+		if (!source.equals(target)) {
+			sg.setLabel("Weights " + sourceLabel + " "
+					+ new Character('\u2192') + " " + targetLabel);
+		} else {
+			sg.setLabel("Weights " + sourceLabel + " "
+					+ new Character('\u21BA'));
+		}
+
     }
     
     /**

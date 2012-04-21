@@ -156,7 +156,7 @@ public class EchoStateNetwork extends Subnetwork {
         setLabel("Echo State Network");
     }
     
-	    @Override
+	@Override
     public void update() {
         inputLayer.update();
         reservoirLayer.update();
@@ -235,6 +235,18 @@ public class EchoStateNetwork extends Subnetwork {
         if (backWeights) {
           connector.setSparsity(backSparsity);
           connectNeuronGroups(outputLayer, reservoirLayer, connector);
+        }
+
+        // If recurrent output weights are on, set up an empty, growing synapse group
+        //	on the output layer
+        if (recurrentOutWeights) {
+        	addEmptySynapseGroup(outputLayer, outputLayer);
+        }
+
+        // If direct in-out weights are on, set up an empty, growing synapse group
+        //	connecting the input layer directly to the output layer
+        if (directInOutWeights) {
+        	addEmptySynapseGroup(inputLayer, outputLayer);        	
         }
 
         // Scale the reservoir's weights to have the desired spectral radius

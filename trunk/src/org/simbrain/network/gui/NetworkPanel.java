@@ -1951,6 +1951,8 @@ public class NetworkPanel extends JPanel {
             } else if (node instanceof SynapseNode) {
                 SynapseNode synapseNode = (SynapseNode) node;
                 synapseNode.getSynapse().incrementWeight();
+                synapseNode.updateColor();
+                synapseNode.updateDiameter();
             }
         }
     }

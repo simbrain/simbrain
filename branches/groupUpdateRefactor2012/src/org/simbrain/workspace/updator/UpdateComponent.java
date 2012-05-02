@@ -72,5 +72,4 @@ public class UpdateComponent implements UpdateAction {
 		return component;
 	}
 
-
 }

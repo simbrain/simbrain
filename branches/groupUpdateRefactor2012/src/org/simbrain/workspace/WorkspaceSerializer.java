@@ -38,13 +38,19 @@ import java.util.zip.ZipOutputStream;
 
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.updator.UpdateAction;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Serializes and deserializes workspaces.
- *
+ * Serializes and deserializes workspaces. Custom serialization (beyond what
+ * XStream can do) is required, in order to recreate workspace components and
+ * couplings from a legible xml form / zipped directory structure. Mainly this
+ * means recreating components, couplings, and update actions. Also some effort
+ * has been made to allow reuse between individual component save / reopen and
+ * workspace level save / reopen.
+ * 
  * @author Matt Watson
  */
 public class WorkspaceSerializer {
@@ -81,10 +87,20 @@ public class WorkspaceSerializer {
 
         workspace.preSerializationInit();
 
+        // Serialize components
         serializeComponents(serializer, archive, zipStream);
 
+        // Serialize couplings
         for (Coupling<?> coupling : workspace.getCouplingManager().getCouplings()) {
             archive.addCoupling(coupling);
+        }
+        
+        // Serialize update actions
+        for (UpdateAction action: workspace.getUpdater().getUpdateManager().getActionList()) {
+            archive.addUpdateAction(action);
+        }
+        for (UpdateAction action: workspace.getUpdater().getUpdateManager().getAvailableActionList()) {
+            archive.addAvailableUpdateAction(action);
         }
 
         ZipEntry entry = new ZipEntry("contents.xml");
@@ -121,8 +137,8 @@ public class WorkspaceSerializer {
              * it's serialized here.
              */
             if (desktopComponent != null) {
-                ArchiveContents.ArchivedComponent.ArchivedDesktopComponent dc
-                = archiveComp.addDesktopComponent(desktopComponent);
+				ArchiveContents.ArchivedComponent.ArchivedDesktopComponent dc = archiveComp
+						.addDesktopComponent(desktopComponent);
                 entry = new ZipEntry(dc.getUri());
                 zipStream.putNextEntry(entry);
                 desktopComponent.save(zipStream);
@@ -178,14 +194,9 @@ public class WorkspaceSerializer {
             read(zip, data);
         }
 
+        // Get the archived contents file.
         contents = (ArchiveContents) ArchiveContents.xstream().fromXML(
                 new ByteArrayInputStream(entries.get("contents.xml")));
-
-        // Deserialize workspace parameters
-        if (contents.getWorkspaceParameters() != null) {
-            workspace.setUpdateDelay(contents.getWorkspaceParameters()
-                    .getUpdateDelay());
-        }
 
         // Add Components
         if (contents.getArchivedComponents() != null) {
@@ -203,15 +214,15 @@ public class WorkspaceSerializer {
                 // created
                 workspace.addWorkspaceComponent(wc);
 
-                if (archivedComponent.getDesktopComponent() != null) {
-                    Rectangle bounds = (Rectangle) new XStream(new DomDriver())
-                    .fromXML(new ByteArrayInputStream(entries
-                            .get(archivedComponent
-                                    .getDesktopComponent().getUri())));
-                    GuiComponent desktopComponent = desktop
-                            .getDesktopComponent(wc);
-                    desktopComponent.getParentFrame().setBounds(bounds);
-                }
+				if (archivedComponent.getDesktopComponent() != null) {
+					Rectangle bounds = (Rectangle) new XStream(new DomDriver())
+							.fromXML(new ByteArrayInputStream(entries
+									.get(archivedComponent
+											.getDesktopComponent().getUri())));
+					GuiComponent<?> desktopComponent = desktop
+							.getDesktopComponent(wc);
+					desktopComponent.getParentFrame().setBounds(bounds);
+				}
             }
         }
 
@@ -246,15 +257,7 @@ public class WorkspaceSerializer {
                                         couplingRef.getArchivedProducer().getArgumentValues(),
                                         couplingRef.getArchivedProducer().getDescription());
                 
-                // For backwards compatibility. TODO: Explain better
-                Class[] argDataTypes;
-                if ( couplingRef.getArchivedConsumer().getArgumentDataTypes() == null) {
-                    System.out.println("using it...");
-                    argDataTypes = new Class[]{couplingRef.getArchivedConsumer().getDataType()};
-                } else {
-                    argDataTypes =  couplingRef.getArchivedConsumer().getArgumentDataTypes();
-                }
-
+                Class[] argDataTypes = couplingRef.getArchivedConsumer().getArgumentDataTypes();
                 Consumer<?> consumer = (Consumer<?>) targetComponent
                         .getAttributeManager()
                         .createConsumer(
@@ -267,6 +270,25 @@ public class WorkspaceSerializer {
                 workspace.addCoupling(new Coupling(producer, consumer));
 
             }
+        }
+        
+        // Add update actions
+    	workspace.getUpdater().getUpdateManager().clear();
+        if (contents.getArchivedActions() != null) {
+            for (ArchiveContents.ArchivedUpdateAction actionRef : contents.getArchivedActions()) {
+            	workspace.getUpdater().getUpdateManager().addAction(contents.createUpdateAction(workspace, componentDeserializer, actionRef));
+            }
+        }        
+        if (contents.getArchivedAvailableActions() != null) {
+            for (ArchiveContents.ArchivedUpdateAction actionRef : contents.getArchivedAvailableActions()) {
+            	workspace.getUpdater().getUpdateManager().addAvailableAction(contents.createUpdateAction(workspace, componentDeserializer, actionRef));
+            }
+        }
+		
+        // Deserialize workspace parameters (serialization occurs in ArchiveContents.java).
+        if (contents.getWorkspaceParameters() != null) {
+            workspace.setUpdateDelay(contents.getWorkspaceParameters()
+                    .getUpdateDelay());            
         }
     }
 

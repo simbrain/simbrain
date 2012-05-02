@@ -33,7 +33,6 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.update_actions.UpdateGroup;
 import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
 
@@ -166,8 +165,10 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "synapseListeners");
         xstream.omitField(RootNetwork.class, "textListeners");
         xstream.omitField(RootNetwork.class, "updateCompleted");
-        xstream.omitField(RootNetwork.class, "updateManager");
+        //xstream.omitField(RootNetwork.class, "updateManager");
         xstream.omitField(RootNetwork.class, "networkThread");
+
+        xstream.omitField(UpdateManager.class, "listeners");        
         xstream.omitField(Network.class, "logger");
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
@@ -196,10 +197,7 @@ public class RootNetwork extends Network {
         groupListeners = new ArrayList<GroupListener>();
         
         // Initialize update manager
-        updateManager = new UpdateManager(this);
-        for (Group group : this.getGroupList()) {
-            updateManager.addAction(new UpdateGroup(group));
-        }
+        updateManager.postUnmarshallingInit();
 
         // Initialize neurons
         for (Neuron neuron : this.getFlatNeuronList()) {
@@ -225,9 +223,7 @@ public class RootNetwork extends Network {
                 removeSynapse(synapse);
             }
         }
-        
-        prioritySortedNeuronList = new ArrayList<Neuron>();
-
+         
         return this;
     }
 

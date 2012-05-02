@@ -50,7 +50,7 @@ public class UpdateManager {
     /**
      * List of listeners on this update manager
      */
-    private final List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
+    private List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
 
     /** Reference to parent network. */
     private final RootNetwork network;
@@ -68,6 +68,16 @@ public class UpdateManager {
         addListeners();
 
     }
+    
+    /**
+     * Perform any initialization required after opening a network from xml.
+     * UpdateManager will have been created from a default no argument constructor
+     * ands its fields populated using xstream.
+     */
+	public void postUnmarshallingInit() {
+		listeners = new ArrayList<UpdateManagerListener>();
+        addListeners();
+	}
 
     /**
      * Update manager should listen for relevant changes in network.

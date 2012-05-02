@@ -444,6 +444,20 @@ public class Workspace {
         return null;
     }
 
+    /**
+     * Returns the coupling associated with a string id.
+     * @param id the string id
+     * @return the associated coupling
+     */
+	public Coupling<?> getCoupling(String id) {
+		for (Coupling<?> coupling : this.getCouplingManager().getCouplings()) {
+			if (coupling.getId().equalsIgnoreCase(id)) {
+				return coupling;
+			}
+		}
+		return null;
+	}
+
     /** The lock used to lock calls on syncAllComponents. */
     private final Object componentLock = new Object();
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingListener;
@@ -43,12 +44,12 @@ public class UpdateActionManager {
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single iteration of the workspace.
      */
-    private final List<UpdateAction> actionList = new ArrayList<UpdateAction>();
+    private final List<UpdateAction> actionList = new CopyOnWriteArrayList<UpdateAction>();
 
     /**
      * The list of possible update actions that can be added to the main list.
      */
-    private final List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
+    private final List<UpdateAction> availableActionList = new CopyOnWriteArrayList<UpdateAction>();
 
     /**
      * List of listeners on this update manager
@@ -84,6 +85,19 @@ public class UpdateActionManager {
         addListeners();
 
     }
+
+    
+    /**
+     * Perform initialization after deserializing.
+     */
+	public void postAddInit() {
+        //addListeners();
+		for(UpdateAction action : actionList) {
+	        System.out.println(action.getLongDescription());
+			
+		}
+	}
+
 
     /**
      * Update manager should listen for relevant changes in workspace.
@@ -225,7 +239,7 @@ public class UpdateActionManager {
      *
      * @param action the action to add.
      */
-    protected void addAvailableAction(UpdateAction action) {
+    public void addAvailableAction(UpdateAction action) {
         availableActionList.add(action);
         for(UpdateManagerListener listener : listeners) {
             listener.availableActionAdded(action);
@@ -271,5 +285,16 @@ public class UpdateActionManager {
     public List<UpdateAction> getAvailableActionList() {
         return availableActionList;
     }
+
+
+	public void clear() {
+		for(UpdateAction action : actionList) {
+			removeAction(action);
+		}
+		for(UpdateAction action : availableActionList) {
+			removeAction(action);
+		}
+		
+	}
 
 }

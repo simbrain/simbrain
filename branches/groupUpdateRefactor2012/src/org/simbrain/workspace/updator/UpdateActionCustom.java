@@ -29,12 +29,12 @@ import bsh.Interpreter;
 public class UpdateActionCustom implements UpdateAction {
 
     /** Provides access to workspace updater. */
-    private final WorkspaceUpdater workspaceUpdater;
+    private final WorkspaceUpdater updater;
         
     /** The custom update script in persistable string form. */
     private String scriptString;
 
-    /** The interpreter for converting the the script into an executible update action. */
+    /** The interpreter for converting the the script into an executable update action. */
     private Interpreter interpreter = new Interpreter();
 
     /** Custom update action. */
@@ -45,12 +45,12 @@ public class UpdateActionCustom implements UpdateAction {
      */
 	public UpdateActionCustom(final WorkspaceUpdater updater,
 			final String script) {
-		this.workspaceUpdater = updater;
+		this.updater = updater;
 		this.scriptString = script;
 
 		try {
-			interpreter.set("updater", workspaceUpdater);
-			interpreter.set("workspace", workspaceUpdater.getWorkspace());
+			interpreter.set("updater", updater);
+			interpreter.set("workspace", updater.getWorkspace());
 			interpreter.eval(scriptString);
 			theAction = ((UpdateAction)interpreter.get("action"));
 		} catch (EvalError e) {
@@ -59,9 +59,12 @@ public class UpdateActionCustom implements UpdateAction {
 	}
 	
 	public void reinit() {
+		if (interpreter == null) {
+			interpreter = new Interpreter();
+		}
 		try {
-			interpreter.set("updater", workspaceUpdater);
-			interpreter.set("workspace", workspaceUpdater.getWorkspace());
+			interpreter.set("updater", updater);
+			interpreter.set("workspace", updater.getWorkspace());
 			interpreter.eval(scriptString);
 			theAction = ((UpdateAction)interpreter.get("action"));
 		} catch (EvalError e) {

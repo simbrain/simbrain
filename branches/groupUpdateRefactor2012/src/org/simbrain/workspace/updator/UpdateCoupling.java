@@ -52,13 +52,20 @@ public class UpdateCoupling implements UpdateAction {
      */
     public String getDescription() {
 		return "Update coupling ("
-				+ coupling.getConsumer().getParentComponent().getName() + ">"
-				+ coupling.getProducer().getParentComponent().getName() + ")";
+				+ coupling.getProducer().getParentComponent().getName() + ">"
+				+ coupling.getConsumer().getParentComponent().getName() + ")";
     }
     
 	@Override
 	public String getLongDescription() {
         return coupling.toString();
+	}
+
+	/**
+	 * @return the coupling
+	 */
+	public Coupling<?> getCoupling() {
+		return coupling;
 	}
 
 }

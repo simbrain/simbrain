@@ -42,7 +42,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class UpdateAllBuffered implements UpdateAction {
 
     /** Provides access to workspace updater. */
-    private final WorkspaceUpdater workspaceUpdater;
+    private final WorkspaceUpdater updater;
     
     /** The static logger for the class. */
     static final Logger LOGGER = Logger.getLogger(UpdateAllBuffered.class);
@@ -51,14 +51,14 @@ public class UpdateAllBuffered implements UpdateAction {
      * @param controls update controls
      */
     public UpdateAllBuffered(WorkspaceUpdater controls) {
-        this.workspaceUpdater = controls;
+        this.updater = controls;
     }
 
     /** 
      * {@inheritDoc}
      */
     public void invoke() {
-        List<? extends WorkspaceComponent> components = workspaceUpdater
+        List<? extends WorkspaceComponent> components = updater
                 .getComponents();
 
         int componentCount = components.size();
@@ -68,7 +68,7 @@ public class UpdateAllBuffered implements UpdateAction {
         }
 
         LOGGER.trace("updating couplings");
-        workspaceUpdater.updateCouplings();
+        updater.updateCouplings();
 
         LOGGER.trace("creating latch");
         LatchCompletionSignal latch = new LatchCompletionSignal(
@@ -76,7 +76,7 @@ public class UpdateAllBuffered implements UpdateAction {
 
         LOGGER.trace("updating components");
         for (WorkspaceComponent component : components) {
-            workspaceUpdater.updateComponent(component, latch);
+            updater.updateComponent(component, latch);
         }
         LOGGER.trace("waiting");
         latch.await();
@@ -93,6 +93,5 @@ public class UpdateAllBuffered implements UpdateAction {
 	public String getLongDescription() {
 		return getDescription();
 	}
-
 
 }

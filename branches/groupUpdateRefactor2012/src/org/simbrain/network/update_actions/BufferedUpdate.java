@@ -39,19 +39,20 @@ public class BufferedUpdate implements UpdateAction {
         this.network = network;
     }
 
-    /** 
-     * {@inheritDoc}
-     */
+	@Override
     public void invoke() {
         network.bufferedUpdateAllNeurons();
         network.updateAllSynapses();
     }
     
-    /** 
-     * {@inheritDoc}
-     */
+	@Override
     public String getDescription() {
-        return "Buffered update of loose items";
+        return "Buffered update";
     }
+
+	@Override
+	public String getLongDescription() {
+        return "Buffered update of loose items";
+	}
 
 }

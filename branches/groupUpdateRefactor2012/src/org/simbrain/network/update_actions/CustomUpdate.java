@@ -16,7 +16,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.updator;
+package org.simbrain.network.update_actions;
+
+import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.interfaces.UpdateAction;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -26,11 +29,11 @@ import bsh.Interpreter;
  * 
  * @author jyoshimi
  */
-public class UpdateActionCustom implements UpdateAction {
+public class CustomUpdate implements UpdateAction {
 
-    /** Provides access to workspace updater. */
-    private final WorkspaceUpdater updater;
-        
+	/** Reference to parent network. */
+	private RootNetwork network;
+
     /** The custom update script in persistable string form. */
     private String scriptString;
 
@@ -41,15 +44,15 @@ public class UpdateActionCustom implements UpdateAction {
     private UpdateAction theAction;
     
     /**
-     * @param controls update controls
+     * @param group group to update
      */
-	public UpdateActionCustom(final WorkspaceUpdater updater,
+    public CustomUpdate(final RootNetwork network,
 			final String script) {
-		this.updater = updater;
+        this.network= network;
 		this.scriptString = script;
 		init();
-	}
-	
+    }
+    
 	/**
 	 * Initialize the interpreter.
 	 */
@@ -58,18 +61,15 @@ public class UpdateActionCustom implements UpdateAction {
 			interpreter = new Interpreter();
 		}
 		try {
-			interpreter.set("updater", updater);
-			interpreter.set("workspace", updater.getWorkspace());
+			interpreter.set("network", network);
 			interpreter.eval(scriptString);
 			theAction = ((UpdateAction)interpreter.get("action"));
 		} catch (EvalError e) {
 			e.printStackTrace();
 		}		
 	}
-    
-    /** 
-     * {@inheritDoc}
-     */
+
+    @Override
     public void invoke() {
     	theAction.invoke();
     }
@@ -97,5 +97,4 @@ public class UpdateActionCustom implements UpdateAction {
 	public void setScriptString(String scriptString) {
 		this.scriptString = scriptString;
 	}
-
 }

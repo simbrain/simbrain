@@ -39,19 +39,20 @@ public class UpdateGroup implements UpdateAction {
         this.group = group;
     }
 
-    /** 
-     * {@inheritDoc}
-     */
+	@Override
     public void invoke() {
         group.update();
     }
 
-    /** 
-     * {@inheritDoc}
-     */
+	@Override
     public String getDescription() {
         return "Update " + group.getLabel();
     }
+
+	@Override
+	public String getLongDescription() {
+        return "Update " + group.getLabel();
+	}
 
     /**
      * @return the group

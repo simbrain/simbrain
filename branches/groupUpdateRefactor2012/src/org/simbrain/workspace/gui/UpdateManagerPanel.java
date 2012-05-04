@@ -213,7 +213,7 @@ public class UpdateManagerPanel extends JPanel {
 	                    dialog.setVisible(true);
 	                    if (!dialog.hasUserCancelled()) {
 	                    	((UpdateActionCustom)action).setScriptString(panel.getTextArea().getText());
-	                    	((UpdateActionCustom)action).reinit();
+	                    	((UpdateActionCustom)action).init();
 	                    }            
 					}        			
         		}
@@ -269,13 +269,14 @@ public class UpdateManagerPanel extends JPanel {
 	                    dialog.setVisible(true);
 	                    if (!dialog.hasUserCancelled()) {
 	                    	((UpdateActionCustom)action).setScriptString(panel.getTextArea().getText());
-	                    	((UpdateActionCustom)action).reinit();
+	                    	((UpdateActionCustom)action).init();
 	                    }            
 					}        			
         		}
         		
         	}
-        });    }    
+        });    
+     }    
     
     
     /** Action which deletes selected actions. */
@@ -343,7 +344,7 @@ public class UpdateManagerPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
         	Scanner scanner = null;
         	File defaultScript = new File(System.getProperty("user.dir")
-					+ "/etc/customUpdateTemplate.bsh");
+					+ "/etc/customWorkspaceUpdateTemplate.bsh");
         	StringBuilder scriptText = new StringBuilder();
         	String NL = System.getProperty("line.separator");
 			try {

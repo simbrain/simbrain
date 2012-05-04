@@ -134,7 +134,7 @@ public class BackpropTrainer extends IterableTrainer {
 
         }
 
-        // Update RMS error
+        // Update RMS error.
         rmsError = Math.sqrt(rmsError / (numRows * network.getOutputNeurons().size()));
         iteration++;
         fireErrorUpdated();

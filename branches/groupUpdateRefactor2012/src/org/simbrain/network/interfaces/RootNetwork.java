@@ -33,6 +33,7 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
 
@@ -169,7 +170,10 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "networkThread");
 
         xstream.omitField(UpdateManager.class, "listeners");        
-        xstream.omitField(Network.class, "logger");
+		xstream.omitField(CustomUpdate.class, "interpreter");
+		xstream.omitField(CustomUpdate.class, "theAction");
+
+		xstream.omitField(Network.class, "logger");
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");

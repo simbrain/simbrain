@@ -26,6 +26,7 @@ import org.simbrain.network.groups.Group;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.update_actions.BufferedUpdate;
+import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
 
@@ -77,6 +78,16 @@ public class UpdateManager {
 	public void postUnmarshallingInit() {
 		listeners = new ArrayList<UpdateManagerListener>();
         addListeners();
+        for(UpdateAction action : getActionList()) {
+        	if (action instanceof CustomUpdate) {
+        		((CustomUpdate)action).init();
+        	}
+        }
+        for(UpdateAction action : getAvailableActionList()) {
+        	if (action instanceof CustomUpdate) {
+        		((CustomUpdate)action).init();
+        	}
+        }
 	}
 
     /**

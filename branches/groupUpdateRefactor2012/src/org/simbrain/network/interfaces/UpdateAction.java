@@ -38,5 +38,12 @@ public interface UpdateAction {
      * @return the update description
      */
     public String getDescription();
+    
+    /**
+     * Provide a longer description for tooltips, etc.
+     *
+     * @return the update description
+     */
+    public String getLongDescription();
 
 }

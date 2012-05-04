@@ -35,19 +35,19 @@ public class PriorityUpdate implements UpdateAction {
         this.network = network;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+	@Override
     public void invoke() {
         network.updateNeuronsByPriority();
         network.updateAllSynapses();
     }
 
-    /** 
-     * {@inheritDoc}
-     */
+	@Override
     public String getDescription() {
-        return "Priority update of loose items";
+        return "Priority update";
     }
 
+	@Override
+	public String getLongDescription() {
+        return "Priority update of loose items";
+	}
 }

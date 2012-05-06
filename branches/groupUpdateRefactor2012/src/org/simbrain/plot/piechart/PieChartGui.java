@@ -38,6 +38,7 @@ import org.simbrain.plot.ChartSettingsListener;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
+import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
@@ -119,6 +120,8 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
         for (Action action : actionManager.getOpenSavePlotActions()) {
             fileMenu.add(action);
         }
+        fileMenu.addSeparator();
+        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
 
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");

@@ -208,8 +208,8 @@ public class NeuronGroup extends Group {
      * @return the center x coordinate.
      */
     public double getCenterX() {
-        double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
         for(Neuron neuron : neuronList) {
             if (neuron.getX() < min) {
                 min = neuron.getX();
@@ -228,8 +228,8 @@ public class NeuronGroup extends Group {
      * @return the center y coordinate.
      */
     public double getCenterY() {
-        double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
         for(Neuron neuron : neuronList) {
             if (neuron.getY() < min) {
                 min = neuron.getY();
@@ -248,8 +248,8 @@ public class NeuronGroup extends Group {
      * @return the width of the group
      */    
     public double getWidth() {
-        double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
         for(Neuron neuron : neuronList) {
             if (neuron.getX() < min) {
                 min = neuron.getX();
@@ -268,11 +268,11 @@ public class NeuronGroup extends Group {
      * @return the height of the group
      */    
     public double getHeight() {
-        double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
         for(Neuron neuron : neuronList) {
             if (neuron.getY() < min) {
-                min = neuron.getY();
+                min = neuron.getY();	
             }
             if (neuron.getY() > max ) {
                 max = neuron.getY();

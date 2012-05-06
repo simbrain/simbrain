@@ -44,7 +44,7 @@ public class InteractionBox extends ScreenElement {
     private float boxOffset_X = 0;
 
     /** Distance from upper left corner of group. */
-    private float boxOffset_Y = -3;
+    private float boxOffset_Y = -2;
 
     /** Main circle of node. */
     private PPath box;

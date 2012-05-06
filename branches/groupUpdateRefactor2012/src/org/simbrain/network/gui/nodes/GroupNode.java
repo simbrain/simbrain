@@ -145,7 +145,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         Action editGroupName = new AbstractAction("Edit group name...") {
             public void actionPerformed(final ActionEvent event) {
                 String newName = JOptionPane.showInputDialog("Name:");
-                GroupNode.this.setTextLabel(newName);
+                group.setLabel(newName);
             }
         };
         JCheckBoxMenuItem groupOnOffItem = new JCheckBoxMenuItem(groupOnOff);

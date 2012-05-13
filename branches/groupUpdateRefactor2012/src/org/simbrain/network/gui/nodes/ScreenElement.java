@@ -78,16 +78,6 @@ public abstract class ScreenElement
     }
 
     /**
-     * Initializes relevant data after a <code>ScreenElement</code> has been unmarshalled via Castor.
-     *
-     * @param networkPanel network panel
-     */
-    public void initCastor(final NetworkPanel networkPanel) {
-        setNetworkPanel(networkPanel);
-        init();
-    }
-
-    /**
      * Initialize this <code>ScreenElement</code>.
      */
     private void init() {
@@ -110,21 +100,42 @@ public abstract class ScreenElement
                 });
         }
         
-        // Basic event handler for single clicks
+        // Basic event handler for single clicks.  Only register regular clicks (not right clicks).
         addInputEventListener(new PBasicInputEventHandler() {
             /** @see PBasicInputEventHandler */
             public void mousePressed(final PInputEvent event) {
                 //System.out.println("Mouse Pressed: " + event);
-                singleClickEvent();
+            	if (!isRightClick(event)) {
+                    singleClickEvent();            		
+            	}
             }
 
             /** @see PBasicInputEventHandler */
             public void mouseClicked(final PInputEvent event) {
                 //System.out.println("Mouse Clicked: " + event);
-                singleClickEvent();
+            	if (!isRightClick(event)) {
+                    singleClickEvent();            		
+            	}
             }
 
         });
+    }
+    
+    /**
+     * Helper method to abstract between genuine right clicks on control-down events
+     * (which are often treated as right clicks when there is no right click button).
+     *
+     * @param event the input event
+     * @return whether it is a "right click" or not
+     */
+    private boolean isRightClick(final PInputEvent event) {
+    	
+    	if (event.isRightMouseButton()) {
+    		return true;
+    	} else if (event.isControlDown()) {
+    		return true;
+    	}
+    	return false;
     }
 
 

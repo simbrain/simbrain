@@ -40,6 +40,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.Vector;
 
 import javax.swing.Action;
@@ -61,6 +62,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -140,6 +142,12 @@ public class SimbrainDesktop {
 
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
+    
+	/**
+	 * Reference to the last internal frames that were focused, so that they can get
+	 * the focus when the next one is closed.
+	 */
+    private static final Stack<GuiComponent<?>> lastFocusedStack = new Stack<GuiComponent<?>>();
 
     /** TODO: Create Javadoc comment. */
     private static final Map<Workspace, SimbrainDesktop> INSTANCES =
@@ -216,7 +224,11 @@ public class SimbrainDesktop {
             GuiComponent<?> component = guiComponents.get(workspaceComponent);
             guiComponents.remove(component);
             component.getParentFrame().dispose();
-        }
+    		if (!lastFocusedStack.isEmpty()) {
+    			lastFocusedStack.remove(component);
+    		}
+			moveLastFocusedComponentToFront();
+		}
 
         /**
          * {@inheritDoc}
@@ -399,6 +411,24 @@ public class SimbrainDesktop {
         }
     };
 
+	/**
+	 * Takes the last gui component opened and moves it to the front of the
+	 * simbrain desktop, place it in focus.
+	 */
+	private void moveLastFocusedComponentToFront() {
+		if (!lastFocusedStack.isEmpty()) {
+			GuiComponent<?> lastFocused = lastFocusedStack.peek();
+			if (lastFocused != null) {
+				try {
+					((JInternalFrame) lastFocused.getParentFrame())
+							.setSelected(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+    
     /**
      * @return Terminal panel.
      */
@@ -745,7 +775,16 @@ public class SimbrainDesktop {
          * Manage cleanup when a component is closed.
          */
         private class WindowFrameListener extends InternalFrameAdapter {
-            /** @see InternalFrameAdapter */
+            @Override
+            public void internalFrameActivated(final InternalFrameEvent e) {
+            	// TODO: Does not work properly. Should be used so that
+            	//  the last focused stack tracks changes in focus and not just
+            	//  open / close events.
+            	//lastFocusedStack.remove(guiComponent);
+            	//lastFocusedStack.push(guiComponent);
+            }
+
+            @Override
             public void internalFrameClosing(final InternalFrameEvent e) {
                 if (workspaceComponent.hasChangedSinceLastSave()) {
                     boolean hasCancelled = guiComponent.showHasChangedDialog();
@@ -764,6 +803,48 @@ public class SimbrainDesktop {
      * @param internalFrame the frame to add.
      */
     public void addInternalFrame(final JInternalFrame internalFrame) {
+    	internalFrame.addInternalFrameListener(new InternalFrameListener() {
+
+			@Override
+			public void internalFrameActivated(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameClosed(InternalFrameEvent arg0) {
+			}
+
+			@Override
+			public void internalFrameClosing(InternalFrameEvent arg0) {
+				moveLastFocusedComponentToFront();				
+			}
+
+			@Override
+			public void internalFrameDeactivated(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameDeiconified(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameIconified(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameOpened(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+    		
+    	});
         desktop.add(internalFrame);
     }
 
@@ -825,7 +906,9 @@ public class SimbrainDesktop {
         componentFrame.setTitle(workspaceComponent.getName());
         desktop.add(componentFrame);
         guiComponent.postAddInit();
-
+        lastFocusedStack.push(guiComponent);
+        //System.out.println(lastOpened.getName());
+        
         // Forces last component of the desktop to the front
         try {
             ((JInternalFrame) componentFrame).setSelected(true);

@@ -270,24 +270,13 @@ public class Utils {
     }
 
     /**
-     * Display the quick reference web page.
-     */
-    public static void showQuickRef() {
-        String url = null;
-
-        url = new String(System.getProperty("user.dir") + FS + "docs" + FS
-                + "SimbrainDocs.html");
-        displayLocalHtmlInBrowser(url);
-    }
-
-    /**
-     * Display a documentation page under {simbrainhome}/docs/Pages/...
+     * Display a documentation page under {simbrainhome}/docs/...
      *
      * @param helpPage Help page
      */
     public static void showHelpPage(final String helpPage) {
         String url = new String(System.getProperty("user.dir") + FS + "docs"
-                + FS + "Pages" + FS + helpPage);
+                + FS + helpPage);
         displayLocalHtmlInBrowser(url);
 
     }

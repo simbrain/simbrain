@@ -31,13 +31,13 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -94,7 +94,7 @@ public class NeuronDialog extends StandardDialog {
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
-    private ShowHelpAction helpAction = new ShowHelpAction();
+    private ShowHelpAction helpAction;
 
     /** The neurons being modified. */
     private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
@@ -268,13 +268,13 @@ public class NeuronDialog extends StandardDialog {
      */
     private void updateHelp() {
         if (cbNeuronType.getSelectedItem() == NULL_STRING) {
-            helpAction.setTheURL("Network/neuron.html");
+            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
             String name = ((ClassDescriptionPair) cbNeuronType
                     .getSelectedItem()).getSimpleName()
                     .replaceAll("Neuron", "");
             name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
-            helpAction.setTheURL("Network/neuron/" + name + ".html");
+            helpAction = new ShowHelpAction("Pages/Network/neuron/" + name + ".html");
         }
     }
 

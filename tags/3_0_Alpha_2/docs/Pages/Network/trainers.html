@@ -2,6 +2,7 @@
 <html><head><title>Simbrain Documentation</title>
 
 
+
   
 
   
@@ -32,10 +33,15 @@ LMS-Offline<br>
 </div>
 <h1>Trainers</h1>
 
+<p><span style="font-style: italic;">NOTE: The Trainer interface is
+only partially functional in this release.&nbsp;&nbsp; It is one of the
+main things being worked on for the final Simbrain 3 release.</span><br>
+</p>
 <p>Trainers can be used to train weights connecting layers of neurons
 using various forms of supervised learning. There are currently three
 trainers: backprop, Least-Mean-Squares (LMS)-iterative, and LMS-offline.<br>
 </p>
+
 <p>The trainer dialog can be used to set the weights connecting a given set of <a href="buildingnets.html#sourceTarget">source and target neurons</a>. &nbsp;
 By using this dialog you can modify the weights connecting the source
 and target neurons, or (for some training algorithms) also create the
@@ -71,7 +77,7 @@ error as it changes in time.<br>
 <p>When you are done training, the source neurons should produce the correct target values.&nbsp; To test, you can open up a <a href="../Worlds/DataWorld/DataWorld.html">data world</a>, load the input data in to that data world, and <a href="../Workspace/Couplings.html">couple</a> it to the source neurons, to see if it worked.<br>
 </p>
 
-<p>Also note that an older version of the trainer is stil available by pressing the&nbsp;<img style="width: 18px; height: 18px;" alt="trainer icon" src="../../Images/Trainer.png"> button in the main desktop toolbar.&nbsp; This will be removed eventually but is there so you can see an alternative design.<br></p>
+
 
 </div>
 </body></html>

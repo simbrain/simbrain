@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.SimpleId;
@@ -41,7 +42,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public class OdorWorld {
 
     /** List of odor world entities. */
-    private List<OdorWorldEntity> entityList = new ArrayList<OdorWorldEntity>();
+    private List<OdorWorldEntity> entityList = new CopyOnWriteArrayList<OdorWorldEntity>();
 
     /** Listeners on this odor world. */
     private List<WorldListener> listenerList = new ArrayList<WorldListener>();
@@ -225,6 +226,15 @@ public class OdorWorld {
             recomputeMaxStimulusLength();
             fireEntityRemoved(entity);
         }
+    }
+    
+    /**
+     * Delete all entities.
+     */
+    public void deleteAllEntities() {
+    	for (OdorWorldEntity entity : entityList) {
+    		deleteEntity(entity);
+    	}
     }
 
     /**

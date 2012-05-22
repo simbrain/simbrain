@@ -22,6 +22,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.connections.Radial;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
@@ -58,8 +59,9 @@ public class RadialPanel extends AbstractConnectionPanel {
      *
      * @param connection type
      */
-    public RadialPanel(final Radial connection) {
-        super(connection);
+    public RadialPanel(final Radial connection,
+    		final NetworkPanel networkPanel) {
+        super(connection, networkPanel);
 
         setExcitatorySynapseType.setText(connection.getBaseExcitatorySynapse()
                 .getType());

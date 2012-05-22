@@ -25,9 +25,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -58,7 +58,7 @@ public class WTAPropertiesDialog extends StandardDialog {
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
-    private ShowHelpAction helpAction = new ShowHelpAction();
+    private ShowHelpAction helpAction;
 
     /**
      * Default constructor.
@@ -70,7 +70,7 @@ public class WTAPropertiesDialog extends StandardDialog {
         setTitle("Set WTA Properties");
         fillFieldValues();
         this.setLocation(500, 0); // Sets location of network dialog
-        helpAction.setTheURL("Network/network/winnerTakeAll.html");
+        helpAction = new ShowHelpAction("Pages/Network/network/winnerTakeAll.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);

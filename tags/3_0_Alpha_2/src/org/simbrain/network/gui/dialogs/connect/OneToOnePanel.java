@@ -24,6 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.interfaces.Synapse;
 
@@ -45,8 +46,9 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     /**
      * Default constructor.
      */
-    public OneToOnePanel(final OneToOne connection) {
-        super(connection);
+    public OneToOnePanel(final OneToOne connection,
+    		final NetworkPanel networkPanel) {
+        super(connection, networkPanel);
         orientationBox = new JComboBox(OneToOne.getOrientationTypes());
         setSynapseType.addActionListener(new ActionListener() {
 

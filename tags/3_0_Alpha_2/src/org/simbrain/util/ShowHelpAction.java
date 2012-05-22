@@ -16,34 +16,61 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.actions;
+package org.simbrain.util;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
- * Workspace help action.
+ * An action  that opens a help file in an external web browser.
  */
-public final class WorkspaceHelpAction extends AbstractAction {
+public final class ShowHelpAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
+    /** Documentation URL. */
+    private final String theURL;
+
+    //TODO: Construct with URL; throw exceptions for bad pages
 
     /**
-     * Create a workspace help action with the specified
-     * workspace.
+     * Create a help action that opens the specified URL (relative to Simbrain/docs).
+     *
+     * @param actionName the name associated with this action
+     * @param url the url to open.
      */
-    public WorkspaceHelpAction() {
+    public ShowHelpAction(final String actionName, final String url) {
+        super(actionName);
+    	this.theURL = url;
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
+    }
+
+    /**
+     * Create a help action that opens the specified URL (relative to the "Pages"
+     * directory in Simbrain/docs).
+     *
+     * @param url the url to open.
+     */
+    public ShowHelpAction(final String url) {
         super("Help");
+    	this.theURL = url;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Utils.showQuickRef();
+    	
+        SwingUtilities.invokeLater(new Runnable() {
+                /** @see Runnable */
+                public void run() {
+                    Utils.showHelpPage(theURL);
+                }
+            });
     }
+
+
 }

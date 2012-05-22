@@ -14,7 +14,6 @@
 package org.simbrain.network.gui.actions.connection;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -25,12 +24,12 @@ import org.simbrain.network.connections.OneToOne;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.dialogs.connect.AbstractConnectionPanel;
 import org.simbrain.network.gui.dialogs.connect.AllToAllPanel;
 import org.simbrain.network.gui.dialogs.connect.OneToOnePanel;
 import org.simbrain.network.gui.dialogs.connect.RadialPanel;
 import org.simbrain.network.gui.dialogs.connect.SparsePanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -78,7 +77,7 @@ public final class ApplyConnectionAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ShowHelpAction helpAction = new ShowHelpAction();
+        ShowHelpAction helpAction = null;
         if (isSelfConnect) {
             // Not used..
             connection.connectNeurons(networkPanel.getRootNetwork(),
@@ -86,21 +85,25 @@ public final class ApplyConnectionAction extends AbstractAction {
                     networkPanel.getSelectedModelNeurons());
         } else {
             if (connection instanceof AllToAll) {
-                optionsPanel = new AllToAllPanel((AllToAll) connection);
+                optionsPanel = new AllToAllPanel((AllToAll) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
-                helpAction.setTheURL("Network/connections/alltoall.html");
+                helpAction = new ShowHelpAction("Pages/Network/connections/alltoall.html");
             } else if (connection instanceof OneToOne) {
-                optionsPanel = new OneToOnePanel((OneToOne) connection);
+                optionsPanel = new OneToOnePanel((OneToOne) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
-                helpAction.setTheURL("Network/connections/onetoone.html");
+                helpAction = new ShowHelpAction("Pages/Network/connections/onetoone.html");
             } else if (connection instanceof Radial) {
-                optionsPanel = new RadialPanel((Radial) connection);
+                optionsPanel = new RadialPanel((Radial) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
-                helpAction.setTheURL("Network/connections/radial.html");
+                helpAction = new ShowHelpAction("Pages/Network/connections/radial.html");
             } else if (connection instanceof Sparse) {
-                optionsPanel = new SparsePanel((Sparse) connection, networkPanel);
+                optionsPanel = new SparsePanel((Sparse) connection,
+                		networkPanel);
                 optionsPanel.fillFieldValues();
-                helpAction.setTheURL("Network/connections/sparse.html");
+                helpAction = new ShowHelpAction("Pages/Network/connections/sparse.html");
             }
             ConnectionDialog dialog = new ConnectionDialog();
             dialog.addButton(new JButton(helpAction));

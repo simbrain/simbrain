@@ -27,8 +27,8 @@ import org.simbrain.network.connections.QuickConnectPreferences;
 import org.simbrain.network.connections.Radial;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -72,8 +72,7 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
         typePanel.addItem("Connection Type", cbConnectionType);
         cbConnectionType.setSelectedItem(QuickConnectPreferences
                 .getCurrentConnection());
-        ShowHelpAction helpAction = new ShowHelpAction();
-        helpAction.setTheURL("Network/connections.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/connections.html");
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);
@@ -95,17 +94,17 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
                 .getSelectedItem();
         if (connection instanceof AllToAll) {
             clearOptionPanel();
-            optionsPanel = new AllToAllPanel((AllToAll) connection);
+            optionsPanel = new AllToAllPanel((AllToAll) connection, panel);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         } else if (connection instanceof OneToOne) {
             clearOptionPanel();
-            optionsPanel = new OneToOnePanel((OneToOne) connection);
+            optionsPanel = new OneToOnePanel((OneToOne) connection, panel);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         } else if (connection instanceof Radial) {
             clearOptionPanel();
-            optionsPanel = new RadialPanel((Radial) connection);
+            optionsPanel = new RadialPanel((Radial) connection, panel);
             optionsPanel.fillFieldValues();
             mainPanel.add(optionsPanel);
         } else if (connection instanceof Sparse) {

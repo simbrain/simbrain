@@ -57,7 +57,6 @@ import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
 import org.simbrain.workspace.actions.ShowPropertyDialogAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
-import org.simbrain.workspace.actions.WorkspaceHelpAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
 import org.simbrain.workspace.actions.chart.NewPieChartAction;
 import org.simbrain.workspace.actions.chart.NewProjectionPlotAction;
@@ -145,9 +144,6 @@ public class WorkspaceActionManager {
     /** Save workspace as action. */
     private final Action saveWorkspaceAsAction;
 
-    /** Workspace help action. */
-    private final Action workspaceHelpAction;
-
     /** Quit workspace action. */
     private final Action quitWorkspaceAction;
 
@@ -217,8 +213,6 @@ public class WorkspaceActionManager {
         newDisplayWorldAction = new NewDisplayWorldAction(workspace);
         newReaderWorldAction = new NewReaderWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
-
-        workspaceHelpAction = new WorkspaceHelpAction();
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
 
@@ -436,13 +430,6 @@ public class WorkspaceActionManager {
      */
     public Action getSaveWorkspaceAsAction() {
         return saveWorkspaceAsAction;
-    }
-
-    /**
-     * @return the workspaceHelpAction.
-     */
-    public Action getWorkspaceHelpAction() {
-        return workspaceHelpAction;
     }
 
     /**

@@ -21,9 +21,9 @@ package org.simbrain.network.gui.dialogs.network;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.Hopfield;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -50,7 +50,7 @@ public class HopfieldPropertiesDialog extends StandardDialog {
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
-    private ShowHelpAction helpAction = new ShowHelpAction();
+    private ShowHelpAction helpAction;
 
     /**
      * Default constructor.
@@ -62,7 +62,7 @@ public class HopfieldPropertiesDialog extends StandardDialog {
         setTitle("Set Discrete Hopfield Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
-        helpAction.setTheURL("Network/network/hopfieldnetwork.html");
+        helpAction = new ShowHelpAction("Pages/Network/network/hopfieldnetwork.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);

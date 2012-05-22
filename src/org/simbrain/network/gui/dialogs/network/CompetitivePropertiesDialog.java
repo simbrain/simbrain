@@ -7,9 +7,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.networks.Competitive;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -46,7 +46,7 @@ public class CompetitivePropertiesDialog extends StandardDialog implements Actio
     private JButton helpButton = new JButton("Help");
 
     /** Show Help Action. */
-    private ShowHelpAction helpAction = new ShowHelpAction();
+    private ShowHelpAction helpAction;
 
     /**
      * Default constructor.
@@ -62,7 +62,7 @@ public class CompetitivePropertiesDialog extends StandardDialog implements Actio
 
         fillFieldValues();
         checkLeakyEpsilon();
-        helpAction.setTheURL("Network/network/competitivenetwork.html");
+        helpAction = new ShowHelpAction("Pages/Network/network/competitivenetwork.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);

@@ -81,6 +81,7 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.ToggleButton;
 import org.simbrain.workspace.Coupling;
@@ -615,7 +616,9 @@ public class SimbrainDesktop {
      */
     private JMenu createHelpMenu() {
         JMenu helpMenu = new JMenu("Help");
-        helpMenu.add(actionManager.getWorkspaceHelpAction());
+        helpMenu.add(new ShowHelpAction("Credits", "SimbrainCredits.html"));
+        helpMenu.add(new ShowHelpAction("Help contents", "SimbrainDocs.html"));
+        helpMenu.add(new ShowHelpAction("Quick start", "Pages/QuickStart.html"));
         return helpMenu;
     }
 

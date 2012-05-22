@@ -15,6 +15,7 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -27,7 +28,9 @@ import java.util.Hashtable;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -45,7 +48,8 @@ import org.simbrain.network.gui.NetworkPanel;
  * @author ztosi
  */
 public class SparsePanel extends AbstractConnectionPanel {
-
+	
+	/** A panel for adjusting excitation and inhibition */
     private final ExcitatoryInhibitoryPropertiesPanel eipPanel;
 
     /** A slider for setting the sparsity of the connections. */
@@ -72,13 +76,16 @@ public class SparsePanel extends AbstractConnectionPanel {
     private JCheckBox allowSelfConnect = new JCheckBox();
 
     /** The number of target neurons */
-    private final int numTargs;
+    private int numTargs;
 
     /**
      * A flag determining if an action was initiated by a user (useful for
      * reciprocal action listeners).
      */
     private boolean userFlag = true;
+    
+    /** A Flag for if the source neuron list contains target neurons. */
+    private boolean sourceContainsTarget;
 
     /**
      * This method is the default constructor.
@@ -86,9 +93,16 @@ public class SparsePanel extends AbstractConnectionPanel {
      * @param connection type
      */
     public SparsePanel(final Sparse connection, final NetworkPanel networkPanel) {
-        super(connection);
+        super(connection, networkPanel);
+        
         eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
-        numTargs = networkPanel.getSelectedModelNeurons().size();
+        if(networkPanel.getSelectedModelNeurons().equals(networkPanel.getSourceModelNeurons())) {
+        	sourceContainsTarget = true;
+        	numTargs = networkPanel.getSelectedModelNeurons().size() - 1;
+        } else {
+        	sourceContainsTarget = false;
+        	numTargs = networkPanel.getSelectedModelNeurons().size();
+        }
         fillFieldValues();
         initializeSparseSlider();
         addChangeListeners();
@@ -106,39 +120,47 @@ public class SparsePanel extends AbstractConnectionPanel {
         this.add(sparseContainer);
         JScrollPane pScroller = new JScrollPane(sparseContainer);
         this.add(pScroller, BorderLayout.CENTER);
-
+        int offset = 0;
+            
         sparseContainer.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
+        
+        if (sourceContainsTarget) {
+        	JPanel selfConnectPanel = new JPanel();
+        	selfConnectPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+	        selfConnectPanel.add(new JLabel("Allow Self-Connections: "));
+	        selfConnectPanel.add(allowSelfConnect);  
+	        gbc.gridwidth = 2;
+	        gbc.gridheight = 1;  
+	        sparseContainer.add(selfConnectPanel, gbc);
+	        gbc.insets = new Insets(10, 10, 0, 10);
+	        gbc.gridy = 1;
+	        gbc.gridwidth = 3;
+	        sparseContainer.add(new JSeparator(), gbc);
+	        offset = 2;
+        }
+	        
+        gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridx = 0;
+        gbc.gridy += offset;
         gbc.gridheight = 4;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
         sparseContainer.add(initializeSparseSubPanel(), gbc);
 
         gbc.insets = new Insets(10, 10, 0, 10);
-        gbc.gridy = 4;
+        gbc.gridy += 4 + offset;
         gbc.gridheight = 1;
         sparseContainer.add(new JSeparator(), gbc);
 
         gbc.insets = new Insets(0, 0, 0, 0);
-        gbc.gridy = 5;
+        gbc.gridy += 1 + offset;
         gbc.gridheight = 9;
         sparseContainer.add(eipPanel, gbc);
-
-        gbc.insets = new Insets(10, 10, 0, 10);
-        gbc.gridy = 14;
-        gbc.gridheight = 1;
-        sparseContainer.add(new JSeparator(), gbc);
-
-        gbc.gridy = 15;
-        gbc.gridwidth = 1;
-        sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
-
-        gbc.gridx = 2;
-        sparseContainer.add(allowSelfConnect, gbc);
-
+   
     }
 
     private JPanel initializeSparseSubPanel() {
@@ -157,6 +179,8 @@ public class SparsePanel extends AbstractConnectionPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.gridwidth = 3;
         ssp.add(sparsitySlider, gbc);
 
@@ -177,14 +201,14 @@ public class SparsePanel extends AbstractConnectionPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        ssp.add(new JLabel(" Connectivity is the same for each neuron's fanout:"), gbc);
+        ssp.add(new JLabel("Equalize Outgoing Connectivity:"), gbc);
         gbc.gridx = 1;
         ssp.add(sparseSpecific, gbc);
         gbc.gridx = 2;
         sSize = synapsesPerSource.getPreferredSize();
         sSize.width = 40;
         synapsesPerSource.setPreferredSize(sSize);
-        synapsesPerSource.setToolTipText("Number of outgoing synapses to be added to each source neuron.");
+        synapsesPerSource.setToolTipText("Number of outgoing synapses per source neuron.");
         ssp.add(synapsesPerSource, gbc);
 
         return ssp;
@@ -219,23 +243,19 @@ public class SparsePanel extends AbstractConnectionPanel {
                 if (!source.getValueIsAdjusting() && source == sparsitySlider) {
                     if (userFlag) {
                         userFlag = false;
-                        double val = (double) (sparsitySlider.getValue());
-                        tfSparsity.setValue(new Double(val));
-                        int sps = (int) ((val / 100) * numTargs);
+                        int val =  sparsitySlider.getValue();
+                        tfSparsity.setValue(new Integer(val));
+                        int sps = (int) ((val / 100.0) * numTargs);
                         synapsesPerSource.setValue(sps);
-
                     } else {
                         userFlag = true;
                     }
-
                 }
             }
-
         });
 
         synapsesPerSource.addPropertyChangeListener("value",
                 new PropertyChangeListener() {
-
                     public void propertyChange(PropertyChangeEvent arg0) {
                         if (arg0.getSource() == synapsesPerSource
                                 && sparseSpecific.isSelected()) {
@@ -243,8 +263,18 @@ public class SparsePanel extends AbstractConnectionPanel {
                             if (userFlag) {
                                 userFlag = false;
                                 if (synapsesPerSource != null) {
-                                    sparse = (((Number) synapsesPerSource.getValue())
-                                            .doubleValue() / numTargs) * 100;
+                                	int synsPerSource = ((Number) 
+                                			synapsesPerSource.getValue())
+                                			.intValue();
+                                	if(synsPerSource > numTargs) { 
+                                		synapsesPerSource.setValue(numTargs);
+                                	} 
+                                	if(synsPerSource < 0) {
+                                		synapsesPerSource.setValue(0);
+                                	}
+                                    sparse = (((Number) synapsesPerSource
+                                    		.getValue()).doubleValue() /
+                                    			numTargs) * 100;
                                     tfSparsity.setValue(sparse);
                                     sparsitySlider.setValue((int) sparse);
                                 }
@@ -253,30 +283,40 @@ public class SparsePanel extends AbstractConnectionPanel {
                             }
                         }
                     }
-                });
+        });
 
         tfSparsity.addPropertyChangeListener("value",
                 new PropertyChangeListener() {
-
                     public void propertyChange(PropertyChangeEvent evt) {
                         if (evt.getSource() == tfSparsity) {
                             int sps;
+                            int sliderVal;
                             if (userFlag) {
                                 userFlag = false;
-                                if (tfSparsity.getValue() != null) {
-                                    sps = (int) ((((Number) tfSparsity.getValue())
-                                            .doubleValue() /100) * numTargs);
-                                    synapsesPerSource.setValue(new Integer(sps));
-                                    int sliderVal = (int) (((Number) tfSparsity
-                                            .getValue()).doubleValue());
+                                if (tfSparsity.getValue() != null) {  	
+                                	int tfSparse = (int) (((Number) tfSparsity
+                                            .getValue()).intValue());
+                                    if(tfSparse > 100) {
+                                    	tfSparsity.setValue(new Integer(100));
+                                    }
+                                    if(tfSparse < 0) {
+                                    	tfSparsity.setValue(new Integer(0));
+                                    }
+                                    sliderVal = (int) (((Number) tfSparsity
+                                            .getValue()).intValue());
                                     sparsitySlider.setValue(sliderVal);
+                                    sps = (int) ((((Number) tfSparsity
+                                    		.getValue()).doubleValue() / 100)
+                                    			* numTargs);
+                                    synapsesPerSource
+                                    	.setValue(new Integer(sps));    
                                 }
                             } else {
                                 userFlag = true;
                             }
                         }
                     }
-                });
+        });
 
     }
     
@@ -298,6 +338,28 @@ public class SparsePanel extends AbstractConnectionPanel {
                 }
             }
         });
+        
+        allowSelfConnect.addActionListener(new ActionListener() {
+        	
+        	public void actionPerformed(ActionEvent arg0) {
+        		if(arg0.getSource() == allowSelfConnect) {
+        			if(sourceContainsTarget) {
+        				double val = ((Number) tfSparsity.getValue())
+        						.doubleValue() / 100.0;
+        				userFlag = false;
+        				if (allowSelfConnect.isSelected()) {
+        					numTargs = getNetworkPanel()
+        							.getSelectedModelNeurons().size();
+        				} else {
+        					numTargs = getNetworkPanel()
+        							.getSelectedModelNeurons().size() - 1;
+        				}
+        				synapsesPerSource.setValue((int) (val * numTargs));
+        			}
+        		}
+        	}
+        	
+        });
 
     }
 
@@ -317,10 +379,12 @@ public class SparsePanel extends AbstractConnectionPanel {
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-    	double sparsityVal = new Double(((Sparse) connection).getSparsity()) * 100; 
+    	double sparsityVal = new Double(((Sparse) connection).getSparsity())
+    		* 100; 
         tfSparsity.setValue(sparsityVal);
         sparsitySlider.setValue((int) sparsityVal);
-        synapsesPerSource.setValue(new Integer((int) ((numTargs *  sparsityVal)/100)));
+        synapsesPerSource.setValue(new Integer((int) ((sparsityVal / 100.0)
+        		* numTargs)));
         synapsesPerSource.setEnabled(false);
     }
 

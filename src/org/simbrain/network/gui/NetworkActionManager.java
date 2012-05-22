@@ -64,7 +64,6 @@ import org.simbrain.network.gui.actions.ShowClampToolBarAction;
 import org.simbrain.network.gui.actions.ShowDebugAction;
 import org.simbrain.network.gui.actions.ShowEditToolBarAction;
 import org.simbrain.network.gui.actions.ShowGUIAction;
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.actions.ShowIOInfoAction;
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
 import org.simbrain.network.gui.actions.ShowMainToolBarAction;
@@ -146,9 +145,6 @@ public final class NetworkActionManager {
 
     /** Stop network action. */
     private final Action stopNetworkAction;
-
-    /** Show help action. */
-    private final Action showHelpAction;
 
     /** Show debug. */
     private final Action showDebugAction;
@@ -313,7 +309,6 @@ public final class NetworkActionManager {
         runNetworkAction = new RunNetworkAction(networkPanel);
         stopNetworkAction = new StopNetworkAction(networkPanel);
 
-        showHelpAction = new ShowHelpAction();
         showDebugAction = new ShowDebugAction(networkPanel);
 
         showNetworkPreferencesAction = new ShowNetworkPreferencesAction(
@@ -617,15 +612,6 @@ public final class NetworkActionManager {
      */
     public Action getStopNetworkAction() {
         return stopNetworkAction;
-    }
-
-    /**
-     * Return the show help action.
-     *
-     * @return the show help action
-     */
-    public Action getShowHelpAction() {
-        return showHelpAction;
     }
 
     /**

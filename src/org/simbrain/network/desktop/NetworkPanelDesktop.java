@@ -27,13 +27,13 @@ import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
-import org.simbrain.network.gui.actions.ShowHelpAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.trainers.Backprop;
+import org.simbrain.util.ShowHelpAction;
 import org.simbrain.workspace.gui.GenericJInternalFrame;
 
 /**
@@ -180,8 +180,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * @return a new Help menu for this rootNetwork panel
      */
     public JMenu createHelpMenu() {
-        ShowHelpAction helpAction= new ShowHelpAction();
-        helpAction.setTheURL("Network.html");
+        ShowHelpAction helpAction= new ShowHelpAction("Pages/Network.html");
         JMenu helpMenu = new JMenu("Help");
         helpMenu.add(helpAction);
         return helpMenu;

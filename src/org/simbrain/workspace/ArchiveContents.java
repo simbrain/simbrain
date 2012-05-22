@@ -462,9 +462,9 @@ class ArchiveContents {
         xstream.alias("Coupling", ArchivedCoupling.class);
         xstream.alias("DesktopComponent", ArchivedComponent.ArchivedDesktopComponent.class);
 
-        xstream.addImplicitCollection(ArchiveContents.class, "components", ArchivedComponent.class);
-        xstream.addImplicitCollection(ArchiveContents.class, "couplings", ArchivedCoupling.class);
-        xstream.addImplicitCollection(ArchivedComponent.class, "desktopComponents");
+//        xstream.addImplicitCollection(ArchiveContents.class, "components", ArchivedComponent.class);
+//        xstream.addImplicitCollection(ArchiveContents.class, "couplings", ArchivedCoupling.class);
+//        xstream.addImplicitCollection(ArchivedComponent.class, "desktopComponents");
 
         return xstream;
     }

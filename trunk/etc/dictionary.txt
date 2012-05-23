@@ -17,3 +17,4 @@ toolbar
 csv
 uncomment
 sparsity
+sigmoidal

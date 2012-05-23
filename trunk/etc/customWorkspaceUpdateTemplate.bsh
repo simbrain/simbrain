@@ -1,0 +1,34 @@
+import org.simbrain.workspace.*;
+import org.simbrain.workspace.updator.*;
+
+private UpdateAction action;
+
+/**
+ * Template workspace update script.  Customize this to suit your needs.  
+ * Uses standard java commands.   You have access to workspace via "workspace"
+ */
+{
+	// Object used for standard update.
+	UpdateAllBuffered bufferedUpdate = new UpdateAllBuffered(updater);
+
+	// Customize this
+	this.action = new UpdateAction() {
+		public void invoke() {
+
+			// Do a standard update
+			bufferedUpdate.invoke();
+						
+			// Do some custom thing
+			System.out.println("Custom updating...");		
+		}
+		// This is how the action appears in the update manager dialog
+		public String getDescription() {
+			return "Custom update";
+		}
+		// This is a longer description for the tooltip
+		public String getLongDescription() {
+			return "Custom tooltip text";
+		}
+
+	};
+}

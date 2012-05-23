@@ -11,12 +11,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.ESNTrainingPanel;
 import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.resource.ResourceManager;

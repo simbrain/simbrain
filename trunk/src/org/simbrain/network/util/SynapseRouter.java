@@ -16,12 +16,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.listeners.NetworkEvent;
 
 /**

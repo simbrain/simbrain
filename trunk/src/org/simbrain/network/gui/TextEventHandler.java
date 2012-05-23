@@ -24,8 +24,8 @@ import java.awt.event.InputEvent;
 
 import javax.swing.text.BadLocationException;
 
+import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.nodes.TextNode;
-import org.simbrain.network.interfaces.NetworkTextObject;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;

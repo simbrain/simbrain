@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.listeners;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 
 /**
  * Listener interface for receiving events relating to neurons. Classes

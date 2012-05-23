@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui;
 
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.core.Neuron;
 
 /**
  * <b>Comparator</b> is used to compare positions of PNodes.

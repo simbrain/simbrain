@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.update_actions;
 
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.UpdateAction;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.UpdateAction;
 
 import bsh.EvalError;
 import bsh.Interpreter;

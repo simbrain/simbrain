@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 
 /**
  * Connect every source neuron to every target neuron.

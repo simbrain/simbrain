@@ -22,7 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.core.Neuron;
 
 /**
  * :oad custom update script. Obviously not done yet.

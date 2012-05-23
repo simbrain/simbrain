@@ -24,14 +24,14 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.genericframe.GenericJInternalFrame;

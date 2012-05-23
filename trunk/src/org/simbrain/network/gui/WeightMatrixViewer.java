@@ -26,9 +26,9 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.util.Comparators;
 import org.simbrain.network.util.SimnetUtils;

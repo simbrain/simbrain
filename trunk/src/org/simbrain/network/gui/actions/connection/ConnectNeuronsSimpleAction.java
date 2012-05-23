@@ -23,9 +23,9 @@ import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.ClampedSynapse;
 
 /**

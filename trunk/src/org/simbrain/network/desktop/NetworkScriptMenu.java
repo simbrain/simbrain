@@ -29,8 +29,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
 
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.interfaces.RootNetwork;
 
 import bsh.EvalError;
 import bsh.Interpreter;

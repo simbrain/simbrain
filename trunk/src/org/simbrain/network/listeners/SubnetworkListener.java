@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.listeners;
 
-import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.core.Network;
 
 /**
  * Listener interface for receiving network events relating to subnetworks.

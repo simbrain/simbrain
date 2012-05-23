@@ -33,8 +33,8 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.interfaces.Network;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;

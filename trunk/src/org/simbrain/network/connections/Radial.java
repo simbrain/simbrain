@@ -20,9 +20,9 @@ package org.simbrain.network.connections;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 
 /**
  * For each neuron, consider every neuron in an excitatory and inhibitory radius

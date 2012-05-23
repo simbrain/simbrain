@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Synapse;
 
 /**
  * Superclass for all trainer classes, which trains a trainable object,

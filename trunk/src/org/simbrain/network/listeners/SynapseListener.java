@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.listeners;
 
-import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 
 /**
  * Listener interface for receiving network events relating to synapses. Classes

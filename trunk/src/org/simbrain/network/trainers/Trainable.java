@@ -15,7 +15,7 @@ package org.simbrain.network.trainers;
 
 import java.util.List;
 
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.core.Neuron;
 
 /**
  * Interface that must be implemented by any object that can be trained by a Trainer.

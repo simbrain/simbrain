@@ -24,9 +24,9 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import org.simbrain.network.connections.OneToOne;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-import org.simbrain.network.interfaces.Synapse;
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one

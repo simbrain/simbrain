@@ -24,9 +24,9 @@ import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
 import org.simbrain.network.util.RandomSource;

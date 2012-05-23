@@ -42,9 +42,9 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.UpdateAction;
-import org.simbrain.network.interfaces.UpdateManager.UpdateManagerListener;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.UpdateAction;
+import org.simbrain.network.core.UpdateManager.UpdateManagerListener;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ScriptEditor;

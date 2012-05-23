@@ -23,9 +23,9 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.interfaces.Synapse;
 
 /**
  * Create a new neuron group.

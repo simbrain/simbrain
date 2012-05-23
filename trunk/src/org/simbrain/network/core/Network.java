@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,13 +24,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.groups.FeedForward;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.networks.Standard;
-import org.simbrain.network.networks.WinnerTakeAll;
 import org.simbrain.network.util.CopyPaste;
 
 /**

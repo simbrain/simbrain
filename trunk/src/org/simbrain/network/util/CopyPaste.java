@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.NetworkTextObject;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkTextObject;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 
 /**
  * <b>CopyPaste</b> provides utilities for creating copies of arbitrary

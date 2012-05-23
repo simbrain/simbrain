@@ -20,12 +20,12 @@ package org.simbrain.network.neurons;
 
 import java.util.ArrayList;
 
-import org.simbrain.network.interfaces.BiasedNeuron;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork.TimeType;
-import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.core.BiasedNeuron;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.core.RootNetwork.TimeType;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.util.SimbrainMath;

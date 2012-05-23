@@ -16,25 +16,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
 /**
- * Indicates that an update rule is invertible.
+ * Classes that implement this interface describe individual actions that together
+ * comprise a network update.
  *
- * Required for LMSOffline training
- * @author ztosi
+ * @author jyoshimi
  *
  */
-public interface Invertible {
+public interface UpdateAction {
 
     /**
-     * The inverse of the activation function.
-     *
-     * @param val the value being sent through the neuron's
-     *          inverse activation function
-     * @param neuron the neuron this inverse value is being mapped from
-     * @return the inverse activation of parameter val
+     * Invoke this action. 
      */
-    double getInverse(double val, Neuron neuron);
+    public void invoke();
+    
+    /**
+     * Provide a String description of this update method.
+     *
+     * @return the update description
+     */
+    public String getDescription();
+    
+    /**
+     * Provide a longer description for tooltips, etc.
+     *
+     * @return the update description
+     */
+    public String getLongDescription();
 
 }

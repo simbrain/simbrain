@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.neurons;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork.TimeType;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.RootNetwork.TimeType;
 
 /**
  * <b>BinaryNeuron</b> takes one of two values.

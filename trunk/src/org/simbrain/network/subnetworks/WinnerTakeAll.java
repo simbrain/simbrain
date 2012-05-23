@@ -20,9 +20,9 @@ package org.simbrain.network.subnetworks;
 
 import java.util.Random;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
 

@@ -23,9 +23,9 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.interfaces.Neuron;
 
 /**
  * Create a new neuron group.

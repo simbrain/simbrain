@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
 /**
  * Indicates that an update rule is differentiable, and has a getDerivative

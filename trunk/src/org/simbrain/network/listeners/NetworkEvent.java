@@ -20,7 +20,7 @@ package org.simbrain.network.listeners;
 
 import java.util.EventObject;
 
-import org.simbrain.network.interfaces.Network;
+import org.simbrain.network.core.Network;
 
 /**
  * Network event which holds an old and new version of some type of object.

@@ -44,7 +44,6 @@ import org.simbrain.network.gui.actions.NewHopfieldNetworkAction;
 import org.simbrain.network.gui.actions.NewKwtaNetworkAction;
 import org.simbrain.network.gui.actions.NewNeuronAction;
 import org.simbrain.network.gui.actions.NewSOMNetworkAction;
-import org.simbrain.network.gui.actions.NewStandardNetworkAction;
 import org.simbrain.network.gui.actions.NewWTANetworkAction;
 import org.simbrain.network.gui.actions.PanEditModeAction;
 import org.simbrain.network.gui.actions.PasteAction;
@@ -210,9 +209,6 @@ public final class NetworkActionManager {
     /** New Self-organizing Map network action. */
     private final Action newSOMNetworkAction;
 
-    /** New standard network action. */
-    private final Action newStandardNetworkAction;
-
     /** New Kwta network action. */
     private final Action newKwtaNetworkAction;
 
@@ -363,7 +359,6 @@ public final class NetworkActionManager {
         newHopfieldNetworkAction = new NewHopfieldNetworkAction(networkPanel);
         newWTANetworkAction = new NewWTANetworkAction(networkPanel);
         newSOMNetworkAction = new NewSOMNetworkAction(networkPanel);
-        newStandardNetworkAction = new NewStandardNetworkAction(networkPanel);
         newKwtaNetworkAction = new NewKwtaNetworkAction(networkPanel);
 
         allToAll = new ApplyConnectionAction(networkPanel, new AllToAll(),
@@ -840,15 +835,6 @@ public final class NetworkActionManager {
      */
     public Action getClampNeuronsAction() {
         return clampNeuronsAction;
-    }
-
-    /**
-     * Return the standard network action.
-     *
-     * @return the standard network action
-     */
-    public Action getNewStandardNetworkAction() {
-        return newStandardNetworkAction;
     }
 
     /**

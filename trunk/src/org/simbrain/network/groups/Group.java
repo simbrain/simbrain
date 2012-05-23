@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.core.RootNetwork;
 
 /**
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui

@@ -43,7 +43,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     protected ArrayList spikeResponderList;
 
     /** Parent network. */
-    protected org.simbrain.network.interfaces.Network parentNet = null;
+    protected org.simbrain.network.core.Network parentNet = null;
 
     /**
      * Adds an item.

@@ -16,34 +16,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
 /**
- * Classes that implement this interface describe individual actions that together
- * comprise a network update.
+ * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
+ * neurons.
  *
- * @author jyoshimi
- *
+ * TODO: Add upper and lower bound parameters? Add randomize option?
  */
-public interface UpdateAction {
+public interface BiasedNeuron {
+    /**
+     * @return the neuron's bias
+     */
+    double getBias();
 
     /**
-     * Invoke this action. 
+     * @param bias the bias to set.
      */
-    public void invoke();
-    
-    /**
-     * Provide a String description of this update method.
-     *
-     * @return the update description
-     */
-    public String getDescription();
-    
-    /**
-     * Provide a longer description for tooltips, etc.
-     *
-     * @return the update description
-     */
-    public String getLongDescription();
-
+    void setBias(double bias);
 }

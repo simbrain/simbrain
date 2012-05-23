@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import org.simbrain.network.interfaces.RootNetwork;
+import org.simbrain.network.core.RootNetwork;
 
 /**
  * <b>ClampedNeuronPanel</b>.

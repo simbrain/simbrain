@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ import org.simbrain.network.update_actions.UpdateGroup;
  * contained here are invoked, in a specific order.
  */
 public class UpdateManager {
-    
+
     /**
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single "update" in the network.
@@ -49,15 +49,15 @@ public class UpdateManager {
     private final List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
 
     /**
-     * List of listeners on this update manager
+     * List of listeners on this update manager.
      */
     private List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
 
     /** Reference to parent network. */
     private final RootNetwork network;
-        
+
     /**
-     * Construct a new update manager
+     * Construct a new update manager.
      *
      * @param network
      */

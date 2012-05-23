@@ -25,10 +25,10 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
 
 /**
  * Select incoming weights action weights action.

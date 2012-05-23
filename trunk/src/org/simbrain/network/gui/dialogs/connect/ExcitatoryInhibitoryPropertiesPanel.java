@@ -36,9 +36,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.connections.ConnectNeurons;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.util.RandomSource;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.StandardDialog;

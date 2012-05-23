@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.synapses.spikeresponders;
 
-import org.simbrain.network.interfaces.SpikeResponder;
-import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.SpikeResponder;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
 
 
 /**

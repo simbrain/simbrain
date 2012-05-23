@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.synapses;
 
-import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 
 
 /**

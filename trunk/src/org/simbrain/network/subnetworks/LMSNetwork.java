@@ -15,8 +15,8 @@ package org.simbrain.network.subnetworks;
 
 import java.awt.geom.Point2D;
 
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.groups.FeedForward;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.trainers.Trainable;
 

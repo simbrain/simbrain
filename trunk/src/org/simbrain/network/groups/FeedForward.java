@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neurons.ClampedNeuron;

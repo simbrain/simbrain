@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;

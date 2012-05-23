@@ -10,8 +10,8 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;

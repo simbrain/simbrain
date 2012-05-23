@@ -36,6 +36,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -47,9 +50,6 @@ import org.simbrain.network.gui.actions.connection.ConnectNeuronsSimpleAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.PNode;

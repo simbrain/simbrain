@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.util.table.DefaultNumericTable;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;

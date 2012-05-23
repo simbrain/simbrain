@@ -21,8 +21,8 @@ package org.simbrain.network.gui.dialogs.neuron;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.SpikingThresholdNeuron;
 import org.simbrain.util.LabelledItemPanel;
 

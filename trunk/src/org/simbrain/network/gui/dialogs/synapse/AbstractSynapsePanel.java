@@ -25,7 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.LabelledItemPanel;
 
 

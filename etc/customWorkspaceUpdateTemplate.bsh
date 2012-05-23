@@ -1,5 +1,5 @@
 import org.simbrain.workspace.*;
-import org.simbrain.workspace.updator.*;
+import org.simbrain.workspace.updater.*;
 
 private UpdateAction action;
 

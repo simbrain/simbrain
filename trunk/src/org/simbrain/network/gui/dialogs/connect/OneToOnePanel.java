@@ -21,12 +21,10 @@ import java.util.Comparator;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 
 import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
+import org.simbrain.network.core.Synapse;
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one
@@ -46,9 +44,8 @@ public class OneToOnePanel extends AbstractConnectionPanel {
     /**
      * Default constructor.
      */
-    public OneToOnePanel(final OneToOne connection,
-    		final NetworkPanel networkPanel) {
-        super(connection, networkPanel);
+    public OneToOnePanel(final OneToOne connection) {
+        super(connection);
         orientationBox = new JComboBox(OneToOne.getOrientationTypes());
         setSynapseType.addActionListener(new ActionListener() {
 

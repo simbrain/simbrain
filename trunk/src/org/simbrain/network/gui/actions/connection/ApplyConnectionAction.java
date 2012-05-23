@@ -77,7 +77,6 @@ public final class ApplyConnectionAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        ShowHelpAction helpAction = null;
         if (isSelfConnect) {
             // Not used..
             connection.connectNeurons(networkPanel.getRootNetwork(),
@@ -85,30 +84,24 @@ public final class ApplyConnectionAction extends AbstractAction {
                     networkPanel.getSelectedModelNeurons());
         } else {
             if (connection instanceof AllToAll) {
-                optionsPanel = new AllToAllPanel((AllToAll) connection,
-                		networkPanel);
+                optionsPanel = new AllToAllPanel((AllToAll) connection);
                 optionsPanel.fillFieldValues();
-                helpAction = new ShowHelpAction("Pages/Network/connections/alltoall.html");
             } else if (connection instanceof OneToOne) {
-                optionsPanel = new OneToOnePanel((OneToOne) connection,
-                		networkPanel);
+                optionsPanel = new OneToOnePanel((OneToOne) connection);
                 optionsPanel.fillFieldValues();
-                helpAction = new ShowHelpAction("Pages/Network/connections/onetoone.html");
             } else if (connection instanceof Radial) {
-                optionsPanel = new RadialPanel((Radial) connection,
-                		networkPanel);
+                optionsPanel = new RadialPanel((Radial) connection);
                 optionsPanel.fillFieldValues();
-                helpAction = new ShowHelpAction("Pages/Network/connections/radial.html");
             } else if (connection instanceof Sparse) {
                 optionsPanel = new SparsePanel((Sparse) connection, networkPanel);
                 optionsPanel.fillFieldValues();
-                helpAction = new ShowHelpAction("Pages/Network/connections/sparse.html");
             }
             ConnectionDialog dialog = new ConnectionDialog();
+            ShowHelpAction helpAction = new ShowHelpAction("Network/connections.html");
             dialog.addButton(new JButton(helpAction));
             dialog.setContentPane(optionsPanel);
-            dialog.pack();
             dialog.setLocationRelativeTo(null);
+            dialog.pack();
             dialog.setVisible(true);
 
         }

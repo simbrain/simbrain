@@ -1,15 +1,20 @@
 /*
- * Part of Simbrain--a java-based neural network kit Copyright (C) 2005,2007 The
- * Authors. See http://www.simbrain.net/credits This program is free software;
- * you can redistribute it and/or modify it under the terms of the GNU General
- * Public License as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. This program is
- * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU General Public License for more details. You
- * should have received a copy of the GNU General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
- * - Suite 330, Boston, MA 02111-1307, USA.
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.simbrain.network.gui.dialogs.connect;
 
@@ -24,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.gui.NetworkPanel;
 
 /**
  * <b>AllToAllPanel</b> creates a dialog for setting preferences of all to all
@@ -43,11 +47,10 @@ public class AllToAllPanel extends AbstractConnectionPanel {
 
     /**
      * This method is the default constructor.
-     *
      * @param connection type
      */
-    public AllToAllPanel(final AllToAll connection, final NetworkPanel panel) {
-        super(connection, panel);
+    public AllToAllPanel(final AllToAll connection) {
+        super(connection);
         eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();

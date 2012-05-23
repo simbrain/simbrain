@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NetworkListener;
@@ -32,6 +33,8 @@ import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
 
 import com.thoughtworks.xstream.XStream;
@@ -83,37 +86,6 @@ public class RootNetwork extends Network {
     /** Whether this is a discrete or continuous time network. */
     private TimeType timeType = TimeType.DISCRETE;
 
-    /**
-     * Enumeration for the update methods. BUFFER: Default update method; based
-     * on buffering PRIORITYBASED: User sets the priority for each neuron,
-     * sub-neuron and synapse (but currently just neurons). Default priority
-     * value is 0. Elements with smaller priority value are updated first.
-     * CUSTOM: User has provided a custom update script.
-     */
-    public enum UpdateMethod {
-        BUFFERED {
-            @Override
-            public String toString() {
-                return "Buffered";
-            }
-        },
-        PRIORITYBASED {
-            @Override
-            public String toString() {
-                return "Priority-based";
-            }
-        },
-        CUSTOM {
-            @Override
-            public String toString() {
-                return "Custom";
-            }
-        }
-    }
-
-    /** Current update method. */
-    private UpdateMethod updateMethod = UpdateMethod.BUFFERED;
-
     /** Text objects. */
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
@@ -126,9 +98,14 @@ public class RootNetwork extends Network {
     /** Comparator used for sorting the priority sorted neuron list. */
     private PriorityComparator priorityComparator = new PriorityComparator();
 
-    /** Custom update rule. */
-    private CustomUpdateRule customRule;
+    /**
+     * The update manager for this network.
+     */
+    private UpdateManager updateManager;
 
+    /** Object which routes synpases to synpase groups. */
+    private final SynapseRouter synapseRouter;
+    
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
 
@@ -165,20 +142,15 @@ public class RootNetwork extends Network {
      * @param id String id of this network
      */
     public RootNetwork() {
-        init();
-    }
-
-    /**
-     * Local initialization.
-     */
-    private void init() {
+        updateManager = new UpdateManager(this);
+        synapseRouter  = new SynapseRouter();
         setRootNetwork(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
     }
 
     /**
      * Returns a properly initialized xstream object.
-     *
+     * 
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -194,16 +166,19 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "synapseListeners");
         xstream.omitField(RootNetwork.class, "textListeners");
         xstream.omitField(RootNetwork.class, "updateCompleted");
+        //xstream.omitField(RootNetwork.class, "updateManager");
         xstream.omitField(RootNetwork.class, "networkThread");
-        xstream.omitField(Network.class, "logger");
+
+        xstream.omitField(UpdateManager.class, "listeners");        
+		xstream.omitField(CustomUpdate.class, "interpreter");
+		xstream.omitField(CustomUpdate.class, "theAction");
+
+		xstream.omitField(Network.class, "logger");
         xstream.omitField(Neuron.class, "fanOut");
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");
         xstream.omitField(Neuron.class, "readOnlyFanIn");
-        xstream.omitField(Neuron.class, "lastActivation");
-        xstream.omitField(Neuron.class, "useActivationHistory");
         xstream.omitField(SigmoidalNeuron.class, "implementationIndex"); // Backwards compatibility issue
-        xstream.omitField(SigmoidalNeuron.class, "clipping"); // Backwards compatibility issue
         return xstream;
     }
 
@@ -216,13 +191,19 @@ public class RootNetwork extends Network {
      */
     private Object readResolve() {
         logger = Logger.getLogger(RootNetwork.class);
+        
+        // Initialize listeners
         networkListeners = new ArrayList<NetworkListener>();
         neuronListeners = new ArrayList<NeuronListener>();
         synapseListeners = new ArrayList<SynapseListener>();
         subnetworkListeners = new ArrayList<SubnetworkListener>();
         textListeners = new ArrayList<TextListener>();
         groupListeners = new ArrayList<GroupListener>();
+        
+        // Initialize update manager
+        updateManager.postUnmarshallingInit();
 
+        // Initialize neurons
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.postUnmarshallingInit();
         }
@@ -236,22 +217,18 @@ public class RootNetwork extends Network {
             } else {
                 System.out.println("Warning:" + synapse.getId()
                         + " has null fanIn");
-                deleteSynapse(synapse);
+                removeSynapse(synapse);
             }
             if (synapse.getSource().getFanOut() != null) {
                 synapse.getSource().getFanOut().add(synapse);
             } else {
                 System.out.println("Warning:" + synapse.getId()
                         + " has null fanOut");
-                deleteSynapse(synapse);
+                removeSynapse(synapse);
             }
         }
+         
         return this;
-    }
-
-    @Deprecated
-    public void updateRootNetwork() {
-        update();
     }
 
     /**
@@ -266,33 +243,37 @@ public class RootNetwork extends Network {
         updateTime();
 
         // Perform update
-        switch (this.updateMethod) {
-        case BUFFERED:
-            logger.debug("default update");
-            updateAllNeurons();
-            updateAllSynapses();
-            updateAllNetworks();
-            updateAllGroups();
-            break;
-        case PRIORITYBASED:
-            logger.debug("priority-based update");
-            updateNeuronsByPriority();
-            updateAllSynapses();
-            updateAllGroups();
-            break;
-        case CUSTOM:
-            logger.debug("custom update");
-            if (customRule != null) {
-                customRule.update(this);
-            }
-            break;
-        default:
-            updateAllNeurons();
-            updateAllSynapses();
-            updateAllNetworks();
-            updateAllGroups();
-            break;
-        }
+        for(UpdateAction action : updateManager.getActionList()) {
+            action.invoke();
+        }        
+        
+//        switch (this.updateMethod) {
+//        case BUFFERED:
+//            logger.debug("default update");
+//            updateAllNeurons();
+//            updateAllSynapses();
+//            updateAllNetworks();
+//            updateAllGroups();
+//            break;
+//        case PRIORITYBASED:
+//            logger.debug("priority-based update");
+//            updateNeuronsByPriority();
+//            updateAllSynapses();
+//            updateAllGroups();
+//            break;
+//        case CUSTOM:
+//            logger.debug("custom update");
+//            if (customRule != null) {
+//                customRule.update(this);
+//            }
+//            break;
+//        default:
+//            updateAllNeurons();
+//            updateAllSynapses();
+//            updateAllNetworks();
+//            updateAllGroups();
+//            break;
+//        }
 
         // Notify network listeners
         this.fireNetworkChanged();
@@ -307,8 +288,8 @@ public class RootNetwork extends Network {
     public void updateAllGroups() {
         // Update group lists
         if (getGroupList() != null) {
-            for (Group n : getGroupList()) {
-                n.update();
+            for (Group group : getGroupList()) {
+                group.update();
             }
         }
     }
@@ -317,19 +298,15 @@ public class RootNetwork extends Network {
      * Update the priority list used for priority based update.
      */
     void updatePriorityList() {
-        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-            prioritySortedNeuronList = this.getFlatNeuronList();
-            resortPriorities();
-        }
+        prioritySortedNeuronList = this.getFlatNeuronList();
+        resortPriorities();
     }
 
     /**
      * Resort the neurons according to their update priorities.
      */
     void resortPriorities() {
-        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-            Collections.sort(prioritySortedNeuronList, priorityComparator);
-        }
+        Collections.sort(prioritySortedNeuronList, priorityComparator);
     }
 
     /**
@@ -353,35 +330,23 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * Loads a new custom update rule in. Called from network scripts, which are
-     * used to create these rules.
-     * 
-     * @param newRule new rule to set
-     */
-    public void setCustomUpdateRule(CustomUpdateRule newRule) {
-        customRule = newRule;
-        this.setUpdateMethod(UpdateMethod.CUSTOM);
-    }
-
-    /**
      * Returns the group, if any, a specified object is contained in.
-     *
-     * TODO: If used a lot set a flag on these things
-     *
+     * 
      * @param object the object to check
      * @return the group, if any, containing that object
      */
     public Group containedInGroup(final Object object) {
         for (Group group : getGroupList()) {
-            if (object instanceof Neuron) {
-                if (group.getNeuronList().contains(object)) {
-                    return group;
-                }
-            } else if (object instanceof Synapse) {
-                if (group.getSynapseList().contains(object)) {
-                    return group;
-                }
-            }
+            //REDO
+//            if (object instanceof Neuron) {
+//                if (group.getNeuronList().contains(object)) {
+//                    return group;
+//                }
+//            } else if (object instanceof Synapse) {
+//                if (group.getSynapseList().contains(object)) {
+//                    return group;
+//                }
+//            }
         }
         return null;
     }
@@ -411,7 +376,7 @@ public class RootNetwork extends Network {
 
     /**
      * Set the current time.
-     *
+     * 
      * @param i the current time
      */
     public void setTime(final double i) {
@@ -432,7 +397,7 @@ public class RootNetwork extends Network {
 
     /**
      * Returns the precision of the current time step.
-     *
+     * 
      * @return the precision of the current time step.
      */
     private int getTimeStepPrecision() {
@@ -512,7 +477,7 @@ public class RootNetwork extends Network {
      * 
      * @param deleted neuron which has been deleted
      */
-    public void fireNeuronDeleted(final Neuron deleted) {
+    public void fireNeuronRemoved(final Neuron deleted) {
         for (NeuronListener listener : neuronListeners) {
             listener.neuronRemoved(new NetworkEvent<Neuron>(this, deleted));
         }
@@ -524,16 +489,6 @@ public class RootNetwork extends Network {
     public void fireNetworkChanged() {
         for (NetworkListener listener : networkListeners) {
             listener.networkChanged();
-        }
-    }
-
-    /**
-     * Fire a network update method changed event to all registered model
-     * listeners.
-     */
-    private void fireNetworkUpdateMethodChanged() {
-        for (NetworkListener listener : networkListeners) {
-            listener.networkUpdateMethodChanged();
         }
     }
 
@@ -620,7 +575,7 @@ public class RootNetwork extends Network {
      * 
      * @param deleted synapse which was deleted
      */
-    public void fireSynapseDeleted(final Synapse deleted) {
+    public void fireSynapseRemoved(final Synapse deleted) {
         for (SynapseListener listener : synapseListeners) {
             listener.synapseRemoved(new NetworkEvent<Synapse>(this, deleted));
         }
@@ -667,7 +622,7 @@ public class RootNetwork extends Network {
      * 
      * @param deleted text which was deleted
      */
-    public void fireTextDeleted(final NetworkTextObject deleted) {
+    public void fireTextRemoved(final NetworkTextObject deleted) {
         for (TextListener listener : textListeners) {
             listener.textRemoved(deleted);
         }
@@ -755,25 +710,43 @@ public class RootNetwork extends Network {
      * 
      * @param deleted Group to be deleted
      */
-    public void fireGroupDeleted(final Group deleted) {
+    public void fireGroupRemoved(final Group deleted) {
         for (GroupListener listener : groupListeners) {
             listener.groupRemoved(new NetworkEvent<Group>(this, deleted));
         }
     }
 
     /**
-     * Fire a group changed event to all registered model listeners. TODO:
-     * Change to grouptype changed?
+     * Fire a group changed event to all registered model listeners.  A string desription describes
+     * the change and is used by listeners to handle the event.   Old group is not currently used
+     * but may be in the future.
      * 
      * @param old Old group
      * @param changed New changed group
+     * @param changeDescription A description of the 
      */
-    public void fireGroupChanged(final Group old, final Group changed) {
+    public void fireGroupChanged(final Group old, final Group changed, final String changeDescription) {
 
         for (GroupListener listener : groupListeners) {
-            listener.groupChanged(new NetworkEvent<Group>(this, old, changed));
+            listener.groupChanged(new NetworkEvent<Group>(this, old, changed),
+                    changeDescription);
         }
     }
+    
+    /**
+     * This version of fireGroupChanged fires a pre-set event, which may have an
+     * auxiliary object set.
+     * 
+     * @param event the network changed event.
+     * @param changeDescription A description of the
+     */
+    public void fireGroupChanged(final NetworkEvent<Group> event, final String changeDescription) {
+
+        for (GroupListener listener : groupListeners) {
+            listener.groupChanged(event, changeDescription);
+        }
+    }
+
 
     /**
      * Fire a group parameters changed event.
@@ -821,36 +794,11 @@ public class RootNetwork extends Network {
         this.fireNeuronClampToggle();
     }
 
-    /**
-     * @return the updateMethod
-     */
-    public UpdateMethod getUpdateMethod() {
-        return updateMethod;
-    }
-
-    /**
-     * @param updateMethod to set
-     */
-    public void setUpdateMethod(final UpdateMethod updateMethod) {
-
-        // Set the method
-        this.updateMethod = updateMethod;
-
-        // If switching to priority updating, update the priority lists
-        if (this.getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
-            updatePriorityList();
-        }
-
-        // Notify listeners
-        this.fireNetworkUpdateMethodChanged();
-    }
 
     @Override
     public String toString() {
 
         String ret = "Root Network \n================= \n";
-        ret += "Update method: " + this.getUpdateMethod() + "\t Iterations:"
-                + this.getTime() + "\n";
 
         for (Neuron n : this.getNeuronList()) {
             ret += (getIndents() + n + "\n");
@@ -873,8 +821,6 @@ public class RootNetwork extends Network {
 
         for (int i = 0; i < getGroupList().size(); i++) {
             Group group = (Group) getGroupList().get(i);
-            ret += ("\n" + getIndents() + "Group " + (i + 1));
-            ret += (getIndents() + "--------------------------------\n");
             ret += group.toString();
         }
 
@@ -1055,7 +1001,7 @@ public class RootNetwork extends Network {
      */
     public void deleteText(final NetworkTextObject text) {
         textList.remove(text);
-        this.fireTextDeleted(text);
+        this.fireTextRemoved(text);
     }
 
     /**
@@ -1067,4 +1013,18 @@ public class RootNetwork extends Network {
         }
         return textList;
     }
+
+    /**
+     * @return the updateManager
+     */
+    public UpdateManager getUpdateManager() {
+        return updateManager;
+    }
+
+	/**
+	 * @return the synapseRouter
+	 */
+	public SynapseRouter getSynapseRouter() {
+		return synapseRouter;
+	}
 }

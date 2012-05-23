@@ -35,12 +35,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
-import org.simbrain.workspace.gui.GenericFrame;
-import org.simbrain.workspace.gui.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.ProducerOrConsumer;
 

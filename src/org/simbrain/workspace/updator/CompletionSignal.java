@@ -6,6 +6,7 @@ package org.simbrain.workspace.updator;
  * @author Matt Watson
  */
 public interface CompletionSignal {
+
     /**
      * Signals that the event is done.
      */

@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs.network;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 
-import org.simbrain.network.networks.KWTA;
+import org.simbrain.network.subnetworks.KWTA;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;

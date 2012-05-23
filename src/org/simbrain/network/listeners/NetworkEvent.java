@@ -24,6 +24,7 @@ import org.simbrain.network.interfaces.Network;
 
 /**
  * Network event which holds an old and new version of some type of object.
+ * 
  *
  * @param <T> The type of the object involved in the event.
  */
@@ -35,6 +36,9 @@ public final class NetworkEvent<T>
 
     /** Previous version of object. */
     private T oldObject;
+    
+    /** An auxiliarity object. */
+    private Object auxiliaryObject;
 
 	/**
      * Create a network event with a new and old object.
@@ -90,6 +94,29 @@ public final class NetworkEvent<T>
      */
     public void setOldObject(T oldObject) {
         this.oldObject = oldObject;
+    }
+
+    /**
+     * Event's default getSource() just returns the same object
+     * as this class's getObject() method.
+     */
+    @Override
+    public Object getSource() {
+        return theObject;
+    }
+
+    /**
+     * @return the auxiliaryObject
+     */
+    public Object getAuxiliaryObject() {
+        return auxiliaryObject;
+    }
+
+    /**
+     * @param auxiliaryObject the auxiliaryObject to set
+     */
+    public void setAuxiliaryObject(Object auxiliaryObject) {
+        this.auxiliaryObject = auxiliaryObject;
     }
 
 }

@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.neurons.AdditiveNeuron;
 import org.simbrain.network.neurons.BinaryNeuron;
@@ -101,6 +102,9 @@ public class Neuron  {
 
     /** Target value. */
     private double targetValue = 0;
+    
+    /** Parent group, if any (null if none). */
+    private Group parentGroup;
 
     /**
      *  Sequence in which the update function should be called
@@ -713,7 +717,7 @@ public class Neuron  {
      */
     public void deleteFanIn() {
         for (Synapse synapse : fanIn) {
-            synapse.getParentNetwork().deleteSynapse(synapse);
+            synapse.getParentNetwork().removeSynapse(synapse);
         }
     }
 
@@ -722,7 +726,7 @@ public class Neuron  {
      */
     public void deleteFanOut() {
         for (Synapse synapse : fanOut) {
-            synapse.getParentNetwork().deleteSynapse(synapse);
+            synapse.getParentNetwork().removeSynapse(synapse);
         }
     }
 
@@ -868,5 +872,19 @@ public class Neuron  {
      */
     public static ClassDescriptionPair[] getRuleList() {
         return RULE_LIST;
+    }
+
+    /**
+     * @return the parentGroup
+     */
+    public Group getParentGroup() {
+        return parentGroup;
+    }
+
+    /**
+     * @param parentGroup the parentGroup to set
+     */
+    public void setParentGroup(Group parentGroup) {
+        this.parentGroup = parentGroup;
     }
 }

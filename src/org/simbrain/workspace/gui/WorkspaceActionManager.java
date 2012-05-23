@@ -55,6 +55,7 @@ import org.simbrain.workspace.actions.QuitWorkspaceAction;
 import org.simbrain.workspace.actions.RunScriptAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAction;
 import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
+import org.simbrain.workspace.actions.ScriptEditorAction;
 import org.simbrain.workspace.actions.ShowPropertyDialogAction;
 import org.simbrain.workspace.actions.WorkspaceAction;
 import org.simbrain.workspace.actions.chart.NewBarChartAction;
@@ -174,6 +175,9 @@ public class WorkspaceActionManager {
     /** Show hide property tab. */
     private final Action propertyTabAction;
 
+    /** Open script editor action. */
+    private final Action showScriptEditorAction;
+    
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
@@ -220,6 +224,8 @@ public class WorkspaceActionManager {
         globalRunAction = new GlobalRunAction(workspace);
         globalStopAction = new GlobalStopAction(workspace);
 
+        showScriptEditorAction = new ScriptEditorAction(desktop);
+        
         runScriptAction = new RunScriptAction(desktop);
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
@@ -411,7 +417,14 @@ public class WorkspaceActionManager {
         return openOdorWorldAction;
     }
 
-    /**
+	/**
+     * @return the getShowScriptEditorAction
+     */
+    public Action getShowScriptEditorAction() {
+		return showScriptEditorAction;
+	}
+
+	/**
      * @return the openWorkspaceAction.
      */
     public Action getOpenWorkspaceAction() {

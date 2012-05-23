@@ -100,8 +100,7 @@ public final class ApplyConnectionAction extends AbstractAction {
                 optionsPanel.fillFieldValues();
                 helpAction = new ShowHelpAction("Pages/Network/connections/radial.html");
             } else if (connection instanceof Sparse) {
-                optionsPanel = new SparsePanel((Sparse) connection,
-                		networkPanel);
+                optionsPanel = new SparsePanel((Sparse) connection, networkPanel);
                 optionsPanel.fillFieldValues();
                 helpAction = new ShowHelpAction("Pages/Network/connections/sparse.html");
             }

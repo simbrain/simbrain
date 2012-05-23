@@ -32,7 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
-import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
+import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
 
 /**
  * Displays a list of all currently open workspace components.
@@ -43,7 +43,7 @@ import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
  * of the represented component. Once it's fixed, the test of this will be
  * setting component properties via terminal and seeing the change reflected.
  */
-public class ComponentPanel extends JPanel implements WorkspaceListener, WorkspaceUpdatorListener  {
+public class ComponentPanel extends JPanel implements WorkspaceListener, WorkspaceUpdaterListener  {
 
     /** Table representing workspace components. */
     private JTable componentTable;
@@ -64,7 +64,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     public ComponentPanel(final SimbrainDesktop desktop) {
         super(new BorderLayout());
         desktop.getWorkspace().addListener(this);
-        desktop.getWorkspace().getUpdator().addUpdatorListener(this);
+        desktop.getWorkspace().getUpdater().addUpdatorListener(this);
         this.desktop = desktop;
 
         // Set up table
@@ -277,7 +277,8 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     }
 
     public void changedUpdateController() {
-        updateLabel.setText("Current updater: " + desktop.getWorkspace().getUpdator().getCurrentUpdatorName());        
+    	//TODO:
+        //updateLabel.setText("Current updater: " + desktop.getWorkspace().getUpdator().getCurrentUpdatorName());        
     }
 
     public void updatedCouplings(int update) {

@@ -26,8 +26,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
 
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.CouplingMenuComponent;
-import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.world.visionworld.filter.PixelAccumulator;
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;

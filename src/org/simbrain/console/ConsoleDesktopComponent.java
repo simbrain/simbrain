@@ -21,8 +21,8 @@ package org.simbrain.console;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
 
 import bsh.Interpreter;

@@ -61,7 +61,7 @@ public abstract class ScreenElement
     private boolean isGrouped = false;
 
     /**
-     * Default Constructor. Used by Castor.
+     * Default Constructor.
      */
     public ScreenElement() {
     }
@@ -78,19 +78,10 @@ public abstract class ScreenElement
     }
 
     /**
-     * Initializes relevant data after a <code>ScreenElement</code> has been unmarshalled via Castor.
-     *
-     * @param networkPanel network panel
-     */
-    public void initCastor(final NetworkPanel networkPanel) {
-        setNetworkPanel(networkPanel);
-        init();
-    }
-
-    /**
      * Initialize this <code>ScreenElement</code>.
      */
     private void init() {
+        
         if (hasContextMenu()) {
             addInputEventListener(new ContextMenuEventHandler());
         }
@@ -108,6 +99,43 @@ public abstract class ScreenElement
                     }
                 });
         }
+        
+        // Basic event handler for single clicks.  Only register regular clicks (not right clicks).
+        addInputEventListener(new PBasicInputEventHandler() {
+            /** @see PBasicInputEventHandler */
+            public void mousePressed(final PInputEvent event) {
+                //System.out.println("Mouse Pressed: " + event);
+            	if (!isRightClick(event)) {
+                    singleClickEvent();            		
+            	}
+            }
+
+            /** @see PBasicInputEventHandler */
+            public void mouseClicked(final PInputEvent event) {
+                //System.out.println("Mouse Clicked: " + event);
+            	if (!isRightClick(event)) {
+                    singleClickEvent();            		
+            	}
+            }
+
+        });
+    }
+    
+    /**
+     * Helper method to abstract between genuine right clicks on control-down events
+     * (which are often treated as right clicks when there is no right click button).
+     *
+     * @param event the input event
+     * @return whether it is a "right click" or not
+     */
+    private boolean isRightClick(final PInputEvent event) {
+    	
+    	if (event.isRightMouseButton()) {
+    		return true;
+    	} else if (event.isControlDown()) {
+    		return true;
+    	}
+    	return false;
     }
 
 
@@ -299,6 +327,13 @@ public abstract class ScreenElement
     }
 
     /**
+     * Called when element is single clicked on. Override to provide custom
+     * behaviors in that case.
+     */
+    protected void singleClickEvent() { 
+    }
+
+    /**
      * Property dialog event handler.
      */
     private class PropertyDialogEventHandler
@@ -319,14 +354,15 @@ public abstract class ScreenElement
             if (event.getClickCount() == 2) {
                 event.setHandled(true);
                 SwingUtilities.invokeLater(new Runnable() {
-                        /** @see Runnable */
-                        public void run() {
-                            JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
-                            propertyDialog.pack();
-                            propertyDialog.setLocationRelativeTo(null);
-                            propertyDialog.setVisible(true);
-                        }
-                    });
+                    /** @see Runnable */
+                    public void run() {
+                        JDialog propertyDialog = ScreenElement.this
+                                .getPropertyDialog();
+                        propertyDialog.pack();
+                        propertyDialog.setLocationRelativeTo(null);
+                        propertyDialog.setVisible(true);
+                    }
+                });
             }
         }
     }

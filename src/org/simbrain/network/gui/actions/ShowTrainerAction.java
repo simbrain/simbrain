@@ -25,8 +25,6 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.NetworkSelectionEvent;
 import org.simbrain.network.gui.NetworkSelectionListener;
-import org.simbrain.network.gui.trainer.TrainerPanel;
-import org.simbrain.network.trainers.Backprop;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -72,6 +70,11 @@ public final class ShowTrainerAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.showTrainer();
+//        Trainer trainer = new Trainer(networkPanel.getRootNetwork(),
+//                networkPanel.getSourceModelNeurons(),
+//                networkPanel.getSelectedModelNeurons(), new Backprop());
+//        TrainerPanel trainerPanel = new TrainerPanel(networkPanel, trainer);
+//        GenericFrame frame = networkPanel.displayPanel(trainerPanel, "Trainer panel");
+//        trainerPanel.setFrame(frame);
     }
 }

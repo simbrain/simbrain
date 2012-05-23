@@ -3,17 +3,25 @@ package org.simbrain.workspace.updator;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Represents a single part of a component update.
+ * Represents a single part of a component update. (Note: Component updates
+ * involving multiple parts have not been tested yet. Theoretically the idea is
+ * that a type of workspace component would override getComponentParts and
+ * return a set of update tasks. I believe they must be able to be separately
+ * run in a given iteration but again, this has not been tested (JKY).
  * 
  * @author Matt Watson
  */
 public class ComponentUpdatePart {
+	
     /** The parent component. */
     private final WorkspaceComponent parent;
+
     /** The runnable task. */
     private final Runnable runnable;
+    
     /** The description of the part. */
     private final String description;
+    
     /** The lock for synchronization. */
     private final Object lock;
     
@@ -90,7 +98,7 @@ public class ComponentUpdatePart {
 
                     thread.setCurrentTask(ComponentUpdatePart.this);
 
-                    WorkspaceUpdator.LOGGER.trace("updating component part: " + getDescription());
+                    WorkspaceUpdater.LOGGER.trace("updating component part: " + getDescription());
 
                     runnable.run();
 

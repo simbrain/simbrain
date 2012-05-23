@@ -85,8 +85,18 @@ import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.connection.ShowConnectDialogAction;
+import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
+import org.simbrain.network.gui.dialogs.network.BackpropCreationDialog;
+import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
+import org.simbrain.network.gui.dialogs.network.ESNCreationDialog;
+import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
+import org.simbrain.network.gui.dialogs.network.KwtaCreationDialog;
+import org.simbrain.network.gui.dialogs.network.LMSCreationDialog;
+import org.simbrain.network.gui.dialogs.network.SOMCreationDialog;
+import org.simbrain.network.gui.dialogs.network.SRNCreationDialog;
+import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -528,17 +538,38 @@ public final class NetworkActionManager {
         }
         return connectionsMenu;
     }
-
+    
     /**
      * @return a list of the network types.
      */
     public List<Action> getNewNetworkActions() {
-        return Arrays.asList(new Action[] { newCompetitiveNetworkAction,
-                newHopfieldNetworkAction, newKwtaNetworkAction,
-                newSOMNetworkAction, newStandardNetworkAction,
-                newWTANetworkAction });
+        return Arrays.asList(new Action[] { 
+                new AddGroupAction(networkPanel, new BackpropCreationDialog(networkPanel), "Backprop"),
+                new AddGroupAction(networkPanel, new CompetitiveCreationDialog(networkPanel), "Competitive"),
+                new AddGroupAction(networkPanel, new ESNCreationDialog(networkPanel), "Echo State Network"),
+                new AddGroupAction(networkPanel, new HopfieldCreationDialog(networkPanel), "Hopfield"),
+                new AddGroupAction(networkPanel, new LMSCreationDialog(networkPanel),
+                        "LMS (Least Mean Squares)"),
+                new AddGroupAction(networkPanel, new KwtaCreationDialog(networkPanel), "KWTA"),
+                new AddGroupAction(networkPanel, new SOMCreationDialog(networkPanel), "SOM (Self organizing map)"),
+                new AddGroupAction(networkPanel, new SRNCreationDialog(networkPanel), "SRN (Simple Recurrent Network)"),
+                new AddGroupAction(networkPanel, new WTACreationDialog(networkPanel), "WTA (Winner take all)")
+        });
     }
-
+    
+    /**
+     * Return a JManue for creating new networks.
+     *
+     * @return the new JMenu.
+     */
+    public JMenu getNewNetworkMenu() {
+        JMenu ret = new JMenu("Insert Network");
+        for(Action action : getNewNetworkActions()) {
+            ret.add(action);
+        }
+        return ret;
+    }
+        
     // public List<JToggleButton> getClampBarActions() {
     // return Arrays.asList(new JToggleButton[] {getClampNeuronsBarItem(),
     // getClampWeightsBarItem()});

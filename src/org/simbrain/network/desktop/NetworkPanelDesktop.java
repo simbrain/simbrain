@@ -21,6 +21,7 @@ package org.simbrain.network.desktop;
 import java.awt.Color;
 
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.gui.NetworkGuiSettings;
@@ -29,12 +30,11 @@ import org.simbrain.network.gui.actions.AddNeuronsAction;
 import org.simbrain.network.gui.actions.ShowEditModeDialogAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.trainer.TrainerPanel;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.trainers.Backprop;
 import org.simbrain.util.ShowHelpAction;
-import org.simbrain.workspace.gui.GenericJInternalFrame;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJInternalFrame;
 
 /**
  * Extension of Network Panel with functions used in a desktop setting.
@@ -133,7 +133,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         insertMenu.add(actionManager.getNewNeuronAction());
         insertMenu.add(new AddNeuronsAction(this));
-        insertMenu.add(createNewNetworkMenu());
+        insertMenu.add(actionManager.getNewNetworkMenu());
         return insertMenu;
     }
 
@@ -203,7 +203,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
      * @param neuron neuron to show in Gui
      * @return desktop version of NeuronNode, with context menu
      */
-    public NeuronNode getNeuronNode(final NetworkPanel net, final Neuron neuron) {
+    public NeuronNode createNeuronNode(final NetworkPanel net, final Neuron neuron) {
         return new NeuronNodeDesktop(component.getWorkspaceComponent(), net, neuron);
     }
 
@@ -220,26 +220,42 @@ public class NetworkPanelDesktop extends NetworkPanel {
         return contextMenu;
     }
 
-    /* (non-Javadoc)
-     * @see org.simbrain.network.gui.NetworkPanel#showTrainer()
-     */
+//    /* (non-Javadoc)
+//     * @see org.simbrain.network.gui.NetworkPanel#showTrainer()
+//     */
+//    @Override
+//    public void showTrainer() {
+//        // Show trainer within Simbrain desktop
+//        Backprop trainer = new Backprop(getRootNetwork(),
+//                getSourceModelNeurons(),
+//                getSelectedModelNeurons());
+//        GenericJInternalFrame frame = new GenericJInternalFrame();
+//        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
+//        frame.setContentPane(trainerPanel);
+//        component.getDesktop().addInternalFrame(frame);
+//        frame.pack();
+//        frame.setMaximizable(true);
+//        frame.setIconifiable(true);
+//        frame.setClosable(true);
+//        frame.setLocation(component.getX() + component.getWidth() + 5,
+//                component.getY());
+//        frame.setVisible(true);
+//    }
+//    
+    
     @Override
-    public void showTrainer() {
-        // Show trainer within Simbrain desktop
-        Backprop trainer = new Backprop(getRootNetwork(),
-                getSourceModelNeurons(),
-                getSelectedModelNeurons());
+    public GenericFrame displayPanel(JPanel panel, String title) {
         GenericJInternalFrame frame = new GenericJInternalFrame();
-        TrainerPanel trainerPanel = new TrainerPanel(frame, trainer);
-        frame.setContentPane(trainerPanel);
+        frame.setContentPane(panel);
         component.getDesktop().addInternalFrame(frame);
         frame.pack();
         frame.setMaximizable(true);
         frame.setIconifiable(true);
         frame.setClosable(true);
-        frame.setLocation(component.getX() + component.getWidth() + 5,
-                component.getY());
+        frame.setTitle(title);
         frame.setVisible(true);
+        return frame;
     }
+
 
 }

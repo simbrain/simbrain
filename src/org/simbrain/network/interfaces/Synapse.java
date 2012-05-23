@@ -21,6 +21,7 @@ package org.simbrain.network.interfaces;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.synapses.ClampedSynapse;
 import org.simbrain.network.synapses.HebbianCPCASynapse;
 import org.simbrain.network.synapses.HebbianSynapse;
@@ -85,6 +86,9 @@ public class Synapse {
 
     /** Time to delay sending activation to target neuron. */
     private int delay = 0;
+    
+    /** Parent group, if any (null if none). */
+    private Group parentGroup;
 
     /**
      * Boolean flag, indicating whether this type of synapse participates in the
@@ -725,6 +729,20 @@ public class Synapse {
         this.target = target;
         this.parentNetwork = parent;
         return new Synapse(this);
+    }
+    
+    /**
+     * @return the parentGroup
+     */
+    public Group getParentGroup() {
+        return parentGroup;
+    }
+
+    /**
+     * @param parentGroup the parentGroup to set
+     */
+    public void setParentGroup(Group parentGroup) {
+        this.parentGroup = parentGroup;
     }
 
 }

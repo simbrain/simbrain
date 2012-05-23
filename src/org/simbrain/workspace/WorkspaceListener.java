@@ -31,7 +31,7 @@ public interface WorkspaceListener {
     void workspaceCleared();
 
     /**
-     * Called after a new workspace has been opened.
+     * Called after a new workspace simulation file has been opened.
      */
     void newWorkspaceOpened();
 

@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.HopfieldDialog;
+import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
 
 /**
  * New discrete hopfield network action.
@@ -57,7 +57,7 @@ public final class NewHopfieldNetworkAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        HopfieldDialog dialog = new HopfieldDialog(networkPanel);
+        HopfieldCreationDialog dialog = new HopfieldCreationDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

@@ -29,7 +29,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.networks.SOM;
+import org.simbrain.network.subnetworks.SOM;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
@@ -265,11 +265,11 @@ public class SOMTrainingDialog extends StandardDialog implements
             setInputTraining(theFile);
         } else if (o == jbReset) {
             som.reset();
-            som.getRootNetwork().fireNetworkChanged();
+            //som.getRootNetwork().fireNetworkChanged();
         } else if (o == jbTrain) {
             setValues();
             som.train();
-            som.getRootNetwork().fireNetworkChanged();
+            //som.getRootNetwork().fireNetworkChanged();
             learningRate.setText(Double.toString(som.getAlpha()));
             epochs.setText(Integer.toString(som.getEpochs()));
             neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));

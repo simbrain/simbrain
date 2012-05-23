@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.WTADialog;
+import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
 
 /**
  * New winner take all network action.
@@ -56,7 +56,7 @@ public final class NewWTANetworkAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        WTADialog dialog = new WTADialog(networkPanel);
+        WTACreationDialog dialog = new WTACreationDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

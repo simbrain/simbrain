@@ -54,7 +54,7 @@ public class GridLayout implements Layout {
      * {@inheritDoc}
      */
     public void layoutNeurons(final Network network) {
-        ArrayList<Neuron> neurons = network.getFlatNeuronList();
+        List<Neuron> neurons = network.getFlatNeuronList();
         layoutNeurons(neurons);
     }
 

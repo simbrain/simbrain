@@ -68,38 +68,18 @@ public class SimnetUtils {
     }
 
     /**
-     * Set the weights connecting two lists of neurons using a weight matrix.
-     * Assumes that each row of the matrix corresponds to a source neuron's
-     * fan-out weight vector, as above. Missing weights are ignored.
-     *
-     * @param src the list of source neurons
-     * @param tar the list of target neurons
-     * @param w the new weight values for the network.
-     */
-    public static void setWeights(final List<Neuron> src,
-            final List<Neuron> tar, final double[][] w) {
-        for (int i = 0; i < src.size(); i++) {
-            for (int j = 0; j < tar.size(); j++) {
-                Synapse s = Network.getSynapse(src.get(i), tar.get(j));
-                if (s != null) {
-                    s.setStrength(w[i][j]);
-                }
-            }
-        }
-    }
-
-    /**
-     * Set the weights connecting two lists of neurons using a weight matrix.
-     * Assumes that each row of the matrix corresponds to a source neuron's
-     * fan-out weight vector, as above. If a weight is missing it is added to
-     * the provided network
-     *
-     * @param network network in which missing weights should be added.
-     * @param src the list of source neurons
-     * @param tar the list of target neurons
-     * @param w the new weight values for the network.
-     */
-    public static void setWeightsFillBlanks(final Network network,
+	 * Set the weights connecting two lists of neurons using a weight matrix.
+	 * Assumes that each row of the matrix corresponds to a source neuron's
+	 * fan-out weight vector, as above. If a weight is missing it is added to
+	 * the root network (from where it can in some cases be routed to a
+	 * SynapseGroup)
+	 * 
+	 * @param network network in which missing weights should be added.
+	 * @param src the list of source neurons
+	 * @param tar the list of target neurons
+	 * @param w the new weight values for the network.
+	 */
+    public static void setWeights(
             final List<Neuron> src, final List<Neuron> tar, final double[][] w) {
         for (int i = 0; i < src.size(); i++) {
             for (int j = 0; j < tar.size(); j++) {
@@ -109,7 +89,7 @@ public class SimnetUtils {
                 } else {
                     Synapse newSynapse = new Synapse(src.get(i), tar.get(j));
                     newSynapse.setStrength(w[i][j]);
-                    network.addSynapse(newSynapse);
+                    newSynapse.getParentNetwork().addSynapse(newSynapse);
                 }
             }
         }
@@ -211,7 +191,7 @@ public class SimnetUtils {
      * @param objects list of objects
      * @return the point corresponding to the upper left corner of the objects
      */
-    public static Point2D getUpperLeft(final ArrayList objects) {
+    public static Point2D getUpperLeft(final List<Object> objects) {
         double x = Double.MAX_VALUE;
         double y = Double.MAX_VALUE;
 

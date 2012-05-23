@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.listeners;
 
-import org.simbrain.network.interfaces.Group;
+import org.simbrain.network.groups.Group;
 
 /**
  * Listener interface for receiving network events relating to model groups.
@@ -45,8 +45,9 @@ public interface GroupListener {
      * Invoked when a group is changed.
      *
      * @param networkEvent event which holds reference to old and changed group.
+     * @param changeDescription a description of the way the group has changed
      */
-    void groupChanged(NetworkEvent<Group> networkEvent);
+    void groupChanged(NetworkEvent<Group> networkEvent, String changeDescription);
 
     /**
      * Invoked when a group is changed.

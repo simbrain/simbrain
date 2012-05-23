@@ -16,14 +16,10 @@ package org.simbrain.network.gui.dialogs.connect;
 import java.awt.BorderLayout;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.connections.Radial;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -35,40 +31,9 @@ public abstract class AbstractConnectionPanel extends JPanel {
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    /**A reference to the network panel. */
-	private final NetworkPanel networkPanel;
-    
     /** Reference to underlying connection object. */
     protected ConnectNeurons connection;
-    
-    /**
-     * The super constructor
-     * @param connection the type of connection
-     * @param networkPanel the network panel where connections are being made
-     */
-    public AbstractConnectionPanel(ConnectNeurons connection,
-    		NetworkPanel networkPanel) {
-    	this.connection = connection;
-    	this.networkPanel = networkPanel;
-    	this.setLayout(new BorderLayout());
-        this.add(mainPanel, BorderLayout.CENTER);
-        
-    	//TODO: Make it so that if no source or target neurons are selected connection options are not available.
-	    if(networkPanel.getSelectedModelNeurons().isEmpty()
-	    		&& !(connection instanceof Radial)) {
-	    	JOptionPane.showMessageDialog(new JFrame(), "No target " +
-	    			"neurons selected.", "Warning",
-	    			JOptionPane.WARNING_MESSAGE);
-	    	throw new IllegalStateException("No targets.");
-	    } else if (networkPanel.getSourceModelNeurons().isEmpty()) {
-	    	JOptionPane.showMessageDialog(new JFrame(), "No source" +
-	    			" neurons selected.", "Warning",
-	    			JOptionPane.WARNING_MESSAGE);
-	    	throw new IllegalStateException("No sources.");
-	   	} 
 
-    }
-    
     /**
      * Adds a new item.
      *
@@ -87,6 +52,15 @@ public abstract class AbstractConnectionPanel extends JPanel {
      */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
+    }
+
+    /**
+     * This method is the default constructor.
+     */
+    public AbstractConnectionPanel(final ConnectNeurons connection) {
+        this.connection = connection;
+        this.setLayout(new BorderLayout());
+        this.add(mainPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -109,13 +83,5 @@ public abstract class AbstractConnectionPanel extends JPanel {
         JLabel theLabel = new JLabel(text);
         labelPanel.add(theLabel);
         this.add(labelPanel, BorderLayout.SOUTH);
-    }
-    
-    /**
-     * A getter for the network panel
-     * @return the network panel
-     */
-    public NetworkPanel getNetworkPanel(){
-    	return networkPanel;
     }
 }

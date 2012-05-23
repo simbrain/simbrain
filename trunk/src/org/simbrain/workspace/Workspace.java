@@ -33,8 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.updator.TaskSynchronizationManager;
-import org.simbrain.workspace.updator.WorkspaceUpdater;
+import org.simbrain.workspace.updater.TaskSynchronizationManager;
+import org.simbrain.workspace.updater.WorkspaceUpdater;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -80,9 +80,9 @@ public class Workspace {
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
     /**
-     * The updator used to manage component updates.
+     * The updater used to manage component updates.
      */
-    private Object updatorLock = new Object();
+    private Object updaterLock = new Object();
 
     /**
      * Delay in milliseconds between update cycles. Used to artificially slow
@@ -91,16 +91,16 @@ public class Workspace {
     private int updateDelay = 0;
 
     /**
-     * The updator used to manage component updates.
+     * The updater used to manage component updates.
      */
-    private final WorkspaceUpdater updator;
+    private final WorkspaceUpdater updater;
 
     /**
      * Construct a workspace.
      */
     public Workspace() {
         manager = new CouplingManager(this);
-        updator = new WorkspaceUpdater(this);
+        updater = new WorkspaceUpdater(this);
     }
 
     /**
@@ -278,8 +278,8 @@ public class Workspace {
      * Update the workspace a single time.
      */
     public void iterate() {
-        synchronized (updatorLock) {
-            updator.runOnce();
+        synchronized (updaterLock) {
+            updater.runOnce();
         }
         updateStopped();
     }
@@ -290,7 +290,7 @@ public class Workspace {
      * @param numIterations number of times to iterate the workspace.
      */
     public void iterate(final int numIterations) {
-        updator.iterate(numIterations);
+        updater.iterate(numIterations);
         updateStopped();
     }
 
@@ -306,8 +306,8 @@ public class Workspace {
      * @param latch the latch to count down after successful iteration.
      */
     public void iterate(CountDownLatch latch) {
-        synchronized (updatorLock) {
-            updator.runOnce(latch);
+        synchronized (updaterLock) {
+            updater.runOnce(latch);
         }
         updateStopped();
     }
@@ -316,8 +316,8 @@ public class Workspace {
      * Iterates all couplings on all components until halted by user.
      */
     public void run() {
-        synchronized (updatorLock) {
-            updator.run();
+        synchronized (updaterLock) {
+            updater.run();
         }
     }
 
@@ -325,8 +325,8 @@ public class Workspace {
      * Stops iteration of all couplings on all components.
      */
     public void stop() {
-        synchronized (updatorLock) {
-            updator.stop();
+        synchronized (updaterLock) {
+            updater.stop();
         }
         updateStopped();
     }
@@ -468,7 +468,7 @@ public class Workspace {
      */
     public void setTaskSynchronizationManager(
             final TaskSynchronizationManager manager) {
-        updator.setTaskSynchronizationManager(manager);
+        updater.setTaskSynchronizationManager(manager);
     }
 
     /**
@@ -611,23 +611,23 @@ public class Workspace {
      * @return the time
      */
     public Number getTime() {
-        return updator.getTime();
+        return updater.getTime();
     }
 
     /**
      * Reset time.
      */
     public void resetTime() {
-        updator.resetTime();
+        updater.resetTime();
     }
 
     /**
-     * Returns a reference to the workspace updator.
+     * Returns a reference to the workspace updater.
      *
-     * @return reference to workspace updator.
+     * @return reference to workspace updater.
      */
     public WorkspaceUpdater getUpdater() {
-        return updator;
+        return updater;
     }
 
     /**

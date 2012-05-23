@@ -1,4 +1,4 @@
-package org.simbrain.workspace.updator;
+package org.simbrain.workspace.updater;
 
 /**
  * Simple interface for calling back when completed.

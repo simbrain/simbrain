@@ -38,11 +38,11 @@ import javax.swing.JToolBar;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.updator.ComponentUpdateListener;
-import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
+import org.simbrain.workspace.updater.ComponentUpdateListener;
+import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 /**
- * Display updator and thread information.
+ * Display updater and thread information.
  *
  * @author jyoshimi
  *
@@ -175,7 +175,7 @@ public class ThreadViewerPanel extends JPanel {
                 });
 
         // Add updater listener
-        workspace.getUpdater().addUpdatorListener(
+        workspace.getUpdater().addUpdaterListener(
                 new WorkspaceUpdaterListener() {
 
                     /**

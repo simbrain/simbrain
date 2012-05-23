@@ -27,7 +27,7 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
+import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 /**
  * Open data world in current workspace.
@@ -50,9 +50,9 @@ public final class GlobalUpdateAction extends WorkspaceAction {
                 .getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
 
-        // Listen to workspace updator so that this button can be enabled or
+        // Listen to workspace updater so that this button can be enabled or
         // disabled depending on whether the workspace is running or not.
-        workspace.getUpdater().addUpdatorListener(new WorkspaceUpdaterListener() {
+        workspace.getUpdater().addUpdaterListener(new WorkspaceUpdaterListener() {
 
             public void changeNumThreads() {
                 // TODO Auto-generated method stub

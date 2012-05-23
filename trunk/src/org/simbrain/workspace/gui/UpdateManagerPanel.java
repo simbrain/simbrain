@@ -46,13 +46,13 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.ScriptEditor;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updator.UpdateAction;
-import org.simbrain.workspace.updator.UpdateActionCustom;
-import org.simbrain.workspace.updator.UpdateActionManager.UpdateManagerListener;
+import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.workspace.updater.UpdateActionCustom;
+import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
 
 /**
  * Panel for display and ordering of workspace update actions.
- * 
+ *
  * @author jeff yoshimi
  *
  */
@@ -60,7 +60,7 @@ public class UpdateManagerPanel extends JPanel {
 
     /** The JList which represents current actions. */
     private final JList currentActionJList = new JList();
-    
+
     /** The model object for current actions. */
     private final DefaultListModel currentActionListModel  = new DefaultListModel();
 

@@ -32,7 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
-import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
+import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 /**
  * Displays a list of all currently open workspace components.
@@ -64,7 +64,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     public ComponentPanel(final SimbrainDesktop desktop) {
         super(new BorderLayout());
         desktop.getWorkspace().addListener(this);
-        desktop.getWorkspace().getUpdater().addUpdatorListener(this);
+        desktop.getWorkspace().getUpdater().addUpdaterListener(this);
         this.desktop = desktop;
 
         // Set up table

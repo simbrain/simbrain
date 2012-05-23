@@ -38,7 +38,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.updator.UpdateAction;
+import org.simbrain.workspace.updater.UpdateAction;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;

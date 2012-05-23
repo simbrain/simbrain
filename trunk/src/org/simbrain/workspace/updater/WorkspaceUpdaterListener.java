@@ -16,34 +16,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.updator;
-
-import org.simbrain.workspace.WorkspaceComponent;
+package org.simbrain.workspace.updater;
 
 /**
  * The listener interface for observers interested in events related to
- * component update activities.
- *
- * @author Matt Watson
+ * the workspace updater.
  */
-public interface ComponentUpdateListener {
-
-	/**
-     * Called when a component update begins.
-     *
-     * @param component The component being updated.
-     * @param update The number of the update.
-     * @param thread The thread doing the update.
-     */
-    void startingComponentUpdate(WorkspaceComponent component, int update, int thread);
+public interface WorkspaceUpdaterListener {
 
     /**
-     * Called when a component update ends.
+     * Called when the couplings are updated.
      *
-     * @param component The component that was updated.
      * @param update The number of the update.
-     * @param thread The thread doing the update.
      */
-    void finishedComponentUpdate(WorkspaceComponent component, int update, int thread);
+    void updatedCouplings(int update);
 
+    /**
+     * Called when the update controller is changed.
+     */
+    void changedUpdateController();
+
+    /**
+     * Called when the number of threads on an update controller is changed.
+     */
+    void changeNumThreads();
+
+    /**
+     * Called every time the workspace is updated.
+     */
+    void workspaceUpdated();
+
+    /**
+     * Called when workspace "run" begins.
+     */
+    void updatingStarted();
+
+    /**
+     * Called when workspace "run" ends.
+     */
+    void updatingFinished();
 }

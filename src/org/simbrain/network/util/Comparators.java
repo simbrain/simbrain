@@ -19,7 +19,7 @@ package org.simbrain.network.util;
 
 import java.util.Comparator;
 
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.core.Neuron;
 
 /**
  * Comparators for using in sorting various kinds of org.simbrain.network lists.

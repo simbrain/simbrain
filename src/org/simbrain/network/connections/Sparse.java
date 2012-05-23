@@ -22,10 +22,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 
 /**
  * Connect neurons sparsely with some probabilities.

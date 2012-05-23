@@ -25,9 +25,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.DataViewer.DataHolder;
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.trainers.InvalidDataException;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainable;

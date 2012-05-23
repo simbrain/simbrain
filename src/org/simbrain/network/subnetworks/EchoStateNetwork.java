@@ -26,11 +26,11 @@ import javax.swing.JOptionPane;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Sparse;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;

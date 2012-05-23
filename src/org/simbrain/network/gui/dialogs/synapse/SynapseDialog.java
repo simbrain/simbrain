@@ -30,11 +30,11 @@ import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
-import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;

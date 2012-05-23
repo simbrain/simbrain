@@ -2,10 +2,10 @@ package org.simbrain.network.subnetworks;
 
 import java.io.File;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
 

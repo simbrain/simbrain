@@ -20,8 +20,8 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import java.util.ArrayList;
 
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.gui.dialogs.RandomPanel;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.RandomNeuron;
 import org.simbrain.network.util.RandomSource;
 

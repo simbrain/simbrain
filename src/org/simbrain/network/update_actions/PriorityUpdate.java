@@ -13,8 +13,8 @@
  */
 package org.simbrain.network.update_actions;
 
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.UpdateAction;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.UpdateAction;
 
 /**
  * Loose neurons (neurons not in groups) are updated in accordance with an

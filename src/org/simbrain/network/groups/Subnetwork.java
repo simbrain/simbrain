@@ -19,9 +19,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
 
 /**
  * A collection of neuron groups and synapse groups which functions as a

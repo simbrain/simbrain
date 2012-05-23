@@ -22,8 +22,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 
 /**
  * MultipathLayout arranges the layers of the network in multiple paths.

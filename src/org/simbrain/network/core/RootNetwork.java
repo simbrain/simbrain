@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +32,6 @@ import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
-import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.util.SynapseRouter;
 import org.simbrain.util.SimpleId;
@@ -105,7 +104,7 @@ public class RootNetwork extends Network {
 
     /** Object which routes synpases to synpase groups. */
     private final SynapseRouter synapseRouter;
-    
+
     /** Network Id generator. */
     private SimpleId networkIdGenerator = new SimpleId("Network", 1);
 
@@ -138,7 +137,7 @@ public class RootNetwork extends Network {
 
     /**
      * When using from a console.
-     * 
+     *
      * @param id String id of this network
      */
     public RootNetwork() {
@@ -161,15 +160,13 @@ public class RootNetwork extends Network {
         xstream.omitField(RootNetwork.class, "groupListeners");
         xstream.omitField(RootNetwork.class, "neuronListeners");
         xstream.omitField(RootNetwork.class, "networkListeners");
-        xstream.omitField(RootNetwork.class, "usingTabs"); // Backwards compatibility issue
         xstream.omitField(RootNetwork.class, "subnetworkListeners");
         xstream.omitField(RootNetwork.class, "synapseListeners");
         xstream.omitField(RootNetwork.class, "textListeners");
         xstream.omitField(RootNetwork.class, "updateCompleted");
-        //xstream.omitField(RootNetwork.class, "updateManager");
         xstream.omitField(RootNetwork.class, "networkThread");
 
-        xstream.omitField(UpdateManager.class, "listeners");        
+        xstream.omitField(UpdateManager.class, "listeners");
 		xstream.omitField(CustomUpdate.class, "interpreter");
 		xstream.omitField(CustomUpdate.class, "theAction");
 
@@ -178,7 +175,6 @@ public class RootNetwork extends Network {
         xstream.omitField(Neuron.class, "fanIn");
         xstream.omitField(Neuron.class, "readOnlyFanOut");
         xstream.omitField(Neuron.class, "readOnlyFanIn");
-        xstream.omitField(SigmoidalNeuron.class, "implementationIndex"); // Backwards compatibility issue
         return xstream;
     }
 

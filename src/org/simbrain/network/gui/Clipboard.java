@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkTextObject;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.TextNode;
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.NetworkTextObject;
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
 

@@ -16,15 +16,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.core.RootNetwork.TimeType;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.interfaces.RootNetwork.TimeType;
 import org.simbrain.network.neurons.AdditiveNeuron;
 import org.simbrain.network.neurons.BinaryNeuron;
 import org.simbrain.network.neurons.ClampedNeuron;
@@ -37,7 +37,6 @@ import org.simbrain.network.neurons.LogisticNeuron;
 import org.simbrain.network.neurons.NakaRushtonNeuron;
 import org.simbrain.network.neurons.PointNeuron;
 import org.simbrain.network.neurons.RandomNeuron;
-import org.simbrain.network.neurons.RunningAverageNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.neurons.SinusoidalNeuron;
 import org.simbrain.network.neurons.SpikingThresholdNeuron;
@@ -102,7 +101,7 @@ public class Neuron  {
 
     /** Target value. */
     private double targetValue = 0;
-    
+
     /** Parent group, if any (null if none). */
     private Group parentGroup;
 

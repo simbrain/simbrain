@@ -26,6 +26,8 @@ import java.awt.geom.Point2D;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -34,8 +36,6 @@ import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
-import org.simbrain.network.interfaces.Synapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;

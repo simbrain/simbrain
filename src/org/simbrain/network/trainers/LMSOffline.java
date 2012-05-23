@@ -28,10 +28,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.core.BiasedNeuron;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.interfaces.BiasedNeuron;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.neurons.SigmoidalNeuron;

@@ -16,9 +16,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
 
-import org.simbrain.network.interfaces.RootNetwork.TimeType;
+import org.simbrain.network.core.RootNetwork.TimeType;
 
 /**
  * <b>SpikingNeuron</b> is the superclass for spiking neuron types (e.g.

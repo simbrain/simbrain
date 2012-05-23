@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.neurons;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.SpikingNeuronUpdateRule;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
 

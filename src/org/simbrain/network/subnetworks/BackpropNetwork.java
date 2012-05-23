@@ -17,8 +17,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.List;
 
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.groups.FeedForward;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.trainers.*;
 
 /**

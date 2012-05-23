@@ -20,8 +20,8 @@ package org.simbrain.network.gui.dialogs.synapse;
 
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.synapses.spikeresponders.RiseAndDecay;
 
 

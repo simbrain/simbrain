@@ -30,11 +30,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;

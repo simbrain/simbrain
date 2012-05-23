@@ -23,8 +23,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.interfaces.Neuron;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;

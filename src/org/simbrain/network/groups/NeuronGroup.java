@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
 
 /**
  * A group of neurons.

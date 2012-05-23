@@ -31,13 +31,13 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
 import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
-import org.simbrain.network.interfaces.NetworkTextObject;
 
 import edu.umd.cs.piccolox.nodes.PStyledText;
 

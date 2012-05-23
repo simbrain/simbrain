@@ -16,18 +16,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
+
 
 /**
- * A custom rule for updating a root network.
+ * Indicates that an update rule is invertible.
+ *
+ * Required for LMSOffline training
+ * @author ztosi
+ *
  */
-public interface CustomUpdateRule {
+public interface Invertible {
 
     /**
-     * The custom update rule.
+     * The inverse of the activation function.
      *
-     * @param network the root network to update.
+     * @param val the value being sent through the neuron's
+     *          inverse activation function
+     * @param neuron the neuron this inverse value is being mapped from
+     * @return the inverse activation of parameter val
      */
-    void update(RootNetwork network);
+    double getInverse(double val, Neuron neuron);
 
 }

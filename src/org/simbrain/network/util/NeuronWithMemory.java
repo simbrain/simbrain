@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.util;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 
 /**
  * A neuron that stores a memory of its last activation.
@@ -38,9 +38,6 @@ public class NeuronWithMemory extends Neuron {
         super(parent, updateRule);
     }
 
-    /* (non-Javadoc)
-     * @see org.simbrain.network.interfaces.Neuron#setActivation(double)
-     */
     @Override
     public void setActivation(double act) {
         lastActivation = getActivation();

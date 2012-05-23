@@ -23,11 +23,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.BinaryNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;

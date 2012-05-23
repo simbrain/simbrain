@@ -4,9 +4,9 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
 import org.simbrain.workspace.Workspace;

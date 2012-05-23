@@ -16,7 +16,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
+
 
 /**
  * <b>NetworkTextObject</b> is a string of text in a neural network, typically

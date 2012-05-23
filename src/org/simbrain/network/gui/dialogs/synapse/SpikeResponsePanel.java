@@ -27,9 +27,9 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import org.simbrain.network.core.SpikeResponder;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.interfaces.SpikeResponder;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
 import org.simbrain.network.synapses.spikeresponders.ProbabilisticResponder;
 import org.simbrain.network.synapses.spikeresponders.RiseAndDecay;

@@ -16,22 +16,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.interfaces;
+package org.simbrain.network.core;
+
 
 /**
- * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
- * neurons.
- *
- * TODO: Add upper and lower bound parameters? Add randomize option?
+ * A custom rule for updating a root network.
  */
-public interface BiasedNeuron {
-    /**
-     * @return the neuron's bias
-     */
-    double getBias();
+public interface CustomUpdateRule {
 
     /**
-     * @param bias the bias to set.
+     * The custom update rule.
+     *
+     * @param network the root network to update.
      */
-    void setBias(double bias);
+    void update(RootNetwork network);
+
 }

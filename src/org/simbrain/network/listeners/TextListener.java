@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.listeners;
 
-import org.simbrain.network.interfaces.NetworkTextObject;
+import org.simbrain.network.core.NetworkTextObject;
 
 /**
  * Listener interface for receiving network events relating to network text

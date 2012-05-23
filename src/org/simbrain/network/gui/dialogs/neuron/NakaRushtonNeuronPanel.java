@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork;
 import org.simbrain.network.neurons.NakaRushtonNeuron;
 import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;

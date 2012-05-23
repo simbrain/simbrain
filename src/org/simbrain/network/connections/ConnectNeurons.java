@@ -20,9 +20,9 @@ package org.simbrain.network.connections;
 
 import java.util.List;
 
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.util.RandomSource;
 
 /**

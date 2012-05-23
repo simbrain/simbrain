@@ -18,13 +18,13 @@
  */
 package org.simbrain.network.update_actions;
 
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.UpdateAction;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.UpdateAction;
 
 /**
  * Buffered update of loose items (neurons and synapses), i.e. items not in
  * groups.  (Buffered update means order of update does not matter).
- * 
+ *
  * @author jyoshimi
  */
 public class BufferedUpdate implements UpdateAction {

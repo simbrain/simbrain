@@ -22,11 +22,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.interfaces.Neuron;
-import org.simbrain.network.interfaces.NeuronUpdateRule;
-import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
-import org.simbrain.network.interfaces.SynapseUpdateRule;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;

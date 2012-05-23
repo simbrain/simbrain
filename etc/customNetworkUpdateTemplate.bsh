@@ -1,0 +1,42 @@
+import java.util.*;
+import org.simbrain.network.*;
+import org.simbrain.network.neurons.*;
+import org.simbrain.network.synapses.*;
+import org.simbrain.network.connections.*;
+import org.simbrain.network.interfaces.*;
+import org.simbrain.network.update_actions.*;
+import org.simbrain.network.layouts.*;
+
+private UpdateAction action;
+
+/**
+ * Template network update script.  Customize this to suit your needs.  
+ * Uses standard java commands.   You have access to network via "network"
+ */
+{
+	// Object used for standard update.
+	BufferedUpdate bufferedUpdate = new BufferedUpdate(network);
+
+	// Customize this
+	this.action = new UpdateAction() {
+		public void invoke() {
+
+			// Do a standard update
+			bufferedUpdate.invoke();
+						
+			// Do some custom thing
+			System.out.println("Custom updating...");		
+		}
+		
+		// This is how the action appears in the update manager dialog
+		public String getDescription() {
+			return "Custom update";
+		}
+		
+		// This is a longer description for the tooltip
+		public String getLongDescription() {
+			return "Custom tooltip text";
+		}
+
+	};
+}

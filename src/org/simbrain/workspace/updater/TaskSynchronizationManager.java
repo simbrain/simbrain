@@ -1,8 +1,8 @@
-package org.simbrain.workspace.updator;
+package org.simbrain.workspace.updater;
 
 /**
- * Interface for integrating user interface threads with updator.
- * 
+ * Interface for integrating user interface threads with an updater.
+ *
  * @author Matt Watson
  */
 public interface TaskSynchronizationManager {

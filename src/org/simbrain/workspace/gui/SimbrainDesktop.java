@@ -94,8 +94,8 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
-import org.simbrain.workspace.updator.InterceptingEventQueue;
-import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
+import org.simbrain.workspace.updater.InterceptingEventQueue;
+import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.game.GameComponent;
@@ -236,8 +236,8 @@ public class SimbrainDesktop {
 
     };
 
-    /** Listens for workspace updator events. */
-    private final WorkspaceUpdaterListener updatorListener = new WorkspaceUpdaterListener() {
+    /** Listens for workspace updater events. */
+    private final WorkspaceUpdaterListener updaterListener = new WorkspaceUpdaterListener() {
 
         /**
          * {@inheritDoc}
@@ -300,7 +300,7 @@ public class SimbrainDesktop {
         wsToolBar = createToolBar();
         createContextMenu();
         workspace.addListener(workspaceListener);
-        workspace.getUpdater().addUpdatorListener(updatorListener);
+        workspace.getUpdater().addUpdaterListener(updaterListener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET,

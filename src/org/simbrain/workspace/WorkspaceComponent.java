@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.simbrain.workspace.updator.ComponentUpdatePart;
+import org.simbrain.workspace.updater.ComponentUpdatePart;
 
 /**
  * Represents a component in a Simbrain {@link org.simbrain.workspace.Workspace}

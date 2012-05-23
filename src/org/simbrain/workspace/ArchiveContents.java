@@ -25,12 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.simbrain.workspace.updator.UpdateAction;
-import org.simbrain.workspace.updator.UpdateActionCustom;
-import org.simbrain.workspace.updator.UpdateAllBuffered;
-import org.simbrain.workspace.updator.UpdateComponent;
-import org.simbrain.workspace.updator.UpdateCoupling;
-import org.simbrain.workspace.updator.WorkspaceUpdater;
+import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.workspace.updater.UpdateActionCustom;
+import org.simbrain.workspace.updater.UpdateAllBuffered;
+import org.simbrain.workspace.updater.UpdateComponent;
+import org.simbrain.workspace.updater.UpdateCoupling;
+import org.simbrain.workspace.updater.WorkspaceUpdater;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -623,10 +623,10 @@ class ArchiveContents {
         xstream.omitField(Workspace.class, "workspaceChanged");
         xstream.omitField(Workspace.class, "currentDirectory");
         xstream.omitField(Workspace.class, "currentFile");
-        xstream.omitField(Workspace.class, "updator");
+        xstream.omitField(Workspace.class, "updater");
         xstream.omitField(Workspace.class, "listeners");
         xstream.omitField(Workspace.class, "componentNameIndices");
-        xstream.omitField(Workspace.class, "updatorLock");
+        xstream.omitField(Workspace.class, "updaterLock");
         xstream.omitField(Workspace.class, "componentLock");
 
 		xstream.omitField(UpdateComponent.class, "component");

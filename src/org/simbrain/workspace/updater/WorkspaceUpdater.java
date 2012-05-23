@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.updator;
+package org.simbrain.workspace.updater;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,8 +69,8 @@ public class WorkspaceUpdater {
     /** Component listeners. */
     private final List<ComponentUpdateListener> componentListeners = new CopyOnWriteArrayList<ComponentUpdateListener>();
 
-    /** Updator listeners. */
-    private final List<WorkspaceUpdaterListener> updatorListeners = new CopyOnWriteArrayList<WorkspaceUpdaterListener>();
+    /** Updater listeners. */
+    private final List<WorkspaceUpdaterListener> updaterListeners = new CopyOnWriteArrayList<WorkspaceUpdaterListener>();
 
     /** Creates a default synch-manager that does nothing. */
     private volatile TaskSynchronizationManager synchManager = NO_ACTION_SYNCH_MANAGER;
@@ -86,9 +86,9 @@ public class WorkspaceUpdater {
 
     /** The update Manager. */
     private UpdateActionManager updateActionManager;
-    
+
     /**
-     * Constructor for the updator that uses the provided controller and
+     * Constructor for the updater that uses the provided controller and
      * threads.
      *
      * @param workspace The parent workspace.
@@ -106,7 +106,7 @@ public class WorkspaceUpdater {
 		// In some cases components can be updated in parallel. So
 		// a thread pool with a configurable number of threads is used
         componentUpdates = Executors.newFixedThreadPool(threads,
-                new UpdatorThreadFactory());
+                new UpdaterThreadFactory());
         
         // A single thread to fire notification events
         notificationEvents = Executors.newSingleThreadExecutor();
@@ -117,7 +117,7 @@ public class WorkspaceUpdater {
     }
 
     /**
-     * Constructor for the updator that uses the default controller and default
+     * Constructor for the updater that uses the default controller and default
      * number of threads.
      *
      * @param workspace The parent workspace.
@@ -165,9 +165,9 @@ public class WorkspaceUpdater {
     }
 
     /**
-     * Returns whether the updator is set to run.
+     * Returns whether the updater is set to run.
      *
-     * @return whether the updator is set to run.
+     * @return whether the updater is set to run.
      */
     public boolean isRunning() {
         return run;
@@ -311,30 +311,30 @@ public class WorkspaceUpdater {
     }
 
     /**
-     * Adds an updator listener to this instance.
+     * Adds an updater listener to this instance.
      *
-     * @param listener updator component listener to add.
+     * @param listener updater component listener to add.
      */
-    public void addUpdatorListener(final WorkspaceUpdaterListener listener) {
-        updatorListeners.add(listener);
+    public void addUpdaterListener(final WorkspaceUpdaterListener listener) {
+        updaterListeners.add(listener);
     }
 
     /**
-     * Return list of updator listeners.
+     * Return list of updater listeners.
      *
-     * @return list of updator listeners;
+     * @return list of updater listeners;
      */
-    public List<WorkspaceUpdaterListener> getUpdatorListeners() {
-        return updatorListeners;
+    public List<WorkspaceUpdaterListener> getUpdaterListeners() {
+        return updaterListeners;
     }
 
     /**
-     * Removes an updator listener from this instance.
+     * Removes an updater listener from this instance.
      *
-     * @param listener The updator listener to add.
+     * @param listener The updater listener to add.
      */
-    public void removeUpdatorListener(final WorkspaceUpdaterListener listener) {
-        updatorListeners.remove(listener);
+    public void removeUpdaterListener(final WorkspaceUpdaterListener listener) {
+        updaterListeners.remove(listener);
     }
 
     /**
@@ -383,7 +383,7 @@ public class WorkspaceUpdater {
 
         notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdaterListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updaterListeners) {
                     listener.updatedCouplings(time);
                 }
             }
@@ -396,7 +396,7 @@ public class WorkspaceUpdater {
     private void notifyWorkspaceUpdateStarted() {
         notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdaterListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updaterListeners) {
                     listener.updatingStarted();
                 }
             }
@@ -409,7 +409,7 @@ public class WorkspaceUpdater {
     private void notifyWorkspaceUpdateCompleted() {
         notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdaterListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updaterListeners) {
                     listener.updatingFinished();
                 }
             }
@@ -423,7 +423,7 @@ public class WorkspaceUpdater {
 
         notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdaterListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updaterListeners) {
                     listener.workspaceUpdated();
                 }
             }
@@ -437,7 +437,7 @@ public class WorkspaceUpdater {
 
         notificationEvents.submit(new Runnable() {
             public void run() {
-                for (WorkspaceUpdaterListener listener : updatorListeners) {
+                for (WorkspaceUpdaterListener listener : updaterListeners) {
                     listener.changedUpdateController();
                 }
             }
@@ -452,7 +452,7 @@ public class WorkspaceUpdater {
     }
 
     /**
-     * Set number of threads in updator.
+     * Set number of threads in updater.
      *
      * @param numThreads number of threads.
      */
@@ -462,17 +462,17 @@ public class WorkspaceUpdater {
         }
         this.numThreads = numThreads;
         this.componentUpdates = Executors.newFixedThreadPool(numThreads,
-                new UpdatorThreadFactory());
-        for (WorkspaceUpdaterListener listener : updatorListeners) {
+                new UpdaterThreadFactory());
+        for (WorkspaceUpdaterListener listener : updaterListeners) {
             listener.changeNumThreads();
         }
 
     }
 
     /**
-     * Iterate the updator for a specified number of iterations.
+     * Iterate the updater for a specified number of iterations.
      *
-     * @param numIterations number of times to iterate updator.
+     * @param numIterations number of times to iterate updater.
      */
     public void iterate(final int numIterations) {
         workspaceUpdates.submit(new Runnable() {
@@ -516,7 +516,7 @@ public class WorkspaceUpdater {
 	 * a clean way to capture the events using the thread instances themselves
 	 * which 'know' their thread number.
 	 */
-    private class UpdatorThreadFactory implements ThreadFactory {
+    private class UpdaterThreadFactory implements ThreadFactory {
         /** Numbers the threads sequentially. */
         private int nextThread = 1;
 
@@ -532,10 +532,10 @@ public class WorkspaceUpdater {
             }
         }
     }
-    
+
     /**
      * Returns a reference to the update manager.
-     * 
+     *
      * @return the update manager
      */
 	public UpdateActionManager getUpdateManager() {

@@ -25,7 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.simbrain.network.networks.WinnerTakeAll;
+import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;

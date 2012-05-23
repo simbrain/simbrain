@@ -85,11 +85,13 @@ public class Radial extends ConnectNeurons {
     }
 
     /** @inheritDoc */
-    public void connectNeurons() {
+    public List<Synapse> connectNeurons() {
+    	ArrayList<Synapse> syns = new ArrayList<Synapse>();
         for (Neuron source : sourceNeurons) {
-            makeExcitatory(source);
-            makeInhibitory(source);
+            makeExcitatory(source, syns);
+            makeInhibitory(source, syns);
         }
+        return syns;
     }
 
     /**
@@ -98,7 +100,7 @@ public class Radial extends ConnectNeurons {
      *
      * @param source source neuron
      */
-    private void makeInhibitory(final Neuron source) {
+    private void makeInhibitory(final Neuron source, List<Synapse> syns) {
         for (Neuron target : network.getNeuronsInRadius(source,
                 inhibitoryRadius)) {
             if (!sourceNeurons.contains(target)) {
@@ -118,6 +120,7 @@ public class Radial extends ConnectNeurons {
                         .instantiateTemplateSynapse(source, target, network);
                 synapse.setStrength(-1);
                 network.addSynapse(synapse);
+                syns.add(synapse);
             }
         }
     }
@@ -128,7 +131,7 @@ public class Radial extends ConnectNeurons {
      *
      * @param source source neuron
      */
-    private void makeExcitatory(final Neuron source) {
+    private void makeExcitatory(final Neuron source, List<Synapse> syns) {
         for (Neuron target : network.getNeuronsInRadius(source,
                 excitatoryRadius)) {
             if (!sourceNeurons.contains(target)) {
@@ -148,6 +151,7 @@ public class Radial extends ConnectNeurons {
                         .instantiateTemplateSynapse(source, target, network);
                 synapse.setStrength(1);
                 network.addSynapse(synapse);
+                syns.add(synapse);
             }
         }
     }

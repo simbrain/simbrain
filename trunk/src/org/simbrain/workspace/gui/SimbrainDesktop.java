@@ -40,6 +40,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.Vector;
 
 import javax.swing.Action;
@@ -61,6 +62,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -84,13 +86,16 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.ToggleButton;
+import org.simbrain.util.genericframe.GenericFrame;
+import org.simbrain.util.genericframe.GenericJFrame;
+import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.workspace.updator.InterceptingEventQueue;
-import org.simbrain.workspace.updator.WorkspaceUpdatorListener;
+import org.simbrain.workspace.updator.WorkspaceUpdaterListener;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.game.GameComponent;
@@ -134,6 +139,12 @@ public class SimbrainDesktop {
 
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
+    
+	/**
+	 * Reference to the last internal frames that were focused, so that they can get
+	 * the focus when the next one is closed.
+	 */
+    private static final Stack<GuiComponent<?>> lastFocusedStack = new Stack<GuiComponent<?>>();
 
     /** TODO: Create Javadoc comment. */
     private static final Map<Workspace, SimbrainDesktop> INSTANCES =
@@ -210,7 +221,11 @@ public class SimbrainDesktop {
             GuiComponent<?> component = guiComponents.get(workspaceComponent);
             guiComponents.remove(component);
             component.getParentFrame().dispose();
-        }
+    		if (!lastFocusedStack.isEmpty()) {
+    			lastFocusedStack.remove(component);
+    		}
+			moveLastFocusedComponentToFront();
+		}
 
         /**
          * {@inheritDoc}
@@ -222,7 +237,7 @@ public class SimbrainDesktop {
     };
 
     /** Listens for workspace updator events. */
-    private final WorkspaceUpdatorListener updatorListener = new WorkspaceUpdatorListener() {
+    private final WorkspaceUpdaterListener updatorListener = new WorkspaceUpdaterListener() {
 
         /**
          * {@inheritDoc}
@@ -285,7 +300,7 @@ public class SimbrainDesktop {
         wsToolBar = createToolBar();
         createContextMenu();
         workspace.addListener(workspaceListener);
-        workspace.getUpdator().addUpdatorListener(updatorListener);
+        workspace.getUpdater().addUpdatorListener(updatorListener);
         SimbrainDesktop.registerComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET,
@@ -309,7 +324,7 @@ public class SimbrainDesktop {
         bottomDock.addTab("Couplings", null, new CouplingListPanel(this,
                 couplings), "Show current couplings");
         bottomDock.addTab("Terminal", null, this.getTerminalPanel(), "Simbrain terminal");
-        bottomDock.addTab("Updator", null, new ThreadViewerPanel(this
+        bottomDock.addTab("Updater", null, new ThreadViewerPanel(this
                 .getWorkspace()), "Simbrain thread viewer");
         // Set up the main panel
         horizontalSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -391,6 +406,24 @@ public class SimbrainDesktop {
         }
     };
 
+	/**
+	 * Takes the last gui component opened and moves it to the front of the
+	 * simbrain desktop, place it in focus.
+	 */
+	private void moveLastFocusedComponentToFront() {
+		if (!lastFocusedStack.isEmpty()) {
+			GuiComponent<?> lastFocused = lastFocusedStack.peek();
+			if (lastFocused != null) {
+				try {
+					((JInternalFrame) lastFocused.getParentFrame())
+							.setSelected(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+    
     /**
      * @return Terminal panel.
      */
@@ -491,7 +524,7 @@ public class SimbrainDesktop {
             // Reset time if user double clicks on label.
             public void mousePressed(final MouseEvent event) {
                 if (event.getClickCount() == 2) {
-                    workspace.getUpdator().resetTime();
+                    workspace.getUpdater().resetTime();
                     updateTimeLabel();
                 }
             }
@@ -526,6 +559,7 @@ public class SimbrainDesktop {
     private JMenu createScriptMenu() {
         JMenu scriptMenu = new JMenu("Scripts");
         scriptMenu.add(actionManager.getRunScriptAction());
+        scriptMenu.add(actionManager.getShowScriptEditorAction());
         scriptMenu.addSeparator();
         scriptMenu.addMenuListener(menuListener);
         for (Action action : actionManager.getScriptActions(this)) {
@@ -738,7 +772,16 @@ public class SimbrainDesktop {
          * Manage cleanup when a component is closed.
          */
         private class WindowFrameListener extends InternalFrameAdapter {
-            /** @see InternalFrameAdapter */
+            @Override
+            public void internalFrameActivated(final InternalFrameEvent e) {
+            	// TODO: Does not work properly. Should be used so that
+            	//  the last focused stack tracks changes in focus and not just
+            	//  open / close events.
+            	//lastFocusedStack.remove(guiComponent);
+            	//lastFocusedStack.push(guiComponent);
+            }
+
+            @Override
             public void internalFrameClosing(final InternalFrameEvent e) {
                 if (workspaceComponent.hasChangedSinceLastSave()) {
                     boolean hasCancelled = guiComponent.showHasChangedDialog();
@@ -757,6 +800,48 @@ public class SimbrainDesktop {
      * @param internalFrame the frame to add.
      */
     public void addInternalFrame(final JInternalFrame internalFrame) {
+    	internalFrame.addInternalFrameListener(new InternalFrameListener() {
+
+			@Override
+			public void internalFrameActivated(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameClosed(InternalFrameEvent arg0) {
+			}
+
+			@Override
+			public void internalFrameClosing(InternalFrameEvent arg0) {
+				moveLastFocusedComponentToFront();				
+			}
+
+			@Override
+			public void internalFrameDeactivated(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameDeiconified(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameIconified(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void internalFrameOpened(InternalFrameEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+    		
+    	});
         desktop.add(internalFrame);
     }
 
@@ -818,7 +903,9 @@ public class SimbrainDesktop {
         componentFrame.setTitle(workspaceComponent.getName());
         desktop.add(componentFrame);
         guiComponent.postAddInit();
-
+        lastFocusedStack.push(guiComponent);
+        //System.out.println(lastOpened.getName());
+        
         // Forces last component of the desktop to the front
         try {
             ((JInternalFrame) componentFrame).setSelected(true);
@@ -1130,7 +1217,7 @@ public class SimbrainDesktop {
      */
     public void updateTimeLabel() {
         timeLabel.setText("Time:" + workspace.getTime());
-        if (workspace.getUpdator().isRunning()) {
+        if (workspace.getUpdater().isRunning()) {
             runningLabel.setVisible(true);
             // SimbrainDesktop.this.desktop.setBackground(Color.red);
         } else {

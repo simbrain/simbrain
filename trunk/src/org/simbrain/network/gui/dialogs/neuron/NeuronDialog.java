@@ -150,11 +150,11 @@ public class NeuronDialog extends StandardDialog {
         // update method
         JLabel priorityLabel = new JLabel("Update Priority");
         topPanel.addItemLabel(priorityLabel, tfPriority);
-        if (((Neuron) neuronList.get(0)).getRootNetwork().getUpdateMethod() != 
-            RootNetwork.UpdateMethod.PRIORITYBASED) {
-            priorityLabel.setEnabled(false);
-            tfPriority.setEnabled(false);
-        }
+//        if (((Neuron) neuronList.get(0)).getRootNetwork().getUpdateMethod() != 
+//            RootNetwork.UpdateMethod.PRIORITYBASED) {
+//            priorityLabel.setEnabled(false);
+//            tfPriority.setEnabled(false);
+//        }
 
         //topPanel.addItem("Attribute type", cbNeuronType);
         topPanel.addItem("Update rule", cbNeuronType);

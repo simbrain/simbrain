@@ -140,7 +140,10 @@ public final class DefaultNumericTable extends NumericTable implements
     @Override
     public void setValue(final int row, final int column, final Double value) {
         rowData.get(row).set(column, value);
-        fireTableDataChanged();
+        // TODO: fireTableDataChanged() used to be called but it was a 
+        //		performance problem.   May be cases where update does not
+        //		happen properly.   If so add amethod for setValue with a boolean
+        //		fireEvent flag here.
     }
 
     /**

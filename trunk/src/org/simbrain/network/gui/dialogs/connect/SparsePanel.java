@@ -15,7 +15,6 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,9 +27,7 @@ import java.util.Hashtable;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -41,43 +38,45 @@ import javax.swing.event.ChangeListener;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.gui.NetworkPanel;
 
+
+
 /**
  * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron
  * connections.
- *
+ * 
  * @author ztosi
+ * 
  */
 public class SparsePanel extends AbstractConnectionPanel {
 	
 	/** A panel for adjusting excitation and inhibition */
     private final ExcitatoryInhibitoryPropertiesPanel eipPanel;
 
-    /** A slider for setting the sparsity of the connections. */
-    private JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
-
+	/** A slider for setting the sparsity of the connections. */
+    private JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100,
+    		10);
+    
     /** A text field for setting the sparsity of the connections. */
-    private JFormattedTextField tfSparsity = new JFormattedTextField(
-            NumberFormat.getNumberInstance());
+    private JFormattedTextField sparsity =
+    	new JFormattedTextField(NumberFormat.getNumberInstance());
 
-    /**
-     * A text field allowing the user to specify the number of outgoing synapses
-     * per source neuron.
+    /** A text field allowing the user to specify the number of outgoing
+     * synapses per source neuron.
      */
-    private JFormattedTextField synapsesPerSource = new JFormattedTextField(
-            NumberFormat.getNumberInstance());
-
-    /**
-     * A check box for determining if the number of outgoing synapses per source
-     * neuron should be equalized.
+    private JFormattedTextField synsPerSource =
+    	new JFormattedTextField(NumberFormat.getNumberInstance());
+    
+    /** A check box for determining if the number of outgoing synapses
+     * per source neuron should be equalized.
      */
     private JCheckBox sparseSpecific = new JCheckBox();
-
+    
     /** A check box for determining if self-connections are to be allowed. */
     private JCheckBox allowSelfConnect = new JCheckBox();
-
+    
     /** The number of target neurons */
-    private int numTargs;
-
+    private final int numTargs;
+    
     /**
      * A flag determining if an action was initiated by a user (useful for
      * reciprocal action listeners).
@@ -93,299 +92,238 @@ public class SparsePanel extends AbstractConnectionPanel {
      * @param connection type
      */
     public SparsePanel(final Sparse connection, final NetworkPanel networkPanel) {
-        super(connection, networkPanel);
-        
-        eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
-        if(networkPanel.getSelectedModelNeurons().equals(networkPanel.getSourceModelNeurons())) {
-        	sourceContainsTarget = true;
-        	numTargs = networkPanel.getSelectedModelNeurons().size() - 1;
-        } else {
-        	sourceContainsTarget = false;
-        	numTargs = networkPanel.getSelectedModelNeurons().size();
-        }
+    	super(connection, networkPanel);  
+    	eipPanel = new ExcitatoryInhibitoryPropertiesPanel(connection);
+        numTargs = networkPanel.getSelectedModelNeurons().size();
         fillFieldValues();
         initializeSparseSlider();
         addChangeListeners();
         addActionListeners();
-        initializeLayout();
+        initializeLayout();  
 
     }
-
+    
     /**
      * Initializes the custom layout of the sparse panel.
      */
-    private void initializeLayout() {
-
-        JPanel sparseContainer = new JPanel();
+    private void initializeLayout(){
+    	
+    	JPanel sparseContainer = new JPanel();
         this.add(sparseContainer);
         JScrollPane pScroller = new JScrollPane(sparseContainer);
         this.add(pScroller, BorderLayout.CENTER);
-        int offset = 0;
-            
-        sparseContainer.setLayout(new GridBagLayout());
+    	
+    	sparseContainer.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
-        
-        if (sourceContainsTarget) {
-        	JPanel selfConnectPanel = new JPanel();
-        	selfConnectPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-	        selfConnectPanel.add(new JLabel("Allow Self-Connections: "));
-	        selfConnectPanel.add(allowSelfConnect);  
-	        gbc.gridwidth = 2;
-	        gbc.gridheight = 1;  
-	        sparseContainer.add(selfConnectPanel, gbc);
-	        gbc.insets = new Insets(10, 10, 0, 10);
-	        gbc.gridy = 1;
-	        gbc.gridwidth = 3;
-	        sparseContainer.add(new JSeparator(), gbc);
-	        offset = 2;
-        }
-	        
-        gbc.insets = new Insets(0, 0, 0, 0);
-        gbc.gridx = 0;
-        gbc.gridy += offset;
         gbc.gridheight = 4;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         sparseContainer.add(initializeSparseSubPanel(), gbc);
-
+        
         gbc.insets = new Insets(10, 10, 0, 10);
-        gbc.gridy += 4 + offset;
+        gbc.gridy = 4;
         gbc.gridheight = 1;
         sparseContainer.add(new JSeparator(), gbc);
-
+        
         gbc.insets = new Insets(0, 0, 0, 0);
-        gbc.gridy += 1 + offset;
+        gbc.gridy = 5;
         gbc.gridheight = 9;
         sparseContainer.add(eipPanel, gbc);
-   
+        
+        gbc.insets = new Insets(10, 10, 0, 10);
+        gbc.gridy = 14;
+        gbc.gridheight = 1;
+        sparseContainer.add(new JSeparator(), gbc);
+        
+        gbc.gridy = 15;
+        gbc.gridwidth = 1;
+        sparseContainer.add(new JLabel("Allow Self-Connections: "), gbc);
+        
+        gbc.gridx = 2;
+        sparseContainer.add(allowSelfConnect, gbc);
+        
     }
-
-    private JPanel initializeSparseSubPanel() {
-        JPanel ssp = new JPanel();
-        ssp.setLayout((new GridBagLayout()));
-        GridBagConstraints gbc = new GridBagConstraints();
+    
+    private JPanel initializeSparseSubPanel(){
+    	JPanel ssp = new JPanel();
+    	ssp.setLayout((new GridBagLayout()));
+    	GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(10, 10, 0, 10);
-        ssp.add(new JLabel("No Connections"), gbc);
-        gbc.gridx = 2;
-        ssp.add(new JLabel("Full Connectivity"), gbc);
-
+        ssp.add(new JLabel("Percent Connectivity:"), gbc);
+         
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 3;
         ssp.add(sparsitySlider, gbc);
-
+         
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.weightx = 0;
         gbc.weighty = 0;
-        JPanel connectivityPanel = new JPanel();
-        connectivityPanel.add(new JLabel("% Connectivity: "));
-        Dimension sSize = tfSparsity.getPreferredSize();
+        ssp.add(new JLabel("Connectivity: "), gbc);
+        
+        gbc.gridx = 1;
+        Dimension sSize = sparsity.getPreferredSize();
         sSize.width = 40;
-        tfSparsity.setPreferredSize(sSize);
-        connectivityPanel.add(tfSparsity);
-        ssp.add(connectivityPanel, gbc);
-
-
+        sparsity.setPreferredSize(sSize);
+        ssp.add(sparsity, gbc);
+        
         gbc.gridx = 0;
         gbc.gridy = 3;
-        ssp.add(new JLabel("Equalize Outgoing Connectivity:"), gbc);
+        ssp.add(new JLabel("Equalize Connections/Source:"), gbc);
+         
         gbc.gridx = 1;
         ssp.add(sparseSpecific, gbc);
+         
         gbc.gridx = 2;
-        sSize = synapsesPerSource.getPreferredSize();
+        sSize = synsPerSource.getPreferredSize();
         sSize.width = 40;
-        synapsesPerSource.setPreferredSize(sSize);
-        synapsesPerSource.setToolTipText("Number of outgoing synapses per source neuron.");
-        ssp.add(synapsesPerSource, gbc);
-
+        synsPerSource.setPreferredSize(sSize);
+        ssp.add(synsPerSource, gbc);
+        
         return ssp;
     }
-
+    
     /**
-     * Initializes the sparse slider.
+     * Initializes the sparse slider. 
      */
-    private void initializeSparseSlider() {
+    private void initializeSparseSlider(){
 
-        sparsitySlider.setMajorTickSpacing(10);
-        sparsitySlider.setMinorTickSpacing(2);
-        sparsitySlider.setPaintTicks(true);
+         sparsitySlider.setMajorTickSpacing(10);
+         sparsitySlider.setMinorTickSpacing(2);
+         sparsitySlider.setPaintTicks(true);
+         
+         Hashtable<Integer, JLabel> labelTable2 = new Hashtable<Integer, JLabel>();
+         labelTable2.put(new Integer(0), new JLabel ("0%"));
+         labelTable2.put(new Integer(100), new JLabel ("100%"));
+         sparsitySlider.setLabelTable(labelTable2);
+         sparsitySlider.setPaintLabels(true);
+    }
+    
+    /**
+     * Adds change listeners specific to sparse panel:
+     * Sparsity slider, sparsity text field, and syns/source
+     * field.
+     */
+    private void addChangeListeners(){
+        
+    	sparsitySlider.addChangeListener(new ChangeListener(){
 
-        Hashtable<Integer, JLabel> labelTable2 = new Hashtable<Integer, JLabel>();
-        labelTable2.put(new Integer(0), new JLabel("0%"));
-        labelTable2.put(new Integer(100), new JLabel("100%"));
-        sparsitySlider.setLabelTable(labelTable2);
-        sparsitySlider.setPaintLabels(true);
+    		public void stateChanged(ChangeEvent e) {
+    			JSlider source = (JSlider)e.getSource();
+    			if(!source.getValueIsAdjusting() && source == sparsitySlider){
+    				if(userFlag){
+    					userFlag = false;
+    					double val = (double)(sparsitySlider.getValue())/100;
+    					sparsity.setValue(new Double(val));
+    					int sps = (int) (val * numTargs);
+						synsPerSource.setValue(new Integer(sps));
+    					
+    				} else {
+    					userFlag = true;
+    				}
+    				
+    			}
+    		}
+    		
+    	});
+    	
+        synsPerSource.addPropertyChangeListener("value", new PropertyChangeListener(){
+
+			public void propertyChange(PropertyChangeEvent arg0) {
+				if(arg0.getSource() == synsPerSource && 
+						sparseSpecific.isSelected()){
+					double sparse;
+					if(userFlag){
+						userFlag = false;
+						if(synsPerSource != null){
+							sparse = ((Number)synsPerSource.getValue()).doubleValue() / numTargs;
+							sparsity.setValue(new Double(sparse));
+							int sVal = (int) (sparse * 100);
+							sparsitySlider.setValue(new Integer(sVal));
+						}
+					} else {
+						userFlag = true;
+					}
+				}
+			}
+        });   
+        
+        sparsity.addPropertyChangeListener("value", new PropertyChangeListener () {
+
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(evt.getSource() == sparsity) {
+					int sps;
+					if(userFlag) {
+						userFlag = false;
+						if(sparsity.getValue() != null) {
+							sps = (int) (((Number)sparsity.getValue()).
+									doubleValue() * numTargs);
+							synsPerSource.setValue(new Integer(sps));
+							int sVal = (int) (((Number)sparsity.
+									getValue()).doubleValue() * 100);
+							sparsitySlider.setValue(new Integer(sVal));
+						}
+					} else {
+						userFlag = true;
+					}
+				}
+			}
+        });
+        
     }
 
     /**
-     * Adds change listeners specific to sparse panel: Sparsity slider, sparsity
-     * text field, and syns/source field.
+     * Adds action listeners specific to sparse panel:
+     * sparse specific check box.
      */
-    private void addChangeListeners() {
+    private void addActionListeners(){
+    	
+    	 sparseSpecific.addActionListener(new ActionListener(){
 
-        sparsitySlider.addChangeListener(new ChangeListener() {
-
-            public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider) e.getSource();
-                if (!source.getValueIsAdjusting() && source == sparsitySlider) {
-                    if (userFlag) {
-                        userFlag = false;
-                        int val =  sparsitySlider.getValue();
-                        tfSparsity.setValue(new Integer(val));
-                        int sps = (int) ((val / 100.0) * numTargs);
-                        synapsesPerSource.setValue(sps);
-                    } else {
-                        userFlag = true;
-                    }
-                }
-            }
-        });
-
-        synapsesPerSource.addPropertyChangeListener("value",
-                new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent arg0) {
-                        if (arg0.getSource() == synapsesPerSource
-                                && sparseSpecific.isSelected()) {
-                            double sparse;
-                            if (userFlag) {
-                                userFlag = false;
-                                if (synapsesPerSource != null) {
-                                	int synsPerSource = ((Number) 
-                                			synapsesPerSource.getValue())
-                                			.intValue();
-                                	if(synsPerSource > numTargs) { 
-                                		synapsesPerSource.setValue(numTargs);
-                                	} 
-                                	if(synsPerSource < 0) {
-                                		synapsesPerSource.setValue(0);
-                                	}
-                                    sparse = (((Number) synapsesPerSource
-                                    		.getValue()).doubleValue() /
-                                    			numTargs) * 100;
-                                    tfSparsity.setValue(sparse);
-                                    sparsitySlider.setValue((int) sparse);
-                                }
-                            } else {
-                                userFlag = true;
-                            }
-                        }
-                    }
-        });
-
-        tfSparsity.addPropertyChangeListener("value",
-                new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getSource() == tfSparsity) {
-                            int sps;
-                            int sliderVal;
-                            if (userFlag) {
-                                userFlag = false;
-                                if (tfSparsity.getValue() != null) {  	
-                                	int tfSparse = (int) (((Number) tfSparsity
-                                            .getValue()).intValue());
-                                    if(tfSparse > 100) {
-                                    	tfSparsity.setValue(new Integer(100));
-                                    }
-                                    if(tfSparse < 0) {
-                                    	tfSparsity.setValue(new Integer(0));
-                                    }
-                                    sliderVal = (int) (((Number) tfSparsity
-                                            .getValue()).intValue());
-                                    sparsitySlider.setValue(sliderVal);
-                                    sps = (int) ((((Number) tfSparsity
-                                    		.getValue()).doubleValue() / 100)
-                                    			* numTargs);
-                                    synapsesPerSource
-                                    	.setValue(new Integer(sps));    
-                                }
-                            } else {
-                                userFlag = true;
-                            }
-                        }
-                    }
-        });
+ 			public void actionPerformed(ActionEvent arg0) {
+ 				if(arg0.getSource() == sparseSpecific){
+ 					if(sparseSpecific.isSelected()){
+ 						synsPerSource.setEnabled(true);
+ 					} else {
+ 						synsPerSource.setEnabled(false);
+ 					}
+ 				}
+ 			}
+         });
 
     }
     
     /**
-     * Adds action listeners specific to sparse panel: sparse specific check
-     * box.
-     */
-    private void addActionListeners() {
-
-        sparseSpecific.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent arg0) {
-                if (arg0.getSource() == sparseSpecific) {
-                    if (sparseSpecific.isSelected()) {
-                        synapsesPerSource.setEnabled(true);
-                    } else {
-                        synapsesPerSource.setEnabled(false);
-                    }
-                }
-            }
-        });
-        
-        allowSelfConnect.addActionListener(new ActionListener() {
-        	
-        	public void actionPerformed(ActionEvent arg0) {
-        		if(arg0.getSource() == allowSelfConnect) {
-        			if(sourceContainsTarget) {
-        				double val = ((Number) tfSparsity.getValue())
-        						.doubleValue() / 100.0;
-        				userFlag = false;
-        				if (allowSelfConnect.isSelected()) {
-        					numTargs = getNetworkPanel()
-        							.getSelectedModelNeurons().size();
-        				} else {
-        					numTargs = getNetworkPanel()
-        							.getSelectedModelNeurons().size() - 1;
-        				}
-        				synapsesPerSource.setValue((int) (val * numTargs));
-        			}
-        		}
-        	}
-        	
-        });
-
-    }
-
-    /**
      * {@inheritDoc}
      */
     public void commitChanges() {
-        ((Sparse) connection).setSparseSpecific(sparseSpecific.isSelected());
-        ((Sparse) connection).setSparsity(((Number) tfSparsity.getValue())
-                .doubleValue()/100);
-        ((Sparse) connection).setAllowSelfConnection(allowSelfConnect
-                .isSelected());
-        eipPanel.commitChanges();
+    	((Sparse)connection).setSparseSpecific(sparseSpecific.isSelected());
+    	((Sparse)connection).setSparsity(((Number)sparsity.getValue()).doubleValue());
+    	((Sparse)connection).setAllowSelfConnection(allowSelfConnect.isSelected());
+    	eipPanel.commitChanges();
     }
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-    	double sparsityVal = new Double(((Sparse) connection).getSparsity())
-    		* 100; 
-        tfSparsity.setValue(sparsityVal);
-        sparsitySlider.setValue((int) sparsityVal);
-        synapsesPerSource.setValue(new Integer((int) ((sparsityVal / 100.0)
-        		* numTargs)));
-        synapsesPerSource.setEnabled(false);
+    	sparsity.setValue(new Double(Sparse.getDEFAULT_SPARSITY()));
+    	synsPerSource.setValue(new Integer((int) (numTargs * ((Number)sparsity.
+				getValue()).doubleValue())));
+        synsPerSource.setEnabled(false);
     }
 
 }

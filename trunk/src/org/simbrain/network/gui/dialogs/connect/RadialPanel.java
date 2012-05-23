@@ -59,9 +59,8 @@ public class RadialPanel extends AbstractConnectionPanel {
      *
      * @param connection type
      */
-    public RadialPanel(final Radial connection,
-    		final NetworkPanel networkPanel) {
-        super(connection, networkPanel);
+    public RadialPanel(final Radial connection, final NetworkPanel panel) {
+        super(connection, panel);
 
         setExcitatorySynapseType.setText(connection.getBaseExcitatorySynapse()
                 .getType());

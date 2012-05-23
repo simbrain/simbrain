@@ -119,8 +119,8 @@ public class NetworkMenuBar {
         returnMenu.add(editMenu);
 
         JMenu insertMenu = new JMenu("Insert");
-        insertMenu.add(networkPanel.createNewNetworkMenu());
         insertMenu.add(actionManager.getNewNeuronAction());
+        insertMenu.add(actionManager.getNewNetworkMenu());
         returnMenu.add(insertMenu);
 
         JMenu viewMenu = new JMenu("View");

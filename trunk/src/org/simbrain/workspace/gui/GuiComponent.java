@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceComponentDeserializer;

@@ -33,10 +33,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+
+import org.simbrain.util.genericframe.GenericJDialog;
 
 /**
  * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and
@@ -51,7 +52,7 @@ import javax.swing.KeyStroke;
  * @author David Fraser
  * @author Michael Harris
  */
-public class StandardDialog extends JDialog {
+public class StandardDialog extends GenericJDialog {
 
     /**
      * When this flag is set to true, then whenever a StandardDialog is used, a
@@ -88,6 +89,7 @@ public class StandardDialog extends JDialog {
      * This method is the default constructor.
      */
     public StandardDialog() {
+    	super();
         init();
     }
 
@@ -99,19 +101,6 @@ public class StandardDialog extends JDialog {
      * @param title The title to display in the dialog.
      */
     public StandardDialog(final Frame parent, final String title) {
-        super(parent, title);
-
-        init();
-    }
-
-    /**
-     * This method creates a StandardDialog with the given parent dialog and
-     * title.
-     * 
-     * @param parent The parent dialog for the dialog.
-     * @param title The title to display in the dialog.
-     */
-    public StandardDialog(final Dialog parent, final String title) {
         super(parent, title);
 
         init();

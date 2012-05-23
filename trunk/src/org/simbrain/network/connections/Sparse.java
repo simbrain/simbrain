@@ -17,12 +17,15 @@
  */
 package org.simbrain.network.connections;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import org.simbrain.network.interfaces.Network;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.Synapse;
+import org.simbrain.network.interfaces.SynapseUpdateRule;
 
 /**
  * Connect neurons sparsely with some probabilities.
@@ -65,18 +68,16 @@ public class Sparse extends ConnectNeurons {
     }
 
     /** @inheritDoc */
-    public void connectNeurons() {
+    public List<Synapse> connectNeurons() {
     	
-    	int possibleConnects = sourceNeurons.size() * targetNeurons.size();
+    	ArrayList<Synapse> syns = new ArrayList<Synapse>();
     	
-    	//TODO: Not entirely stable if target neurons are only a partial subset of source or vice versa
-    	if(sourceNeurons.containsAll(targetNeurons) && !allowSelfConnection){
-    		possibleConnects = possibleConnects - sourceNeurons.size();
-    	}
-
-    	int numSyns = (int) (sparsity * possibleConnects);
+    	//TODO: percent excititory currently not guaranteed for recurrent
+        //connections (source list == target list) when self connection is
+        //not allowed
     	
-    	int numExcite = (int) ((percentExcitatory / 100) * numSyns);
+    	int numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons.size());
+    	int numExcite = (int) (percentExcitatory * numSyns);
     	Neuron source;
     	Neuron target;
     	Synapse synapse;
@@ -92,8 +93,6 @@ public class Sparse extends ConnectNeurons {
 	    			.get(randGen.nextInt(targetNeurons.size()));
 	    		} while (Network.getSynapse(source, target) != null ||
 	    				(!allowSelfConnection && (source == target)));
-	    		
-	    		
 	    		
 	    		if(i < numExcite){
 	    			synapse = baseExcitatorySynapse
@@ -114,13 +113,12 @@ public class Sparse extends ConnectNeurons {
 	    		}
 	    		
 	    		network.addSynapse(synapse);
-	    		
+	    		syns.add(synapse);
 	    	}
-
     	} else {
     		int synsPerSource = numSyns / sourceNeurons.size();
     		Random rGen = new Random();
-    		int numEx = (int) ((percentExcitatory / 100) * numSyns);
+    		int numEx = (int) (percentExcitatory * numSyns);
     		int numIn = numSyns - numEx;
     		
     		for (int i = 0; i < sourceNeurons.size(); i++) {
@@ -153,24 +151,13 @@ public class Sparse extends ConnectNeurons {
     					}
     				}
     				network.addSynapse(synapse);
+    				syns.add(synapse);
     			}
     			
     		}
     		
     	}
-    }
-    
-    /** 
-     * A method for determining if the target neurons are a subset of the
-     * source neurons.
-     * @return if the source list contains the members of the target list
-     */
-    public boolean sourceContainsTarget(){
-    	if(sourceNeurons.contains(targetNeurons)) {
-    		return true;
-    	} else {
-    		return false;
-    	}
+    	return syns;
     }
 
 	public static double getDEFAULT_SPARSITY() {

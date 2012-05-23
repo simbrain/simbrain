@@ -82,7 +82,7 @@ import org.simbrain.network.interfaces.Neuron;
 
         for (int i = 0; i < layers.size(); i++) {
             Network currentLayer = layers.get(i);
-            ArrayList<Neuron> neurons = currentLayer.getFlatNeuronList();
+            List<Neuron> neurons = currentLayer.getFlatNeuronList();
             for (int j = 0; j < neurons.size(); j++) {
                 double hOffset = ((baseCount - neurons.size()) * hSpacing) / 2;
                 Neuron neuron = (Neuron) neurons.get(j);

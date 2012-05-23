@@ -24,14 +24,17 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.interfaces.BiasedNeuron;
 import org.simbrain.network.interfaces.Neuron;
 import org.simbrain.network.interfaces.RootNetwork;
-import org.simbrain.network.interfaces.Synapse;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.neurons.SigmoidalNeuron;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Matrices;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
@@ -45,6 +48,25 @@ import Jama.Matrix;
  * @author jyoshimi
  */
 public class LMSOffline extends Trainer {
+	
+	/** Current solution type. */
+    private SolutionType solutionType = SolutionType.WIENER_HOPF;
+
+    /** Whether or not ridge regression is to be performed. */
+    private boolean ridgeRegression;
+    
+    /** The magnitude of the ridge regression. */
+    private double alpha;
+    
+	/**
+	 * Construct the LMSOOffline object, with a trainable network the
+	 * Synapse group where the new synapses will be placed.
+	 *
+	 * @param network the network to train
+	 */
+	public LMSOffline(Trainable network) {
+		super(network);
+	}
 
     /**
      * Solution methods for offline LMS.
@@ -72,89 +94,105 @@ public class LMSOffline extends Trainer {
 
     };
 
-    /** Current solution type. */
-    private SolutionType solutionType = SolutionType.MOORE_PENROSE;
-
-    /**
-     * Construct the trainer.
-     *
-     * @param network parent network
-     * @param inputList input layer
-     * @param outputList output layer
-     */
-    public LMSOffline(RootNetwork network, List<Neuron> inputList,
-            List<Neuron> outputList) {
-        super(network, inputList, outputList);
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param trainer trainer to copy
-     */
-    public LMSOffline(Trainer trainer) {
-        super(trainer);
-    }
-
-    @Override
-    public void randomize() {
-        // Not used; synapses created from scratch.
-    }
-
     @Override
     public void apply() {
+    	
+    	fireTrainingBegin();
+
+    	int index = 0;
+    	for(Neuron n : network.getOutputNeurons()) {
+    		if(n.getUpdateRule() instanceof SigmoidalNeuron) {
+    			for(int i = 0; i < network.getTrainingData().length; i++) {
+    				network.getTrainingData()[i][index] = 
+    						((SigmoidalNeuron) n.getUpdateRule())
+    						.getInverse(network.getTrainingData()[i][index], n);
+    			}
+    		} 
+    		index++;
+    	}
+    	
         if (solutionType == SolutionType.WIENER_HOPF) {
-            weinerHopfSolution();
+            weinerHopfSolution(network);
         } else if (solutionType == SolutionType.MOORE_PENROSE) {
-            moorePenroseSolution();
+            moorePenroseSolution(network);
         } else {
             throw new IllegalArgumentException("Solution type must be "
                     + "'MoorePenrose' or 'WeinerHopf'.");
         }
-    }
+        
+    	fireTrainingEnd();
 
-
-    @Override
-    public void init() {
     }
 
     /**
      * Implements the Wiener-Hopf solution to LMS linear regression.
      */
-    public void weinerHopfSolution() {
-        Matrix inputMatrix = new Matrix(getInputData());
-        Matrix trainingMatrix = new Matrix(getTrainingData());
+    public void weinerHopfSolution(Trainable network) {
+        Matrix inputMatrix = new Matrix(network.getInputData());
+		Matrix trainingMatrix = new Matrix(network.getTrainingData());
 
-        trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
-        inputMatrix = inputMatrix.transpose().times(inputMatrix);
+		fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
+		trainingMatrix = inputMatrix.transpose().times(trainingMatrix);
 
-        inputMatrix = inputMatrix.inverse();
+		fireProgressUpdate(
+				"Cross-Correlating States with Teacher data (P = S'D)...", 15);
+		inputMatrix = inputMatrix.transpose().times(inputMatrix);
 
-        double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
-        SimnetUtils.setWeightsFillBlanks(this.getNetwork(), getInputLayer(),
-                getOutputLayer(), wOut);
+		fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
+		try {
+			
+			if(ridgeRegression) {
+				Matrix scaledIdentity = Matrix.identity(inputMatrix.
+						getRowDimension(), inputMatrix.getColumnDimension()).
+						times(alpha * alpha);
+				inputMatrix = inputMatrix.plus(scaledIdentity);
+			} 
+			
+			inputMatrix = inputMatrix.inverse();
+			
 
-        trainingMatrix = null;
-        inputMatrix = null;
+			fireProgressUpdate("Computing Weights...", 80);
+			double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
+			fireProgressUpdate("Setting Weights...", 95);
+			SimnetUtils.setWeights(network.getInputNeurons(),
+					network.getOutputNeurons(), wOut);
+			fireProgressUpdate("Done!", 100);
+
+			// TODO: What error does JAMA actually throw for singular Matrices?
+		} catch (RuntimeException e) {
+			JOptionPane.showMessageDialog(new JFrame(), ""
+					+ "State Correlation Matrix is Singular",
+					"Training Failed", JOptionPane.ERROR_MESSAGE);
+			fireProgressUpdate("Training Failed", 0);
+		}
+
+		trainingMatrix = null;
+		inputMatrix = null;
     }
 
     /**
      * Moore penrose.
      */
-    public void moorePenroseSolution() {
-        Matrix inputMatrix = new Matrix(getInputData());
-        Matrix trainingMatrix = new Matrix(getTrainingData());
+    public void moorePenroseSolution(Trainable network) {
+        Matrix inputMatrix = new Matrix(network.getInputData());
+        Matrix trainingMatrix = new Matrix(network.getTrainingData());
 
+        fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", 0);
         // Computes Moore-Penrose Pseudoinverse
         inputMatrix = Matrices.pinv(inputMatrix);
 
+        fireProgressUpdate("Computing Weights...", 50);
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
-        SimnetUtils.setWeightsFillBlanks(this.getNetwork(), getInputLayer(),
-                getOutputLayer(), wOut);
+        
+        fireProgressUpdate("Setting Weights...", 75);
+		SimnetUtils.setWeights(network.getInputNeurons(),
+				network.getOutputNeurons(), wOut);
+        fireProgressUpdate("Done!", 100);
+        
         inputMatrix = null;
         trainingMatrix = null;
     }
-
+    
     /**
      * Set solution type.
      *
@@ -191,7 +229,23 @@ public class LMSOffline extends Trainer {
         setSolutionType((SolutionType) solutionType.getCurrentObject());
     }
 
-    /**
+    public boolean isRidgeRegression() {
+		return ridgeRegression;
+	}
+
+	public void setRidgeRegression(boolean ridgeRegression) {
+		this.ridgeRegression = ridgeRegression;
+	}
+
+	public double getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(double alpha) {
+		this.alpha = alpha;
+	}
+
+	/**
      * Main method for testing.
      *
      * @param args not used
@@ -236,12 +290,7 @@ public class LMSOffline extends Trainer {
         outputList.add(output);
 
         // ConnectionLayers
-        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
-        synapse.setLowerBound(0);
-        synapse.setUpperBound(1);
         AllToAll connection = new AllToAll(network, inputList, outputList);
-        connection.setBaseExcitatorySynapse(synapse);
-        connection.setBaseInhibitorySynapse(synapse);
         connection.connectNeurons();
 
         // AND Task
@@ -249,12 +298,13 @@ public class LMSOffline extends Trainer {
         double trainingData[][] = { { -1 }, { -1 }, { -1 }, { 1 } };
 
         // Initialize the trainer
-        LMSOffline trainer = new LMSOffline(network, inputList, outputList);
-        trainer.setInputData(inputData);
-        trainer.setTrainingData(trainingData);
-        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
-        trainer.setSolutionType(SolutionType.WIENER_HOPF);
-        trainer.apply();
+        //REDO
+//        LMSOffline trainer = new LMSOffline(network, inputList, outputList);
+//        trainer.setInputData(inputData);
+//        trainer.setTrainingData(trainingData);
+//        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
+//        trainer.setSolutionType(SolutionType.WIENER_HOPF);
+//        trainer.apply();
         return network;
     }
 
@@ -295,21 +345,17 @@ public class LMSOffline extends Trainer {
         }
 
         // Connect Layers
-        Synapse synapse = new Synapse(null, null, new ClampedSynapse());
-        synapse.setLowerBound(0);
-        synapse.setUpperBound(1);
         AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
-        connection.setBaseExcitatorySynapse(synapse);
-        connection.setBaseInhibitorySynapse(synapse);
         connection.connectNeurons();
 
         // Initialize the trainer
-        LMSOffline trainer = new LMSOffline(network, inputLayer, outputLayer);
-        trainer.setInputData(inputData);
-        trainer.setTrainingData(trainingData);
-        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
-        trainer.setSolutionType(SolutionType.WIENER_HOPF);
-        trainer.apply();
+        //REDO
+//        LMSOffline trainer = new LMSOffline(network, inputLayer, outputLayer);
+//        trainer.setInputData(inputData);
+//        trainer.setTrainingData(trainingData);
+//        //trainer.setSolutionType(SolutionType.MOORE_PENROSE);
+//        trainer.setSolutionType(SolutionType.WIENER_HOPF);
+//        trainer.apply();
         return network;
     }
 

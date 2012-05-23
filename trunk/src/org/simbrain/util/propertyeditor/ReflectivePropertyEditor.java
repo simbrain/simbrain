@@ -27,17 +27,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import org.simbrain.network.trainers.Trainer;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -105,6 +109,40 @@ public class ReflectivePropertyEditor extends JPanel {
     public ReflectivePropertyEditor() {
     }
 
+    /**
+     * Returns an action for showing a property dialog for the provided objects.
+     * 
+     * @param Object object the object whose properties should be displayed
+     * @return the action
+     */
+    public static AbstractAction getPropertiesDialogAction(
+            final Object object) {
+        return new AbstractAction() {
+
+            // Initialize
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+                putValue(NAME, "Show properties...");
+                putValue(SHORT_DESCRIPTION, "Show properties");
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void actionPerformed(ActionEvent arg0) {
+                ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
+                editor.setUseSuperclass(false);
+                editor.setObject(object);
+                JDialog dialog = editor.getDialog();
+                dialog.setModal(true);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+
+        };
+    }
+    
     /**
      * Set object to edit. For use with no argument constructor.
      *

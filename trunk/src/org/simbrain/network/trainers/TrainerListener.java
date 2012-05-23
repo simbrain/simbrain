@@ -18,35 +18,33 @@
  */
 package org.simbrain.network.trainers;
 
-import java.util.List;
-
-import org.simbrain.network.interfaces.Network;
-import org.simbrain.network.interfaces.Neuron;
-
 /**
- * Observer class for trainer objects.
+ * Classes with implement this interface fire events indicating 
+ * changes in the status of a trainer.
  *
  * @author jyoshimi
  */
 public interface TrainerListener {
 
-    /**
-     * Called when the error value is updated.  Only applies to iterable methods.
-     */
-    void errorUpdated();
+	/**
+	 * Called when training begins. Useful for forms of training that take a
+	 * while, where indication of progress is useful.
+	 */
+	public void beginTraining();
 
+	/**
+	 * Called when training ends. Useful for forms of training that take a
+	 * while, where indication of progress is useful.
+	 */
+    public void endTraining();
+    
     /**
-     * The trainer's input data changed.
-     *
-     * @param inputData the new input data.
-     */
-    void inputDataChanged(double[][] inputData);
-
-    /**
-     * The trainer's training data changed.
-     *
-     * @param trainingData the new training data
-     */
-    void trainingDataChanged(double[][] trainingData);
+	 * Called for updates on the progress of a trainer. Used currently for
+	 * progress bars.
+	 * 
+	 * @param progressUpdate a string message about the  current progress on an update.
+	 * @param percentComplete how far along an operation is.
+	 */
+    public void progressUpdated(String progressUpdate, int percentComplete);
 
 }

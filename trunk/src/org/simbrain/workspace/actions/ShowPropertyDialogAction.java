@@ -18,20 +18,13 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.WorkspaceDialog;
 
 /**
  * Opens a workspace property dialog.
@@ -61,35 +54,7 @@ public final class ShowPropertyDialogAction extends AbstractAction {
      *            Action event
      */
     public void actionPerformed(final ActionEvent event) {
-
-        StandardDialog dialog = new StandardDialog();
-        dialog.setTitle("Workspace Properties");
-        LabelledItemPanel mainPanel = new LabelledItemPanel();
-
-        // Panel with a slider bar and label to display simulation speed
-        JPanel sliderPanel = new JPanel();
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 500, workspace.getUpdateDelay());
-        final JLabel speedLabel = new JLabel("" + workspace.getUpdateDelay());
-        speedLabel.setPreferredSize(new Dimension(50,10));
-        slider.setToolTipText("Use this to delay simulation speed; "
-                + "sometimes useful for demo purposes");
-        slider.setMajorTickSpacing(100);
-        slider.setPaintTicks(true);
-        slider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                JSlider source = (JSlider) e.getSource();
-                workspace.setUpdateDelay(source.getValue());
-                speedLabel.setText("" + workspace.getUpdateDelay());
-            }
-        });
-        sliderPanel.add(slider);
-        sliderPanel.add(speedLabel);
-        sliderPanel.setBorder(null);
-
-        mainPanel.addItem(
-                "Simulation delay (millisconds to sleep between iterations)",
-                sliderPanel);
-        dialog.setContentPane(mainPanel);
+    	WorkspaceDialog dialog = new WorkspaceDialog(workspace);
         dialog.setModal(true);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

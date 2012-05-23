@@ -177,6 +177,35 @@ public final class Coupling<E> {
         }
         return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
      }
+    
+    /**
+     * Returns an id used for persistence.
+     * 
+     * @return id
+     */
+	public String getId() {
+		String producerString;
+		String consumerString;
+		if (producer == null) {
+			producerString = "Null";
+		} else {
+			producerString = producer.getParentComponent().getName()
+					+ ":"
+					+ producer.getParentComponent().getKeyFromObject(
+							producer.getBaseObject()) + ":"
+					+ producer.getMethodName();
+		}
+		if (consumer == null) {
+			consumerString = "Null";
+		} else {
+			consumerString = consumer.getParentComponent().getName()
+					+ ":"
+					+ consumer.getParentComponent().getKeyFromObject(
+							consumer.getBaseObject()) + ":"
+					+ consumer.getMethodName();
+		}
+		return producerString + "-" + consumerString;
+ 	}
 
     /**
      * {@inheritDoc}
@@ -217,4 +246,5 @@ public final class Coupling<E> {
         producer.getParentComponent().removeOutgoingCoupling(this);
         consumer.getParentComponent().removeIncomingCoupling(this);
     }
+
 }

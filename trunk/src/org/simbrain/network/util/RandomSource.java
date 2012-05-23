@@ -178,6 +178,14 @@ public class RandomSource {
         return distributionIndex;
     }
 
+    public String getDistributionName() {
+    	if(distributionIndex == 1) {
+    		return "Gaussian";
+    	} else {
+    		return "Uniform";
+    	}
+    }
+    
     /**
      * @param distributionIndex
      *            The distributionIndex to set.

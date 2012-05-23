@@ -28,7 +28,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public interface ComponentUpdateListener {
 
-	/*
+	/**
      * Called when a component update begins.
      *
      * @param component The component being updated.

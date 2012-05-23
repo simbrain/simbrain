@@ -82,7 +82,7 @@ public class MultipathLayout implements Layout {
 
         // set the first layer
         Network currentLayer = layers.get(0);
-        ArrayList<Neuron> neurons = currentLayer.getFlatNeuronList();
+        List<Neuron> neurons = currentLayer.getFlatNeuronList();
         for (int j = 0; j < neurons.size(); j++) {
             //double hOffset  =  ((baseCount - neurons.size()) * hSpacing) / 2;
             Neuron neuron = (Neuron) neurons.get(j);

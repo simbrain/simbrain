@@ -171,6 +171,19 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     }
 
     /**
+     * Fills fields with values from a Random Source.
+     * @param rand
+     */
+    public void fillFieldValues(RandomSource rand) {
+        cbDistribution.setSelectedIndex(rand.getDistributionIndex());
+        tsClipping.setSelected(rand.getClipping());
+        tfLowBound.setText(Double.toString(rand.getLowerBound()));
+        tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        tfMean.setText(Double.toString(rand.getMean()));
+    }
+    
+    /**
      * Fills fields with default values.
      */
     public void fillDefaultValues() {

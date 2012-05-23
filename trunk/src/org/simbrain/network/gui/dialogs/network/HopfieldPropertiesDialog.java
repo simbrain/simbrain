@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs.network;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 
-import org.simbrain.network.networks.Hopfield;
+import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;

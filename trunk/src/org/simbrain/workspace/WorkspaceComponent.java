@@ -58,24 +58,6 @@ public abstract class WorkspaceComponent {
     /** List of consumer types. */
     private final List<AttributeType> consumerTypes = new ArrayList<AttributeType>();
 
-    // TODO: Only create and maintain the lists below when in priority update
-    // mode
-    /**
-     * List of couplings which attach to this component (i.e. have a consumer
-     * whose parent is this component). Used in priority based update.
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     */
-    private final List<Coupling<?>> incomingCouplingList = new ArrayList<Coupling<?>>();
-
-    /**
-     * List of couplings which originate in this component (i.e. have a producer
-     * whose parent is this component).Used in priority based update.
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     */
-    private final List<Coupling<?>> outgoingCouplingList = new ArrayList<Coupling<?>>();
-
     /**
      * Whether to display the GUI for this component (obviously only relevant
      * when Simbrain is run as a GUI).
@@ -103,13 +85,6 @@ public abstract class WorkspaceComponent {
      * org.simbrain.workspace.Workspace#preSerializationInit()}.
      */
     private int serializePriority = 0;
-
-    /**
-     * When using priority update, update components in the order of their
-     * priority, which lower values meaning earlier update. {@see
-     * org.simbrain.workspace.updator.PriorityUpdator}.
-     */
-    private int updatePriority = 0;
 
     /**
      * Initializer
@@ -466,15 +441,6 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * The overall name for the set of supported formats.
-     *
-     * @return the description
-     */
-    public String getDescription() {
-        return null;
-    }
-
-    /**
      * The file extension for a component type, e.g. By default, "xml".
      *
      * @return the file extension
@@ -625,75 +591,6 @@ public abstract class WorkspaceComponent {
      */
     protected void setSerializePriority(int serializePriority) {
         this.serializePriority = serializePriority;
-    }
-
-    /**
-     * @return the updatePriority
-     */
-    public int getUpdatePriority() {
-        return updatePriority;
-    }
-
-    /**
-     * @param updatePriority the updatePriority to set
-     */
-    public void setUpdatePriority(int updatePriority) {
-        this.updatePriority = updatePriority;
-        workspace.resortPriorities();
-    }
-
-    /**
-     * Add an "incoming" coupling to this component (that is, a coupling which
-     * has a consumer whose parent is this component).
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     */
-    protected void addIncomingCoupling(Coupling<?> incomingCoupling) {
-        incomingCouplingList.add(incomingCoupling);
-    }
-
-    /**
-     * Add an "outgoing" coupling to this component (that is, a coupling which
-     * has a producer whose parent is this component).
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     */
-    protected void addOutgoingCoupling(Coupling<?> outgoingCoupling) {
-        outgoingCouplingList.add(outgoingCoupling);
-    }
-
-    /**
-     * Remove an "incoming" coupling from this component (that is, a coupling
-     * which has a consumer whose parent is this component).
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     */
-    protected void removeIncomingCoupling(Coupling<?> incomingCoupling) {
-        incomingCouplingList.remove(incomingCoupling);
-    }
-
-    /**
-     * Remove an "outgoing" coupling from this component (that is, a coupling
-     * which has a producer whose parent is this component).
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     */
-    protected void removeOutgoingCoupling(Coupling<?> outgoingCoupling) {
-        outgoingCouplingList.remove(outgoingCoupling);
-    }
-
-    /**
-     * @return the incomingCouplingList
-     */
-    public List<Coupling<?>> getIncomingCouplings() {
-        return incomingCouplingList;
-    }
-
-    /**
-     * @return the outgoingCouplingList
-     */
-    public List<Coupling<?>> getOutgoingCouplings() {
-        return outgoingCouplingList;
     }
 
 }

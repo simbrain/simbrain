@@ -195,7 +195,7 @@ public class SOM extends Subnetwork {
     public void iterate() {
         for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
-            winDistance = Double.MAX_VALUE;
+            winDistance = Double.POSITIVE_INFINITY;
             winner = 0;
             int counter;
             double physicalDistance;
@@ -300,7 +300,7 @@ public class SOM extends Subnetwork {
         for (epochNumber = 0; epochNumber < batchSize; epochNumber++) {
             for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
-                winDistance = Double.MAX_VALUE;
+                winDistance = Double.POSITIVE_INFINITY;
                 winner = 0;
                 int counter;
                 double physicalDistance;
@@ -372,7 +372,7 @@ public class SOM extends Subnetwork {
     @Override
     public void update() {
 
-        winDistance = Double.MAX_VALUE;
+        winDistance = Double.POSITIVE_INFINITY;
         // winner = 0;
         double physicalDistance;
 

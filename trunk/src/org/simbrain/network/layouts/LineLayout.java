@@ -93,13 +93,6 @@ public class LineLayout implements Layout {
     /**
      * {@inheritDoc}
      */
-    public void layoutNeurons(final Network network) {
-        layoutNeurons(network.getFlatNeuronList());
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
     public void layoutNeurons(final List<Neuron> neurons) {
         if (orientation == LineOrientation.VERTICAL) {
             double ypos = initialY;
@@ -117,8 +110,6 @@ public class LineLayout implements Layout {
             }
         }
     }
-    
-    
 
     /** @see Layout */
     public void setInitialLocation(final Point2D initialPoint) {

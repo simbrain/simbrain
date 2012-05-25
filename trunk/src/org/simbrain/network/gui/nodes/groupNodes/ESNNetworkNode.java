@@ -25,7 +25,7 @@ import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 /**
  * PNode representation of an Echo State Network.
  */
-public class ESNNetworkNode extends SubnetGroupNode {
+public class ESNNetworkNode extends SubnetworkNode {
 		
 	/**
      * Create an ESN network

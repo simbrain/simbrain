@@ -257,7 +257,7 @@ public class SimbrainMath {
      * @return largest value in array
      */
     public static double getMaximum(final double[] theVec) {
-        double max = Double.MIN_VALUE;
+        double max = Double.NEGATIVE_INFINITY;
 
         for (int i = 0; i < theVec.length; i++) {
             if (theVec[i] > max) {

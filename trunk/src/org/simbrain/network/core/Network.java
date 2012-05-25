@@ -33,8 +33,8 @@ import org.simbrain.network.util.CopyPaste;
 /**
  * <b>Network</b> provides core neural network functionality and is the the main
  * API for external calls. Network objects are sets of neurons and weights
- * connecting them. Most update and learning logic occurs in the neurons and weights themselves,
- * as well as in special groups.
+ * connecting them. Most update and learning logic occurs in the neurons and
+ * weights themselves, as well as in special groups.
  */
 public abstract class Network {
 
@@ -56,9 +56,6 @@ public abstract class Network {
     /** Array list of synapses. */
     private final List<Synapse> synapseList = new ArrayList<Synapse>();
 
-    /** Array list of sub-networks. */
-    private ArrayList<Network> networkList = new ArrayList<Network>();
-
     /** Since groups span all levels of the hierarchy they are stored here. */
     private final List<Group> groupList = new ArrayList<Group>();
 
@@ -73,14 +70,6 @@ public abstract class Network {
 
     /** Only used for sub-nets of complex networks which have parents. */
     private Network parentNet = null;
-    
-    /**
-     *  Sequence in which the update function should be called
-     *  for this sub-network. By default, this is set to 0 for all
-     *  the sub-networks. If you want a subset of sub-networks to fire
-     *  before others, assign it a higher priority value.
-     */
-    private int updatePriority = 0;
 
     /**
      * Used to create an instance of network (Default constructor).
@@ -98,50 +87,9 @@ public abstract class Network {
     }
 
     /**
-     * Make a copy of the provided network, using the provided root network as
-     * its root.
-     *
-     * @param newRoot the new root network
-     * @param oldNetwork the old network to copy
-     * @return the new copy of the network
-     */
-    public static Network newInstance(final RootNetwork newRoot,
-            final Network oldNetwork) {
-
-        //REDO
-//        if (oldNetwork instanceof Competitive) {
-//            return new Competitive(newRoot, (Competitive) oldNetwork);
-//        } else if (oldNetwork instanceof KWTA) {
-//            return new KWTA(newRoot, (KWTA) oldNetwork);
-//        } else if (oldNetwork instanceof SOM) {
-//            return new SOM(newRoot, (SOM) oldNetwork);
-//        } 
-//        } else if (oldNetwork instanceof WinnerTakeAll) {
-//            return new WinnerTakeAll(newRoot, (WinnerTakeAll) oldNetwork);
-//        }
-//        else if (oldNetwork instanceof Hopfield) {
-//            return new Hopfield(newRoot, (Hopfield) oldNetwork);
-//        } 
-        return null;
-    }
-
-    /**
      * Update the network.
      */
     public abstract void update();
-
-    /**
-     * Updates all networks.
-     */
-    public void updateAllNetworks() {
-        //TODO: Unable to init logger after deserialize
-//        logger.debug("updating " + networkList.size() + " networks");
-
-        for (Network network : networkList) {
-  //          logger.debug("updating network: " + network);
-            network.update();
-        }
-    }
 
     /**
      * Adds a list of network elements to this network.
@@ -157,9 +105,6 @@ public abstract class Network {
             } else if (object instanceof Synapse) {
                 Synapse synapse = (Synapse) object;
                 addSynapse(synapse);
-            } else if (object instanceof Network) {
-                Network net = (Network) object;
-                addNetwork(net);
             } else if (object instanceof NetworkTextObject) {
                 this.getRootNetwork().addText((NetworkTextObject) object);
             }
@@ -188,46 +133,17 @@ public abstract class Network {
     }
 
     /**
-     * @return how many subnetworks down this is
-     */
-    public int getDepth() {
-        Network net = this;
-        int n = 0;
-
-        while (!(net instanceof RootNetwork)) {
-            net = net.getParentNetwork();
-            n++;
-        }
-
-        return n;
-    }
-
-    /**
-     * @return a string of tabs for use in indenting debug info accroding to the
-     *         depth of a subnet
-     */
-    public String getIndents() {
-        String ret = new String("");
-
-        for (int i = 0; i < (this.getDepth() - 1); i++) {
-            ret = ret.concat("\t");
-        }
-
-        return ret;
-    }
-
-    /**
      * @return List of neurons in network.
      */
     public List<? extends Neuron> getNeuronList() {
-        return this.neuronList;
+        return Collections.unmodifiableList(neuronList);
     }
 
     /**
      * @return List of synapses in network.
      */
     public List<Synapse> getSynapseList() {
-        return this.synapseList;
+        return Collections.unmodifiableList(synapseList);
     }
 
     /**
@@ -509,13 +425,6 @@ public abstract class Network {
         // Notify listeners that this neuron has been deleted
         rootNetwork.fireNeuronRemoved(toDelete);
 
-        //If we just removed the last neuron of a network, remove that network
-        Network parent = toDelete.getParentNetwork();
-        if (!(parent instanceof RootNetwork)) {
-            if (parent.isEmpty()) {
-                parent.getParentNetwork().deleteNetwork(parent);
-            }
-        }
     }
 
     /**
@@ -723,33 +632,6 @@ public abstract class Network {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public String toString() {
-        String ret = new String();
-
-        for (Neuron n : neuronList) {
-            ret += (getIndents() + n + "\n");
-        }
-
-        if (synapseList.size() > 0) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse tempRef = (Synapse) synapseList.get(i);
-                ret += (getIndents() + tempRef);
-            }
-        }
-
-        for (int i = 0; i < networkList.size(); i++) {
-            Network net = (Network) networkList.get(i);
-            ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
-            ret += (getIndents() + "--------------------------------\n");
-            ret += net.toString();
-        }
-
-        return ret;
-    }
-
-    /**
      * @return Degree to which to round off values.
      */
     public int getPrecision() {
@@ -891,67 +773,13 @@ public abstract class Network {
     }
 
     /**
-     * Adds a new network.
-     * @param n Network type to add.
-     */
-    public void addNetwork(final Network n) {
-        networkList.add(n);
-        n.setParentNetwork(this);
-        n.setRootNetwork(rootNetwork);
-        getRootNetwork().fireSubnetAdded(n);
-        n.setId(getRootNetwork().getNetworkIdGenerator().getId());
-    }
-
-    /**
-     * @param i Network number to get.
-     * @return network
-     */
-    public Network getNetwork(final int i) {
-        return (Network) networkList.get(i);
-    }
-
-    /**
-     * Delete network.
-     *
-     * @param toDelete Network to be deleted
-     */
-    public void deleteNetwork(final Network toDelete) {
-
-        // Remove all neurons (and the synapses with them)
-        while (toDelete.getNeuronList().size() > 0) {
-            toDelete.removeNeuron(toDelete.getNeuron(0));
-        }
-
-        // Remove all subnets
-        while (toDelete.getNetworkList().size() > 0) {
-            toDelete.deleteNetwork(toDelete.getNetwork(0));
-        }
-
-        // Remove the network
-        if (toDelete.getParentNetwork() != null) {
-            toDelete.getParentNetwork().getNetworkList().remove(toDelete);
-        }
-
-        //If we just removed the last neuron of a network, remove that network
-        Network parent = toDelete.getParentNetwork();
-        if (!(parent instanceof RootNetwork)) {
-            if (parent.isEmpty()) {
-                parent.getParentNetwork().deleteNetwork(parent);
-            }
-        }
-
-        // Notify listeners
-        rootNetwork.fireSubnetDeleted(toDelete);
-    }
-
-    /**
      * Add a group to the network.
      *
      * @param group group of network elements
      */
     public void addGroup(final Group group) {
         if ((rootNetwork != null)) {
-            
+
             // Generate group id
             String id = getRootNetwork().getGroupIdGenerator().getId();
             group.setId(id);
@@ -1005,35 +833,7 @@ public abstract class Network {
         if (this.getNeuronCount() == 0) {
             neuronsGone = true;
         }
-        if (this.getNetworkList().isEmpty()) {
-            networksGone = true;
-        }
         return (neuronsGone && networksGone);
-    }
-
-    /**
-     * Add an array of networks and set their parents to this.
-     *
-     * @param networks list of neurons to add
-     */
-    public void addNetworkList(final ArrayList<Network> networks) {
-        for (Network n : networks) {
-            addNetwork(n);
-        }
-    }
-
-    /**
-     * @return Returns the networkList.
-     */
-    public ArrayList<Network> getNetworkList() {
-        return networkList;
-    }
-
-    /**
-     * @param networkList The networkList to set.
-     */
-    public void setNetworkList(final ArrayList<Network> networkList) {
-        this.networkList = networkList;
     }
 
     /**
@@ -1043,7 +843,7 @@ public abstract class Network {
      * @return the flat list
      */
     public List<Neuron> getFlatNeuronList() {
-        
+
         List<Neuron> ret = new ArrayList<Neuron>();
         ret.addAll(neuronList);
 
@@ -1069,13 +869,7 @@ public abstract class Network {
     public List<Synapse> getFlatSynapseList() {
         List<Synapse> ret = new ArrayList<Synapse>();
         ret.addAll(synapseList);
-
-        for (int i = 0; i < networkList.size(); i++) {
-            Network net = (Network) networkList.get(i);
-            List<Synapse> toAdd;
-            toAdd = net.getFlatSynapseList();
-            ret.addAll(toAdd);
-        }
+        //TODO: Deal with group neurons.   Check all uses of this.
 
         return ret;
     }
@@ -1089,28 +883,7 @@ public abstract class Network {
         ArrayList<Object> ret = new ArrayList<Object>();
         ret.addAll(getNeuronList());
         ret.addAll(getSynapseList());
-        ret.addAll(getNetworkList());
-        return ret;
-    }
-
-    /**
-     * Create "flat" list of all subnetworks.
-     *
-     * @return the flat list
-     */
-    public ArrayList<Network> getFlatNetworkList() {
-        ArrayList<Network> ret = new ArrayList<Network>();
-        ret.addAll(networkList);
-
-        for (int i = 0; i < networkList.size(); i++) {
-            Network net = (Network) networkList.get(i);
-            ArrayList<Network> toAdd;
-
-            toAdd = net.getFlatNetworkList();
-
-            ret.addAll(toAdd);
-        }
-
+        // TODO: Group list?
         return ret;
     }
 

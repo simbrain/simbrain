@@ -21,7 +21,6 @@ package org.simbrain.network.gui.filters;
 import org.simbrain.network.gui.nodes.GroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
-import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
@@ -92,25 +91,17 @@ public final class Filters {
         public boolean accept(final PNode node) {
                 return (((node instanceof NeuronNode) && (!isGrouped(node)))
                         || ((node instanceof SynapseNode) && (!isGrouped(node)))
-                        || ((node instanceof TextNode) && (!isGrouped(node)))
-                        || ((node instanceof SubnetworkNode) && (!isGrouped(node)))
+                        || ((node instanceof TextNode) && (!isGrouped(node)))                       
                         || (node instanceof ViewGroupNode));
             }
     };
 
-    /** Subnetwork node filter. */
-    private static final AbstractFilter SUBNETWORK_NODE_FILTER = new AbstractFilter() {
-            /** @see AbstractFilter */
-            public boolean accept(final PNode node) {
-                return (node instanceof SubnetworkNode);
-            }
-        };
 
         /** Subnetwork node filter. */
     private static final AbstractFilter PARENT_NODE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-            return ((node instanceof SubnetworkNode) || (node instanceof GroupNode));
+            return (node instanceof GroupNode);
         }
     };
 
@@ -148,15 +139,6 @@ public final class Filters {
      */
     public static AbstractFilter getSynapseNodeFilter() {
         return SYNAPSE_NODE_FILTER;
-    }
-
-    /**
-     * Return the subnetwork node filter.
-     *
-     * @return the subnetwork node filter
-     */
-    public static AbstractFilter getSubnetworkNodeFilter() {
-        return SUBNETWORK_NODE_FILTER;
     }
 
     /**

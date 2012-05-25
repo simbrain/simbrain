@@ -41,13 +41,11 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
     public ViewGroupNode(final NetworkPanel netPanel, final ArrayList<ScreenElement> elements) {
         super(netPanel);
         PBounds bounds = new PBounds();
-        for (ScreenElement element : elements) {
-            if (!(element instanceof SubnetworkNode)) {
-                element.setPickable(false);
-                groupedObjects.add(element);
-                bounds.add(element.getGlobalBounds());
-            }
-        }
+		for (ScreenElement element : elements) {
+			element.setPickable(false);
+			groupedObjects.add(element);
+			bounds.add(element.getGlobalBounds());
+		}
         this.setBounds(bounds);
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
     }

@@ -53,7 +53,7 @@ public class KWTA extends Subnetwork  {
      * subnetwork.
      */
     private double inhibitoryConductance;
-    
+
     //REDO
 //
 //    /**

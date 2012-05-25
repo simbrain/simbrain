@@ -91,7 +91,7 @@ public class SFileChooser {
      * only one extension is supported.
      *
      * @param currentDirectory Open and save directory
-     * @param description the description of the extension
+     * @param description a description of the extension
      * @param extension File type extension for open and save
      */
     public SFileChooser(final String currentDirectory, final String description, final String extension) {

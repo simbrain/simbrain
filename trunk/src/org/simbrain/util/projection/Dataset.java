@@ -327,7 +327,7 @@ public class Dataset {
      * @return minimum distance between any two points in the low-d dataset
      */
     public double getMinimumDistance() {
-        double l = Double.MAX_VALUE;
+        double l = Double.POSITIVE_INFINITY;
         int stop = getDistanceEnd();
 
         calculateDistances();

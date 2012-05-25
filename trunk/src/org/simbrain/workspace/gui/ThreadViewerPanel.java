@@ -109,19 +109,9 @@ public class ThreadViewerPanel extends JPanel {
 		        dialog.setVisible(true);
 			}
         });
-        
+
         topStatsPanel.add(showUpdateManager);
-        
-        //REDO
-//        updatorComboBox.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent arg0) {
-//                if (updatorComboBox.getSelectedItem() == WorkspaceUpdator.TYPE.BUFFERED) {
-//                    workspace.setUpdateController(new BufferedUpdator());
-//                } else if (updatorComboBox.getSelectedItem() == WorkspaceUpdator.TYPE.PRIORITY) {
-//                    workspace.setUpdateController(new PriorityUpdator());
-//                }
-//            }
-//        });
+
 
         topStatsPanel.addSeparator();
         topStatsPanel.add(new JLabel("Number of Threads: "));

@@ -121,12 +121,12 @@ public final class Coupling<E> {
                             public E call() throws Exception {
                                 consumer.setValue(buffer);
                                 LOGGER.debug(consumer.getParentComponent()
-                                        .getDescription()
+                                        .getName()
                                         + " just consumed "
                                         + producer.getValue()
                                         + " from "
                                         + producer.getParentComponent()
-                                                .getDescription());
+                                                .getName());
 
                                 return null;
                             }
@@ -177,7 +177,7 @@ public final class Coupling<E> {
         }
         return  producerComponent + " " + producerString +  " --> " + consumerComponent + " " + consumerString;
      }
-    
+
     /**
      * Returns an id used for persistence.
      * 
@@ -225,26 +225,6 @@ public final class Coupling<E> {
      */
     public int hashCode() {
         return producer.hashCode() + (ARBITRARY_PRIME * consumer.hashCode());
-    }
-
-    //TODO: Below should only occur when in priority update.
-
-    /**
-     * Update internal list of incoming / outgoing couplings used in priority
-     * based update.
-     */
-    protected void addCouplingsToComponentList() {
-        producer.getParentComponent().addOutgoingCoupling(this);
-        consumer.getParentComponent().addIncomingCoupling(this);
-    }
-
-    /**
-     * Update internal list of incoming / outgoing couplings used in priority
-     * based update.
-     */
-    protected void removeCouplingsFromComponentLists() {
-        producer.getParentComponent().removeOutgoingCoupling(this);
-        consumer.getParentComponent().removeIncomingCoupling(this);
     }
 
 }

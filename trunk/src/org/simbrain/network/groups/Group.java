@@ -29,18 +29,17 @@ public abstract class Group {
     /** Reference to the network this group is a part of. */
     private final RootNetwork parentNetwork;
 
-//    /** Whether this Group should be active or not. */
-//    private boolean isOn = true;
-
     /** Name of this group. */
     private String id;
 
-    /** Name of this group.  Null strings lead to default labeling conventions.  */
-    private String label; 
+	/** Name of this group. Null strings lead to default labeling conventions. */
+	private String label;
 
-    /** Whether this group should be deleted when all its components are deleted. */
+	/**
+	 * Whether this group should be deleted when all its components are deleted.
+	 */
     private boolean deleteWhenEmpty = true;
-    
+
     /** Flag which prevents infinite loops when deleting composite groups. */
     private boolean markedForDeletion = false;
 
@@ -70,34 +69,12 @@ public abstract class Group {
      * Update this group.
      */
     public abstract void update();
-    
+
     /**
      * Perform necessary deletion cleanup.
      */
     public abstract void delete();
 
-//
-//    /**
-//     * Turn the group on or off.  When off, the group update function
-//     * should not be called.
-//     */
-//    public void toggleOnOff() {
-//        if (isOn) {
-//            isOn = false;
-//        } else {
-//            isOn = true;
-//        }
-//    }
-//
-//    /**
-//     * @return whether the group is "on" or not.
-//     */
-//    public boolean isOn() {
-//        return isOn;
-//    }
-//
-
-    
     @Override
     public String toString() {
         if (label != null) {
@@ -165,11 +142,11 @@ public abstract class Group {
     public boolean isDeleteWhenEmpty() {
         return deleteWhenEmpty;
     }
-    
+
     /**
      * Returns true if this group has a parent group (i.e. it is a sub-group
      * within a larger group).
-     * 
+     *
      * @return true if this group has a parent, false otherwise.
      */
     public boolean hasParentGroup() {
@@ -177,7 +154,7 @@ public abstract class Group {
             return false;
         } else {
             return true;
-        }        
+        }
     }
 
     /**

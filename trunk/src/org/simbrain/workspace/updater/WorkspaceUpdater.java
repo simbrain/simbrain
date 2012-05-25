@@ -45,7 +45,7 @@ import org.simbrain.workspace.WorkspaceComponent;
  * notification updates (a single thread), and one for component updates (a
  * thread pool with multiple threads that can be configured), for cases when
  * component updating happens concurrently.
- * 
+ *
  * @author Matt Watson
  * @author Jeff Yoshimi
  */
@@ -107,10 +107,10 @@ public class WorkspaceUpdater {
 		// a thread pool with a configurable number of threads is used
         componentUpdates = Executors.newFixedThreadPool(threads,
                 new UpdaterThreadFactory());
-        
+
         // A single thread to fire notification events
         notificationEvents = Executors.newSingleThreadExecutor();
-        
+
         // Instantiate the update action manager
         updateActionManager = new UpdateActionManager(this);
 
@@ -603,21 +603,6 @@ public class WorkspaceUpdater {
         workspace.getCouplingManager().updateAllCouplings();
         LOGGER.trace("couplings updated");
         workspace.getUpdater().notifyCouplingsUpdated();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public void updateOutgoingCouplings(WorkspaceComponent component) {
-        workspace.getCouplingManager().updateOutgoingCouplings(component);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void updateIncomingCouplings(WorkspaceComponent component) {
-        workspace.getCouplingManager().updateIncomingCouplings(component);
     }
 
 	/**

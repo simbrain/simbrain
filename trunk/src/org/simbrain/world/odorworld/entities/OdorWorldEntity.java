@@ -297,7 +297,7 @@ public abstract class OdorWorldEntity {
      */
     public String getName() {
         if (name == null) {
-            return id; // For backwards compatibility as of 2/11
+            return id;
         } else {
             return name;
         }
@@ -316,11 +316,7 @@ public abstract class OdorWorldEntity {
      * @return the id
      */
     public String getId() {
-        if (id == null) {
-            return name; // For backwards compatibility as of 2/11
-        } else {
-            return id;
-        }
+		return id;
     }
 
     /**

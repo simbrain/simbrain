@@ -40,7 +40,7 @@ import org.simbrain.network.gui.nodes.InteractionBox;
  * 
  * @author jyoshimi
  */
-public class HopfieldNode extends SubnetGroupNode {
+public class HopfieldNode extends SubnetworkNode {
     
     /**
      * Create a Hopfield Network PNode.

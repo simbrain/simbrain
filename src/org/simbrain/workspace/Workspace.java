@@ -243,9 +243,6 @@ public class Workspace {
 
         fireWorkspaceComponentAdded(component);
 
-        // If priority based update, resort the component list by priorities
-        resortPriorities();
-
     }
 
     /**
@@ -676,18 +673,6 @@ public class Workspace {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Resort the components according to update priorities
-     */
-    protected void resortPriorities() {
-        Collections.sort(componentList, new Comparator<WorkspaceComponent>() {
-            public int compare(WorkspaceComponent c1, WorkspaceComponent c2) {
-                return Integer.valueOf(c1.getUpdatePriority()).compareTo(
-                        Integer.valueOf(c2.getUpdatePriority()));
-            }
-        });
     }
 
 }

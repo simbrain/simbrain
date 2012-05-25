@@ -20,7 +20,6 @@ package org.simbrain.network.util;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
@@ -29,14 +28,14 @@ import org.simbrain.network.core.Synapse;
 
 /**
  * <b>CopyPaste</b> provides utilities for creating copies of arbitrary
- * collections of network objects (neurons, synapses, networks, groups, text
+ * collections of network objects (neurons, synapses, groups, text
  * objects, etc.).
  */
 public class CopyPaste {
 
     /**
      * Creates a copy of a list of network model elements: neurons, synapses,
-     * networks, and groups.
+     * and groups.
      *
      * @param newParent parent network for these objects. May be a root network
      *            or a subnetwork.
@@ -54,29 +53,13 @@ public class CopyPaste {
 
         for (Object item : items) {
             if (item instanceof Neuron) {
-                Neuron oldNeuron = ((Neuron) item);
-                // Don't make direct copies of neurons inside a subnetwork. They
-                // will be copied (with the correct parent network) in the
-                // Network copy constructor.
-                if (!isContainedInANetwork(oldNeuron, items)) {
-                    Neuron newNeuron = new Neuron(newParent, oldNeuron);
-                    ret.add(newNeuron);
-                    neuronMappings.put(oldNeuron, newNeuron);
-                }
+				Neuron oldNeuron = ((Neuron) item);
+				Neuron newNeuron = new Neuron(newParent, oldNeuron);
+				ret.add(newNeuron);
+				neuronMappings.put(oldNeuron, newNeuron);
             } else if (item instanceof Synapse) {
                 if (!isStranded((Synapse) item, items)) {
                     synapses.add((Synapse) item);
-                }
-            } else if (item instanceof Network) {
-                Network oldNet = (Network) item;
-                Network newNet = Network.newInstance(
-                        newParent.getRootNetwork(), oldNet);
-                ret.add(newNet);
-                Iterator<Neuron> oldNeuronIterator = oldNet.getFlatNeuronList()
-                        .iterator();
-                for (Neuron newNeuron : newNet.getFlatNeuronList()) {
-                    neuronMappings.put(oldNeuronIterator.next(),
-                            newNeuron);
                 }
             } else if (item instanceof NetworkTextObject) {
                 NetworkTextObject text = ((NetworkTextObject) item);
@@ -97,26 +80,6 @@ public class CopyPaste {
         }
 
         return ret;
-    }
-
-    /**
-     * Returns true if the neuron is contained in some subnetwork included in
-     * the list.
-     *
-     * @param toCheck neuron to check
-     * @param allItems list of items, whose subnetworks should be checked
-     * @return true if the neuron to check is in the list of items
-     */
-    private static boolean isContainedInANetwork(final Neuron toCheck, 
-            final ArrayList<?> allItems) {
-        for (Object object : allItems) {
-            if (object instanceof Network) {
-                if (((Network) object).getFlatNeuronList().contains(toCheck)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**

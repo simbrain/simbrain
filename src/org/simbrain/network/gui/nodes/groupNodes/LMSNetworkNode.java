@@ -43,7 +43,7 @@ import org.simbrain.util.genericframe.GenericFrame;
  * 
  * @author jyoshimi
  */
-public class LMSNetworkNode extends SubnetGroupNode {
+public class LMSNetworkNode extends SubnetworkNode {
 
     /**
      * Create a layered network

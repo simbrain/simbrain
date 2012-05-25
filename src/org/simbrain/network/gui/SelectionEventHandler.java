@@ -29,7 +29,6 @@ import java.util.Iterator;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionMarquee;
-import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.util.SimnetUtils;
@@ -249,14 +248,7 @@ final class SelectionEventHandler
                     ((NeuronNode)node).pushViewPositionToModel();
                 } else if (node instanceof TextNode) {
                     ((TextNode)node).pushViewPositionToModel();
-                } else if (node instanceof SubnetworkNode) {
-                    for (Object object : (ArrayList) node.getAllNodes()) {
-                      if (object instanceof NeuronNode) {
-                          ((NeuronNode)object).setMoving(false);
-                          ((NeuronNode)object).pushViewPositionToModel();
-                      }
-                  }
-              }
+                }
             }
 
             // end drag selected node(s)

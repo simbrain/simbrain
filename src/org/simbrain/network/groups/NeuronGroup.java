@@ -177,26 +177,25 @@ public class NeuronGroup extends Group {
         if (isEmpty() && isDeleteWhenEmpty()) {
             delete();
         }
-        //REDO
         //getParent().fireGroupChanged(this, this);
     }
-    
+
     @Override
     public String toString() {
         String ret = new String();
         ret += ("Neuron Group [" + getLabel() + "] Neuron group with "
                 + this.getNeuronList().size() + " neuron(s)\n");
         return ret;
-    }   
+    }
 
     @Override
     public boolean isEmpty() {
         return neuronList.isEmpty();
     }
-    
+
     /**
      * True if the group contains the specified neuron.
-     * 
+     *
      * @param n neuron to check for.
      * @return true if the group contains this neuron, false otherwise
      */
@@ -287,6 +286,7 @@ public class NeuronGroup extends Group {
     }
     
     /**
+     * 
      * Translate all neurons (the only objects with position information).
      *
      * @param offsetX x offset for translation.
@@ -298,5 +298,5 @@ public class NeuronGroup extends Group {
             neuron.setY(neuron.getY() + offsetY);
         }
     }
-    
+
 }

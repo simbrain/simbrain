@@ -33,13 +33,6 @@ import org.simbrain.network.core.Neuron;
 public interface Layout {
 
     /**
-     * Layout a network.
-     *
-     * @param network reference to network whose nodes should be laid out
-     */
-    void layoutNeurons(Network network);
-
-    /**
      * Layout a list of neurons.
      *
      * @param neurons the list of neurons

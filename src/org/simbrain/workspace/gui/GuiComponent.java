@@ -78,7 +78,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
         chooser = new SFileChooser(WorkspacePreferences.getCurrentDirectory(workspaceComponent.getClass()),
-                workspaceComponent.getDescription());
+               null);
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);
         }
@@ -152,7 +152,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
         SFileChooser chooser = new SFileChooser(
                 WorkspacePreferences.getCurrentDirectory(workspaceComponent
-                        .getClass()), workspaceComponent.getDescription());
+                        .getClass()), null);
 
         for (String format : workspaceComponent.getFormats()) {
             chooser.addExtension(format);

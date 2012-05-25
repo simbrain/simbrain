@@ -72,14 +72,6 @@ public class HexagonalGridLayout implements Layout {
     /**
      * {@inheritDoc}
      */
-    public void layoutNeurons(final Network network) {
-        List<Neuron> neurons = network.getFlatNeuronList();
-        layoutNeurons(neurons);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void layoutNeurons(final List<Neuron> neurons) {
         int rowNum = 0;
         int numCols = numColumns;

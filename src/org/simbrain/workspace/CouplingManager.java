@@ -324,10 +324,6 @@ public class CouplingManager {
         targetComponentCouplings.put(target, addCouplingToList(
             targetComponentCouplings.get(source), coupling));
 
-        // Update component level producer / consumer lists (only for priority
-        // based update)
-        coupling.addCouplingsToComponentList();
-
         // Fire coupling added event
         fireCouplingAdded(coupling);
     }
@@ -445,9 +441,6 @@ public class CouplingManager {
      * @param coupling The coupling to remove.
      */
     public void removeCoupling(final Coupling<?> coupling) {
-
-        // Update parent lists (only for priority based update).
-        coupling.removeCouplingsFromComponentLists();
 
         WorkspaceComponent source = coupling.getProducer().getParentComponent();
         WorkspaceComponent target = coupling.getConsumer().getParentComponent();
@@ -596,32 +589,6 @@ public class CouplingManager {
      */
     public void removeCouplingListener(final CouplingListener listener) {
         couplingListeners.remove(listener);
-    }
-
-    /**
-     * Update all outgoing couplings (i.e. producers) associated with this
-     * component. Used in priority based workspace update.
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     * @param component component whose producers should be updated.
-     */
-    public void updateOutgoingCouplings(WorkspaceComponent component) {
-        for (Coupling<?> coupling : component.getOutgoingCouplings()) {
-            coupling.setBuffer();
-        }
-    }
-
-    /**
-     * Update all incoming couplings (i.e. consumers) associated with this
-     * component. Used in priority based workspace update.
-     *
-     * @see {org.simbrain.workspace.updator.PriorityUpdator}
-     * @param component component whose consumers should be updated.
-     */
-    public void updateIncomingCouplings(WorkspaceComponent component) {
-        for (Coupling<?> coupling : component.getIncomingCouplings()) {
-            coupling.update();
-        }
     }
 
     /**

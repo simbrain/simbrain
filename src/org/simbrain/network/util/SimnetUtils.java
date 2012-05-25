@@ -192,8 +192,8 @@ public class SimnetUtils {
      * @return the point corresponding to the upper left corner of the objects
      */
     public static Point2D getUpperLeft(final List<Object> objects) {
-        double x = Double.MAX_VALUE;
-        double y = Double.MAX_VALUE;
+        double x = Double.POSITIVE_INFINITY;
+        double y = Double.POSITIVE_INFINITY;
 
         for (final Object object : objects) {
             if (object instanceof Neuron) {
@@ -215,10 +215,10 @@ public class SimnetUtils {
                 }
             }
         }
-        if (x == Double.MAX_VALUE) {
+        if (x == Double.POSITIVE_INFINITY) {
             x = 0;
         }
-        if (y == Double.MAX_VALUE) {
+        if (y == Double.POSITIVE_INFINITY) {
             y = 0;
         }
         return new Point2D.Double(x, y);

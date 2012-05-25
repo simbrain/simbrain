@@ -71,7 +71,6 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SelectionHandle;
 import org.simbrain.network.gui.nodes.SourceHandle;
-import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.gui.nodes.ViewGroupNode;
@@ -81,13 +80,12 @@ import org.simbrain.network.gui.nodes.groupNodes.HopfieldNode;
 import org.simbrain.network.gui.nodes.groupNodes.LMSNetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.groupNodes.SOMNode;
-import org.simbrain.network.gui.nodes.groupNodes.SubnetGroupNode;
+import org.simbrain.network.gui.nodes.groupNodes.SubnetworkNode;
 import org.simbrain.network.gui.nodes.groupNodes.SynapseGroupNode;
 import org.simbrain.network.listeners.GroupListener;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
-import org.simbrain.network.listeners.SubnetworkListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -494,22 +492,6 @@ public class NetworkPanel extends JPanel {
 
         });
 
-        // Handle Subnetwork Events
-        rootNetwork.addSubnetworkListener(new SubnetworkListener() {
-
-            public void subnetAdded(final NetworkEvent<Network> e) {
-                NetworkPanel.this.addSubnetwork(e.getObject());
-            }
-
-            public void subnetRemoved(final NetworkEvent<Network> e) {
-                SubnetworkNode subnet = findSubnetworkNode(e.getObject());
-                if (subnet != null) {
-                    canvas.getLayer().removeChild(subnet);
-                }
-                centerCamera();
-            }
-        });
-
         // Handle Group Events
         rootNetwork.addGroupListener(new GroupListener() {
             /** @see NetworkListener */
@@ -598,14 +580,14 @@ public class NetworkPanel extends JPanel {
                     ret = new LMSNetworkNode(NetworkPanel.this,
                             (LMSNetwork) group);                                    
                 } else {
-                    ret = new SubnetGroupNode(NetworkPanel.this,
+                    ret = new SubnetworkNode(NetworkPanel.this,
                             (Subnetwork) group);                
                 }
             } else if (group instanceof EchoStateNetwork) {
             	ret = new ESNNetworkNode(NetworkPanel.this,
             			(EchoStateNetwork) group);
             } else {
-                ret = new SubnetGroupNode(NetworkPanel.this,
+                ret = new SubnetworkNode(NetworkPanel.this,
                         (Subnetwork) group);
             }
 
@@ -704,57 +686,6 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Add representation of specified subnetwork to network panel.
-     */
-    private void addSubnetwork(final Network network) {
-
-        // Only top-level subnets are added. Special graphical representation
-        // for subnetworks of subnets is contained in
-        // org.simbrain.network.nodes.subnetworks
-        if (network.getDepth() > 1) {
-            return;
-        }
-
-        // Make a list of neuron nodes
-        ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
-        for (Neuron neuron : network.getFlatNeuronList()) {
-            addNeuron(neuron);
-            NeuronNode node = (NeuronNode) objectNodeMap.get(neuron);
-            if (node != null) {
-                neuronNodes.add(node);
-            }
-        }
-
-        // Find the upper left corner of these nodes and created sbunetwork node
-        Point2D upperLeft = getUpperLeft(neuronNodes);
-        SubnetworkNode subnetwork = getSubnetworkNodeFromSubnetwork(upperLeft,
-                network);
-
-        // Populate subnetwork node and add it
-        for (NeuronNode node : neuronNodes) {
-            node.translate(-upperLeft.getX()
-                    + SubnetworkNode.OUTLINE_INSET_WIDTH, -upperLeft.getY()
-                    + SubnetworkNode.OUTLINE_INSET_HEIGHT
-                    + SubnetworkNode.TAB_HEIGHT);
-            // node.pushViewPositionToModel();
-            subnetwork.addChild(node);
-        }
-        canvas.getLayer().addChild(subnetwork);
-        subnetwork.init();
-
-        // Add synapses
-        for (Synapse synapse : network.getFlatSynapseList()) {
-            addSynapse(synapse);
-            SynapseNode node = (SynapseNode) objectNodeMap.get(synapse);
-            if (node != null) {
-                canvas.getLayer().addChild(node);
-                node.moveToBack();
-            }
-        }
-        clearSelection();
-    }
-
-    /**
      * Add a model group node to the piccolo canvas.
      *
      * @param group the group to add
@@ -765,7 +696,7 @@ public class NetworkPanel extends JPanel {
         if(objectNodeMap.get(group) != null) {
             return;
         }
-        
+
         // Make a list of neuron and synapse nodes
         List<PNode> nodes = new ArrayList<PNode>();
 
@@ -833,38 +764,7 @@ public class NetworkPanel extends JPanel {
         }
 
         clearSelection();
-        
-    }
 
-    /**
-     * Convert a subnetwork into a subnetwork node. TODO: Cheesy design!
-     *
-     * @param upperLeft for intializing location of subnetworknode
-     * @param subnetwork the subnetwork itself
-     * @return the subnetworknode
-     */
-    private SubnetworkNode getSubnetworkNodeFromSubnetwork(
-            final Point2D upperLeft, final Network subnetwork) {
-        SubnetworkNode ret = null;
-
-        //REDO
-//        if (subnetwork instanceof Competitive) {
-//            ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork,
-//                    upperLeft.getX(), upperLeft.getY());
-//        } else if (subnetwork instanceof SOM) {
-//            ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(),
-//                    upperLeft.getY());
-//        else if (subnetwork instanceof Hopfield) {
-//            ret = new HopfieldNetworkNode(this, (Hopfield) subnetwork,
-//                    upperLeft.getX(), upperLeft.getY());
-//        } else if (subnetwork instanceof WinnerTakeAll) {
-//            ret = new WTANetworkNode(this, (WinnerTakeAll) subnetwork,
-//                    upperLeft.getX(), upperLeft.getY());
-//        } else if (subnetwork instanceof KWTA) {
-//            ret = new KwtaNetworkNode(this, (KWTA) subnetwork,
-//                    upperLeft.getX(), upperLeft.getY());
-//        }
-        return ret;
     }
 
     /**
@@ -1095,9 +995,6 @@ public class NetworkPanel extends JPanel {
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 rootNetwork.deleteText(selectedTextNode.getTextObject());
-            } else if (selectedNode instanceof SubnetworkNode) {
-                SubnetworkNode selectedSubnet = (SubnetworkNode) selectedNode;
-                rootNetwork.deleteNetwork(selectedSubnet.getSubnetwork());
             }
         }
     }
@@ -1439,8 +1336,6 @@ public class NetworkPanel extends JPanel {
                 ret.add(((SynapseNode) e).getSynapse());
             } else if (e instanceof TextNode) {
                 ret.add(((TextNode)e).getTextObject());
-            } else if (e instanceof SubnetworkNode) {
-                ret.add(((SubnetworkNode) e).getSubnetwork());
             }
         }
         return ret;
@@ -1499,16 +1394,6 @@ public class NetworkPanel extends JPanel {
      */
     public Collection<TextNode> getTextNodes() {
         return canvas.getLayer().getAllNodes(Filters.getTextNodeFilter(), null);
-    }
-
-    /**
-     * Return a collection of all subnet nodes.
-     *
-     * @return a collection of all subnet nodes
-     */
-    public Collection getSubnetNodes() {
-        return canvas.getLayer().getAllNodes(Filters.getSubnetworkNodeFilter(),
-                null);
     }
 
     /**
@@ -1673,15 +1558,6 @@ public class NetworkPanel extends JPanel {
      * Synchronize model and view.
      */
     public void syncToModel() {
-        for (Network network : rootNetwork.getNetworkList()) {
-            addSubnetwork(network);
-            for (Neuron neuron : network.getNeuronList()) {
-                addNeuron(neuron);
-            }
-            for (Synapse synapse : network.getSynapseList()) {
-                addSynapse(synapse);
-            }
-        }
         for (Neuron neuron : rootNetwork.getNeuronList()) { 
             addNeuron(neuron);
         }
@@ -1733,22 +1609,6 @@ public class NetworkPanel extends JPanel {
             }
         }
         return new Point2D.Double(x, y);
-    }
-
-    /**
-     * Find the SubnetworkNode corresponding to a given model subnetwork.
-     *
-     * @param net the model subnetwork.
-     * @return the corresponding subnetwork nodes, null otherwise.
-     */
-    public SubnetworkNode findSubnetworkNode(final Network net) {
-        for (Iterator i = this.getSubnetNodes().iterator(); i.hasNext();) {
-            SubnetworkNode node = ((SubnetworkNode) i.next());
-            if (node.getSubnetwork().getId().equalsIgnoreCase(net.getId())) {
-                return node;
-            }
-        }
-        return null;
     }
 
     /**

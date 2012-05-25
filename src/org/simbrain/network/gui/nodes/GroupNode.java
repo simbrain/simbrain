@@ -44,7 +44,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * Represents a {@link org.simbrain.network.groups.Group}.  This class can be 
  * used for default behavior.
- * 
+ *
  * Subclasses can provide custom behavior:
  * - Context menu
  * - Tooltips, etc. 
@@ -62,7 +62,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
     /** Default outline padding. */
     private final double DEFAULT_PADDING = 2.0d;
-    
+
     /** Distance between nodes and the outline itself. */
     private double outlinePadding = DEFAULT_PADDING;
 
@@ -71,7 +71,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
 
     /** Network panel. */
     private NetworkPanel networkPanel;
-    
+
     /** The model group. */
     private final Group group;
 
@@ -94,7 +94,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         this.setTextLabel(group.getLabel());
         updateVisibility();
     }
-    
+
     /**
      * Set the interaction box. 
      *
@@ -109,7 +109,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         updateInteractionBox();
         updateText();
     }
-    
+
     /**
      * Returns a reference to the interaction box.
      *
@@ -124,7 +124,6 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         updateBounds();
     }
 
-
     /**
      * Creates default actions for all model group nodes.
      *
@@ -132,9 +131,10 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      */
     protected JPopupMenu getDefaultContextMenu() {
         JPopupMenu ret = new JPopupMenu();
-        Action groupOnOff = new AbstractAction("Group is active") {
+        Action editGroupName = new AbstractAction("Edit group name...") {
             public void actionPerformed(final ActionEvent event) {
-                //group.toggleOnOff(); //REDO
+                String newName = JOptionPane.showInputDialog("Name:");
+                group.setLabel(newName);
             }
         };
         Action removeGroup = new AbstractAction("Remove group") {
@@ -142,16 +142,8 @@ public class GroupNode extends PPath implements PropertyChangeListener {
                 getNetworkPanel().getRootNetwork().removeGroup(group);
             }
         };
-        Action editGroupName = new AbstractAction("Edit group name...") {
-            public void actionPerformed(final ActionEvent event) {
-                String newName = JOptionPane.showInputDialog("Name:");
-                group.setLabel(newName);
-            }
-        };
-        JCheckBoxMenuItem groupOnOffItem = new JCheckBoxMenuItem(groupOnOff);
-        ret.add(groupOnOffItem);
-        ret.add(removeGroup);
         ret.add(editGroupName);
+        ret.add(removeGroup);
         return ret;
     }
 
@@ -207,7 +199,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     public Group getGroup() {
         return group;
     }
-    
+
     /**
      * Updated bounds of outline based on location of its outlined objects.
      */
@@ -274,7 +266,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     protected void setOutlinePadding(double padding) {
         this.outlinePadding = padding;
     }
-    
+
     /**
      * @return the padding
      */
@@ -287,7 +279,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      */
     protected void selectAllNodes() {
         //System.out.println(group.getLabel());
-        // REDO: Can't this happen in subclass overrides?
+        // TODO: Can't this happen in subclass overrides?
         if ((group instanceof FeedForward)
                 || (group instanceof Subnetwork)) {
             networkPanel.setSelection(getChildrenNeuronNodes(this));
@@ -322,5 +314,5 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         }
         return ret;
     }
-    
+
 }

@@ -135,7 +135,7 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
     class ComponentTableModel extends AbstractTableModel {
 
         /** Column names. */
-        String[] columnNames = {"Component", "Type", "Gui On", "Update On", "Update Priority"};
+        String[] columnNames = {"Component", "Type", "Gui On", "Update On"};
 
         /** Internal list of components. */
         private ArrayList<WorkspaceComponent> data = new ArrayList<WorkspaceComponent>();      
@@ -174,8 +174,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
                 return data.get(row).getGuiOn();
             case 3:
                 return data.get(row).getUpdateOn();
-            case 4:
-                return data.get(row).getUpdatePriority();
             default:
                 return null;
             }
@@ -196,10 +194,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
             case 3:
                 data.get(row).setUpdateOn((Boolean) value);
                 return;
-            case 4:
-                data.get(row).setUpdatePriority(
-                        Integer.valueOf((Integer) value));
-                return;
             }
             this.fireTableDataChanged();
         }
@@ -216,8 +210,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
             case 2:
                 return true;
             case 3:
-                return true;
-            case 4:
                 return true;
             default:
                 return false;

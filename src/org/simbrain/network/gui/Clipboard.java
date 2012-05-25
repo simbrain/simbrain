@@ -100,8 +100,6 @@ public class Clipboard {
         for (Object object : list) {
             if (object instanceof Neuron) {
                 ret.add((NeuronNode)net.getObjectNodeMap().get(object));
-            } else if (object instanceof Network) {
-                ret.add(net.findSubnetworkNode((Network) object));
             } else if (object instanceof NetworkTextObject) {
                 ret.add((TextNode)net.getObjectNodeMap().get(object));
             }

@@ -26,19 +26,19 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
- * REDO: Rename to SubnetworkNode when subnetworks dismantled.
- * 
+ * PNode representation of a subnetwork.
+ *
  * @author jyoshimi
  */
-public class SubnetGroupNode extends GroupNode {
+public class SubnetworkNode extends GroupNode {
 
     /**
-     * Create a subnetwork node
-     * 
+     * Create a subnetwork node.
+     *
      * @param networkPanel parent panel
      * @param group the layered network
      */
-    public SubnetGroupNode(NetworkPanel networkPanel, Subnetwork group) {
+    public SubnetworkNode(NetworkPanel networkPanel, Subnetwork group) {
         super(networkPanel, group);
     }
 

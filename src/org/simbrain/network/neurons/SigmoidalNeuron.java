@@ -21,9 +21,9 @@ package org.simbrain.network.neurons;
 import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Differentiable;
 import org.simbrain.network.core.Invertible;
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 /**

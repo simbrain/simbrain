@@ -378,7 +378,7 @@ public class Synapse {
             strength += increment;
         }
         //target.weightChanged(this); // Maybe?
-        getRootNetwork().fireSynapseChanged(this);
+        getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -388,7 +388,7 @@ public class Synapse {
         if (strength > lowerBound) {
             strength -= increment;
         }
-        getRootNetwork().fireSynapseChanged(this);
+        getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -402,7 +402,7 @@ public class Synapse {
         } else if (strength == 0) {
             strength = 0;
         }
-        getRootNetwork().fireSynapseChanged(this);
+        getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -416,7 +416,7 @@ public class Synapse {
         } else if (strength == 0) {
             strength = 0;
         }
-        getRootNetwork().fireSynapseChanged(this);
+        getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -430,7 +430,7 @@ public class Synapse {
         if (symmetric != null) {
             symmetric.setStrength(strength);
         }
-        getRootNetwork().fireSynapseChanged(this);
+        getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -460,7 +460,7 @@ public class Synapse {
      */
     public void randomize() {
         strength = getRandomValue();
-        getRootNetwork().fireSynapseChanged(this);
+        getNetwork().fireSynapseChanged(this);
     }
 
     /**
@@ -620,8 +620,8 @@ public class Synapse {
      *
      * @return reference to root network.
      */
-    public RootNetwork getRootNetwork() {
-        return this.getSource().getParentNetwork().getRootNetwork();
+    public Network getNetwork() {
+        return this.getSource().getParentNetwork();
     }
 
     /**
@@ -663,8 +663,8 @@ public class Synapse {
         this.learningRule = newLearningRule;
         initSpikeResponder();
         if (parentNetwork != null) {
-            getRootNetwork().fireSynapseTypeChanged(oldRule, learningRule);
-            // getRootNetwork().rootNetwork.updateTimeType();
+            getNetwork().fireSynapseTypeChanged(oldRule, learningRule);
+            // getNetwork().Network.updateTimeType();
             // Currently synapses don't have a time type
         }
     }

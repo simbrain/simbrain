@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -40,7 +40,7 @@ public class Subnetwork extends Group {
      *
      * @param net parent network.
      */
-    public Subnetwork(final RootNetwork net) {
+    public Subnetwork(final Network net) {
         super(net);
         setLabel("Subnetwork");
     }
@@ -53,7 +53,7 @@ public class Subnetwork extends Group {
      * @param numNeuronGroups number of neuron groups
      * @param numSynapseGroups number of synapse groups
      */
-    public Subnetwork(final RootNetwork net, int numNeuronGroups, int numSynapseGroups) {
+    public Subnetwork(final Network net, int numNeuronGroups, int numSynapseGroups) {
         super(net);
         setLabel("Subnetwork");
         for (int i = 0; i < numNeuronGroups; i++) {

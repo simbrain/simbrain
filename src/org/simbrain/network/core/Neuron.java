@@ -23,7 +23,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.core.RootNetwork.TimeType;
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neurons.AdditiveNeuron;
 import org.simbrain.network.neurons.BinaryNeuron;
@@ -230,8 +230,8 @@ public class Neuron  {
             s.initSpikeResponder();
         }
         if (getParentNetwork() != null) {
-            getRootNetwork().updateTimeType();
-            getRootNetwork().fireNeuronTypeChanged(oldRule, updateRule);
+            getNetwork().updateTimeType();
+            getNetwork().fireNeuronTypeChanged(oldRule, updateRule);
         }
         updateRule.init(this);
     }
@@ -358,7 +358,7 @@ public class Neuron  {
         if (activation < upperBound) {
             activation += increment;
         }
-        this.getParentNetwork().getRootNetwork().fireNeuronChanged(this);
+        this.getParentNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -368,7 +368,7 @@ public class Neuron  {
         if (activation > lowerBound) {
             activation -= increment;
         }
-        this.getParentNetwork().getRootNetwork().fireNeuronChanged(this);
+        this.getParentNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -442,7 +442,7 @@ public class Neuron  {
      */
     public void randomize() {
         setActivation(getRandomValue());
-        getRootNetwork().fireNeuronChanged(this);
+        getNetwork().fireNeuronChanged(this);
     }
 
     /**
@@ -519,8 +519,8 @@ public class Neuron  {
      *
      * @return root network.
      */
-    public RootNetwork getRootNetwork() {
-        return parent.getRootNetwork();
+    public Network getNetwork() {
+        return parent;
     }
 
     /**
@@ -674,8 +674,8 @@ public class Neuron  {
     public void setX(final double x) {
         this.x = x;
         if (this.getParentNetwork() != null) {
-            if (this.getParentNetwork().getRootNetwork() != null) {
-                this.getParentNetwork().getRootNetwork().fireNeuronMoved(this);
+            if (this.getParentNetwork() != null) {
+                this.getParentNetwork().fireNeuronMoved(this);
             }
         }
     }
@@ -686,9 +686,7 @@ public class Neuron  {
     public void setY(final double y) {
         this.y = y;
         if (this.getParentNetwork() != null) {
-            if (this.getParentNetwork().getRootNetwork() != null) {
-                this.getParentNetwork().getRootNetwork().fireNeuronMoved(this);
-            }
+            this.getParentNetwork().fireNeuronMoved(this);
         }
     }
 
@@ -784,7 +782,7 @@ public class Neuron  {
         // Update the root network's priority tree map
         if (this.getParentNetwork() != null) {
             // Resort the neuron in the priority sorted list
-            getRootNetwork().resortPriorities();
+            getNetwork().resortPriorities();
         }
     }
 

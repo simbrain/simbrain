@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.UpdateAction;
 import org.simbrain.network.core.UpdateManager.UpdateManagerListener;
 import org.simbrain.network.update_actions.CustomUpdate;
@@ -71,12 +71,12 @@ public class UpdateManagerPanel extends JPanel {
     private final DefaultListModel availableActionListModel  = new DefaultListModel();
 
     /** Reference to root network. */
-    private final RootNetwork network;
+    private final Network network;
     
     /**
      * Creates a new action list panel.
      */
-    public UpdateManagerPanel(final RootNetwork network) {
+    public UpdateManagerPanel(final Network network) {
 
         super(new BorderLayout());
         this.network = network;

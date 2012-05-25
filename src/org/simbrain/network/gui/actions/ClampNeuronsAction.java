@@ -65,14 +65,14 @@ public final class ClampNeuronsAction
 //        JToggleButton cb = (JToggleButton) event.getSource();
         if (event.getSource() instanceof JToggleButton) {
             JToggleButton cb = (JToggleButton) event.getSource();
-            networkPanel.getRootNetwork().setClampNeurons(cb.isSelected());
+            networkPanel.getNetwork().setClampNeurons(cb.isSelected());
         } else {
             JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
-            networkPanel.getRootNetwork().setClampNeurons(cb.isSelected());
+            networkPanel.getNetwork().setClampNeurons(cb.isSelected());
         }
 
         // Determine status
-//        networkPanel.getRootNetwork().setClampNeurons(cb.isSelected());
+//        networkPanel.getNetwork().setClampNeurons(cb.isSelected());
 
     }
 }

@@ -21,7 +21,7 @@ package org.simbrain.network.listeners;
 
 /**
  * Listener interface for receiving general network events. Classes interested
- * in responding to such events are registered with a RootNetwork, which
+ * in responding to such events are registered with a Network, which
  * broadcasts those events to registered observer classes.
  */
 public interface NetworkListener {

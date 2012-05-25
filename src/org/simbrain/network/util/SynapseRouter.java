@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
@@ -282,8 +282,8 @@ public class SynapseRouter {
 
 					// Create the new synapse group (since its been shown that
 					// syn belongs to no bound SG)
-					sg = new SynapseGroup(syn.getRootNetwork());
-					syn.getRootNetwork().fireGroupAdded(sg);
+					sg = new SynapseGroup(syn.getNetwork());
+					syn.getNetwork().fireGroupAdded(sg);
 
 					// If the parent subnet of sourceNeuronGroup != null add our
 					// new synapse group to that subnet
@@ -421,7 +421,7 @@ public class SynapseRouter {
 	 * @param args
 	 */
 	public static void main(String args[]) {
-		RootNetwork rn = new RootNetwork();
+		Network rn = new Network();
 		NeuronGroup ng1 = new NeuronGroup(rn);
 		NeuronGroup ng2 = new NeuronGroup(rn);
 		SynapseRouter srm = new SynapseRouter();

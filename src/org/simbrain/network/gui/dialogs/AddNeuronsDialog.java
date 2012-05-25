@@ -104,7 +104,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
         networkPanel.clearSelection();
 
-        baseNeuron = new Neuron(networkPanel.getRootNetwork(), DEFAULT_NEURON);
+        baseNeuron = new Neuron(networkPanel.getNetwork(), DEFAULT_NEURON);
         setActionListeners();
 
         selectNeuronType.setText(baseNeuron.getUpdateRule().getDescription());
@@ -155,10 +155,10 @@ public class AddNeuronsDialog extends StandardDialog {
     private void addNeuronsToPanel() {
         int number = Integer.parseInt(numNeurons.getText());
         for (int i = 0; i < number; i++) {
-            Neuron neuron = new Neuron(networkPanel.getRootNetwork(),
+            Neuron neuron = new Neuron(networkPanel.getNetwork(),
                     baseNeuron);
             nodes.add(new NeuronNode(networkPanel, neuron));
-            networkPanel.getRootNetwork().addNeuron(neuron);
+            networkPanel.getNetwork().addNeuron(neuron);
         }
         networkPanel.setSelection(nodes);
         layout.setInitialLocation(networkPanel.getLastClickedPosition());

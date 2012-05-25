@@ -24,7 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.SigmoidalNeuron;
@@ -66,7 +66,7 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public SigmoidalNeuronPanel(RootNetwork network) {
+    public SigmoidalNeuronPanel(Network network) {
         super(network);
         this.add(tabbedPane);
         mainTab.addItem("Implementation", cbImplementation);

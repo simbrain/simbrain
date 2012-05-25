@@ -53,12 +53,12 @@ public class NetworkMenuBar {
 //                chooser.addExtension("xml");
 //                File theFile = chooser.showOpenDialog();
 //                if (theFile != null) {
-//                    RootNetwork newNetwork;
+//                    Network newNetwork;
 //                    try {
-//                        newNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(new FileInputStream(theFile));
-//                        newNetwork.setParent(networkPanel.getRootNetwork().getParent());
+//                        newNetwork = (Network) Network.getXStream().fromXML(new FileInputStream(theFile));
+//                        newNetwork.setParent(networkPanel.getNetwork().getParent());
 //                        networkPanel.clearPanel();
-//                        networkPanel.setRootNetwork(newNetwork);
+//                        networkPanel.setNetwork(newNetwork);
 //                        networkPanel.syncToModel();
 //                        networkPanel.repaint();
 //                    } catch (FileNotFoundException e1) {
@@ -76,7 +76,7 @@ public class NetworkMenuBar {
 //                File theFile = chooser.showSaveDialog();
 //                if (theFile != null) {
 //                    try {
-//                        RootNetwork.getXStream().toXML(networkPanel.getRootNetwork(), new FileOutputStream(theFile));
+//                        Network.getXStream().toXML(networkPanel.getNetwork(), new FileOutputStream(theFile));
 //                    } catch (FileNotFoundException e1) {
 //                        e1.printStackTrace();
 //                    }                    

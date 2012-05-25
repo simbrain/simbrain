@@ -64,7 +64,7 @@ public class CopyPaste {
             } else if (item instanceof NetworkTextObject) {
                 NetworkTextObject text = ((NetworkTextObject) item);
                 NetworkTextObject newText = new NetworkTextObject(
-                        newParent.getRootNetwork(), text);
+                        newParent, text);
                 ret.add(newText);
             }
         }

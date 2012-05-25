@@ -96,10 +96,10 @@ public class HopfieldCreationDialog extends StandardDialog {
         // Layout layout = layoutPanel.getNeuronLayout();
         GridLayout layout = new GridLayout(50, 50, (int) Math.sqrt(numUnits));
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Hopfield hop = new Hopfield(networkPanel.getRootNetwork(), numUnits,
+        Hopfield hop = new Hopfield(networkPanel.getNetwork(), numUnits,
                 layout);
         hop.setUpdateOrder(getUpdateType());
-        networkPanel.getRootNetwork().addGroup(hop);
+        networkPanel.getNetwork().addGroup(hop);
         networkPanel.repaint();
         super.closeDialogOk();
     }

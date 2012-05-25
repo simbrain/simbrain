@@ -73,6 +73,6 @@ public final class RandomizeObjectsAction
         for (SynapseNode node : networkPanel.getSelectedSynapses()) {
             node.getSynapse().randomize();
         }
-        networkPanel.getRootNetwork().fireNetworkChanged();
+        networkPanel.getNetwork().fireNetworkChanged();
     }
 }

@@ -20,7 +20,7 @@ package org.simbrain.network.groups;
 import java.util.List;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 
 /**
  * Extend neuron group with layer information used in a layered network.
@@ -44,7 +44,7 @@ public class NeuronLayer extends NeuronGroup {
      * @param neurons set of neurons
      * @param type the type of this layer
      */
-    public NeuronLayer(RootNetwork net, List<Neuron> neurons, LayerType type) {
+    public NeuronLayer(Network net, List<Neuron> neurons, LayerType type) {
         super(net, neurons);
         this.type = type;
         setLabel(type.name() + " Layer");

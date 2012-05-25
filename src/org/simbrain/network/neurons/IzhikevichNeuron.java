@@ -68,7 +68,7 @@ public class IzhikevichNeuron extends SpikingNeuronUpdateRule {
      * Updates the neuron.
      */
     public void update(Neuron neuron) {
-        double timeStep = neuron.getRootNetwork().getTimeStep();
+        double timeStep = neuron.getNetwork().getTimeStep();
         double inputs = neuron.getWeightedInputs();
         double activation = neuron.getActivation();
 

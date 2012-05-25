@@ -18,9 +18,7 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.core.RootNetwork.TimeType;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.util.Utils;
 
 /**

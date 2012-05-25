@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 
 /**
  * <b>Group</b>: a logical group of neurons and / or synapses. Its gui
@@ -27,7 +27,7 @@ import org.simbrain.network.core.RootNetwork;
 public abstract class Group {
 
     /** Reference to the network this group is a part of. */
-    private final RootNetwork parentNetwork;
+    private final Network parentNetwork;
 
     /** Name of this group. */
     private String id;
@@ -54,7 +54,7 @@ public abstract class Group {
      *
      * @param net reference to root network.
      */
-    public Group(final RootNetwork net) {
+    public Group(final Network net) {
         parentNetwork = net;
     }
 
@@ -89,7 +89,7 @@ public abstract class Group {
     /**
      * @return the parent
      */
-    public RootNetwork getParentNetwork() {
+    public Network getParentNetwork() {
         return parentNetwork;
     }
 

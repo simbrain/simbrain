@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.AddNeuronsAction;
@@ -46,8 +46,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
     /** Reference to Desktop Component. */
     NetworkDesktopComponent component;
 
-    public NetworkPanelDesktop(final NetworkDesktopComponent component, final RootNetwork rootNetwork) {
-        super(rootNetwork);
+    public NetworkPanelDesktop(final NetworkDesktopComponent component, final Network Network) {
+        super(Network);
         this.component = component;
 
         // By default the network's run toolbar is not shown in the context of a
@@ -74,9 +74,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     /**
-     * Create and return a new Edit menu for this rootNetwork panel.
+     * Create and return a new Edit menu for this Network panel.
      *
-     * @return a new Edit menu for this rootNetwork panel
+     * @return a new Edit menu for this Network panel
      */
     JMenu createEditMenu() {
 
@@ -123,9 +123,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     /**
-     * Create and return a new Insert menu for this rootNetwork panel.
+     * Create and return a new Insert menu for this Network panel.
      *
-     * @return a new Insert menu for this rootNetwork panel
+     * @return a new Insert menu for this Network panel
      */
      JMenu createInsertMenu() {
 
@@ -138,9 +138,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     /**
-     * Create and return a new View menu for this rootNetwork panel.
+     * Create and return a new View menu for this Network panel.
      *
-     * @return a new View menu for this rootNetwork panel
+     * @return a new View menu for this Network panel
      */
     JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
@@ -175,9 +175,9 @@ public class NetworkPanelDesktop extends NetworkPanel {
     }
 
     /**
-     * Create and return a new Help menu for this rootNetwork panel.
+     * Create and return a new Help menu for this Network panel.
      *
-     * @return a new Help menu for this rootNetwork panel
+     * @return a new Help menu for this Network panel
      */
     public JMenu createHelpMenu() {
         ShowHelpAction helpAction= new ShowHelpAction("Pages/Network.html");
@@ -226,7 +226,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
 //    @Override
 //    public void showTrainer() {
 //        // Show trainer within Simbrain desktop
-//        Backprop trainer = new Backprop(getRootNetwork(),
+//        Backprop trainer = new Backprop(getNetwork(),
 //                getSourceModelNeurons(),
 //                getSelectedModelNeurons());
 //        GenericJInternalFrame frame = new GenericJInternalFrame();

@@ -25,7 +25,7 @@ import java.util.List;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
@@ -60,7 +60,7 @@ public class Hopfield extends Subnetwork {
      * @param newRoot new root network
      * @param oldNet old network.
      */
-    public Hopfield(RootNetwork newRoot, Hopfield oldNet) {
+    public Hopfield(Network newRoot, Hopfield oldNet) {
         super(newRoot);
         this.setUpdateOrder(oldNet.getUpdateOrder());
         setLabel("Hopfield network");
@@ -71,9 +71,9 @@ public class Hopfield extends Subnetwork {
      *
      * @param numNeurons Number of neurons in new network
      * @param layout Neuron layout pattern
-     * @param root reference to RootNetwork.
+     * @param root reference to Network.
      */
-    public Hopfield(final RootNetwork root, final int numNeurons, final Layout layout) {
+    public Hopfield(final Network root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
         setLabel("Hopfield network");
 

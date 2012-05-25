@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.DecayNeuron;
@@ -69,7 +69,7 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
     /**
      * This method is the default constructor.
      */
-    public DecayNeuronPanel(RootNetwork network) {
+    public DecayNeuronPanel(Network network) {
         super(network);
         cbRelAbs.addActionListener(this);
         cbRelAbs.setActionCommand("relAbs");

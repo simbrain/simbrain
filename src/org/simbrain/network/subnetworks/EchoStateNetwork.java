@@ -28,7 +28,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.GridLayout;
@@ -146,7 +146,7 @@ public class EchoStateNetwork extends Subnetwork {
      * @param reservoirNodes number of reservoir nodes
      * @param outputNodes number of output nodes
      */
-    public EchoStateNetwork(final RootNetwork network, int inputNodes,
+    public EchoStateNetwork(final Network network, int inputNodes,
             int reservoirNodes, int outputNodes, Point2D initialPosition) {
         super(network);
         this.initialPosition = initialPosition;

@@ -54,14 +54,14 @@ public class UpdateManager {
     private List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
 
     /** Reference to parent network. */
-    private final RootNetwork network;
+    private final Network network;
 
     /**
      * Construct a new update manager.
      *
      * @param network
      */
-    public UpdateManager(RootNetwork network) {
+    public UpdateManager(Network network) {
         this.network = network;
         // Default update method
         addAction(new BufferedUpdate(network));

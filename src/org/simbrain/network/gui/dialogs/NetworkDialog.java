@@ -206,7 +206,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
         miscPanel.addItem("Nudge Amount", nudgeAmountField);
 
         // UpdatePanel
-        updatePanel = new UpdateManagerPanel(networkPanel.getRootNetwork());
+        updatePanel = new UpdateManagerPanel(networkPanel.getNetwork());
 
         // Set up tab panels
         tabGraphics.add(graphicsPanel);
@@ -247,7 +247,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
 
         if (o == isRoundingBox) {
             checkRounding();
-            networkPanel.getRootNetwork().setRoundingOff(
+            networkPanel.getNetwork().setRoundingOff(
                     isRoundingBox.isSelected());
         } else if (o == changeColorButton) {
             Color theColor = getColor();
@@ -338,11 +338,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     public void fillFieldValues() {
         showTimeBox.setSelected(networkPanel.getShowTime());
         showSubnetOutlineBox.setSelected(networkPanel.getShowSubnetOutline());
-        precisionField.setText(Integer.toString(networkPanel.getRootNetwork()
+        precisionField.setText(Integer.toString(networkPanel.getNetwork()
                 .getPrecision()));
         nudgeAmountField.setText(Double.toString(NetworkGuiSettings
                 .getNudgeAmount()));
-        isRoundingBox.setSelected(networkPanel.getRootNetwork()
+        isRoundingBox.setSelected(networkPanel.getNetwork()
                 .getRoundingOff());
         weightSizeMaxSlider.setValue(NetworkGuiSettings.getMaxDiameter());
         weightSizeMinSlider.setValue(NetworkGuiSettings.getMinDiameter());
@@ -354,7 +354,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener,
     private void commitChanges() {
         NetworkGuiSettings.setNudgeAmount(Double.parseDouble(nudgeAmountField
                 .getText()));
-        networkPanel.getRootNetwork().setPrecision(
+        networkPanel.getNetwork().setPrecision(
                 Integer.parseInt(precisionField.getText()));
     }
 

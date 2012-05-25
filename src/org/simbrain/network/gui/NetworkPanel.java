@@ -51,7 +51,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.groups.FeedForward;
@@ -116,8 +116,8 @@ public class NetworkPanel extends JPanel {
     /** The Piccolo PCanvas. */
     private final PCanvas canvas;
 
-    /** The model neural-rootNetwork object. */
-    private RootNetwork rootNetwork;
+    /** The model neural-Network object. */
+    private Network network;
 
     /** Default edit mode. */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
@@ -246,12 +246,12 @@ public class NetworkPanel extends JPanel {
     private final HashMap<Object, PNode> objectNodeMap = new HashMap<Object, PNode>();
 
     /**
-     * Create a new rootNetwork panel.
+     * Create a new Network panel.
      */
-    public NetworkPanel(final RootNetwork rootNetwork) {
+    public NetworkPanel(final Network Network) {
         super();
 
-        this.rootNetwork = rootNetwork;
+        this.network = Network;
         canvas = new PCanvas();
 
         // Always render in high quality
@@ -340,7 +340,7 @@ public class NetworkPanel extends JPanel {
     private void addNetworkListeners() {
 
         // Handle general network events
-        rootNetwork.addNetworkListener(new NetworkListener() {
+        network.addNetworkListener(new NetworkListener() {
 
             public void networkChanged() {
                 EventQueue.invokeLater(new Runnable() {
@@ -358,7 +358,7 @@ public class NetworkPanel extends JPanel {
                             }
                         }
                         timeLabel.update();
-                        rootNetwork.setUpdateCompleted(true);
+                        network.setUpdateCompleted(true);
                     }
                 });
             }
@@ -380,7 +380,7 @@ public class NetworkPanel extends JPanel {
         });
 
         // Handle Neuron Events
-        rootNetwork.addNeuronListener(new NeuronListener() {
+        network.addNeuronListener(new NeuronListener() {
 
             public void neuronAdded(final NetworkEvent<Neuron> e) {
                 addNeuron(e.getObject());
@@ -420,7 +420,7 @@ public class NetworkPanel extends JPanel {
         });
 
         // Handle Synapse Events
-        rootNetwork.addSynapseListener(new SynapseListener() {
+        network.addSynapseListener(new SynapseListener() {
 
             public void synapseChanged(final NetworkEvent<Synapse> e) {
                 // TODO: Below seemed to cause crashes with Subnets that have GrowableSynapseLayers.
@@ -473,7 +473,7 @@ public class NetworkPanel extends JPanel {
         });
 
         // Handle Text Events
-        rootNetwork.addTextListener(new TextListener() {
+        network.addTextListener(new TextListener() {
 
             public void textRemoved(NetworkTextObject removedText) {
                 TextNode node = (TextNode) objectNodeMap.get(removedText);
@@ -493,7 +493,7 @@ public class NetworkPanel extends JPanel {
         });
 
         // Handle Group Events
-        rootNetwork.addGroupListener(new GroupListener() {
+        network.addGroupListener(new GroupListener() {
             /** @see NetworkListener */
             public void groupAdded(final NetworkEvent<Group> e) {
                 addGroup(e.getObject());
@@ -628,11 +628,11 @@ public class NetworkPanel extends JPanel {
             }
         }
 
-        Neuron neuron = new Neuron(getRootNetwork(), new LinearNeuron());
+        Neuron neuron = new Neuron(getNetwork(), new LinearNeuron());
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.setActivation(0);
-        getRootNetwork().addNeuron(neuron);
+        getNetwork().addNeuron(neuron);
         repaint();
     }
 
@@ -768,7 +768,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Create a new context menu for this rootNetwork panel.
+     * Create a new context menu for this Network panel.
      */
     public JPopupMenu createContextMenu() {
 
@@ -799,16 +799,16 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Return the context menu for this rootNetwork panel.
+     * Return the context menu for this Network panel.
      * <p>
      * This context menu should return actions that are appropriate for the
-     * rootNetwork panel as a whole, e.g. actions that change modes, actions
+     * Network panel as a whole, e.g. actions that change modes, actions
      * that operate on the selection, actions that add new components, etc.
      * Actions specific to a node of interest should be built into a
      * node-specific context menu.
      * </p>
      *
-     * @return the context menu for this rootNetwork panel
+     * @return the context menu for this Network panel
      */
     JPopupMenu getContextMenu() {
         return contextMenu;
@@ -882,9 +882,9 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Creates a new rootNetwork JMenu.
+     * Creates a new Network JMenu.
      *
-     * @return the new rootNetwork menu
+     * @return the new Network menu
      */
     protected JMenu createClampMenu() {
         JMenu clampMenu = new JMenu("Clamp");
@@ -941,22 +941,22 @@ public class NetworkPanel extends JPanel {
     // bound properties
 
     /**
-     * Return the current edit mode for this rootNetwork panel.
+     * Return the current edit mode for this Network panel.
      *
-     * @return the current edit mode for this rootNetwork panel
+     * @return the current edit mode for this Network panel
      */
     public EditMode getEditMode() {
         return editMode;
     }
 
     /**
-     * Set the current edit mode for this rootNetwork panel to
+     * Set the current edit mode for this Network panel to
      * <code>editMode</code>.
      * <p>
      * This is a bound property.
      * </p>
      *
-     * @param newEditMode edit mode for this rootNetwork panel, must not be null
+     * @param newEditMode edit mode for this Network panel, must not be null
      */
     public void setEditMode(final EditMode newEditMode) {
 
@@ -988,13 +988,13 @@ public class NetworkPanel extends JPanel {
         for (PNode selectedNode : getSelection()) {
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
-                rootNetwork.removeNeuron(selectedNeuronNode.getNeuron());
+                network.removeNeuron(selectedNeuronNode.getNeuron());
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
-                rootNetwork.removeSynapse(selectedSynapseNode.getSynapse());
+                network.removeSynapse(selectedSynapseNode.getSynapse());
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
-                rootNetwork.deleteText(selectedTextNode.getTextObject());
+                network.deleteText(selectedTextNode.getTextObject());
             }
         }
     }
@@ -1155,7 +1155,7 @@ public class NetworkPanel extends JPanel {
      */
     public void clearSelection() {
         selectionModel.clear();
-        // TODO: Fire rootNetwork changed
+        // TODO: Fire Network changed
     }
 
     /**
@@ -1218,18 +1218,18 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Add the specified rootNetwork selection listener.
+     * Add the specified Network selection listener.
      *
-     * @param l rootNetwork selection listener to add
+     * @param l Network selection listener to add
      */
     public void addSelectionListener(final NetworkSelectionListener l) {
         selectionModel.addSelectionListener(l);
     }
 
     /**
-     * Remove the specified rootNetwork selection listener.
+     * Remove the specified Network selection listener.
      *
-     * @param l rootNetwork selection listener to remove
+     * @param l Network selection listener to remove
      */
     public void removeSelectionListener(final NetworkSelectionListener l) {
         selectionModel.removeSelectionListener(l);
@@ -1322,7 +1322,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Returns model rootNetwork elements corresponding to selected screen
+     * Returns model Network elements corresponding to selected screen
      * elements.
      *
      * @return list of selected model elements
@@ -1342,7 +1342,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Returns model rootNetwork elements corresponding to selected screen
+     * Returns model Network elements corresponding to selected screen
      * elements.
      *
      * @return list of selected model elements
@@ -1440,7 +1440,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Called by rootNetwork preferences as preferences are changed. Iterates
+     * Called by Network preferences as preferences are changed. Iterates
      * through screen elements and resets relevant colors.
      */
     public void resetColors() {
@@ -1454,7 +1454,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Called by rootNetwork preferences as preferences are changed. Iterates
+     * Called by Network preferences as preferences are changed. Iterates
      * through screen elemenets and resets relevant colors.
      */
     public void resetSynapseDiameters() {
@@ -1465,7 +1465,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Returns information about the rootNetwork in String form.
+     * Returns information about the Network in String form.
      *
      * @return String description about this NeuronNode.
      */
@@ -1478,19 +1478,19 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * @return Returns the rootNetwork.
+     * @return Returns the Network.
      */
-    public RootNetwork getRootNetwork() {
-        return rootNetwork;
+    public Network getNetwork() {
+        return network;
     }
 
     /**
      * Set Root network.
      *
-     * @param rootNetwork The rootNetwork to set.
+     * @param Network The Network to set.
      */
-    public void setRootNetwork(final RootNetwork network) {
-        this.rootNetwork = network;
+    public void setNetwork(final Network network) {
+        this.network = network;
     }
 
     /**
@@ -1505,7 +1505,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Centers the neural rootNetwork in the middle of the PCanvas.
+     * Centers the neural Network in the middle of the PCanvas.
      */
     public void centerCamera() {
         PCamera camera = canvas.getCamera();
@@ -1558,16 +1558,16 @@ public class NetworkPanel extends JPanel {
      * Synchronize model and view.
      */
     public void syncToModel() {
-        for (Neuron neuron : rootNetwork.getNeuronList()) { 
+        for (Neuron neuron : network.getNeuronList()) { 
             addNeuron(neuron);
         }
-        for (Synapse synapse : rootNetwork.getSynapseList()) {
+        for (Synapse synapse : network.getSynapseList()) {
             addSynapse(synapse);
         }
-        for (Group group : rootNetwork.getGroupList()) {
+        for (Group group : network.getGroupList()) {
             addGroup(group);
         }
-        for (NetworkTextObject text : rootNetwork.getTextList()) {
+        for (NetworkTextObject text : network.getTextList()) {
             addTextObject(text);
         }
         syncSynapseClampState();
@@ -1578,16 +1578,16 @@ public class NetworkPanel extends JPanel {
      * Sync gui to network neuron clamp state.
      */
     private void syncNeuronClampState() {
-        neuronClampButton.setSelected(rootNetwork.getClampNeurons());
-        neuronClampMenuItem.setSelected(rootNetwork.getClampNeurons());
+        neuronClampButton.setSelected(network.getClampNeurons());
+        neuronClampMenuItem.setSelected(network.getClampNeurons());
     }
 
     /**
      * Sync gui to network synapse clamp state.
      */
     private void syncSynapseClampState() {
-        synapseClampButton.setSelected(rootNetwork.getClampWeights());
-        synapseClampMenuItem.setSelected(rootNetwork.getClampWeights());
+        synapseClampButton.setSelected(network.getClampWeights());
+        synapseClampMenuItem.setSelected(network.getClampWeights());
     }
 
     /**
@@ -1703,7 +1703,7 @@ public class NetworkPanel extends JPanel {
         // updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
         // }
 
-        if ((rootNetwork != null) && (canvas.getLayer().getChildrenCount() > 0)
+        if ((network != null) && (canvas.getLayer().getChildrenCount() > 0)
                 && (!editMode.isPan())) {
             centerCamera();
         }
@@ -1781,9 +1781,9 @@ public class NetworkPanel extends JPanel {
     // for (Iterator j = toggleButton.iterator(); j.hasNext(); ) {
     // JToggleButton box = (JToggleButton) j.next();
     // if (box.getAction() instanceof ClampWeightsAction) {
-    // box.setSelected(rootNetwork.getClampWeights());
+    // box.setSelected(Network.getClampWeights());
     // } else if (box.getAction() instanceof ClampNeuronsAction) {
-    // box.setSelected(rootNetwork.getClampNeurons());
+    // box.setSelected(Network.getClampNeurons());
     // }
     // }
     // }
@@ -1795,9 +1795,9 @@ public class NetworkPanel extends JPanel {
     // for (Iterator j = checkBoxes.iterator(); j.hasNext(); ) {
     // JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
     // if (box.getAction() instanceof ClampWeightsAction) {
-    // box.setSelected(rootNetwork.getClampWeights());
+    // box.setSelected(Network.getClampWeights());
     // } else if (box.getAction() instanceof ClampNeuronsAction) {
-    // box.setSelected(rootNetwork.getClampNeurons());
+    // box.setSelected(Network.getClampNeurons());
     // }
     // }
     // }
@@ -1861,7 +1861,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Close model rootNetwork.
+     * Close model Network.
      */
     public void closeNetwork() {
     }
@@ -2203,7 +2203,7 @@ public class NetworkPanel extends JPanel {
 //     * display the panel within the Simbrain desktop.
 //     */
 //    public void showTrainer() {
-//        Backprop trainer = new Backprop(getRootNetwork(),
+//        Backprop trainer = new Backprop(getNetwork(),
 //                getSourceModelNeurons(),
 //                getSelectedModelNeurons());
 //        JDialog dialog = new JDialog();

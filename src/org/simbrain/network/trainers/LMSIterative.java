@@ -25,7 +25,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -166,7 +166,7 @@ public class LMSIterative extends IterableTrainer {
         // TODO: Long API! Must be shortcuts...
 
         // Build network
-        RootNetwork network = new RootNetwork();
+        Network network = new Network();
 
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
@@ -228,7 +228,7 @@ public class LMSIterative extends IterableTrainer {
         // TODO: Long API! Must be shortcuts...
 
         // Build network
-        RootNetwork network = new RootNetwork();
+        Network network = new Network();
 
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();

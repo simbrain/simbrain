@@ -59,9 +59,9 @@ public final class NewSynapseGroupAction
     public void actionPerformed(final ActionEvent event) {
         List<Synapse> synapseList = (List<Synapse>) networkPanel.getSelectedModelSynapses();
         if (synapseList.size() > 0) {
-            SynapseGroup group = new SynapseGroup(networkPanel.getRootNetwork());
-            networkPanel.getRootNetwork().transferSynapsesToGroup(synapseList, group);
-            networkPanel.getRootNetwork().addGroup(group);
+            SynapseGroup group = new SynapseGroup(networkPanel.getNetwork());
+            networkPanel.getNetwork().transferSynapsesToGroup(synapseList, group);
+            networkPanel.getNetwork().addGroup(group);
         }
 
     }

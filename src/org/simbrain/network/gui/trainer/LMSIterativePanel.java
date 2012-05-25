@@ -103,7 +103,7 @@ public class LMSIterativePanel extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			if (trainer != null) {
 				trainer.randomize();
-				panel.getRootNetwork().fireNetworkChanged();
+				panel.getNetwork().fireNetworkChanged();
 			}
 		}
 	};

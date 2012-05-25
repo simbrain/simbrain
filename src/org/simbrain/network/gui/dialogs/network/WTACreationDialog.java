@@ -93,13 +93,13 @@ public class WTACreationDialog extends StandardDialog {
     protected void closeDialogOk() {
       Layout layout = layoutPanel.getNeuronLayout();
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
-      WinnerTakeAll wta = new WinnerTakeAll(networkPanel.getRootNetwork(), Integer.parseInt(numberOfUnits.getText()), layout);
+      WinnerTakeAll wta = new WinnerTakeAll(networkPanel.getNetwork(), Integer.parseInt(numberOfUnits.getText()), layout);
       wta.setWinValue(Double.parseDouble(winnerValue.getText()));
       wta.setLoseValue(Double.parseDouble(loserValue.getText()));
       wta.setUseRandom(useRandomBox.isSelected());
       wta.setRandomProb(Double.parseDouble(randomProb.getText()));
       
-      networkPanel.getRootNetwork().addGroup(wta);
+      networkPanel.getNetwork().addGroup(wta);
       networkPanel.repaint();
       super.closeDialogOk();
     }

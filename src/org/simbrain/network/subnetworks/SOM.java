@@ -3,7 +3,7 @@ package org.simbrain.network.subnetworks;
 import java.io.File;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
@@ -110,9 +110,9 @@ public class SOM extends Subnetwork {
      *
      * @param numNeurons size of this network in neurons
      * @param layout Defines how neurons are to be layed out
-     * @param root reference to RootNetwork.
+     * @param root reference to Network.
      */
-    public SOM(final RootNetwork root, final int numNeurons, final Layout layout) {
+    public SOM(final Network root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
         for (int i = 0; i < numNeurons; i++) {
             getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new LinearNeuron()));
@@ -130,7 +130,7 @@ public class SOM extends Subnetwork {
 //     * @param newRoot new root net
 //     * @param oldNet old network
 //     */
-//    public SOM(RootNetwork newRoot, SOM oldNet) {
+//    public SOM(Network newRoot, SOM oldNet) {
 //        super(newRoot, oldNet);
 //        this.setAlphaDecayRate(oldNet.getAlphaDecayRate());
 //        this.setInitAlpha(oldNet.getInitAlpha());

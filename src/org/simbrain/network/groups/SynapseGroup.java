@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -33,7 +33,7 @@ public class SynapseGroup extends Group {
      * @param net parent network
      * @param list list of synapses
      */
-    public SynapseGroup(final RootNetwork net, final List<Synapse> list) {
+    public SynapseGroup(final Network net, final List<Synapse> list) {
         super(net);
         for (Synapse synapse : list) {
             addSynapse(synapse);
@@ -45,7 +45,7 @@ public class SynapseGroup extends Group {
      *
      * @param net parent network
      */
-    public SynapseGroup(final RootNetwork net) {
+    public SynapseGroup(final Network net) {
         super(net);
     }
 

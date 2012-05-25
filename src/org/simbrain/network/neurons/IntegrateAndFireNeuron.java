@@ -82,7 +82,7 @@ public class IntegrateAndFireNeuron extends SpikingNeuronUpdateRule {
         }
 
         double val = neuron.getActivation()
-                + (neuron.getParentNetwork().getRootNetwork().getTimeStep()
+                + (neuron.getParentNetwork().getTimeStep()
                         / timeConstant * (restingPotential
                         - neuron.getActivation() + (resistance * inputs)));
 

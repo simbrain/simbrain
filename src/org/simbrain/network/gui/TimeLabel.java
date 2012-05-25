@@ -29,7 +29,7 @@ public class TimeLabel extends JLabel {
         this.addMouseListener(new MouseAdapter() {
             public void mousePressed(final MouseEvent event) {
                 if (event.getClickCount() == 2) {
-                    networkPanel.getRootNetwork().setTime(0);
+                    networkPanel.getNetwork().setTime(0);
                     update();
                 }
             }
@@ -40,7 +40,7 @@ public class TimeLabel extends JLabel {
      * Update the text based on the network time.
      */
     public void update() {
-        setText(networkPanel.getRootNetwork().getTimeLabel());
+        setText(networkPanel.getNetwork().getTimeLabel());
     }
 
 }

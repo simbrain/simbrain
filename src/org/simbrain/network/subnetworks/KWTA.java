@@ -21,7 +21,7 @@ package org.simbrain.network.subnetworks;
 import java.util.Comparator;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.PointNeuron;
@@ -62,7 +62,7 @@ public class KWTA extends Subnetwork  {
 //     * @param newRoot new root network
 //     * @param oldNet old network.
 //     */
-//    public KWTA(RootNetwork newRoot, KWTA oldNet) {
+//    public KWTA(Network newRoot, KWTA oldNet) {
 //        super(newRoot, oldNet);
 //        setK(oldNet.getK());
 //    }
@@ -72,9 +72,9 @@ public class KWTA extends Subnetwork  {
      *
      * @param layout for layout of Neurons.
      * @param k for the number of Neurons in the Kwta Network.
-     * @param root reference to RootNetwork.
+     * @param root reference to Network.
      */
-    public KWTA(final RootNetwork root, final int k, final Layout layout) {
+    public KWTA(final Network root, final int k, final Layout layout) {
         super(root, 1, 1);
         for (int i = 0; i < k; i++) {
             getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuron()));

@@ -27,7 +27,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.util.Comparators;
@@ -110,7 +110,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         this.setTable(table);
 
         // Add network listener
-        panel.getRootNetwork().addNetworkListener(new NetworkListener() {
+        panel.getNetwork().addNetworkListener(new NetworkListener() {
 
             public void networkChanged() {
                 repaint();
@@ -137,7 +137,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
         private Synapse[][] weights;
 
         /** Reference to root network. */
-        private RootNetwork parentNetwork;
+        private Network parentNetwork;
 
         /**
          * @param weights the weights to set
@@ -154,7 +154,7 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
                  * Save reference when a non-null is found (important for
                  * networks with null vals)
                  */
-                parentNetwork = weights[row][col].getRootNetwork();
+                parentNetwork = weights[row][col].getNetwork();
             }
             //TODO: Below ok with large changes?
             if (parentNetwork != null) {

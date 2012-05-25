@@ -75,8 +75,8 @@ public class LMSCreationDialog extends StandardDialog {
         Point2D lastClicked = networkPanel.getLastClickedPosition();
 
         // Create the layered network
-        networkPanel.getRootNetwork().addGroup(
-                new LMSNetwork(networkPanel.getRootNetwork(), Integer
+        networkPanel.getNetwork().addGroup(
+                new LMSNetwork(networkPanel.getNetwork(), Integer
                         .parseInt(numInputs.getText()), Integer
                         .parseInt(numOutputs.getText()), lastClicked));
 

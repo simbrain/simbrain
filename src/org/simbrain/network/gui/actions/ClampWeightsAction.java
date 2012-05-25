@@ -64,14 +64,14 @@ public final class ClampWeightsAction
 //        JToggleButton cb = (JToggleButton) event.getSource();
         if (event.getSource() instanceof JToggleButton) {
             JToggleButton cb = (JToggleButton) event.getSource();
-            networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
+            networkPanel.getNetwork().setClampWeights(cb.isSelected());
         } else {
             JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
-            networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
+            networkPanel.getNetwork().setClampWeights(cb.isSelected());
         }
 
         // Determine status
-//        networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
+//        networkPanel.getNetwork().setClampWeights(cb.isSelected());
 
     }
 }

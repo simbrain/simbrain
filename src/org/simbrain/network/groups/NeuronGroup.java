@@ -23,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -35,7 +35,7 @@ public class NeuronGroup extends Group {
     private final List<Neuron> neuronList = new CopyOnWriteArrayList<Neuron>();
     
     /** @see Group */
-    public NeuronGroup(final RootNetwork net, final List<Neuron> neurons) {
+    public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
         for (Neuron neuron : neurons) {
             addNeuron(neuron);
@@ -48,7 +48,7 @@ public class NeuronGroup extends Group {
      * 
      * @param root parent network
      */
-    public NeuronGroup(final RootNetwork root) {
+    public NeuronGroup(final Network root) {
         super(root);
     }
     

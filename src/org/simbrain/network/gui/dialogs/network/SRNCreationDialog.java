@@ -154,7 +154,7 @@ public class SRNCreationDialog extends StandardDialog {
     public void closeDialogOk() {
         try {
 
-            SimpleRecurrentNetwork srnBuild = new SimpleRecurrentNetwork(panel.getRootNetwork(),
+            SimpleRecurrentNetwork srnBuild = new SimpleRecurrentNetwork(panel.getNetwork(),
                     Integer.parseInt(tfNumInputs.getText()), Integer
                             .parseInt(tfNumHidden.getText()), Integer
                             .parseInt(tfNumOutputs.getText()),

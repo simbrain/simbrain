@@ -96,13 +96,13 @@ public class SOMCreationDialog extends StandardDialog implements ActionListener 
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        SOM som = new SOM(networkPanel.getRootNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
+        SOM som = new SOM(networkPanel.getNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
         som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
         som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
         som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
         som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
         som.setNeighborhoodDecayAmount(Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
-        networkPanel.getRootNetwork().addGroup(som);
+        networkPanel.getNetwork().addGroup(som);
         networkPanel.repaint();
         super.closeDialogOk();
     }

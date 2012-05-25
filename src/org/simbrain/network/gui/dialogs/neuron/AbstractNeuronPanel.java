@@ -26,7 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -39,7 +39,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
     public static final String NULL_STRING = "...";
 
     /** Parent network. */
-    protected final RootNetwork parentNet;
+    protected final Network parentNet;
 
     /** Main panel. */
     private final LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -50,7 +50,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * This method is the default constructor.
      */
-    public AbstractNeuronPanel(RootNetwork parentNetwork) {
+    public AbstractNeuronPanel(Network parentNetwork) {
         this.parentNet = parentNetwork;
         this.setLayout(new BorderLayout());
         this.add(mainPanel, BorderLayout.CENTER);
@@ -120,7 +120,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * @return the parentNet
      */
-    public RootNetwork getParentNetwork() {
+    public Network getParentNetwork() {
         return parentNet;
     }
 }

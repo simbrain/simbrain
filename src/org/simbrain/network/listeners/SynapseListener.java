@@ -24,7 +24,7 @@ import org.simbrain.network.core.SynapseUpdateRule;
 /**
  * Listener interface for receiving network events relating to synapses. Classes
  * interested in responding to synapse related events are registered with a
- * RootNetwork, which broadcasts synapse relevant events to registered observer
+ * Network, which broadcasts synapse relevant events to registered observer
  * classes.
  */
 public interface SynapseListener {

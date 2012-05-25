@@ -21,7 +21,7 @@ package org.simbrain.network.subnetworks;
 import java.util.Iterator;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
@@ -68,9 +68,9 @@ public class Competitive extends Subnetwork {
      *
      * @param numNeurons size of this network in neurons
      * @param layout Defines how neurons are to be layed out
-     * @param root reference to RootNetwork.
+     * @param root reference to Network.
      */
-    public Competitive(final RootNetwork root, final int numNeurons, final Layout layout) {
+    public Competitive(final Network root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
         getSynapseGroup().setDeleteWhenEmpty(false);
 		root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
@@ -89,7 +89,7 @@ public class Competitive extends Subnetwork {
 //     * @param newParent new root network
 //     * @param oldNet old network.
 //     */
-//    public Competitive(RootNetwork newRoot, Competitive oldNet) {
+//    public Competitive(Network newRoot, Competitive oldNet) {
 //        super(newRoot);
 //        setEpsilon(oldNet.getEpsilon());
 //        setLeakyEpsilon(oldNet.getLeakyEpsilon());

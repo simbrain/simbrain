@@ -73,6 +73,6 @@ public final class ZeroSelectedObjectsAction
             SynapseNode node = (SynapseNode) i.next();
             node.getSynapse().setStrength(0);
         }
-        networkPanel.getRootNetwork().fireNetworkChanged();
+        networkPanel.getNetwork().fireNetworkChanged();
     }
 }

@@ -20,7 +20,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neurons.StochasticNeuron;
 
@@ -37,7 +37,7 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public StochasticNeuronPanel(RootNetwork network) {
+    public StochasticNeuronPanel(Network network) {
         super(network);
         this.addItem("Firing probability", tfFiringProbability);
         this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's"

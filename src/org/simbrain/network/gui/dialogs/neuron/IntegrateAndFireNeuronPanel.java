@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.IntegrateAndFireNeuron;
@@ -73,7 +73,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates a new instance of the integrate and fire neuron panel.
      */
-    public IntegrateAndFireNeuronPanel(RootNetwork network) {
+    public IntegrateAndFireNeuronPanel(Network network) {
         super(network);
 
         this.add(tabbedPane);
@@ -98,7 +98,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 
         tfRestingPotential.setText(Double.toString(neuronRef.getRestingPotential()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfReset.setText(Double.toString(neuronRef.getResetPotential()));
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
@@ -155,7 +155,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         IntegrateAndFireNeuron neuronRef = new IntegrateAndFireNeuron();
         tfRestingPotential.setText(Double.toString(neuronRef.getRestingPotential()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(this.getParentNetwork().getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(this.getParentNetwork().getTimeStep()));
         tfReset.setText(Double.toString(neuronRef.getResetPotential()));
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
@@ -168,7 +168,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < ruleList.size(); i++) {
             IntegrateAndFireNeuron neuronRef = (IntegrateAndFireNeuron) ruleList.get(i);

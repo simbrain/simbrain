@@ -36,7 +36,7 @@ import java.awt.Color;
  */
 public class NetworkGuiSettings {
 
-    /** Color of all lines in rootNetwork panel. */
+    /** Color of all lines in Network panel. */
     private static Color lineColor =  Color.black;
 
     /** Color of background. */

@@ -56,6 +56,6 @@ public final class ShowDebugAction
         System.out.println("--- Network Panel ----");
         System.out.println(networkPanel);
         System.out.println("--- Logical Network ----");
-        System.out.println(networkPanel.getRootNetwork());
+        System.out.println(networkPanel.getNetwork());
     }
 }

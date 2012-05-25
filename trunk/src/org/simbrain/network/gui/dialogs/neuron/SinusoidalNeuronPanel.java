@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.SinusoidalNeuron;
@@ -59,7 +59,7 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public SinusoidalNeuronPanel(RootNetwork network) {
+    public SinusoidalNeuronPanel(Network network) {
         super(network);
         this.add(tabbedPanel);
         mainPanel.addItem("Phase", tfPhase);

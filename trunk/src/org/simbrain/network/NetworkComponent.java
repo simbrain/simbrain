@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.listeners.NetworkEvent;
@@ -41,7 +41,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 public final class NetworkComponent extends WorkspaceComponent {
 
     /** Reference to root network, the main model network. */
-    private RootNetwork rootNetwork = new RootNetwork();
+    private Network network = new Network();
 
     /**
      * Create a new network component.
@@ -54,9 +54,9 @@ public final class NetworkComponent extends WorkspaceComponent {
     /**
      * Create a new network component.
      */
-    public NetworkComponent(final String name, final RootNetwork network) {
+    public NetworkComponent(final String name, final Network network) {
         super(name);
-        this.rootNetwork = network;
+        this.network = network;
         init();
     }
 
@@ -64,9 +64,6 @@ public final class NetworkComponent extends WorkspaceComponent {
      * Initialize attribute types and listeners.
      */
     private void init() {
-
-        // Set root networks' id to the component's name
-        rootNetwork.setId(super.getName());
 
         // Initialize attribute types and their default visibility
         addProducerType(new AttributeType(this, "Neuron", "getActivation", double.class, true));
@@ -82,7 +79,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         addConsumerType(new AttributeType(this, "Neuron", "setLabel", String.class, false));
         addConsumerType(new AttributeType(this, "Synapse", "setStrength", double.class, false));
 
-        rootNetwork.addNeuronListener(new NeuronListener() {
+        network.addNeuronListener(new NeuronListener() {
             /**
              * {@inheritDoc}
              */
@@ -119,7 +116,7 @@ public final class NetworkComponent extends WorkspaceComponent {
            }
         });
 
-        rootNetwork.addSynapseListener(new SynapseListener() {
+        network.addSynapseListener(new SynapseListener() {
 
             public void synapseAdded(NetworkEvent<Synapse> networkEvent) {
                 setChangedSinceLastSave(true);
@@ -149,12 +146,12 @@ public final class NetworkComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         for (AttributeType type : getVisibleConsumerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
-                for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                for (Neuron neuron : network.getFlatNeuronList()) {
                     String description = type.getDescription(neuron.getId());
                     returnList.add(getAttributeManager().createPotentialConsumer(neuron, type, description));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
-                for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                for (Synapse synapse : network.getFlatSynapseList()) {
                     String description = type.getDescription(synapse.getId());
                     returnList.add(getAttributeManager().createPotentialConsumer(synapse, type, description));
                 }
@@ -169,12 +166,12 @@ public final class NetworkComponent extends WorkspaceComponent {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         for (AttributeType type : getVisibleProducerTypes()) {
             if (type.getTypeName().equalsIgnoreCase("Neuron")) {
-                for (Neuron neuron : rootNetwork.getFlatNeuronList()) {
+                for (Neuron neuron : network.getFlatNeuronList()) {
                     String description = type.getDescription(neuron.getId());
                     returnList.add(getAttributeManager().createPotentialProducer(neuron, type, description));
                 }
             } else if (type.getTypeName().equalsIgnoreCase("Synapse")) {
-                for (Synapse synapse : rootNetwork.getFlatSynapseList()) {
+                for (Synapse synapse : network.getFlatSynapseList()) {
                     String description = type.getDescription(synapse.getId());
                     returnList.add(getAttributeManager().createPotentialProducer(synapse, type, description));
                 }
@@ -186,9 +183,9 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public Object getObjectFromKey(String objectKey) {
         if (objectKey.startsWith("Neuron")) {
-            return this.getRootNetwork().getNeuron(objectKey);
+            return this.getNetwork().getNeuron(objectKey);
         } else if (objectKey.startsWith("Synapse")) {
-            return this.getRootNetwork().getSynapse(objectKey);
+            return this.getNetwork().getSynapse(objectKey);
         }
         return null;
     }
@@ -207,13 +204,13 @@ public final class NetworkComponent extends WorkspaceComponent {
      * {@inheritDoc}
      */
      public static NetworkComponent open(final InputStream input, final String name, final String format) {
-        RootNetwork newNetwork = (RootNetwork) RootNetwork.getXStream().fromXML(input);
+        Network newNetwork = (Network) Network.getXStream().fromXML(input);
         return new NetworkComponent(name, newNetwork);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-        RootNetwork.getXStream().toXML(rootNetwork, output);
+        Network.getXStream().toXML(network, output);
     }
 
     /**
@@ -221,13 +218,13 @@ public final class NetworkComponent extends WorkspaceComponent {
      *
      * @return the root network
      */
-    public RootNetwork getRootNetwork() {
-        return rootNetwork;
+    public Network getNetwork() {
+        return network;
     }
 
     @Override
     public void update() {
-        rootNetwork.update();
+        network.update();
     }
 
     @Override
@@ -237,7 +234,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return RootNetwork.getXStream().toXML(rootNetwork);
+        return Network.getXStream().toXML(network);
     }
 
 }

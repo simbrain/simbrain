@@ -63,6 +63,6 @@ public final class IterateNetworkAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         LOGGER.debug("actionPerformed called");
-        networkPanel.getRootNetwork().update();
+        networkPanel.getNetwork().update();
     }
 }

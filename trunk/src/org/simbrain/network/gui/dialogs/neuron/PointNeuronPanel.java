@@ -22,7 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neurons.PointNeuron;
 import org.simbrain.network.neurons.PointNeuron.OutputFunction;
@@ -84,7 +84,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates an instance of this panel.
      */
-    public PointNeuronPanel(RootNetwork network) {
+    public PointNeuronPanel(Network network) {
         super(network);
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
@@ -109,7 +109,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         PointNeuron neuronRef = (PointNeuron) ruleList.get(0);
 
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
 
         tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
@@ -158,7 +158,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         PointNeuron neuronRef = new PointNeuron();
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
@@ -175,7 +175,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < ruleList.size(); i++) {
             PointNeuron neuronRef = (PointNeuron) ruleList.get(i);

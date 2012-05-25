@@ -63,7 +63,7 @@ public final class RunScriptAction extends AbstractAction {
             Interpreter interpreter = new Interpreter();
 
             try {
-                interpreter.set("network", networkPanel.getRootNetwork());
+                interpreter.set("network", networkPanel.getNetwork());
                 interpreter.set("networkPanel", networkPanel);
                 interpreter.source(scriptFile.toString());
             } catch (FileNotFoundException e) {

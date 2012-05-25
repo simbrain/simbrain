@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.neurons;
 
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork.TimeType;
 
 /**
  * <b>ThreeValuedNeuron</b> is a natural extension of a binary neuron, which

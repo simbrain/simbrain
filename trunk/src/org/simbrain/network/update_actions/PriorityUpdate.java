@@ -13,25 +13,25 @@
  */
 package org.simbrain.network.update_actions;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.UpdateAction;
 
 /**
  * Loose neurons (neurons not in groups) are updated in accordance with an
  * ordered priority list. User sets the priority for each neuron. Default
  * priority value is 0. Elements with smaller priority value are updated first.
- * 
+ *
  * @author jyoshimi
  */
 public class PriorityUpdate implements UpdateAction {
 
     /** Reference to network to update. */
-    private RootNetwork network;
+    private Network network;
 
     /**
      * @param network
      */
-    public PriorityUpdate(RootNetwork network) {
+    public PriorityUpdate(Network network) {
         this.network = network;
     }
 

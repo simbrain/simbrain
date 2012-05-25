@@ -79,7 +79,7 @@ public final class ApplyConnectionAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         if (isSelfConnect) {
             // Not used..
-            connection.connectNeurons(networkPanel.getRootNetwork(),
+            connection.connectNeurons(networkPanel.getNetwork(),
                     networkPanel.getSelectedModelNeurons(),
                     networkPanel.getSelectedModelNeurons());
         } else {
@@ -116,7 +116,7 @@ public final class ApplyConnectionAction extends AbstractAction {
         protected void closeDialogOk() {
             super.closeDialogOk();
             optionsPanel.commitChanges();
-            connection.connectNeurons(networkPanel.getRootNetwork(),
+            connection.connectNeurons(networkPanel.getNetwork(),
                     networkPanel.getSourceModelNeurons(),
                     networkPanel.getSelectedModelNeurons());
         }

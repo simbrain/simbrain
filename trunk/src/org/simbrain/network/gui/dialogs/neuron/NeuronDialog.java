@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.util.ClassDescriptionPair;
@@ -150,8 +150,8 @@ public class NeuronDialog extends StandardDialog {
         // update method
         JLabel priorityLabel = new JLabel("Update Priority");
         topPanel.addItemLabel(priorityLabel, tfPriority);
-//        if (((Neuron) neuronList.get(0)).getRootNetwork().getUpdateMethod() != 
-//            RootNetwork.UpdateMethod.PRIORITYBASED) {
+//        if (((Neuron) neuronList.get(0)).getNetwork().getUpdateMethod() != 
+//            Network.UpdateMethod.PRIORITYBASED) {
 //            priorityLabel.setEnabled(false);
 //            tfPriority.setEnabled(false);
 //        }
@@ -177,7 +177,7 @@ public class NeuronDialog extends StandardDialog {
      */
     private void initNeuronType() {
 
-        RootNetwork parentNetwork = neuronList.get(0).getRootNetwork();
+        Network parentNetwork = neuronList.get(0).getNetwork();
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getType")) {
             cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
             cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
@@ -216,7 +216,7 @@ public class NeuronDialog extends StandardDialog {
      * @param updateRuleClass  the class to match
      * @return panel the matching panel
      */
-    private AbstractNeuronPanel getNeuronPanel(RootNetwork network,  Class<?> updateRuleClass) {
+    private AbstractNeuronPanel getNeuronPanel(Network network,  Class<?> updateRuleClass) {
         // The panel name to look for
         String panelClassName = "org.simbrain.network.gui.dialogs.neuron."
                 + updateRuleClass.getSimpleName() + "Panel";
@@ -224,7 +224,7 @@ public class NeuronDialog extends StandardDialog {
         try {
             Class<?> theClass = Class.forName(panelClassName);
             Constructor<?> constructor = theClass
-                    .getConstructor(new Class[] { RootNetwork.class });
+                    .getConstructor(new Class[] { Network.class });
             return (AbstractNeuronPanel) constructor.newInstance(network);
         } catch (ClassNotFoundException e) {
             System.err.print("The class, \"" + panelClassName
@@ -287,7 +287,7 @@ public class NeuronDialog extends StandardDialog {
 
         public void actionPerformed(final ActionEvent e) {
             neuronsHaveChanged = true;
-            RootNetwork network = neuronList.get(0).getRootNetwork();
+            Network network = neuronList.get(0).getNetwork();
             updateHelp();
 
             Object selected = cbNeuronType.getSelectedItem();
@@ -389,7 +389,7 @@ public class NeuronDialog extends StandardDialog {
         }
 
         // Notify the network that changes have been made 
-        ((Neuron) neuronList.get(0)).getParentNetwork().getRootNetwork().fireNetworkChanged();
+        ((Neuron) neuronList.get(0)).getParentNetwork().fireNetworkChanged();
 
         // Now commit changes specific to the neuron type
         neuronPanel.setRuleList(getRuleList());

@@ -8,7 +8,7 @@ import java.util.List;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.LineLayout;
@@ -66,7 +66,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
      * @param numHiddenNodes number of nodes in the hidden and context layers
      * @param numOutputNodes number of output nodes
      */
-    public SimpleRecurrentNetwork(final RootNetwork network, int numInputNodes,
+    public SimpleRecurrentNetwork(final Network network, int numInputNodes,
             int numHiddenNodes, int numOutputNode, Point2D initialPosition) {
         super(network);
 

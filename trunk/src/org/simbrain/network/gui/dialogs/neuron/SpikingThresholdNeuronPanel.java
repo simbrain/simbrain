@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neurons.SpikingThresholdNeuron;
 import org.simbrain.util.LabelledItemPanel;
@@ -46,7 +46,7 @@ public class SpikingThresholdNeuronPanel extends AbstractNeuronPanel {
      *
      * @param net Network
      */
-    public SpikingThresholdNeuronPanel(RootNetwork network) {
+    public SpikingThresholdNeuronPanel(Network network) {
         super(network);
         addItem("Threshold", tfThreshold);
     }

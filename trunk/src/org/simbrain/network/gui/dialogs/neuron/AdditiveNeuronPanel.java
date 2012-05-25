@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.AdditiveNeuron;
@@ -65,7 +65,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
      *
      * @param net Network
      */
-    public AdditiveNeuronPanel(RootNetwork network) {
+    public AdditiveNeuronPanel(Network network) {
         super(network);
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
@@ -85,7 +85,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
@@ -129,7 +129,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
         AdditiveNeuron neuronRef = new AdditiveNeuron();
         tfLambda.setText(Double.toString(neuronRef.getLambda()));
         tfResistance.setText(Double.toString(neuronRef.getResistance()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
@@ -139,7 +139,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < ruleList.size(); i++) {
             AdditiveNeuron neuronRef = (AdditiveNeuron) ruleList.get(i);

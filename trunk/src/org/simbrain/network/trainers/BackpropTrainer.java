@@ -31,7 +31,7 @@ import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Differentiable;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -326,7 +326,7 @@ public class BackpropTrainer extends IterableTrainer {
         double trainingData[][] = { { 0 }, { 1 }, { 1 }, { 0 } };
 
         // Build network
-        RootNetwork network = new RootNetwork();
+        Network network = new Network();
 
         // Layout object
         LineLayout layout = new LineLayout(50, LineOrientation.HORIZONTAL);
@@ -411,7 +411,7 @@ public class BackpropTrainer extends IterableTrainer {
 //        String FILE_OUTPUT_LOCATION = "./";
 //        File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
 //        try {
-//            RootNetwork.getXStream().toXML(network,
+//            Network.getXStream().toXML(network,
 //                    new FileOutputStream(theFile));
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();

@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.core.RootNetwork.TimeType;
+import org.simbrain.network.core.Network.TimeType;
 
 /**
  * <b>SpikingNeuron</b> is the superclass for spiking neuron types (e.g.
@@ -68,7 +68,7 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
      */
     public void setHasSpiked(final boolean hasSpiked) {
         if (hasSpiked == true) {
-            lastSpikeTime = parentNeuron.getRootNetwork()
+            lastSpikeTime = parentNeuron.getNetwork()
                     .getTime();
         }
         this.hasSpiked = hasSpiked;

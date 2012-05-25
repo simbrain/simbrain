@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.neurons;
 
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 /**
@@ -75,7 +75,7 @@ public class SinusoidalNeuron extends NeuronUpdateRule {
         double lowerBound = neuron.getLowerBound();
         double range = upperBound - lowerBound;
         double val = ((range / 2) * Math.sin(frequency
-                * neuron.getRootNetwork().getTime() + phase))
+                * neuron.getNetwork().getTime() + phase))
             + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {

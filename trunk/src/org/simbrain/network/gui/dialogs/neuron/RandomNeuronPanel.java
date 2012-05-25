@@ -20,7 +20,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import java.util.ArrayList;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.RandomNeuron;
 import org.simbrain.network.util.RandomSource;
@@ -38,7 +38,7 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public RandomNeuronPanel(RootNetwork network) {
+    public RandomNeuronPanel(Network network) {
         super(network);
         this.add(rp);
     }

@@ -63,8 +63,8 @@ public class DesktopNetworkDialog extends NetworkDialog {
                 getZeroWeightColor()));
         NetworkGuiSettings.setMaxDiameter(NetworkGuiPreferences.getMaxDiameter());
         NetworkGuiSettings.setMinDiameter(NetworkGuiPreferences.getMinDiameter());
-//        networkPanel.getRootNetwork().setTimeStep(NetworkPreferences.getTimeStep());
-//        networkPanel.getRootNetwork().setPrecision(NetworkPreferences.getPrecision());
+//        networkPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
+//        networkPanel.getNetwork().setPrecision(NetworkPreferences.getPrecision());
         NetworkGuiSettings.setNudgeAmount(NetworkGuiPreferences.getNudgeAmount());
         networkPanel.resetColors();
         setIndicatorColor();
@@ -89,8 +89,8 @@ public class DesktopNetworkDialog extends NetworkDialog {
         NetworkGuiPreferences.setZeroWeightColor(NetworkGuiSettings.getZeroWeightColor().getRGB());
         NetworkGuiPreferences.setMaxDiameter(NetworkGuiSettings.getMaxDiameter());
         NetworkGuiPreferences.setMinDiameter(NetworkGuiSettings.getMinDiameter());
-//        NetworkPreferences.setTimeStep(networkPanel.getRootNetwork().getTimeStep());
-//        NetworkPreferences.setPrecision(networkPanel.getRootNetwork().getPrecision());
+//        NetworkPreferences.setTimeStep(networkPanel.getNetwork().getTimeStep());
+//        NetworkPreferences.setPrecision(networkPanel.getNetwork().getPrecision());
         NetworkGuiPreferences.setNudgeAmount(NetworkGuiSettings.getNudgeAmount());
     }
 

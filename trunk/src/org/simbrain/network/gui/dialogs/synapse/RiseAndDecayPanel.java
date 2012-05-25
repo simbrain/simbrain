@@ -60,7 +60,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         RiseAndDecay spikeResponder = (RiseAndDecay) spikeResponderList.get(0);
 
         tfMaximumResponse.setText(Double.toString(spikeResponder.getMaximumResponse()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfDecayRate.setText(Double.toString(spikeResponder.getDecayRate()));
 
         //Handle consistency of multiply selections
@@ -79,7 +79,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
     public void fillDefaultValues() {
         RiseAndDecay spikerRef = new RiseAndDecay();
         tfMaximumResponse.setText(Double.toString(spikerRef.getMaximumResponse()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfDecayRate.setText(Double.toString(spikerRef.getDecayRate()));
     }
 
@@ -87,7 +87,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < spikeResponderList.size(); i++) {
             RiseAndDecay spikerRef = (RiseAndDecay) spikeResponderList.get(i);

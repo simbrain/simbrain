@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -62,7 +62,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
      * Creates an instance of this panel.
      *
      */
-    public LinearNeuronPanel(RootNetwork network) {
+    public LinearNeuronPanel(Network network) {
         super(network);
         this.add(tabbedPane);
         mainTab.addItem("Slope", tfSlope);

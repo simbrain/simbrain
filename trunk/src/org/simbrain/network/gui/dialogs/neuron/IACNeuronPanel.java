@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.IACNeuron;
@@ -62,7 +62,7 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
      * This method is the default constructor.
      *
      */
-    public IACNeuronPanel(RootNetwork network) {
+    public IACNeuronPanel(Network network) {
         super(network);
         this.add(tabbedPane);
         mainPanel.addItem("Decay", tfDecay);

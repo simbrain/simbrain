@@ -21,7 +21,7 @@ package org.simbrain.network.subnetworks;
 import java.util.Random;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -60,7 +60,7 @@ public class WinnerTakeAll extends NeuronGroup {
      * @param newRoot new root net
      * @param oldNet old network
      */
-    public WinnerTakeAll(RootNetwork newRoot,  WinnerTakeAll oldNet) {
+    public WinnerTakeAll(Network newRoot,  WinnerTakeAll oldNet) {
         super(null,null);
         setLoseValue(oldNet.getLoseValue());
         setWinValue(oldNet.getWinValue());
@@ -75,7 +75,7 @@ public class WinnerTakeAll extends NeuronGroup {
      * @param numNeurons Number of neurons in new network
      * @param layout the way to layout the network
      */
-    public WinnerTakeAll(final RootNetwork root, final int numNeurons, final Layout layout) {
+    public WinnerTakeAll(final Network root, final int numNeurons, final Layout layout) {
         super(root);
         for (int i = 0; i < numNeurons; i++) {
           //TODO: Prevent invalid states like this?

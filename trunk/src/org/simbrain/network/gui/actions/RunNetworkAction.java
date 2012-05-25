@@ -58,9 +58,9 @@ public final class RunNetworkAction extends AbstractAction {
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {
                 while (networkPanel.isRunning()) {
-                    networkPanel.getRootNetwork().setUpdateCompleted(false);
-                    networkPanel.getRootNetwork().update();
-                    while (networkPanel.getRootNetwork().isUpdateCompleted() == false) {
+                    networkPanel.getNetwork().setUpdateCompleted(false);
+                    networkPanel.getNetwork().update();
+                    while (networkPanel.getNetwork().isUpdateCompleted() == false) {
                         // Block until update is competed
                         try {
                             Thread.sleep(1);

@@ -23,7 +23,7 @@ import org.simbrain.network.groups.Group;
 /**
  * Listener interface for receiving network events relating to model groups.
  * Classes interested in responding to such events are registered with a
- * RootNetwork, which broadcasts those events to registered observer classes.
+ * Network, which broadcasts those events to registered observer classes.
  */
 public interface GroupListener {
 

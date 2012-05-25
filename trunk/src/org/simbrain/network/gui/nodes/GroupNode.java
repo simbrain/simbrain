@@ -139,7 +139,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         };
         Action removeGroup = new AbstractAction("Remove group") {
             public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().getRootNetwork().removeGroup(group);
+                getNetworkPanel().getNetwork().removeGroup(group);
             }
         };
         ret.add(editGroupName);

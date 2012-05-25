@@ -62,7 +62,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         super(frame, component);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-        networkPanel = new NetworkPanelDesktop(this, component.getRootNetwork());
+        networkPanel = new NetworkPanelDesktop(this, component.getNetwork());
 
         // component.setCurrentFile(currentFile);
 
@@ -94,9 +94,9 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     }
 
     /**
-     * Create and return a new File menu for this rootNetwork panel.
+     * Create and return a new File menu for this Network panel.
      *
-     * @return a new File menu for this rootNetwork panel
+     * @return a new File menu for this Network panel
      */
     JMenu createFileMenu() {
 
@@ -123,10 +123,10 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         // TODO: Below only needs to happen when opening; but currently it
         // happens also when creating a new network
         networkPanel.clearPanel();
-        if (networkPanel.getRootNetwork() != this.getWorkspaceComponent()
-                .getRootNetwork()) {
-            networkPanel.setRootNetwork(this.getWorkspaceComponent()
-                    .getRootNetwork().getRootNetwork());
+        if (networkPanel.getNetwork() != this.getWorkspaceComponent()
+                .getNetwork()) {
+            networkPanel.setNetwork(this.getWorkspaceComponent()
+                    .getNetwork());
         }
         networkPanel.syncToModel();
         networkPanel.initGui();

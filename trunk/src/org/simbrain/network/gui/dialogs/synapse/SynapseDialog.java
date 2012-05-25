@@ -376,7 +376,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         // Notify the network that changes have been made 
         Synapse firstSynapse = synapseList.get(0);
         if (firstSynapse.getParentNetwork() != null) {
-            firstSynapse.getParentNetwork().getRootNetwork().fireNetworkChanged();
+            firstSynapse.getParentNetwork().fireNetworkChanged();
         }
 
         // Now commit changes specific to the synapse type

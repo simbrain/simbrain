@@ -100,7 +100,7 @@ public class KeyBindings {
                 ActionEvent.SHIFT_MASK), "debug");
         panel.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println(panel.getRootNetwork().toString());
+                System.out.println(panel.getNetwork().toString());
             }
         });
 
@@ -149,7 +149,7 @@ public class KeyBindings {
             public void actionPerformed(ActionEvent e) {
                 ConnectNeurons connection = QuickConnectPreferences
                         .getCurrentConnection();
-                connection.connectNeurons(panel.getRootNetwork(),
+                connection.connectNeurons(panel.getNetwork(),
                         panel.getSourceModelNeurons(),
                         panel.getSelectedModelNeurons());
             }

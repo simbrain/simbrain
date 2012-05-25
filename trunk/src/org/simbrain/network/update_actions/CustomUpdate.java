@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.update_actions;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.UpdateAction;
 
 import bsh.EvalError;
@@ -32,7 +32,7 @@ import bsh.Interpreter;
 public class CustomUpdate implements UpdateAction {
 
 	/** Reference to parent network. */
-	private RootNetwork network;
+	private Network network;
 
     /** The custom update script in persistable string form. */
     private String scriptString;
@@ -46,7 +46,7 @@ public class CustomUpdate implements UpdateAction {
     /**
      * @param group group to update
      */
-    public CustomUpdate(final RootNetwork network,
+    public CustomUpdate(final Network network,
 			final String script) {
         this.network= network;
 		this.scriptString = script;

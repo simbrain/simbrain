@@ -154,10 +154,10 @@ public class IterativeControlsPanel extends JPanel {
 						while (!trainer.isUpdateCompleted()) {
 							trainer.apply();
 							if (showUpdates.isSelected()) {
-								panel.getRootNetwork()
+								panel.getNetwork()
 										.setUpdateCompleted(false);
-								panel.getRootNetwork().fireNetworkChanged();
-								while (panel.getRootNetwork()
+								panel.getNetwork().fireNetworkChanged();
+								while (panel.getNetwork()
 										.isUpdateCompleted() == false) {
 									try {
 										Thread.sleep(1);
@@ -205,7 +205,7 @@ public class IterativeControlsPanel extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 trainer.apply();
                 if (showUpdates.isSelected()) {
-                	panel.getRootNetwork().fireNetworkChanged();
+                	panel.getNetwork().fireNetworkChanged();
                 }
             }
 

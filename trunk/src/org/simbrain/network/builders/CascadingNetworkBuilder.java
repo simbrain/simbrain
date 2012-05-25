@@ -22,8 +22,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.network.synapses.ClampedSynapse;
@@ -62,7 +62,7 @@ public final class CascadingNetworkBuilder {
     private String neuronType = DEFAULT_NEURON_TYPE;
 
     /** Reference to root network. */
-    private RootNetwork network;
+    private Network network;
 
     /**
      * Create a cascading network builder with a specific number of layers and
@@ -72,7 +72,7 @@ public final class CascadingNetworkBuilder {
      * @param numBrachesPerNeuron branches per neuron
      * @param network parent network
      */
-    public CascadingNetworkBuilder(RootNetwork network, int numLayers,
+    public CascadingNetworkBuilder(Network network, int numLayers,
             int numBrachesPerNeuron) {
         this.network = network;
         this.numLayers = numLayers;
@@ -84,7 +84,7 @@ public final class CascadingNetworkBuilder {
      *
      * @param network parent network
      */
-    public CascadingNetworkBuilder(RootNetwork network) {
+    public CascadingNetworkBuilder(Network network) {
         this.network = network;
     }
 

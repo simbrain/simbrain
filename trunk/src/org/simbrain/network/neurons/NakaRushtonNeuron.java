@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.neurons;
 
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 /**
@@ -108,7 +108,7 @@ public class NakaRushtonNeuron extends NeuronUpdateRule {
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            a += (neuron.getParentNetwork().getRootNetwork().getTimeStep() / adaptationTimeConstant)
+            a += (neuron.getParentNetwork().getTimeStep() / adaptationTimeConstant)
                     * (adaptationParameter * val - a);
         } else {
             a = 0;
@@ -123,10 +123,10 @@ public class NakaRushtonNeuron extends NeuronUpdateRule {
         }
 
         if (addNoise) {
-            val += (neuron.getParentNetwork().getRootNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
+            val += (neuron.getParentNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator
                     .getRandom()));
         } else {
-            val += (neuron.getParentNetwork().getRootNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+            val += (neuron.getParentNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
         neuron.setBuffer(val);

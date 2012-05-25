@@ -26,7 +26,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.NakaRushtonNeuron;
@@ -76,7 +76,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
     /**
      * Creates a new  Naka-Rushton neuron panel.
      */
-    public NakaRushtonNeuronPanel(RootNetwork network) {
+    public NakaRushtonNeuronPanel(Network network) {
         super(network);
         tsUseAdaptation.addActionListener(this);
 
@@ -114,7 +114,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         tfSemiSaturation.setText(Double.toString(neuronRef.getSemiSaturationConstant()));
         tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tsNoise.setSelected(neuronRef.getAddNoise());
         tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
         tfAdaptationTime.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
@@ -174,7 +174,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         tfSemiSaturation.setText(Double.toString(neuronRef.getSemiSaturationConstant()));
         tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tsNoise.setSelected(neuronRef.getAddNoise());
         tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
         tfAdaptationTime.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
@@ -186,7 +186,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < ruleList.size(); i++) {
             NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) ruleList.get(i);

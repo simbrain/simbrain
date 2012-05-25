@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.update_actions;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.UpdateAction;
 
 /**
@@ -30,12 +30,12 @@ import org.simbrain.network.core.UpdateAction;
 public class BufferedUpdate implements UpdateAction {
 
     /** Reference to network to update. */
-    private RootNetwork network;
-    
+    private Network network;
+
     /**
      * @param network
      */
-    public BufferedUpdate(RootNetwork network) {
+    public BufferedUpdate(Network network) {
         this.network = network;
     }
 

@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.neurons;
 
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.RootNetwork.TimeType;
 
 /**
  * <b>ClampedNeuron</b> is a simple neuron that does nothing!

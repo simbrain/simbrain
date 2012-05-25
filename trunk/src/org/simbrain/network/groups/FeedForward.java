@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -58,7 +58,7 @@ public class FeedForward extends Subnetwork {
      *            correspond to the number of nodes in layers 1...n.
      * @param initialPosition upper left corner where network will be placed.
      */
-    public FeedForward(final RootNetwork network, int[] nodesPerLayer,
+    public FeedForward(final Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
         super(network);
         

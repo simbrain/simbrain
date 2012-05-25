@@ -102,7 +102,7 @@ public class STDPSynapse extends SynapseUpdateRule {
             SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse
                     .getTarget().getUpdateRule();
             if (tar.hasSpiked() ) {
-				delta_t = synapse.getRootNetwork().getTime()
+				delta_t = synapse.getNetwork().getTime()
 						- src.getLastSpikeTime();
 				delta_w = W_plus * Math.exp(-delta_t / tau_plus) * learningRate;
 				//System.out.println("LTP: " + delta_t + "/" + delta_w);
@@ -112,7 +112,7 @@ public class STDPSynapse extends SynapseUpdateRule {
             }
             if (src.hasSpiked()) {
 				delta_t = tar.getLastSpikeTime()
-						- synapse.getRootNetwork().getTime();
+						- synapse.getNetwork().getTime();
 				delta_w = -W_minus * Math.exp(delta_t / tau_minus)
 						* learningRate;
 				//System.out.println("LTD: " + delta_t + "/" + delta_w);

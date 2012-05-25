@@ -97,14 +97,14 @@ public class CompetitiveCreationDialog extends StandardDialog implements ActionL
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Competitive competitive = new Competitive(networkPanel.getRootNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
+        Competitive competitive = new Competitive(networkPanel.getNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
         competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
         competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
         competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
         competitive.setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
-        networkPanel.getRootNetwork().addGroup(competitive);
+        networkPanel.getNetwork().addGroup(competitive);
         networkPanel.repaint();
         super.closeDialogOk();
     }

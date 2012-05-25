@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.neurons;
 
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.RootNetwork.TimeType;
 import org.simbrain.network.util.RandomSource;
 
 /**

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.dialogs.RandomPanel;
 import org.simbrain.network.neurons.IzhikevichNeuron;
@@ -67,7 +67,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates an instance of this panel.
      */
-    public IzhikevichNeuronPanel(RootNetwork network) {
+    public IzhikevichNeuronPanel(Network network) {
         super(network);
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
@@ -88,7 +88,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         IzhikevichNeuron neuronRef = (IzhikevichNeuron) ruleList.get(0);
 
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
 
         tfA.setText(Double.toString(neuronRef.getA()));
         tfB.setText(Double.toString(neuronRef.getB()));
@@ -136,7 +136,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         IzhikevichNeuron neuronRef = new IzhikevichNeuron();
-        tfTimeStep.setText(Double.toString(parentNet.getRootNetwork().getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfA.setText(Double.toString(neuronRef.getA()));
         tfB.setText(Double.toString(neuronRef.getB()));
         tfC.setText(Double.toString(neuronRef.getC()));
@@ -149,7 +149,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        parentNet.getRootNetwork().setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < ruleList.size(); i++) {
             IzhikevichNeuron neuronRef = (IzhikevichNeuron) ruleList.get(i);

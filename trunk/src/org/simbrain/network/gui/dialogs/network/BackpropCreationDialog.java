@@ -84,7 +84,7 @@ public class BackpropCreationDialog extends StandardDialog {
         Point2D lastClicked = networkPanel.getLastClickedPosition();
 
         // Create the layered network
-        networkPanel.getRootNetwork().addGroup(new BackpropNetwork(networkPanel.getRootNetwork(), 
+        networkPanel.getNetwork().addGroup(new BackpropNetwork(networkPanel.getNetwork(), 
                 topology, lastClicked));
         
       networkPanel.repaint();

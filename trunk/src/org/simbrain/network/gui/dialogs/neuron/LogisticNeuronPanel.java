@@ -20,7 +20,7 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neurons.LogisticNeuron;
 
@@ -36,7 +36,7 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
     /**
      * Creates an instance of this panel.
      */
-    public LogisticNeuronPanel(RootNetwork network) {
+    public LogisticNeuronPanel(Network network) {
         super(network);
         addItem("Growth rate", tfGrowthRate);
         this.addBottomText("<html>Note 1: This is not a sigmoidal logistic function. <p>"

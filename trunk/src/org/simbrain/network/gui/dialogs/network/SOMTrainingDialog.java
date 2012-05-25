@@ -265,11 +265,11 @@ public class SOMTrainingDialog extends StandardDialog implements
             setInputTraining(theFile);
         } else if (o == jbReset) {
             som.reset();
-            //som.getRootNetwork().fireNetworkChanged();
+            //som.getNetwork().fireNetworkChanged();
         } else if (o == jbTrain) {
             setValues();
             som.train();
-            //som.getRootNetwork().fireNetworkChanged();
+            //som.getNetwork().fireNetworkChanged();
             learningRate.setText(Double.toString(som.getAlpha()));
             epochs.setText(Integer.toString(som.getEpochs()));
             neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));

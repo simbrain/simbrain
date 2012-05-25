@@ -267,7 +267,7 @@ public class ESNCreationDialog extends StandardDialog {
 
             //Initialize logical network builder
             EchoStateNetwork esn = new EchoStateNetwork(
-                    panel.getRootNetwork(),
+                    panel.getNetwork(),
                     //Get layer size values from fields...
                     Integer.parseInt(tfNumInputs.getText()),
                     Integer.parseInt(tfNumReservoir.getText()),

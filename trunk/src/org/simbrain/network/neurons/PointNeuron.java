@@ -21,11 +21,11 @@ package org.simbrain.network.neurons;
 import java.util.ArrayList;
 
 import org.simbrain.network.core.BiasedNeuron;
+import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.core.RootNetwork.TimeType;
 import org.simbrain.network.listeners.NetworkEvent;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.util.SimbrainMath;
@@ -163,7 +163,7 @@ public class PointNeuron extends NeuronUpdateRule implements SynapseListener,
         neuron.setLowerBound(0);
         setInputLists(neuron);
         if (neuron.getParentNetwork() != null) {
-            neuron.getParentNetwork().getRootNetwork().addSynapseListener(this);
+            neuron.getParentNetwork().addSynapseListener(this);
         }
 
     }

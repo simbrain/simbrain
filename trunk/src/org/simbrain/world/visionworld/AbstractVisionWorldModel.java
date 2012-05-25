@@ -58,7 +58,7 @@ abstract class AbstractVisionWorldModel
      * @return Initialized object.
      */
     private Object readResolve() {
-//        logger = Logger.getLogger(RootNetwork.class);
+//        logger = Logger.getLogger(Network.class);
 //        this.updatePriorities = new TreeSet<Integer>();
         return this;
     }

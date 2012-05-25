@@ -23,7 +23,7 @@ import org.simbrain.network.core.NetworkTextObject;
 /**
  * Listener interface for receiving network events relating to network text
  * objects. Classes interested in responding to text related events are
- * registered with a RootNetwork, which broadcasts text relevant events to
+ * registered with a Network, which broadcasts text relevant events to
  * registered observer classes.
  */
 public interface TextListener {

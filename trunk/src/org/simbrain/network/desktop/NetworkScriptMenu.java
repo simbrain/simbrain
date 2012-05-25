@@ -29,7 +29,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
 
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkPanel;
 
 import bsh.EvalError;
@@ -90,7 +90,7 @@ public class NetworkScriptMenu {
         private String scriptName;
 
         /** Reference to Root Network */
-        private RootNetwork network;
+        private Network network;
 
         /** Reference to Network panel */
         private NetworkPanel networkPanel;
@@ -106,7 +106,7 @@ public class NetworkScriptMenu {
             // putValue(SHORT_DESCRIPTION, name);
             this.scriptName = name;
             this.networkPanel = panel;
-            this.network = panel.getRootNetwork();
+            this.network = panel.getNetwork();
         }
 
         /** @see AbstractAction */

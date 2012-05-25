@@ -52,7 +52,7 @@ public class SOMNode extends SubnetworkNode {
         setInteractionBox(new SOMInteractionBox(networkPanel));
         setContextMenu();
         setOutlinePadding(15f);
-        networkPanel.getRootNetwork().addNetworkListener(new NetworkListener() {
+        networkPanel.getNetwork().addNetworkListener(new NetworkListener() {
 
             public void networkChanged() {
                 group.setLabel("SOM - Learning rate:"

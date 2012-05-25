@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neurons.ClampedNeuron;
 import org.simbrain.network.neurons.LinearNeuron;
@@ -252,14 +252,14 @@ public class LMSOffline extends Trainer {
      */
     public static void main(String[] args) {
 
-        RootNetwork network = test2();
+        Network network = test2();
         //System.out.println(network);
 
         // Write to file
         String FILE_OUTPUT_LOCATION = "./";
         File theFile = new File(FILE_OUTPUT_LOCATION + "result.xml");
         try {
-            RootNetwork.getXStream().toXML(network,
+            Network.getXStream().toXML(network,
                     new FileOutputStream(theFile));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -270,8 +270,8 @@ public class LMSOffline extends Trainer {
     /**
      * Simple AND Test
      */
-    private static RootNetwork test1() {
-        RootNetwork network = new RootNetwork();
+    private static Network test1() {
+        Network network = new Network();
         Neuron input1 = new Neuron(network, "ClampedNeuron");
         input1.setLocation(10, 70);
         input1.setIncrement(1);
@@ -311,9 +311,9 @@ public class LMSOffline extends Trainer {
     /**
      * Simple association test
      */
-    private static RootNetwork test2() {
+    private static Network test2() {
 
-        RootNetwork network = new RootNetwork();
+        Network network = new Network();
 
         double inputData[][] = { { .95, 0, 0, 0 }, { 0, .95, 0, 0 },
                 { 0, 0, .95, 0 }, { 0, 0, 0, .95 } };

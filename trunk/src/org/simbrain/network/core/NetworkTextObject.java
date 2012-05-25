@@ -27,7 +27,7 @@ package org.simbrain.network.core;
 public class NetworkTextObject {
 
     /** Reference to parent root network of this text object. */
-    private final RootNetwork parent;
+    private final Network parent;
 
     /** x-coordinate of this object in 2-space. */
     private double x;
@@ -57,7 +57,7 @@ public class NetworkTextObject {
      * @param x x position
      * @param y y position
      */
-    public NetworkTextObject(RootNetwork parent, double x, double y) {
+    public NetworkTextObject(Network parent, double x, double y) {
         this.parent = parent;
         this.x = x;
         this.y = y;
@@ -69,7 +69,7 @@ public class NetworkTextObject {
      * @param newParent parent network for this text object
      * @param text text object to copy
      */
-    public NetworkTextObject(RootNetwork parent, NetworkTextObject text) {
+    public NetworkTextObject(Network parent, NetworkTextObject text) {
         this.parent = parent;
         this.text = text.getText();
         this.x = text.getX();

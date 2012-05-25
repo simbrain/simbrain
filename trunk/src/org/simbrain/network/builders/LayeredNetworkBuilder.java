@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.RootNetwork;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronLayer;
 import org.simbrain.network.groups.NeuronLayer.LayerType;
@@ -83,7 +83,7 @@ public final class LayeredNetworkBuilder {
      * @param network the parent network to which the layered network is being
      *            added
      */
-    public void buildNetwork(final RootNetwork network) {
+    public void buildNetwork(final Network network) {
 
         // Layout
         LineLayout layout = new LineLayout(betweenNeuronInterval,

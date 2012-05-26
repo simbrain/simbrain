@@ -24,7 +24,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurons.PointNeuron;
+import org.simbrain.network.neuron_update_rules.PointNeuronRule;
 
 /**
  * <b>KwtaNetwork</b> implements a k Winner Take All network. The k neurons
@@ -77,7 +77,7 @@ public class KWTA extends Subnetwork  {
     public KWTA(final Network root, final int k, final Layout layout) {
         super(root, 1, 1);
         for (int i = 0; i < k; i++) {
-            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuron()));
+            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuronRule()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
         getSynapseGroup().setDeleteWhenEmpty(false);
@@ -99,9 +99,9 @@ public class KWTA extends Subnetwork  {
      */
     private void setCurrentThresholdCurrent() {
 
-        double highest = ((PointNeuron) getNeuronGroup().getNeuronList().get(k).getUpdateRule())
+        double highest = ((PointNeuronRule) getNeuronGroup().getNeuronList().get(k).getUpdateRule())
               .getInhibitoryThresholdConductance();
-        double secondHighest = ((PointNeuron) getNeuronGroup().getNeuronList().get(k-1).getUpdateRule())
+        double secondHighest = ((PointNeuronRule) getNeuronGroup().getNeuronList().get(k-1).getUpdateRule())
             .getInhibitoryThresholdConductance();
 
         inhibitoryConductance = secondHighest + q * (highest - secondHighest);
@@ -111,7 +111,7 @@ public class KWTA extends Subnetwork  {
 
         // Set inhibitory conductances in the layer
         for (Neuron neuron : getNeuronGroup().getNeuronList()) {
-            ((PointNeuron) neuron.getUpdateRule())
+            ((PointNeuronRule) neuron.getUpdateRule())
                     .setInhibitoryConductance(inhibitoryConductance);
         }
     }
@@ -135,8 +135,8 @@ public class KWTA extends Subnetwork  {
          */
         public int compare(Neuron neuron1, Neuron neuron2) {
             return 
-                (int) ((PointNeuron)neuron1.getUpdateRule()).getExcitatoryConductance() - 
-                (int)((PointNeuron)neuron1.getUpdateRule()).getExcitatoryConductance();
+                (int) ((PointNeuronRule)neuron1.getUpdateRule()).getExcitatoryConductance() - 
+                (int)((PointNeuronRule)neuron1.getUpdateRule()).getExcitatoryConductance();
         }
     }
 

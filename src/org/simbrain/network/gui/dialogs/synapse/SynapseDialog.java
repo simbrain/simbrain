@@ -63,7 +63,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 
     /** Synapse panel. */
-    private AbstractSynapsePanel synapsePanel = new ClampedSynapsePanel();
+    private AbstractSynapsePanel synapsePanel = new ClampedSynapseRulePanel();
 
     /** Id Label. */
     private JLabel idLabel = new JLabel();
@@ -192,7 +192,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
             cbSynapseType.setSelectedIndex(Synapse.getRuleList().length);
             // Default to clamped synapse panel
-            synapsePanel = new ClampedSynapsePanel();
+            synapsePanel = new ClampedSynapseRulePanel();
         } else {
             setComboBox(synapseList.get(0).getLearningRule().getDescription());
             Class<?> synapseType = ((ClassDescriptionPair) cbSynapseType
@@ -400,7 +400,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         } else {
             String name = ((ClassDescriptionPair) cbSynapseType
                     .getSelectedItem()).getSimpleName()
-                    .replaceAll("Synapse", "");
+                    .replaceAll("Rule", "");
             name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
             helpAction = new ShowHelpAction("Pages/Network/synapse/" + name + ".html");
         }

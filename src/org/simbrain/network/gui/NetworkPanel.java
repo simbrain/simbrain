@@ -88,7 +88,7 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.subnetworks.Hopfield;
@@ -628,7 +628,7 @@ public class NetworkPanel extends JPanel {
             }
         }
 
-        Neuron neuron = new Neuron(getNetwork(), new LinearNeuron());
+        Neuron neuron = new Neuron(getNetwork(), new LinearRule());
         neuron.setX(p.getX());
         neuron.setY(p.getY());
         neuron.setActivation(0);

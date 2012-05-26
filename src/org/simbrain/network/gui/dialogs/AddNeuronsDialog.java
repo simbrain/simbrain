@@ -29,7 +29,7 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -49,7 +49,7 @@ public class AddNeuronsDialog extends StandardDialog {
     private static final Layout DEFAULT_LAYOUT = new GridLayout();
 
     /** The default neuron. */
-    private static final NeuronUpdateRule DEFAULT_NEURON = new LinearNeuron();
+    private static final NeuronUpdateRule DEFAULT_NEURON = new LinearRule();
 
     /** The layout to be used on the neurons. */
     private Layout layout = DEFAULT_LAYOUT;

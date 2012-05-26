@@ -27,8 +27,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
  * Train using least mean squares.
@@ -171,7 +171,7 @@ public class LMSIterative extends IterableTrainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 4; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuron()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule()); 
             network.addNeuron(neuron);
             inputLayer.add(neuron);
             //System.out.println("Input " + i + " = " + neuron.getId());
@@ -180,7 +180,7 @@ public class LMSIterative extends IterableTrainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(network, new LinearNeuron());
+            Neuron neuron = new Neuron(network, new LinearRule());
             ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
@@ -233,7 +233,7 @@ public class LMSIterative extends IterableTrainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuron()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule()); 
             network.addNeuron(neuron);
             inputLayer.add(neuron);
             //System.out.println("Input " + i + " = " + neuron.getId());
@@ -242,7 +242,7 @@ public class LMSIterative extends IterableTrainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 1; i++) {
-            Neuron neuron = new Neuron(network, new LinearNeuron()); 
+            Neuron neuron = new Neuron(network, new LinearRule()); 
             ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);

@@ -24,9 +24,9 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
@@ -72,7 +72,7 @@ public class FeedForward extends Subnetwork {
         // Set up input layer
         List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuron());
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             inputLayerNeurons.add(neuron);
@@ -88,7 +88,7 @@ public class FeedForward extends Subnetwork {
         layout.layoutNeurons(inputLayerNeurons);
 
         // Prepare base synapse for connecting layers
-        Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapse());
+        Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapseRule());
         synapse.setLowerBound(-10);
         synapse.setUpperBound(10);
 
@@ -99,7 +99,7 @@ public class FeedForward extends Subnetwork {
         for (int i = 1; i < nodesPerLayer.length; i++) {
             List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
             for (int j = 0; j < nodesPerLayer[i]; j++) {
-                Neuron neuron = new Neuron(network, new SigmoidalNeuron());
+                Neuron neuron = new Neuron(network, new SigmoidalRule());
                 neuron.setLowerBound(0);
                 neuron.setUpdatePriority(i);
                 hiddenLayerNeurons.add(neuron);

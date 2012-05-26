@@ -37,7 +37,7 @@ import org.simbrain.network.gui.dialogs.layout.LayoutDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 

@@ -25,7 +25,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
  * <b>Competitive</b> implements a simple competitive network (See PDP 1, ch. 151-193.)
@@ -76,7 +76,7 @@ public class Competitive extends Subnetwork {
 		root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
 				getNeuronGroup(), getSynapseGroup());
         for (int i = 0; i < numNeurons; i++) {
-            getNeuronGroup().addNeuron(new Neuron(root, new LinearNeuron()));
+            getNeuronGroup().addNeuron(new Neuron(root, new LinearRule()));
         }
         layout.layoutNeurons(this.getNeuronGroup().getNeuronList());
         setLabel("Competitive Network");

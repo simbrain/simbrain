@@ -24,7 +24,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 
 
 /**
@@ -79,7 +79,7 @@ public class WinnerTakeAll extends NeuronGroup {
         super(root);
         for (int i = 0; i < numNeurons; i++) {
           //TODO: Prevent invalid states like this?
-          this.addNeuron(new Neuron(root, new LinearNeuron()));
+          this.addNeuron(new Neuron(root, new LinearRule()));
         }
         layout.layoutNeurons(this.getNeuronList());
         setLabel("Winner take all network");

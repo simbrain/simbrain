@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.synapses.spikeresponders.RiseAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
 
 
 /**

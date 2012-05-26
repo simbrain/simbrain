@@ -7,7 +7,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 
 /**
  * <b>SOM</b> implements a Self-Organizing Map network.
@@ -115,7 +115,7 @@ public class SOM extends Subnetwork {
     public SOM(final Network root, final int numNeurons, final Layout layout) {
         super(root, 1, 1);
         for (int i = 0; i < numNeurons; i++) {
-            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new LinearNeuron()));
+            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new LinearRule()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
         getSynapseGroup().setDeleteWhenEmpty(false);
@@ -460,7 +460,7 @@ public class SOM extends Subnetwork {
      * @return ret default som neuron
      */
     private Neuron getDefaultSOMNeuron() {
-        Neuron ret = new Neuron(getParentNetwork(), new LinearNeuron());
+        Neuron ret = new Neuron(getParentNetwork(), new LinearRule());
         ret.setIncrement(1);
         ret.setLowerBound(0);
         return ret;

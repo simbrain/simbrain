@@ -31,9 +31,9 @@ import org.simbrain.network.groups.NeuronLayer;
 import org.simbrain.network.groups.NeuronLayer.LayerType;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
 /**
  * Adds a layered object to a network. The topology is specified by an array of
@@ -92,7 +92,7 @@ public final class LayeredNetworkBuilder {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < nodesPerLayer[0]; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuron());
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
@@ -108,7 +108,7 @@ public final class LayeredNetworkBuilder {
         }
 
         // Prepare base synapse for connecting layers
-        Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapse());
+        Synapse synapse = Synapse.getTemplateSynapse(new ClampedSynapseRule());
         synapse.setLowerBound(-10);
         synapse.setUpperBound(10);
 
@@ -119,7 +119,7 @@ public final class LayeredNetworkBuilder {
         for (int i = 1; i < nodesPerLayer.length; i++) {
             List<Neuron> hiddenLayer = new ArrayList<Neuron>();
             for (int j = 0; j < nodesPerLayer[i]; j++) {
-                Neuron neuron = new Neuron(network, new SigmoidalNeuron());
+                Neuron neuron = new Neuron(network, new SigmoidalRule());
                 neuron.setLowerBound(0);
                 neuron.setUpdatePriority(i);
                 network.addNeuron(neuron);

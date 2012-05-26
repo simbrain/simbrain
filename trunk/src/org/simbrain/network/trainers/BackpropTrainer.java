@@ -35,9 +35,9 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.util.SimnetUtils;
 
 /**
@@ -336,7 +336,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuron()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule()); 
             neuron.setIncrement(1); // For easier testing
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
@@ -348,7 +348,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Set up hidden layer 1
         List<Neuron> hiddenLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 5; i++) {
-            Neuron neuron = new Neuron(network, new SigmoidalNeuron());
+            Neuron neuron = new Neuron(network, new SigmoidalRule());
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             hiddenLayer.add(neuron);
@@ -359,7 +359,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Set up hidden layer 2
         List<Neuron> hiddenLayer2 = new ArrayList<Neuron>();
         for (int i = 0; i < 5; i++) {
-            Neuron neuron = new Neuron(network, new SigmoidalNeuron());
+            Neuron neuron = new Neuron(network, new SigmoidalRule());
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             hiddenLayer2.add(neuron);
@@ -371,7 +371,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 1; i++) {
-            Neuron neuron = new Neuron(network, new SigmoidalNeuron());
+            Neuron neuron = new Neuron(network, new SigmoidalRule());
             neuron.setLowerBound(0);
             network.addNeuron(neuron);
             outputLayer.add(neuron);

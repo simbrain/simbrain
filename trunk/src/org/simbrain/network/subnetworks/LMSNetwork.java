@@ -17,7 +17,7 @@ import java.awt.geom.Point2D;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.FeedForward;
-import org.simbrain.network.neurons.LinearNeuron;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 
 /**
@@ -41,7 +41,7 @@ public class LMSNetwork extends FeedForward implements Trainable {
             int numOutputNeurons, Point2D initialPosition) {
         super(network, new int[] { numInputNeurons, numOutputNeurons },
                 initialPosition);
-        getOutputLayer().setNeuronType(new LinearNeuron());
+        getOutputLayer().setNeuronType(new LinearRule());
         setLabel("LMS Network");
     }
     

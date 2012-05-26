@@ -37,10 +37,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.simbrain.network.subnetworks.EchoStateNetwork;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.neurons.BinaryNeuron;
-import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
+import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.network.trainers.LMSOffline.SolutionType;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -106,11 +106,11 @@ public class ESNCreationDialog extends StandardDialog {
     //Mapping of Strings to NeuronUpdateRules, currently only Logisitc, Tanh,
     //and Linear neurons are allowed.
     {
-        boxMap.put("Linear", new LinearNeuron());
-        SigmoidalNeuron sig0 = new SigmoidalNeuron();
+        boxMap.put("Linear", new LinearRule());
+        SigmoidalRule sig0 = new SigmoidalRule();
         sig0.setType(SigmoidType.LOGISTIC);
         boxMap.put("Logistic", sig0);
-        SigmoidalNeuron sig1 = new SigmoidalNeuron();
+        SigmoidalRule sig1 = new SigmoidalRule();
         sig1.setType(SigmoidType.TANH);
         boxMap.put("Tanh", sig1);
     }

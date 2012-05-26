@@ -22,16 +22,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.synapses.ClampedSynapse;
-import org.simbrain.network.synapses.HebbianCPCASynapse;
-import org.simbrain.network.synapses.HebbianSynapse;
-import org.simbrain.network.synapses.HebbianThresholdSynapse;
-import org.simbrain.network.synapses.OjaSynapse;
-import org.simbrain.network.synapses.RandomSynapse;
-import org.simbrain.network.synapses.STDPSynapse;
-import org.simbrain.network.synapses.ShortTermPlasticitySynapse;
-import org.simbrain.network.synapses.SubtractiveNormalizationSynapse;
-import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
+import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
+import org.simbrain.network.synapse_update_rules.HebbianRule;
+import org.simbrain.network.synapse_update_rules.HebbianThresholdRule;
+import org.simbrain.network.synapse_update_rules.OjaRule;
+import org.simbrain.network.synapse_update_rules.RandomSynapseRule;
+import org.simbrain.network.synapse_update_rules.STDPRule;
+import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
+import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
+import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.Utils;
 
@@ -101,24 +101,24 @@ public class Synapse {
 
     /** List of Neuron update rules; used in Gui Combo boxes. */
     private static final ClassDescriptionPair[] RULE_LIST = {
-            new ClassDescriptionPair(ClampedSynapse.class,
-                    new ClampedSynapse().getDescription()),
-            new ClassDescriptionPair(HebbianSynapse.class,
-                    new HebbianSynapse().getDescription()),
-            new ClassDescriptionPair(HebbianCPCASynapse.class,
-                    new HebbianCPCASynapse().getDescription()),
-            new ClassDescriptionPair(HebbianThresholdSynapse.class,
-                    new HebbianThresholdSynapse().getDescription()),
-            new ClassDescriptionPair(OjaSynapse.class,
-                    new OjaSynapse().getDescription()),
-            new ClassDescriptionPair(RandomSynapse.class,
-                    new RandomSynapse().getDescription()),
-            new ClassDescriptionPair(ShortTermPlasticitySynapse.class,
-                    new ShortTermPlasticitySynapse().getDescription()),
-            new ClassDescriptionPair(STDPSynapse.class,
-                    new STDPSynapse().getDescription()),
-            new ClassDescriptionPair(SubtractiveNormalizationSynapse.class,
-                    new SubtractiveNormalizationSynapse().getDescription()) };
+            new ClassDescriptionPair(ClampedSynapseRule.class,
+                    new ClampedSynapseRule().getDescription()),
+            new ClassDescriptionPair(HebbianRule.class,
+                    new HebbianRule().getDescription()),
+            new ClassDescriptionPair(HebbianCPCARule.class,
+                    new HebbianCPCARule().getDescription()),
+            new ClassDescriptionPair(HebbianThresholdRule.class,
+                    new HebbianThresholdRule().getDescription()),
+            new ClassDescriptionPair(OjaRule.class,
+                    new OjaRule().getDescription()),
+            new ClassDescriptionPair(RandomSynapseRule.class,
+                    new RandomSynapseRule().getDescription()),
+            new ClassDescriptionPair(ShortTermPlasticityRule.class,
+                    new ShortTermPlasticityRule().getDescription()),
+            new ClassDescriptionPair(STDPRule.class,
+                    new STDPRule().getDescription()),
+            new ClassDescriptionPair(SubtractiveNormalizationRule.class,
+                    new SubtractiveNormalizationRule().getDescription()) };
 
     /**
      * Construct a synapse using a source and target neuron, defaulting to
@@ -129,7 +129,7 @@ public class Synapse {
      * @param target target neuron
      */
     public Synapse(Neuron source, Neuron target) {
-        this(source, target, new ClampedSynapse());
+        this(source, target, new ClampedSynapseRule());
     }
 
     /**
@@ -641,7 +641,8 @@ public class Synapse {
     public void setLearningRule(String name) {
         try {
             SynapseUpdateRule newRule = (SynapseUpdateRule) Class.forName(
-                    "org.simbrain.network.synapses." + name).newInstance();
+                    "org.simbrain.network.synapse_update_rules." + name)
+                    .newInstance();
             setLearningRule(newRule);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(
@@ -683,7 +684,7 @@ public class Synapse {
      * @see instantiateTemplateSynapse
      */
     public static Synapse getTemplateSynapse() {
-        return new Synapse(null, null, new ClampedSynapse(), (Network) null);
+        return new Synapse(null, null, new ClampedSynapseRule(), (Network) null);
     }
 
     /**

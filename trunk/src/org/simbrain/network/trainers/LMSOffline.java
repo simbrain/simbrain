@@ -32,9 +32,9 @@ import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Matrices;
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
@@ -101,10 +101,10 @@ public class LMSOffline extends Trainer {
 
     	int index = 0;
     	for(Neuron n : network.getOutputNeurons()) {
-    		if(n.getUpdateRule() instanceof SigmoidalNeuron) {
+    		if(n.getUpdateRule() instanceof SigmoidalRule) {
     			for(int i = 0; i < network.getTrainingData().length; i++) {
     				network.getTrainingData()[i][index] = 
-    						((SigmoidalNeuron) n.getUpdateRule())
+    						((SigmoidalRule) n.getUpdateRule())
     						.getInverse(network.getTrainingData()[i][index], n);
     			}
     		} 
@@ -323,7 +323,7 @@ public class LMSOffline extends Trainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 4; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuron());
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
             neuron.setLocation(10 + (i*40), 70);
             neuron.setIncrement(1);
             network.addNeuron(neuron);
@@ -334,7 +334,7 @@ public class LMSOffline extends Trainer {
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(network, new LinearNeuron());
+            Neuron neuron = new Neuron(network, new LinearRule());
             ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
             neuron.setLocation(15 + (i*40), 0);
             neuron.setLowerBound(0);

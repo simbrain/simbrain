@@ -25,8 +25,8 @@ import java.util.List;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
 /**
  * Creates a cascading network.
@@ -121,14 +121,14 @@ public final class CascadingNetworkBuilder {
                 network.addNeuron(baseNeuron);
                 double initialXOffset = branchWidth / 2;
                 for (int j = 0; j < numBrachesPerNeuron; j++) {
-                    Neuron targetNeuron = new Neuron(network, new LinearNeuron()); //TODO;
+                    Neuron targetNeuron = new Neuron(network, new LinearRule()); //TODO;
                     targetNeuron.setLocation(baseNeuron.getX() - initialXOffset
                             + (j * layerSpacing), initialPosition.y
                             - (layerIndex * verticalSpacing));
                     tempList.add(targetNeuron);
                     network.addNeuron(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
-                    Synapse synapse = new Synapse(baseNeuron, targetNeuron, new ClampedSynapse());
+                    Synapse synapse = new Synapse(baseNeuron, targetNeuron, new ClampedSynapseRule());
                     network.addSynapse(synapse);
                 }
             }

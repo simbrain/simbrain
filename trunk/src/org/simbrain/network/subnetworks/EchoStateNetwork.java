@@ -34,10 +34,10 @@ import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron.SigmoidType;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule.SigmoidType;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
@@ -88,7 +88,7 @@ public class EchoStateNetwork extends Subnetwork {
     private boolean directInOutWeights;
 
     /** Reservoir neuron type */
-    private NeuronUpdateRule reservoirNeuronType = new SigmoidalNeuron();
+    private NeuronUpdateRule reservoirNeuronType = new SigmoidalRule();
 
     /** Reference to input layer. */
     private NeuronGroup inputLayer;
@@ -101,11 +101,11 @@ public class EchoStateNetwork extends Subnetwork {
 
    /** Default TANH neurons for the reservoir */
     {
-        ((SigmoidalNeuron) reservoirNeuronType).setType(SigmoidType.TANH);
+        ((SigmoidalRule) reservoirNeuronType).setType(SigmoidType.TANH);
     }
 
     /** Default output neuron type */
-    private NeuronUpdateRule outputNeuronType = new LinearNeuron();
+    private NeuronUpdateRule outputNeuronType = new LinearRule();
 
     /** Initial position of network (from bottom left). */
     private Point2D initialPosition;
@@ -173,7 +173,7 @@ public class EchoStateNetwork extends Subnetwork {
         List<Neuron> inputLayerNeurons  = new ArrayList<Neuron>();
         List<Neuron> reservoirLayerNeurons  = new ArrayList<Neuron>();
         List<Neuron> outputLayerNeurons  = new ArrayList<Neuron>();
-        initializeLayer(inputLayerNeurons, new ClampedNeuron(),
+        initializeLayer(inputLayerNeurons, new ClampedNeuronRule(),
                 numInputs);
         initializeLayer(reservoirLayerNeurons, reservoirNeuronType,
                 numResNodes);
@@ -314,10 +314,10 @@ public class EchoStateNetwork extends Subnetwork {
         //  output to the inverse of the sigmoidal, so that when it's put
         //  in to the sigmoidal it will produce the desired output.
         for (Neuron n : outputLayer.getNeuronList()) {
-            if (n.getUpdateRule() instanceof SigmoidalNeuron) {
+            if (n.getUpdateRule() instanceof SigmoidalRule) {
                 for (int i = 0; i < trainingData.length; i++) {
                     int col = outputLayer.getNeuronList().indexOf(n);
-                    trainingData[i][col] = ((SigmoidalNeuron)
+                    trainingData[i][col] = ((SigmoidalRule)
                             n.getUpdateRule()).getInverse(trainingData[i][col],
                                     n);
                 }

@@ -26,7 +26,7 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
 /**
  * Connect neurons action. Connects a set of source neurons to a set of target
@@ -81,7 +81,7 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
         for (NeuronNode source : sourceNeurons) {
             networkPanel.getNetwork().addSynapse(
                     new Synapse(source.getNeuron(), targetNeuron.getNeuron(),
-                            new ClampedSynapse()));
+                            new ClampedSynapseRule()));
         }
 
     }

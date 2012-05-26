@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs.synapse;
 import javax.swing.JTextField;
 
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.synapses.spikeresponders.Step;
+import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 
 
 /**

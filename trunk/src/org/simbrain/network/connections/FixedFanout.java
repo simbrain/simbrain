@@ -28,7 +28,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.synapses.ClampedSynapse;
+import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
 /**
  * Connect every source neuron to every target neuron.
@@ -40,7 +40,7 @@ public class FixedFanout extends ConnectNeurons {
      * The synapse to be used as a basis for the connection. Default to a
      * clamped synapse.
      */
-    private static SynapseUpdateRule baseSynapseType = new ClampedSynapse();
+    private static SynapseUpdateRule baseSynapseType = new ClampedSynapseRule();
 
     /** Allows neurons to have a self connection. */
     // TODO: add GUI for sigma and numOutbound

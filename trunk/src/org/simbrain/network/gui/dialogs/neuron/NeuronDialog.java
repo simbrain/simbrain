@@ -182,7 +182,7 @@ public class NeuronDialog extends StandardDialog {
             cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
             cbNeuronType.setSelectedIndex(cbNeuronType.getItemCount() - 1);
             // Simply to serve as an empty panel
-            neuronPanel = new ClampedNeuronPanel(parentNetwork);
+            neuronPanel = new ClampedNeuronRulePanel(parentNetwork);
         } else {
             setComboBox(neuronList.get(0).getUpdateRule().getDescription());
             Class<?> neuronType = ((ClassDescriptionPair) cbNeuronType
@@ -272,7 +272,7 @@ public class NeuronDialog extends StandardDialog {
         } else {
             String name = ((ClassDescriptionPair) cbNeuronType
                     .getSelectedItem()).getSimpleName()
-                    .replaceAll("Neuron", "");
+                    .replaceAll("Rule", "");
             name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
             helpAction = new ShowHelpAction("Pages/Network/neuron/" + name + ".html");
         }

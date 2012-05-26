@@ -30,10 +30,10 @@ import javax.swing.JPanel;
 import org.simbrain.network.core.SpikeResponder;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkUtils;
-import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
-import org.simbrain.network.synapses.spikeresponders.ProbabilisticResponder;
-import org.simbrain.network.synapses.spikeresponders.RiseAndDecay;
-import org.simbrain.network.synapses.spikeresponders.Step;
+import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 import org.simbrain.util.LabelledItemPanel;
 
 //Note: diff changeset 1490 and 1491 to see how to put general spike response features into this panel

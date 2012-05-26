@@ -25,23 +25,23 @@ import java.util.List;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
-import org.simbrain.network.neurons.AdditiveNeuron;
-import org.simbrain.network.neurons.BinaryNeuron;
-import org.simbrain.network.neurons.ClampedNeuron;
-import org.simbrain.network.neurons.DecayNeuron;
-import org.simbrain.network.neurons.IACNeuron;
-import org.simbrain.network.neurons.IntegrateAndFireNeuron;
-import org.simbrain.network.neurons.IzhikevichNeuron;
-import org.simbrain.network.neurons.LinearNeuron;
-import org.simbrain.network.neurons.LogisticNeuron;
-import org.simbrain.network.neurons.NakaRushtonNeuron;
-import org.simbrain.network.neurons.PointNeuron;
-import org.simbrain.network.neurons.RandomNeuron;
-import org.simbrain.network.neurons.SigmoidalNeuron;
-import org.simbrain.network.neurons.SinusoidalNeuron;
-import org.simbrain.network.neurons.SpikingThresholdNeuron;
-import org.simbrain.network.neurons.StochasticNeuron;
-import org.simbrain.network.neurons.ThreeValueNeuron;
+import org.simbrain.network.neuron_update_rules.AdditiveRule;
+import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.DecayRule;
+import org.simbrain.network.neuron_update_rules.IACRule;
+import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
+import org.simbrain.network.neuron_update_rules.IzhikevichRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.neuron_update_rules.LogisticRule;
+import org.simbrain.network.neuron_update_rules.NakaRushtonRule;
+import org.simbrain.network.neuron_update_rules.PointNeuronRule;
+import org.simbrain.network.neuron_update_rules.RandomNeuronRule;
+import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.neuron_update_rules.SinusoidalRule;
+import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
+import org.simbrain.network.neuron_update_rules.StochasticRule;
+import org.simbrain.network.neuron_update_rules.ThreeValueRule;
 import org.simbrain.util.ClassDescriptionPair;
 
 /**
@@ -115,23 +115,23 @@ public class Neuron  {
 
     /** List of Neuron update rules; used in Gui Combo boxes. */
     private static final ClassDescriptionPair[] RULE_LIST = {
-        new ClassDescriptionPair(AdditiveNeuron.class, new AdditiveNeuron().getDescription()),
-        new ClassDescriptionPair(BinaryNeuron.class, new BinaryNeuron().getDescription()),
-        new ClassDescriptionPair(ClampedNeuron.class, new ClampedNeuron().getDescription()),
-        new ClassDescriptionPair(DecayNeuron.class, new DecayNeuron().getDescription()),
-        new ClassDescriptionPair(IACNeuron.class, new IACNeuron().getDescription()),
-        new ClassDescriptionPair(IntegrateAndFireNeuron.class, new IntegrateAndFireNeuron().getDescription()),
-        new ClassDescriptionPair(IzhikevichNeuron.class, new IzhikevichNeuron().getDescription()),
-        new ClassDescriptionPair(LinearNeuron.class, new LinearNeuron().getDescription()),
-        new ClassDescriptionPair(LogisticNeuron.class, new LogisticNeuron().getDescription()),
-        new ClassDescriptionPair(NakaRushtonNeuron.class, new NakaRushtonNeuron().getDescription()),
-        new ClassDescriptionPair(PointNeuron.class, new PointNeuron().getDescription()),
-        new ClassDescriptionPair(RandomNeuron.class, new RandomNeuron().getDescription()),
-        new ClassDescriptionPair(SigmoidalNeuron.class, new SigmoidalNeuron().getDescription()),
-        new ClassDescriptionPair(SinusoidalNeuron.class, new SinusoidalNeuron().getDescription()),
-        new ClassDescriptionPair(SpikingThresholdNeuron.class, new SpikingThresholdNeuron().getDescription()),
-        new ClassDescriptionPair(StochasticNeuron.class, new StochasticNeuron().getDescription()),
-        new ClassDescriptionPair(ThreeValueNeuron.class, new ThreeValueNeuron().getDescription())};
+        new ClassDescriptionPair(AdditiveRule.class, new AdditiveRule().getDescription()),
+        new ClassDescriptionPair(BinaryRule.class, new BinaryRule().getDescription()),
+        new ClassDescriptionPair(ClampedNeuronRule.class, new ClampedNeuronRule().getDescription()),
+        new ClassDescriptionPair(DecayRule.class, new DecayRule().getDescription()),
+        new ClassDescriptionPair(IACRule.class, new IACRule().getDescription()),
+        new ClassDescriptionPair(IntegrateAndFireRule.class, new IntegrateAndFireRule().getDescription()),
+        new ClassDescriptionPair(IzhikevichRule.class, new IzhikevichRule().getDescription()),
+        new ClassDescriptionPair(LinearRule.class, new LinearRule().getDescription()),
+        new ClassDescriptionPair(LogisticRule.class, new LogisticRule().getDescription()),
+        new ClassDescriptionPair(NakaRushtonRule.class, new NakaRushtonRule().getDescription()),
+        new ClassDescriptionPair(PointNeuronRule.class, new PointNeuronRule().getDescription()),
+        new ClassDescriptionPair(RandomNeuronRule.class, new RandomNeuronRule().getDescription()),
+        new ClassDescriptionPair(SigmoidalRule.class, new SigmoidalRule().getDescription()),
+        new ClassDescriptionPair(SinusoidalRule.class, new SinusoidalRule().getDescription()),
+        new ClassDescriptionPair(SpikingThresholdRule.class, new SpikingThresholdRule().getDescription()),
+        new ClassDescriptionPair(StochasticRule.class, new StochasticRule().getDescription()),
+        new ClassDescriptionPair(ThreeValueRule.class, new ThreeValueRule().getDescription())};
 
     /**
      * Construct a specific type of neuron from a string description.
@@ -206,7 +206,8 @@ public class Neuron  {
     public void setUpdateRule(String name) {
         try {
             NeuronUpdateRule newRule  = (NeuronUpdateRule) Class.forName(
-                    "org.simbrain.network.neurons." + name).newInstance();
+                    "org.simbrain.network.neuron_update_rules." + name)
+                    .newInstance();
             setUpdateRule(newRule);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(

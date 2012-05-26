@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.synapses.spikeresponders.JumpAndDecay;
-import org.simbrain.network.synapses.spikeresponders.ProbabilisticResponder;
-import org.simbrain.network.synapses.spikeresponders.RiseAndDecay;
-import org.simbrain.network.synapses.spikeresponders.Step;
+import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 
 
 /**

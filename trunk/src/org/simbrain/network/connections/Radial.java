@@ -65,13 +65,13 @@ public class Radial extends ConnectNeurons {
 
     /**
      * See super class description.
-     * 
+     *
      * @param network network with neurons to be connected.
      * @param neurons source neurons.
      * @param neurons2 target neurons.
      */
     public Radial(final Network network, final List<? extends Neuron> neurons,
-            final ArrayList<? extends Neuron> neurons2) {
+            final List<? extends Neuron> neurons2) {
         super(network, neurons, neurons2);
     }
 

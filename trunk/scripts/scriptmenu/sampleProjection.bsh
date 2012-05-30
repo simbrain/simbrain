@@ -4,7 +4,7 @@ import java.awt.Point;
 import org.simbrain.network.neurons.*;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.interfaces.*;
+import org.simbrain.network.core.*;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neurons.LinearNeuron;
 import org.simbrain.plot.projection.*;
@@ -12,26 +12,28 @@ import org.simbrain.workspace.*;
 
 {
 
+	// PARAMETERS
+    int numNeurons = 25;
+    double sparsity = .4;
+    double excitatoryRatio = .6;
+
     // Make Network
     NetworkComponent networkComponent = new NetworkComponent("Attractor Network");
     workspace.addWorkspaceComponent(networkComponent);
-    desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 500);
-    RootNetwork network = networkComponent.getRootNetwork();
+    Network network = networkComponent.getNetwork();
     GridLayout layout = new GridLayout(50.0, 50.0, 5);
-    int numNeurons = 25;
     layout.setInitialLocation(new Point(10, 10));
     for (int i = 0; i < numNeurons; i++) {
-        Neuron neuron = new Neuron(network, "NakaRushtonNeuron");
+        Neuron neuron = new Neuron(network, "NakaRushtonRule");
         network.addNeuron(neuron);
     }
-    layout.layoutNeurons(network);
+    layout.layoutNeurons(network.getNeuronList());
     Sparse connection = new Sparse(network, network.getFlatNeuronList(),
             network.getFlatNeuronList());
-    connection.setSparsity(.4);
-    connection.setPercentExcitatory(60);
+    connection.setSparsity(sparsity);
+    connection.setExcitatoryRatio(excitatoryRatio);
     connection.connectNeurons();    
     network.randomizeNeurons();
-    desktop.getDesktopComponent(networkComponent).postAddInit();
 
     //Make a projection component
     ProjectionComponent chart = new ProjectionComponent("Projection of Attractor Network");

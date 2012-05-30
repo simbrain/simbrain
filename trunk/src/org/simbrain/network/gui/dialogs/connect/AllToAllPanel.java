@@ -31,12 +31,12 @@ import javax.swing.JSeparator;
 import org.simbrain.network.connections.AllToAll;
 
 /**
- * <b>AllToAllPanel</b> creates a dialog for setting preferences of all to all
- * neuron connections.
- * 
+ * <b>AllToAllPanel</b> creates displays preferences for all to all neuron
+ * connections.
+ *
  * @author ztosi
  * @author jyoshimi
- * 
+ *
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 

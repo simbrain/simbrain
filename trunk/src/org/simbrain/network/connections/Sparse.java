@@ -18,36 +18,34 @@
 package org.simbrain.network.connections;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
 
 /**
- * Connect neurons sparsely with some probabilities.
+ * Connect neurons sparsely.
  *
  * @author ztosi
  * @author jyoshimi
  */
 public class Sparse extends ConnectNeurons {
 
-	/** The default sparsity. */
+	/** The default sparsity (between 0 and 1). */
 	private static double DEFAULT_SPARSITY = 0.1;
 
 	/** The overall sparsity of the connections. */
     private double sparsity = DEFAULT_SPARSITY;
-    
+
     /**  Whether or not sparsity applies a constant number of synapses to each
      * source neuron. */
     private boolean sparseSpecific;
 
     /** A switch determining if self connections are possible. */
     private boolean allowSelfConnection;
-    
+
     /**
      * See super class description.
      *
@@ -71,20 +69,20 @@ public class Sparse extends ConnectNeurons {
     public List<Synapse> connectNeurons() {
     	
     	ArrayList<Synapse> syns = new ArrayList<Synapse>();
-    	
+
     	//TODO: percent excititory currently not guaranteed for recurrent
         //connections (source list == target list) when self connection is
         //not allowed
     	
     	int numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons.size());
-    	int numExcite = (int) (percentExcitatory * numSyns);
+    	int numExcite = (int) (excitatoryRatio * numSyns);
     	Neuron source;
     	Neuron target;
     	Synapse synapse;
     	Random randGen = new Random();
-    	
+
     	if (!sparseSpecific) {
-    		
+
 	    	for (int i = 0; i < numSyns; i++) {
 	    		do {
 	    		source = sourceNeurons
@@ -97,30 +95,30 @@ public class Sparse extends ConnectNeurons {
 	    		if(i < numExcite){
 	    			synapse = baseExcitatorySynapse
 	                	.instantiateTemplateSynapse(source, target, network);
-	    			if(enableExRand){
-	    				synapse.setStrength(excitatoryRand.getRandom());
+	    			if(enableExcitatoryRandomization){
+	    				synapse.setStrength(excitatoryRandomizer.getRandom());
 	    			} else {
 	    				synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
 	    			}
 	    		} else {
 	    			synapse = baseInhibitorySynapse
 	                	.instantiateTemplateSynapse(source, target, network);
-	    			if(enableInRand) {
-	    				synapse.setStrength(inhibitoryRand.getRandom());
+	    			if(enableInhibitoryRandomization) {
+	    				synapse.setStrength(inhibitoryRandomizer.getRandom());
 	    			} else {
 	    				synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
 	    			}
 	    		}
-	    		
+
 	    		network.addSynapse(synapse);
 	    		syns.add(synapse);
 	    	}
     	} else {
     		int synsPerSource = numSyns / sourceNeurons.size();
     		Random rGen = new Random();
-    		int numEx = (int) (percentExcitatory * numSyns);
+    		int numEx = (int) (excitatoryRatio * numSyns);
     		int numIn = numSyns - numEx;
-    		
+
     		for (int i = 0; i < sourceNeurons.size(); i++) {
     			source = sourceNeurons.get(i);
     			for (int j = 0; j < synsPerSource; j++) {
@@ -134,8 +132,8 @@ public class Sparse extends ConnectNeurons {
     					numEx--;
     					synapse = baseExcitatorySynapse
 	                		.instantiateTemplateSynapse(source, target, network);
-    					if(enableExRand) {
-    						synapse.setStrength(excitatoryRand.getRandom());
+    					if(enableExcitatoryRandomization) {
+    						synapse.setStrength(excitatoryRandomizer.getRandom());
     					} else {
     						synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
     					}
@@ -144,8 +142,8 @@ public class Sparse extends ConnectNeurons {
     					numIn--;
     					synapse = baseInhibitorySynapse
 	                		.instantiateTemplateSynapse(source, target, network);
-    					if(enableInRand) {
-    						synapse.setStrength(inhibitoryRand.getRandom());
+    					if(enableInhibitoryRandomization) {
+    						synapse.setStrength(inhibitoryRandomizer.getRandom());
     					} else {
     						synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
     					}
@@ -153,9 +151,8 @@ public class Sparse extends ConnectNeurons {
     				network.addSynapse(synapse);
     				syns.add(synapse);
     			}
-    			
+
     		}
-    		
     	}
     	return syns;
     }

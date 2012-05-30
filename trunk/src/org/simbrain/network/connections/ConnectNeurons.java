@@ -47,21 +47,21 @@ public abstract class ConnectNeurons {
      */
     protected List<? extends Neuron> targetNeurons;
 
-    /** The default percent excitatory/inhibitory. */
-	protected static double DEFAULT_RATIO = 0.5;
-	
+    /** The default ratio of excitatory to inhibitory weights. */
+	protected static double DEFAULT_EXCITATORY_RATIO = 0.5;
+
 	/** The default excitatory strength. */
 	protected static double DEFAULT_EXCITATORY_STRENGTH = 1;
-	
+
 	/** The default inhibitory strength. */
 	protected static double DEFAULT_INHIBITORY_STRENGTH = -1;
-    
-    /** Percent of connections which are excitatory. */
-	protected double percentExcitatory = DEFAULT_RATIO;
-	
-	/** Percent of connections which are inhibitory */
-	protected double percentInhibitory = 1-DEFAULT_RATIO;
-    
+
+    /**
+     * Ratio of excitatory to inhibitory neurons. 1 means all excitatory, 0
+     * means all inhibitory.
+     */
+	protected double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
+
     /** Template synapse for excitatory synapses. */
     protected Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
 
@@ -69,17 +69,17 @@ public abstract class ConnectNeurons {
     protected Synapse baseInhibitorySynapse = Synapse.getTemplateSynapse();
 
     /** A source of random numbers for inhibitory connections. */
-    protected RandomSource inhibitoryRand = new RandomSource();
-    
+    protected RandomSource inhibitoryRandomizer = new RandomSource();
+
     /** A source of random numbers for excitatory connections. */
-    protected RandomSource excitatoryRand = new RandomSource();
-    
+    protected RandomSource excitatoryRandomizer = new RandomSource();
+
     /** A switch for enabling randomized excitatory connections. */
-    protected boolean enableExRand;
-    
+    protected boolean enableExcitatoryRandomization;
+
     /** A switch for enabling randomized inhibitory connections. */
-    protected boolean enableInRand;
-    
+    protected boolean enableInhibitoryRandomization;
+
     /**
      * Default constructor.
      *
@@ -131,7 +131,7 @@ public abstract class ConnectNeurons {
     public Network getNetwork(){
     	return network;
     }
-    
+
     /**
      * @return the baseExcitatorySynapse
      */
@@ -159,123 +159,39 @@ public abstract class ConnectNeurons {
     public void setBaseInhibitorySynapse(Synapse baseInhibitorySynapse) {
         this.baseInhibitorySynapse = baseInhibitorySynapse;
     }
-    
-    /**
-     * Returns the percent of connections which are excitatory.
-     * @return the percent of excitatory connections.
-     */
-    public double getPercentExcitatory() {
-		return percentExcitatory;
-	}
 
     /**
-     * Sets the percent of connections which are excitatory and 
-     * simultaneously sets the percent of connections which are
-     * inhibitory (1-percentExcitatory)
-     * @param percentExcitatory percent of connections to be made excitatory
+     * Sets the ratio of excitatory to inhibitory connections. The inhibitory
+     * part of the ratio is assumed to be 1- excitatoryRatio. So, 1 is all
+     * excitatory (1:0), 0 is all inhibitory (0:1), .7 is 70% excitatory (.7:.3), etc.
+     *
+     * @param excitatoryRatio ratio of excitatory to inhibitory connections
      */
-	public void setPercentExcitatory(double percentExcitatory) {
-		if(percentExcitatory < 0 || percentExcitatory > 1.0){
-			throw new IllegalArgumentException("Invalid excitatory percent value");
-		}
-		this.percentExcitatory = percentExcitatory;
-		percentInhibitory = 1 - percentExcitatory;
-	}
-
-	/**
-	 * Sets the percent of connections which are inhibitory and 
-     * simultaneously sets the percent of connections which are
-     * excitatory (1-percentInhibitory)
-	 * @param percentInhibitory percent of connections to be made inhibitory
-	 */
-	public void setPercentInhibitory(double percentInhibitory) {
-		if(percentInhibitory < 0 || percentExcitatory > 1.0){
-			throw new IllegalArgumentException("Invalid Inhibitory percent value");
-		}
-		this.percentInhibitory = percentInhibitory;
-		percentExcitatory = 1 - percentInhibitory;
-	}
-	
-	public double getPercentInhibitory() {
-		return percentInhibitory;
+	public void setExcitatoryRatio(double excitatoryRatio) {
+        if (excitatoryRatio < 0 || excitatoryRatio > 1.0) {
+            throw new IllegalArgumentException("Invalid excitatory ratio value");
+        }
+		this.excitatoryRatio = excitatoryRatio;
 	}
 
 	public static double getDefaultRatio() {
-		return DEFAULT_RATIO;
+		return DEFAULT_EXCITATORY_RATIO;
 	}
 
-	public RandomSource getInhibitoryRand() {
-		return inhibitoryRand;
+	public RandomSource getInhibitoryRandomizer() {
+		return inhibitoryRandomizer;
 	}
 
-	public void setInhibitoryRand(RandomSource inhibitoryRand) {
-		this.inhibitoryRand = inhibitoryRand;
+	public RandomSource getExcitatoryRandomizer() {
+		return excitatoryRandomizer;
 	}
 
-	public RandomSource getExcitatoryRand() {
-		return excitatoryRand;
+	public void setEnableExcitatoryRandomization(boolean enableExRand) {
+		this.enableExcitatoryRandomization = enableExRand;
 	}
 
-	public void setExcitatoryRand(RandomSource excitatoryRand) {
-		this.excitatoryRand = excitatoryRand;
-	}
-
-	public List<? extends Neuron> getSourceNeurons() {
-		return sourceNeurons;
-	}
-
-	public void setSourceNeurons(List<? extends Neuron> sourceNeurons) {
-		this.sourceNeurons = sourceNeurons;
-	}
-
-	public List<? extends Neuron> getTargetNeurons() {
-		return targetNeurons;
-	}
-
-	public void setTargetNeurons(List<? extends Neuron> targetNeurons) {
-		this.targetNeurons = targetNeurons;
-	}
-
-	public static double getDEFAULT_RATIO() {
-		return DEFAULT_RATIO;
-	}
-
-	public static void setDEFAULT_RATIO(double dEFAULTRATIO) {
-		DEFAULT_RATIO = dEFAULTRATIO;
-	}
-
-	public static double getDEFAULT_EXCITATORY_STRENGTH() {
-		return DEFAULT_EXCITATORY_STRENGTH;
-	}
-
-	public static void setDEFAULT_EXCITATORY_STRENGTH(
-			double dEFAULTEXCITATORYSTRENGTH) {
-		DEFAULT_EXCITATORY_STRENGTH = dEFAULTEXCITATORYSTRENGTH;
-	}
-
-	public static double getDEFAULT_INHIBITORY_STRENGTH() {
-		return DEFAULT_INHIBITORY_STRENGTH;
-	}
-
-	public static void setDEFAULT_INHIBITORY_STRENGTH(
-			double dEFAULTINHIBITORYSTRENGTH) {
-		DEFAULT_INHIBITORY_STRENGTH = dEFAULTINHIBITORYSTRENGTH;
-	}
-
-	public boolean isEnableExRand() {
-		return enableExRand;
-	}
-
-	public void setEnableExRand(boolean enableExRand) {
-		this.enableExRand = enableExRand;
-	}
-
-	public boolean isEnableInRand() {
-		return enableInRand;
-	}
-
-	public void setEnableInRand(boolean enableInRand) {
-		this.enableInRand = enableInRand;
+	public void setEnableInhibitoryRandomization(boolean enableInRand) {
+		this.enableInhibitoryRandomization = enableInRand;
 	}
 
 }

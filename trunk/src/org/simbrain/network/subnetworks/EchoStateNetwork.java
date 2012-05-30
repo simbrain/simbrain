@@ -181,12 +181,12 @@ public class EchoStateNetwork extends Subnetwork {
                 numOutputs);
         
         Sparse connector = new Sparse();
-        connector.setEnableExRand(true);
-        connector.setEnableInRand(true);
+        connector.setEnableExcitatoryRandomization(true);
+        connector.setEnableInhibitoryRandomization(true);
         
         //TODO: The user should be able to set these:
-        RandomSource exRand = connector.getExcitatoryRand();
-        RandomSource inRand = connector.getInhibitoryRand();
+        RandomSource exRand = connector.getExcitatoryRandomizer();
+        RandomSource inRand = connector.getInhibitoryRandomizer();
         exRand.setLowerBound(0.01);
         exRand.setUpperBound(0.5);
         inRand.setLowerBound(-0.5);

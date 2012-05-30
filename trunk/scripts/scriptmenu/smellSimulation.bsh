@@ -4,11 +4,11 @@ import java.util.*;
 import org.simbrain.network.neurons.*;
 import org.simbrain.network.*;
 import org.simbrain.network.connections.*;
-import org.simbrain.network.interfaces.*;
+import org.simbrain.network.core.*;
 import org.simbrain.network.layouts.*;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neurons.*;
-import org.simbrain.network.synapses.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.workspace.*;
 import org.simbrain.world.odorworld.*;
@@ -84,28 +84,28 @@ import org.simbrain.plot.projection.*;
 
     // Add Recurrent network
     source("./scripts/scriptmenu/sparseNetwork.bsh");
-    NetworkComponent networkComponent = workspace.getComponent("Recurrent Network");
-    RootNetwork network = networkComponent.getRootNetwork();
+    NetworkComponent networkComponent = workspace.getComponent("Sparse Network");
+    Network network = networkComponent.getNetwork();
     List targetNeurons = network.getFlatNeuronList();
     List sourceNeurons = new ArrayList();
 
     // Add input layer to recurrent network
     LineLayout layout = new LineLayout(-20,350,70, LineOrientation.HORIZONTAL);
     for (int i = 0; i < 5; i++) {
-        Neuron neuron = new Neuron(network, "LinearNeuron");
+        Neuron neuron = new Neuron(network, "LinearRule");
         neuron.setLowerBound(0);
         neuron.setUpperBound(100);
         network.addNeuron(neuron);
         sourceNeurons.add(neuron);
     }
     layout.layoutNeurons(sourceNeurons);
-    ((NetworkDesktopComponent)desktop.getDesktopComponent(networkComponent)).getNetworkPanel().centerCamera();
+    //((NetworkDesktopComponent)desktop.getDesktopComponent(networkComponent)).getNetworkPanel().centerCamera();
 
     // Connect input layer to main network
     Sparse sparseConnect = new Sparse(network, sourceNeurons, targetNeurons);
     //sparseConnect.setBaseExcitatorySynapse(new Hebbian(null, null));
     sparseConnect.setSparsity(.4);
-    sparseConnect.setPercentExcitatory(100);
+    sparseConnect.setExcitatoryRatio(1);
     sparseConnect.connectNeurons();
 
     // Couple odor world to network

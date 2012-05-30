@@ -16,7 +16,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.core;
+package org.simbrain.network.neuron_update_rules;
+
+import org.simbrain.network.core.Neuron;
 
 
 /**
@@ -26,7 +28,7 @@ package org.simbrain.network.core;
  * @author ztosi
  *
  */
-public interface Invertible {
+public interface InvertibleUpdateRule {
 
     /**
      * The inverse of the activation function.

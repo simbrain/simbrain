@@ -32,6 +32,7 @@ import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.ShortTermPlasticityRule;
 import org.simbrain.network.synapse_update_rules.SubtractiveNormalizationRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.ClassDescriptionPair;
 import org.simbrain.util.Utils;
 

@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.core;
+package org.simbrain.network.neuron_update_rules;
 
 /**
  * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
@@ -24,7 +24,7 @@ package org.simbrain.network.core;
  *
  * TODO: Add upper and lower bound parameters? Add randomize option?
  */
-public interface BiasedNeuron {
+public interface BiasedUpdateRule {
     /**
      * @return the neuron's bias
      */

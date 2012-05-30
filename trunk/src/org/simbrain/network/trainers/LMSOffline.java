@@ -28,10 +28,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
@@ -335,7 +335,7 @@ public class LMSOffline extends Trainer {
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
             Neuron neuron = new Neuron(network, new LinearRule());
-            ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
+            ((BiasedUpdateRule)neuron.getUpdateRule()).setBias(0);
             neuron.setLocation(15 + (i*40), 0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);

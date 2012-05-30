@@ -26,6 +26,7 @@ import java.util.List;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.AdditiveRule;
+import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
@@ -431,8 +432,8 @@ public class Neuron  {
                 }
             }
         }
-        if (this.getUpdateRule() instanceof BiasedNeuron) {
-            wtdSum += ((BiasedNeuron) this.getUpdateRule()).getBias();
+        if (this.getUpdateRule() instanceof BiasedUpdateRule) {
+            wtdSum += ((BiasedUpdateRule) this.getUpdateRule()).getBias();
         }
 
         return wtdSum;
@@ -844,8 +845,8 @@ public class Neuron  {
      * @param upper upper bound for randomization.
      * */
     public void randomizeBias(double lower, double upper) {
-        if (this.getUpdateRule() instanceof BiasedNeuron) {
-            ((BiasedNeuron) this.getUpdateRule()).setBias((upper - lower)
+        if (this.getUpdateRule() instanceof BiasedUpdateRule) {
+            ((BiasedUpdateRule) this.getUpdateRule()).setBias((upper - lower)
                     * Math.random() + lower);
         }
     }
@@ -873,6 +874,8 @@ public class Neuron  {
     }
 
     /**
+     * TODO: Possibly make this be a NeuronGroup.  See design notes. 
+     *
      * @return the parentGroup
      */
     public Group getParentGroup() {

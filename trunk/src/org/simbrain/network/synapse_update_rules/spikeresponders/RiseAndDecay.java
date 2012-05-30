@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.simbrain.network.core.SpikeResponder;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 
 

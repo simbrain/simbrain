@@ -18,9 +18,6 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.core.BiasedNeuron;
-import org.simbrain.network.core.Differentiable;
-import org.simbrain.network.core.Invertible;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -35,8 +32,8 @@ import org.simbrain.network.util.RandomSource;
  * @author Jeff Yoshimi
  *
  */
-public class SigmoidalRule extends NeuronUpdateRule implements BiasedNeuron,
-        Differentiable, Invertible {
+public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
+        DifferentiableUpdateRule, InvertibleUpdateRule {
 
     /** Implementations of the Sigmoidal activation function. */
     public static enum SigmoidType {

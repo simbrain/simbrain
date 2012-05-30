@@ -144,7 +144,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
         // Standard all to all connections
         AllToAll connect = new AllToAll(this.getParentNetwork());
         connect.setAllowSelfConnection(false);
-        connect.setPercentExcitatory(.5);
+        connect.setExcitatoryRatio(.5);
         //connect.setBaseExcitatorySynapse(null);
         connectNeuronGroups(inputLayer, hiddenLayer, connect);
         connectNeuronGroups(contextLayer, hiddenLayer, connect);
@@ -153,8 +153,8 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
 
     /**
      * Initializes a layer by adding the desired number of neurons with the
-     * desired neuron update rule to the List of neurons
-     * 
+     * desired neuron update rule to the List of neurons.
+     *
      * @param layer the list of neurons
      * @param nodeType the desired neuron update rule
      * @param layerType the type of layer for labeling as a neuron group

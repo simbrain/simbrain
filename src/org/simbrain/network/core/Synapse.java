@@ -648,7 +648,7 @@ public class Synapse {
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(
                     "The provided learning rule name, \"" + name
-                            + "\", does not correspond to a known neuron type."
+                            + "\", does not correspond to a known synapse type."
                             + "\n Could not find " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();

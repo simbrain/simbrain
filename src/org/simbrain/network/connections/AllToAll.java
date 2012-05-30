@@ -71,7 +71,7 @@ public class AllToAll extends ConnectNeurons {
  
     	numConnects = sourceNeurons.size() * targetNeurons.size();
     	
-        int numEx = (int) (percentExcitatory * numConnects);
+        int numEx = (int) (excitatoryRatio * numConnects);
         int numIn = numConnects - numEx;
     	
         //TODO: percent excititory currently not guaranteed for recurrent
@@ -88,8 +88,8 @@ public class AllToAll extends ConnectNeurons {
         				numEx--;
         				synapse = baseExcitatorySynapse.
         					instantiateTemplateSynapse(source, target, network);
-        				if(enableExRand){
-    	    				synapse.setStrength(excitatoryRand.getRandom());
+        				if(enableExcitatoryRandomization){
+    	    				synapse.setStrength(excitatoryRandomizer.getRandom());
     	    			} else {
     	    				synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
     	    			}
@@ -97,8 +97,8 @@ public class AllToAll extends ConnectNeurons {
         				numIn--;
         				synapse = baseInhibitorySynapse.
     						instantiateTemplateSynapse(source, target, network);
-        				if(enableInRand){
-        					synapse.setStrength(inhibitoryRand.getRandom());
+        				if(enableInhibitoryRandomization){
+        					synapse.setStrength(inhibitoryRandomizer.getRandom());
         				} else {
         					synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
         				}

@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 
@@ -105,7 +105,7 @@ public class LMSIterative extends IterableTrainer {
                 //        Utils.round(error,2) + ")");                
 
                 // Update bias of target neuron
-                BiasedNeuron bias = (BiasedNeuron)outputNeuron.getUpdateRule();
+                BiasedUpdateRule bias = (BiasedUpdateRule)outputNeuron.getUpdateRule();
                 bias.setBias(bias.getBias() + (learningRate * error));
             }
             rmsError = Math.sqrt(rmsError / (numInputs * numOutputs));
@@ -123,8 +123,8 @@ public class LMSIterative extends IterableTrainer {
         for (Neuron neuron : network.getOutputNeurons()) {
             neuron.clear(); // Looks nicer in the GUI
             neuron.randomizeFanIn();
-            if (neuron.getUpdateRule() instanceof BiasedNeuron) {
-                ((BiasedNeuron) neuron.getUpdateRule()).setBias(Math.random());
+            if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
+                ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(Math.random());
             }
         }
     }
@@ -181,7 +181,7 @@ public class LMSIterative extends IterableTrainer {
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
             Neuron neuron = new Neuron(network, new LinearRule());
-            ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
+            ((BiasedUpdateRule)neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);
@@ -243,7 +243,7 @@ public class LMSIterative extends IterableTrainer {
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 1; i++) {
             Neuron neuron = new Neuron(network, new LinearRule()); 
-            ((BiasedNeuron)neuron.getUpdateRule()).setBias(0);
+            ((BiasedUpdateRule)neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);

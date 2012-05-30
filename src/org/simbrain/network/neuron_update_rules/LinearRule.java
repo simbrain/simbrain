@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.core.BiasedNeuron;
-import org.simbrain.network.core.Differentiable;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -29,7 +27,7 @@ import org.simbrain.network.util.RandomSource;
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements BiasedNeuron, Differentiable {
+public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule {
 
     /** Slope. */
     private double slope = 1;

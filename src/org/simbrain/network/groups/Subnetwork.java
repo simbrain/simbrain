@@ -28,7 +28,7 @@ import org.simbrain.network.core.Synapse;
  * subnetwork within the main root network, with its own update rules.
  */
 public class Subnetwork extends Group {
-    
+
     /** List of neuron groups. */
     private final List<NeuronGroup> neuronGroupList = new CopyOnWriteArrayList<NeuronGroup>();
 
@@ -44,7 +44,7 @@ public class Subnetwork extends Group {
         super(net);
         setLabel("Subnetwork");
     }
-    
+
     /**
      * Create a subnetwork group initialized with a specified numbers of neuron
      * groups and synapse groups.
@@ -63,7 +63,7 @@ public class Subnetwork extends Group {
             addSynapseGroup(new SynapseGroup(net));
         }
     }
-    
+
     @Override
     public void delete() {
         if (isMarkedForDeletion()) {

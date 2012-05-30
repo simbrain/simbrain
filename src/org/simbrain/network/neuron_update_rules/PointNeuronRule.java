@@ -20,7 +20,6 @@ package org.simbrain.network.neuron_update_rules;
 
 import java.util.ArrayList;
 
-import org.simbrain.network.core.BiasedNeuron;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -36,7 +35,7 @@ import org.simbrain.util.SimbrainMath;
  * book.
  */
 public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener,
-        BiasedNeuron {
+        BiasedUpdateRule {
 
     /** Excitatory inputs for connected Synapses. */
     private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();

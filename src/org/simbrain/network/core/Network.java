@@ -35,6 +35,7 @@ import org.simbrain.network.listeners.NetworkListener;
 import org.simbrain.network.listeners.NeuronListener;
 import org.simbrain.network.listeners.SynapseListener;
 import org.simbrain.network.listeners.TextListener;
+import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SynapseRouter;
@@ -618,8 +619,8 @@ public class Network {
      */
     public void clearBiases() {
         for (Neuron neuron : this.getFlatNeuronList()) {
-            if (neuron.getUpdateRule() instanceof BiasedNeuron) {
-                ((BiasedNeuron) neuron.getUpdateRule()).setBias(0);
+            if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
+                ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
             }
         }
         fireNetworkChanged();

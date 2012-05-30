@@ -16,12 +16,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.core;
+package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay;
-import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
-import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
-import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
+import org.simbrain.network.core.Synapse;
 
 
 /**

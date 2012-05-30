@@ -27,15 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.core.BiasedNeuron;
-import org.simbrain.network.core.Differentiable;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
+import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
+import org.simbrain.network.neuron_update_rules.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 import org.simbrain.network.util.SimnetUtils;
@@ -126,7 +126,7 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Update biases
             for (Neuron neuron : biasDeltaMap.keySet()) {
-                BiasedNeuron biasedNeuron = (BiasedNeuron) (neuron
+                BiasedUpdateRule biasedNeuron = (BiasedUpdateRule) (neuron
                         .getUpdateRule());
                 biasedNeuron.setBias(biasedNeuron.getBias()
                         + biasDeltaMap.get(neuron));
@@ -197,8 +197,8 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Store error signal for this neuron
         double errorSignal = 0;
-        if (neuron.getUpdateRule() instanceof Differentiable) {
-            double derivative = ((Differentiable) neuron.getUpdateRule())
+        if (neuron.getUpdateRule() instanceof DifferentiableUpdateRule) {
+            double derivative = ((DifferentiableUpdateRule) neuron.getUpdateRule())
                     .getDerivative(neuron.getWeightedInputs(), neuron);
             errorSignal = error * derivative;
             errorMap.put(neuron, errorSignal);
@@ -212,7 +212,7 @@ public class BackpropTrainer extends IterableTrainer {
         }
 
         // Compute and store bias delta for this neuron
-        if (neuron.getUpdateRule() instanceof BiasedNeuron) {
+        if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
             biasDeltaMap.put(neuron,
                     learningRate * errorSignal);
         }

@@ -81,7 +81,6 @@ public class FeedForward extends Subnetwork {
         addNeuronGroup(inputLayer);
         if (initialPosition == null) {
             initialPosition = new Point2D.Double(0,0);
-            
         }
         layout.setInitialLocation(new Point((int) initialPosition.getX(), (int)
                 initialPosition.getY()));
@@ -111,7 +110,7 @@ public class FeedForward extends Subnetwork {
             NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
 
             AllToAll connection  = new AllToAll(getParentNetwork());
-            
+
             connectNeuronGroups(lastLayer, hiddenLayer, connection);
 
             // Reset last layer

@@ -37,7 +37,7 @@ import org.simbrain.workspace.updater.UpdateAction;
  * iterated once (in the GUI, when the step button is clicked), the actions
  * contained here are invoked, in a specific order.
  */
-public class UpdateManager {
+public class NetworkUpdateManager {
 
     /**
      * The list of update actions, in a specific order. One run through these
@@ -63,7 +63,7 @@ public class UpdateManager {
      *
      * @param network
      */
-    public UpdateManager(Network network) {
+    public NetworkUpdateManager(Network network) {
         this.network = network;
         // Default update method
         addAction(new BufferedUpdate(network));

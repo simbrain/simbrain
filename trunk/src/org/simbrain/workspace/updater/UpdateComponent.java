@@ -22,7 +22,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Update a specific workspace component.
- * 
+ *
  * @author jyoshimi
  */
 public class UpdateComponent implements UpdateAction {
@@ -36,40 +36,47 @@ public class UpdateComponent implements UpdateAction {
     /**
      * @param component component to update
      */
-    public UpdateComponent(WorkspaceUpdater updater, WorkspaceComponent component) {
-    	this.updater = updater;
+    public UpdateComponent(WorkspaceUpdater updater,
+            WorkspaceComponent component) {
+        this.updater = updater;
         this.component = component;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public void invoke() {
-    	// TODO: Is the below needed?  Would component.update() suffice?
+        // TODO: Is the below needed? Would component.update() suffice?
         LatchCompletionSignal latch = new LatchCompletionSignal(1);
         updater.updateComponent(component, latch);
         latch.await();
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public String getDescription() {
-        return "Update " + component.getName();
+        if (component == null) {
+            return "Invalid action";
+        } else if (component.getName() != null) {
+            return "Update " + component.getName();
+        } else {
+            return "Action description is null";
+        }
     }
-    
-	@Override
-	public String getLongDescription() {
-		return getDescription();
-	}
+
+    @Override
+    public String getLongDescription() {
+        return getDescription();
+    }
 
     /**
      * Returns a reference to this component.
-     * 
+     *
      * @return the component
      */
-	public WorkspaceComponent getComponent() {
-		return component;
-	}
+    public WorkspaceComponent getComponent() {
+        return component;
+    }
 
 }

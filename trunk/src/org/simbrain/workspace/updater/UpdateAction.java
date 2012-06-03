@@ -19,8 +19,8 @@
 package org.simbrain.workspace.updater;
 
 /**
- * Classes that implement this interface describe individual actions that together
- * comprise a workspace update.
+ * Classes that implement this interface describe individual actions that
+ * together comprise a workspace update.
  *
  * @author jyoshimi
  *
@@ -28,17 +28,17 @@ package org.simbrain.workspace.updater;
 public interface UpdateAction {
 
     /**
-     * Invoke this action. 
+     * Invoke this action.
      */
     public void invoke();
-    
+
     /**
      * Provide a String description of this update method.
      *
      * @return the update description
      */
     public String getDescription();
-    
+
     /**
      * Provide a longer description for tooltips, etc.
      *

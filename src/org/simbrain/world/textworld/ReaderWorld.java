@@ -125,7 +125,7 @@ public class ReaderWorld extends TextWorld {
                 }
 
             } else {
-                System.out.println("here");
+                //System.out.println("here");
                 //setCurrentItem(new TextItem(getPosition(), getPosition(), ""));
                 setPosition(1);
             }
@@ -197,7 +197,7 @@ public class ReaderWorld extends TextWorld {
 
     /**
      * Set the parse style object.
-     * 
+     *
      * @param parseStyle the current parse style
      */
     private void setTheParseStyle(ParseStyle parseStyle) {
@@ -206,7 +206,7 @@ public class ReaderWorld extends TextWorld {
 
     /**
      * Get the current parse style.
-     * 
+     *
      * @return the current parse style
      */
     public ParseStyle getTheParseStyle() {

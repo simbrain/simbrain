@@ -43,72 +43,70 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
  * @author jyoshimi
  */
 public class ReaderPanel extends JPanel {
-    
-    /** Underlying model text world. */ 
+
+    /** Underlying model text world. */
     private final ReaderWorld world;
-    
+
     /** Text area for inputting text into networks. */
     private JTextArea textArea = new JTextArea();
 
     /**
-     * Construct a reader panel to represent data in a text world
-     * 
+     * Construct a reader panel to represent data in a text world.
+     *
      * @param world the world to represent
      */
     public ReaderPanel(ReaderWorld theWorld) {
         this.world = theWorld;
-        //textArea.addKeyListener(this);
-        //textArea.addMouseListener(this);
-        
+        // textArea.addKeyListener(this);
+        // textArea.addMouseListener(this);
+
         textArea.setLineWrap(true);
         textArea.setText(world.getText());
-        
+
         init();
-        
+
     }
-    
-    
+
     /**
-     * Initialize all the listeners of this class. 
+     * Initialize all the listeners of this class.
      */
     private void init() {
-        
+
         textArea.addCaretListener(new CaretListener() {
 
             public void caretUpdate(CaretEvent arg0) {
-                //System.out.println("caretUpdate");
+                // System.out.println("caretUpdate");
 
                 // Tricky here. Need to set the position without firing an event
                 // (and then infinite loop),
                 // but also need to reset the matcher in the underlying object.
                 // I wish there were a cleaner way...
                 world.setPosition(textArea.getCaretPosition(), false);
-                world.resetMatcher();  
+                world.resetMatcher();
 
-                //removeHighlights(textArea);
+                // removeHighlights(textArea);
             }
-            
+
         });
-        
 
         // Listener for changes in the textarea
         textArea.getDocument().addDocumentListener(new DocumentListener() {
 
             public void changedUpdate(DocumentEvent arg0) {
-                //System.out.println("changedUpdate");
+                // System.out.println("changedUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void insertUpdate(DocumentEvent arg0) {
-                //System.out.println("insertUpdate");
+                // System.out.println("insertUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void removeUpdate(DocumentEvent arg0) {
-                //System.out.println("removeUpdate");
+                // System.out.println("removeUpdate");
                 world.setText(textArea.getText(), false);
             }
-            
+
         });
 
         final JScrollPane inputScrollPane = new JScrollPane(textArea,
@@ -120,25 +118,25 @@ public class ReaderPanel extends JPanel {
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                //textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
+                // textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
                 inputScrollPane.setPreferredSize(new Dimension(ReaderPanel.this
                         .getPreferredSize().width - 25, ReaderPanel.this
                         .getPreferredSize().height - 25));
-                //inputScrollPane.revalidate();
+                // inputScrollPane.revalidate();
             }
         });
-                
+
         world.addListener(new TextListener() {
             public void textChanged() {
-                // TODO: Is the below needed?  
-                //textArea.setText(world.getText(), false); 
+                // TODO: Is the below needed?
+                // textArea.setText(world.getText(), false);
             }
 
             public void dictionaryChanged() {
             }
 
             public void positionChanged() {
-                textArea.setCaretPosition(world.getPosition());                    
+                textArea.setCaretPosition(world.getPosition());
             }
 
             public void currentItemChanged(TextItem newItem) {
@@ -149,11 +147,11 @@ public class ReaderPanel extends JPanel {
                             .getCurrentItem().getEndPosition());
                 }
             }
-            
+
         });
 
     }
-    
+
     /**
      * Highlight word beginning at <code>begin</code> nd ending at
      * <code>end</code>.
@@ -173,10 +171,10 @@ public class ReaderPanel extends JPanel {
             System.err.checkError();
         }
     }
-    
+
     /**
      * Removes highlights from specified component.
-     * 
+     *
      * @param textComp text component to remove highlights from.
      */
     public void removeHighlights(final JTextComponent textComp) {
@@ -188,22 +186,21 @@ public class ReaderPanel extends JPanel {
             }
         }
     }
-    
+
     /**
      * A private subclass of the default highlight painter.
      */
     class MyHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
-        
+
         /**
          * Sets the color of highlighter.
-         * 
+         *
          * @param color Color of highlight
          */
         public MyHighlightPainter(final Color color) {
             super(color);
         }
     }
-
 
     /**
      * @return the world

@@ -43,7 +43,7 @@ public class DisplayWorld extends TextWorld {
 
     /**
      * Add a text to the end of the underling text object.
-     * 
+     *
      * @param newText the text to add
      */
     public void addText(String newText) {
@@ -60,19 +60,20 @@ public class DisplayWorld extends TextWorld {
      * Add the provided text, if the provided value is above threshold. Called
      * by consumers reading data from (e.g) neural networks. If node activation
      * > threshold then display a particular word.
-     * 
+     *
      * @param string text to add
      * @param value value to check against threshold
      */
     public void addTextIfAboveThreshold(final double value, final String string) {
         if (value > threshold) {
-            addText(string + " "); // TODO: Replace space with user-specified "buffer" string
+            addText(string + " "); // TODO: Replace space with user-specified
+                                   // "buffer" string
         }
     }
 
     /**
      * Returns a properly initialized xstream object.
-     * 
+     *
      * @return the XStream object
      */
     static XStream getXStream() {

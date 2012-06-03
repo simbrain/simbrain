@@ -34,58 +34,61 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
 
 /**
  * Display text data from another source.
- * 
+ *
  * @author jyoshimi
  */
 public class DisplayPanel extends JPanel {
-    
-    /** Underlying model text world. */ 
+
+    /** Underlying model text world. */
     private final DisplayWorld world;
-    
+
     /** Text area for inputting text into networks. */
     private JTextArea textArea = new JTextArea();
 
     /**
-     * Construct a reader panel to represent data in a text world
-     * 
+     * Construct a reader panel to represent data in a text world.
+     *
      * @param world the world to represent
      */
     public DisplayPanel(DisplayWorld theWorld) {
         this.world = theWorld;
-        //textArea.addKeyListener(this);
-        //textArea.addMouseListener(this);
-        
+        // textArea.addKeyListener(this);
+        // textArea.addMouseListener(this);
+
         textArea.setLineWrap(true);
         textArea.setText(world.getText());
-        
+
         textArea.addCaretListener(new CaretListener() {
 
             public void caretUpdate(CaretEvent arg0) {
-                //System.out.println("caretUpdate");
-                world.setPosition(textArea.getCaretPosition());
-                //removeHighlights(textArea);
+                // Tricky here. Need to set the position without firing an event
+                // (and then infinite loop),
+                // but also need to reset the matcher in the underlying object.
+                // I wish there were a cleaner way...
+                world.setPosition(textArea.getCaretPosition(), false);
             }
-            
+
         });
         textArea.getDocument().addDocumentListener(new DocumentListener() {
 
             public void changedUpdate(DocumentEvent arg0) {
-                //TODO: Check if needed in all places, migrate to separate method
-                //      Careful of infinite loops later if this fires events in world
-                //System.out.println("changedUpdate");
+                // TODO: Check if needed in all places, migrate to separate
+                // method
+                // Careful of infinite loops later if this fires events in world
+                // System.out.println("changedUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void insertUpdate(DocumentEvent arg0) {
-                //System.out.println("insertUpdate");
+                // System.out.println("insertUpdate");
                 world.setText(textArea.getText(), false);
             }
 
             public void removeUpdate(DocumentEvent arg0) {
-                //System.out.println("removeUpdate");
+                // System.out.println("removeUpdate");
                 world.setText(textArea.getText(), false);
             }
-            
+
         });
 
         final JScrollPane inputScrollPane = new JScrollPane(textArea,
@@ -97,14 +100,14 @@ public class DisplayPanel extends JPanel {
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                //textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
-                inputScrollPane.setPreferredSize(new Dimension(DisplayPanel.this
-                        .getPreferredSize().width - 25, DisplayPanel.this
-                        .getPreferredSize().height - 25));
-                //inputScrollPane.revalidate();
+                // textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
+                inputScrollPane.setPreferredSize(new Dimension(
+                        DisplayPanel.this.getPreferredSize().width - 25,
+                        DisplayPanel.this.getPreferredSize().height - 25));
+                // inputScrollPane.revalidate();
             }
         });
-                
+
         world.addListener(new TextListener() {
 
             public void textChanged() {
@@ -118,7 +121,7 @@ public class DisplayPanel extends JPanel {
             }
 
             public void positionChanged() {
-                world.setPosition(textArea.getCaretPosition(), false);
+                textArea.setCaretPosition(world.getPosition());
             }
 
             public void currentItemChanged(TextItem newItem) {
@@ -126,7 +129,6 @@ public class DisplayPanel extends JPanel {
         });
 
     }
-
 
     /**
      * @return the world

@@ -89,13 +89,14 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
         addMenuBar();
         add(panel);
         frame.pack();
-        
+
         // Force component to fill up parent panel
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 Component component = e.getComponent();
-                panel.setPreferredSize(new Dimension(component.getWidth(), component.getHeight()));
+                panel.setPreferredSize(new Dimension(component.getWidth(),
+                        component.getHeight()));
                 panel.revalidate();
             }
         });
@@ -113,7 +114,6 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
      */
     private void addMenuBar() {
 
-        
         // File Menu
         menuBar.add(file);
         file.add(new OpenAction(this));
@@ -127,7 +127,8 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
                 .getLoadDictionaryAction(world));
         showDictionary.setAction(TextWorldActions
                 .getShowDictionaryAction(world));
-        preferences.setAction(TextWorldActions.getShowPreferencesDialogAction(world));
+        preferences.setAction(TextWorldActions
+                .getShowPreferencesDialogAction(world));
         edit.add(loadDictionary);
         edit.add(showDictionary);
         edit.addSeparator();
@@ -135,17 +136,16 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
         menuBar.add(edit);
 
         // Coupling menu
-        menuBar.add(new CouplingMenuComponent("Couple", this.getWorkspaceComponent()
-                .getWorkspace(), this.getWorkspaceComponent()));
+        menuBar.add(new CouplingMenuComponent("Couple", this
+                .getWorkspaceComponent().getWorkspace(), this
+                .getWorkspaceComponent()));
 
-        
         // Help Menu
         menuBar.add(help);
 
         // Add menu
         getParentFrame().setJMenuBar(menuBar);
     }
-
 
     @Override
     public void closing() {

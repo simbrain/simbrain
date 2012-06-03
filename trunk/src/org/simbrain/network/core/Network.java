@@ -67,7 +67,7 @@ public class Network {
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
 
     /** The update manager for this network. */
-    private UpdateManager updateManager;
+    private NetworkUpdateManager updateManager;
 
     /** Object which routes synapses to synapse groups. */
     private final SynapseRouter synapseRouter;
@@ -148,7 +148,7 @@ public class Network {
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
-        updateManager = new UpdateManager(this);
+        updateManager = new NetworkUpdateManager(this);
         synapseRouter = new SynapseRouter();
         prioritySortedNeuronList = new ArrayList<Neuron>();
     }
@@ -1008,7 +1008,7 @@ public class Network {
         xstream.omitField(Network.class, "updateCompleted");
         xstream.omitField(Network.class, "networkThread");
 
-        xstream.omitField(UpdateManager.class, "listeners");
+        xstream.omitField(NetworkUpdateManager.class, "listeners");
         xstream.omitField(CustomUpdate.class, "interpreter");
         xstream.omitField(CustomUpdate.class, "theAction");
 
@@ -1644,7 +1644,7 @@ public class Network {
     /**
      * @return the updateManager
      */
-    public UpdateManager getUpdateManager() {
+    public NetworkUpdateManager getUpdateManager() {
         return updateManager;
     }
 

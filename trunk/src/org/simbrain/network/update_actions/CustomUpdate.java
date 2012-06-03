@@ -64,20 +64,21 @@ public class CustomUpdate implements NetworkUpdateAction {
     }
 
     /**
-     * Create a new custom update action.
+     * Create a new custom update action from a file containing the custom
+     * script.
      *
      * @param network network to update
-     * @param script script to use in invoking the update action
+     * @param file file containing custom code
      */
     public CustomUpdate(final Network network, final File file) {
         this.network = network;
         StringBuilder scriptText = new StringBuilder();
-        String NL = System.getProperty("line.separator");
+        String newLine = System.getProperty("line.separator");
         Scanner scanner = null;
         try {
             scanner = new Scanner(new FileInputStream(file));
             while (scanner.hasNextLine()) {
-                scriptText.append(scanner.nextLine() + NL);
+                scriptText.append(scanner.nextLine() + newLine);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

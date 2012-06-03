@@ -14,7 +14,7 @@
 package org.simbrain.network.update_actions;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.UpdateAction;
+import org.simbrain.network.core.NetworkUpdateAction;
 
 /**
  * Loose neurons (neurons not in groups) are updated in accordance with an
@@ -23,7 +23,7 @@ import org.simbrain.network.core.UpdateAction;
  *
  * @author jyoshimi
  */
-public class PriorityUpdate implements UpdateAction {
+public class PriorityUpdate implements NetworkUpdateAction {
 
     /** Reference to network to update. */
     private Network network;

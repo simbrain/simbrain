@@ -18,60 +18,95 @@
  */
 package org.simbrain.network.update_actions;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.UpdateAction;
+import org.simbrain.network.core.NetworkUpdateAction;
 
 import bsh.EvalError;
 import bsh.Interpreter;
 
 /**
  * Update using a custom action saved as a beanshell script.
- * 
+ *
  * @author jyoshimi
  */
-public class CustomUpdate implements UpdateAction {
+public class CustomUpdate implements NetworkUpdateAction {
 
-	/** Reference to parent network. */
-	private Network network;
+    /** Reference to parent network. */
+    private Network network;
 
     /** The custom update script in persistable string form. */
     private String scriptString;
 
-    /** The interpreter for converting the the script into an executable update action. */
+    /**
+     * The interpreter for converting the the script into an executable update
+     * action.
+     */
     private Interpreter interpreter = new Interpreter();
 
     /** Custom update action. */
-    private UpdateAction theAction;
-    
+    private NetworkUpdateAction theAction;
+
     /**
-     * @param group group to update
+     * Create a new custom update action.
+     *
+     * @param network network to update
+     * @param script script to use in invoking the update action
      */
-    public CustomUpdate(final Network network,
-			final String script) {
-        this.network= network;
-		this.scriptString = script;
-		init();
+    public CustomUpdate(final Network network, final String script) {
+        this.network = network;
+        this.scriptString = script;
+        init();
     }
-    
-	/**
-	 * Initialize the interpreter.
-	 */
-	public void init() {
-		if (interpreter == null) {
-			interpreter = new Interpreter();
-		}
-		try {
-			interpreter.set("network", network);
-			interpreter.eval(scriptString);
-			theAction = ((UpdateAction)interpreter.get("action"));
-		} catch (EvalError e) {
-			e.printStackTrace();
-		}		
-	}
+
+    /**
+     * Create a new custom update action.
+     *
+     * @param network network to update
+     * @param script script to use in invoking the update action
+     */
+    public CustomUpdate(final Network network, final File file) {
+        this.network = network;
+        StringBuilder scriptText = new StringBuilder();
+        String NL = System.getProperty("line.separator");
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new FileInputStream(file));
+            while (scanner.hasNextLine()) {
+                scriptText.append(scanner.nextLine() + NL);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            scanner.close();
+        }
+        this.scriptString = scriptText.toString();
+        init();
+    }
+
+    /**
+     * Initialize the interpreter.
+     */
+    public void init() {
+        if (interpreter == null) {
+            interpreter = new Interpreter();
+        }
+        try {
+            interpreter.set("network", network);
+            interpreter.eval(scriptString);
+            theAction = ((NetworkUpdateAction) interpreter.get("action"));
+        } catch (EvalError e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void invoke() {
-    	theAction.invoke();
+        theAction.invoke();
     }
 
     @Override
@@ -79,22 +114,22 @@ public class CustomUpdate implements UpdateAction {
         return theAction.getDescription();
     }
 
-	@Override
-	public String getLongDescription() {
-		return theAction.getLongDescription();
-	}
+    @Override
+    public String getLongDescription() {
+        return theAction.getLongDescription();
+    }
 
-	/**
-	 * @return the scriptString
-	 */
-	public String getScriptString() {
-		return scriptString;
-	}
+    /**
+     * @return the scriptString
+     */
+    public String getScriptString() {
+        return scriptString;
+    }
 
-	/**
-	 * @param scriptString the scriptString to set
-	 */
-	public void setScriptString(String scriptString) {
-		this.scriptString = scriptString;
-	}
+    /**
+     * @param scriptString the scriptString to set
+     */
+    public void setScriptString(String scriptString) {
+        this.scriptString = scriptString;
+    }
 }

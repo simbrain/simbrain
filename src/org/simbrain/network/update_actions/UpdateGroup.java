@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.update_actions;
 
-import org.simbrain.network.core.UpdateAction;
+import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.groups.Group;
 
 /**
@@ -27,7 +27,7 @@ import org.simbrain.network.groups.Group;
  * 
  * @author jyoshimi
  */
-public class UpdateGroup implements UpdateAction {
+public class UpdateGroup implements NetworkUpdateAction {
 
     /** Reference to group. */
     private final Group group;

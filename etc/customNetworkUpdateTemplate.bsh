@@ -1,13 +1,13 @@
 import java.util.*;
 import org.simbrain.network.*;
-import org.simbrain.network.neurons.*;
-import org.simbrain.network.synapses.*;
+import org.simbrain.network.core.*;
+import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.network.connections.*;
-import org.simbrain.network.interfaces.*;
 import org.simbrain.network.update_actions.*;
 import org.simbrain.network.layouts.*;
 
-private UpdateAction action;
+private NetworkUpdateAction action;
 
 /**
  * Template network update script.  Customize this to suit your needs.  
@@ -18,7 +18,7 @@ private UpdateAction action;
 	BufferedUpdate bufferedUpdate = new BufferedUpdate(network);
 
 	// Customize this
-	this.action = new UpdateAction() {
+	this.action = new NetworkUpdateAction() {
 		public void invoke() {
 
 			// Do a standard update

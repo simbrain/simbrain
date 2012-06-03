@@ -21,6 +21,7 @@ package org.simbrain.network.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.groups.Group;
 import org.simbrain.network.listeners.GroupListener;
@@ -29,6 +30,7 @@ import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateGroup;
+import org.simbrain.workspace.updater.UpdateAction;
 
 /**
  * Manage network updates. Maintain a list of actions. When the network is
@@ -41,12 +43,12 @@ public class UpdateManager {
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single "update" in the network.
      */
-    private final List<UpdateAction> actionList = new ArrayList<UpdateAction>();
+    private final List<NetworkUpdateAction> actionList = new CopyOnWriteArrayList<NetworkUpdateAction>();
 
     /**
      * The list of possible update actions that can be added to the main list.
      */
-    private final List<UpdateAction> availableActionList = new ArrayList<UpdateAction>();
+    private final List<NetworkUpdateAction> availableActionList = new CopyOnWriteArrayList<NetworkUpdateAction>();
 
     /**
      * List of listeners on this update manager.
@@ -65,42 +67,42 @@ public class UpdateManager {
         this.network = network;
         // Default update method
         addAction(new BufferedUpdate(network));
-        addAvailableAction(new PriorityUpdate(network));        
+        addAvailableAction(new PriorityUpdate(network));
         addListeners();
 
     }
-    
+
     /**
      * Perform any initialization required after opening a network from xml.
-     * UpdateManager will have been created from a default no argument constructor
-     * ands its fields populated using xstream.
+     * UpdateManager will have been created from a default no argument
+     * constructor ands its fields populated using xstream.
      */
-	public void postUnmarshallingInit() {
-		listeners = new ArrayList<UpdateManagerListener>();
+    public void postUnmarshallingInit() {
+        listeners = new ArrayList<UpdateManagerListener>();
         addListeners();
-        for(UpdateAction action : getActionList()) {
-        	if (action instanceof CustomUpdate) {
-        		((CustomUpdate)action).init();
-        	}
+        for (NetworkUpdateAction action : getActionList()) {
+            if (action instanceof CustomUpdate) {
+                ((CustomUpdate) action).init();
+            }
         }
-        for(UpdateAction action : getAvailableActionList()) {
-        	if (action instanceof CustomUpdate) {
-        		((CustomUpdate)action).init();
-        	}
+        for (NetworkUpdateAction action : getAvailableActionList()) {
+            if (action instanceof CustomUpdate) {
+                ((CustomUpdate) action).init();
+            }
         }
-	}
+    }
 
     /**
      * Update manager should listen for relevant changes in network.
      */
     private void addListeners() {
-        // Group are automatically listened for, and added.  Possibly
-        //  Make it possible to override this default behavior.
+        // Group are automatically listened for, and added. Possibly
+        // Make it possible to override this default behavior.
         network.addGroupListener(new GroupListener() {
 
             public void groupAdded(NetworkEvent<Group> e) {
                 if (e.getObject().isTopLevelGroup()) {
-                    addAction(new UpdateGroup(e.getObject()));                    
+                    addAction(new UpdateGroup(e.getObject()));
                 }
             }
 
@@ -111,30 +113,31 @@ public class UpdateManager {
 
             public void groupChanged(NetworkEvent<Group> networkEvent,
                     String changeDescription) {
-                
+
             }
 
             public void groupParameterChanged(NetworkEvent<Group> networkEvent) {
             }
-            
-        });    }
-    
+
+        });
+    }
+
     /**
      * Remove action (if one exists) associated with the provided group.
      *
-     * @param group 
+     * @param group
      */
     private void removeGroupAction(Group group) {
-        UpdateAction toDelete = null;
-        for (UpdateAction action : actionList) {
+        NetworkUpdateAction toDelete = null;
+        for (NetworkUpdateAction action : actionList) {
             if (action instanceof UpdateGroup) {
-                if (((UpdateGroup)action).getGroup() == group) {
-                    toDelete = action;                                                        
+                if (((UpdateGroup) action).getGroup() == group) {
+                    toDelete = action;
                 }
             }
         }
         if (toDelete != null) {
-            removeActionCompletely(toDelete);
+            removeAction(toDelete);
         }
 
     }
@@ -147,7 +150,7 @@ public class UpdateManager {
     public void addListener(UpdateManagerListener listener) {
         listeners.add(listener);
     }
-    
+
     /**
      * Remove listener.
      *
@@ -156,11 +159,11 @@ public class UpdateManager {
     public void removeListener(UpdateManagerListener listener) {
         listeners.remove(listener);
     }
-    
+
     /**
      * @return the actionList
      */
-    public List<UpdateAction> getActionList() {
+    public List<NetworkUpdateAction> getActionList() {
         return actionList;
     }
 
@@ -171,92 +174,92 @@ public class UpdateManager {
      * @param index2 index of second element
      */
     public void swapElements(final int index1, final int index2) {
-        //TODO: Handle case where indices don't make sense
+        // TODO: Handle case where indices don't make sense
         Collections.swap(actionList, index1, index2);
-        for(UpdateManagerListener listener : listeners) {
+        for (UpdateManagerListener listener : listeners) {
             listener.actionOrderChanged();
         }
     }
-    
+
     /**
-     * Add an action to the list.  (Takes it off the available list)
+     * Add an action to the list. (Takes it off the available list)
      *
      * @param action the action to add.
      */
-    public void addAction(UpdateAction action) {
+    public void addAction(NetworkUpdateAction action) {
         actionList.add(action);
-        for(UpdateManagerListener listener : listeners) {
+        for (UpdateManagerListener listener : listeners) {
             listener.actionAdded(action);
         }
         removeAvailableAction(action);
     }
-    
+
     /**
      * Remove an action from the list. (But adds it it to the available list)
      *
      * @param action the action to remove
      */
-    public void removeAction(UpdateAction action) {
+    public void moveActionToAvailableList(NetworkUpdateAction action) {
         actionList.remove(action);
-        for(UpdateManagerListener listener : listeners) {
+        for (UpdateManagerListener listener : listeners) {
             listener.actionRemoved(action);
         }
         addAvailableAction(action);
     }
-    
+
     /**
      * Completely remove an action (from both current and available lists).
      *
      * @param action the action to completely remove
      */
-    public void removeActionCompletely(UpdateAction action) {
+    public void removeAction(NetworkUpdateAction action) {
         actionList.remove(action);
         availableActionList.remove(action);
-        for(UpdateManagerListener listener : listeners) {
+        for (UpdateManagerListener listener : listeners) {
             listener.actionRemoved(action);
         }
     }
-    
+
     /**
      * Add an action to the list.
      *
      * @param action the action to add.
      */
-    protected void addAvailableAction(UpdateAction action) {
+    protected void addAvailableAction(NetworkUpdateAction action) {
         availableActionList.add(action);
-        for(UpdateManagerListener listener : listeners) {
+        for (UpdateManagerListener listener : listeners) {
             listener.availableActionAdded(action);
         }
     }
-    
+
     /**
      * Remove a potential action from the list.
      *
      * @param action the action to remove
      */
-    public void removeAvailableAction(UpdateAction action) {
+    public void removeAvailableAction(NetworkUpdateAction action) {
         availableActionList.remove(action);
-        for(UpdateManagerListener listener : listeners) {
+        for (UpdateManagerListener listener : listeners) {
             listener.availableActionRemoved(action);
         }
     }
-    
+
     /**
      * Listen from changes to update manager.
      */
     public interface UpdateManagerListener {
 
         /** An action was added. */
-        public void actionAdded(UpdateAction action);
+        public void actionAdded(NetworkUpdateAction action);
 
         /** An action was removed. */
-        public void actionRemoved(UpdateAction action);
+        public void actionRemoved(NetworkUpdateAction action);
 
         /** A potential action was added. */
-        public void availableActionAdded(UpdateAction action);
+        public void availableActionAdded(NetworkUpdateAction action);
 
         /** An potential action was removed. */
-        public void availableActionRemoved(UpdateAction action);
+        public void availableActionRemoved(NetworkUpdateAction action);
 
         /** The action order was changed. */
         public void actionOrderChanged();
@@ -265,8 +268,29 @@ public class UpdateManager {
     /**
      * @return the potentialActionList
      */
-    public List<UpdateAction> getAvailableActionList() {
+    public List<NetworkUpdateAction> getAvailableActionList() {
         return availableActionList;
+    }
+
+    /**
+     * Move all current actions to available actions.
+     */
+    public void clearCurrentActions() {
+        for (NetworkUpdateAction action : actionList) {
+            moveActionToAvailableList(action);
+        }
+    }
+
+    /**
+     * Remove all actions completely.
+     */
+    public void clear() {
+        for (NetworkUpdateAction action : actionList) {
+            removeAction(action);
+        }
+        for (NetworkUpdateAction action : availableActionList) {
+            removeAction(action);
+        }
     }
 
 }

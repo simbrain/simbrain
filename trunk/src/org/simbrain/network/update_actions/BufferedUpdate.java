@@ -19,7 +19,7 @@
 package org.simbrain.network.update_actions;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.UpdateAction;
+import org.simbrain.network.core.NetworkUpdateAction;
 
 /**
  * Buffered update of loose items (neurons and synapses), i.e. items not in
@@ -27,7 +27,7 @@ import org.simbrain.network.core.UpdateAction;
  *
  * @author jyoshimi
  */
-public class BufferedUpdate implements UpdateAction {
+public class BufferedUpdate implements NetworkUpdateAction {
 
     /** Reference to network to update. */
     private Network network;

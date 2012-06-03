@@ -19,26 +19,26 @@
 package org.simbrain.network.core;
 
 /**
- * Classes that implement this interface describe individual actions that together
- * comprise a network update.
+ * Classes that implement this interface describe individual actions that
+ * together comprise a network update.
  *
  * @author jyoshimi
  *
  */
-public interface UpdateAction {
+public interface NetworkUpdateAction {
 
     /**
-     * Invoke this action. 
+     * Invoke this action.
      */
     public void invoke();
-    
+
     /**
      * Provide a String description of this update method.
      *
      * @return the update description
      */
     public String getDescription();
-    
+
     /**
      * Provide a longer description for tooltips, etc.
      *

@@ -43,7 +43,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.TransferHandler;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.UpdateAction;
+import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.UpdateManager.UpdateManagerListener;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.resource.ResourceManager;
@@ -52,7 +52,7 @@ import org.simbrain.util.StandardDialog;
 
 /**
  * Panel for display and ordering of network update actions.
- * 
+ *
  * @author jeff yoshimi
  *
  */
@@ -60,19 +60,19 @@ public class UpdateManagerPanel extends JPanel {
 
     /** The JList which represents current actions. */
     private final JList currentActionJList = new JList();
-    
+
     /** The model object for current actions. */
-    private final DefaultListModel currentActionListModel  = new DefaultListModel();
+    private final DefaultListModel currentActionListModel = new DefaultListModel();
 
     /** The JList which represents available actions. */
     private final JList availableActionJList = new JList();
 
     /** The model object for current actions. */
-    private final DefaultListModel availableActionListModel  = new DefaultListModel();
+    private final DefaultListModel availableActionListModel = new DefaultListModel();
 
     /** Reference to root network. */
     private final Network network;
-    
+
     /**
      * Creates a new action list panel.
      */
@@ -93,22 +93,24 @@ public class UpdateManagerPanel extends JPanel {
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         currentListScroll
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        currentListScroll.setBorder(BorderFactory.createTitledBorder("Current Update Sequence"));
-        //currentListScroll.setBackground(null);
+        currentListScroll.setBorder(BorderFactory
+                .createTitledBorder("Current Update Sequence"));
+        // currentListScroll.setBackground(null);
 
         // Set up Available Action list
         availableActionJList.setModel(availableActionListModel);
         updateAvailableActionsList();
         configureAvailableJList();
         JScrollPane availableListScroll = new JScrollPane(availableActionJList);
-        //availableActionJList.setBackground(getBackground());
-        //availableListScroll.setBackground(null);
-        
+        // availableActionJList.setBackground(getBackground());
+        // availableListScroll.setBackground(null);
+
         availableListScroll
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         availableListScroll
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        availableListScroll.setBorder(BorderFactory.createTitledBorder("Unused Update Actions"));
+        availableListScroll.setBorder(BorderFactory
+                .createTitledBorder("Unused Update Actions"));
 
         // Add lists
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -116,26 +118,25 @@ public class UpdateManagerPanel extends JPanel {
         split.setResizeWeight(.5);
         add(split, BorderLayout.CENTER);
 
-        
         // Buttons
         JPanel buttonPanel = new JPanel();
-        JButton customActionButton = new JButton(addCustomAction);       
+        JButton customActionButton = new JButton(addCustomAction);
         buttonPanel.add(customActionButton);
-        JButton addActionsButton = new JButton(addActionsAction);       
+        JButton addActionsButton = new JButton(addActionsAction);
         buttonPanel.add(addActionsButton);
-        JButton deleteActionsButton = new JButton(deleteActionsAction);       
+        JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
-        updateAvailableActionsList();        
+        updateAvailableActionsList();
         add(buttonPanel, BorderLayout.SOUTH);
-        
+
         // Listen for network updates
         network.getUpdateManager().addListener(listener);
-        
+
         // TODO: Handle closing event
         // Should remove listener from update manager when this is closed
-                
+
     }
-    
+
     /**
      * Configure the JList.
      */
@@ -144,17 +145,17 @@ public class UpdateManagerPanel extends JPanel {
             public Component getListCellRendererComponent(JList list,
                     Object updateAction, int index, boolean isSelected,
                     boolean cellHasFocus) {
-                
+
                 JLabel label = new JLabel((index + 1) + ": "
-                        + ((UpdateAction) updateAction).getDescription());
-				label.setToolTipText(((UpdateAction) updateAction)
-						.getLongDescription());
+                        + ((NetworkUpdateAction) updateAction).getDescription());
+                label.setToolTipText(((NetworkUpdateAction) updateAction)
+                        .getLongDescription());
                 if (index == 0) {
                     label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
-                            Color.LIGHT_GRAY));                    
+                            Color.LIGHT_GRAY));
                 } else {
                     label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-                            Color.LIGHT_GRAY));                                        
+                            Color.LIGHT_GRAY));
                 }
                 label.setBackground(null);
                 if (isSelected) {
@@ -171,33 +172,33 @@ public class UpdateManagerPanel extends JPanel {
             }
         });
         currentActionJList.addMouseListener(new MouseAdapter() {
-        	public void mouseClicked(MouseEvent e) {
-        		if (e.getClickCount() == 2) {
-        			
-        			// When double clicking on custom actions open an editor
-					UpdateAction action = (UpdateAction) currentActionJList
-							.getModel().getElementAt(
-									currentActionJList.locationToIndex(e
-											.getPoint()));
-					if (action instanceof CustomUpdate) {
-						ScriptEditor panel = new ScriptEditor(
-								((CustomUpdate) action).getScriptString());
-	        			StandardDialog dialog = ScriptEditor.getDialog(panel);
-	                    dialog.pack();
-	                    dialog.setLocationRelativeTo(null);
-	                    dialog.setVisible(true);
-	                    if (!dialog.hasUserCancelled()) {
-	                    	((CustomUpdate)action).setScriptString(panel.getTextArea().getText());
-	                    	((CustomUpdate)action).init();
-	                    }            
-					}        			
-        		}
-        		
-        	}
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+
+                    // When double clicking on custom actions open an editor
+                    NetworkUpdateAction action = (NetworkUpdateAction) currentActionJList
+                            .getModel().getElementAt(
+                                    currentActionJList.locationToIndex(e
+                                            .getPoint()));
+                    if (action instanceof CustomUpdate) {
+                        ScriptEditor panel = new ScriptEditor(
+                                ((CustomUpdate) action).getScriptString());
+                        StandardDialog dialog = ScriptEditor.getDialog(panel);
+                        dialog.pack();
+                        dialog.setLocationRelativeTo(null);
+                        dialog.setVisible(true);
+                        if (!dialog.hasUserCancelled()) {
+                            ((CustomUpdate) action).setScriptString(panel
+                                    .getTextArea().getText());
+                            ((CustomUpdate) action).init();
+                        }
+                    }
+                }
+
+            }
         });
-    }    
-    
-    
+    }
+
     /**
      * Configure the JList.
      */
@@ -205,16 +206,17 @@ public class UpdateManagerPanel extends JPanel {
         availableActionJList.setCellRenderer(new ListCellRenderer() {
             public Component getListCellRendererComponent(JList list,
                     Object updateAction, int index, boolean isSelected,
-                    boolean cellHasFocus) {                
-                JLabel label = new JLabel(((UpdateAction) updateAction).getDescription());
-				label.setToolTipText(((UpdateAction) updateAction)
-						.getLongDescription());
+                    boolean cellHasFocus) {
+                JLabel label = new JLabel(((NetworkUpdateAction) updateAction)
+                        .getDescription());
+                label.setToolTipText(((NetworkUpdateAction) updateAction)
+                        .getLongDescription());
                 if (index == 0) {
                     label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,
-                            Color.LIGHT_GRAY));                    
+                            Color.LIGHT_GRAY));
                 } else {
                     label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
-                            Color.LIGHT_GRAY));                                        
+                            Color.LIGHT_GRAY));
                 }
                 if (isSelected) {
                     label.setBackground(list.getSelectionBackground());
@@ -230,31 +232,31 @@ public class UpdateManagerPanel extends JPanel {
             }
         });
         availableActionJList.addMouseListener(new MouseAdapter() {
-        	public void mouseClicked(MouseEvent e) {
-        		if (e.getClickCount() == 2) {
-					UpdateAction action = (UpdateAction) availableActionJList
-							.getModel().getElementAt(
-									availableActionJList.locationToIndex(e
-											.getPoint()));
-					if (action instanceof CustomUpdate) {
-						ScriptEditor panel = new ScriptEditor(
-								((CustomUpdate) action).getScriptString());
-	        			StandardDialog dialog = ScriptEditor.getDialog(panel);
-	                    dialog.pack();
-	                    dialog.setLocationRelativeTo(null);
-	                    dialog.setVisible(true);
-	                    if (!dialog.hasUserCancelled()) {
-	                    	((CustomUpdate)action).setScriptString(panel.getTextArea().getText());
-	                    	((CustomUpdate)action).init();
-	                    }            
-					}        			
-        		}
-        		
-        	}
-        });    
-    }    
-    
-    
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    NetworkUpdateAction action = (NetworkUpdateAction) availableActionJList
+                            .getModel().getElementAt(
+                                    availableActionJList.locationToIndex(e
+                                            .getPoint()));
+                    if (action instanceof CustomUpdate) {
+                        ScriptEditor panel = new ScriptEditor(
+                                ((CustomUpdate) action).getScriptString());
+                        StandardDialog dialog = ScriptEditor.getDialog(panel);
+                        dialog.pack();
+                        dialog.setLocationRelativeTo(null);
+                        dialog.setVisible(true);
+                        if (!dialog.hasUserCancelled()) {
+                            ((CustomUpdate) action).setScriptString(panel
+                                    .getTextArea().getText());
+                            ((CustomUpdate) action).init();
+                        }
+                    }
+                }
+
+            }
+        });
+    }
+
     /** Action which deletes selected actions. */
     Action deleteActionsAction = new AbstractAction() {
         // Initialize
@@ -276,11 +278,12 @@ public class UpdateManagerPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             for (Object action : currentActionJList.getSelectedValues()) {
-                network.getUpdateManager().removeAction((UpdateAction) action);
+                network.getUpdateManager().moveActionToAvailableList(
+                        (NetworkUpdateAction) action);
             }
         }
     };
-    
+
     /** Action which allows for creation of custom action. */
     Action addCustomAction = new AbstractAction() {
         // Initialize
@@ -294,41 +297,42 @@ public class UpdateManagerPanel extends JPanel {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-        	Scanner scanner = null;
-        	File defaultScript = new File(System.getProperty("user.dir")
-					+ "/etc/customNetworkUpdateTemplate.bsh");
-        	StringBuilder scriptText = new StringBuilder();
-        	String NL = System.getProperty("line.separator");
-			try {
-				scanner = new Scanner(new FileInputStream(defaultScript));
-				while (scanner.hasNextLine()) {
-					scriptText.append(scanner.nextLine() + NL);
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} finally {
-				scanner.close();
-			}
-        	
-			ScriptEditor panel = new ScriptEditor(scriptText.toString());
-			panel.setScriptFile(defaultScript);
-			StandardDialog dialog = ScriptEditor.getDialog(panel);
-			// Setting script file to null prevents the template script from
-			// being saved. Forces "save as"
-			// if save button pressed.
-			panel.setScriptFile(null); 
+            Scanner scanner = null;
+            File defaultScript = new File(System.getProperty("user.dir")
+                    + "/etc/customNetworkUpdateTemplate.bsh");
+            StringBuilder scriptText = new StringBuilder();
+            String NL = System.getProperty("line.separator");
+            try {
+                scanner = new Scanner(new FileInputStream(defaultScript));
+                while (scanner.hasNextLine()) {
+                    scriptText.append(scanner.nextLine() + NL);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                scanner.close();
+            }
+
+            ScriptEditor panel = new ScriptEditor(scriptText.toString());
+            panel.setScriptFile(defaultScript);
+            StandardDialog dialog = ScriptEditor.getDialog(panel);
+            // Setting script file to null prevents the template script from
+            // being saved. Forces "save as"
+            // if save button pressed.
+            panel.setScriptFile(null);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
             if (!dialog.hasUserCancelled()) {
-            	CustomUpdate updateAction = new CustomUpdate(
-						network, panel.getTextArea().getText());
-            	network.getUpdateManager().addAction((UpdateAction) updateAction);
-            }            
-        	
+                CustomUpdate updateAction = new CustomUpdate(network, panel
+                        .getTextArea().getText());
+                network.getUpdateManager().addAction(
+                        (NetworkUpdateAction) updateAction);
+            }
+
         }
     };
-    
+
     /** Action which deletes selected actions. */
     Action addActionsAction = new AbstractAction() {
         // Initialize
@@ -343,43 +347,46 @@ public class UpdateManagerPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             for (Object action : availableActionJList.getSelectedValues()) {
-                network.getUpdateManager().addAction((UpdateAction) action);
+                network.getUpdateManager().addAction(
+                        (NetworkUpdateAction) action);
             }
         }
     };
-    
+
     /**
      * Update the JList's model.
      */
     private void updateCurrentActionsList() {
         currentActionListModel.clear();
-        for (UpdateAction action : network.getUpdateManager().getActionList()) {
+        for (NetworkUpdateAction action : network.getUpdateManager()
+                .getActionList()) {
             currentActionListModel.addElement(action);
         }
         repaint();
     }
-    
+
     /**
      * Update the combo box showing potential actions.
      */
     private void updateAvailableActionsList() {
         availableActionListModel.clear();
-        for (UpdateAction action : network.getUpdateManager().getAvailableActionList()) {
+        for (NetworkUpdateAction action : network.getUpdateManager()
+                .getAvailableActionList()) {
             availableActionListModel.addElement(action);
         }
         repaint();
     }
-    
+
     /**
      * Listener for update manager changes.
      */
     private UpdateManagerListener listener = new UpdateManagerListener() {
 
-        public void actionAdded(UpdateAction action) {
+        public void actionAdded(NetworkUpdateAction action) {
             updateCurrentActionsList();
         }
 
-        public void actionRemoved(UpdateAction action) {
+        public void actionRemoved(NetworkUpdateAction action) {
             updateCurrentActionsList();
         }
 
@@ -387,27 +394,28 @@ public class UpdateManagerPanel extends JPanel {
             updateCurrentActionsList();
         }
 
-        public void availableActionAdded(UpdateAction action) {
+        public void availableActionAdded(NetworkUpdateAction action) {
             updateAvailableActionsList();
         }
 
-        public void availableActionRemoved(UpdateAction action) {
+        public void availableActionRemoved(NetworkUpdateAction action) {
             updateAvailableActionsList();
         }
-        
+
     };
 
     /**
      * Handle drag and drop events
+     *
      * @return
      */
     private TransferHandler createTransferHandler() {
         return new TransferHandler() {
 
             public boolean canImport(TransferHandler.TransferSupport info) {
-//                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-//                    return false;
-//                }
+                // if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                // return false;
+                // }
 
                 JList.DropLocation dl = (JList.DropLocation) info
                         .getDropLocation();
@@ -426,14 +434,16 @@ public class UpdateManagerPanel extends JPanel {
                         .getDropLocation();
                 int targetIndex = dl.getIndex();
                 int sourceIndex = currentActionJList.getSelectedIndex();
-                int listSize = network.getUpdateManager().getActionList().size();
+                int listSize = network.getUpdateManager().getActionList()
+                        .size();
                 if (targetIndex == listSize) {
                     targetIndex--;
                 }
                 if (sourceIndex == listSize) {
                     sourceIndex--;
-                }                
-                network.getUpdateManager().swapElements(sourceIndex, targetIndex);
+                }
+                network.getUpdateManager().swapElements(sourceIndex,
+                        targetIndex);
                 return true;
             }
 
@@ -448,21 +458,20 @@ public class UpdateManagerPanel extends JPanel {
         };
     }
 
-
-//    /**
-//     * Test panel.
-//     */
-//    public static void main(String[] args) {
-//        JFrame frame = new JFrame();
-//        List<String> actions = new ArrayList<String>();
-//        actions.add("Buffered Update");
-//        actions.add("Group 1");
-//        actions.add("Group 2");
-//        actions.add("Neuron 1");
-//        UpdateManagerPanel panel = new UpdateManagerPanel(frame, actions);
-//        frame.setContentPane(panel);
-//        frame.setVisible(true);
-//        frame.pack();
-//    }
+    // /**
+    // * Test panel.
+    // */
+    // public static void main(String[] args) {
+    // JFrame frame = new JFrame();
+    // List<String> actions = new ArrayList<String>();
+    // actions.add("Buffered Update");
+    // actions.add("Group 1");
+    // actions.add("Group 2");
+    // actions.add("Neuron 1");
+    // UpdateManagerPanel panel = new UpdateManagerPanel(frame, actions);
+    // frame.setContentPane(panel);
+    // frame.setVisible(true);
+    // frame.pack();
+    // }
 
 }

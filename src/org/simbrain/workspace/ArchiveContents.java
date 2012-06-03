@@ -57,10 +57,10 @@ class ArchiveContents {
     /** All of the updateactions in the archive. */
     private List<ArchivedUpdateAction> archivedActions = new ArrayList<ArchivedUpdateAction>();
 
-	/**
-	 * All of the "available" update actions in the archive. See
-	 * UpdateActionManager for more on this distinction.
-	 */
+    /**
+     * All of the "available" update actions in the archive. See
+     * UpdateActionManager for more on this distinction.
+     */
     private List<ArchivedUpdateAction> archivedAvailableActions = new ArrayList<ArchivedUpdateAction>();
 
     /** The serializer for this archive. */
@@ -88,54 +88,60 @@ class ArchiveContents {
      * @return The component created for this WorkspaceComponent.
      */
     ArchivedComponent addComponent(final WorkspaceComponent workspaceComponent) {
-        ArchivedComponent component = new ArchivedComponent(serializer, workspaceComponent);
+        ArchivedComponent component = new ArchivedComponent(serializer,
+                workspaceComponent);
         archivedComponents.add(component);
         componentUris.put(workspaceComponent, component.uri);
         return component;
     }
-    
+
     /**
      * Adds an update action the archive.
      *
      * @param action the action to archive.
      */
-	void addUpdateAction(UpdateAction action) {
-		archivedActions.add(getArchivedAction(action));
-	}
-	
+    void addUpdateAction(UpdateAction action) {
+        archivedActions.add(getArchivedAction(action));
+    }
+
     /**
      * Adds an update action the "available" archive.
      *
      * @param action the action to archive.
      */
-	public void addAvailableUpdateAction(UpdateAction action) {
-		archivedAvailableActions.add(getArchivedAction(action));
-	}
-	
-	/**
-	 * Creates the archived action given the "real" update action.
-	 *
-	 * @param action the real update action.
-	 * @return teh archived action.
-	 */
-	private ArchivedUpdateAction getArchivedAction(final UpdateAction action) {
-		String component_id = null;
-		String coupling_id = null;
-		
-		// Get a component id if this is an update component action
-		if (action instanceof UpdateComponent) {
-			component_id = componentUris.get( ((UpdateComponent)action).getComponent());
-		}
-		// Get a coupling id, if this is coupling action
-		if (action instanceof UpdateCoupling) {
-			Coupling<?> coupling = ((UpdateCoupling)action).getCoupling();
-			coupling_id = coupling.getId();
-		}
-		
-		// Create and return the archived action
-		return new ArchivedUpdateAction(action, component_id, coupling_id);
-	}
+    public void addAvailableUpdateAction(UpdateAction action) {
+        archivedAvailableActions.add(getArchivedAction(action));
+    }
 
+    /**
+     * Creates the archived action given the "real" update action.
+     *
+     * @param action the real update action.
+     * @return teh archived action.
+     */
+    private ArchivedUpdateAction getArchivedAction(final UpdateAction action) {
+        String component_id = null;
+        String coupling_id = null;
+
+        // Get a component id if this is an update component action
+        if (action instanceof UpdateComponent) {
+            component_id = componentUris.get(((UpdateComponent) action)
+                    .getComponent());
+        }
+        // Get a coupling id, if this is coupling action
+        if (action instanceof UpdateCoupling) {
+            Coupling<?> coupling = ((UpdateCoupling) action).getCoupling();
+            if (coupling != null) {
+                coupling_id = coupling.getId();
+            } else {
+                System.err.println("Invalid coupling action found while saving:"
+                        + action.getDescription());
+            }
+        }
+
+        // Create and return the archived action
+        return new ArchivedUpdateAction(action, component_id, coupling_id);
+    }
 
     /**
      * Returns an immutable list of the components in this archive.
@@ -176,68 +182,77 @@ class ArchiveContents {
         }
 
         return null;
-    }	
-	
-	/**
-	 * Create a "real" update action from an archived update action.
-	 * 
-	 * @param workspace parent workspace in which to place the new action
-	 * @param componentDeserializer used to get the workspace component corresponding to a workspace component id
-	 * @param archivedAction the archived action to convert into a real action
-	 * @return the "real" update action 
-	 */
-	UpdateAction createUpdateAction(final Workspace workspace, final WorkspaceComponentDeserializer componentDeserializer, final ArchivedUpdateAction archivedAction) {
+    }
 
-		// Use reflection to create the update action, based on what type of action was archived.   For actions whose constructors require
-		// components or couplings, the archived ids are used to find the component or coupling.  
-		UpdateAction retAction = null;
-		if (archivedAction.getUpdateAction() instanceof UpdateComponent) {
-			try {
-				WorkspaceComponent comp = componentDeserializer
-						.getComponent(archivedAction.getComponentId());
-				retAction = archivedAction
-						.getUpdateAction()
-						.getClass()
-						.getConstructor(
-								new Class[] { WorkspaceUpdater.class,
-										WorkspaceComponent.class })
-						.newInstance(workspace.getUpdater(), comp);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else if (archivedAction.getUpdateAction() instanceof UpdateAllBuffered) {
-			try {
-				retAction = archivedAction.getUpdateAction().getClass()
-						.getConstructor(new Class[] { WorkspaceUpdater.class })
-						.newInstance(workspace.getUpdater());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else if (archivedAction.getUpdateAction() instanceof UpdateActionCustom) {
-			try {
-				String script = ((UpdateActionCustom)archivedAction.getUpdateAction()).getScriptString();
-				retAction = archivedAction.getUpdateAction().getClass()
-						.getConstructor(new Class[] { WorkspaceUpdater.class, String.class })
-						.newInstance(workspace.getUpdater(), script);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}  else if (archivedAction.getUpdateAction() instanceof UpdateCoupling) {
-			try {
-				String id = archivedAction.getCouplingId();
-				Coupling<?> coupling = workspace.getCoupling(id);
-				retAction = archivedAction.getUpdateAction().getClass()
-						.getConstructor(new Class[] { Coupling.class})
-						.newInstance(coupling);
+    /**
+     * Create a "real" update action from an archived update action.
+     *
+     * @param workspace parent workspace in which to place the new action
+     * @param componentDeserializer used to get the workspace component
+     *            corresponding to a workspace component id
+     * @param archivedAction the archived action to convert into a real action
+     * @return the "real" update action
+     */
+    UpdateAction createUpdateAction(final Workspace workspace,
+            final WorkspaceComponentDeserializer componentDeserializer,
+            final ArchivedUpdateAction archivedAction) {
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+        // Use reflection to create the update action, based on what type of
+        // action was archived. For actions whose constructors require
+        // components or couplings, the archived ids are used to find the
+        // component or coupling.
+        UpdateAction retAction = null;
+        if (archivedAction.getUpdateAction() instanceof UpdateComponent) {
+            try {
+                WorkspaceComponent comp = componentDeserializer
+                        .getComponent(archivedAction.getComponentId());
+                retAction = archivedAction
+                        .getUpdateAction()
+                        .getClass()
+                        .getConstructor(
+                                new Class[] { WorkspaceUpdater.class,
+                                        WorkspaceComponent.class })
+                        .newInstance(workspace.getUpdater(), comp);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (archivedAction.getUpdateAction() instanceof UpdateAllBuffered) {
+            try {
+                retAction = archivedAction.getUpdateAction().getClass()
+                        .getConstructor(new Class[] { WorkspaceUpdater.class })
+                        .newInstance(workspace.getUpdater());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (archivedAction.getUpdateAction() instanceof UpdateActionCustom) {
+            try {
+                String script = ((UpdateActionCustom) archivedAction
+                        .getUpdateAction()).getScriptString();
+                retAction = archivedAction
+                        .getUpdateAction()
+                        .getClass()
+                        .getConstructor(
+                                new Class[] { WorkspaceUpdater.class,
+                                        String.class })
+                        .newInstance(workspace.getUpdater(), script);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (archivedAction.getUpdateAction() instanceof UpdateCoupling) {
+            try {
+                String id = archivedAction.getCouplingId();
+                Coupling<?> coupling = workspace.getCoupling(id);
+                retAction = archivedAction.getUpdateAction().getClass()
+                        .getConstructor(new Class[] { Coupling.class })
+                        .newInstance(coupling);
 
-		return retAction;
-	}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
+        return retAction;
+    }
 
     /**
      * Adds a coupling to the archive.
@@ -250,56 +265,62 @@ class ArchiveContents {
         archivedCouplings.add(c);
         return c;
     }
-    
+
     /**
-     * A persistable form of update action that can be used to recreate the action.
+     * A persistable form of update action that can be used to recreate the
+     * action.
      *
      * @author Jeff Yoshimi
      */
     static final class ArchivedUpdateAction {
-        
-    	/** Reference to the action itself. */
-    	private final UpdateAction updateAction;
-    	
-    	/** Reference to the component id for this action, or null if not needed. */
-    	private final String componentId;
-    	
-    	/** Reference to the coupling id for this action, or null if not needed. */
-    	private final String couplingId;
-    	
-    	/**
-    	 * Construct the archived update action.
-    	 *
-    	 * @param action reference to the update action itself.
-    	 * @param componentId component id or null if none needed
-    	 * @param couplingId coupling id or null if none needed
-    	 */
-    	private ArchivedUpdateAction(UpdateAction action, String componentId, String couplingId) {
-    		this.updateAction = action;
-    		this.componentId = componentId;
-    		this.couplingId = couplingId;
-    	}
-		/**
-		 * @return the componentId
-		 */
-		public String getComponentId() {
-			return componentId;
-		}
-		/**
-		 * @return the couplingId
-		 */
-		public String getCouplingId() {
-			return couplingId;
-		}
-		/**
-		 * @return the updateAction
-		 */
-		public UpdateAction getUpdateAction() {
-			return updateAction;
-		}
-    	
-    }
 
+        /** Reference to the action itself. */
+        private final UpdateAction updateAction;
+
+        /**
+         * Reference to the component id for this action, or null if not needed.
+         */
+        private final String componentId;
+
+        /** Reference to the coupling id for this action, or null if not needed. */
+        private final String couplingId;
+
+        /**
+         * Construct the archived update action.
+         *
+         * @param action reference to the update action itself.
+         * @param componentId component id or null if none needed
+         * @param couplingId coupling id or null if none needed
+         */
+        private ArchivedUpdateAction(UpdateAction action, String componentId,
+                String couplingId) {
+            this.updateAction = action;
+            this.componentId = componentId;
+            this.couplingId = couplingId;
+        }
+
+        /**
+         * @return the componentId
+         */
+        public String getComponentId() {
+            return componentId;
+        }
+
+        /**
+         * @return the couplingId
+         */
+        public String getCouplingId() {
+            return couplingId;
+        }
+
+        /**
+         * @return the updateAction
+         */
+        public UpdateAction getUpdateAction() {
+            return updateAction;
+        }
+
+    }
 
     /**
      * Represents the data used to store components in the archive.
@@ -338,7 +359,8 @@ class ArchiveContents {
          * @param serializer The component serializer for the archive.
          * @param component The workspace component this entry represents.
          */
-        private ArchivedComponent(final WorkspaceComponentSerializer serializer,
+        private ArchivedComponent(
+                final WorkspaceComponentSerializer serializer,
                 final WorkspaceComponent component) {
             this.className = component.getClass().getCanonicalName();
             this.id = serializer.getId(component);
@@ -381,11 +403,12 @@ class ArchiveContents {
              * @param parent The parent component entry.
              * @param dc The desktop component this instance represents.
              */
-            private ArchivedDesktopComponent(final ArchivedComponent parent, final org.simbrain.workspace.gui.GuiComponent<?> dc) {
+            private ArchivedDesktopComponent(final ArchivedComponent parent,
+                    final org.simbrain.workspace.gui.GuiComponent<?> dc) {
                 this.className = dc.getClass().getCanonicalName();
                 this.format = dc.getWorkspaceComponent().getDefaultFormat();
-                this.uri = "guis/" + parent.id + '_' + parent.name.replaceAll("\\s", "_")
-                    + '.' + format;
+                this.uri = "guis/" + parent.id + '_'
+                        + parent.name.replaceAll("\\s", "_") + '.' + format;
             }
 
             /**
@@ -461,10 +484,10 @@ class ArchiveContents {
         ArchivedCoupling(final ArchiveContents parent,
                 final org.simbrain.workspace.Coupling<?> coupling) {
 
-            this.archivedProducer = new ArchivedAttribute(parent, coupling
-                    .getProducer());
-            this.archivedConsumer = new ArchivedAttribute(parent, coupling
-                    .getConsumer());
+            this.archivedProducer = new ArchivedAttribute(parent,
+                    coupling.getProducer());
+            this.archivedConsumer = new ArchivedAttribute(parent,
+                    coupling.getConsumer());
         }
 
         /**
@@ -593,8 +616,7 @@ class ArchiveContents {
     /**
      * Writes this instance to XML.
      *
-     * @param stream
-     *            The stream to write to.
+     * @param stream The stream to write to.
      */
     void toXml(final OutputStream stream) {
         xstream().toXML(this, stream);
@@ -615,7 +637,8 @@ class ArchiveContents {
         xstream.omitField(ArchivedUpdateAction.class, "serializer");
         xstream.omitField(ArchivedUpdateAction.class, "updater");
         xstream.omitField(ArchivedComponent.class, "data");
-        xstream.omitField(ArchivedComponent.ArchivedDesktopComponent.class, "data");
+        xstream.omitField(ArchivedComponent.ArchivedDesktopComponent.class,
+                "data");
 
         xstream.omitField(Workspace.class, "LOGGER");
         xstream.omitField(Workspace.class, "manager");
@@ -629,23 +652,27 @@ class ArchiveContents {
         xstream.omitField(Workspace.class, "updaterLock");
         xstream.omitField(Workspace.class, "componentLock");
 
-		xstream.omitField(UpdateComponent.class, "component");
-		xstream.omitField(UpdateComponent.class, "updater");
-		xstream.omitField(UpdateCoupling.class, "coupling");
-		xstream.omitField(UpdateActionCustom.class, "interpreter");
-		xstream.omitField(UpdateActionCustom.class, "theAction");
-		xstream.omitField(UpdateActionCustom.class, "updater");
-		xstream.omitField(UpdateAllBuffered.class, "updater");
+        xstream.omitField(UpdateComponent.class, "component");
+        xstream.omitField(UpdateComponent.class, "updater");
+        xstream.omitField(UpdateCoupling.class, "coupling");
+        xstream.omitField(UpdateActionCustom.class, "interpreter");
+        xstream.omitField(UpdateActionCustom.class, "theAction");
+        xstream.omitField(UpdateActionCustom.class, "updater");
+        xstream.omitField(UpdateAllBuffered.class, "updater");
 
         xstream.alias("Workspace", ArchiveContents.class);
         xstream.alias("Component", ArchivedComponent.class);
         xstream.alias("Coupling", ArchivedCoupling.class);
         xstream.alias("UpdateAction", ArchivedUpdateAction.class);
-        xstream.alias("DesktopComponent", ArchivedComponent.ArchivedDesktopComponent.class);
+        xstream.alias("DesktopComponent",
+                ArchivedComponent.ArchivedDesktopComponent.class);
 
-//        xstream.addImplicitCollection(ArchiveContents.class, "components", ArchivedComponent.class);
-//        xstream.addImplicitCollection(ArchiveContents.class, "couplings", ArchivedCoupling.class);
-//        xstream.addImplicitCollection(ArchivedComponent.class, "desktopComponents");
+        // xstream.addImplicitCollection(ArchiveContents.class, "components",
+        // ArchivedComponent.class);
+        // xstream.addImplicitCollection(ArchiveContents.class, "couplings",
+        // ArchivedCoupling.class);
+        // xstream.addImplicitCollection(ArchivedComponent.class,
+        // "desktopComponents");
 
         return xstream;
     }
@@ -657,18 +684,18 @@ class ArchiveContents {
         return workspaceParameters;
     }
 
-	/**
-	 * @return the archivedActions
-	 */
-	public List<ArchivedUpdateAction> getArchivedActions() {
-		return archivedActions;
-	}
+    /**
+     * @return the archivedActions
+     */
+    public List<ArchivedUpdateAction> getArchivedActions() {
+        return archivedActions;
+    }
 
-	/**
-	 * @return the archivedAvailableActions
-	 */
-	public List<ArchivedUpdateAction> getArchivedAvailableActions() {
-		return archivedAvailableActions;
-	}
+    /**
+     * @return the archivedAvailableActions
+     */
+    public List<ArchivedUpdateAction> getArchivedAvailableActions() {
+        return archivedAvailableActions;
+    }
 
 }

@@ -34,6 +34,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
+import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
 
 /**
@@ -674,5 +675,17 @@ public class Workspace {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Convenience method for setting an update action. Removes
+     * all current actions.
+     *
+     * @param action new action
+     */
+    public void setUpdateAction(UpdateAction action) {
+        updater.getUpdateManager().clearCurrentActions();
+        updater.getUpdateManager().addAction(action);
+    }
+
 
 }

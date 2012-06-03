@@ -22,50 +22,60 @@ import org.simbrain.workspace.Coupling;
 
 /**
  * Updates a coupling
- * 
+ *
  * @author jyoshimi
  */
 public class UpdateCoupling implements UpdateAction {
 
-    /**  of couplings to update. */
+    /** of couplings to update. */
     private final Coupling<?> coupling;
-    
+
     /**
      * Construct the action.
      *
-     * @param coupling  coupling  to update
+     * @param coupling coupling to update
      */
     public UpdateCoupling(Coupling<?> coupling) {
         this.coupling = coupling;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public void invoke() {
-    	coupling.setBuffer();
-    	coupling.update();
+        coupling.setBuffer();
+        coupling.update();
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public String getDescription() {
-		return "Update coupling ("
-				+ coupling.getProducer().getParentComponent().getName() + ">"
-				+ coupling.getConsumer().getParentComponent().getName() + ")";
+        if (coupling == null) {
+            return "Invalid action";
+        } else {
+            return "Update coupling ("
+                    + coupling.getProducer().getParentComponent().getName()
+                    + ">"
+                    + coupling.getConsumer().getParentComponent().getName()
+                    + ")";
+        }
     }
-    
-	@Override
-	public String getLongDescription() {
-        return coupling.toString();
-	}
 
-	/**
-	 * @return the coupling
-	 */
-	public Coupling<?> getCoupling() {
-		return coupling;
-	}
+    @Override
+    public String getLongDescription() {
+        if (coupling == null) {
+            return "Invalid action";
+        } else {
+            return coupling.toString();
+        }
+    }
+
+    /**
+     * @return the coupling
+     */
+    public Coupling<?> getCoupling() {
+        return coupling;
+    }
 
 }

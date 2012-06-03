@@ -30,8 +30,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 /**
  * Action for showing an entity dialog.
  */
-public final class ShowEntityDialogAction
-    extends AbstractAction {
+public final class ShowEntityDialogAction extends AbstractAction {
 
     /** Entity to edit. */
     private final OdorWorldEntity entity;
@@ -42,19 +41,20 @@ public final class ShowEntityDialogAction
      * @param component GUI component, must not be null.
      */
     public ShowEntityDialogAction(OdorWorldEntity entity) {
-        super("Edit entity" );
+        super("Edit entity");
         this.entity = entity;
-//        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P,
-//                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        // this.putValue(this.ACCELERATOR_KEY,
+        // KeyStroke.getKeyStroke(KeyEvent.VK_P,
+        // Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
         putValue(SHORT_DESCRIPTION, "Edit entity...");
     }
 
-
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
         DialogOdorWorldEntity dialog = new DialogOdorWorldEntity(entity);
-        dialog.setTitle("Edit " + entity.getName());
+        dialog.setTitle("Edit " + entity.getName() + " (" + entity.getId()
+                + ")");
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

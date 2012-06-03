@@ -167,12 +167,12 @@ public abstract class OdorWorldEntity {
      * Sets this OdorWorldEntity's current x position.
      */
     public void setX(final float newx) {
-        //System.out.println("x:" + newx);
+        // System.out.println("x:" + newx);
         if (parentWorld.getWrapAround()) {
             if (newx <= 0) {
                 this.x = parentWorld.getWidth()
                         - (Math.abs(newx) % parentWorld.getWidth());
-            } else if (newx >  parentWorld.getWidth()) {
+            } else if (newx > parentWorld.getWidth()) {
                 this.x = newx % parentWorld.getWidth();
             } else {
                 this.x = newx;
@@ -188,12 +188,12 @@ public abstract class OdorWorldEntity {
      * Sets this OdorWorldEntity's current y position.
      */
     public void setY(final float newy) {
-        //System.out.println("y:" + newy);
+        // System.out.println("y:" + newy);
         if (parentWorld.getWrapAround()) {
             if (newy <= 0) {
                 this.y = parentWorld.getHeight()
                         - (Math.abs(newy) % parentWorld.getHeight());
-            } else if (newy >  parentWorld.getHeight()) {
+            } else if (newy > parentWorld.getHeight()) {
                 this.y = newy % parentWorld.getHeight();
             } else {
                 this.y = newy;
@@ -207,8 +207,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Check whether, if the provided point is used to set the x (upper left)
-     * coordinate of the entity, the bounds of the object will be in
-     * bounds.
+     * coordinate of the entity, the bounds of the object will be in bounds.
      *
      * @param x the point to check
      * @return whether the point is in bounds or not.
@@ -222,8 +221,7 @@ public abstract class OdorWorldEntity {
 
     /**
      * Check whether, if the provided point is used to set the y (upper left)
-     * coordinate of the entity, the bounds of the object will be in
-     * bounds.
+     * coordinate of the entity, the bounds of the object will be in bounds.
      *
      * @param y the point to check
      * @return whether the point is in bounds or not.
@@ -234,7 +232,6 @@ public abstract class OdorWorldEntity {
         }
         return true;
     }
-
 
     /**
      * Gets this OdorWorldEntity's width, based on the size of the current
@@ -316,7 +313,7 @@ public abstract class OdorWorldEntity {
      * @return the id
      */
     public String getId() {
-		return id;
+        return id;
     }
 
     /**
@@ -429,7 +426,7 @@ public abstract class OdorWorldEntity {
         int tileHeight = parentWorld.getHeight() / numTilesY;
         for (int i = 0; i < numTilesX; i++) {
             for (int j = 0; j < numTilesY; j++) {
-                addSensor(new TileSensor(this, ((i * tileWidth) + offset), 
+                addSensor(new TileSensor(this, ((i * tileWidth) + offset),
                         ((j * tileHeight) + offset), tileWidth, tileHeight));
             }
         }
@@ -483,8 +480,6 @@ public abstract class OdorWorldEntity {
     public double getCenterY() {
         return y + (getHeight() / 2);
     }
-    
-    
 
     /**
      * Set the location of this entity.
@@ -496,6 +491,7 @@ public abstract class OdorWorldEntity {
         setX(x - (getWidth() / 2));
         setY(y - (getHeight() / 2));
     }
+
     /**
      * Returns the location of the entity as a double array.
      *

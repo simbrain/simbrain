@@ -340,6 +340,7 @@ public class Workspace {
         currentFile = null;
         fireWorkspaceCleared();
         manager.clearCouplings();
+        this.getUpdater().getUpdateManager().setDefaultUpdateActions();
     }
 
     /**

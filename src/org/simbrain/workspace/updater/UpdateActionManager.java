@@ -81,7 +81,7 @@ public class UpdateActionManager {
     public UpdateActionManager(final WorkspaceUpdater workspace) {
         this.workspaceUpdater = workspace;
         // Default update method
-        addAction(new UpdateAllBuffered(workspace));
+        setDefaultUpdateActions();
         addListeners();
 
     }
@@ -306,6 +306,15 @@ public class UpdateActionManager {
         for (UpdateAction action : availableActionList) {
             removeAction(action);
         }
+    }
+
+    /**
+     * Puts the update in its default configuration, with Buffered update as the
+     * default action.
+     */
+    public void setDefaultUpdateActions() {
+        clear();
+        addAction(new UpdateAllBuffered(workspaceUpdater));
     }
 
 }

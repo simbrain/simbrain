@@ -935,6 +935,24 @@ public class Network {
     }
 
     /**
+     * Create a "flat" list of groups, which includes the top-level groups
+     * plus all subgroups.
+     *
+     * @return the flat list
+     */
+    public List<Group> getFlatGroupList() {
+        List<Group> ret = new ArrayList<Group>();
+        ret.addAll(groupList);
+        for (Group group : groupList) {
+            if (group instanceof Subnetwork) {
+                ret.addAll(((Subnetwork) group).getNeuronGroupList());
+                ret.addAll(((Subnetwork) group).getSynapseGroupList());
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Returns the precision of the current time step.
      *
      * @return the precision of the current time step.
@@ -1044,6 +1062,11 @@ public class Network {
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.postUnmarshallingInit();
         }
+
+        // Initialize groups
+        //for (Group group : this.getFlatGroupList()) {
+        //    group.postUnmarshallingInit();
+        //}
 
         // Check for and remove corrupt synapses.
         // This should not happen but as of 1/24/11 I have not

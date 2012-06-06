@@ -27,12 +27,12 @@ import java.util.Set;
  *
  * @author jyoshimi
  */
-public class DefaultTextTable  extends SimbrainDataTable<String> {
+public class DefaultTextTable extends SimbrainDataTable<String> {
 
     /** The data. */
     private List<List<String>> rowData = new ArrayList<List<String>>();
 
-    //TODO: Add more constructors
+    // TODO: Add more constructors
 
     /**
      * Construct from list of strings.
@@ -55,7 +55,7 @@ public class DefaultTextTable  extends SimbrainDataTable<String> {
     private void init(int rows, int cols) {
         rowData.clear();
         for (int i = 0; i < rows; i++) {
-            rowData.add((List<String>) getNewRow(" ", cols));
+            rowData.add(getNewRow(" ", cols));
         }
 
         fireTableStructureChanged();

@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
  * <b>AbstractSynapsePanel</b> is the parent class for all panels used to set
  * parameters of specific synapse update rules.
@@ -46,6 +45,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Adds an item.
+     *
      * @param text label of item to add
      * @param comp component to add
      */
@@ -55,6 +55,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
 
     /**
      * Add item label.
+     *
      * @param text label to add
      * @param comp component to apply label
      */
@@ -100,7 +101,7 @@ public abstract class AbstractSynapsePanel extends JPanel {
     }
 
     /**
-     * Add notes or other text to bottom of panel.  Can be html formatted.
+     * Add notes or other text to bottom of panel. Can be html formatted.
      *
      * @param text Text to add to bottom of panel
      */

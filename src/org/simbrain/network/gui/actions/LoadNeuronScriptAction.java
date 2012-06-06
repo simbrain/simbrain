@@ -27,8 +27,7 @@ import org.simbrain.network.core.Neuron;
 /**
  * :oad custom update script. Obviously not done yet.
  */
-public final class LoadNeuronScriptAction
-    extends AbstractAction {
+public final class LoadNeuronScriptAction extends AbstractAction {
 
     /** Reference to neuron. */
     private Neuron theNeuron;
@@ -41,14 +40,13 @@ public final class LoadNeuronScriptAction
         theNeuron = neuron;
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-//        SFileChooser chooser = new SFileChooser(".", "bsh");
-//        File theFile = chooser.showOpenDialog();
-//        if (theFile != null) {
-            //System.out.println("setting i");
-            //theNeuron.setCustomUpdateScript(theFile);
-//        }
+        // SFileChooser chooser = new SFileChooser(".", "bsh");
+        // File theFile = chooser.showOpenDialog();
+        // if (theFile != null) {
+        // System.out.println("setting i");
+        // theNeuron.setCustomUpdateScript(theFile);
+        // }
     }
 }

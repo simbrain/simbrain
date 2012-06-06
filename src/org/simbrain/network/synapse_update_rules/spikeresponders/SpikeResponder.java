@@ -20,7 +20,6 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
 
-
 /**
  * <b>SpikeResponder</b>.
  */
@@ -33,7 +32,9 @@ public abstract class SpikeResponder {
     protected Synapse parent;
 
     /** Used for combo box. */
-    private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), ProbabilisticResponder.getName(), RiseAndDecay.getName() };
+    private static String[] typeList = { Step.getName(),
+            JumpAndDecay.getName(), ProbabilisticResponder.getName(),
+            RiseAndDecay.getName() };
 
     /**
      * @return Spike responder to duplcate.
@@ -47,6 +48,7 @@ public abstract class SpikeResponder {
 
     /**
      * Duplicates synapses of type Spiker.
+     *
      * @param s Synapse to duplicate
      * @return Duplicate synapse
      */
@@ -58,7 +60,8 @@ public abstract class SpikeResponder {
      * @return the name of the class of this synapse
      */
     public String getType() {
-        return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.') + 1);
+        return this.getClass().getName()
+                .substring(this.getClass().getName().lastIndexOf('.') + 1);
     }
 
     /**
@@ -69,7 +72,8 @@ public abstract class SpikeResponder {
     }
 
     /**
-     * Helper function for combo boxes.  Associates strings with indices.
+     * Helper function for combo boxes. Associates strings with indices.
+     *
      * @param type Type of spiker
      * @return Combo box index
      */

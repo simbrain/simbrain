@@ -30,7 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-
 /**
  * <b>NetworkUtils</b> provides static utility methods for the Network class.
  */
@@ -46,7 +45,8 @@ public class NetworkUtils {
      * @return true if the list of objects returns the same value for
      *         methodName, false otherwise
      */
-    public static boolean isConsistent(final List toCheck, final Class theClass, final String methodName) {
+    public static boolean isConsistent(final List toCheck,
+            final Class theClass, final String methodName) {
         Method theMethod = null;
 
         try {
@@ -91,16 +91,19 @@ public class NetworkUtils {
     }
 
     /**
-     * Helper method for creating formatted rows in dialog boxes, which consist of a  label, a component, and some
-     * tool-tip for the label.
+     * Helper method for creating formatted rows in dialog boxes, which consist
+     * of a label, a component, and some tool-tip for the label.
      *
-     * @param text the text to be displayed to the left of the commponent as a JLabel
+     * @param text the text to be displayed to the left of the commponent as a
+     *            JLabel
      * @param toolTip a tooltip / help to be displayed for the label
-     * @param theComponent the component to be displayed to the right of the label
+     * @param theComponent the component to be displayed to the right of the
+     *            label
      *
      * @return a JPanel containing the formatted label and component
      */
-    public static JPanel createRow(final String text, final String toolTip, final JComponent theComponent) {
+    public static JPanel createRow(final String text, final String toolTip,
+            final JComponent theComponent) {
         JPanel retPanel = new JPanel();
         retPanel.setLayout(new BoxLayout(retPanel, BoxLayout.X_AXIS));
 

@@ -151,7 +151,7 @@ public class Workspace {
         }
     }
 
-   /**
+    /**
      * Fire a component removed event.
      *
      * @param component the component added
@@ -254,7 +254,7 @@ public class Workspace {
     public void removeWorkspaceComponent(final WorkspaceComponent component) {
         LOGGER.debug("removing component: " + component);
 
-        // Remove all couplings associated with this component 
+        // Remove all couplings associated with this component
         this.getCouplingManager().removeCouplings(component);
         componentList.remove(component);
         this.setWorkspaceChanged(true);
@@ -292,14 +292,13 @@ public class Workspace {
         updateStopped();
     }
 
-
     /**
      * Iterate using a latch, which is counted down after the iteration
      * completes. Use this in applications where it is important to perform
      * additional operations after each workspace update.
      *
-     * NOTE-1: The latch must be initialized with a count of 1.
-     * NOTE-2: This function should be called from a separate thread.
+     * NOTE-1: The latch must be initialized with a count of 1. NOTE-2: This
+     * function should be called from a separate thread.
      *
      * @param latch the latch to count down after successful iteration.
      */
@@ -394,7 +393,7 @@ public class Workspace {
      * @return the currentDirectory
      */
     public String getCurrentDirectory() {
-        return  WorkspacePreferences.getCurrentDirectory();
+        return WorkspacePreferences.getCurrentDirectory();
     }
 
     /**
@@ -445,17 +444,18 @@ public class Workspace {
 
     /**
      * Returns the coupling associated with a string id.
+     *
      * @param id the string id
      * @return the associated coupling
      */
-	public Coupling<?> getCoupling(String id) {
-		for (Coupling<?> coupling : this.getCouplingManager().getCouplings()) {
-			if (coupling.getId().equalsIgnoreCase(id)) {
-				return coupling;
-			}
-		}
-		return null;
-	}
+    public Coupling<?> getCoupling(String id) {
+        for (Coupling<?> coupling : this.getCouplingManager().getCouplings()) {
+            if (coupling.getId().equalsIgnoreCase(id)) {
+                return coupling;
+            }
+        }
+        return null;
+    }
 
     /** The lock used to lock calls on syncAllComponents. */
     private final Object componentLock = new Object();
@@ -518,8 +518,8 @@ public class Workspace {
     }
 
     /**
-     * Recursively synchronizes on the components in the provided
-     * iterator and executes the provided task if there are no more components.
+     * Recursively synchronizes on the components in the provided iterator and
+     * executes the provided task if there are no more components.
      *
      * @param <E> The return type of task.
      * @param iterator The iterator of the remaining components to synchronize
@@ -678,8 +678,8 @@ public class Workspace {
     }
 
     /**
-     * Convenience method for setting an update action. Removes
-     * all current actions.
+     * Convenience method for setting an update action. Removes all current
+     * actions.
      *
      * @param action new action
      */
@@ -687,6 +687,5 @@ public class Workspace {
         updater.getUpdateManager().clearCurrentActions();
         updater.getUpdateManager().addAction(action);
     }
-
 
 }

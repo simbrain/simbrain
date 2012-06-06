@@ -39,8 +39,7 @@ import org.simbrain.util.Utils;
 /**
  * <b>SOMTrainingDialog</b> is a dialog box for training SOM networks.
  */
-public class SOMTrainingDialog extends StandardDialog implements
-        ActionListener {
+public class SOMTrainingDialog extends StandardDialog implements ActionListener {
 
     /** The visual container for the sub panels. */
     private Box mainPanel = Box.createVerticalBox();
@@ -91,10 +90,12 @@ public class SOMTrainingDialog extends StandardDialog implements
     private JButton jbTrain = new JButton("Train");
 
     /** Play button. */
-    private JButton jbPlay = new JButton(ResourceManager.getImageIcon("Play.png"));
+    private JButton jbPlay = new JButton(
+            ResourceManager.getImageIcon("Play.png"));
 
     /** Step button. */
-    private JButton jbStep = new JButton(ResourceManager.getImageIcon("Step.png"));
+    private JButton jbStep = new JButton(
+            ResourceManager.getImageIcon("Step.png"));
 
     /** Epochs label. */
     private JLabel epochs = new JLabel();
@@ -115,7 +116,7 @@ public class SOMTrainingDialog extends StandardDialog implements
     private SOM som;
 
     /** Location of SOM directory. */
-    private static String somDirectory =  ".";
+    private static String somDirectory = ".";
 
     /** SOM training dialog thread. */
     private SOMTDialogThread theThread = null;
@@ -128,26 +129,26 @@ public class SOMTrainingDialog extends StandardDialog implements
     public SOMTrainingDialog(final SOM som) {
 
         this.som = som;
-        //Initialize Dialog
+        // Initialize Dialog
         setTitle("Train SOM Network");
         fillFieldValues();
         fillLabelValues();
 
-        //Set up top panel
+        // Set up top panel
         topPanel.addItem("Input file", jbInputsFile);
         topPanel.addItem("Reset network", jbReset);
 
-        //Set up bottom panel
+        // Set up bottom panel
         bottomPanel.addItem("Epochs", epochs);
         bottomPanel.addItem("Learning Rate", learningRate);
         bottomPanel.addItem("Neighborhood Size", neighborhoodSize);
 
-        //Setup panels for tabs
+        // Setup panels for tabs
         createUserPanel();
         createBatchPanel();
         createParametersPanel();
 
-        //Create tabs
+        // Create tabs
         tabbedPane.addTab("User", userPanel);
         tabbedPane.addTab("Batch", batchPanel);
         tabbedPane.addTab("Parameters", parametersPanel);
@@ -188,7 +189,8 @@ public class SOMTrainingDialog extends StandardDialog implements
         parametersPanel.addItem("Learning Rate", tfLearningRate);
         parametersPanel.addItem("Neighborhood Size", tfNeighborhoodSize);
         parametersPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
-        parametersPanel.addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
+        parametersPanel.addItem("Neighborhood Decay Amount",
+                tfNeigborhoodDecayAmount);
     }
 
     /**
@@ -196,10 +198,12 @@ public class SOMTrainingDialog extends StandardDialog implements
      */
     protected void closeDialogOk() {
         som.setInitAlpha(Double.parseDouble(tfLearningRate.getText()));
-        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
+        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize
+                .getText()));
         som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-        som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
-        //NetworkPreferences.setCurrentSOMDirectory(getSOMDirectory());
+        som.setNeighborhoodDecayAmount(Integer
+                .parseInt(tfNeigborhoodDecayAmount.getText()));
+        // NetworkPreferences.setCurrentSOMDirectory(getSOMDirectory());
         stopThread();
         super.closeDialogOk();
     }
@@ -254,7 +258,7 @@ public class SOMTrainingDialog extends StandardDialog implements
 
         if (o == jbInputsFile) {
             SFileChooser chooser = new SFileChooser(getSOMDirectory(),
-                "Comma Separated Values", "csv");
+                    "Comma Separated Values", "csv");
             File theFile = chooser.showOpenDialog();
 
             if (theFile == null) {
@@ -265,14 +269,15 @@ public class SOMTrainingDialog extends StandardDialog implements
             setInputTraining(theFile);
         } else if (o == jbReset) {
             som.reset();
-            //som.getNetwork().fireNetworkChanged();
+            // som.getNetwork().fireNetworkChanged();
         } else if (o == jbTrain) {
             setValues();
             som.train();
-            //som.getNetwork().fireNetworkChanged();
+            // som.getNetwork().fireNetworkChanged();
             learningRate.setText(Double.toString(som.getAlpha()));
             epochs.setText(Integer.toString(som.getEpochs()));
-            neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
+            neighborhoodSize
+                    .setText(Double.toString(som.getNeighborhoodSize()));
             bottomPanel.repaint();
         } else if (o == jbPlay) {
             setValues();
@@ -308,7 +313,8 @@ public class SOMTrainingDialog extends StandardDialog implements
             som.iterate();
             epochs.setText(Integer.toString(som.getEpochs()));
             learningRate.setText(Double.toString(som.getAlpha()));
-            neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
+            neighborhoodSize
+                    .setText(Double.toString(som.getNeighborhoodSize()));
             updateCompleted = true;
             bottomPanel.repaint();
         }
@@ -322,7 +328,8 @@ public class SOMTrainingDialog extends StandardDialog implements
         tfLearningRate.setText("" + som.getInitAlpha());
         tfNeighborhoodSize.setText("" + som.getInitNeighborhoodSize());
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
-        tfNeigborhoodDecayAmount.setText(Double.toString(som.getNeighborhoodDecayAmount()));
+        tfNeigborhoodDecayAmount.setText(Double.toString(som
+                .getNeighborhoodDecayAmount()));
         this.checkTrainingFiles();
     }
 
@@ -342,9 +349,11 @@ public class SOMTrainingDialog extends StandardDialog implements
     public void setValues() {
         som.setBatchSize(Integer.parseInt(tfEpochs.getText()));
         som.setInitAlpha(Double.parseDouble(tfLearningRate.getText()));
-        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
+        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize
+                .getText()));
         som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-        som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
+        som.setNeighborhoodDecayAmount(Integer
+                .parseInt(tfNeigborhoodDecayAmount.getText()));
     }
 
     /**
@@ -364,7 +373,8 @@ public class SOMTrainingDialog extends StandardDialog implements
     }
 
     /**
-     * SOMTDialogThreadcreates a system thread to be run when training SOM networks.
+     * SOMTDialogThreadcreates a system thread to be run when training SOM
+     * networks.
      *
      */
     public class SOMTDialogThread extends Thread {

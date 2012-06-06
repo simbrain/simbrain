@@ -29,17 +29,17 @@ public interface TextListener {
      * The text has changed.
      */
     void textChanged();
-    
+
     /**
      * The dictionary has changed.
      */
     void dictionaryChanged();
-    
+
     /**
      * The position of the caret has changed.
      */
     void positionChanged();
-    
+
     /**
      * The current item has changed
      */

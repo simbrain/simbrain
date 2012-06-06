@@ -20,19 +20,18 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 
-
 /**
- * <b>Probabilistic</b> spike responders produces a response with some probability.
+ * <b>Probabilistic</b> spike responders produces a response with some
+ * probability.
  */
 public class ProbabilisticResponder extends SpikeResponder {
-
 
     /** Probability of producing an output; must be between 0 and 1. */
     private double activationProbability = .5;
 
     /** Amount of activation to return when this responder is activated. */
     private double responseValue = 1;
-    
+
     /**
      * @return duplicate StepSynapse (used, e.g., in copy/paste).
      */
@@ -48,7 +47,8 @@ public class ProbabilisticResponder extends SpikeResponder {
      * Update the synapse.
      */
     public void update() {
-        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule()).hasSpiked()) {
+        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule())
+                .hasSpiked()) {
             if (Math.random() > (1 - activationProbability)) {
                 value = responseValue * parent.getStrength();
             } else {

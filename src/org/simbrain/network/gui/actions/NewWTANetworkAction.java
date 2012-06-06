@@ -28,12 +28,10 @@ import org.simbrain.network.gui.dialogs.network.WTACreationDialog;
 /**
  * New winner take all network action.
  */
-public final class NewWTANetworkAction
-    extends AbstractAction {
+public final class NewWTANetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new new winner take all network action with the specified
@@ -51,7 +49,6 @@ public final class NewWTANetworkAction
 
         this.networkPanel = networkPanel;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

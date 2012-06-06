@@ -35,8 +35,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 /**
  * Panel showing an agent's sensors.
  *
- * TODO: Use Jtree instead? 
- * TODO: Do the same for effectors.
+ * TODO: Use Jtree instead? TODO: Do the same for effectors.
  *
  */
 public class SensorPanel extends JPanel {
@@ -52,14 +51,13 @@ public class SensorPanel extends JPanel {
         // Set up table
         model = new SensorModel();
         table = new JTable(model);
-        ((DefaultTableCellRenderer) table.getTableHeader()
-                .getDefaultRenderer())
+        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
                 .setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(false);
         table.setGridColor(Color.LIGHT_GRAY);
         table.setFocusable(false);
 
-        for(Sensor sensor : entity.getSensors()) {
+        for (Sensor sensor : entity.getSensors()) {
             model.addRow(sensor);
         }
 
@@ -73,13 +71,14 @@ public class SensorPanel extends JPanel {
     class SensorModel extends AbstractTableModel {
 
         /** Column names. */
-        String[] columnNames = {"Id","Label",  "Type" };
+        String[] columnNames = { "Id", "Label", "Type" };
 
         /** Internal list of components. */
-        private List<Sensor> data = new ArrayList<Sensor>();      
+        private List<Sensor> data = new ArrayList<Sensor>();
 
         /**
          * Add a row
+         *
          * @param sensor
          */
         public void addRow(Sensor sensor) {
@@ -131,7 +130,7 @@ public class SensorPanel extends JPanel {
             case 0:
                 return;
             case 1:
-                data.get(row).setLabel((String)value);
+                data.get(row).setLabel((String) value);
                 return;
             case 2:
                 return;

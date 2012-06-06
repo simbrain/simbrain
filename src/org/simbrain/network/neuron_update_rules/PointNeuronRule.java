@@ -34,8 +34,8 @@ import org.simbrain.util.SimbrainMath;
  * Cognitive Neuroscience, chapter 2. All page references below are are to this
  * book.
  */
-public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener,
-        BiasedUpdateRule {
+public class PointNeuronRule extends NeuronUpdateRule implements
+        SynapseListener, BiasedUpdateRule {
 
     /** Excitatory inputs for connected Synapses. */
     private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
@@ -228,7 +228,8 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
         leakCurrent = 0;
         inhibitoryCurrent = 0;
         netCurrent = 0;
-        setInputLists(neuron); // Temporary hack to allow input lists to be updated by pressing "clear"
+        setInputLists(neuron); // Temporary hack to allow input lists to be
+                               // updated by pressing "clear"
     }
 
     /**
@@ -289,7 +290,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
         }
 
         // Display current values of variables for diagnostics.
-        //printState(neuron);
+        // printState(neuron);
     }
 
     /**
@@ -311,11 +312,14 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
 
     @Override
     public String getToolTipText(final Neuron neuron) {
-        return "Activation: " + neuron.getActivation() +
-                "\n\nMembrane Potential: " +  SimbrainMath.roundDouble(membranePotential, 2) +
-                "\n\nNet Current: " +  SimbrainMath.roundDouble(netCurrent, 2) + 
-                "\n\nExcitatory current:  "  +SimbrainMath.roundDouble(excitatoryCurrent, 2) +   
-                "\n \nLeak current: " + SimbrainMath.roundDouble(leakCurrent, 2);
+        return "Activation: " + neuron.getActivation()
+                + "\n\nMembrane Potential: "
+                + SimbrainMath.roundDouble(membranePotential, 2)
+                + "\n\nNet Current: " + SimbrainMath.roundDouble(netCurrent, 2)
+                + "\n\nExcitatory current:  "
+                + SimbrainMath.roundDouble(excitatoryCurrent, 2)
+                + "\n \nLeak current: "
+                + SimbrainMath.roundDouble(leakCurrent, 2);
     }
 
     /**
@@ -710,6 +714,5 @@ public class PointNeuronRule extends NeuronUpdateRule implements SynapseListener
     public String getDescription() {
         return "Point neuron (Leabra)";
     }
-
 
 }

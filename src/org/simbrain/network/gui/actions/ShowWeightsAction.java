@@ -28,16 +28,13 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Show GUI weights action.
  */
-public final class ShowWeightsAction
-    extends AbstractAction {
+public final class ShowWeightsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Shows and updates the GUI with the specified
-     * network panel.
+     * Shows and updates the GUI with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */

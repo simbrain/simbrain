@@ -45,14 +45,22 @@ public class OdorWorldComponent extends WorkspaceComponent {
     private OdorWorld world = new OdorWorld();
 
     /** Attribute types. */
-    AttributeType xLocationType = (new AttributeType(this, "Location", "X", double.class, false));
-    AttributeType yLocationType = (new AttributeType(this, "Location", "Y", double.class, false));
-    AttributeType leftRotationType = (new AttributeType(this, "Left", double.class, true));
-    AttributeType rightRotationType = (new AttributeType(this, "Right", double.class, true));
-    AttributeType straightMovementType = (new AttributeType(this, "Straight", double.class, true));
-    AttributeType absoluteMovementType = (new AttributeType(this, "Absolute-movement", double.class, false));
-    AttributeType smellSensorType = (new AttributeType(this, "Smell", double.class, true));
-    AttributeType tileSensorType = (new AttributeType(this, "Tile", double.class, false));
+    AttributeType xLocationType = (new AttributeType(this, "Location", "X",
+            double.class, false));
+    AttributeType yLocationType = (new AttributeType(this, "Location", "Y",
+            double.class, false));
+    AttributeType leftRotationType = (new AttributeType(this, "Left",
+            double.class, true));
+    AttributeType rightRotationType = (new AttributeType(this, "Right",
+            double.class, true));
+    AttributeType straightMovementType = (new AttributeType(this, "Straight",
+            double.class, true));
+    AttributeType absoluteMovementType = (new AttributeType(this,
+            "Absolute-movement", double.class, false));
+    AttributeType smellSensorType = (new AttributeType(this, "Smell",
+            double.class, true));
+    AttributeType tileSensorType = (new AttributeType(this, "Tile",
+            double.class, false));
 
     /**
      * Default constructor.
@@ -202,17 +210,20 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 for (Sensor sensor : entity.getSensors()) {
                     if (sensor instanceof TileSensor) {
                         returnList.add(getAttributeManager()
-                                .createPotentialProducer(sensor,
+                                .createPotentialProducer(
+                                        sensor,
                                         "isActivated",
                                         double.class,
-                                        entity.getName() + ":" + ((TileSensor) sensor).getLabel()));
+                                        entity.getName()
+                                                + ":"
+                                                + ((TileSensor) sensor)
+                                                        .getLabel()));
                     }
                 }
             }
         }
         return returnList;
     }
-
 
     /**
      * Initialize this component.
@@ -223,6 +234,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
             public void updated() {
                 fireUpdateEvent();
             }
+
             public void effectorAdded(final Effector effector) {
                 setChangedSinceLastSave(true);
                 firePotentialAttributesChanged();
@@ -255,12 +267,14 @@ public class OdorWorldComponent extends WorkspaceComponent {
                 fireAttributeObjectRemoved(sensor);
                 firePotentialAttributesChanged();
             }
+
             public void entityChanged(OdorWorldEntity entity) {
                 setChangedSinceLastSave(true);
             }
+
             public void propertyChanged() {
                 // TODO Auto-generated method stub
-                
+
             }
         });
     }
@@ -273,7 +287,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
      * @param format
      * @return
      */
-    public static OdorWorldComponent open(InputStream input, String name, String format) {
+    public static OdorWorldComponent open(InputStream input, String name,
+            String format) {
         OdorWorld newWorld = (OdorWorld) OdorWorld.getXStream().fromXML(input);
         return new OdorWorldComponent(name, newWorld);
     }

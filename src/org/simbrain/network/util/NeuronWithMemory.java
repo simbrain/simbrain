@@ -44,7 +44,9 @@ public class NeuronWithMemory extends Neuron {
         super.setActivation(act);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.network.interfaces.Neuron#setBuffer(double)
      */
     @Override

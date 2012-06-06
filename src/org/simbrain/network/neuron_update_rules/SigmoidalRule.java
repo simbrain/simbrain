@@ -32,8 +32,8 @@ import org.simbrain.network.util.RandomSource;
  * @author Jeff Yoshimi
  *
  */
-public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
-        DifferentiableUpdateRule, InvertibleUpdateRule {
+public class SigmoidalRule extends NeuronUpdateRule implements
+        BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule {
 
     /** Implementations of the Sigmoidal activation function. */
     public static enum SigmoidType {
@@ -113,7 +113,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
 
         double val = neuron.getWeightedInputs();
 
-        switch(type) {
+        switch (type) {
         case TANH:
             val = tanh(val, neuron);
             break;
@@ -148,7 +148,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
         double l = neuron.getLowerBound();
         double diff = u - l;
 
-        switch(type) {
+        switch (type) {
         case TANH:
             double a = (2 * slope) / diff;
             retVal = diff / 2 * a * Math.pow(1 / Math.cosh(a * x), 2);
@@ -158,8 +158,9 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
             retVal = a * (diff / Math.PI) * (1 / (1 + Math.pow(a * x, 2)));
             break;
         case LOGISTIC:
-            retVal = slope / (Math.exp(slope * x / diff)
-                    * Math.pow(1 / Math.exp(slope * x / diff) + 1, 2));
+            retVal = slope
+                    / (Math.exp(slope * x / diff) * Math.pow(
+                            1 / Math.exp(slope * x / diff) + 1, 2));
             break;
         default:
             break;
@@ -171,7 +172,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
      * {@inheritDoc}
      */
     public double getInverse(double val, Neuron neuron) {
-        switch(type) {
+        switch (type) {
         case TANH:
             val = invTanh(val, neuron);
             break;
@@ -188,8 +189,9 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
         return val;
     }
 
-    //TODO Move variables like diff and a to init, and make sure init is called when
-    //  upper bound, lower bound, or slope are changed.
+    // TODO Move variables like diff and a to init, and make sure init is called
+    // when
+    // upper bound, lower bound, or slope are changed.
 
     /**
      * Returns the results of the hyperbolic tangent function.
@@ -285,8 +287,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
         double lowerBound = neuron.getLowerBound();
         double a = (Math.PI * slope) / (upperBound - lowerBound);
         double diff = upperBound - lowerBound;
-        double z = ((input - ((upperBound + lowerBound) / 2))
-                * (Math.PI / diff));
+        double z = ((input - ((upperBound + lowerBound) / 2)) * (Math.PI / diff));
         return Math.tan(z) / a;
     }
 
@@ -299,7 +300,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
         sn.setType(getType());
         sn.setSlope(getSlope());
         sn.setAddNoise(getAddNoise());
-        sn.noiseGenerator =  new RandomSource(noiseGenerator);
+        sn.noiseGenerator = new RandomSource(noiseGenerator);
         return sn;
     }
 
@@ -369,7 +370,7 @@ public class SigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule,
      */
     public SigmoidType getType() {
         if (type == null) {
-            type = SigmoidType.LOGISTIC; //TODO: Explain (backwards compat) 
+            type = SigmoidType.LOGISTIC; // TODO: Explain (backwards compat)
         }
         return type;
     }

@@ -23,7 +23,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
  */

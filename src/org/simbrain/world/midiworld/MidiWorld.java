@@ -6,8 +6,7 @@ import javax.swing.JPanel;
 /**
  * MIDI world.
  */
-public final class MidiWorld
-    extends JPanel {
+public final class MidiWorld extends JPanel {
 
     /**
      * Create a new MIDI world.

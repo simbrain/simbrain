@@ -31,8 +31,7 @@ import org.simbrain.network.gui.nodes.ViewGroupNode;
 /**
  * Ungroup group.
  */
-public final class UngroupAction
-    extends AbstractAction {
+public final class UngroupAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -40,13 +39,13 @@ public final class UngroupAction
     /** Picked node. */
     private final ViewGroupNode node;
 
-
     /**
      * Ungroup selected objects.
      *
      * @param networkPanel network panel, must not be null
      */
-    public UngroupAction(final NetworkPanel networkPanel, final ViewGroupNode node) {
+    public UngroupAction(final NetworkPanel networkPanel,
+            final ViewGroupNode node) {
         super("Ungroup gui objects");
         this.node = node;
         if (networkPanel == null) {
@@ -55,20 +54,21 @@ public final class UngroupAction
 
         this.networkPanel = networkPanel;
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_U, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_U,
+                toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SHORT_DESCRIPTION, "Ungroup gui objects");
 
-//        updateAction();
-//        // add a selection listener to update state based on selection
-//        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-//
-//                /** @see NetworkSelectionListener */
-//                public void selectionChanged(final NetworkSelectionEvent event) {
-//                    updateAction();
-//                }
-//            });
+        // updateAction();
+        // // add a selection listener to update state based on selection
+        // networkPanel.addSelectionListener(new NetworkSelectionListener() {
+        //
+        // /** @see NetworkSelectionListener */
+        // public void selectionChanged(final NetworkSelectionEvent event) {
+        // updateAction();
+        // }
+        // });
     }
 
     /**

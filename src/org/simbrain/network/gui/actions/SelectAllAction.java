@@ -31,12 +31,10 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Select all action.
  */
-public final class SelectAllAction
-    extends AbstractAction {
+public final class SelectAllAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new select all action with the specified network panel.
@@ -57,8 +55,7 @@ public final class SelectAllAction
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('a'), this);
         networkPanel.getActionMap().put(this, this);
-   }
-
+    }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

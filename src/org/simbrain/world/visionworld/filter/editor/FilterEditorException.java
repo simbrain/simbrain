@@ -21,8 +21,7 @@ package org.simbrain.world.visionworld.filter.editor;
 /**
  * Filter editor exception.
  */
-public final class FilterEditorException
-    extends Exception {
+public final class FilterEditorException extends Exception {
 
     /**
      * Create a new filter editor exception.
@@ -50,7 +49,8 @@ public final class FilterEditorException
     }
 
     /**
-     * Create a new filter editor exception with the specified message and cause.
+     * Create a new filter editor exception with the specified message and
+     * cause.
      *
      * @param message message
      * @param cause cause

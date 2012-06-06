@@ -19,8 +19,8 @@
 package org.simbrain.network.trainers;
 
 /**
- * Classes which implement this interface fire events indicating 
- * changes in the error associated with an iterable trainer.
+ * Classes which implement this interface fire events indicating changes in the
+ * error associated with an iterable trainer.
  *
  * @author jyoshimi
  */
@@ -30,6 +30,5 @@ public interface ErrorListener {
      * Called when the error value is updated.
      */
     public void errorUpdated();
-    
 
 }

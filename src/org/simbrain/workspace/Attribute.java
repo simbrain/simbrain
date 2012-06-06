@@ -48,14 +48,15 @@ public interface Attribute {
     public Class<?> getDataType();
 
     /**
-     * Returns the  name of the method associated with this attribute.
+     * Returns the name of the method associated with this attribute.
+     *
      * @return base method name
      */
     public String getMethodName();
 
     /**
      * Returns the argument types for the method this attribute is based on.
-     * Null if not used.  Currently only used in producers.
+     * Null if not used. Currently only used in producers.
      *
      * @return the argumentDataTypes
      */
@@ -63,7 +64,7 @@ public interface Attribute {
 
     /**
      * Returns the argument values for the method this attribute is based on.
-     * Null if not used.  Currently only used in producers.
+     * Null if not used. Currently only used in producers.
      *
      * @return the argumentValues
      */

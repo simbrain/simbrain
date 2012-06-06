@@ -23,8 +23,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
 import org.simbrain.network.connections.OneToOne;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
 /**
  * <b>OneToOnePanel</b> creates a dialog for setting preferences of one to one

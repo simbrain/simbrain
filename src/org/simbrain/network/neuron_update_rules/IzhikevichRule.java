@@ -22,7 +22,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
  * <b>IzhikevichNeuron</b>. Default values correspond to "tonic spiking".
  */

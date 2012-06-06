@@ -21,7 +21,10 @@ public abstract class Moveable implements Viewable {
     /** the static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(Moveable.class);
 
-    /** used to put the camera out in front of the moveable so it it's not in the view. */
+    /**
+     * used to put the camera out in front of the moveable so it it's not in the
+     * view.
+     */
     private static final float VIEW_LEAD = 0.5f;
     /** arbitrary number used to calculate the current angle. */
     private static final int ROT_CALC_BUFFER = 3600;
@@ -33,35 +36,32 @@ public abstract class Moveable implements Viewable {
      * processed in an update. That is the input with updates with the highest
      * priority will block events on a lower priority input.
      */
-    private List<Holder> inputs = Collections.synchronizedList(new ArrayList<Holder>());
+    private List<Holder> inputs = Collections
+            .synchronizedList(new ArrayList<Holder>());
 
-    private static class Holder implements Comparable<Holder>
-    {
+    private static class Holder implements Comparable<Holder> {
         final int priority;
         final Collection<? extends Action> input;
 
-        private Holder(int priority, Collection<? extends Action> input)
-        {
+        private Holder(int priority, Collection<? extends Action> input) {
             this.priority = priority;
             this.input = input;
         }
-        
-        public int compareTo(Holder other)
-        {
+
+        public int compareTo(Holder other) {
             return priority - other.priority;
         }
-        
-        public int hashCode()
-        {
+
+        public int hashCode() {
             return priority;
         }
-        
-        public boolean equals(Object other)
-        {
-            return other instanceof Holder && ((Holder) other).priority == priority;
+
+        public boolean equals(Object other) {
+            return other instanceof Holder
+                    && ((Holder) other).priority == priority;
         }
     }
-    
+
     /** The number of degrees each turn event rotates the view. */
     private final float rotationSpeed = 2.0f;
 
@@ -92,23 +92,25 @@ public abstract class Moveable implements Viewable {
 
     protected Object readResolve() {
         Collections.synchronizedList(new ArrayList<Holder>());
-        
+
         return this;
     }
-    
+
     /**
      * Adds an input with the given priority (lower has more priority).
      *
      * @param priority the priority of the input provided
      * @param input the input for this view
      */
-    public void addInput(final int priority, final Collection<? extends Action> input) {
+    public void addInput(final int priority,
+            final Collection<? extends Action> input) {
         Holder holder = new Holder(priority, input);
-        
+
         int index = Collections.binarySearch(inputs, holder);
-        
-        if (index < 0) index = -(index + 1);
-        
+
+        if (index < 0)
+            index = -(index + 1);
+
         inputs.add(index, holder);
     }
 
@@ -129,7 +131,8 @@ public abstract class Moveable implements Viewable {
         location = location.add(new Vector(0, VIEW_LEAD, 0));
         camera.setLocation(location.toVector3f());
 
-        final Vector3f left = direction.toVector3f().cross(Y_AXIS).normalizeLocal();
+        final Vector3f left = direction.toVector3f().cross(Y_AXIS)
+                .normalizeLocal();
         final Vector3f up = left.cross(direction.toVector3f()).normalizeLocal();
 
         camera.setLeft(left);
@@ -149,10 +152,10 @@ public abstract class Moveable implements Viewable {
             long now = System.currentTimeMillis();
             fraction = last == 0 ? FULL : ((float) (now - last)) / FULL;
             last = now;
-            
+
             /* input is synchronized but we need to lock over the iterator */
             for (Holder holder : inputs) {
-                
+
                 /*
                  * if there are events on this input process them and then
                  * return
@@ -162,14 +165,14 @@ public abstract class Moveable implements Viewable {
                         for (final Action action : holder.input) {
                             if (action.parent != this) {
                                 throw new IllegalArgumentException(
-                                    "actions can only be handled by parent");
+                                        "actions can only be handled by parent");
                             }
-    
+
                             action.doAction();
                         }
-    
+
                         doUpdates();
-    
+
                         return;
                     }
                 }
@@ -180,10 +183,10 @@ public abstract class Moveable implements Viewable {
     private long last = 0;
     private static final long FULL = 15;
     private float fraction;
-    
+
     private static final int UP_LIMIT = 345;
     private static final int DOWN_LIMIT = 10;
-    
+
     /**
      * Does the necessary processing for any changes to the view.
      */
@@ -192,24 +195,28 @@ public abstract class Moveable implements Viewable {
         float upSpeed = this.upSpeed * fraction;
         leftRightRot += (leftRightChange * fraction);
         upDownRot += (upDownChange * fraction);
-        
+
         leftRightChange = 0;
         upDownChange = 0;
-        
+
         /* these are for doing proper rotations */
         final Quaternion leftRightQuat = new Quaternion();
         final Quaternion upDownQuat = new Quaternion();
-        
+
         /*
          * normalize the left/right angle and then use it to set the left/right
          * quaternion
          */
         leftRightRot = (leftRightRot + ROT_CALC_BUFFER) % DEGREES_IN_A_CIRCLE;
-        leftRightQuat.fromAngleNormalAxis(leftRightRot * FastMath.DEG_TO_RAD, Y_AXIS);
+        leftRightQuat.fromAngleNormalAxis(leftRightRot * FastMath.DEG_TO_RAD,
+                Y_AXIS);
 
-        /* normalize the up/down angle and then use it to set the up/down quaternion */
+        /*
+         * normalize the up/down angle and then use it to set the up/down
+         * quaternion
+         */
         upDownRot = (upDownRot + ROT_CALC_BUFFER) % DEGREES_IN_A_CIRCLE;
-        
+
         if (upDownRot <= UP_LIMIT && upDownRot >= DOWN_LIMIT) {
             if (upDownRot < 180) {
                 upDownRot = DOWN_LIMIT;
@@ -217,7 +224,7 @@ public abstract class Moveable implements Viewable {
                 upDownRot = UP_LIMIT;
             }
         }
-        
+
         upDownQuat.fromAngleAxis(upDownRot * FastMath.DEG_TO_RAD, X_AXIS);
 
         /* get copies of the current direction and location */
@@ -232,7 +239,7 @@ public abstract class Moveable implements Viewable {
 
         LOGGER.trace("speed: " + speed);
         LOGGER.trace("upSpeed: " + upSpeed);
-        
+
         /*
          * update the location by adding a vector that is defined by the current
          * direction multiplied by the current speed
@@ -303,7 +310,7 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("left: " + super.value);
-//                leftRightRot += getValue() * rotationSpeed;
+                // leftRightRot += getValue() * rotationSpeed;
                 leftRightChange = getValue() * rotationSpeed;
             }
         };
@@ -319,7 +326,7 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("right: " + super.value);
-//                leftRightRot -= getValue() * rotationSpeed;
+                // leftRightRot -= getValue() * rotationSpeed;
                 leftRightChange = -getValue() * rotationSpeed;
             }
         };
@@ -395,7 +402,7 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("down: " + super.value);
-//                upDownRot += getValue() * rotationSpeed;
+                // upDownRot += getValue() * rotationSpeed;
                 upDownChange = getValue() * rotationSpeed;
             }
         };
@@ -411,7 +418,7 @@ public abstract class Moveable implements Viewable {
             @Override
             void doAction() {
                 LOGGER.trace("up: " + super.value);
-//                upDownRot -= getValue() * rotationSpeed;
+                // upDownRot -= getValue() * rotationSpeed;
                 upDownChange = -getValue() * rotationSpeed;
             }
         };
@@ -425,16 +432,16 @@ public abstract class Moveable implements Viewable {
     public abstract class Action {
         /** The name of this action for debugging purposes. */
         private final String name;
-        
+
         /**
          * Creates a new action with the given name.
-         * 
+         *
          * @param name The name of the action.
          */
         private Action(final String name) {
             this.name = name;
         }
-        
+
         /**
          * Method all action instances use. Not meant to be called this from
          * outside this class.
@@ -445,14 +452,14 @@ public abstract class Moveable implements Viewable {
         private final Moveable parent = Moveable.this;
 
         /**
-         * the value used to determine the amount of the actions change.
-         * 1 is the default and the normal full amount. Larger values
-         * and negative values are allowed.
+         * the value used to determine the amount of the actions change. 1 is
+         * the default and the normal full amount. Larger values and negative
+         * values are allowed.
          */
         private float value = 1f;
 
         /**
-         * Sets the degree of the action.  0 will result in no change.
+         * Sets the degree of the action. 0 will result in no change.
          *
          * @param amount the amount to move.
          */

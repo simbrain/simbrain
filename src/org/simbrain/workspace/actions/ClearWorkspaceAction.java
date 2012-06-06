@@ -28,15 +28,14 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  * Clear the current workspace.
  */
 public final class ClearWorkspaceAction extends WorkspaceAction {
-    
+
     private static final long serialVersionUID = 1L;
 
-    //TODO
+    // TODO
     private SimbrainDesktop desktop;
 
     /**
-     * Create a clear workspace action with the specified
-     * workspace.
+     * Create a clear workspace action with the specified workspace.
      */
     public ClearWorkspaceAction(SimbrainDesktop desktop) {
         super("Clear Workspace", desktop.getWorkspace());

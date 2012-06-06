@@ -87,7 +87,7 @@ public class Synapse {
 
     /** Time to delay sending activation to target neuron. */
     private int delay = 0;
-    
+
     /** Parent group, if any (null if none). */
     private Group parentGroup;
 
@@ -378,7 +378,7 @@ public class Synapse {
         if (strength < upperBound) {
             strength += increment;
         }
-        //target.weightChanged(this); // Maybe?
+        // target.weightChanged(this); // Maybe?
         getNetwork().fireSynapseChanged(this);
     }
 
@@ -647,7 +647,8 @@ public class Synapse {
             setLearningRule(newRule);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(
-                    "The provided learning rule name, \"" + name
+                    "The provided learning rule name, \""
+                            + name
                             + "\", does not correspond to a known synapse type."
                             + "\n Could not find " + e.getMessage());
         } catch (Exception e) {
@@ -732,7 +733,7 @@ public class Synapse {
         this.parentNetwork = parent;
         return new Synapse(this);
     }
-    
+
     /**
      * @return the parentGroup
      */

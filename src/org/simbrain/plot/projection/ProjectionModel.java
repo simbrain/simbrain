@@ -19,7 +19,6 @@
 package org.simbrain.plot.projection;
 
 import java.awt.EventQueue;
-import java.util.Arrays;
 
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -171,11 +170,13 @@ public class ProjectionModel extends ChartModel {
                 for (int i = 0; i < size; i++) {
                     double[] point = projector.getProjectedPoint(i);
                     if (point == null) {
-                        //System.out.println(i + ":" + point);
+                        // System.out.println(i + ":" + point);
                     } else {
-                        //System.out.println(i + ":" + point[0] + "," + point[1]);
-                        if (i != (size-1)) {
-                            // No need to update the chart yet (hence the "false"
+                        // System.out.println(i + ":" + point[0] + "," +
+                        // point[1]);
+                        if (i != (size - 1)) {
+                            // No need to update the chart yet (hence the
+                            // "false"
                             // parameter)
                             dataset.getSeries(0).add(point[0], point[1], false);
                         } else {

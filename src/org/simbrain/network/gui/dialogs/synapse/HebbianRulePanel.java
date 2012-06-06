@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.HebbianRule;
 
-
 /**
  * <b>HebbianSynapsePanel</b>.
  */
@@ -50,8 +49,9 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(ruleList, HebbianRule.class, "getLearningRate")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(ruleList, HebbianRule.class,
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -60,7 +60,8 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        tfLearningRate.setText(Double.toString(HebbianRule.DEFAULT_LEARNING_RATE));
+        tfLearningRate.setText(Double
+                .toString(HebbianRule.DEFAULT_LEARNING_RATE));
     }
 
     /**
@@ -70,7 +71,8 @@ public class HebbianRulePanel extends AbstractSynapsePanel {
         for (int i = 0; i < ruleList.size(); i++) {
             HebbianRule synapseRef = (HebbianRule) ruleList.get(i);
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                        .getText()));
             }
         }
     }

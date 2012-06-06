@@ -23,7 +23,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
@@ -64,14 +63,14 @@ public class DecayRule extends NeuronUpdateRule {
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public DecayRule deepCopy() {
         DecayRule dn = new DecayRule();
@@ -85,7 +84,7 @@ public class DecayRule extends NeuronUpdateRule {
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void update(Neuron neuron) {
         double val = neuron.getActivation() + neuron.getWeightedInputs();

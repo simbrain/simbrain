@@ -34,8 +34,7 @@ public final class NewConsoleAction extends WorkspaceAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a new console action with the specified
-     * workspace.
+     * Create a new console action with the specified workspace.
      */
     public NewConsoleAction(Workspace workspace) {
         super("New Console", workspace);

@@ -26,7 +26,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 /**
  * A multiple view element that represents the ground in an environment.
- * 
+ *
  * @author Matt Watson
  */
 public class Terrain extends MultipleViewElement<TerrainPage> {
@@ -48,16 +48,16 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
     private static final int SNOW_OPTIMAL = 255;
     /** temporary hard-coding. */
     private static final int SNOW_HIGH = 384;
-    
+
     /** The size of the blocks in the TerrainPage. */
     private static final int BLOCK_SIZE = 64;
-    
+
     /** A height map creates a 'natural' bumpy terrain. */
     private final MidPointHeightMap heightMap;
 
     /** The underlying jME Object that represents the terrain. */
     private final TerrainPage heightBlock;
-    
+
     /** The size of the terrain. */
     private final int size;
 
@@ -65,7 +65,7 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
      * Creates a terrain based on the given size. It will actually create 4
      * blocks of the given size in both directions so the total area will be the
      * square of 2 times size.
-     * 
+     *
      * @param size The size of the terrain.
      */
     Terrain(final int size) {
@@ -78,17 +78,17 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
         this.size = (int) Math.sqrt(elements.length);
         heightMap = new MidPointHeightMap(size, 1f);
         int[] heightMapArray = heightMap.getHeightMap();
-        
+
         for (int i = 0; i < heightMapArray.length; i++) {
             heightMapArray[i] = Integer.parseInt(elements[i]);
         }
-        
+
         heightBlock = create();
     }
-    
+
     /**
      * Returns the height at the x and z parts of the given point.
-     * 
+     *
      * @param location the location to check
      * @return the height at the given point
      */
@@ -103,8 +103,8 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
     public TerrainPage create() {
         final Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
 
-        return new TerrainPage("Terrain", BLOCK_SIZE, heightMap.getSize() + 1, terrainScale,
-            heightMap.getHeightMap(), false);
+        return new TerrainPage("Terrain", BLOCK_SIZE, heightMap.getSize() + 1,
+                terrainScale, heightMap.getHeightMap(), false);
     }
 
     /**
@@ -113,20 +113,21 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
     @Override
     public void initSpatial(final Renderer renderer, final TerrainPage block) {
         /* generate a terrain texture with 2 textures */
-        final ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
+        final ProceduralTextureGenerator pt = new ProceduralTextureGenerator(
+                heightMap);
 
-        pt.addTexture(ResourceManager.getImageIcon("grassb.png"),
-            GRASS_LOW, GRASS_OPTIMAL, GRASS_HIGH);
-        pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"),
-            DIRT_LOW, DIRT_OPTIMAL, DIRT_HIGH);
-        pt.addTexture(ResourceManager.getImageIcon("highest.jpg"),
-            SNOW_LOW, SNOW_OPTIMAL, SNOW_HIGH);
+        pt.addTexture(ResourceManager.getImageIcon("grassb.png"), GRASS_LOW,
+                GRASS_OPTIMAL, GRASS_HIGH);
+        pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"), DIRT_LOW,
+                DIRT_OPTIMAL, DIRT_HIGH);
+        pt.addTexture(ResourceManager.getImageIcon("highest.jpg"), SNOW_LOW,
+                SNOW_OPTIMAL, SNOW_HIGH);
         pt.createTexture(size);
 
         /* assign the texture to the terrain */
         final TextureState ts = renderer.createTextureState();
-        final Texture t1 = TextureManager.loadTexture(pt.getImageIcon().getImage(),
-                Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR, true);
+        final Texture t1 = TextureManager.loadTexture(pt.getImageIcon()
+                .getImage(), Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR, true);
 
         ts.setTexture(t1, 0);
 
@@ -139,7 +140,7 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
 
     /**
      * No implementation.
-     * 
+     *
      * @param block Not used.
      */
     @Override
@@ -149,7 +150,7 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
 
     /**
      * No implementation.
-     * 
+     *
      * @param collision Not used.
      */
     public void collision(final Collision collision) {
@@ -165,7 +166,7 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
 
     /**
      * No implementation.
-     * 
+     *
      * @return null
      */
     public SpatialData getTentative() {
@@ -180,54 +181,57 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
 
     public void setTentativeLocation(Point point) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setFloor(float height) {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     public List<Odor> getOdors() {
         return Collections.emptyList();
     }
-    
+
     public static class TerrainConverter implements Converter {
 
-        public void marshal(Object value, HierarchicalStreamWriter writer, MarshallingContext context) {
+        public void marshal(Object value, HierarchicalStreamWriter writer,
+                MarshallingContext context) {
             Terrain terrain = (Terrain) value;
-            
+
             int[] heightMap = terrain.heightMap.getHeightMap();
-            
+
             writer.startNode("heightMap");
             StringBuffer buffer = new StringBuffer();
-            
+
             for (int i = 0; i < heightMap.length; i++) {
                 buffer.append(heightMap[i]);
-                if (i < heightMap.length - 1) buffer.append(',');
+                if (i < heightMap.length - 1)
+                    buffer.append(',');
             }
-            
+
             writer.setValue(buffer.toString());
             writer.endNode();
         }
 
-        public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        public Object unmarshal(HierarchicalStreamReader reader,
+                UnmarshallingContext context) {
             reader.moveDown();
-//            System.out.println("getValue");
+            // System.out.println("getValue");
             String value = reader.getValue();
-//            System.out.println("split");
+            // System.out.println("split");
             String[] elements = value.split(",");
-//            System.out.println("construct");
+            // System.out.println("construct");
             reader.moveUp();
-            
+
             return new Terrain(elements);
-            
+
         }
 
         @SuppressWarnings("unchecked")
         public boolean canConvert(Class clazz) {
             return clazz.equals(Terrain.class);
         }
-        
+
     }
 }

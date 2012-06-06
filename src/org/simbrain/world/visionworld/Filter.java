@@ -32,7 +32,7 @@ public interface Filter {
      * @return value for the specified image
      */
     double filter(BufferedImage image);
-    
+
     /**
      * Return the description of this filter.
      *

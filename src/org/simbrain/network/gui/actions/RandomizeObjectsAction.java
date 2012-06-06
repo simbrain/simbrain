@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -35,16 +34,14 @@ import org.simbrain.resource.ResourceManager;
  *
  * TODO: rename to RandomizeScreenElementsAction?
  */
-public final class RandomizeObjectsAction
-    extends AbstractAction {
+public final class RandomizeObjectsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new randomize screen elements action with the
-     * specified network panel.
+     * Create a new randomize screen elements action with the specified network
+     * panel.
      *
      * @param networkPanel network panel, must not be null
      */
@@ -63,7 +60,6 @@ public final class RandomizeObjectsAction
                 KeyStroke.getKeyStroke('r'), this);
         networkPanel.getActionMap().put(this, this);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

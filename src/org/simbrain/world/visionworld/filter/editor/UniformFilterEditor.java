@@ -37,9 +37,7 @@ import org.simbrain.world.visionworld.filter.UniformFilter;
 /**
  * Uniform filter editor.
  */
-public final class UniformFilterEditor
-    extends JPanel
-    implements FilterEditor {
+public final class UniformFilterEditor extends JPanel implements FilterEditor {
 
     /** Value. */
     private JTextField value;
@@ -62,7 +60,6 @@ public final class UniformFilterEditor
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
     /**
      * Create a new uniform filter editor.
      */
@@ -71,7 +68,6 @@ public final class UniformFilterEditor
         initComponents();
         layoutComponents();
     }
-
 
     /**
      * Initialize components.
@@ -85,7 +81,8 @@ public final class UniformFilterEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME),
+                new EmptyBorder(6, 6, 6, 6)));
         setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
@@ -126,8 +123,7 @@ public final class UniformFilterEditor
     public Filter createFilter() throws FilterEditorException {
         try {
             return new UniformFilter(Double.valueOf(value.getText()));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             throw new FilterEditorException(e);
         }
     }

@@ -177,7 +177,7 @@ public abstract class TextWorld {
     }
 
     /**
-     * Set position.  Fire event only if specified.
+     * Set position. Fire event only if specified.
      *
      * @param newPosition new position to set
      * @param fireEvent whether to fire event
@@ -193,7 +193,6 @@ public abstract class TextWorld {
             System.err.println("Invalid position:" + newPosition);
         }
     }
-
 
     /**
      * @return the lastPosition
@@ -219,11 +218,10 @@ public abstract class TextWorld {
         fireDictionaryChangedEvent();
     }
 
-
     /**
-     * Check to see if the dictionary contains the provided word. Used
-     * for localist representations of words at component level.
-     * 
+     * Check to see if the dictionary contains the provided word. Used for
+     * localist representations of words at component level.
+     *
      * @param word word to check for
      * @return 1 if found, false otherwise
      */
@@ -259,8 +257,8 @@ public abstract class TextWorld {
     }
 
     /**
-     * Represents the "current item", and includes a representation
-     * of the beginning and ending of the item in the main text.
+     * Represents the "current item", and includes a representation of the
+     * beginning and ending of the item in the main text.
      */
     class TextItem {
 

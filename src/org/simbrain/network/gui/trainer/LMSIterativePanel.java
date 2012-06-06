@@ -35,19 +35,19 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 
 /**
- * Panel for controlling iterative trainers.  Can be reused by any GUI element that 
- * invokes an iterative trainer (i.e. any subclass of IterableTtrainer).
- * 
+ * Panel for controlling iterative trainers. Can be reused by any GUI element
+ * that invokes an iterative trainer (i.e. any subclass of IterableTtrainer).
+ *
  * @author jeffyoshimi
  */
 public class LMSIterativePanel extends JPanel {
-	
+
     /** Parent frame. */
     private GenericFrame parentFrame;
-    
+
     /** Reference to trainer object. */
     private final LMSIterative trainer;
-    
+
     /** Reference to network panel. */
     private final NetworkPanel panel;
 
@@ -57,56 +57,56 @@ public class LMSIterativePanel extends JPanel {
      * @param networkPanel parent frame
      * @param trainer the trainer to control
      */
-    public LMSIterativePanel(NetworkPanel networkPanel,
-			LMSIterative trainer) {
-    	this.trainer = trainer;
-    	this.panel = networkPanel;
+    public LMSIterativePanel(NetworkPanel networkPanel, LMSIterative trainer) {
+        this.trainer = trainer;
+        this.panel = networkPanel;
         setLayout(new BorderLayout());
-    	add("Center", new IterativeControlsPanel(networkPanel, trainer));
-    	
-    	// Put LMS specific controls at the bottom
-    	JPanel southPanel = new JPanel(new BorderLayout());
-    	southPanel.add("North", new JSeparator(SwingConstants.HORIZONTAL));
-    	JPanel panel = new JPanel();
-    	JButton propertiesButton = new JButton(TrainerGuiActions.getPropertiesDialogAction(trainer));
-    	//propertiesButton.setHideActionText(true);
-    	panel.add(propertiesButton);
-    	panel.add(new JButton(randomizeAction));
-    	southPanel.add("Center", panel);
-    	add("South", southPanel);    	
+        add("Center", new IterativeControlsPanel(networkPanel, trainer));
+
+        // Put LMS specific controls at the bottom
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add("North", new JSeparator(SwingConstants.HORIZONTAL));
+        JPanel panel = new JPanel();
+        JButton propertiesButton = new JButton(
+                TrainerGuiActions.getPropertiesDialogAction(trainer));
+        // propertiesButton.setHideActionText(true);
+        panel.add(propertiesButton);
+        panel.add(new JButton(randomizeAction));
+        southPanel.add("Center", panel);
+        add("South", southPanel);
         // Add listener
         trainer.addErrorListener(new ErrorListener() {
 
             public void errorUpdated() {
                 parentFrame.pack();
             }
-            
+
         });
 
-	}
-    
+    }
+
     /**
      * Action for randomizing the underlying network.
      */
-	Action randomizeAction = new AbstractAction() {
+    Action randomizeAction = new AbstractAction() {
 
-		// Initialize
-		{
-			putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-			putValue(NAME, "Randomize");
-			putValue(SHORT_DESCRIPTION, "Randomize network");
-		}
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+            putValue(NAME, "Randomize");
+            putValue(SHORT_DESCRIPTION, "Randomize network");
+        }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		public void actionPerformed(ActionEvent arg0) {
-			if (trainer != null) {
-				trainer.randomize();
-				panel.getNetwork().fireNetworkChanged();
-			}
-		}
-	};
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent arg0) {
+            if (trainer != null) {
+                trainer.randomize();
+                panel.getNetwork().fireNetworkChanged();
+            }
+        }
+    };
 
     /**
      * @param parentFrame the parentFrame to set

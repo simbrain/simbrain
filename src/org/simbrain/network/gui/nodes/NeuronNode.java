@@ -20,8 +20,6 @@ package org.simbrain.network.gui.nodes;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -32,13 +30,11 @@ import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkGuiSettings;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.CopyAction;
@@ -46,9 +42,6 @@ import org.simbrain.network.gui.actions.CutAction;
 import org.simbrain.network.gui.actions.DeleteAction;
 import org.simbrain.network.gui.actions.PasteAction;
 import org.simbrain.network.gui.actions.SetNeuronPropertiesAction;
-import org.simbrain.network.gui.actions.connection.ConnectNeuronsSimpleAction;
-import org.simbrain.network.gui.actions.modelgroups.NewNeuronGroupAction;
-import org.simbrain.network.gui.actions.modelgroups.NewSynapseGroupAction;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
 
@@ -329,8 +322,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         contextMenu.addSeparator();
 
         // Group action
-        //contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
-        //contextMenu.addSeparator();
+        // contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
+        // contextMenu.addSeparator();
 
         // Model Group Actions
         contextMenu.add(getNetworkPanel().getActionManager().getGroupMenu());
@@ -398,13 +391,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             float saturation = checkValid((float) Math.abs(activation
                     / neuron.getUpperBound()));
             float hotColor = NetworkGuiSettings.getHotColor();
-            circle.setPaint(Color.getHSBColor(hotColor, saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(hotColor, saturation, 1));
         } else if (activation < 0) {
 
             float saturation = checkValid((float) Math.abs(activation
                     / neuron.getLowerBound()));
             float coolColor = NetworkGuiSettings.getCoolColor();
-            circle.setPaint(Color.getHSBColor(coolColor, saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(coolColor, saturation, 1));
         }
 
         if (neuron.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
@@ -566,12 +559,12 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 text = text.replaceAll(".0$", "");
             }
             activationText.setText(text);
-        } else if ((act > -1) &&  (act < 0)) { // Between -1 and 0
+        } else if ((act > -1) && (act < 0)) { // Between -1 and 0
             // text.setPaint(Color.white);
             activationText.setFont(NEURON_FONT_BOLD);
             activationText.setText(Utils.round(act, 1).replaceAll("^-0*", "-")
                     .replaceAll(".0$", ""));
-        } else { 
+        } else {
             // greater than 1 or less than -1
             activationText.setFont(NEURON_FONT_BOLD);
             if (Math.abs(act) < 10) {

@@ -54,8 +54,8 @@ public class SFileChooser {
     private boolean useNativeFileChooser = true;
 
     /**
-     * The map of extensions and their descriptions in the order
-     * of their addition.
+     * The map of extensions and their descriptions in the order of their
+     * addition.
      */
     private final LinkedHashMap<String, String> exts = new LinkedHashMap<String, String>();
 
@@ -87,14 +87,15 @@ public class SFileChooser {
     }
 
     /**
-     * Creates the file chooser dialog.  Use this constructor when
-     * only one extension is supported.
+     * Creates the file chooser dialog. Use this constructor when only one
+     * extension is supported.
      *
      * @param currentDirectory Open and save directory
      * @param description a description of the extension
      * @param extension File type extension for open and save
      */
-    public SFileChooser(final String currentDirectory, final String description, final String extension) {
+    public SFileChooser(final String currentDirectory,
+            final String description, final String extension) {
         this.currentDirectory = currentDirectory;
         this.description = description;
 
@@ -179,7 +180,6 @@ public class SFileChooser {
             return null;
         }
     }
-
 
     /**
      * Swing open dialog.
@@ -288,7 +288,7 @@ public class SFileChooser {
             chooser.setSelectedFile(file);
             String extension = getExtension(file);
 
-            //System.out.println("extension: " + extension);
+            // System.out.println("extension: " + extension);
 
             if (extension != null) {
                 chooser.setFileFilter(filters.get(extension));
@@ -301,7 +301,8 @@ public class SFileChooser {
             return null;
         }
 
-        File tmpFile = addExtension(chooser.getSelectedFile(), chooser.getFileFilter());
+        File tmpFile = addExtension(chooser.getSelectedFile(),
+                chooser.getFileFilter());
         if (tmpFile.exists() && !confirmOverwrite(tmpFile)) {
             return null;
         }
@@ -348,7 +349,8 @@ public class SFileChooser {
     /**
      * File-filter.
      */
-    private class ExtensionFileFilter extends FileFilter implements FilenameFilter {
+    private class ExtensionFileFilter extends FileFilter implements
+            FilenameFilter {
 
         /** Extension to filter. */
         private final String extension;
@@ -397,7 +399,8 @@ public class SFileChooser {
      *
      * @author Matt Watson
      */
-    private class ExtensionSetFileFilter extends FileFilter implements FilenameFilter {
+    private class ExtensionSetFileFilter extends FileFilter implements
+            FilenameFilter {
 
         /** A collection of extension names. */
         private final Collection<String> extensions;
@@ -423,7 +426,8 @@ public class SFileChooser {
          * @return whether the file has the correct extension type
          */
         public boolean accept(final File file) {
-            return (file.isDirectory()) || extensions.contains(getExtension(file));
+            return (file.isDirectory())
+                    || extensions.contains(getExtension(file));
         }
 
         /**
@@ -439,7 +443,8 @@ public class SFileChooser {
             for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
                 builder.append("*.");
                 builder.append(i.next());
-                if (i.hasNext()) builder.append(", ");
+                if (i.hasNext())
+                    builder.append(", ");
             }
 
             return builder.toString();
@@ -506,7 +511,7 @@ public class SFileChooser {
         if (filter instanceof ExtensionFileFilter) {
             extension = ((ExtensionFileFilter) filter).extension;
         } else {
-           extension = exts.keySet().iterator().next();
+            extension = exts.keySet().iterator().next();
         }
 
         if (hasExtension(theFile, extension)) {

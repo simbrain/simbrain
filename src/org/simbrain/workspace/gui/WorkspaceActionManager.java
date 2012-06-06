@@ -177,15 +177,14 @@ public class WorkspaceActionManager {
 
     /** Open script editor action. */
     private final Action showScriptEditorAction;
-    
+
     /** Location of script menu directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
 
     /**
      * Create a new workspace action manager for the specified workspace.
      *
-     * @param desktop
-     *            workspace, must not be null
+     * @param desktop workspace, must not be null
      */
     public WorkspaceActionManager(final SimbrainDesktop desktop) {
         Workspace workspace = desktop.getWorkspace();
@@ -225,12 +224,13 @@ public class WorkspaceActionManager {
         globalStopAction = new GlobalStopAction(workspace);
 
         showScriptEditorAction = new ScriptEditorAction(desktop);
-        
+
         runScriptAction = new RunScriptAction(desktop);
 
         openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
         openCouplingListAction = new OpenCouplingListAction(desktop);
-        openWorkspaceComponentListAction = new OpenWorkspaceComponentListAction(desktop);
+        openWorkspaceComponentListAction = new OpenWorkspaceComponentListAction(
+                desktop);
 
         propertyTabAction = new PropertyTabAction(desktop);
     }
@@ -242,14 +242,14 @@ public class WorkspaceActionManager {
      */
     public List<Action> getGlobalControlActions() {
         return Arrays
-                .asList(new Action[] {globalRunAction, globalStopAction});
+                .asList(new Action[] { globalRunAction, globalStopAction });
     }
 
     /**
      * @return Open and save workspace actions.
      */
     public List<Action> getOpenSaveWorkspaceActions() {
-        return Arrays.asList(new Action[] {openWorkspaceAction,
+        return Arrays.asList(new Action[] { openWorkspaceAction,
                 saveWorkspaceAction, saveWorkspaceAsAction });
     }
 
@@ -257,7 +257,7 @@ public class WorkspaceActionManager {
      * @return Open worlds actions.
      */
     public List<Action> getOpenWorldActions() {
-        return Arrays.asList(new Action[] {openDataWorldAction,
+        return Arrays.asList(new Action[] { openDataWorldAction,
                 openOdorWorldAction });
     }
 
@@ -265,10 +265,8 @@ public class WorkspaceActionManager {
      * @return New worlds actions.
      */
     public List<Action> getNewWorldActions() {
-        return Arrays.asList(new Action[] {
-                newDataWorldAction,
-                newOdorWorldAction,
-                newDisplayWorldAction,
+        return Arrays.asList(new Action[] { newDataWorldAction,
+                newOdorWorldAction, newDisplayWorldAction,
                 newReaderWorldAction,
                 // newThreeDeeWorldAction,
                 newVisionWorldAction });
@@ -278,13 +276,14 @@ public class WorkspaceActionManager {
      * @return Simbrain gauge actions.
      */
     public List<Action> getPlotActions() {
-        return Arrays.asList(new Action[] {newBarChartAction, newPieChartAction,
-                newProjectionPlotAction, newScatterPlotAction, newTimeSeriesAction});
+        return Arrays.asList(new Action[] { newBarChartAction,
+                newPieChartAction, newProjectionPlotAction,
+                newScatterPlotAction, newTimeSeriesAction });
     }
 
     /**
      * Make a list of script actions by iterating through script menu directory.
-     * 
+     *
      * @param workspace reference
      * @return script action
      */
@@ -302,8 +301,6 @@ public class WorkspaceActionManager {
         }
         return list;
     }
-    
-
 
     /**
      * Create an action based on the name of a script.
@@ -321,10 +318,12 @@ public class WorkspaceActionManager {
 
         /**
          * Create a new add gauge action with the specified workspace.
+         *
          * @param desktop Simbrain desktop
          * @param scriptName name of script
          */
-        public ScriptAction(final SimbrainDesktop desktop, final String scriptName) {
+        public ScriptAction(final SimbrainDesktop desktop,
+                final String scriptName) {
             super(scriptName, desktop.getWorkspace());
             // putValue(SHORT_DESCRIPTION, name);
             this.scriptName = scriptName;
@@ -336,17 +335,17 @@ public class WorkspaceActionManager {
         public void actionPerformed(final ActionEvent event) {
 
             Interpreter interpreter = new Interpreter();
-            
+
             try {
                 interpreter.set("workspace", workspace);
                 interpreter.set("desktop", desktop);
                 interpreter.source(SCRIPT_MENU_DIRECTORY + '/' + scriptName);
             } catch (FileNotFoundException e) {
-               System.out.println("File not found");
-               e.printStackTrace();
+                System.out.println("File not found");
+                e.printStackTrace();
             } catch (IOException e) {
-               System.out.println("IO Exception");
-               e.printStackTrace();
+                System.out.println("IO Exception");
+                e.printStackTrace();
             } catch (EvalError e) {
                 System.out.println("Evaluation error");
                 e.printStackTrace();
@@ -417,14 +416,14 @@ public class WorkspaceActionManager {
         return openOdorWorldAction;
     }
 
-	/**
+    /**
      * @return the getShowScriptEditorAction
      */
     public Action getShowScriptEditorAction() {
-		return showScriptEditorAction;
-	}
+        return showScriptEditorAction;
+    }
 
-	/**
+    /**
      * @return the openWorkspaceAction.
      */
     public Action getOpenWorkspaceAction() {

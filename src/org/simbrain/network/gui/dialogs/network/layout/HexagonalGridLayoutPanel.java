@@ -23,11 +23,10 @@ import javax.swing.JTextField;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 
-
 /**
  * <b>LayoutPanel</b> allows the user to define the layout of a network.
  */
-public class HexagonalGridLayoutPanel extends AbstractLayoutPanel  {
+public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
 
     /** Spacing field. */
     private JTextField tfNumColumns = new JTextField("3");
@@ -49,9 +48,10 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel  {
 
     /** @see AbstractLayoutPanel */
     public Layout getNeuronLayout() {
-        HexagonalGridLayout layout = new HexagonalGridLayout(Double.parseDouble(tfHSpacing
-                .getText()), Double.parseDouble(tfVSpacing.getText()), Integer
-                .parseInt(tfNumColumns.getText()));
+        HexagonalGridLayout layout = new HexagonalGridLayout(
+                Double.parseDouble(tfHSpacing.getText()),
+                Double.parseDouble(tfVSpacing.getText()),
+                Integer.parseInt(tfNumColumns.getText()));
         return layout;
     }
 

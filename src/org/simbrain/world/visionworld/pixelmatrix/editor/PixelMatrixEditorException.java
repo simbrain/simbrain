@@ -21,8 +21,7 @@ package org.simbrain.world.visionworld.pixelmatrix.editor;
 /**
  * Pixel matrix editor exception.
  */
-public final class PixelMatrixEditorException
-    extends Exception {
+public final class PixelMatrixEditorException extends Exception {
 
     /**
      * Create a new pixel matrix editor exception.
@@ -50,12 +49,14 @@ public final class PixelMatrixEditorException
     }
 
     /**
-     * Create a new pixel matrix editor exception with the specified message and cause.
+     * Create a new pixel matrix editor exception with the specified message and
+     * cause.
      *
      * @param message message
      * @param cause cause
      */
-    public PixelMatrixEditorException(final String message, final Throwable cause) {
+    public PixelMatrixEditorException(final String message,
+            final Throwable cause) {
         super(message, cause);
     }
 }

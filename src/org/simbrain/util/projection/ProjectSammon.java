@@ -84,6 +84,7 @@ public class ProjectSammon extends ProjectionMethod {
 
     /**
      * Sammon projector constructor.
+     *
      * @param set projector settings
      */
     public ProjectSammon(final Settings set) {
@@ -92,6 +93,7 @@ public class ProjectSammon extends ProjectionMethod {
 
     /**
      * Perform necessary initialization.
+     *
      * @param up Upstairs dataset
      * @param down Downstairs dataset
      */
@@ -103,11 +105,13 @@ public class ProjectSammon extends ProjectionMethod {
         setHighDimension(upstairs.getDimensions());
         setDstar(upstairs.getDistances());
         setDstarSum(upstairs.getSumDistances());
-        downstairs.perturbOverlappingPoints(theSettings.getPerturbationAmount());
+        downstairs
+                .perturbOverlappingPoints(theSettings.getPerturbationAmount());
     }
 
     /**
      * Iterate the Sammon algorithm and return currentCloseness.
+     *
      * @return closeness of points
      */
     public double iterate() {
@@ -115,7 +119,7 @@ public class ProjectSammon extends ProjectionMethod {
         if (upstairs.getNumPoints() < 2) {
             return 0;
         }
-                // Question: Why do I need the new below? Why can't I use refs for Y_m
+        // Question: Why do I need the new below? Why can't I use refs for Y_m
         // and Y_i?
         setYArray(downstairs.getDatasetCopy());
         setD(downstairs.getDistances());
@@ -192,16 +196,14 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param d
-     *            step size for Sammon map
+     * @param d step size for Sammon map
      */
     public void setEpsilon(final double d) {
         theSettings.setEpsilon(d);
     }
 
     /**
-     * @param y
-     *            The yArray to set.
+     * @param y The yArray to set.
      */
     void setYArray(final ArrayList y) {
         yArray = y;
@@ -215,8 +217,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param xI
-     *            The xI to set.
+     * @param xI The xI to set.
      */
     void setXI(final double[] xI) {
         this.xI = xI;
@@ -230,8 +231,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param xJ
-     *            The xJ to set.
+     * @param xJ The xJ to set.
      */
     void setXJ(final double[] xJ) {
         this.xJ = xJ;
@@ -245,8 +245,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param yI
-     *            The yI to set.
+     * @param yI The yI to set.
      */
     void setYI(final double[] yI) {
         this.yI = yI;
@@ -260,8 +259,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param yJ
-     *            The yJ to set.
+     * @param yJ The yJ to set.
      */
     void setYJ(final double[] yJ) {
         this.yJ = yJ;
@@ -275,8 +273,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param yM
-     *            The yM to set.
+     * @param yM The yM to set.
      */
     void setYM(final double[] yM) {
         this.yM = yM;
@@ -290,8 +287,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param yN
-     *            The yN to set.
+     * @param yN The yN to set.
      */
     void setYN(final double[] yN) {
         this.yN = yN;
@@ -305,8 +301,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param yNew
-     *            The yNew to set.
+     * @param yNew The yNew to set.
      */
     void setYNew(final double[] yNew) {
         this.yNew = yNew;
@@ -320,8 +315,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param dstar
-     *            The dstar to set.
+     * @param dstar The dstar to set.
      */
     void setDstar(final double[][] dstar) {
         this.dstar = dstar;
@@ -335,8 +329,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param d
-     *            The d to set.
+     * @param d The d to set.
      */
     void setD(final double[][] d) {
         this.d = d;
@@ -350,8 +343,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param dstarSum
-     *            The dstarSum to set.
+     * @param dstarSum The dstarSum to set.
      */
     void setDstarSum(final double dstarSum) {
         this.dstarSum = dstarSum;
@@ -365,8 +357,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param partSum
-     *            The partSum to set.
+     * @param partSum The partSum to set.
      */
     void setPartialSum(final double partSum) {
         partialSum = partSum;
@@ -380,8 +371,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param currentCloseness
-     *            The currentCloseness to set.
+     * @param currentCloseness The currentCloseness to set.
      */
     void setCurrentCloseness(final double currentCloseness) {
         this.currentCloseness = currentCloseness;
@@ -395,8 +385,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param e
-     *            The e to set.
+     * @param e The e to set.
      */
     void setE(final double e) {
         this.e = e;
@@ -410,8 +399,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param lowDimension
-     *            The lowDimension to set.
+     * @param lowDimension The lowDimension to set.
      */
     void setLowDimension(final int lowDimension) {
         this.lowDimension = lowDimension;
@@ -425,8 +413,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param numPoints
-     *            The numPoints to set.
+     * @param numPoints The numPoints to set.
      */
     void setNumPoints(final int numPoints) {
         this.numPoints = numPoints;
@@ -440,8 +427,7 @@ public class ProjectSammon extends ProjectionMethod {
     }
 
     /**
-     * @param highDimension
-     *            The highDimension to set.
+     * @param highDimension The highDimension to set.
      */
     void setHighDimension(final int highDimension) {
         this.highDimension = highDimension;

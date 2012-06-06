@@ -20,8 +20,6 @@ package org.simbrain.util.projection;
 
 import org.simbrain.util.propertyeditor.ComboBoxWrapper;
 
-
-
 /**
  * <b>Settings</b> stores gauge parameters which must persist when the
  * projection algorithm is changed, but which should not be static (which must
@@ -57,7 +55,6 @@ public class Settings {
         }
     };
 
-
     /**
      * Distance within which added points are considered old and are thus not
      * added.
@@ -65,7 +62,8 @@ public class Settings {
     protected double tolerance = GaugePreferences.getTolerance();
 
     /** Amount by which to perturb overlapping points. */
-    protected double perturbationAmount = GaugePreferences.getPerturbationAmount();
+    protected double perturbationAmount = GaugePreferences
+            .getPerturbationAmount();
 
     /** Method to add new datapoints. */
     protected SammonAddMethod sammonAddMethod = SammonAddMethod.REFRESH;
@@ -201,8 +199,8 @@ public class Settings {
      * @param imageBox the imageBox to set
      */
     public void setSammonAddPointMethod(ComboBoxWrapper decayFunctionBox) {
-        setSammonAddMethod((SammonAddMethod) decayFunctionBox.getCurrentObject());
+        setSammonAddMethod((SammonAddMethod) decayFunctionBox
+                .getCurrentObject());
     }
-
 
 }

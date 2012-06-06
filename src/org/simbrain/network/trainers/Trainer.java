@@ -22,40 +22,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
-
 /**
  * Superclass for all trainer classes, which trains a trainable object,
  * typically a network.
- * 
+ *
  * @author jeffyoshimi
- * 
+ *
  */
 public abstract class Trainer {
 
     /** Listener list. */
     private List<TrainerListener> listeners = new ArrayList<TrainerListener>();
-    
+
     /** The trainable object to be trained. */
     protected final Trainable network;
-    
+
     /**
      * Construct the trainer and pass in a reference to the trainable element.
      *
      * @param network the network to be trained
      */
     public Trainer(Trainable network) {
-    	this.network = network;
+        this.network = network;
     }
-    
+
     /**
      * Apply the algorithm.
      */
     public abstract void apply();
-    
+
     /**
      * Add a trainer listener.
      *
@@ -67,7 +62,7 @@ public abstract class Trainer {
         }
         listeners.add(eventListener);
     }
-    
+
     /**
      * Remove a trainer listener.
      *
@@ -89,31 +84,32 @@ public abstract class Trainer {
     /**
      * Notify listeners that training has begin.
      */
-	public void fireTrainingBegin() {
-		for (TrainerListener listener : getListeners()) {
-			listener.beginTraining();
-		}
-	}
-	
-	/**
-	 * Notify listeners that training has ended.
-	 */
-	public void fireTrainingEnd() {
-		for (TrainerListener listener : getListeners()) {
-			listener.endTraining();
-		}
-	}
-    
-	/**
-	 * Notify listeners of an update in training progress.  Used by GUI progress bars.
-	 *
-	 * @param progressUpdate string description of current state
-	 * @param percentComplete how far along the training is.
-	 */
-	public void fireProgressUpdate (String progressUpdate, int percentComplete) {
-    	for(TrainerListener listener : getListeners()){
-    		listener.progressUpdated(progressUpdate, percentComplete);
-    	}
+    public void fireTrainingBegin() {
+        for (TrainerListener listener : getListeners()) {
+            listener.beginTraining();
+        }
+    }
+
+    /**
+     * Notify listeners that training has ended.
+     */
+    public void fireTrainingEnd() {
+        for (TrainerListener listener : getListeners()) {
+            listener.endTraining();
+        }
+    }
+
+    /**
+     * Notify listeners of an update in training progress. Used by GUI progress
+     * bars.
+     *
+     * @param progressUpdate string description of current state
+     * @param percentComplete how far along the training is.
+     */
+    public void fireProgressUpdate(String progressUpdate, int percentComplete) {
+        for (TrainerListener listener : getListeners()) {
+            listener.progressUpdated(progressUpdate, percentComplete);
+        }
     }
 
 }

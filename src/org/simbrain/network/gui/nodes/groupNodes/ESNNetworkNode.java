@@ -26,8 +26,8 @@ import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
  * PNode representation of an Echo State Network.
  */
 public class ESNNetworkNode extends SubnetworkNode {
-		
-	/**
+
+    /**
      * Create an ESN network
      *
      * @param networkPanel parent panel
@@ -38,7 +38,7 @@ public class ESNNetworkNode extends SubnetworkNode {
         setInteractionBox(new ESNInteractionBox(networkPanel));
         setContextMenu();
     }
-    
+
     /**
      * Custom interaction box for ESN group node.
      */
@@ -51,15 +51,15 @@ public class ESNNetworkNode extends SubnetworkNode {
         protected JDialog getPropertyDialog() {
             ReflectivePropertyEditor editor = new ReflectivePropertyEditor();
             editor.setUseSuperclass(false);
-            editor.setObject((EchoStateNetwork) getGroup());
+            editor.setObject(getGroup());
             JDialog dialog = editor.getDialog();
             return dialog;
         }
-        
-      @Override
-      protected boolean hasPropertyDialog() {
-          return true;
-      }
+
+        @Override
+        protected boolean hasPropertyDialog() {
+            return true;
+        }
 
         @Override
         protected String getToolTipText() {
@@ -77,95 +77,99 @@ public class ESNNetworkNode extends SubnetworkNode {
      * Sets custom menu.
      */
     private void setContextMenu() {
-    	JPopupMenu menu = super.getDefaultContextMenu();
+        JPopupMenu menu = super.getDefaultContextMenu();
         menu.addSeparator();
         menu.add(new JMenuItem(trainOfflineAction));
         menu.addSeparator();
-        
+
         final EchoStateNetwork esn = (EchoStateNetwork) getGroup();
-        
-		// Reference to the input data in the ESN
-		DataHolder inputData = new DataHolder() {
-			@Override
-			public void setData(double[][] data) {
-				esn.setInputData(data);
-			}
 
-			@Override
-			public double[][] getData() {
-				return esn.getInputData();
-			}
+        // Reference to the input data in the ESN
+        DataHolder inputData = new DataHolder() {
+            @Override
+            public void setData(double[][] data) {
+                esn.setInputData(data);
+            }
 
-		};
-		// Reference to the training data in the ESN
-		DataHolder trainingData = new DataHolder() {
-			@Override
-			public void setData(double[][] data) {
-				esn.setTrainingData(data);
-			}
+            @Override
+            public double[][] getData() {
+                return esn.getInputData();
+            }
 
-			@Override
-			public double[][] getData() {
-				return esn.getTrainingData();
-			}
+        };
+        // Reference to the training data in the ESN
+        DataHolder trainingData = new DataHolder() {
+            @Override
+            public void setData(double[][] data) {
+                esn.setTrainingData(data);
+            }
 
-		};
-		menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
-				new Trainable() {
-					@Override
-					public List<Neuron> getInputNeurons() {
-						return ((EchoStateNetwork)getGroup()).getInputLayer().getNeuronList();
-					}
+            @Override
+            public double[][] getData() {
+                return esn.getTrainingData();
+            }
 
-					@Override
-					public List<Neuron> getOutputNeurons() {
-						return ((EchoStateNetwork)getGroup()).getOutputLayer().getNeuronList();
-					}
+        };
+        menu.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(),
+                new Trainable() {
+                    @Override
+                    public List<Neuron> getInputNeurons() {
+                        return ((EchoStateNetwork) getGroup()).getInputLayer()
+                                .getNeuronList();
+                    }
 
-					@Override
-					public double[][] getInputData() {
-						return null;
-					}
+                    @Override
+                    public List<Neuron> getOutputNeurons() {
+                        return ((EchoStateNetwork) getGroup()).getOutputLayer()
+                                .getNeuronList();
+                    }
 
-					@Override
-					public double[][] getTrainingData() {
-						return null;
-					}}, inputData, trainingData));
+                    @Override
+                    public double[][] getInputData() {
+                        return null;
+                    }
 
-		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-				esn.getInputLayer().getNeuronList(), inputData, "Input"));
-		menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(),
-				esn.getOutputLayer().getNeuronList(), trainingData, "Training"));
+                    @Override
+                    public double[][] getTrainingData() {
+                        return null;
+                    }
+                }, inputData, trainingData));
+
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
+                .getInputLayer().getNeuronList(), inputData, "Input"));
+        menu.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), esn
+                .getOutputLayer().getNeuronList(), trainingData, "Training"));
         setContextMenu(menu);
     }
-    
+
     /**
      * Action to train ESN Offline
      */
-	Action trainOfflineAction = new AbstractAction() {
+    Action trainOfflineAction = new AbstractAction() {
 
-		// Initialize
-		{
-			putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
-			putValue(NAME, "Train offline...");
-			putValue(SHORT_DESCRIPTION, "Train offline...");
-		}
+        // Initialize
+        {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(NAME, "Train offline...");
+            putValue(SHORT_DESCRIPTION, "Train offline...");
+        }
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			try{ 
-				EchoStateNetwork network = (EchoStateNetwork) getGroup();
-	        	ESNTrainingPanel trainingPanel = new ESNTrainingPanel(network);
-	            trainingPanel.setGenericParent(getNetworkPanel()
-	            		.displayPanel(trainingPanel, "Trainer"));
-	            trainingPanel.init();
-			} catch (NullPointerException npe) {				
-				JOptionPane.showMessageDialog(new JFrame(), 
-						"Input and training data must\nbe entered prior to" +
-						" training.", "Warning", JOptionPane.WARNING_MESSAGE);
-				npe.printStackTrace();
-			}
-		}
-	};
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            try {
+                EchoStateNetwork network = (EchoStateNetwork) getGroup();
+                ESNTrainingPanel trainingPanel = new ESNTrainingPanel(network);
+                trainingPanel.setGenericParent(getNetworkPanel().displayPanel(
+                        trainingPanel, "Trainer"));
+                trainingPanel.init();
+            } catch (NullPointerException npe) {
+                JOptionPane.showMessageDialog(new JFrame(),
+                        "Input and training data must\nbe entered prior to"
+                                + " training.", "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+                npe.printStackTrace();
+            }
+        }
+    };
 
 }

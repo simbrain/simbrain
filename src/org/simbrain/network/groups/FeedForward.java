@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
@@ -33,7 +33,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 /**
  * A standard feed-forward network, where a succession of neuron groups and
  * synapse groups are organized into layers.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class FeedForward extends Subnetwork {
@@ -50,7 +50,7 @@ public class FeedForward extends Subnetwork {
     /**
      * Add the layered network to the specified network, with a specified number
      * of layers and nodes in each layer.
-     * 
+     *
      * @param network the parent network to which the layered network is being
      *            added
      * @param nodesPerLayer an array of integers which determines the number of
@@ -61,7 +61,7 @@ public class FeedForward extends Subnetwork {
     public FeedForward(final Network network, int[] nodesPerLayer,
             Point2D initialPosition) {
         super(network);
-        
+
         this.initialPosition = initialPosition;
         setLabel("Layered Network");
 
@@ -80,10 +80,10 @@ public class FeedForward extends Subnetwork {
         NeuronGroup inputLayer = new NeuronGroup(network, inputLayerNeurons);
         addNeuronGroup(inputLayer);
         if (initialPosition == null) {
-            initialPosition = new Point2D.Double(0,0);
+            initialPosition = new Point2D.Double(0, 0);
         }
-        layout.setInitialLocation(new Point((int) initialPosition.getX(), (int)
-                initialPosition.getY()));
+        layout.setInitialLocation(new Point((int) initialPosition.getX(),
+                (int) initialPosition.getY()));
         layout.layoutNeurons(inputLayerNeurons);
 
         // Prepare base synapse for connecting layers
@@ -105,11 +105,13 @@ public class FeedForward extends Subnetwork {
             }
 
             layout.layoutNeurons(hiddenLayerNeurons);
-            NeuronGroup hiddenLayer = new NeuronGroup(network, hiddenLayerNeurons); 
+            NeuronGroup hiddenLayer = new NeuronGroup(network,
+                    hiddenLayerNeurons);
             addNeuronGroup(hiddenLayer);
-            NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
+            NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer,
+                    Direction.NORTH, betweenLayerInterval);
 
-            AllToAll connection  = new AllToAll(getParentNetwork());
+            AllToAll connection = new AllToAll(getParentNetwork());
 
             connectNeuronGroups(lastLayer, hiddenLayer, connection);
 
@@ -152,7 +154,7 @@ public class FeedForward extends Subnetwork {
         super.addNeuronGroup(group);
         group.setLabel("Layer " + getNeuronGroupCount());
     }
-    
+
     /**
      * Returns the input layer.
      *
@@ -161,34 +163,34 @@ public class FeedForward extends Subnetwork {
     public NeuronGroup getInputLayer() {
         return getNeuronGroup(0);
     }
-    
+
     /**
      * Returns the output layer.
      *
      * @return the output layer
      */
     public NeuronGroup getOutputLayer() {
-        return getNeuronGroup(getNeuronGroupCount()-1);
+        return getNeuronGroup(getNeuronGroupCount() - 1);
     }
-    
-    /**
-	 * Convenience method for getting the neurons associated with the input
-	 * group. Also allows all feed-forward networks to implement Trainable.
-	 * 
-	 * @return the input layer neurons as a list.
-	 */
-	public List<Neuron> getInputNeurons() {
-		return getInputLayer().getNeuronList();
-	}
 
     /**
-	 * Convenience method for getting the neurons associated with the output
-	 * group. Also allows all feed-forward networks to implement Trainable.
-	 * 
-	 * @return the output layer neurons as a list.
-	 */
-	public List<Neuron> getOutputNeurons() {
-		return getOutputLayer().getNeuronList();
-	}
+     * Convenience method for getting the neurons associated with the input
+     * group. Also allows all feed-forward networks to implement Trainable.
+     *
+     * @return the input layer neurons as a list.
+     */
+    public List<Neuron> getInputNeurons() {
+        return getInputLayer().getNeuronList();
+    }
+
+    /**
+     * Convenience method for getting the neurons associated with the output
+     * group. Also allows all feed-forward networks to implement Trainable.
+     *
+     * @return the output layer neurons as a list.
+     */
+    public List<Neuron> getOutputNeurons() {
+        return getOutputLayer().getNeuronList();
+    }
 
 }

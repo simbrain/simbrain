@@ -25,8 +25,7 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Wand edit mode action.
  */
-public final class WandEditModeAction
-    extends EditModeAction {
+public final class WandEditModeAction extends EditModeAction {
 
     /**
      * Create a new pan edit mode action with the specified network panel.
@@ -38,8 +37,8 @@ public final class WandEditModeAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Wand.png"));
         putValue(SHORT_DESCRIPTION, "Wand Mode");
 
-        //networkPanel.getInputMap().put(KeyStroke.getKeyStroke('k'), this);
-        //networkPanel.getActionMap().put(this, this);
+        // networkPanel.getInputMap().put(KeyStroke.getKeyStroke('k'), this);
+        // networkPanel.getActionMap().put(this, this);
 
     }
 }

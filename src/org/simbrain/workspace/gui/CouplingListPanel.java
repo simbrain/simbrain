@@ -64,9 +64,11 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
             putValue(NAME, "Delete couplings");
             putValue(SHORT_DESCRIPTION, "Delete selected couplings");
-            CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            CouplingListPanel.this.getInputMap(
+                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke("BACK_SPACE"), this);
-            CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            CouplingListPanel.this.getInputMap(
+                    JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke("DELETE"), this);
             CouplingListPanel.this.getActionMap().put(this, this);
         }
@@ -75,16 +77,20 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
          * {@inheritDoc}
          */
         public void actionPerformed(ActionEvent arg0) {
-            desktop.getWorkspace().getCouplingManager().removeCouplings(getSelectedCouplings());
+            desktop.getWorkspace().getCouplingManager()
+                    .removeCouplings(getSelectedCouplings());
         }
     };
 
     /**
-     * Creates a new coupling list panel using the applicable desktop and coupling lists.
+     * Creates a new coupling list panel using the applicable desktop and
+     * coupling lists.
+     *
      * @param desktop Reference to simbrain desktop
      * @param couplingList list of couplings to be shown in window
      */
-    public CouplingListPanel(final SimbrainDesktop desktop, final Vector<Coupling<?>> couplingList) {
+    public CouplingListPanel(final SimbrainDesktop desktop,
+            final Vector<Coupling<?>> couplingList) {
 
         super(new BorderLayout());
 
@@ -95,18 +101,22 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         // Listens for frame closing for removal of listener.
         couplingFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(final WindowEvent w) {
-                desktop.getWorkspace().getCouplingManager().removeCouplingListener(CouplingListPanel.this);
+                desktop.getWorkspace().getCouplingManager()
+                        .removeCouplingListener(CouplingListPanel.this);
             }
         });
         desktop.getWorkspace().getCouplingManager().addCouplingListener(this);
 
-        //Populates the coupling list with data.
+        // Populates the coupling list with data.
         couplings.setListData(this.couplingList);
 
-        //Scroll pane for showing lists larger than viewing window and setting maximum size
+        // Scroll pane for showing lists larger than viewing window and setting
+        // maximum size
         final JScrollPane listScroll = new JScrollPane(couplings);
-        listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        listScroll
+                .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        listScroll
+                .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Allows the user to delete couplings within the list frame.
         JPanel buttonPanel = new JPanel();
@@ -124,13 +134,14 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
      * Updates the list of couplings when new couplings are made.
      */
     private void couplingsUpdated() {
-        couplingList = new Vector(desktop.getWorkspace().getCouplingManager().getCouplings());
+        couplingList = new Vector(desktop.getWorkspace().getCouplingManager()
+                .getCouplings());
         couplings.setListData(couplingList);
     }
 
-
     /**
      * Returns consumers selected in consumer list.
+     *
      * @return selected consumers.
      */
     private ArrayList<Coupling<?>> getSelectedCouplings() {

@@ -24,7 +24,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.spikeresponders.RiseAndDecay;
 
-
 /**
  * <b>RiseAndDecayPanel</b>.
  */
@@ -59,16 +58,19 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
     public void fillFieldValues() {
         RiseAndDecay spikeResponder = (RiseAndDecay) spikeResponderList.get(0);
 
-        tfMaximumResponse.setText(Double.toString(spikeResponder.getMaximumResponse()));
+        tfMaximumResponse.setText(Double.toString(spikeResponder
+                .getMaximumResponse()));
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfDecayRate.setText(Double.toString(spikeResponder.getDecayRate()));
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class, "getMaximumResponse")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
+                "getMaximumResponse")) {
             tfMaximumResponse.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class, "getDecayRate")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList, RiseAndDecay.class,
+                "getDecayRate")) {
             tfDecayRate.setText(NULL_STRING);
         }
     }
@@ -78,7 +80,8 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
      */
     public void fillDefaultValues() {
         RiseAndDecay spikerRef = new RiseAndDecay();
-        tfMaximumResponse.setText(Double.toString(spikerRef.getMaximumResponse()));
+        tfMaximumResponse.setText(Double.toString(spikerRef
+                .getMaximumResponse()));
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfDecayRate.setText(Double.toString(spikerRef.getDecayRate()));
     }
@@ -93,11 +96,13 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
             RiseAndDecay spikerRef = (RiseAndDecay) spikeResponderList.get(i);
 
             if (!tfMaximumResponse.getText().equals(NULL_STRING)) {
-                spikerRef.setMaximumResponse(Double.parseDouble(tfMaximumResponse.getText()));
+                spikerRef.setMaximumResponse(Double
+                        .parseDouble(tfMaximumResponse.getText()));
             }
 
             if (!tfDecayRate.getText().equals(NULL_STRING)) {
-                spikerRef.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
+                spikerRef
+                        .setDecayRate(Double.parseDouble(tfDecayRate.getText()));
             }
         }
     }

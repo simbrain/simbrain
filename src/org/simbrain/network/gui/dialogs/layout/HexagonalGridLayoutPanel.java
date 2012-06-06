@@ -19,9 +19,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.layouts.Layout;
 
 /**
  * <b>HexagonalGridLayoutPanel</b> allows the user to define the layout of a
@@ -76,8 +74,7 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
      * Applies settings after OK button is pressed.
      */
     public void commitChanges() {
-        layout.setNumColumns(Integer.parseInt(tfNumColumns
-                .getText()));
+        layout.setNumColumns(Integer.parseInt(tfNumColumns.getText()));
         layout.setHSpacing(Double.parseDouble(tfHSpacing.getText()));
         layout.setVSpacing(Double.parseDouble(tfVSpacing.getText()));
         layout.setManualColumns(manuallySetNumColumns.isSelected());
@@ -88,8 +85,7 @@ public class HexagonalGridLayoutPanel extends AbstractLayoutPanel {
         tfNumColumns.setText(Integer.toString(layout.getNumColumns()));
         tfHSpacing.setText(Double.toString(layout.getHSpacing()));
         tfVSpacing.setText(Double.toString(layout.getVSpacing()));
-        manuallySetNumColumns
-                .setSelected(layout.isManualColumns());
+        manuallySetNumColumns.setSelected(layout.isManualColumns());
         enableDisableSpacingFields();
     }
 }

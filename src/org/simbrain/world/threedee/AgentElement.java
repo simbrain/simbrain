@@ -34,7 +34,7 @@ public class AgentElement extends MultipleViewElement<Node> {
     public Agent getAgent() {
         return agent;
     }
-    
+
     /**
      * Initializes one spatial node.
      *
@@ -72,9 +72,12 @@ public class AgentElement extends MultipleViewElement<Node> {
     @Override
     public void updateSpatial(final Node node) {
 
-        if (agent.getLocation() == null) { return; }
+        if (agent.getLocation() == null) {
+            return;
+        }
 
-        node.lookAt(agent.getLocation().add(agent.getDirection()).toVector3f(), Y_AXIS);
+        node.lookAt(agent.getLocation().add(agent.getDirection()).toVector3f(),
+                Y_AXIS);
         node.setLocalTranslation(agent.getLocation().toVector3f());
     }
 
@@ -95,7 +98,7 @@ public class AgentElement extends MultipleViewElement<Node> {
     public SpatialData getTentative() {
         return agent.getTentative();
     }
-    
+
     /**
      * Calls agent.commit.
      */

@@ -49,10 +49,11 @@ public class BarChartModel extends ChartModel {
     /** Minimum range. */
     private double lowerBound = 0;
 
-//    private Range chartRange = new Range(0, 10);
+    // private Range chartRange = new Range(0, 10);
 
     /**
      * Bar chart model constructor.
+     *
      * @param parent component
      */
     public BarChartModel() {
@@ -75,8 +76,8 @@ public class BarChartModel extends ChartModel {
     }
 
     /**
-     * Create specified number of set of data sources.
-     * Adds these two existing data sources.
+     * Create specified number of set of data sources. Adds these two existing
+     * data sources.
      *
      * @param numDataSources number of data sources to initialize plot with
      */
@@ -111,7 +112,7 @@ public class BarChartModel extends ChartModel {
         }
     }
 
-    //TODO: Change names from row / column to "bars"?
+    // TODO: Change names from row / column to "bars"?
 
     public void removeColumn(final int index) {
         dataset.removeColumn(index);
@@ -143,8 +144,7 @@ public class BarChartModel extends ChartModel {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
+     * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
      *
@@ -161,7 +161,8 @@ public class BarChartModel extends ChartModel {
         System.out.println("------------ Debug model ------------");
         for (int i = 0; i < dataset.getRowCount(); i++) {
             for (int j = 0; j < dataset.getColumnCount(); j++) {
-                System.out.println("<" + i + "," + j + "> " + dataset.getValue(i, j));
+                System.out.println("<" + i + "," + j + "> "
+                        + dataset.getValue(i, j));
             }
         }
         System.out.println("--------------------------------------");
@@ -175,8 +176,7 @@ public class BarChartModel extends ChartModel {
     }
 
     /**
-     * @param barColor
-     *            the barColor to set
+     * @param barColor the barColor to set
      */
     public void setBarColor(final Color barColor) {
         this.barColor = barColor;

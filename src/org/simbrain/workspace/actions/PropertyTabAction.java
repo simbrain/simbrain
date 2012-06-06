@@ -35,15 +35,13 @@ public final class PropertyTabAction extends AbstractAction {
     private SimbrainDesktop desktop;
 
     /**
-     * Create an open data world with the specified
-     * workspace.
+     * Create an open data world with the specified workspace.
      */
     public PropertyTabAction(SimbrainDesktop desktop) {
         super("Property Tabs");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Properties.png"));
         this.desktop = desktop;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

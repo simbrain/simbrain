@@ -32,11 +32,12 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
 
-
 /**
- * <b>DialogOdorWorldWall</b> is a dialog box for setting the properties of a wall.
+ * <b>DialogOdorWorldWall</b> is a dialog box for setting the properties of a
+ * wall.
  */
-public class DialogOdorWorldWall extends StandardDialog implements ActionListener {
+public class DialogOdorWorldWall extends StandardDialog implements
+        ActionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -73,7 +74,10 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     /** The panel containing items not pertaining to other panels. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
 
-    /** The text field containing the number of bites until the wall dies (absolute, not remaining). */
+    /**
+     * The text field containing the number of bites until the wall dies
+     * (absolute, not remaining).
+     */
     private JTextField bitesToDie = new JTextField();
 
     /** The checkbox representing whether or not the wall is edible. */
@@ -83,12 +87,12 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      * This method initialises the components on the topPanel.
      */
     private void init() {
-        //Initialize Dialog
+        // Initialize Dialog
         setTitle("Wall Dialog");
         fillFieldValues();
-        this.setLocation(initialDialogPlacement, 0); //Sets location of dialog
+        this.setLocation(initialDialogPlacement, 0); // Sets location of dialog
 
-        //Set up sliders
+        // Set up sliders
         width.setMajorTickSpacing(majorTickSpacing);
         width.setPaintTicks(true);
         width.setPaintLabels(true);
@@ -98,12 +102,12 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 
         bitesToDie.setColumns(2);
 
-        //Add Action Listeners
+        // Add Action Listeners
         colorButton.addActionListener(this);
 
         edible.addActionListener(this);
 
-        //Set up topPanel
+        // Set up topPanel
         topPanel.addItem("Set wall color (all Walls)", colorButton);
         topPanel.addItem("Width", width);
         topPanel.addItem("Height", height);
@@ -113,15 +117,17 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
         miscPanel.addItem("Resurrection Probability", resurrectionProb);
 
         // TODO
-//        setStimPanel(new StimulusVectorPanel(wall));
-//        getStimPanel().getTabbedPane().insertTab("Wall", null, topPanel, null, 0);
-//        getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
-//        getStimPanel().getTabbedPane().setSelectedIndex(0);
+        // setStimPanel(new StimulusVectorPanel(wall));
+        // getStimPanel().getTabbedPane().insertTab("Wall", null, topPanel,
+        // null, 0);
+        // getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
+        // getStimPanel().getTabbedPane().setSelectedIndex(0);
         setContentPane(getStimPanel());
     }
 
     /**
      * Respond to button pressing events.
+     *
      * @param e the ActionEvent triggering this method
      */
     public void actionPerformed(final ActionEvent e) {
@@ -130,9 +136,9 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
         if (o == colorButton) {
             Color theColor = getColor();
             // TODO: Colors now specific to walls
-//            if (theColor != null) {
-//                worldPanel.setWallColor(theColor);
-//            }
+            // if (theColor != null) {
+            // worldPanel.setWallColor(theColor);
+            // }
         }
 
         if (o == edible) {
@@ -144,12 +150,12 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-//        width.setValue(wall.getWidth());
-//        height.setValue(wall.getHeight());
-//        resurrectionProb.setText("" + wall.getResurrectionProb());
-//        edible.setSelected(wall.getEdible());
-//        bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
-//        bitesToDie.setEnabled(wall.getEdible());
+        // width.setValue(wall.getWidth());
+        // height.setValue(wall.getHeight());
+        // resurrectionProb.setText("" + wall.getResurrectionProb());
+        // edible.setSelected(wall.getEdible());
+        // bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
+        // bitesToDie.setEnabled(wall.getEdible());
     }
 
     /**
@@ -159,8 +165,13 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      */
     public Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
-        colorChooser.setLocation(colorChooserIndent, colorChooserIndent); //Set location of color chooser
+        Color theColor = JColorChooser.showDialog(this, "Choose Color",
+                Color.BLACK);
+        colorChooser.setLocation(colorChooserIndent, colorChooserIndent); // Set
+                                                                          // location
+                                                                          // of
+                                                                          // color
+                                                                          // chooser
 
         return theColor;
     }
@@ -169,14 +180,14 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      * Commits the changes edited here.
      */
     public void commitChanges() {
-//        wall.setEdible(edible.isSelected());
-//
-//        if (!edible.isSelected()) {
-//            wall.setBites(0);
-//        }
-//
-//        wall.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
-//        wall.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
+        // wall.setEdible(edible.isSelected());
+        //
+        // if (!edible.isSelected()) {
+        // wall.setBites(0);
+        // }
+        //
+        // wall.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
+        // wall.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
     }
 
     /**

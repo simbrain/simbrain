@@ -9,13 +9,13 @@ import java.util.List;
  * supplemented by pushes from a simple neural network.
  */
 public interface Behavior {
-        
+
     public void apply(long elapsedTime);
-    
+
     public void collisionX();
-    
+
     public void collissionY();
-    
+
     public List<Class> applicableEntityTypes();
 
 }

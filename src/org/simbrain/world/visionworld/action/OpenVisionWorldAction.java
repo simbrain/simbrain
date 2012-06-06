@@ -28,28 +28,27 @@ import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 /**
  * Create pixel matrix action.
  */
-public final class OpenVisionWorldAction
-    extends AbstractAction {
+public final class OpenVisionWorldAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorldDesktopComponent desktopComponent;
-
 
     /**
      * Create a new create pixel matrix action.
      *
      * @param visionWorld vision world, must not be null
      */
-    public OpenVisionWorldAction(final VisionWorldDesktopComponent desktopComponent) {
+    public OpenVisionWorldAction(
+            final VisionWorldDesktopComponent desktopComponent) {
         super("Open...");
         if (desktopComponent == null) {
-            throw new IllegalArgumentException("Desktop component must not be null");
+            throw new IllegalArgumentException(
+                    "Desktop component must not be null");
         }
         this.desktopComponent = desktopComponent;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
         putValue(SHORT_DESCRIPTION, "Open Vision World");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

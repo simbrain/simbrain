@@ -18,20 +18,20 @@ import com.jme.scene.shape.Sphere;
 
 public class Plant extends MultipleViewElement<Node> implements Entity {
     private static final float COLLISION_RADIUS = 0.5f;
-    
+
     private Point location;
     private Point tentativeLocation;
     private final Odor odor = new Odor("green", this);
-    
+
     public Plant(Point location) {
         this.location = location;
         this.tentativeLocation = location;
     }
-    
+
     public Plant() {
-        this(new Point(0,0,0));
+        this(new Point(0, 0, 0));
     }
-    
+
     @Override
     public Node create() {
         final Sphere s = new Sphere("sphere", new Vector3f(), 12, 12, 0.5f);

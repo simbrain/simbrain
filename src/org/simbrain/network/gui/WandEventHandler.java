@@ -35,7 +35,7 @@ import edu.umd.cs.piccolo.event.PInputEventFilter;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
 /**
- * Wand event handler.  Change activation when dragging over neurons.
+ * Wand event handler. Change activation when dragging over neurons.
  */
 final class WandEventHandler extends PDragSequenceEventHandler {
 
@@ -97,13 +97,13 @@ final class WandEventHandler extends PDragSequenceEventHandler {
                 - radius / 2, position.getY() - radius / 2, radius, radius);
         boundsFilter.setEllipse(ellipse);
 
-        Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot()
-                .getAllNodes(boundsFilter, null);
+        Collection highlightedNodes = networkPanel.getCanvas().getLayer()
+                .getRoot().getAllNodes(boundsFilter, null);
 
         // Auto-highlighter mode
         for (Object node : highlightedNodes) {
             if (node instanceof NeuronNode) {
-                modifyNode((NeuronNode)node);
+                modifyNode((NeuronNode) node);
             }
 
         }
@@ -137,8 +137,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         /**
          * Set the bounds for this bounds filter to <code>bounds</code>.
          *
-         * @param ellipse
-         *            bounds for this bounds filter
+         * @param ellipse bounds for this bounds filter
          */
         public void setEllipse(Ellipse2D.Double ellipse) {
             this.ellipse = ellipse;
@@ -165,11 +164,10 @@ final class WandEventHandler extends PDragSequenceEventHandler {
     }
 
     /**
-     * Selection event filter, accepts various mouse events, but only when
-     * the network panel's edit mode is <code>EditMode.WAND</code>.
+     * Selection event filter, accepts various mouse events, but only when the
+     * network panel's edit mode is <code>EditMode.WAND</code>.
      */
-    private class ZoomEventFilter
-        extends PInputEventFilter {
+    private class ZoomEventFilter extends PInputEventFilter {
 
         /**
          * Create a new selection event filter.
@@ -177,7 +175,6 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         public ZoomEventFilter() {
             super(InputEvent.BUTTON1_MASK);
         }
-
 
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {

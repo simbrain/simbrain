@@ -28,8 +28,7 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Set auto zoom.
  */
-public final class SetAutoZoomAction
-    extends AbstractAction {
+public final class SetAutoZoomAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -50,7 +49,6 @@ public final class SetAutoZoomAction
         this.networkPanel = networkPanel;
 
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

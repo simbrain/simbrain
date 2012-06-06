@@ -32,16 +32,13 @@ public final class SaveWorkspaceAsAction extends DesktopAction {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
-     * Create a save workspace as action with the specified
-     * workspace.
+     * Create a save workspace as action with the specified workspace.
      */
     public SaveWorkspaceAsAction(SimbrainDesktop desktop) {
         super("Save Workspace As", desktop);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

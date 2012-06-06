@@ -19,8 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectNeurons;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 
 /**
@@ -53,7 +53,8 @@ public class Subnetwork extends Group {
      * @param numNeuronGroups number of neuron groups
      * @param numSynapseGroups number of synapse groups
      */
-    public Subnetwork(final Network net, int numNeuronGroups, int numSynapseGroups) {
+    public Subnetwork(final Network net, int numNeuronGroups,
+            int numSynapseGroups) {
         super(net);
         setLabel("Subnetwork");
         for (int i = 0; i < numNeuronGroups; i++) {
@@ -75,28 +76,28 @@ public class Subnetwork extends Group {
             neuronGroup.setDeleteWhenEmpty(true);
             getParentNetwork().removeGroup(neuronGroup);
         }
-        for (SynapseGroup synapseGroup: synapseGroupList) {
+        for (SynapseGroup synapseGroup : synapseGroupList) {
             synapseGroup.setDeleteWhenEmpty(true);
             getParentNetwork().removeGroup(synapseGroup);
         }
     }
-   
+
     @Override
     public boolean isEmpty() {
         boolean neuronGroupsEmpty = neuronGroupList.isEmpty();
         boolean synapseGroupsEmpty = synapseGroupList.isEmpty();
-        
-		// If synapse groups exist but are empty, treat synapse groups as empty
+
+        // If synapse groups exist but are empty, treat synapse groups as empty
         boolean allAreEmpty = true;
-        for(SynapseGroup synapseGroup : synapseGroupList) {
-        	if (!synapseGroup.isEmpty()) {
-        		allAreEmpty = false;
-        	}
+        for (SynapseGroup synapseGroup : synapseGroupList) {
+            if (!synapseGroup.isEmpty()) {
+                allAreEmpty = false;
+            }
         }
         if (allAreEmpty) {
-        	synapseGroupsEmpty = true;
+            synapseGroupsEmpty = true;
         }
-        
+
         return (neuronGroupsEmpty && synapseGroupsEmpty);
     }
 
@@ -107,9 +108,9 @@ public class Subnetwork extends Group {
      */
     public void addSynapseGroup(SynapseGroup group) {
         synapseGroupList.add(group);
-        group.setParentGroup(this);  
+        group.setParentGroup(this);
     }
-    
+
     /**
      * Add a neuron group.
      *
@@ -127,14 +128,14 @@ public class Subnetwork extends Group {
      * @param target the target group
      */
     public SynapseGroup connectNeuronGroups(NeuronGroup source,
-    		NeuronGroup target) {
+            NeuronGroup target) {
         AllToAll connection = new AllToAll(getParentNetwork(),
                 source.getNeuronList(), target.getNeuronList());
-        //connection.setPercentExcitatory(1);
+        // connection.setPercentExcitatory(1);
         SynapseGroup newGroup = connectNeuronGroups(source, target, connection);
         return newGroup;
     }
-    
+
     /**
      * Connects two groups of neurons according to some connection style.
      *
@@ -143,15 +144,15 @@ public class Subnetwork extends Group {
      * @param connection the type of connection desired between the two groups
      */
     public SynapseGroup connectNeuronGroups(NeuronGroup source,
-    		NeuronGroup target, ConnectNeurons connection) {
+            NeuronGroup target, ConnectNeurons connection) {
         SynapseGroup newGroup = connectNeuronGroups(source, target, ""
                 + (indexOfNeuronGroup(source) + 1), ""
                 + (indexOfNeuronGroup(target) + 1), connection);
-    	return newGroup;
+        return newGroup;
     }
-    
+
     /**
-     * Connects two groups of neurons according to some connection style, and 
+     * Connects two groups of neurons according to some connection style, and
      * allows for custom labels of the neuron groups within the weights label.
      *
      * @param source the source group
@@ -161,69 +162,69 @@ public class Subnetwork extends Group {
      * @param connection the type of connection desired between the two groups
      */
     public SynapseGroup connectNeuronGroups(NeuronGroup source,
-    		NeuronGroup target, String sourceLabel, String targetLabel,
-    		ConnectNeurons connection) {
+            NeuronGroup target, String sourceLabel, String targetLabel,
+            ConnectNeurons connection) {
         List<Synapse> synapses = connection.connectNeurons(getParentNetwork(),
-                source.getNeuronList(),target.getNeuronList());
+                source.getNeuronList(), target.getNeuronList());
         SynapseGroup newGroup = new SynapseGroup(getParentNetwork());
         getParentNetwork().transferSynapsesToGroup(synapses, newGroup);
         addSynapseGroup(newGroup);
         newGroup.setDeleteWhenEmpty(false);
         setSynapseGroupLabel(source, target, newGroup, sourceLabel, targetLabel);
 
-    	// By default set up a synapse routing...
+        // By default set up a synapse routing...
         getParentNetwork().getSynapseRouter()
-				.associateSynapseGroupWithNeuronGroupPair(source,
-						target, newGroup);
+                .associateSynapseGroupWithNeuronGroupPair(source, target,
+                        newGroup);
         return newGroup;
     }
-    
-	/**
-	 * The source and target neuron groups are associated with a synapse group
-	 * that is initially empty. A routing rule is set up so that the synapse
-	 * group will be automatically populated when synapses are added which
-	 * connect the source and parent neuron group.
-	 * 
-	 * @param source the source neuron group
-	 * @param target the target neuron group
-	 */
-	public void addEmptySynapseGroup(NeuronGroup source, NeuronGroup target) {
-		SynapseGroup sg = new SynapseGroup(getParentNetwork());
-		addSynapseGroup(sg);
-		sg.setDeleteWhenEmpty(false);
-		setSynapseGroupLabel(source, target, sg, ""
-				+ (indexOfNeuronGroup(source) + 1), ""
-				+ (indexOfNeuronGroup(target) + 1));
-
-		getParentNetwork().getSynapseRouter()
-				.associateSynapseGroupWithNeuronGroupPair(source, target, sg);
-
-	}
 
     /**
-     * Utility method for labeling synapse groups based on the neuron groups they connect.
-     * A forward arrow is used for feed-forward synapse groups, a circular arrow for 
-     * recurrent synapse groups. 
+     * The source and target neuron groups are associated with a synapse group
+     * that is initially empty. A routing rule is set up so that the synapse
+     * group will be automatically populated when synapses are added which
+     * connect the source and parent neuron group.
+     *
+     * @param source the source neuron group
+     * @param target the target neuron group
+     */
+    public void addEmptySynapseGroup(NeuronGroup source, NeuronGroup target) {
+        SynapseGroup sg = new SynapseGroup(getParentNetwork());
+        addSynapseGroup(sg);
+        sg.setDeleteWhenEmpty(false);
+        setSynapseGroupLabel(source, target, sg, ""
+                + (indexOfNeuronGroup(source) + 1), ""
+                + (indexOfNeuronGroup(target) + 1));
+
+        getParentNetwork().getSynapseRouter()
+                .associateSynapseGroupWithNeuronGroupPair(source, target, sg);
+
+    }
+
+    /**
+     * Utility method for labeling synapse groups based on the neuron groups
+     * they connect. A forward arrow is used for feed-forward synapse groups, a
+     * circular arrow for recurrent synapse groups.
      *
      * @param source source neuron group
      * @param target target neuron group
      * @param sg synapse group
      * @param sourceLabel source label
-     * @param targetLabel target  label
+     * @param targetLabel target label
      */
-	private void setSynapseGroupLabel(NeuronGroup source, NeuronGroup target,
-			final SynapseGroup sg, final String sourceLabel,
-			final String targetLabel) {
-		if (!source.equals(target)) {
-			sg.setLabel("Weights " + sourceLabel + " "
-					+ new Character('\u2192') + " " + targetLabel);
-		} else {
-			sg.setLabel("Weights " + sourceLabel + " "
-					+ new Character('\u21BA'));
-		}
+    private void setSynapseGroupLabel(NeuronGroup source, NeuronGroup target,
+            final SynapseGroup sg, final String sourceLabel,
+            final String targetLabel) {
+        if (!source.equals(target)) {
+            sg.setLabel("Weights " + sourceLabel + " "
+                    + new Character('\u2192') + " " + targetLabel);
+        } else {
+            sg.setLabel("Weights " + sourceLabel + " "
+                    + new Character('\u21BA'));
+        }
 
     }
-    
+
     /**
      * Remove a neuron group.
      *
@@ -231,7 +232,7 @@ public class Subnetwork extends Group {
      */
     public void removeNeuronGroup(NeuronGroup neuronGroup) {
         neuronGroupList.remove(neuronGroup);
-        getParentNetwork().fireGroupRemoved(neuronGroup);            
+        getParentNetwork().fireGroupRemoved(neuronGroup);
     }
 
     /**
@@ -241,7 +242,7 @@ public class Subnetwork extends Group {
      */
     public void removeSynapseGroup(SynapseGroup synapseGroup) {
         synapseGroupList.remove(synapseGroup);
-        getParentNetwork().fireGroupRemoved(synapseGroup);            
+        getParentNetwork().fireGroupRemoved(synapseGroup);
     }
 
     /**
@@ -253,7 +254,7 @@ public class Subnetwork extends Group {
     public NeuronGroup getNeuronGroup(int index) {
         return neuronGroupList.get(index);
     }
-    
+
     /**
      * Get the first neuron group in the list. Convenience method when there is
      * just one neuron group.
@@ -263,7 +264,7 @@ public class Subnetwork extends Group {
     public NeuronGroup getNeuronGroup() {
         return neuronGroupList.get(0);
     }
-    
+
     /**
      * Get number of neuron groups or "layers" in the list.
      *
@@ -272,7 +273,7 @@ public class Subnetwork extends Group {
     public int getNeuronGroupCount() {
         return neuronGroupList.size();
     }
-    
+
     /**
      * Returns an unmodifiable version of the neuron group list.
      *
@@ -281,29 +282,30 @@ public class Subnetwork extends Group {
     public List<NeuronGroup> getNeuronGroupList() {
         return Collections.unmodifiableList(neuronGroupList);
     }
-    
+
     /**
-     * Return neuron groups as a list.  Used in backprop trainer.
+     * Return neuron groups as a list. Used in backprop trainer.
      *
      * @return layers list
      */
     public List<List<Neuron>> getNeuronGroupsAsList() {
-    	List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
-    	for (NeuronGroup group : neuronGroupList) {
-    		ret.add(group.getNeuronList());    	
-    	}
-    	return ret;
+        List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
+        for (NeuronGroup group : neuronGroupList) {
+            ret.add(group.getNeuronList());
+        }
+        return ret;
     }
-    
+
     /**
      * Returns the index of a neuron group.
+     *
      * @param group the group being queried.
      * @return the index of the group in the list.
      */
-    public int indexOfNeuronGroup(NeuronGroup group){
-    	return getNeuronGroupList().indexOf(group);
+    public int indexOfNeuronGroup(NeuronGroup group) {
+        return getNeuronGroupList().indexOf(group);
     }
-    
+
     /**
      * Get a synapse group by index.
      *
@@ -313,7 +315,7 @@ public class Subnetwork extends Group {
     public SynapseGroup getSynapseGroup(int index) {
         return synapseGroupList.get(index);
     }
-    
+
     /**
      * Get the first synapse group in the list. Convenience method when there is
      * just one synapse group.
@@ -350,7 +352,7 @@ public class Subnetwork extends Group {
      */
     public List<Neuron> getFlatNeuronList() {
         List<Neuron> ret = new ArrayList<Neuron>();
-        for(NeuronGroup group : neuronGroupList) {
+        for (NeuronGroup group : neuronGroupList) {
             ret.addAll(group.getNeuronList());
         }
         return Collections.unmodifiableList(ret);
@@ -364,7 +366,7 @@ public class Subnetwork extends Group {
      */
     public List<Synapse> getFlatSynapseList() {
         List<Synapse> ret = new ArrayList<Synapse>();
-        for(SynapseGroup group : synapseGroupList) {
+        for (SynapseGroup group : synapseGroupList) {
             ret.addAll(group.getSynapseList());
         }
         return Collections.unmodifiableList(ret);
@@ -387,7 +389,6 @@ public class Subnetwork extends Group {
         }
         return ret;
     }
-    
 
     /**
      * {@inheritDoc}
@@ -408,5 +409,5 @@ public class Subnetwork extends Group {
             neuronGroup.update();
         }
     }
-    
+
 }

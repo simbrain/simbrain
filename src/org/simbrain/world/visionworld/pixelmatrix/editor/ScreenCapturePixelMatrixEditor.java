@@ -37,9 +37,8 @@ import org.simbrain.world.visionworld.pixelmatrix.ScreenCapturePixelMatrix;
 /**
  * Screen capture pixel matrix editor.
  */
-public final class ScreenCapturePixelMatrixEditor
-    extends JPanel
-    implements PixelMatrixEditor {
+public final class ScreenCapturePixelMatrixEditor extends JPanel implements
+        PixelMatrixEditor {
 
     /** Screen origin x. */
     private JTextField originX;
@@ -68,7 +67,6 @@ public final class ScreenCapturePixelMatrixEditor
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
-
     /**
      * Create a new screen capture pixel matrix editor.
      */
@@ -78,7 +76,6 @@ public final class ScreenCapturePixelMatrixEditor
         initComponents();
         layoutComponents();
     }
-
 
     /**
      * Initialize components.
@@ -95,7 +92,8 @@ public final class ScreenCapturePixelMatrixEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME),
+                new EmptyBorder(6, 6, 6, 6)));
         setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
@@ -168,8 +166,10 @@ public final class ScreenCapturePixelMatrixEditor
 
     /** {@inheritDoc} */
     public Component getEditorComponent() {
-        originX.setText(String.valueOf(ScreenCapturePixelMatrix.DEFAULT_ORIGIN_X));
-        originY.setText(String.valueOf(ScreenCapturePixelMatrix.DEFAULT_ORIGIN_Y));
+        originX.setText(String
+                .valueOf(ScreenCapturePixelMatrix.DEFAULT_ORIGIN_X));
+        originY.setText(String
+                .valueOf(ScreenCapturePixelMatrix.DEFAULT_ORIGIN_Y));
         height.setText(String.valueOf(ScreenCapturePixelMatrix.DEFAULT_HEIGHT));
         width.setText(String.valueOf(ScreenCapturePixelMatrix.DEFAULT_WIDTH));
         return this;
@@ -182,14 +182,13 @@ public final class ScreenCapturePixelMatrixEditor
             int y = Integer.valueOf(originY.getText());
             int h = Integer.valueOf(height.getText());
             int w = Integer.valueOf(width.getText());
-            ScreenCapturePixelMatrix pixelMatrix = new ScreenCapturePixelMatrix(x, y, w, h);
+            ScreenCapturePixelMatrix pixelMatrix = new ScreenCapturePixelMatrix(
+                    x, y, w, h);
             pixelMatrix.capture();
             return pixelMatrix;
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             throw new PixelMatrixEditorException(e);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new PixelMatrixEditorException(e);
         }
     }

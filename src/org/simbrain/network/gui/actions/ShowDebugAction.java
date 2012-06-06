@@ -28,8 +28,7 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Prints debug information to standard output.
  */
-public final class ShowDebugAction
-    extends AbstractAction {
+public final class ShowDebugAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -49,7 +48,6 @@ public final class ShowDebugAction
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke("D"), this);
         networkPanel.getActionMap().put(this, this);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

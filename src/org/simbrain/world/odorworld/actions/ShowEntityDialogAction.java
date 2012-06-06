@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.propertyeditor.ReflectivePropertyEditor;
 import org.simbrain.world.odorworld.DialogOdorWorldEntity;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

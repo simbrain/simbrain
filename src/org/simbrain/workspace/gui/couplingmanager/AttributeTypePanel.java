@@ -38,7 +38,7 @@ import org.simbrain.workspace.gui.couplingmanager.PotentialAttributePanel.Produc
 /**
  * Displays a list of attribute types.
  */
-public class AttributeTypePanel extends JPanel  {
+public class AttributeTypePanel extends JPanel {
 
     /** Table representing attribute types. */
     private JTable table;
@@ -51,14 +51,14 @@ public class AttributeTypePanel extends JPanel  {
      *
      * @param desktop reference.
      */
-    public AttributeTypePanel(final WorkspaceComponent component, final ProducerOrConsumer poc) {
+    public AttributeTypePanel(final WorkspaceComponent component,
+            final ProducerOrConsumer poc) {
         super(new BorderLayout());
 
         // Set up table
         model = new AttributeTypeModel();
         table = new JTable(model);
-        ((DefaultTableCellRenderer) table.getTableHeader()
-                .getDefaultRenderer())
+        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
                 .setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(false);
         table.setGridColor(Color.LIGHT_GRAY);
@@ -92,10 +92,10 @@ public class AttributeTypePanel extends JPanel  {
     class AttributeTypeModel extends AbstractTableModel {
 
         /** Column names. */
-        String[] columnNames = {"Name","Data Type",  "Visible" };
+        String[] columnNames = { "Name", "Data Type", "Visible" };
 
         /** Internal list of components. */
-        private List<AttributeType> data = new ArrayList<AttributeType>();      
+        private List<AttributeType> data = new ArrayList<AttributeType>();
 
         public void addRow(AttributeType type) {
             data.add(type);

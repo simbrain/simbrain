@@ -97,14 +97,14 @@ public class WorkspaceUpdater {
      */
     public WorkspaceUpdater(final Workspace workspace, final int threads) {
 
-    	this.workspace = workspace;
+        this.workspace = workspace;
         this.numThreads = threads;
-        
+
         // A single thread updates the workspace
         workspaceUpdates = Executors.newSingleThreadExecutor();
-        
-		// In some cases components can be updated in parallel. So
-		// a thread pool with a configurable number of threads is used
+
+        // In some cases components can be updated in parallel. So
+        // a thread pool with a configurable number of threads is used
         componentUpdates = Executors.newFixedThreadPool(threads,
                 new UpdaterThreadFactory());
 
@@ -123,8 +123,7 @@ public class WorkspaceUpdater {
      * @param workspace The parent workspace.
      */
     public WorkspaceUpdater(final Workspace workspace) {
-        this(workspace, Runtime.getRuntime()
-                .availableProcessors());
+        this(workspace, Runtime.getRuntime().availableProcessors());
     }
 
     /**
@@ -174,8 +173,8 @@ public class WorkspaceUpdater {
     }
 
     /**
-     * Starts the update thread.  Used when "running" the workspace
-     * by pressing the play button in the gui.
+     * Starts the update thread. Used when "running" the workspace by pressing
+     * the play button in the gui.
      */
     public void run() {
         run = true;
@@ -271,17 +270,16 @@ public class WorkspaceUpdater {
             e.printStackTrace();
         }
 
-        for(UpdateAction action : updateActionManager.getActionList()) {
+        for (UpdateAction action : updateActionManager.getActionList()) {
             action.invoke();
-        }        
+        }
 
-        synchManager.runTasks(); 
+        synchManager.runTasks();
 
         notifyWorkspaceUpdated();
 
         LOGGER.trace("done: " + time);
     }
-
 
     /**
      * Adds a component listener to this instance.
@@ -510,12 +508,12 @@ public class WorkspaceUpdater {
         }
     };
 
-	/**
-	 * Creates the threads used in the ExecutorService. Used to create a custom
-	 * thread class that will be generated inside the executor. This allows for
-	 * a clean way to capture the events using the thread instances themselves
-	 * which 'know' their thread number.
-	 */
+    /**
+     * Creates the threads used in the ExecutorService. Used to create a custom
+     * thread class that will be generated inside the executor. This allows for
+     * a clean way to capture the events using the thread instances themselves
+     * which 'know' their thread number.
+     */
     private class UpdaterThreadFactory implements ThreadFactory {
         /** Numbers the threads sequentially. */
         private int nextThread = 1;
@@ -538,16 +536,15 @@ public class WorkspaceUpdater {
      *
      * @return the update manager
      */
-	public UpdateActionManager getUpdateManager() {
-		return updateActionManager;
-	}
-	
+    public UpdateActionManager getUpdateManager() {
+        return updateActionManager;
+    }
 
-	/**
-	 * Get a synchronized list of component.
-	 *
-	 * @return the synchronized list of components
-	 */
+    /**
+     * Get a synchronized list of component.
+     *
+     * @return the synchronized list of components
+     */
     public List<? extends WorkspaceComponent> getComponents() {
         List<? extends WorkspaceComponent> components = workspace
                 .getComponentList();
@@ -605,11 +602,11 @@ public class WorkspaceUpdater {
         workspace.getUpdater().notifyCouplingsUpdated();
     }
 
-	/**
-	 * @return the workspace
-	 */
-	public Workspace getWorkspace() {
-		return workspace;
-	}
+    /**
+     * @return the workspace
+     */
+    public Workspace getWorkspace() {
+        return workspace;
+    }
 
 }

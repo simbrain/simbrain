@@ -88,9 +88,8 @@ public class SparsePanel extends AbstractConnectionPanel {
 
     /**
      * This method is the default constructor.
-     * 
-     * @param connection
-     *            type
+     *
+     * @param connection type
      */
     public SparsePanel(final Sparse connection, final NetworkPanel networkPanel) {
         super(connection);

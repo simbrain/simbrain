@@ -18,10 +18,9 @@
  */
 package org.simbrain.network.core;
 
-
 /**
  * <b>NetworkTextObject</b> is a string of text in a neural network, typically
- * used to label elements of a neural network simulation.  Contains basic text
+ * used to label elements of a neural network simulation. Contains basic text
  * properties as well.
  */
 public class NetworkTextObject {
@@ -108,7 +107,9 @@ public class NetworkTextObject {
         this.y = y;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -185,6 +186,5 @@ public class NetworkTextObject {
     public void setBold(boolean bold) {
         this.bold = bold;
     }
-
 
 }

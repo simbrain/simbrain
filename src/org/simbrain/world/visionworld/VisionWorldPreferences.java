@@ -22,13 +22,15 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * <b>VisionWorldPreferences</b> handles storage and retrieval of user preferences, e.g. current directory.
+ * <b>VisionWorldPreferences</b> handles storage and retrieval of user
+ * preferences, e.g. current directory.
  */
 public class VisionWorldPreferences {
     /** System specific file separator. */
     private static final String FS = System.getProperty("file.separator");
-    /**The main user preference object. */
-    private static final Preferences VISION_WORLD_PREFERENCES = Preferences.userRoot().node("/org/simbrain/worlds");
+    /** The main user preference object. */
+    private static final Preferences VISION_WORLD_PREFERENCES = Preferences
+            .userRoot().node("/org/simbrain/worlds");
 
     /**
      * Private no-arg constructor.
@@ -58,6 +60,7 @@ public class VisionWorldPreferences {
 
     /**
      * Sets the current vision world directory.
+     *
      * @param dir Directory to set as current
      */
     public static void setCurrentDirectory(final String dir) {
@@ -66,18 +69,20 @@ public class VisionWorldPreferences {
 
     /**
      * The current vision world directory.
+     *
      * @return Current directory
      */
     public static String getCurrentDirectory() {
-        return VISION_WORLD_PREFERENCES.get("CurrentDirectory", getDefaultDirectory());
+        return VISION_WORLD_PREFERENCES.get("CurrentDirectory",
+                getDefaultDirectory());
     }
 
     /**
      * The default directory, called when current directory has not been set.
+     *
      * @return Default directory
      */
     public static String getDefaultDirectory() {
         return "." + FS + "simulations" + FS + "worlds";
     }
 }
-

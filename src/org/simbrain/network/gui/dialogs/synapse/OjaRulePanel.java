@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.OjaRule;
 
-
 /**
  * <b>OjaSynapsePanel</b>.
  */
@@ -52,15 +51,18 @@ public class OjaRulePanel extends AbstractSynapsePanel {
     public void fillFieldValues() {
         synapseRef = (OjaRule) ruleList.get(0);
 
-        tfNormalize.setText(Double.toString(synapseRef.getNormalizationFactor()));
+        tfNormalize
+                .setText(Double.toString(synapseRef.getNormalizationFactor()));
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(ruleList, OjaRule.class, "getNormalizationFactor")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
+                "getNormalizationFactor")) {
             tfNormalize.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, OjaRule.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, OjaRule.class,
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -69,8 +71,9 @@ public class OjaRulePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-//        OjaSynapse synapseRef = new OjaSynapse();
-        tfNormalize.setText(Double.toString(OjaRule.DEFAULT_NORMALIZATION_FACTOR));
+        // OjaSynapse synapseRef = new OjaSynapse();
+        tfNormalize.setText(Double
+                .toString(OjaRule.DEFAULT_NORMALIZATION_FACTOR));
         tfLearningRate.setText(Double.toString(OjaRule.DEFAULT_LEARNING_RATE));
     }
 
@@ -82,11 +85,13 @@ public class OjaRulePanel extends AbstractSynapsePanel {
             OjaRule synapseRef = (OjaRule) ruleList.get(i);
 
             if (!tfNormalize.getText().equals(NULL_STRING)) {
-                synapseRef.setNormalizationFactor(Double.parseDouble(tfNormalize.getText()));
+                synapseRef.setNormalizationFactor(Double
+                        .parseDouble(tfNormalize.getText()));
             }
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                        .getText()));
             }
         }
     }

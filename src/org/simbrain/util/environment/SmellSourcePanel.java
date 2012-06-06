@@ -264,8 +264,7 @@ public class SmellSourcePanel extends LabelledItemPanel implements
         smellSource.setAddNoise(rbAddNoise.isSelected());
 
         if (rbAddNoise.isSelected()) {
-            smellSource.setNoiseLevel((double) jsNoiseLevel.getValue()
-                    / 100);
+            smellSource.setNoiseLevel((double) jsNoiseLevel.getValue() / 100);
         }
     }
 

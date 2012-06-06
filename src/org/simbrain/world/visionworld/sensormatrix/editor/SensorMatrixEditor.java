@@ -29,23 +29,24 @@ import org.simbrain.world.visionworld.SensorMatrix;
 public interface SensorMatrixEditor {
 
     /**
-     * Return the editor component for this sensor matrix editor.
-     * The editor component will not be null.
+     * Return the editor component for this sensor matrix editor. The editor
+     * component will not be null.
      *
      * @return the editor component for this sensor matrix editor
      */
     Component getEditorComponent();
-    
+
     /**
-     * Create a new instance of SensorMatrix from the properties of this
-     * sensor matrix editor and the specified default filter.  The sensor matrix
-     * will not be null.
+     * Create a new instance of SensorMatrix from the properties of this sensor
+     * matrix editor and the specified default filter. The sensor matrix will
+     * not be null.
      *
      * @param defaultFilter default filter
-     * @return a new instance of SensorMatrix created from the properties
-     *    of this sensor matrix editor
+     * @return a new instance of SensorMatrix created from the properties of
+     *         this sensor matrix editor
      * @throws SensorMatrixEditorException if a SensorMatrix cannot properly be
-     *    created from the properties of this sensor matrix editor
+     *             created from the properties of this sensor matrix editor
      */
-    SensorMatrix createSensorMatrix(final Filter defaultFilter) throws SensorMatrixEditorException;
+    SensorMatrix createSensorMatrix(final Filter defaultFilter)
+            throws SensorMatrixEditorException;
 }

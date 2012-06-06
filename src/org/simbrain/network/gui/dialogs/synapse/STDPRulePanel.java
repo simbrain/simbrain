@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 
-
 /**
  * <b>ShortTermPlasticitySynapsePanel</b> allows users to edit STDP synapses.
  */
@@ -33,13 +32,13 @@ public class STDPRulePanel extends AbstractSynapsePanel {
     private JTextField tfTauMinus = new JTextField();
 
     /** Tau plus. */
-    private JTextField tfTauPlus= new JTextField();
+    private JTextField tfTauPlus = new JTextField();
 
     /** W minus. */
     private JTextField tfWMinus = new JTextField();
 
     /** WÊplus. */
-    private JTextField tfWPlus= new JTextField();
+    private JTextField tfWPlus = new JTextField();
 
     /** Learning rate. */
     private JTextField tfLearningRate = new JTextField();
@@ -71,7 +70,8 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         // Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getTau_minus")) {
+        if (!NetworkUtils
+                .isConsistent(ruleList, STDPRule.class, "getTau_minus")) {
             tfTauMinus.setText(NULL_STRING);
         }
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getTau_plus")) {
@@ -83,7 +83,8 @@ public class STDPRulePanel extends AbstractSynapsePanel {
         if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getW_plus")) {
             tfWPlus.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(ruleList, STDPRule.class,
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -93,11 +94,11 @@ public class STDPRulePanel extends AbstractSynapsePanel {
      */
     public void fillDefaultValues() {
         STDPRule template = new STDPRule();
-        tfTauPlus.setText("" +  template.getTau_plus());
-        tfTauMinus.setText("" +  template.getTau_minus());
-        tfWPlus.setText("" +  template.getW_plus());
-        tfWMinus.setText("" +  template.getW_minus());
-        tfLearningRate.setText("" +  template.getLearningRate());
+        tfTauPlus.setText("" + template.getTau_plus());
+        tfTauMinus.setText("" + template.getTau_minus());
+        tfWPlus.setText("" + template.getW_plus());
+        tfWMinus.setText("" + template.getW_minus());
+        tfLearningRate.setText("" + template.getLearningRate());
     }
 
     /**
@@ -109,7 +110,8 @@ public class STDPRulePanel extends AbstractSynapsePanel {
             STDPRule synapseRef = (STDPRule) ruleList.get(i);
 
             if (!tfTauMinus.getText().equals(NULL_STRING)) {
-                synapseRef.setTau_minus(Double.parseDouble(tfTauMinus.getText()));
+                synapseRef
+                        .setTau_minus(Double.parseDouble(tfTauMinus.getText()));
             }
             if (!tfTauPlus.getText().equals(NULL_STRING)) {
                 synapseRef.setTau_plus(Double.parseDouble(tfTauPlus.getText()));
@@ -121,7 +123,8 @@ public class STDPRulePanel extends AbstractSynapsePanel {
                 synapseRef.setW_plus(Double.parseDouble(tfWPlus.getText()));
             }
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                        .getText()));
             }
         }
     }

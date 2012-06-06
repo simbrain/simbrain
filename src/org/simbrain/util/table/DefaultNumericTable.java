@@ -67,7 +67,7 @@ public final class DefaultNumericTable extends NumericTable implements
         this.numColumns = numColumns;
         init();
     }
-    
+
     /**
      * Construct a table from an 2-d array of doubles.
      *
@@ -75,8 +75,8 @@ public final class DefaultNumericTable extends NumericTable implements
      */
     public DefaultNumericTable(final double[][] data) {
         this.numRows = data.length;
-        if(data.length > 0) {
-            this.numColumns = data[0].length;            
+        if (data.length > 0) {
+            this.numColumns = data[0].length;
         }
         init();
         setData(data);
@@ -94,11 +94,13 @@ public final class DefaultNumericTable extends NumericTable implements
      */
     protected void init() {
         for (int i = 0; i < numRows; i++) {
-            rowData.add((List<Double>) getNewRow(0));
+            rowData.add(getNewRow(0));
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#reset(int, int)
      */
     public void reset(int rows, int cols) {
@@ -108,13 +110,15 @@ public final class DefaultNumericTable extends NumericTable implements
         numColumns = cols;
 
         for (int i = 0; i < rows; i++) {
-            rowData.add((List<Double>) getNewRow(0));
+            rowData.add(getNewRow(0));
         }
 
         fireTableStructureChanged();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#reset(int, int, double)
      */
     public void reset(int rows, int cols, double val) {
@@ -140,10 +144,10 @@ public final class DefaultNumericTable extends NumericTable implements
     @Override
     public void setValue(final int row, final int column, final Double value) {
         rowData.get(row).set(column, value);
-        // TODO: fireTableDataChanged() used to be called but it was a 
-        //		performance problem.   May be cases where update does not
-        //		happen properly.   If so add amethod for setValue with a boolean
-        //		fireEvent flag here.
+        // TODO: fireTableDataChanged() used to be called but it was a
+        // performance problem. May be cases where update does not
+        // happen properly. If so add amethod for setValue with a boolean
+        // fireEvent flag here.
     }
 
     /**
@@ -177,7 +181,9 @@ public final class DefaultNumericTable extends NumericTable implements
         return getValue(currentRow, column);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#addRow(double)
      */
     public void addRow(final double value) {
@@ -198,7 +204,9 @@ public final class DefaultNumericTable extends NumericTable implements
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#insertRow(int, double)
      */
     public void insertRow(final int at, final double value) {
@@ -223,22 +231,30 @@ public final class DefaultNumericTable extends NumericTable implements
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#addColumn(double)
      */
     public void addColumn(final double value) {
         addColumn(value, true);
     }
 
-    /* (non-Javadoc)
-     * @see org.simbrain.util.table.MutableTable#addRowsColumns(int, int, double)
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.simbrain.util.table.MutableTable#addRowsColumns(int, int,
+     * double)
      */
     public void addRowsColumns(final int row, final int col, final double value) {
         modifyRowsColumns(row + numRows, col + numColumns, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.simbrain.util.table.MutableTable#modifyRowsColumns(int, int, double)
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.simbrain.util.table.MutableTable#modifyRowsColumns(int, int,
+     * double)
      */
     public void modifyRowsColumns(final int row, final int col,
             final double value) {
@@ -266,21 +282,27 @@ public final class DefaultNumericTable extends NumericTable implements
         fireTableStructureChanged();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#addRows(int, double)
      */
     public void addRows(final int rowsToAdd, final double number) {
         addRowsColumns(rowsToAdd, 0, number);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#addColumns(int, double)
      */
     public void addColumns(final int colsToAdd, final double defaultValue) {
         addRowsColumns(0, colsToAdd, defaultValue);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#insertColumn(int, double)
      */
     public void insertColumn(final int at, final double value) {
@@ -291,13 +313,14 @@ public final class DefaultNumericTable extends NumericTable implements
         this.fireColumnAdded(at);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#removeRow(int)
      */
     public void removeRow(final int rowToRemoveIndex) {
         removeRow(rowToRemoveIndex, true);
     }
-
 
     /**
      * Remove row with choice whether to fire an event or not.
@@ -341,35 +364,45 @@ public final class DefaultNumericTable extends NumericTable implements
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.MutableTable#removeColumn(int)
      */
     public void removeColumn(final int columnToRemoveIndex) {
         removeColumn(columnToRemoveIndex, true);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.IterableRows#getCurrentRow()
      */
     public int getCurrentRow() {
         return currentRow;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.IterableRows#isIterationMode()
      */
     public boolean isIterationMode() {
         return iterationMode;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.IterableRows#setIterationMode(boolean)
      */
     public void setIterationMode(boolean iterationMode) {
         this.iterationMode = iterationMode;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.IterableRows#setCurrentRow(int)
      */
     public void setCurrentRow(int currentRow) {
@@ -386,7 +419,9 @@ public final class DefaultNumericTable extends NumericTable implements
         return numRows;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.simbrain.util.table.IterableRows#update()
      */
     public void updateCurrentRow() {

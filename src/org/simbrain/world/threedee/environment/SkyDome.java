@@ -45,14 +45,14 @@ import com.jme.scene.state.TextureState;
 import com.jme.scene.state.ZBufferState;
 
 /**
-* A Dome used to create a sky effect.  Parts taken from jME project source.
-*
-* @author Matt Watson
-*/
+ * A Dome used to create a sky effect. Parts taken from jME project source.
+ *
+ * @author Matt Watson
+ */
 public class SkyDome extends Node {
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
-    
+
     /** One hundred-eighty degrees in radians. */
     private static final float HALF_CIRCLE = (float) Math.toRadians(180);
 
@@ -60,18 +60,18 @@ public class SkyDome extends Node {
     private Dome skyboxDome;
     /** The renderer for the SkyDome. */
     private Renderer renderer;
-    
+
     /**
-     * Creates a new skyDome. The size of the skyDome and name is specified here.
-     * By default, no textures are set.
+     * Creates a new skyDome. The size of the skyDome and name is specified
+     * here. By default, no textures are set.
      *
      * @param name The name of the SkyBox.
      * @param planes The planes of the Dome.
      * @param radialSamples The radial samples of the Dome.
      * @param radius The radius of the Dome.
      */
-    public SkyDome(final String name, final int planes, final int radialSamples,
-            final float radius) {
+    public SkyDome(final String name, final int planes,
+            final int radialSamples, final float radius) {
         super(name);
 
         skyboxDome = new Dome("topSkyDome", planes, radialSamples, radius);
@@ -101,11 +101,12 @@ public class SkyDome extends Node {
      * replaces the texture at the index specified by textureUnit.
      *
      * @param texture The texture for that side to assume.
-     * @param textureUnit The texture unite of the given side's TextureState the texture
-     *        will assume.
+     * @param textureUnit The texture unite of the given side's TextureState the
+     *            texture will assume.
      */
     public void setTexture(final Texture texture, final int textureUnit) {
-        TextureState ts = (TextureState) skyboxDome.getRenderState(RenderState.RS_TEXTURE);
+        TextureState ts = (TextureState) skyboxDome
+                .getRenderState(RenderState.RS_TEXTURE);
         if (ts == null) {
             ts = renderer.createTextureState();
         }
@@ -125,7 +126,8 @@ public class SkyDome extends Node {
      */
     public void initialize() {
         /* Create Dome */
-        skyboxDome.setLocalRotation(new Quaternion(new float[] {0, HALF_CIRCLE, 0}));
+        skyboxDome.setLocalRotation(new Quaternion(new float[] { 0,
+                HALF_CIRCLE, 0 }));
 
         /* We don't want the light to effect our skybox */
         LightState lightState = renderer.createLightState();
@@ -168,13 +170,16 @@ public class SkyDome extends Node {
      * application as you pan around the world.
      */
     public void preloadTextures() {
-        TextureState ts = (TextureState) skyboxDome.getRenderState(RenderState.RS_TEXTURE);
-        if (ts != null) { ts.apply(); }
+        TextureState ts = (TextureState) skyboxDome
+                .getRenderState(RenderState.RS_TEXTURE);
+        if (ts != null) {
+            ts.apply();
+        }
     }
 
     /**
      * Sets the renderer for this instance.
-     * 
+     *
      * @param renderer The renderer to set.
      */
     void setRenderer(final Renderer renderer) {

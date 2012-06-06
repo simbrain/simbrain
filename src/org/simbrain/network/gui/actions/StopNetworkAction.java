@@ -28,12 +28,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Stop network action.
  */
-public final class StopNetworkAction
-    extends AbstractAction {
+public final class StopNetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new stop network action with the specified network panel.
@@ -51,9 +49,8 @@ public final class StopNetworkAction
         putValue(SHORT_DESCRIPTION, "Stop iterate network update algorithm");
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-    	networkPanel.setRunning(false);
+        networkPanel.setRunning(false);
     }
 }

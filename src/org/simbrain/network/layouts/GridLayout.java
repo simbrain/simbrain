@@ -1,10 +1,8 @@
 package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 
 /**
@@ -39,7 +37,8 @@ public class GridLayout implements Layout {
      * @param vSpacing vertical spacing between neurons
      * @param numColumns number of columns of neurons
      */
-    public GridLayout(final double hSpacing, final double vSpacing, final int numColumns) {
+    public GridLayout(final double hSpacing, final double vSpacing,
+            final int numColumns) {
         this.hSpacing = hSpacing;
         this.vSpacing = vSpacing;
         this.numColumns = numColumns;
@@ -48,7 +47,8 @@ public class GridLayout implements Layout {
     /**
      * Default constructor.
      */
-    public GridLayout() { }
+    public GridLayout() {
+    }
 
     /**
      * {@inheritDoc}
@@ -61,7 +61,7 @@ public class GridLayout implements Layout {
         }
 
         for (int i = 0; i < neurons.size(); i++) {
-            Neuron neuron = (Neuron) neurons.get(i);
+            Neuron neuron = neurons.get(i);
             if (i % numCols == 0) {
                 rowNum++;
             }
@@ -70,16 +70,18 @@ public class GridLayout implements Layout {
         }
     }
 
-    /** @see Layout
-     *  @param initialPoint Initial point
+    /**
+     * @see Layout
+     * @param initialPoint Initial point
      */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
         initialY = initialPoint.getY();
     }
 
-    /** @see Layout
-     *  @return String
+    /**
+     * @see Layout
+     * @return String
      */
     public String getLayoutName() {
         return "Grid";

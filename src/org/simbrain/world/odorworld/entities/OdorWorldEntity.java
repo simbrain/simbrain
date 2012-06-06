@@ -701,7 +701,7 @@ public abstract class OdorWorldEntity {
      * @return the x position as a double.
      */
     public double getDoubleX() {
-        return (double) x;
+        return x;
     }
 
     /**
@@ -710,7 +710,7 @@ public abstract class OdorWorldEntity {
      * @return the y position as a double.
      */
     public double getDoubleY() {
-        return (double) y;
+        return y;
     }
 
     /**

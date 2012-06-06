@@ -28,21 +28,21 @@ import org.simbrain.world.visionworld.Filter;
 public interface FilterEditor {
 
     /**
-     * Return the editor component for this filter editor.
-     * The editor component will not be null.
+     * Return the editor component for this filter editor. The editor component
+     * will not be null.
      *
      * @return the editor component for this filter editor
      */
     Component getEditorComponent();
 
     /**
-     * Create a new instance of Filter from the properties of this
-     * filter editor.  The filter will not be null.
+     * Create a new instance of Filter from the properties of this filter
+     * editor. The filter will not be null.
      *
-     * @return a new instance of Filter created from the properties
-     *    of this filter editor
-     * @throws FilterEditorException if a Filter cannot properly be
-     *    created from the properties of this filter editor
+     * @return a new instance of Filter created from the properties of this
+     *         filter editor
+     * @throws FilterEditorException if a Filter cannot properly be created from
+     *             the properties of this filter editor
      */
     Filter createFilter() throws FilterEditorException;
 }

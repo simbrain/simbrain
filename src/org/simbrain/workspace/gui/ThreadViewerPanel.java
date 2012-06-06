@@ -50,15 +50,15 @@ import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 public class ThreadViewerPanel extends JPanel {
 
     /** Thread viewer panel. */
-	private JPanel threadViewer = new JPanel(new BorderLayout());
+    private JPanel threadViewer = new JPanel(new BorderLayout());
 
     /** Thread viewer panel. */
-	private JToolBar topStatsPanel= new JToolBar();
+    private JToolBar topStatsPanel = new JToolBar();
 
-	/** List of update types to be used as model for the updater combo box. */
+    /** List of update types to be used as model for the updater combo box. */
     private Vector updateTypes = new Vector();
 
-	/** Update types. */
+    /** Update types. */
     private JComboBox updaterComboBox = new JComboBox(updateTypes);
 
     /** List. */
@@ -92,37 +92,36 @@ public class ThreadViewerPanel extends JPanel {
         threadViewer.add(scrollPane);
 
         // Update Type Selector
-//        topStatsPanel.add(new JLabel("Update type:"));
-//        topStatsPanel.add(updatorComboBox);
-//        updatorComboBox.setMaximumSize(new Dimension(150,100));
-//        setUpdatorComboBoxToDefaults();
-        
+        // topStatsPanel.add(new JLabel("Update type:"));
+        // topStatsPanel.add(updatorComboBox);
+        // updatorComboBox.setMaximumSize(new Dimension(150,100));
+        // setUpdatorComboBoxToDefaults();
+
         JButton showUpdateManager = new JButton("Update Manager");
         showUpdateManager.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-		    	JDialog dialog = new JDialog();
-		    	dialog.setContentPane(new UpdateManagerPanel(workspace));
-		        dialog.setModal(true);
-		        dialog.pack();
-		        dialog.setLocationRelativeTo(null);
-		        dialog.setVisible(true);
-			}
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                JDialog dialog = new JDialog();
+                dialog.setContentPane(new UpdateManagerPanel(workspace));
+                dialog.setModal(true);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
         });
 
         topStatsPanel.add(showUpdateManager);
 
-
         topStatsPanel.addSeparator();
         topStatsPanel.add(new JLabel("Number of Threads: "));
-        updaterNumThreads.setMaximumSize(new Dimension(100,100));
+        updaterNumThreads.setMaximumSize(new Dimension(100, 100));
         topStatsPanel.add(updaterNumThreads);
         JButton setThreadsButton = new JButton("Set");
         setThreadsButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent arg0) {
                 workspace.getUpdater().setNumThreads(
                         Integer.parseInt(updaterNumThreads.getText()));
-			}
+            }
 
         });
         topStatsPanel.add(setThreadsButton);
@@ -139,24 +138,22 @@ public class ThreadViewerPanel extends JPanel {
         workspace.getUpdater().addComponentListener(
                 new ComponentUpdateListener() {
 
-                	/**
-                	 * {@inheritDoc}
-                	 */
+                    /**
+                     * {@inheritDoc}
+                     */
                     public void finishedComponentUpdate(
-                            WorkspaceComponent component, int update,
-                            int thread) {
+                            WorkspaceComponent component, int update, int thread) {
                         listModel.getElementAt(thread - 1).setText(
                                 "Thread " + thread + ": finished updating "
                                         + component.getName());
                         threadViewer.repaint();
                     }
 
-                	/**
-                	 * {@inheritDoc}
-                	 */
+                    /**
+                     * {@inheritDoc}
+                     */
                     public void startingComponentUpdate(
-                            WorkspaceComponent component, int update,
-                            int thread) {
+                            WorkspaceComponent component, int update, int thread) {
                         listModel.getElementAt(thread - 1).setText(
                                 "Thread " + thread + ": starting to update"
                                         + component.getName());
@@ -191,7 +188,8 @@ public class ThreadViewerPanel extends JPanel {
                         updateList();
                     }
 
-                    // TODO: Should be some useful graphic thing to do when update begins and ends...
+                    // TODO: Should be some useful graphic thing to do when
+                    // update begins and ends...
                     public void updatingStarted() {
                         // TODO Auto-generated method stub
                     }
@@ -211,8 +209,8 @@ public class ThreadViewerPanel extends JPanel {
      * Update thread viewer list.
      */
     private void updateList() {
-    	listModel = new ThreadListModel<ListItem>();
-    	for (int i = 1; i <= workspace.getUpdater().getNumThreads(); i++) {
+        listModel = new ThreadListModel<ListItem>();
+        for (int i = 1; i <= workspace.getUpdater().getNumThreads(); i++) {
             ListItem label = new ListItem("Thread " + i);
             listModel.add(label);
         }
@@ -222,20 +220,21 @@ public class ThreadViewerPanel extends JPanel {
 
     /**
      * Re-populate the updater combo box.
-     */ 
+     */
     private void updateUpdaterComboBox() {
-    	//REDO
-//        if (workspace.getUpdater().getType() == WorkspaceUpdater.TYPE.CUSTOM) {
-//            setUpdaterComboBoxToDefaults();
-////            String name = workspace.getUpdater().getCurrentUpdaterName();
-////            updateTypes.add(name);
-//            updaterComboBox.setSelectedItem(name);
-//        } else {
-//            updaterComboBox.setSelectedItem(workspace.getUpdater().getType());
-//            if (updaterComboBox.getItemCount() > 2) {
-//                setUpdaterComboBoxToDefaults();
-//            }
-//        }
+        // REDO
+        // if (workspace.getUpdater().getType() == WorkspaceUpdater.TYPE.CUSTOM)
+        // {
+        // setUpdaterComboBoxToDefaults();
+        // // String name = workspace.getUpdater().getCurrentUpdaterName();
+        // // updateTypes.add(name);
+        // updaterComboBox.setSelectedItem(name);
+        // } else {
+        // updaterComboBox.setSelectedItem(workspace.getUpdater().getType());
+        // if (updaterComboBox.getItemCount() > 2) {
+        // setUpdaterComboBoxToDefaults();
+        // }
+        // }
     }
 
     /**
@@ -243,13 +242,13 @@ public class ThreadViewerPanel extends JPanel {
      */
     private void setUpdaterComboBoxToDefaults() {
         updateTypes.removeAllElements();
-//        updateTypes.add(WorkspaceUpdater.TYPE.BUFFERED);
-//        updateTypes.add(WorkspaceUpdater.TYPE.PRIORITY);
+        // updateTypes.add(WorkspaceUpdater.TYPE.BUFFERED);
+        // updateTypes.add(WorkspaceUpdater.TYPE.PRIORITY);
     }
 
-	/**
-	 * Update various labels and components reflecting update stats.
-	 */
+    /**
+     * Update various labels and components reflecting update stats.
+     */
     private void updateStats() {
         updateUpdaterComboBox();
         updaterNumThreads.setText("" + workspace.getUpdater().getNumThreads());

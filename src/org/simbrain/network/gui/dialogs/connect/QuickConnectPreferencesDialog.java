@@ -72,7 +72,8 @@ public class QuickConnectPreferencesDialog extends StandardDialog implements
         typePanel.addItem("Connection Type", cbConnectionType);
         cbConnectionType.setSelectedItem(QuickConnectPreferences
                 .getCurrentConnection());
-        ShowHelpAction helpAction = new ShowHelpAction("Network/connections.html");
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Network/connections.html");
         addButton(new JButton(helpAction));
         initPanel();
         mainPanel.add(typePanel);

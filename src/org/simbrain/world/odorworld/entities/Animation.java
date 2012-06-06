@@ -51,19 +51,18 @@ public class Animation {
      * @param imageLocation file name of image
      */
     public Animation(final String imageLocation) {
-      //Duration does not matter in this case, so set it to 1 arbitrarily.
-      this(new String[]{imageLocation}, 1); 
+        // Duration does not matter in this case, so set it to 1 arbitrarily.
+        this(new String[] { imageLocation }, 1);
     }
 
-//    /**
-//     * Creates a duplicate of this animation. The list of frames are shared
-//     * between the two Animations, but each Animation can be animated
-//     * independently.
-//     */
-//    public Object clone() {
-//        return new Animation(frames, totalDuration);
-//    }
-
+    // /**
+    // * Creates a duplicate of this animation. The list of frames are shared
+    // * between the two Animations, but each Animation can be animated
+    // * independently.
+    // */
+    // public Object clone() {
+    // return new Animation(frames, totalDuration);
+    // }
 
     /**
      * Adds an image to the animation with the specified duration (time to
@@ -74,7 +73,6 @@ public class Animation {
         frames.add(new AnimFrame(image, totalDuration));
     }
 
-
     /**
      * Starts this animation over from the beginning.
      */
@@ -82,7 +80,6 @@ public class Animation {
         animTime = 0;
         currFrameIndex = 0;
     }
-
 
     /**
      * Updates this animation's current image (frame), if necessary.
@@ -101,7 +98,6 @@ public class Animation {
         }
     }
 
-
     /**
      * Gets this Animation's current image. Returns null if this animation has
      * no images.
@@ -109,12 +105,10 @@ public class Animation {
     public synchronized Image getImage() {
         if (frames.size() == 0) {
             return null;
-        }
-        else {
+        } else {
             return getFrame(currFrameIndex).image;
         }
     }
-
 
     /**
      * Get a specified frame.
@@ -123,9 +117,8 @@ public class Animation {
      * @return the indicated frame
      */
     private AnimFrame getFrame(final int i) {
-        return (AnimFrame) frames.get(i);
+        return frames.get(i);
     }
-
 
     /**
      * An single frame of an animation.
@@ -149,7 +142,6 @@ public class Animation {
             this.endTime = endTime;
         }
     }
-
 
     /**
      * @return the imageNames
@@ -178,7 +170,8 @@ public class Animation {
             if ((imageNames.length > 0) && (totalDuration > 0)) {
                 duration = totalDuration / imageNames.length;
             }
-            this.addFrame(OdorWorldResourceManager.getImage(imageNames[i]), duration);
+            this.addFrame(OdorWorldResourceManager.getImage(imageNames[i]),
+                    duration);
         }
     }
 }

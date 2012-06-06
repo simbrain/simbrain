@@ -26,21 +26,23 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.GridLayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LayoutPanel;
 import org.simbrain.network.gui.dialogs.network.layout.LineLayoutPanel;
 import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.subnetworks.Competitive;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>CompetitiveDialog</b> is used as an assistant to create competitive networks.
+ * <b>CompetitiveDialog</b> is used as an assistant to create competitive
+ * networks.
  *
  */
-public class CompetitiveCreationDialog extends StandardDialog implements ActionListener {
+public class CompetitiveCreationDialog extends StandardDialog implements
+        ActionListener {
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -87,7 +89,8 @@ public class CompetitiveCreationDialog extends StandardDialog implements ActionL
      */
     public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[] {
+                new LineLayoutPanel(), new GridLayoutPanel() });
         init();
     }
 
@@ -97,11 +100,13 @@ public class CompetitiveCreationDialog extends StandardDialog implements ActionL
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Competitive competitive = new Competitive(networkPanel.getNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
+        Competitive competitive = new Competitive(networkPanel.getNetwork(),
+                Integer.parseInt(tfNumNeurons.getText()), layout);
         competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
         competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
         competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
-        competitive.setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
+        competitive
+                .setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
         competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
         competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
         networkPanel.getNetwork().addGroup(competitive);
@@ -169,12 +174,12 @@ public class CompetitiveCreationDialog extends StandardDialog implements ActionL
      */
     private void fillFieldValues() {
         // REDO
-        //Competitive ct = new Competitive();
+        // Competitive ct = new Competitive();
         tfEpsilon.setText(Double.toString(.1));
         tfLoserValue.setText(Double.toString(0));
         tfNumNeurons.setText(Integer.toString(5));
         tfWinnerValue.setText(Double.toString(1));
-        tfLeakyEpsilon.setText(Double.toString(.1/4));
+        tfLeakyEpsilon.setText(Double.toString(.1 / 4));
         cbUseLeakyLearning.setSelected(false);
         cbNormalizeInputs.setSelected(true);
     }

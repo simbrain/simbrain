@@ -30,12 +30,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Delete action.
  */
-public final class DeleteAction
-    extends AbstractAction {
+public final class DeleteAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new delete action with the specified network panel.
@@ -60,7 +58,6 @@ public final class DeleteAction
                 KeyStroke.getKeyStroke("DELETE"), this);
         networkPanel.getActionMap().put(this, this);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

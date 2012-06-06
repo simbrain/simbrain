@@ -30,9 +30,9 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.util.ClassDescriptionPair;
@@ -150,13 +150,13 @@ public class NeuronDialog extends StandardDialog {
         // update method
         JLabel priorityLabel = new JLabel("Update Priority");
         topPanel.addItemLabel(priorityLabel, tfPriority);
-//        if (((Neuron) neuronList.get(0)).getNetwork().getUpdateMethod() != 
-//            Network.UpdateMethod.PRIORITYBASED) {
-//            priorityLabel.setEnabled(false);
-//            tfPriority.setEnabled(false);
-//        }
+        // if (((Neuron) neuronList.get(0)).getNetwork().getUpdateMethod() !=
+        // Network.UpdateMethod.PRIORITYBASED) {
+        // priorityLabel.setEnabled(false);
+        // tfPriority.setEnabled(false);
+        // }
 
-        //topPanel.addItem("Attribute type", cbNeuronType);
+        // topPanel.addItem("Attribute type", cbNeuronType);
         topPanel.addItem("Update rule", cbNeuronType);
 
         mainPanel.add(topPanel);
@@ -209,14 +209,15 @@ public class NeuronDialog extends StandardDialog {
     }
 
     /**
-     * Returns neuron panel corresponding to the given update rule.
-     * Assumes the panel class name = update rule class name + "Panel"
-     * E.g. "LinearNeuron" > "LinearNeuronPanel".
+     * Returns neuron panel corresponding to the given update rule. Assumes the
+     * panel class name = update rule class name + "Panel" E.g. "LinearNeuron" >
+     * "LinearNeuronPanel".
      *
-     * @param updateRuleClass  the class to match
+     * @param updateRuleClass the class to match
      * @return panel the matching panel
      */
-    private AbstractNeuronPanel getNeuronPanel(Network network,  Class<?> updateRuleClass) {
+    private AbstractNeuronPanel getNeuronPanel(Network network,
+            Class<?> updateRuleClass) {
         // The panel name to look for
         String panelClassName = "org.simbrain.network.gui.dialogs.neuron."
                 + updateRuleClass.getSimpleName() + "Panel";
@@ -255,7 +256,7 @@ public class NeuronDialog extends StandardDialog {
 
         Object selected = cbNeuronType.getSelectedItem();
         if (selected != NULL_STRING) {
-            String name = ((ClassDescriptionPair)selected).getSimpleName();
+            String name = ((ClassDescriptionPair) selected).getSimpleName();
             for (int i = 0; i < neuronList.size(); i++) {
                 neuronList.get(i).setUpdateRule(name);
             }
@@ -263,18 +264,17 @@ public class NeuronDialog extends StandardDialog {
     }
 
     /**
-     * Set the help page based on the currently selected neuron type.
-     * Assumes it
+     * Set the help page based on the currently selected neuron type. Assumes it
      */
     private void updateHelp() {
         if (cbNeuronType.getSelectedItem() == NULL_STRING) {
             helpAction = new ShowHelpAction("Pages/Network/neuron.html");
         } else {
             String name = ((ClassDescriptionPair) cbNeuronType
-                    .getSelectedItem()).getSimpleName()
-                    .replaceAll("Rule", "");
+                    .getSelectedItem()).getSimpleName().replaceAll("Rule", "");
             name = name.substring(0, 1).toLowerCase().concat(name.substring(1));
-            helpAction = new ShowHelpAction("Pages/Network/neuron/" + name + ".html");
+            helpAction = new ShowHelpAction("Pages/Network/neuron/" + name
+                    + ".html");
         }
     }
 
@@ -323,12 +323,14 @@ public class NeuronDialog extends StandardDialog {
 
         neuronPanel.fillFieldValues();
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getActivation")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+                "getActivation")) {
             tfActivation.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getIncrement")) {
+        if (!NetworkUtils
+                .isConsistent(neuronList, Neuron.class, "getIncrement")) {
             tfIncrement.setText(NULL_STRING);
         }
 
@@ -336,15 +338,18 @@ public class NeuronDialog extends StandardDialog {
             tfNeuronLabel.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getUpdatePriority")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+                "getUpdatePriority")) {
             tfPriority.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLowerBound")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+                "getLowerBound")) {
             tfLowBound.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getUpperBound")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class,
+                "getUpperBound")) {
             tfUpBound.setText(NULL_STRING);
         }
     }
@@ -356,14 +361,16 @@ public class NeuronDialog extends StandardDialog {
 
         for (int i = 0; i < neuronList.size(); i++) {
 
-            Neuron neuronRef = (Neuron) neuronList.get(i);
+            Neuron neuronRef = neuronList.get(i);
 
             if (!tfActivation.getText().equals(NULL_STRING)) {
-                neuronRef.setActivation(Double.parseDouble(tfActivation.getText()));
+                neuronRef.setActivation(Double.parseDouble(tfActivation
+                        .getText()));
             }
 
             if (!tfIncrement.getText().equals(NULL_STRING)) {
-                neuronRef.setIncrement(Double.parseDouble(tfIncrement.getText()));
+                neuronRef
+                        .setIncrement(Double.parseDouble(tfIncrement.getText()));
             }
 
             if (!tfNeuronLabel.getText().equals(NULL_STRING)) {
@@ -371,15 +378,18 @@ public class NeuronDialog extends StandardDialog {
             }
 
             if (!tfPriority.getText().equals(NULL_STRING)) {
-                neuronRef.setUpdatePriority(Integer.parseInt(tfPriority .getText()));
+                neuronRef.setUpdatePriority(Integer.parseInt(tfPriority
+                        .getText()));
             }
 
             if (!tfUpBound.getText().equals(NULL_STRING)) {
-                neuronRef.setUpperBound(Double.parseDouble(tfUpBound.getText()));
+                neuronRef
+                        .setUpperBound(Double.parseDouble(tfUpBound.getText()));
             }
 
             if (!tfLowBound.getText().equals(NULL_STRING)) {
-                neuronRef.setLowerBound(Double.parseDouble(tfLowBound.getText()));
+                neuronRef
+                        .setLowerBound(Double.parseDouble(tfLowBound.getText()));
             }
 
         }
@@ -388,13 +398,12 @@ public class NeuronDialog extends StandardDialog {
             changeNeuronTypes();
         }
 
-        // Notify the network that changes have been made 
-        ((Neuron) neuronList.get(0)).getParentNetwork().fireNetworkChanged();
+        // Notify the network that changes have been made
+        neuronList.get(0).getParentNetwork().fireNetworkChanged();
 
         // Now commit changes specific to the neuron type
         neuronPanel.setRuleList(getRuleList());
         neuronPanel.commitChanges();
     }
-
 
 }

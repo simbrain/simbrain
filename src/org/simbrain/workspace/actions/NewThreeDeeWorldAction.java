@@ -32,15 +32,12 @@ public final class NewThreeDeeWorldAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
-     * Create a new odor world action with the specified
-     * workspace.
+     * Create a new odor world action with the specified workspace.
      */
     public NewThreeDeeWorldAction(Workspace workspace) {
         super("3D World", workspace);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

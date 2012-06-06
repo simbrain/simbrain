@@ -27,8 +27,7 @@ import edu.umd.cs.piccolo.event.PPanEventHandler;
 /**
  * Pan event handler.
  */
-final class PanEventHandler
-    extends PPanEventHandler {
+final class PanEventHandler extends PPanEventHandler {
 
     /** Network Panel. */
     private final NetworkPanel networkPanel;
@@ -42,14 +41,11 @@ final class PanEventHandler
         this.networkPanel = networkPanel;
     }
 
-
-
     /**
      * Pan event filter, accepts left mouse clicks, but only when the network
      * panel's edit mode is <code>EditMode.PAN</code>.
      */
-    private class PanEventFilter
-        extends PInputEventFilter {
+    private class PanEventFilter extends PInputEventFilter {
 
         /**
          * Create a new pan event filter.
@@ -57,7 +53,6 @@ final class PanEventHandler
         public PanEventFilter() {
             super(InputEvent.BUTTON1_MASK);
         }
-
 
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {

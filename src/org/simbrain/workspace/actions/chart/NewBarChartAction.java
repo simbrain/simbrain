@@ -43,7 +43,6 @@ public final class NewBarChartAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Bar Chart");
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         BarChartComponent plot = new BarChartComponent("");

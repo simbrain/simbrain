@@ -54,7 +54,7 @@ public class InteractionBox extends ScreenElement {
 
     /** Context menu. */
     private JPopupMenu contextMenu;
-    
+
     /** Reference to associated groupNode. */
     private GroupNode groupNode;
 
@@ -67,7 +67,7 @@ public class InteractionBox extends ScreenElement {
         box = PPath.createRectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         Color color = new Color(248, 252, 184);
         box.setPaint(color);
-        //box.setTransparency(.2f);
+        // box.setTransparency(.2f);
         box.setStrokePaint(java.awt.Color.GRAY);
         setBounds(box.getBounds());
         addChild(box);
@@ -85,15 +85,15 @@ public class InteractionBox extends ScreenElement {
         if (this.textLabel == null) {
             this.textLabel = new PText(text);
             this.addChild(textLabel);
-            textLabel.scaleAboutPoint(.8, box.getBounds().getCenter2D()
-                    .getX(), box.getBounds().getCenter2D().getY());
+            textLabel.scaleAboutPoint(.8, box.getBounds().getCenter2D().getX(),
+                    box.getBounds().getCenter2D().getY());
         } else {
             textLabel.setText(text);
             textLabel.resetBounds();
         }
 
         // Reset box bounds
-        box.setBounds(textLabel.getBounds()); 
+        box.setBounds(textLabel.getBounds());
     }
 
     @Override
@@ -123,7 +123,7 @@ public class InteractionBox extends ScreenElement {
 
     @Override
     protected boolean hasPropertyDialog() {
-        return false; 
+        return false;
     }
 
     @Override

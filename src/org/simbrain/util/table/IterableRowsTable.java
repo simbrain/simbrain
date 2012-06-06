@@ -20,8 +20,8 @@ package org.simbrain.util.table;
 
 /**
  * Interface for tables (subclasses of SimbrainJTable) that have concept of
- * "current row" implemented which allows the table to iterated from row to
- * row when updated.
+ * "current row" implemented which allows the table to iterated from row to row
+ * when updated.
  *
  * @author jyoshimi
  *

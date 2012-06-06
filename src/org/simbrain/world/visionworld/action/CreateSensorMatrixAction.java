@@ -28,12 +28,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Create sensor matrix action.
  */
-public final class CreateSensorMatrixAction
-    extends AbstractAction {
+public final class CreateSensorMatrixAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new create sensor matrix action.
@@ -48,7 +46,6 @@ public final class CreateSensorMatrixAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
         this.visionWorld = visionWorld;
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

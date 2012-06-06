@@ -23,8 +23,7 @@ import java.util.EventObject;
 /**
  * Event object representing a change in a VisionWorldModel.
  */
-public final class VisionWorldModelEvent
-    extends EventObject {
+public final class VisionWorldModelEvent extends EventObject {
 
     /** Old pixel matrix. */
     private final PixelMatrix oldPixelMatrix;
@@ -38,7 +37,6 @@ public final class VisionWorldModelEvent
     /** Sensor matrix. */
     private final SensorMatrix sensorMatrix;
 
-
     /**
      * Create a new vision world model event with the specified event source.
      *
@@ -47,11 +45,11 @@ public final class VisionWorldModelEvent
      * @param pixelMatrix pixel matrix, must not be null
      */
     public VisionWorldModelEvent(final VisionWorldModel source,
-                                 final PixelMatrix oldPixelMatrix,
-                                 final PixelMatrix pixelMatrix) {
+            final PixelMatrix oldPixelMatrix, final PixelMatrix pixelMatrix) {
         super(source);
         if (oldPixelMatrix == null) {
-            throw new IllegalArgumentException("oldPixelMatrix must not be null");
+            throw new IllegalArgumentException(
+                    "oldPixelMatrix must not be null");
         }
         if (pixelMatrix == null) {
             throw new IllegalArgumentException("pixelMatrix must not be null");
@@ -70,11 +68,11 @@ public final class VisionWorldModelEvent
      * @param sensorMatrix pixel matrix, must not be null
      */
     public VisionWorldModelEvent(final VisionWorldModel source,
-                                 final SensorMatrix oldSensorMatrix,
-                                 final SensorMatrix sensorMatrix) {
+            final SensorMatrix oldSensorMatrix, final SensorMatrix sensorMatrix) {
         super(source);
         if (oldSensorMatrix == null) {
-            throw new IllegalArgumentException("oldSensorMatrix must not be null");
+            throw new IllegalArgumentException(
+                    "oldSensorMatrix must not be null");
         }
         if (sensorMatrix == null) {
             throw new IllegalArgumentException("sensorMatrix must not be null");
@@ -85,10 +83,9 @@ public final class VisionWorldModelEvent
         this.sensorMatrix = sensorMatrix;
     }
 
-
     /**
-     * Return the source of this event as a vision world model.
-     * The vision world model will not be null.
+     * Return the source of this event as a vision world model. The vision world
+     * model will not be null.
      *
      * @return the source of this event as a vision world model
      */

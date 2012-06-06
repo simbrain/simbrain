@@ -40,12 +40,11 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
     /** Set of selected sensors. */
     private final Set<Sensor> selection;
 
-
     /**
      * Create a new sensor selection model with the specified vision world.
      *
-     * @param visionWorld vision world for this sensor selection model,
-     *    must not be null
+     * @param visionWorld vision world for this sensor selection model, must not
+     *            be null
      */
     SensorSelectionModel(final VisionWorld visionWorld) {
         if (visionWorld == null) {
@@ -55,7 +54,6 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         selection = new HashSet<Sensor>();
         listenerList = new EventListenerList();
     }
-
 
     /**
      * Return the number of selected sensors for this sensor selection model.
@@ -100,7 +98,8 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
     }
 
     /**
-     * Add all of the specified collection of sensors to this sensor selection model.
+     * Add all of the specified collection of sensors to this sensor selection
+     * model.
      *
      * @param sensors collection of sensors to add
      */
@@ -126,7 +125,8 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
     }
 
     /**
-     * Remove all of the specified collection of sensors from this sensor selection model.
+     * Remove all of the specified collection of sensors from this sensor
+     * selection model.
      *
      * @param sensors collection of sensors to remove
      */
@@ -155,8 +155,7 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
     public void toggleSelection(final Sensor sensor) {
         if (isSelected(sensor)) {
             remove(sensor);
-        }
-        else {
+        } else {
             add(sensor);
         }
     }
@@ -191,7 +190,7 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
         }
         Set<Sensor> oldSelection = new HashSet<Sensor>(selection);
         selection.clear();
-        
+
         boolean rv = selection.addAll(sensors);
         if (rv || sensors.isEmpty()) {
             fireSelectionChanged(oldSelection, selection);
@@ -203,7 +202,8 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
      *
      * @param listener listener to add
      */
-    public void addSensorSelectionListener(final SensorSelectionListener listener) {
+    public void addSensorSelectionListener(
+            final SensorSelectionListener listener) {
         listenerList.add(SensorSelectionListener.class, listener);
     }
 
@@ -222,16 +222,19 @@ public final class SensorSelectionModel implements Iterable<Sensor> {
      * @param oldSelection old selection
      * @param selection new selection
      */
-    public void fireSelectionChanged(final Set<Sensor> oldSelection, final Set<Sensor> selection) {
+    public void fireSelectionChanged(final Set<Sensor> oldSelection,
+            final Set<Sensor> selection) {
         Object[] listeners = listenerList.getListenerList();
         SensorSelectionEvent e = null;
 
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == SensorSelectionListener.class) {
                 if (e == null) {
-                    e = new SensorSelectionEvent(visionWorld, oldSelection, selection);
+                    e = new SensorSelectionEvent(visionWorld, oldSelection,
+                            selection);
                 }
-                ((SensorSelectionListener) listeners[i + 1]).selectionChanged(e);
+                ((SensorSelectionListener) listeners[i + 1])
+                        .selectionChanged(e);
             }
         }
     }

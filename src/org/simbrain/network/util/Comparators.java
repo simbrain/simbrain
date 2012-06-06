@@ -35,6 +35,7 @@ public class Comparators {
         public String toString() {
             return "Vertical";
         }
+
         public int compare(final Neuron neuron1, final Neuron neuron2) {
             return Double.compare(neuron1.getX(), neuron2.getX());
         }
@@ -47,6 +48,7 @@ public class Comparators {
         public String toString() {
             return "Horizontal";
         }
+
         public int compare(final Neuron neuron1, final Neuron neuron2) {
             return Double.compare(neuron1.getY(), neuron2.getY());
         }

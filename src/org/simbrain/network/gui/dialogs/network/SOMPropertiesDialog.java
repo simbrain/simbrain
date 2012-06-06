@@ -14,10 +14,12 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 
 /**
- * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a SOM.
+ * <b>SOMPropertiesDialog</b> is a dialog box for setting the properties of a
+ * SOM.
  *
  */
-public class SOMPropertiesDialog extends StandardDialog implements ActionListener {
+public class SOMPropertiesDialog extends StandardDialog implements
+        ActionListener {
 
     /** Main Panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -61,14 +63,15 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
         setTitle("Set SOM Properties");
 
         fillFieldValues();
-        helpAction  = new ShowHelpAction("Pages/Network/network/som.html");
+        helpAction = new ShowHelpAction("Pages/Network/network/som.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);
         mainPanel.addItem("Initial Learning Rate", tfAlpha);
         mainPanel.addItem("Initial Neighborhood Size", tfInitNeighborhoodSize);
         mainPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
-        mainPanel.addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
+        mainPanel
+                .addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
         mainPanel.addItem("Learning Rate", lLearningRate);
         mainPanel.addItem("Neighborhood Size", lNeighborhoodSize);
         setContentPane(mainPanel);
@@ -78,11 +81,13 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
-      som.setInitNeighborhoodSize(Double.parseDouble(tfInitNeighborhoodSize.getText()));
-      som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
-      som.setNeighborhoodDecayAmount(Double.parseDouble(tfNeigborhoodDecayAmount.getText()));
-      super.closeDialogOk();
+        som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
+        som.setInitNeighborhoodSize(Double.parseDouble(tfInitNeighborhoodSize
+                .getText()));
+        som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
+        som.setNeighborhoodDecayAmount(Double
+                .parseDouble(tfNeigborhoodDecayAmount.getText()));
+        super.closeDialogOk();
     }
 
     /**
@@ -90,9 +95,11 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
      */
     public void fillFieldValues() {
         tfAlpha.setText(Double.toString(som.getInitAlpha()));
-        tfInitNeighborhoodSize.setText(Double.toString(som.getInitNeighborhoodSize()));
+        tfInitNeighborhoodSize.setText(Double.toString(som
+                .getInitNeighborhoodSize()));
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
-        tfNeigborhoodDecayAmount.setText(Double.toString(som.getNeighborhoodDecayAmount()));
+        tfNeigborhoodDecayAmount.setText(Double.toString(som
+                .getNeighborhoodDecayAmount()));
         lLearningRate.setText(Utils.round(som.getAlpha(), 2));
         lNeighborhoodSize.setText(Utils.round(som.getNeighborhoodSize(), 2));
     }

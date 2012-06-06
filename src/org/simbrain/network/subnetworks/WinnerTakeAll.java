@@ -20,12 +20,11 @@ package org.simbrain.network.subnetworks;
 
 import java.util.Random;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-
 
 /**
  * <b>WinnerTakeAll</b>.The neuron with the highest weighted input in a
@@ -53,15 +52,14 @@ public class WinnerTakeAll extends NeuronGroup {
     /** Probability of setting the winner randomly, when useRandom is true. */
     private double randomProb = .1;
 
-
     /**
      * Copy constructor.
      *
      * @param newRoot new root net
      * @param oldNet old network
      */
-    public WinnerTakeAll(Network newRoot,  WinnerTakeAll oldNet) {
-        super(null,null);
+    public WinnerTakeAll(Network newRoot, WinnerTakeAll oldNet) {
+        super(null, null);
         setLoseValue(oldNet.getLoseValue());
         setWinValue(oldNet.getWinValue());
         setUseRandom(oldNet.isUseRandom());
@@ -75,11 +73,12 @@ public class WinnerTakeAll extends NeuronGroup {
      * @param numNeurons Number of neurons in new network
      * @param layout the way to layout the network
      */
-    public WinnerTakeAll(final Network root, final int numNeurons, final Layout layout) {
+    public WinnerTakeAll(final Network root, final int numNeurons,
+            final Layout layout) {
         super(root);
         for (int i = 0; i < numNeurons; i++) {
-          //TODO: Prevent invalid states like this?
-          this.addNeuron(new Neuron(root, new LinearRule()));
+            // TODO: Prevent invalid states like this?
+            this.addNeuron(new Neuron(root, new LinearRule()));
         }
         layout.layoutNeurons(this.getNeuronList());
         setLabel("Winner take all network");
@@ -87,7 +86,7 @@ public class WinnerTakeAll extends NeuronGroup {
 
     @Override
     public void update() {
-        
+
         if (getParentNetwork().getClampNeurons()) {
             return;
         }
@@ -107,9 +106,9 @@ public class WinnerTakeAll extends NeuronGroup {
         // Set neuron values
         for (int i = 0; i < getNeuronList().size(); i++) {
             if (i == winnerIndex) {
-                ((Neuron) getNeuronList().get(i)).setActivation(winValue);
+                getNeuronList().get(i).setActivation(winValue);
             } else {
-                ((Neuron) getNeuronList().get(i)).setActivation(loseValue);
+                getNeuronList().get(i).setActivation(loseValue);
             }
         }
     }
@@ -132,7 +131,7 @@ public class WinnerTakeAll extends NeuronGroup {
     private int getWinningIndex() {
         int winnerIndex = 0;
         double max = Double.NEGATIVE_INFINITY;
-        double lastVal  =  getNeuronList().get(0).getWeightedInputs();
+        double lastVal = getNeuronList().get(0).getWeightedInputs();
         boolean tie = true;
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron n = getNeuronList().get(i);
@@ -224,6 +223,6 @@ public class WinnerTakeAll extends NeuronGroup {
 
     public void setEnabled(boolean enabled) {
         // TODO Auto-generated method stub
-        
+
     }
 }

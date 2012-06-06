@@ -91,8 +91,10 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        xAttributeType = new AttributeType(this, "Point", "setX", double.class, true);
-        yAttributeType = new AttributeType(this, "Point", "setY", double.class, true);
+        xAttributeType = new AttributeType(this, "Point", "setX", double.class,
+                true);
+        yAttributeType = new AttributeType(this, "Point", "setY", double.class,
+                true);
         addConsumerType(xAttributeType);
         addConsumerType(yAttributeType);
         // TODO: What if called more than once?
@@ -110,16 +112,14 @@ public class ScatterPlotComponent extends WorkspaceComponent {
                 String xDesc = xAttributeType.getSimpleDescription("Point "
                         + setter.getIndex() + "[X]");
                 PotentialConsumer xConsumer = getAttributeManager()
-                        .createPotentialConsumer(setter, xAttributeType,
-                                xDesc);
+                        .createPotentialConsumer(setter, xAttributeType, xDesc);
                 returnList.add(xConsumer);
             }
             if (yAttributeType.isVisible()) {
                 String yDesc = yAttributeType.getSimpleDescription("Point "
                         + setter.getIndex() + "[Y]");
                 PotentialConsumer yConsumer = getAttributeManager()
-                        .createPotentialConsumer(setter, yAttributeType,
-                                yDesc);
+                        .createPotentialConsumer(setter, yAttributeType, yDesc);
                 returnList.add(yConsumer);
             }
         }
@@ -155,13 +155,11 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         setterList.add(new ScatterPlotSetter(i));
     }
 
-
     /**
      * Add chart listener to model.
      */
     private void addListener() {
         model.addListener(new ChartListener() {
-
 
             /**
              * {@inheritDoc}
@@ -191,7 +189,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             }
 
         });
-  }
+    }
 
     /**
      * @return the model.
@@ -216,7 +214,8 @@ public class ScatterPlotComponent extends WorkspaceComponent {
      */
     public static ScatterPlotComponent open(final InputStream input,
             final String name, final String format) {
-        ScatterPlotModel dataModel = (ScatterPlotModel) ScatterPlotModel.getXStream().fromXML(input);
+        ScatterPlotModel dataModel = (ScatterPlotModel) ScatterPlotModel
+                .getXStream().fromXML(input);
         return new ScatterPlotComponent(name, dataModel);
     }
 
@@ -233,7 +232,7 @@ public class ScatterPlotComponent extends WorkspaceComponent {
         try {
             int i = Integer.parseInt(objectKey);
             ScatterPlotSetter setter = getSetter(i);
-            return  setter;
+            return setter;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
         }
@@ -260,7 +259,8 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             if (!model.isShowHistory()) {
                 model.getDataset().getSeries(index).clear();
             }
-            model.getDataset().getSeries(index).add(setter.getX(), setter.getY());
+            model.getDataset().getSeries(index)
+                    .add(setter.getX(), setter.getY());
         }
     }
 
@@ -287,14 +287,12 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             this.index = index;
         }
 
-
         /**
          * @return the index
          */
         public int getIndex() {
             return index;
         }
-
 
         /**
          * @return the xval
@@ -303,7 +301,6 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             return xval;
         }
 
-
         /**
          * @param xval the xval to set
          */
@@ -311,14 +308,12 @@ public class ScatterPlotComponent extends WorkspaceComponent {
             this.xval = xval;
         }
 
-
         /**
          * @return the yval
          */
         public double getY() {
             return yval;
         }
-
 
         /**
          * @param yval the yval to set

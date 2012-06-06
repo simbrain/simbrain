@@ -9,13 +9,13 @@ import com.jme.renderer.Renderer;
 
 /**
  * A view that can be moved around freely in three dimensions.
- * 
+ *
  * @author Matt Watson
  */
 public class FreeBirdView extends Moveable {
     /** The height at which the free-bird starts. */
-//    private static final float START_HEIGHT = 25f;
-    
+    // private static final float START_HEIGHT = 25f;
+
     /** The current direction of the view. */
     private Vector direction;
 
@@ -41,10 +41,16 @@ public class FreeBirdView extends Moveable {
     /**
      * {@inheritDoc}
      */
-//    @Override
-    public void init(Renderer renderer, final Camera cam, int width, int height) {//final Vector direction, final Point location) {
-//        this.direction = direction;
-//        this.location = location.add(new Vector(0, START_HEIGHT, 0));
+    // @Override
+    public void init(Renderer renderer, final Camera cam, int width, int height) {// final
+                                                                                  // Vector
+                                                                                  // direction,
+                                                                                  // final
+                                                                                  // Point
+                                                                                  // location)
+                                                                                  // {
+    // this.direction = direction;
+    // this.location = location.add(new Vector(0, START_HEIGHT, 0));
     }
 
     /**

@@ -28,12 +28,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Normal view action.
  */
-public final class NormalViewAction
-    extends AbstractAction {
+public final class NormalViewAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new normal view action.
@@ -48,7 +46,6 @@ public final class NormalViewAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
         this.visionWorld = visionWorld;
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

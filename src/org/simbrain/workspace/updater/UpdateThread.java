@@ -1,8 +1,7 @@
 package org.simbrain.workspace.updater;
 
 /**
- * This thread class adds some special methods specific to this
- * class.
+ * This thread class adds some special methods specific to this class.
  *
  * @author Matt Watson
  */
@@ -20,7 +19,8 @@ class UpdateThread extends Thread {
      * @param runnable The runnable instance.
      * @param thread The thread number.
      */
-    UpdateThread(final WorkspaceUpdater updater, final Runnable runnable, final int thread) {
+    UpdateThread(final WorkspaceUpdater updater, final Runnable runnable,
+            final int thread) {
         super(runnable);
         this.updater = updater;
         this.thread = thread;

@@ -25,16 +25,18 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Sensor matrix node.
  */
-public final class SensorMatrixNode
-    extends AbstractSensorMatrixNode {
+public final class SensorMatrixNode extends AbstractSensorMatrixNode {
 
     /**
      * Create a new sensor matrix node with the specified sensor matrix.
      *
-     * @param visionWorld vision world for this sensor matrix node, must not be null
-     * @param sensorMatrix sensor matrix for this sensor matrix node, must not be null
+     * @param visionWorld vision world for this sensor matrix node, must not be
+     *            null
+     * @param sensorMatrix sensor matrix for this sensor matrix node, must not
+     *            be null
      */
-    public SensorMatrixNode(final VisionWorld visionWorld, final SensorMatrix sensorMatrix) {
+    public SensorMatrixNode(final VisionWorld visionWorld,
+            final SensorMatrix sensorMatrix) {
         super(sensorMatrix);
 
         // for each sensor in the sensor matrix, create and add a sensor node
@@ -43,7 +45,8 @@ public final class SensorMatrixNode
                 Sensor sensor = sensorMatrix.getSensor(row, column);
                 if (sensor != null) {
                     SensorNode node = new SensorNode(visionWorld, sensor);
-                    node.offset(sensor.getReceptiveField().getX(), sensor.getReceptiveField().getY());
+                    node.offset(sensor.getReceptiveField().getX(), sensor
+                            .getReceptiveField().getY());
                     addChild(node);
                 }
             }

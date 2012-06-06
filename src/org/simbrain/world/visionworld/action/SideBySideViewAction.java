@@ -27,12 +27,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Side-by-side view action.
  */
-public final class SideBySideViewAction
-    extends AbstractAction {
+public final class SideBySideViewAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new side-by-side view action.
@@ -46,7 +44,6 @@ public final class SideBySideViewAction
         }
         this.visionWorld = visionWorld;
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

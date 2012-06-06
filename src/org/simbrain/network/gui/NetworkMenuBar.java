@@ -29,9 +29,9 @@ import org.simbrain.util.ShowHelpAction;
 /**
  * Menu bar that appears inside of JPanel; for use in Applets.
  *
- * TODO: Add file menu; fix help menu.
- * TODO: Reduce duplicated code between this and NetworkPanelDesktop.
- * TODO: Rename so that the fact that this is only used in applets is clear.
+ * TODO: Add file menu; fix help menu. TODO: Reduce duplicated code between this
+ * and NetworkPanelDesktop. TODO: Rename so that the fact that this is only used
+ * in applets is clear.
  */
 public class NetworkMenuBar {
 
@@ -42,49 +42,53 @@ public class NetworkMenuBar {
 
         JMenuBar returnMenu = new JMenuBar();
 
-// TODO: The code below works locally but won't work in an unsigned applet.
-//          I have not figured out how to sign applets properly yet so I'm not adding this for now
-        
-//        JMenu fileMenu = new JMenu("File");
-//        JMenuItem openItem = new JMenuItem("Open");
-//        openItem.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                SFileChooser chooser = new SFileChooser(".", "Open Network");
-//                chooser.addExtension("xml");
-//                File theFile = chooser.showOpenDialog();
-//                if (theFile != null) {
-//                    Network newNetwork;
-//                    try {
-//                        newNetwork = (Network) Network.getXStream().fromXML(new FileInputStream(theFile));
-//                        newNetwork.setParent(networkPanel.getNetwork().getParent());
-//                        networkPanel.clearPanel();
-//                        networkPanel.setNetwork(newNetwork);
-//                        networkPanel.syncToModel();
-//                        networkPanel.repaint();
-//                    } catch (FileNotFoundException e1) {
-//                        e1.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-//        fileMenu.add(openItem);
-//        JMenuItem saveItem = new JMenuItem("Save");
-//        saveItem.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                SFileChooser chooser = new SFileChooser(".", "Save Network");
-//                chooser.addExtension("xml");
-//                File theFile = chooser.showSaveDialog();
-//                if (theFile != null) {
-//                    try {
-//                        Network.getXStream().toXML(networkPanel.getNetwork(), new FileOutputStream(theFile));
-//                    } catch (FileNotFoundException e1) {
-//                        e1.printStackTrace();
-//                    }                    
-//                }
-//            }
-//        });
-//        fileMenu.add(saveItem);
-//        returnMenu.add(fileMenu);
+        // TODO: The code below works locally but won't work in an unsigned
+        // applet.
+        // I have not figured out how to sign applets properly yet so I'm not
+        // adding this for now
+
+        // JMenu fileMenu = new JMenu("File");
+        // JMenuItem openItem = new JMenuItem("Open");
+        // openItem.addActionListener(new ActionListener() {
+        // public void actionPerformed(ActionEvent e) {
+        // SFileChooser chooser = new SFileChooser(".", "Open Network");
+        // chooser.addExtension("xml");
+        // File theFile = chooser.showOpenDialog();
+        // if (theFile != null) {
+        // Network newNetwork;
+        // try {
+        // newNetwork = (Network) Network.getXStream().fromXML(new
+        // FileInputStream(theFile));
+        // newNetwork.setParent(networkPanel.getNetwork().getParent());
+        // networkPanel.clearPanel();
+        // networkPanel.setNetwork(newNetwork);
+        // networkPanel.syncToModel();
+        // networkPanel.repaint();
+        // } catch (FileNotFoundException e1) {
+        // e1.printStackTrace();
+        // }
+        // }
+        // }
+        // });
+        // fileMenu.add(openItem);
+        // JMenuItem saveItem = new JMenuItem("Save");
+        // saveItem.addActionListener(new ActionListener() {
+        // public void actionPerformed(ActionEvent e) {
+        // SFileChooser chooser = new SFileChooser(".", "Save Network");
+        // chooser.addExtension("xml");
+        // File theFile = chooser.showSaveDialog();
+        // if (theFile != null) {
+        // try {
+        // Network.getXStream().toXML(networkPanel.getNetwork(), new
+        // FileOutputStream(theFile));
+        // } catch (FileNotFoundException e1) {
+        // e1.printStackTrace();
+        // }
+        // }
+        // }
+        // });
+        // fileMenu.add(saveItem);
+        // returnMenu.add(fileMenu);
 
         JMenu editMenu = new JMenu("Edit");
         editMenu.add(actionManager.getCutAction());
@@ -111,7 +115,7 @@ public class NetworkMenuBar {
         editMenu.addSeparator();
         editMenu.add(networkPanel.createClampMenu());
         editMenu.addSeparator();
-        //editMenu.add(actionManager.getShowIOInfoMenuItem());
+        // editMenu.add(actionManager.getShowIOInfoMenuItem());
         editMenu.add(actionManager.getSetAutoZoomMenuItem());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());

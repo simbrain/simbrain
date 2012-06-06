@@ -32,8 +32,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * Zoom event handler.
  */
-final class ZoomEventHandler
-    extends PDragSequenceEventHandler {
+final class ZoomEventHandler extends PDragSequenceEventHandler {
 
     /** Zoom in factor. */
     private static final double ZOOM_IN_FACTOR = 0.5d;
@@ -61,14 +60,14 @@ final class ZoomEventHandler
 
     /**
      * Create a new zoom event handler.
-     * @param networkPanel 
+     *
+     * @param networkPanel
      */
     public ZoomEventHandler(NetworkPanel networkPanel) {
         super();
         setEventFilter(new ZoomEventFilter());
         this.networkPanel = networkPanel;
     }
-
 
     /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
@@ -99,7 +98,7 @@ final class ZoomEventHandler
         marqueeStartPosition = event.getPosition();
 
         marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
-                                       (float) marqueeStartPosition.getY());
+                (float) marqueeStartPosition.getY());
 
         networkPanel.getCanvas().getLayer().addChild(marquee);
     }
@@ -115,7 +114,7 @@ final class ZoomEventHandler
 
         marquee.globalToLocal(rect);
         marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
-                                   (float) rect.getWidth(), (float) rect.getHeight());
+                (float) rect.getWidth(), (float) rect.getHeight());
         rect = null;
     }
 
@@ -128,9 +127,11 @@ final class ZoomEventHandler
         // of less than a certian size were the result of a single click
         // and not of a click and drag to create a marquee
         PBounds zoomRect = marquee.getGlobalBounds();
-        if ((zoomRect.getWidth() >= DRAG_WIDTH_THRESHOLD) || (zoomRect.getHeight() >= DRAG_HEIGHT_THRESHOLD)) {
+        if ((zoomRect.getWidth() >= DRAG_WIDTH_THRESHOLD)
+                || (zoomRect.getHeight() >= DRAG_HEIGHT_THRESHOLD)) {
             PCamera camera = networkPanel.getCanvas().getCamera();
-            camera.animateViewToCenterBounds(zoomRect, true, ZOOM_ANIMATION_DURATION);
+            camera.animateViewToCenterBounds(zoomRect, true,
+                    ZOOM_ANIMATION_DURATION);
         }
 
         marquee.removeFromParent();
@@ -138,13 +139,12 @@ final class ZoomEventHandler
         marqueeStartPosition = null;
     }
 
-
     /**
      * Zoom event filter, accepts left mouse clicks, but only when the network
-     * panel's edit mode is either <code>EditMode.ZOOM_IN</code> or <code>EditMode.ZOOM_OUT</code>.
+     * panel's edit mode is either <code>EditMode.ZOOM_IN</code> or
+     * <code>EditMode.ZOOM_OUT</code>.
      */
-    private class ZoomEventFilter
-        extends PInputEventFilter {
+    private class ZoomEventFilter extends PInputEventFilter {
 
         /**
          * Create a new zoom event filter.
@@ -152,7 +152,6 @@ final class ZoomEventHandler
         public ZoomEventFilter() {
             super(InputEvent.BUTTON1_MASK);
         }
-
 
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {

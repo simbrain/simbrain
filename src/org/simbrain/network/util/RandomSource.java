@@ -27,7 +27,7 @@ import java.util.Random;
 public class RandomSource {
 
     /** Labels used by combo boxes. */
-    private static String[] functionList = {"Uniform", "Gaussian"};
+    private static String[] functionList = { "Uniform", "Gaussian" };
 
     /** A uniform distribution. */
     public static final int UNIFORM = 0;
@@ -102,8 +102,7 @@ public class RandomSource {
     /**
      * Clip <code>val</code> to upper and lower bounds.
      *
-     * @param val
-     *            the value to clip
+     * @param val the value to clip
      * @return the clipped value
      */
     private double clip(final double val) {
@@ -117,8 +116,6 @@ public class RandomSource {
 
         return ret;
     }
-
-
 
     /**
      * @return Returns the mean.
@@ -142,8 +139,7 @@ public class RandomSource {
     }
 
     /**
-     * @param standardDeviation
-     *            The standardDeviation to set.
+     * @param standardDeviation The standardDeviation to set.
      */
     public void setStandardDeviation(final double standardDeviation) {
         this.standardDeviation = standardDeviation;
@@ -157,8 +153,7 @@ public class RandomSource {
     }
 
     /**
-     * @param clipping
-     *            The useBounds to set.
+     * @param clipping The useBounds to set.
      */
     public void setClipping(final boolean clipping) {
         this.clipping = clipping;
@@ -179,16 +174,15 @@ public class RandomSource {
     }
 
     public String getDistributionName() {
-    	if(distributionIndex == 1) {
-    		return "Gaussian";
-    	} else {
-    		return "Uniform";
-    	}
+        if (distributionIndex == 1) {
+            return "Gaussian";
+        } else {
+            return "Uniform";
+        }
     }
-    
+
     /**
-     * @param distributionIndex
-     *            The distributionIndex to set.
+     * @param distributionIndex The distributionIndex to set.
      */
     public void setDistributionIndex(final int distributionIndex) {
         this.distributionIndex = distributionIndex;
@@ -202,8 +196,7 @@ public class RandomSource {
     }
 
     /**
-     * @param lowerBound
-     *            The lowerBound to set.
+     * @param lowerBound The lowerBound to set.
      */
     public void setLowerBound(final double lowerBound) {
         this.lowerBound = lowerBound;
@@ -217,8 +210,7 @@ public class RandomSource {
     }
 
     /**
-     * @param upperBound
-     *            The upperBound to set.
+     * @param upperBound The upperBound to set.
      */
     public void setUpperBound(final double upperBound) {
         this.upperBound = upperBound;

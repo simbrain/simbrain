@@ -25,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-
 /**
  * <b>ComboBoxRenderer</b> formats and inserts images into combo boxes.
  */

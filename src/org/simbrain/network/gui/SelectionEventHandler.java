@@ -48,8 +48,7 @@ import edu.umd.cs.piccolox.nodes.PStyledText;
 /**
  * Selection event handler.
  */
-final class SelectionEventHandler
-    extends PDragSequenceEventHandler {
+final class SelectionEventHandler extends PDragSequenceEventHandler {
 
     /** Selection marquee. */
     private SelectionMarquee marquee;
@@ -63,7 +62,7 @@ final class SelectionEventHandler
     /** Bounds filter. */
     private final BoundsFilter boundsFilter;
 
-    /** Prior selection, if any.  Required for shift-lasso selection. */
+    /** Prior selection, if any. Required for shift-lasso selection. */
     private Collection priorSelection = Collections.EMPTY_LIST;
 
     /** Network Panel. */
@@ -71,7 +70,8 @@ final class SelectionEventHandler
 
     /**
      * Create a new selection event handler.
-     * @param networkPanel 
+     *
+     * @param networkPanel
      */
     public SelectionEventHandler(NetworkPanel networkPanel) {
         super();
@@ -79,7 +79,6 @@ final class SelectionEventHandler
         setEventFilter(new SelectionEventFilter());
         this.networkPanel = networkPanel;
     }
-
 
     /** @see PDragSequenceEventHandler */
     public void mousePressed(final PInputEvent event) {
@@ -93,7 +92,7 @@ final class SelectionEventHandler
     /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
 
-        //System.out.println("In net panel mouse clicked:" + event);
+        // System.out.println("In net panel mouse clicked:" + event);
         super.mouseClicked(event);
 
         PNode node = event.getPath().getPickedNode();
@@ -132,10 +131,8 @@ final class SelectionEventHandler
             pickedNode = pickedNode.getParent();
         }
 
-
         if (pickedNode == null) {
 
-            
             if (event.isShiftDown()) {
                 priorSelection = new ArrayList(networkPanel.getSelection());
             } else {
@@ -144,7 +141,7 @@ final class SelectionEventHandler
 
             // create a new selection marquee at the mouse position
             marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
-                                           (float) marqueeStartPosition.getY());
+                    (float) marqueeStartPosition.getY());
 
             // add marquee as child of the network panel's layer
             networkPanel.getCanvas().getLayer().addChild(marquee);
@@ -165,7 +162,8 @@ final class SelectionEventHandler
                 if (event.isShiftDown()) {
                     networkPanel.toggleSelection(pickedNode);
                 } else {
-                    networkPanel.setSelection(Collections.singleton(pickedNode));
+                    networkPanel
+                            .setSelection(Collections.singleton(pickedNode));
                 }
             }
         }
@@ -186,16 +184,20 @@ final class SelectionEventHandler
 
             marquee.globalToLocal(rect);
 
-            marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
-                                       (float) rect.getWidth(), (float) rect.getHeight());
+            marquee.setPathToRectangle((float) rect.getX(),
+                    (float) rect.getY(), (float) rect.getWidth(),
+                    (float) rect.getHeight());
 
             boundsFilter.setBounds(rect);
 
-            Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot().getAllNodes(boundsFilter, null);
+            Collection highlightedNodes = networkPanel.getCanvas().getLayer()
+                    .getRoot().getAllNodes(boundsFilter, null);
 
             if (event.isShiftDown()) {
-                Collection selection = Utils.union(priorSelection, highlightedNodes);
-                selection.removeAll(Utils.intersection(priorSelection, highlightedNodes));
+                Collection selection = Utils.union(priorSelection,
+                        highlightedNodes);
+                selection.removeAll(Utils.intersection(priorSelection,
+                        highlightedNodes));
                 networkPanel.setSelection(selection);
             } else {
                 networkPanel.setSelection(highlightedNodes);
@@ -206,20 +208,22 @@ final class SelectionEventHandler
             // continue to drag selected node(s)
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
-            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
+            for (Iterator i = networkPanel.getSelection().iterator(); i
+                    .hasNext();) {
                 PNode node = (PNode) i.next();
                 if (node instanceof ScreenElement) {
 
                     if (pickedNode instanceof NeuronNode) {
-                        ((NeuronNode)pickedNode).pushViewPositionToModel();
+                        ((NeuronNode) pickedNode).pushViewPositionToModel();
                     } else if (pickedNode instanceof NeuronNode) {
-                        ((TextNode)pickedNode).pushViewPositionToModel();
+                        ((TextNode) pickedNode).pushViewPositionToModel();
                     }
 
                     ScreenElement screenElement = (ScreenElement) node;
                     if (screenElement.isDraggable()) {
                         screenElement.localToParent(delta);
-                        screenElement.offset(delta.getWidth(), delta.getHeight());
+                        screenElement.offset(delta.getWidth(),
+                                delta.getHeight());
                     }
                 }
             }
@@ -238,43 +242,47 @@ final class SelectionEventHandler
             marquee = null;
             marqueeStartPosition = null;
         } else {
-        // Something was being dragged
+            // Something was being dragged
 
             // To ensure fire neuron moving events don't affect these neurons
-            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
+            for (Iterator i = networkPanel.getSelection().iterator(); i
+                    .hasNext();) {
                 PNode node = (PNode) i.next();
                 if (node instanceof NeuronNode) {
-                    ((NeuronNode)node).setMoving(false);
-                    ((NeuronNode)node).pushViewPositionToModel();
+                    ((NeuronNode) node).setMoving(false);
+                    ((NeuronNode) node).pushViewPositionToModel();
                 } else if (node instanceof TextNode) {
-                    ((TextNode)node).pushViewPositionToModel();
+                    ((TextNode) node).pushViewPositionToModel();
                 }
             }
 
             // end drag selected node(s)
             pickedNode = null;
 
-            // Reset the beginning of a sequence of pastes, but keep the old paste-offset
-            // This occurs when pasting a sequence, and moving one set of objects to a new location
+            // Reset the beginning of a sequence of pastes, but keep the old
+            // paste-offset
+            // This occurs when pasting a sequence, and moving one set of
+            // objects to a new location
             if (networkPanel.getNumberOfPastes() != 1) {
-                networkPanel.setBeginPosition(SimnetUtils.getUpperLeft((ArrayList) networkPanel.getSelectedModelElements()));
+                networkPanel.setBeginPosition(SimnetUtils
+                        .getUpperLeft((ArrayList) networkPanel
+                                .getSelectedModelElements()));
             }
-            networkPanel.setEndPosition(SimnetUtils.getUpperLeft((ArrayList) networkPanel.getSelectedModelElements()));
+            networkPanel.setEndPosition(SimnetUtils
+                    .getUpperLeft((ArrayList) networkPanel
+                            .getSelectedModelElements()));
         }
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();
     }
 
-
     /**
      * Bounds filter.
      */
-    private class BoundsFilter
-        implements PNodeFilter {
+    private class BoundsFilter implements PNodeFilter {
 
         /** Bounds. */
         private PBounds bounds;
-
 
         /**
          * Set the bounds for this bounds filter to <code>bounds</code>.
@@ -288,10 +296,11 @@ final class SelectionEventHandler
         /** @see PNodeFilter */
         public boolean accept(final PNode node) {
             boolean isPickable = node.getPickable();
-            boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);            
+            boolean boundsIntersects = node.getGlobalBounds()
+                    .intersects(bounds);
             // Allow selection of a synapes via the line associated with it
             if (node instanceof SynapseNode) {
-                Line2D.Double line = ((SynapseNode)node).getLine();
+                Line2D.Double line = ((SynapseNode) node).getLine();
                 if (bounds.intersectsLine(line)) {
                     boundsIntersects = true;
                 }
@@ -316,11 +325,10 @@ final class SelectionEventHandler
     }
 
     /**
-     * Selection event filter, accepts various mouse events, but only when
-     * the network panel's edit mode is <code>EditMode.SELECTION</code>.
+     * Selection event filter, accepts various mouse events, but only when the
+     * network panel's edit mode is <code>EditMode.SELECTION</code>.
      */
-    private class SelectionEventFilter
-        extends PInputEventFilter {
+    private class SelectionEventFilter extends PInputEventFilter {
 
         /**
          * Create a new selection event filter.
@@ -328,7 +336,6 @@ final class SelectionEventHandler
         public SelectionEventFilter() {
             super(InputEvent.BUTTON1_MASK);
         }
-
 
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {

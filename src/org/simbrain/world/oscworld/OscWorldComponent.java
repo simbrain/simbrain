@@ -30,11 +30,11 @@ import com.illposed.osc.OSCPortOut;
 
 /**
  * OSC world component.
- * 
- * TODO: For this and MIDI make sure to note that consumer, producer classes removed
+ *
+ * TODO: For this and MIDI make sure to note that consumer, producer classes
+ * removed
  */
-public final class OscWorldComponent
-    extends WorkspaceComponent {
+public final class OscWorldComponent extends WorkspaceComponent {
 
     /** OSC port in. */
     private final OSCPortIn oscPortIn;
@@ -54,12 +54,11 @@ public final class OscWorldComponent
     static {
         try {
             DEFAULT_OSC_OUT_HOST = InetAddress.getLocalHost();
-        }
-        catch (UnknownHostException e) {
-            throw new RuntimeException("could not create default OSC out host", e);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("could not create default OSC out host",
+                    e);
         }
     }
-
 
     /**
      * Create a new OSC world component with the specified name.
@@ -71,26 +70,24 @@ public final class OscWorldComponent
         try {
             oscPortIn = new OSCPortIn(DEFAULT_OSC_IN_PORT);
             oscPortIn.startListening();
-        }
-        catch (SocketException e) {
+        } catch (SocketException e) {
             throw new RuntimeException("could not create OSC port in", e);
         }
         try {
-            oscPortOut = new OSCPortOut(DEFAULT_OSC_OUT_HOST, DEFAULT_OSC_OUT_PORT);
-        }
-        catch (SocketException e) {
+            oscPortOut = new OSCPortOut(DEFAULT_OSC_OUT_HOST,
+                    DEFAULT_OSC_OUT_PORT);
+        } catch (SocketException e) {
             throw new RuntimeException("could not create OSC port out", e);
         }
     }
 
-
     /** {@inheritDoc} */
     public void closing() {
         oscPortIn.stopListening();
-        // TODO:  always throws SocketException; wrote email to JavaOSC author
+        // TODO: always throws SocketException; wrote email to JavaOSC author
         oscPortIn.close();
         oscPortOut.close();
-        // TODO:  remove list event listeners
+        // TODO: remove list event listeners
     }
 
     /** {@inheritDoc} */
@@ -103,7 +100,7 @@ public final class OscWorldComponent
         // empty
     }
 
-    // TODO:  make these bound properties
+    // TODO: make these bound properties
     /**
      * Return the OSC in host name.
      *
@@ -158,64 +155,69 @@ public final class OscWorldComponent
         return oscPortOut;
     }
 
-    //TODO: Moving consumer, producer lists to top level breaks this stuff which uses glazed lists..
-    
-//    /**
-//     * Add the specified OSC message consumer list event listener.
-//     *
-//     * @param listener OSC message consumer list event listener to add
-//     */
-//    void addConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
-////        getConsumers().addListEventListener(listener);
-//    }
-//
-//    /**
-//     * Remove the specified OSC message consumer list event listener.
-//     *
-//     * @param listener OSC message consumer list event listener to remove
-//     */
-//    void removeConsumerListEventListener(final ListEventListener<OscMessageConsumer> listener) {
-// //       getConsumers().removeListEventListener(listener);
-//    }
-//
-//
-//    /**
-//     * Add the specified OSC message producer list event listener.
-//     *
-//     * @param listener OSC message producer list event listener to add
-//     */
-//    void addProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
-//   //     getConsumers().addListEventListener(listener);
-//    }
-//
-//    /**
-//     * Remove the specified OSC message producer list event listener.
-//     *
-//     * @param listener OSC message producer list event listener to remove
-//     */
-//    void removeProducerListEventListener(final ListEventListener<OscMessageProducer> listener) {
-////        getConsumers().removeListEventListener(listener);
-//    }
+    // TODO: Moving consumer, producer lists to top level breaks this stuff
+    // which uses glazed lists..
+
+    // /**
+    // * Add the specified OSC message consumer list event listener.
+    // *
+    // * @param listener OSC message consumer list event listener to add
+    // */
+    // void addConsumerListEventListener(final
+    // ListEventListener<OscMessageConsumer> listener) {
+    // // getConsumers().addListEventListener(listener);
+    // }
+    //
+    // /**
+    // * Remove the specified OSC message consumer list event listener.
+    // *
+    // * @param listener OSC message consumer list event listener to remove
+    // */
+    // void removeConsumerListEventListener(final
+    // ListEventListener<OscMessageConsumer> listener) {
+    // // getConsumers().removeListEventListener(listener);
+    // }
+    //
+    //
+    // /**
+    // * Add the specified OSC message producer list event listener.
+    // *
+    // * @param listener OSC message producer list event listener to add
+    // */
+    // void addProducerListEventListener(final
+    // ListEventListener<OscMessageProducer> listener) {
+    // // getConsumers().addListEventListener(listener);
+    // }
+    //
+    // /**
+    // * Remove the specified OSC message producer list event listener.
+    // *
+    // * @param listener OSC message producer list event listener to remove
+    // */
+    // void removeProducerListEventListener(final
+    // ListEventListener<OscMessageProducer> listener) {
+    // // getConsumers().removeListEventListener(listener);
+    // }
 
     /**
      * Add a new OSC in message with the specified address.
      *
-     * @param address OSC in message address, must not be null and must start with
-     *    <code>'/'</code> character
+     * @param address OSC in message address, must not be null and must start
+     *            with <code>'/'</code> character
      */
     public void addInMessage(final String address) {
-//        OscMessageProducer producer = new OscMessageProducer(address, this);
- //       addProducer(producer);
+        // OscMessageProducer producer = new OscMessageProducer(address, this);
+        // addProducer(producer);
     }
 
     /**
      * Add a new OSC out message with the specified address.
      *
-     * @param address OSC out message address, must not be null and must start with
-     *    <code>'/'</code> character
+     * @param address OSC out message address, must not be null and must start
+     *            with <code>'/'</code> character
      */
     public void addOutMessage(final String address) {
-//        OscMessageConsumer consumer = new OscMessageConsumer(address, this);
-//        addConsumer(consumer);
+        // OscMessageConsumer consumer = new OscMessageConsumer(address, this);
+        // addConsumer(consumer);
     }
 }

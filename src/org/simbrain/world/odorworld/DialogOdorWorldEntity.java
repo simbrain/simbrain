@@ -106,9 +106,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         this.fillFieldValues();
 
         // Main tab
-        //tabbedPane.addTab("Main", mainPanel);
+        // tabbedPane.addTab("Main", mainPanel);
         mainEditor = new ReflectivePropertyEditor();
-        mainEditor.setExcludeList(new String[]{"entityType", "id"});
+        mainEditor.setExcludeList(new String[] { "entityType", "id" });
         mainEditor.setObject(entityRef);
         tabbedPane.addTab("Main", mainEditor);
 
@@ -128,7 +128,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         cbRenderer.setPreferredSize(new Dimension(cbRendererDimension,
                 cbRendererDimension));
         cbImageName.setRenderer(cbRenderer);
-        //mainPanel.addItem("Image", cbImageName);
+        // mainPanel.addItem("Image", cbImageName);
 
         // Misc. Tabs
         bitesToDie.setColumns(2);
@@ -136,8 +136,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         miscPanel.addItem("Edible", edible);
         miscPanel.addItem("Bites to die", bitesToDie);
         miscPanel.addItem("Resurrection Probability", resurrectionProb);
-        //lifeCycleEditor =  new ReflectivePropertyEditor(entityRef.getLifeCycle());
-        //tabbedPane.addTab("LifeCycle", lifeCycleEditor);
+        // lifeCycleEditor = new
+        // ReflectivePropertyEditor(entityRef.getLifeCycle());
+        // tabbedPane.addTab("LifeCycle", lifeCycleEditor);
 
         setContentPane(tabbedPane);
     }
@@ -160,13 +161,13 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         if (entityRef != null) {
             tfEntityName.setText(entityRef.getName());
         }
-         //
-         //cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.));
-         //edible.setSelected(entityRef`);
-         //bitesToDie.setText((new
-         //Integer(entityRef.getBitesToDie())).toString());
-         //bitesToDie.setEnabled(entityRef.getEdible());
-         //resurrectionProb.setText("" + entityRef.getResurrectionProb());
+        //
+        // cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.));
+        // edible.setSelected(entityRef`);
+        // bitesToDie.setText((new
+        // Integer(entityRef.getBitesToDie())).toString());
+        // bitesToDie.setEnabled(entityRef.getEdible());
+        // resurrectionProb.setText("" + entityRef.getResurrectionProb());
     }
 
     /**
@@ -177,7 +178,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements
         if (smellPanel != null) {
             smellPanel.commitChanges();
         }
-        //lifeCycleEditor.commit();
+        // lifeCycleEditor.commit();
         // entityRef.setEdible(edible.isSelected());
         //
         // if (!edible.isSelected()) {

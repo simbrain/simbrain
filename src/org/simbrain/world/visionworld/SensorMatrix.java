@@ -24,32 +24,32 @@ package org.simbrain.world.visionworld;
 public interface SensorMatrix {
 
     /**
-     * Return the number of rows of this sensor matrix.
-     * The number of rows will be at least one.
+     * Return the number of rows of this sensor matrix. The number of rows will
+     * be at least one.
      *
      * @return the number of rows of this sensor matrix
      */
     int rows();
 
     /**
-     * Return the number of columns of this sensor matrix.
-     * The number of columns will be at least one.
+     * Return the number of columns of this sensor matrix. The number of columns
+     * will be at least one.
      *
      * @return the number of columns of this sensor matrix
      */
     int columns();
 
     /**
-     * Return the receptive field height for sensors in this sensor matrix.
-     * The receptive field height will be at least zero.
+     * Return the receptive field height for sensors in this sensor matrix. The
+     * receptive field height will be at least zero.
      *
      * @return the receptive field height for sensors in this sensor matrix
      */
     int getReceptiveFieldHeight();
 
     /**
-     * Return the receptive field width for sensors in this sensor matrix.
-     * The receptive field width will be at least zero.
+     * Return the receptive field width for sensors in this sensor matrix. The
+     * receptive field width will be at least zero.
      *
      * @return the receptive field width for sensors in this sensor matrix
      */
@@ -59,19 +59,23 @@ public interface SensorMatrix {
      * Return the default filter for the sensors in this sensor matrix, if any.
      *
      * @return the default filter for the sensors in this sensor matrix or
-     *    <code>null</code> if one has not been defined
+     *         <code>null</code> if one has not been defined
      */
     Filter getDefaultFilter();
 
     /**
-     * Return the sensor in this sensor matrix at the specified row and column, if any.
+     * Return the sensor in this sensor matrix at the specified row and column,
+     * if any.
      *
      * @param row row, must be <code>&gt;= 0</code> and <code>&lt; rows()</code>
-     * @param column column, must be <code>&gt;= 0</code> and <code>&lt; columns()</code>
-     * @return the sensor in this sensor matrix at the specified row and column, if any
-     * @throws IndexOutOfBoundsException if <code>row</code> is less than zero or
-     *    greater than or equal to <code>rows()</code>, or if <code>column</code> is
-     *    less than zero or greater than or equal to <code>columns()</code>
+     * @param column column, must be <code>&gt;= 0</code> and
+     *            <code>&lt; columns()</code>
+     * @return the sensor in this sensor matrix at the specified row and column,
+     *         if any
+     * @throws IndexOutOfBoundsException if <code>row</code> is less than zero
+     *             or greater than or equal to <code>rows()</code>, or if
+     *             <code>column</code> is less than zero or greater than or
+     *             equal to <code>columns()</code>
      */
     Sensor getSensor(int row, int column);
 }

@@ -32,7 +32,7 @@ import org.simbrain.network.synapse_update_rules.ClampedSynapseRule;
 
 /**
  * Connect every source neuron to every target neuron.
- * 
+ *
  */
 public class FixedFanout extends ConnectNeurons {
 

@@ -46,10 +46,10 @@ public final class ScriptEditorAction extends AbstractAction {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("ScriptEditor.png"));
         putValue(SHORT_DESCRIPTION, "Script Editor");
     }
-    
+
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GenericJInternalFrame frame =  ScriptEditor.getInternalFrame();
+        GenericJInternalFrame frame = ScriptEditor.getInternalFrame();
         desktop.addInternalFrame(frame);
         frame.setResizable(true);
         frame.setClosable(true);

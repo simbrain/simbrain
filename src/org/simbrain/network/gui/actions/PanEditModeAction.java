@@ -25,8 +25,7 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Pan edit mode action.
  */
-public final class PanEditModeAction
-    extends EditModeAction {
+public final class PanEditModeAction extends EditModeAction {
 
     /**
      * Create a new pan edit mode action with the specified network panel.

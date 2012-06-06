@@ -22,7 +22,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.util.RandomSource;
 
-
 /**
  * <b>RandomSynapse</b>.
  */

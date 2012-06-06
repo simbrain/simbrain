@@ -26,7 +26,6 @@ import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
  * <b>ProbabilisticSpikingNeuronPanel</b>.
  */
@@ -55,8 +54,7 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        SpikingThresholdRule neuronRef = (SpikingThresholdRule) ruleList
-                .get(0);
+        SpikingThresholdRule neuronRef = (SpikingThresholdRule) ruleList.get(0);
 
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 
@@ -85,9 +83,9 @@ public class SpikingThresholdRulePanel extends AbstractNeuronPanel {
                     .get(i);
 
             if (!tfThreshold.getText().equals(NULL_STRING)) {
-                neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
+                neuronRef
+                        .setThreshold(Double.parseDouble(tfThreshold.getText()));
             }
         }
     }
 }
-

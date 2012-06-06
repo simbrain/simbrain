@@ -42,8 +42,7 @@ public final class OpenCouplingListAction extends AbstractAction {
     private SimbrainDesktop desktop;
 
     /**
-     * Create a coupling list with the specified
-     * workspace.
+     * Create a coupling list with the specified workspace.
      *
      * @param desktop reference to simbrain desktop.
      */
@@ -60,9 +59,9 @@ public final class OpenCouplingListAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent event) {
         final JFrame frame = new JFrame("Coupling List");
-        JComponent cl = new CouplingListPanel(desktop,
-                new Vector(desktop.getWorkspace().getCouplingManager().getCouplings()));
-//        JComponent cl = new AttributePanel(desktop);
+        JComponent cl = new CouplingListPanel(desktop, new Vector(desktop
+                .getWorkspace().getCouplingManager().getCouplings()));
+        // JComponent cl = new AttributePanel(desktop);
         MyGlassPane pane = new MyGlassPane();
         frame.setContentPane(cl);
         frame.setGlassPane(pane);

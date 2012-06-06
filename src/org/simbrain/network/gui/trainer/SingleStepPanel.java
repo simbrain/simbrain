@@ -23,10 +23,9 @@ import javax.swing.JPanel;
 
 import org.simbrain.network.trainers.Trainer;
 
-
 /**
  * Component for training a network using current data only.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class SingleStepPanel extends JPanel {
@@ -48,17 +47,17 @@ public class SingleStepPanel extends JPanel {
         this.add(currentTraining);
         setDataButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-//                double[] inputVector = Network
-//                        .getActivationVector(trainer.getInputLayer());
-//                double[] trainingVector = Network
-//                        .getActivationVector(trainer.getOutputLayer());
-//                currentInput.setText("Input: "
-//                        + Utils.getVectorString(inputVector, ","));
-//                currentTraining.setText("Target:  "
-//                        + Utils.getVectorString(trainingVector, ","));
-//                trainer.setInputData(new double[][] { inputVector});
-//                trainer.setTrainingData(new double[][] { trainingVector});
-                //parentFrame.pack();
+                // double[] inputVector = Network
+                // .getActivationVector(trainer.getInputLayer());
+                // double[] trainingVector = Network
+                // .getActivationVector(trainer.getOutputLayer());
+                // currentInput.setText("Input: "
+                // + Utils.getVectorString(inputVector, ","));
+                // currentTraining.setText("Target:  "
+                // + Utils.getVectorString(trainingVector, ","));
+                // trainer.setInputData(new double[][] { inputVector});
+                // trainer.setTrainingData(new double[][] { trainingVector});
+                // parentFrame.pack();
             }
         });
     }

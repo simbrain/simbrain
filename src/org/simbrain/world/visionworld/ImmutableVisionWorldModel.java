@@ -21,8 +21,7 @@ package org.simbrain.world.visionworld;
 /**
  * Immutable implementation of VisionWorldModel.
  */
-public final class ImmutableVisionWorldModel
-    extends AbstractVisionWorldModel {
+public final class ImmutableVisionWorldModel extends AbstractVisionWorldModel {
 
     /** Pixel matrix. */
     private final PixelMatrix pixelMatrix;
@@ -30,18 +29,17 @@ public final class ImmutableVisionWorldModel
     /** Sensor matrix. */
     private final SensorMatrix sensorMatrix;
 
-
     /**
-     * Create a new immutable vision world model with the specified
-     * pixel matrix and sensor matrix.
+     * Create a new immutable vision world model with the specified pixel matrix
+     * and sensor matrix.
      *
      * @param pixelMatrix pixel matrix for this immutable vision world model,
-     *    must not be null
+     *            must not be null
      * @param sensorMatrix sensor matrix for this immutable vision world model,
-     *    must not be null
+     *            must not be null
      */
     public ImmutableVisionWorldModel(final PixelMatrix pixelMatrix,
-                                     final SensorMatrix sensorMatrix) {
+            final SensorMatrix sensorMatrix) {
         super();
         if (pixelMatrix == null) {
             throw new IllegalArgumentException("pixelMatrix must not be null");
@@ -53,7 +51,6 @@ public final class ImmutableVisionWorldModel
         this.sensorMatrix = sensorMatrix;
     }
 
-
     /** {@inheritDoc} */
     public PixelMatrix getPixelMatrix() {
         return pixelMatrix;
@@ -61,7 +58,8 @@ public final class ImmutableVisionWorldModel
 
     /** {@inheritDoc} */
     public void setPixelMatrix(final PixelMatrix pixelMatrix) {
-        throw new UnsupportedOperationException("setPixelMatrix operation not supported");
+        throw new UnsupportedOperationException(
+                "setPixelMatrix operation not supported");
     }
 
     /** {@inheritDoc} */
@@ -71,6 +69,7 @@ public final class ImmutableVisionWorldModel
 
     /** {@inheritDoc} */
     public void setSensorMatrix(final SensorMatrix sensorMatrix) {
-        throw new UnsupportedOperationException("setSensorMatrix operation not supported");
+        throw new UnsupportedOperationException(
+                "setSensorMatrix operation not supported");
     }
 }

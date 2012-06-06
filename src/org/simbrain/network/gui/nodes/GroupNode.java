@@ -28,12 +28,11 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.FeedForward;
+import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 
@@ -42,22 +41,18 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 
 /**
- * Represents a {@link org.simbrain.network.groups.Group}.  This class can be 
+ * Represents a {@link org.simbrain.network.groups.Group}. This class can be
  * used for default behavior.
  *
- * Subclasses can provide custom behavior:
- * - Context menu
- * - Tooltips, etc. 
- * - Formatting for interaction box 
- * - Formatting for outline
- * - Insets for outline
+ * Subclasses can provide custom behavior: - Context menu - Tooltips, etc. -
+ * Formatting for interaction box - Formatting for outline - Insets for outline
  */
 public class GroupNode extends PPath implements PropertyChangeListener {
 
     /** References to outlined objects. */
     private List<PNode> outlinedObjects = new ArrayList<PNode>();
 
-    /** Default stroke.  Light gray line. */
+    /** Default stroke. Light gray line. */
     private static final BasicStroke DEFAULT_STROKE = new BasicStroke(1f);
 
     /** Default outline padding. */
@@ -78,10 +73,9 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     /**
      * Create a PNode representation of a model group.
      *
-     * @param networkPanel
-     *            networkPanel for this subnetwork node, must not be null.
-     * @param group
-     *            the group object being represented
+     * @param networkPanel networkPanel for this subnetwork node, must not be
+     *            null.
+     * @param group the group object being represented
      */
     public GroupNode(final NetworkPanel networkPanel, final Group group) {
         this.networkPanel = networkPanel;
@@ -96,7 +90,7 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     }
 
     /**
-     * Set the interaction box. 
+     * Set the interaction box.
      *
      * @param interactionBox
      */
@@ -155,11 +149,11 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     public void addPNode(final PNode node) {
         node.addPropertyChangeListener(this);
         // Below was the source of major performance issues
-        //node.getParent().addPropertyChangeListener(this); 
+        // node.getParent().addPropertyChangeListener(this);
         outlinedObjects.add(node);
         updateVisibility();
     }
-    
+
     /**
      * Remove a reference node.
      *
@@ -170,20 +164,20 @@ public class GroupNode extends PPath implements PropertyChangeListener {
         node.removePropertyChangeListener(this);
         updateVisibility();
     }
-    
-  /**
-  * If this node has not been deleted, then it should be visible or not based on
-  * whether there are items to display.
-  * 
-  * TODO: But keep interaction box visible?
-  */
- private void updateVisibility() {
-     if (getOutlinedObjects().isEmpty()) {
-         setVisible(false);
-     } else {
-         setVisible(true);
-     }        
- }
+
+    /**
+     * If this node has not been deleted, then it should be visible or not based
+     * on whether there are items to display.
+     *
+     * TODO: But keep interaction box visible?
+     */
+    private void updateVisibility() {
+        if (getOutlinedObjects().isEmpty()) {
+            setVisible(false);
+        } else {
+            setVisible(true);
+        }
+    }
 
     /**
      * Update the text label to reflect underlying group label.
@@ -211,13 +205,12 @@ public class GroupNode extends PPath implements PropertyChangeListener {
             bounds.add(childBounds);
         }
 
-        bounds.setRect(bounds.getX() - outlinePadding,
-                bounds.getY() - outlinePadding,
-                bounds.getWidth() + (2 * outlinePadding),
+        bounds.setRect(bounds.getX() - outlinePadding, bounds.getY()
+                - outlinePadding, bounds.getWidth() + (2 * outlinePadding),
                 bounds.getHeight() + (2 * outlinePadding));
 
         setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                            (float) bounds.getWidth(), (float) bounds.getHeight());
+                (float) bounds.getWidth(), (float) bounds.getHeight());
 
         updateInteractionBox();
     }
@@ -226,8 +219,9 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      * Update location of interaction box.
      */
     protected void updateInteractionBox() {
-        // System.out.println(getGroup().getLabel()); TODO: Uncomment this to see just how often
-        //  this method is called.  Too much!
+        // System.out.println(getGroup().getLabel()); TODO: Uncomment this to
+        // see just how often
+        // this method is called. Too much!
         interactionBox.setOffset(
                 getBounds().getX() + interactionBox.getBoxOffset_X(),
                 getBounds().getY() - interactionBox.getHeight()
@@ -278,10 +272,9 @@ public class GroupNode extends PPath implements PropertyChangeListener {
      * Select all grouped objects.
      */
     protected void selectAllNodes() {
-        //System.out.println(group.getLabel());
+        // System.out.println(group.getLabel());
         // TODO: Can't this happen in subclass overrides?
-        if ((group instanceof FeedForward)
-                || (group instanceof Subnetwork)) {
+        if ((group instanceof FeedForward) || (group instanceof Subnetwork)) {
             networkPanel.setSelection(getChildrenNeuronNodes(this));
         } else {
             networkPanel.setSelection(outlinedObjects);
@@ -296,20 +289,20 @@ public class GroupNode extends PPath implements PropertyChangeListener {
     }
 
     /**
-     * Helper method to get all children neuron nodes.  Recursively finds all
+     * Helper method to get all children neuron nodes. Recursively finds all
      * children neuron nodes.
      *
      * @param parentNode the node whose children are being sought
      * @return the list of children neuron nodes.
      */
     protected List<NeuronNode> getChildrenNeuronNodes(GroupNode parentNode) {
-        
+
         List<NeuronNode> ret = new ArrayList<NeuronNode>();
         for (PNode node : parentNode.getOutlinedObjects()) {
             if (node instanceof NeuronNode) {
                 ret.add((NeuronNode) node);
             } else if (node instanceof GroupNode) {
-                ret.addAll(getChildrenNeuronNodes((GroupNode)node));
+                ret.addAll(getChildrenNeuronNodes((GroupNode) node));
             }
         }
         return ret;

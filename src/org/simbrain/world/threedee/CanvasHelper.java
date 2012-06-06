@@ -11,7 +11,7 @@ import com.jmex.awt.lwjgl.LWJGLCanvas;
 
 /**
  * Helper class that creates a jME canvas and sets it up with.
- * 
+ *
  * @author Matt Watson
  */
 public class CanvasHelper {
@@ -21,14 +21,16 @@ public class CanvasHelper {
     /**
      * Creates an new Canvas helper with the provided height and width using the
      * provided JMECanvasImplementor.
-     * 
+     *
      * @param width The width of the canvas.
      * @param height The height of the canvas.
      * @param impl The 'implementor' instance.
      */
-    public CanvasHelper(final int width, final int height, final JMECanvasImplementor impl) {
+    public CanvasHelper(final int width, final int height,
+            final JMECanvasImplementor impl) {
         /* make the canvas */
-        canvas = (LWJGLCanvas) DisplaySystem.getDisplaySystem("lwjgl").createCanvas(width, height);
+        canvas = (LWJGLCanvas) DisplaySystem.getDisplaySystem("lwjgl")
+                .createCanvas(width, height);
 
         /* add a listener... if window is resized, we can do something about it */
         canvas.addComponentListener(new ComponentAdapter() {
@@ -43,7 +45,7 @@ public class CanvasHelper {
          * be called KeyInput.setProvider(KeyInput.INPUT_AWT);
          * AWTMouseInput.setup(canvas, false);
          */
-        
+
         final JMECanvas jmeCanvas = (canvas);
         jmeCanvas.setImplementor(impl);
         jmeCanvas.setUpdateInput(true);
@@ -57,7 +59,7 @@ public class CanvasHelper {
 
     /**
      * Returns the canvas created by this class.
-     * 
+     *
      * @return the canvas created by this class
      */
     public Canvas getCanvas() {

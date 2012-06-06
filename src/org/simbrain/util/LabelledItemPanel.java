@@ -26,11 +26,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
 /**
  * <b>LabelledItemPanel</b> provides a panel for laying out labeled elements
- * neatly with all the labels and elements
- * aligned down the screen.
+ * neatly with all the labels and elements aligned down the screen.
  *
  * @author David Fraser
  * @author Michael Harris
@@ -105,14 +103,14 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-	 * Adds a labeled item to the panel on the current myNextItemRow, at the
-	 * specified column
-	 * @param labelText The label text for the item.
-	 * @param item The item to be added.
-	 * @param col desired grid bag layor column
-	 */
-    public void addItem(final String labelText, final JComponent item,
-            int col) {
+     * Adds a labeled item to the panel on the current myNextItemRow, at the
+     * specified column
+     *
+     * @param labelText The label text for the item.
+     * @param item The item to be added.
+     * @param col desired grid bag layor column
+     */
+    public void addItem(final String labelText, final JComponent item, int col) {
         // Create the label and its constraints
         JLabel label = new JLabel(labelText);
 
@@ -129,7 +127,7 @@ public class LabelledItemPanel extends JPanel {
         // Add the component with its constraints
         GridBagConstraints itemConstraints = new GridBagConstraints();
 
-        itemConstraints.gridx = col+1;
+        itemConstraints.gridx = col + 1;
         itemConstraints.gridy = myNextItemRow;
         itemConstraints.insets = new Insets(10, 10, 0, 10);
         itemConstraints.weightx = 1.0;
@@ -139,17 +137,18 @@ public class LabelledItemPanel extends JPanel {
         add(item, itemConstraints);
 
     }
-    
+
     public int getMyNextItemRow() {
-    	return myNextItemRow;
+        return myNextItemRow;
     }
 
     public void setMyNextItemRow(int myNextItemRow) {
-    	this.myNextItemRow = myNextItemRow;
+        this.myNextItemRow = myNextItemRow;
     }
 
-	/**
-     * Modification of addItem which takes a label, rather than text, as an argument.
+    /**
+     * Modification of addItem which takes a label, rather than text, as an
+     * argument.
      *
      * @param label Label to be added
      * @param item SimbrainComponent to be added

@@ -27,12 +27,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Create pixel matrix action.
  */
-public final class SelectAllAction
-    extends AbstractAction {
+public final class SelectAllAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld world;
-
 
     /**
      * Create a new create pixel matrix action.
@@ -42,13 +40,14 @@ public final class SelectAllAction
     public SelectAllAction(final VisionWorld world) {
         super("Select All");
         if (world == null) {
-            throw new IllegalArgumentException("Desktop component must not be null");
+            throw new IllegalArgumentException(
+                    "Desktop component must not be null");
         }
         this.world = world;
-//        putValue(SMALL_ICON, ResourceManager.getImageIcon("PixelMatrix.png"));
-//        putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
+        // putValue(SMALL_ICON,
+        // ResourceManager.getImageIcon("PixelMatrix.png"));
+        // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

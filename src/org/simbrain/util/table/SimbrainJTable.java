@@ -37,7 +37,6 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 
 import org.jdesktop.swingx.JXTable;
 
@@ -83,7 +82,7 @@ public class SimbrainJTable extends JXTable {
 
     /** Whether to display the default popup menu. */
     private boolean displayPopUpMenu = true;
-    
+
     /**
      * Whether the table's data has changed or not, since the last save. Used
      * externally.
@@ -435,7 +434,7 @@ public class SimbrainJTable extends JXTable {
                         label.setText(rowHeadings.get(row));
                     } else {
                         // First column displays the row number.
-                        label.setText("" + (int) (row + 1));
+                        label.setText("" + (row + 1));
                     }
                 }
                 return label;
@@ -545,7 +544,7 @@ public class SimbrainJTable extends JXTable {
         @Override
         public void setValueAt(Object value, int row, int column) {
             if (column > 0) {
-                data.setValue(row, column - 1, (Double) value);
+                data.setValue(row, column - 1, value);
             }
         }
 
@@ -628,7 +627,7 @@ public class SimbrainJTable extends JXTable {
     }
 
     /**
-     * TODO: This only works for setting from true to false.  Setting from false
+     * TODO: This only works for setting from true to false. Setting from false
      * back to true does not work.
      *
      * @param displayColumnHeadings the displayColumnHeadings to set
@@ -636,7 +635,7 @@ public class SimbrainJTable extends JXTable {
     public void setDisplayColumnHeadings(boolean displayColumnHeadings) {
         this.displayColumnHeadings = displayColumnHeadings;
         if (displayColumnHeadings == false) {
-            this.setTableHeader(null); // dubious method but worked 
+            this.setTableHeader(null); // dubious method but worked
         }
     }
 

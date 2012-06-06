@@ -32,21 +32,21 @@ public class LogisticRule extends NeuronUpdateRule {
     private double growthRate = 3.9;
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void init(Neuron neuron) {
         // No implementation
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public LogisticRule deepCopy() {
         LogisticRule ln = new LogisticRule();
@@ -56,7 +56,7 @@ public class LogisticRule extends NeuronUpdateRule {
     }
 
     /**
-     * @{inheritDoc}
+     * @{inheritDoc
      */
     public void update(Neuron neuron) {
 

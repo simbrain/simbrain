@@ -25,7 +25,6 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 
-
 /**
  * <b>LayoutPanel</b> allows the user to define the layout of a network.
  */
@@ -35,7 +34,8 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
     private JTextField tfSpacing = new JTextField("40");
 
     /** Layout style selected. */
-    private JComboBox cbLayouts = new JComboBox(new LineOrientation[] {LineOrientation.HORIZONTAL, LineOrientation.VERTICAL});
+    private JComboBox cbLayouts = new JComboBox(new LineOrientation[] {
+            LineOrientation.HORIZONTAL, LineOrientation.VERTICAL });
 
     /**
      * Default constructor.
@@ -49,7 +49,8 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
      * @return Returns the neuronLayout.
      */
     public Layout getNeuronLayout() {
-        LineLayout layout = new LineLayout(Double.parseDouble(tfSpacing.getText()), (LineOrientation) cbLayouts.getSelectedItem());
+        LineLayout layout = new LineLayout(Double.parseDouble(tfSpacing
+                .getText()), (LineOrientation) cbLayouts.getSelectedItem());
         return layout;
     }
 

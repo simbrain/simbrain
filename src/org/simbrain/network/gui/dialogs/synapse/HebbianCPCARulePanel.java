@@ -23,14 +23,13 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.HebbianCPCARule;
 
-
 /**
  * <b>HebbianCPCAPanel</b>.
  */
 public class HebbianCPCARulePanel extends AbstractSynapsePanel {
-private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-/** Learning rate field. */
+    /** Learning rate field. */
     private JTextField tfLearningRate = new JTextField();
 
     /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
@@ -66,17 +65,20 @@ private static final long serialVersionUID = 1L;
         tfTheta.setText(Double.toString(synapseRef.getTheta()));
         tfLambda.setText(Double.toString(synapseRef.getLambda()));
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getLearningRate")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
+                "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
         if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getM")) {
-                tfM.setText(NULL_STRING);
+            tfM.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getTheta")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
+                "getTheta")) {
             tfTheta.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class, "getLambda")) {
+        if (!NetworkUtils.isConsistent(ruleList, HebbianCPCARule.class,
+                "getLambda")) {
             tfLambda.setText(NULL_STRING);
         }
     }
@@ -85,8 +87,9 @@ private static final long serialVersionUID = 1L;
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-//        HebbianCPCA synapseRef = new HebbianCPCA();
-        tfLearningRate.setText(Double.toString(HebbianCPCARule.DEFAULT_LEARNING_RATE));
+        // HebbianCPCA synapseRef = new HebbianCPCA();
+        tfLearningRate.setText(Double
+                .toString(HebbianCPCARule.DEFAULT_LEARNING_RATE));
         tfM.setText(Double.toString(HebbianCPCARule.DEFAULT_M));
         tfTheta.setText(Double.toString(HebbianCPCARule.DEFAULT_THETA));
         tfLambda.setText(Double.toString(HebbianCPCARule.DEFAULT_LAMBDA));
@@ -100,7 +103,8 @@ private static final long serialVersionUID = 1L;
             HebbianCPCARule synapseRef = (HebbianCPCARule) ruleList.get(i);
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
-                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate
+                        .getText()));
             }
             if (!tfM.getText().equals(NULL_STRING)) {
                 synapseRef.setM(Double.parseDouble(tfM.getText()));

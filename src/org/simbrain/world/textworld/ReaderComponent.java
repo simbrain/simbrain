@@ -60,7 +60,7 @@ public class ReaderComponent extends WorkspaceComponent {
         world = newWorld;
         init();
     }
-    
+
     /**
      * Initialize attribute types.
      */
@@ -70,11 +70,14 @@ public class ReaderComponent extends WorkspaceComponent {
         world.addListener(new TextListener() {
             public void textChanged() {
             }
+
             public void dictionaryChanged() {
-               ReaderComponent.this.firePotentialAttributesChanged();
+                ReaderComponent.this.firePotentialAttributesChanged();
             }
+
             public void positionChanged() {
             }
+
             public void currentItemChanged(TextItem newItem) {
             }
         });
@@ -88,15 +91,15 @@ public class ReaderComponent extends WorkspaceComponent {
                 char letter;
                 for (letter = 'a'; letter <= 'z'; letter++) {
                     returnList.add(new PotentialProducer(this, world,
-                            "matchCurrentLetter", double.class,
-                            char.class, letter, "Letter " + letter));
+                            "matchCurrentLetter", double.class, char.class,
+                            letter, "Letter " + letter));
                 }
             }
             if (type.getTypeName().equalsIgnoreCase("Words")) {
                 for (String word : world.getDictionary()) {
                     returnList.add(new PotentialProducer(this, world,
-                            "matchCurrentItem", double.class,
-                            String.class, word, word));
+                            "matchCurrentItem", double.class, String.class,
+                            word, word));
                 }
 
             }
@@ -109,7 +112,8 @@ public class ReaderComponent extends WorkspaceComponent {
      */
     public static ReaderComponent open(InputStream input, String name,
             String format) {
-        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(input);
+        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(
+                input);
         return new ReaderComponent(name, newWorld);
     }
 

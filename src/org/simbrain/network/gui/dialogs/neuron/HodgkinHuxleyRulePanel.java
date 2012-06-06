@@ -24,24 +24,24 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.neuron_update_rules.HodgkinHuxleyRule;
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
- * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary neurons.
+ * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary
+ * neurons.
  */
 public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
 
     private JTextField perNaChannels = new JTextField();
-    
+
     private JTextField perKChannels = new JTextField();
-    
+
     private JTextField getEna = new JTextField();
-    
+
     private JTextField getEk = new JTextField();
-    
-//    private JTextField ENA = new JTextField();
-//
-//    private JTextField Ek = new JTextField();
-    
+
+    // private JTextField ENA = new JTextField();
+    //
+    // private JTextField Ek = new JTextField();
+
     /** Main tab for neuron prefernces. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
@@ -51,11 +51,11 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
     public HodgkinHuxleyRulePanel(Network network) {
         super(network);
         this.add(mainTab);
-        mainTab.addItem("Sodium Channels", perNaChannels);        
+        mainTab.addItem("Sodium Channels", perNaChannels);
         mainTab.addItem("Potassium Channels", perKChannels);
         mainTab.addItem("Equilibrium Potential", getEna);
         mainTab.addItem("Equilibrium Potential", getEk);
-        }
+    }
 
     /**
      * Populate fields with current data.
@@ -65,15 +65,14 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
 
         perNaChannels.setText(Double.toString(neuronRef.getPerNaChannels()));
         perKChannels.setText(Double.toString(neuronRef.getPerKChannels()));
-//        ENA.setText(Double.toString(neuronRef.getENA()));
+        // ENA.setText(Double.toString(neuronRef.getENA()));
 
-        
-        
-//        //Handle consistency of multiple selections
-//        if (!NetworkUtils.isConsistent(ruleList, HodgkinHuxleyNeuron.class, "getTemp")) {
-//            tfTemp.setText(NULL_STRING);
-//        }
-        
+        // //Handle consistency of multiple selections
+        // if (!NetworkUtils.isConsistent(ruleList, HodgkinHuxleyNeuron.class,
+        // "getTemp")) {
+        // tfTemp.setText(NULL_STRING);
+        // }
+
     }
 
     /**
@@ -81,7 +80,7 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         HodgkinHuxleyRule neuronRef = new HodgkinHuxleyRule();
-//        tfTemp.setText(Double.toString(neuronRef.getTemp()));
+        // tfTemp.setText(Double.toString(neuronRef.getTemp()));
 
     }
 
@@ -92,9 +91,9 @@ public class HodgkinHuxleyRulePanel extends AbstractNeuronPanel {
         for (int i = 0; i < ruleList.size(); i++) {
             HodgkinHuxleyRule neuronRef = (HodgkinHuxleyRule) ruleList.get(i);
 
-//          if (!tfTemp.getText().equals(NULL_STRING)) {
-//             neuronRef.setTemp(Double.parseDouble(tfTemp.getText()));
-//         }
+            // if (!tfTemp.getText().equals(NULL_STRING)) {
+            // neuronRef.setTemp(Double.parseDouble(tfTemp.getText()));
+            // }
 
         }
     }

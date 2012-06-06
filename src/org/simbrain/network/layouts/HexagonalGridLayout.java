@@ -19,10 +19,8 @@
 package org.simbrain.network.layouts;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 
 /**
@@ -67,7 +65,8 @@ public class HexagonalGridLayout implements Layout {
     /**
      * Default Constructor.
      */
-    public HexagonalGridLayout() { }
+    public HexagonalGridLayout() {
+    }
 
     /**
      * {@inheritDoc}
@@ -79,7 +78,7 @@ public class HexagonalGridLayout implements Layout {
             numCols = (int) Math.sqrt(neurons.size());
         }
         for (int i = 0; i < neurons.size(); i++) {
-            Neuron neuron = (Neuron) neurons.get(i);
+            Neuron neuron = neurons.get(i);
             if (i % numCols == 0) {
                 rowNum++;
             }
@@ -93,7 +92,7 @@ public class HexagonalGridLayout implements Layout {
     }
 
     /**
-     *  {@inheritDoc}
+     * {@inheritDoc}
      */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();

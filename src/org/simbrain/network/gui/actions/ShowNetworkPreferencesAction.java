@@ -33,12 +33,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Show network preferences action.
  */
-public final class ShowNetworkPreferencesAction
-    extends AbstractAction {
+public final class ShowNetworkPreferencesAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new show network preferences action with the specified network
@@ -56,24 +54,25 @@ public final class ShowNetworkPreferencesAction
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+                KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit()
+                        .getMenuShortcutKeyMask()));
 
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
         SwingUtilities.invokeLater(new Runnable() {
 
-                /** @see Runnable */
-                public void run() {
-                    NetworkDialog dialog = networkPanel.getNetworkDialog(networkPanel);
-                    dialog.pack();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.setVisible(true);
-                }
-            });
+            /** @see Runnable */
+            public void run() {
+                NetworkDialog dialog = networkPanel
+                        .getNetworkDialog(networkPanel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+        });
     }
 }

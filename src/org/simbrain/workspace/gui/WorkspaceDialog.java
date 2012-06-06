@@ -41,8 +41,8 @@ import org.simbrain.workspace.Workspace;
  */
 public class WorkspaceDialog extends StandardDialog implements ActionListener {
 
-	/** Reference to workspace. **/
-	private Workspace workspace;
+    /** Reference to workspace. **/
+    private Workspace workspace;
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -74,14 +74,15 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
         // Set up tab panels
         tabbedPane.addTab("Update", updatePanel);
         setContentPane(tabbedPane);
-        
+
         LabelledItemPanel miscPanel = new LabelledItemPanel();
 
         // Panel with a slider bar and label to display simulation speed
         JPanel sliderPanel = new JPanel();
-        JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 500, workspace.getUpdateDelay());
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 500,
+                workspace.getUpdateDelay());
         final JLabel speedLabel = new JLabel("" + workspace.getUpdateDelay());
-        speedLabel.setPreferredSize(new Dimension(50,10));
+        speedLabel.setPreferredSize(new Dimension(50, 10));
         slider.setToolTipText("Use this to delay simulation speed; "
                 + "sometimes useful for demo purposes");
         slider.setMajorTickSpacing(100);
@@ -100,12 +101,13 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
         miscPanel.addItem(
                 "Simulation delay (millisconds to sleep between iterations)",
                 sliderPanel);
-        
+
         tabbedPane.addTab("Misc.", miscPanel);
 
         // Add help button
         JButton helpButton = new JButton("Help");
-        ShowHelpAction helpAction = new ShowHelpAction("Workspace/Preferences.html");
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Workspace/Preferences.html");
         helpButton.setAction(helpAction);
         this.addButton(helpButton);
     }
@@ -136,8 +138,8 @@ public class WorkspaceDialog extends StandardDialog implements ActionListener {
 
     }
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-	}
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+    }
 
 }

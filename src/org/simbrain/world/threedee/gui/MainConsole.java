@@ -40,25 +40,25 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
     private static final int WIDTH = 512;
     /** Temporary hard-coded height of the frames. */
     private static final int HEIGHT = 384;
-    
+
     /** All the current views. */
     private final Map<AgentView, JFrame> views = new HashMap<AgentView, JFrame>();
     /** The parent Component. */
     private final ThreeDeeComponent component;
-    
+
     /** BorderLayout for root panel. */
     private BorderLayout layout;
     /** The custom root panel. */
     private JPanel root;
     /** The panel that hold all the Agent controls. */
     private JPanel agents;
-    
+
     /** Timer that fires the update operation. */
     private final Timer timer;
-    
+
     /**
      * Creates a new main console.
-     * 
+     *
      * @param component The parent component.
      */
     public MainConsole(GenericFrame frame, final ThreeDeeComponent component) {
@@ -74,58 +74,58 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
     public void postAddInit() {
         layout = new BorderLayout();
         root = new JPanel();
-        
+
         root.setLayout(layout);
         root.add(mainPanel(), BorderLayout.NORTH);
-        
+
         agents = new JPanel(new GridLayout(0, 1));
         root.add(agents, BorderLayout.CENTER);
-        
+
         add(root);
-        
+
         for (Agent agent : component.getAgents()) {
             newAgentPanel(agent);
         }
-        
+
         getParentFrame().pack();
     }
-    
+
     /**
      * Returns a new main panel.
-     * 
+     *
      * @return A new main panel.
      */
     private JPanel mainPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1, 1));
-        
+
         agents = new JPanel(new GridLayout(0, 1));
-        
+
         panel.add(new JButton(new NewAgentAction()));
-        
+
         return panel;
     }
-    
+
     Map<Agent, JPanel> panels = new HashMap<Agent, JPanel>();
-    
+
     /**
      * Creates a new Agent panel for the provided panel.
-     * 
+     *
      * @param agent The Agent to create the panel for.
      */
     private void newAgentPanel(final Agent agent) {
         JPanel panel = new JPanel();
-        
+
         panels.put(agent, panel);
-        
+
         panel.add(new JButton(new CreateAgentViewAction(agent)));
         agents.add(panel);
         getParentFrame().pack();
     }
-    
+
     /**
      * Action for a new agent.
-     * 
+     *
      * @author Matt Watson
      */
     private class NewAgentAction extends AbstractAction {
@@ -136,20 +136,20 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         {
             this.putValue(AbstractAction.NAME, "New Agent");
         }
-        
+
         /**
          * {@inheritDoc}
          */
         public void actionPerformed(final ActionEvent e) {
             Agent agent = component.createAgent();
-            
+
             newAgentPanel(agent);
         }
     };
-    
+
     /**
      * Action for a new agent view.
-     * 
+     *
      * @author Matt Watson
      */
     private class CreateAgentViewAction extends AbstractAction {
@@ -157,23 +157,24 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
         private static final long serialVersionUID = 1L;
         /** The agent to create a view for. */
         private Agent agent;
-        
+
         /**
          * Creates a new instance.
-         * 
+         *
          * @param agent The agent to create a view for.
          */
         CreateAgentViewAction(final Agent agent) {
             this.agent = agent;
             this.putValue(AbstractAction.NAME, "Create View");
         }
-        
+
         /**
          * {@inheritDoc}
          */
         public void actionPerformed(final ActionEvent e) {
             this.setEnabled(false);
-            final AgentView view = new AgentView(agent, component.getEnvironment(), WIDTH, HEIGHT);
+            final AgentView view = new AgentView(agent,
+                    component.getEnvironment(), WIDTH, HEIGHT);
             final CanvasHelper canvas = new CanvasHelper(WIDTH, HEIGHT, view);
             final JFrame innerFrame = new JFrame("Agent " + agent.getName());
 
@@ -216,19 +217,20 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
 
                 public void actionPerformed(ActionEvent e) {
                     System.out.println("Here..");
-                    Thread thread = new Thread(new Runnable(){
+                    Thread thread = new Thread(new Runnable() {
                         public void run() {
-                            //final Sight sight = agent.getBindings().createSight(view);
-                            //System.out.println("-->" + sight);
+                            // final Sight sight =
+                            // agent.getBindings().createSight(view);
+                            // System.out.println("-->" + sight);
                             innerFrame.addWindowListener(new WindowAdapter() {
                                 public void windowClosed(final WindowEvent e) {
                                     System.out.println("closing");
-                                    //sight.close();
+                                    // sight.close();
                                 }
                             });
                         }
                     });
-                  Executors.newSingleThreadExecutor().execute(thread);
+                    Executors.newSingleThreadExecutor().execute(thread);
                 }
             });
 
@@ -241,31 +243,31 @@ public class MainConsole extends GuiComponent<ThreeDeeComponent> {
                     getParentFrame().pack();
                 }
             });
-            
+
             getParentFrame().pack();
         }
     };
-    
+
     /**
      * Gets a key handler for an agent.
-     * 
+     *
      * @param agent the agent to get a key handler for.
-     * 
+     *
      * @return the new key handler.
      */
     private KeyHandler getHandler(final Agent agent) {
         KeyHandler handler = new KeyHandler();
-        
+
         handler.addBinding(KeyEvent.VK_LEFT, agent.left());
         handler.addBinding(KeyEvent.VK_RIGHT, agent.right());
         handler.addBinding(KeyEvent.VK_UP, agent.forward());
         handler.addBinding(KeyEvent.VK_DOWN, agent.backward());
         handler.addBinding(KeyEvent.VK_Z, agent.up());
         handler.addBinding(KeyEvent.VK_A, agent.down());
-        
+
         return handler;
     }
-    
+
     /**
      * {@inheritDoc}
      */

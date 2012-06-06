@@ -21,7 +21,7 @@ package org.simbrain.network.core;
 import org.simbrain.util.Utils;
 
 /**
- * A rule for updating a synapse.  A learning rule.
+ * A rule for updating a synapse. A learning rule.
  *
  * @author jyoshimi
  */
@@ -67,7 +67,7 @@ public abstract class SynapseUpdateRule {
      * @param synapse reference to parent synapse
      */
     public void clear(final Synapse synapse) {
-        synapse.setStrength(0); //TODO: Used?
+        synapse.setStrength(0); // TODO: Used?
     }
 
     /**

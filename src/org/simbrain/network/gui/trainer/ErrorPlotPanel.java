@@ -26,7 +26,7 @@ import org.simbrain.util.Utils;
 
 /**
  * Component for representing error in a trainer.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class ErrorPlotPanel extends JPanel {
@@ -45,14 +45,14 @@ public class ErrorPlotPanel extends JPanel {
 
     /**
      * Construct a trainer panel around a trainer object.
-     * 
+     *
      * @param trainer the trainer this panel represents
      */
     public ErrorPlotPanel(final IterableTrainer trainer) {
 
         this.trainer = trainer;
         JPanel mainPanel = new JPanel();
-        
+
         // Configure time series plot
         model = new TimeSeriesModel(1);
         model.setRangeLowerBound(0);
@@ -72,23 +72,22 @@ public class ErrorPlotPanel extends JPanel {
         // Customize button panel; first remove all buttons
         graphPanel.removeAllButtonsFromToolBar();
         graphPanel.addClearGraphDataButton();
-		graphPanel.addPreferencesButton();
-		graphPanel.getButtonPanel().add(rmsError);
-		graphPanel.getButtonPanel().add(runningLabel);
-		mainPanel.add(graphPanel);
-		add(mainPanel);
+        graphPanel.addPreferencesButton();
+        graphPanel.getButtonPanel().add(rmsError);
+        graphPanel.getButtonPanel().add(runningLabel);
+        mainPanel.add(graphPanel);
+        add(mainPanel);
 
-		trainer.addErrorListener(new ErrorListener() {
-			@Override
-			public void errorUpdated() {
-				if (model != null) {
-					model.update();
-					model.addData(0, trainer.getIteration(),
-							trainer.getError());
-					updateErrorField();
-				}
-			}
-		});
+        trainer.addErrorListener(new ErrorListener() {
+            @Override
+            public void errorUpdated() {
+                if (model != null) {
+                    model.update();
+                    model.addData(0, trainer.getIteration(), trainer.getError());
+                    updateErrorField();
+                }
+            }
+        });
 
     }
 
@@ -96,8 +95,7 @@ public class ErrorPlotPanel extends JPanel {
      * Update error text field.
      */
     private void updateErrorField() {
-            rmsError.setText("Error:"
-                    + Utils.round(trainer.getError(), 4));
+        rmsError.setText("Error:" + Utils.round(trainer.getError(), 4));
     }
 
 }

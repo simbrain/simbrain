@@ -29,7 +29,7 @@ public class ClipboardEvent extends EventObject {
      * Create a new clipboard event with the specified source.
      */
     public ClipboardEvent() {
-//        super(source);
+        // super(source);
         super(new Object());
     }
 }

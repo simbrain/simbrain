@@ -20,7 +20,7 @@ import org.simbrain.network.trainers.Trainer;
 
 /**
  * Component for training a network using the current data only.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class LoadDataPanel extends JPanel {
@@ -30,10 +30,10 @@ public class LoadDataPanel extends JPanel {
      */
     public LoadDataPanel(final NetworkPanel panel, final Trainer trainer) {
         super();
-//        add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer,
-//                TrainerDataType.Input)));
-//        add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer, 
-//                TrainerDataType.Trainer)));
+        // add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer,
+        // TrainerDataType.Input)));
+        // add(new JButton(TrainerGuiActions.getEditDataAction(panel, trainer,
+        // TrainerDataType.Trainer)));
     }
 
 }

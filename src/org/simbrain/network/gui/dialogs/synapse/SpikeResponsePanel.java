@@ -39,7 +39,7 @@ import org.simbrain.util.LabelledItemPanel;
 //Note: diff changeset 1490 and 1491 to see how to put general spike response features into this panel
 
 /**
- * <b>SpikeResponsePanel</b>.  
+ * <b>SpikeResponsePanel</b>.
  */
 public class SpikeResponsePanel extends JPanel implements ActionListener {
 
@@ -53,7 +53,8 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 
     /** Spike response type. */
-    private JComboBox cbSpikeResponseType = new JComboBox(SpikeResponder.getTypeList());
+    private JComboBox cbSpikeResponseType = new JComboBox(
+            SpikeResponder.getTypeList());
 
     /** Spike function panel. */
     private AbstractSpikeResponsePanel spikeFunctionPanel;
@@ -108,29 +109,38 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
      * Initalizes spike response type.
      */
     private void initSpikeResponseType() {
-        SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
+        SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList
+                .get(0);
 
-        if (!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "getType")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList,
+                SpikeResponder.class, "getType")) {
             cbSpikeResponseType.addItem(NULL_STRING);
-            cbSpikeResponseType.setSelectedIndex(SpikeResponder.getTypeList().length);
-            spikeFunctionPanel = new BlankSpikerPanel(); // Simply to serve as an empty panel
+            cbSpikeResponseType
+                    .setSelectedIndex(SpikeResponder.getTypeList().length);
+            spikeFunctionPanel = new BlankSpikerPanel(); // Simply to serve as
+                                                         // an empty panel
         } else if (spikeResponder instanceof Step) {
-            cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(Step.getName()));
+            cbSpikeResponseType.setSelectedIndex(SpikeResponder
+                    .getSpikerTypeIndex(Step.getName()));
             spikeFunctionPanel = new StepSpikerPanel();
             spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
             spikeFunctionPanel.fillFieldValues();
         } else if (spikeResponder instanceof JumpAndDecay) {
-            cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(JumpAndDecay.getName()));
+            cbSpikeResponseType.setSelectedIndex(SpikeResponder
+                    .getSpikerTypeIndex(JumpAndDecay.getName()));
             spikeFunctionPanel = new JumpAndDecayPanel();
             spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
             spikeFunctionPanel.fillFieldValues();
         } else if (spikeResponder instanceof RiseAndDecay) {
-            cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(RiseAndDecay.getName()));
-            spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder.getParent().getSource().getParentNetwork());
+            cbSpikeResponseType.setSelectedIndex(SpikeResponder
+                    .getSpikerTypeIndex(RiseAndDecay.getName()));
+            spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder
+                    .getParent().getSource().getParentNetwork());
             spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
             spikeFunctionPanel.fillFieldValues();
-        }  else if (spikeResponder instanceof ProbabilisticResponder) {
-            cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(ProbabilisticResponder.getName()));
+        } else if (spikeResponder instanceof ProbabilisticResponder) {
+            cbSpikeResponseType.setSelectedIndex(SpikeResponder
+                    .getSpikerTypeIndex(ProbabilisticResponder.getName()));
             spikeFunctionPanel = new ProbabilisticSpikeResponderPanel();
             spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
             spikeFunctionPanel.fillFieldValues();
@@ -141,21 +151,28 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
      * Change spike responders.
      */
     private void changeSpikeResponders() {
-        if (cbSpikeResponseType.getSelectedItem().toString().equalsIgnoreCase(Step.getName())) {
+        if (cbSpikeResponseType.getSelectedItem().toString()
+                .equalsIgnoreCase(Step.getName())) {
             for (int i = 0; i < spikeResponderList.size(); i++) {
                 ((Synapse) synapseList.get(i)).setSpikeResponder(new Step());
             }
-        } else if (cbSpikeResponseType.getSelectedItem().toString().equalsIgnoreCase(JumpAndDecay.getName())) {
+        } else if (cbSpikeResponseType.getSelectedItem().toString()
+                .equalsIgnoreCase(JumpAndDecay.getName())) {
             for (int i = 0; i < spikeResponderList.size(); i++) {
-                ((Synapse) synapseList.get(i)).setSpikeResponder(new JumpAndDecay());
+                ((Synapse) synapseList.get(i))
+                        .setSpikeResponder(new JumpAndDecay());
             }
-        } else if (cbSpikeResponseType.getSelectedItem().toString().equalsIgnoreCase(RiseAndDecay.getName())) {
+        } else if (cbSpikeResponseType.getSelectedItem().toString()
+                .equalsIgnoreCase(RiseAndDecay.getName())) {
             for (int i = 0; i < spikeResponderList.size(); i++) {
-                ((Synapse) synapseList.get(i)).setSpikeResponder(new RiseAndDecay());
+                ((Synapse) synapseList.get(i))
+                        .setSpikeResponder(new RiseAndDecay());
             }
-        }  else if (cbSpikeResponseType.getSelectedItem().toString().equalsIgnoreCase(ProbabilisticResponder.getName())) {
+        } else if (cbSpikeResponseType.getSelectedItem().toString()
+                .equalsIgnoreCase(ProbabilisticResponder.getName())) {
             for (int i = 0; i < spikeResponderList.size(); i++) {
-                ((Synapse) synapseList.get(i)).setSpikeResponder(new ProbabilisticResponder());
+                ((Synapse) synapseList.get(i))
+                        .setSpikeResponder(new ProbabilisticResponder());
             }
         }
     }
@@ -164,24 +181,29 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     public void actionPerformed(final ActionEvent e) {
         spikeRespondersHaveChanged = true;
 
-        SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
+        SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList
+                .get(0);
 
         if (cbSpikeResponseType.getSelectedItem().equals(Step.getName())) {
             mainPanel.remove(spikeFunctionPanel);
             spikeFunctionPanel = new StepSpikerPanel();
             spikeFunctionPanel.fillDefaultValues();
             mainPanel.add(spikeFunctionPanel);
-        } else if (cbSpikeResponseType.getSelectedItem().equals(JumpAndDecay.getName())) {
+        } else if (cbSpikeResponseType.getSelectedItem().equals(
+                JumpAndDecay.getName())) {
             mainPanel.remove(spikeFunctionPanel);
             spikeFunctionPanel = new JumpAndDecayPanel();
             spikeFunctionPanel.fillDefaultValues();
             mainPanel.add(spikeFunctionPanel);
-        } else if (cbSpikeResponseType.getSelectedItem().equals(RiseAndDecay.getName())) {
+        } else if (cbSpikeResponseType.getSelectedItem().equals(
+                RiseAndDecay.getName())) {
             mainPanel.remove(spikeFunctionPanel);
-            spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder.getParent().getSource().getParentNetwork());
+            spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder
+                    .getParent().getSource().getParentNetwork());
             spikeFunctionPanel.fillDefaultValues();
             mainPanel.add(spikeFunctionPanel);
-        } else if (cbSpikeResponseType.getSelectedItem().equals(ProbabilisticResponder.getName())) {
+        } else if (cbSpikeResponseType.getSelectedItem().equals(
+                ProbabilisticResponder.getName())) {
             mainPanel.remove(spikeFunctionPanel);
             spikeFunctionPanel = new ProbabilisticSpikeResponderPanel();
             spikeFunctionPanel.fillDefaultValues();
@@ -206,7 +228,8 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
      */
     public void commitChanges() {
         for (int i = 0; i < spikeResponderList.size(); i++) {
-            SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
+            SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList
+                    .get(0);
         }
 
         if (spikeRespondersHaveChanged) {
@@ -233,10 +256,12 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 
     /**
      * Returns the respones function in a string.
+     *
      * @return responseFunction
      */
     public String getResponseFunction() {
-        String responseFunction = cbSpikeResponseType.getSelectedItem().toString();
+        String responseFunction = cbSpikeResponseType.getSelectedItem()
+                .toString();
         return responseFunction;
     }
 

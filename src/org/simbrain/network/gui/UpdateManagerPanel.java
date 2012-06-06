@@ -327,7 +327,7 @@ public class UpdateManagerPanel extends JPanel {
                 CustomUpdate updateAction = new CustomUpdate(network, panel
                         .getTextArea().getText());
                 network.getUpdateManager().addAction(
-                        (NetworkUpdateAction) updateAction);
+                        updateAction);
             }
 
         }

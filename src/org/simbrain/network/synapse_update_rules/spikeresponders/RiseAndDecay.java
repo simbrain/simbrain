@@ -20,7 +20,6 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 
-
 /**
  * <b>RiseAndDecay</b>.
  */
@@ -36,6 +35,7 @@ public class RiseAndDecay extends SpikeResponder {
 
     /**
      * Duplicates a spike responder synapse.
+     *
      * @return null
      */
     public SpikeResponder duplicate() {
@@ -47,12 +47,14 @@ public class RiseAndDecay extends SpikeResponder {
      * Update the synapse.
      */
     public void update() {
-        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule()).hasSpiked()) {
+        if (((SpikingNeuronUpdateRule) parent.getSource().getUpdateRule())
+                .hasSpiked()) {
             recovery = 1;
         }
 
         recovery += ((timeStep / decayRate) * (-recovery));
-        value += ((timeStep / decayRate) * ((Math.E * maximumResponse * recovery * (1 - value)) - value));
+        value += ((timeStep / decayRate) * ((Math.E * maximumResponse
+                * recovery * (1 - value)) - value));
     }
 
     /**

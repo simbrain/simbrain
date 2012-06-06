@@ -30,14 +30,13 @@ import org.simbrain.network.gui.NetworkPanel;
  */
 public final class ShowRunToolBarAction
 
-    extends AbstractAction {
+extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
     /**
-     * Create a new clamp neurons action with the specified
-     * network panel.
+     * Create a new clamp neurons action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */

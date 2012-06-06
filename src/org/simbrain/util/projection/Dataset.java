@@ -38,11 +38,11 @@ import com.Ostermiller.util.CSVPrinter;
 
 /**
  * <b>Dataset</b> represents a set of n-dimensional points. Both the low and
- * high dimensional data of the current {@link ProjectionMethod} are instances of this
- * class. Dataset provides methods for working with such sets (e.g. open dataset
- * up, adding points, checking their integrity, finding nearest neighbors of a
- * point, calculating their interpoint distances, etc.). It is assumed that all
- * points in a dataset have the same dimensionality.
+ * high dimensional data of the current {@link ProjectionMethod} are instances
+ * of this class. Dataset provides methods for working with such sets (e.g. open
+ * dataset up, adding points, checking their integrity, finding nearest
+ * neighbors of a point, calculating their interpoint distances, etc.). It is
+ * assumed that all points in a dataset have the same dimensionality.
  */
 public class Dataset {
 
@@ -109,7 +109,8 @@ public class Dataset {
      */
     public double[] getPoint(final int i) {
         if (i >= getNumPoints()) {
-            System.err.println("Error: requested datapoint outside of dataset range");
+            System.err
+                    .println("Error: requested datapoint outside of dataset range");
 
             return null;
         }
@@ -146,7 +147,8 @@ public class Dataset {
      * @param point the point to add
      */
     private boolean _addPoint(double[] point) {
-        if (!dataset.add(point)) return false;
+        if (!dataset.add(point))
+            return false;
         ensureDistances();
         return true;
     }
@@ -177,7 +179,7 @@ public class Dataset {
      */
     public boolean addPoint(final double[] point) {
         logger.debug("addPoint called");
-        
+
         checkDimension(point);
 
         return _addPoint(point);
@@ -185,7 +187,7 @@ public class Dataset {
 
     /**
      * sets the point at the given index
-     *  
+     *
      * @param index the index of the point to set
      * @param point the new point
      */
@@ -202,7 +204,8 @@ public class Dataset {
      */
     public void setPoint(final int i, final double[] point) {
         if ((i < 0) || (i >= getNumPoints())) {
-            System.err.println("Error: trying to set a datapoint which does not exist");
+            System.err
+                    .println("Error: trying to set a datapoint which does not exist");
 
             return;
         }
@@ -231,8 +234,8 @@ public class Dataset {
     }
 
     /**
-     * calculates the index of the start index for distances
-     * from the given point
+     * calculates the index of the start index for distances from the given
+     * point
      *
      * @param point the point to find the start index for
      * @return the index to the distances array for the given point
@@ -250,16 +253,17 @@ public class Dataset {
     }
 
     /**
-     * Calculates the distances between pointA and pointB.
-     * A must be greater than B
+     * Calculates the distances between pointA and pointB. A must be greater
+     * than B
      *
      * @param pointA the first point
      * @param pointB the second point
      */
     private double calculateDistance(int pointA, int pointB) {
         if (pointA <= pointB) {
-            throw new IllegalArgumentException("pointA must be greater than pointB - A: " + pointA
-                    + " B: " + pointB);
+            throw new IllegalArgumentException(
+                    "pointA must be greater than pointB - A: " + pointA
+                            + " B: " + pointB);
         }
 
         int start = getDistanceIndex(pointA);
@@ -271,8 +275,8 @@ public class Dataset {
     }
 
     /**
-     * calculates and stores all the distances to all other points
-     * with the given point
+     * calculates and stores all the distances to all other points with the
+     * given point
      *
      * @param point the point to calculate distances for
      */
@@ -280,14 +284,16 @@ public class Dataset {
         int start = getDistanceIndex(point);
 
         for (int i = 0; i < point; i++) {
-            distances[start + i] = getDistance(dataset.get(point), dataset.get(i));
+            distances[start + i] = getDistance(dataset.get(point),
+                    dataset.get(i));
         }
 
         int numPoints = getNumPoints();
 
         for (int i = point + 1; i < numPoints; i++) {
             start = getDistanceIndex(i);
-            distances[start + point] = getDistance(dataset.get(point), dataset.get(i));
+            distances[start + point] = getDistance(dataset.get(point),
+                    dataset.get(i));
         }
     }
 
@@ -361,14 +367,14 @@ public class Dataset {
      * Read in stored dataset file.
      *
      * @param file Name of file to read in
-     * @throws FileNotFoundException 
+     * @throws FileNotFoundException
      */
-    private void readData(final File file)
-    {
+    private void readData(final File file) {
         clear();
 
         try {
-            CSVParser theParser = new CSVParser(new FileInputStream(file), "", "", "#");
+            CSVParser theParser = new CSVParser(new FileInputStream(file), "",
+                    "", "#");
 
             // # is a comment delimeter in net files
             String[][] values = theParser.getAllValues();
@@ -412,10 +418,10 @@ public class Dataset {
 
         CSVPrinter thePrinter = new CSVPrinter(f);
 
-        //thePrinter.printlnComment("");
-        ///thePrinter.printlnComment("File: " + theFile.getName());
-        //thePrinter.printlnComment("");
-        //thePrinter.println();
+        // thePrinter.printlnComment("");
+        // /thePrinter.printlnComment("File: " + theFile.getName());
+        // thePrinter.printlnComment("");
+        // thePrinter.println();
         thePrinter.println(this.getDoubleStrings());
 
         thePrinter.println();
@@ -449,9 +455,10 @@ public class Dataset {
             // if point is repeated assume a random perturbation will fix it
             if (repeat) {
                 double[] newPoint = new double[dimensions];
-                
+
                 for (int k = 0; k < dimensions; k++) {
-                    newPoint[k] = getComponent(i, k) + ((Math.random() - 0.5) * factor);
+                    newPoint[k] = getComponent(i, k)
+                            + ((Math.random() - 0.5) * factor);
                     setPoint(i, newPoint);
                 }
             } else {
@@ -470,7 +477,7 @@ public class Dataset {
         ps.println("points := [");
 
         for (int i = 0; i < getNumPoints(); i++) {
-            y = (double[]) getPoint(i);
+            y = getPoint(i);
             ps.println("[" + y[0] + "," + y[1] + "],");
         }
 
@@ -492,8 +499,8 @@ public class Dataset {
      */
     public double getComponent(final int datapointNumber, final int dimension) {
         if (dimension < 0 || dimension >= dimensions) {
-            throw new IllegalArgumentException(dimension 
-            + " is not a valid dimesion for this dataset.");
+            throw new IllegalArgumentException(dimension
+                    + " is not a valid dimesion for this dataset.");
         }
 
         double[] point = getPoint(datapointNumber);
@@ -508,8 +515,9 @@ public class Dataset {
      */
     private void checkDimension(double[] point) {
         if ((point.length > 1) && (point.length != dimensions)) {
-            throw new IllegalArgumentException("Error: Dataset is " + dimensions
-                    + " dimensional, added data is " + point.length + " dimensional");
+            throw new IllegalArgumentException("Error: Dataset is "
+                    + dimensions + " dimensional, added data is "
+                    + point.length + " dimensional");
         }
     }
 
@@ -525,10 +533,11 @@ public class Dataset {
      */
     private boolean isUniquePoint(final double[] toCheck, final double tolerance) {
         logger.debug("checking for uniqueness with tolerance: " + tolerance);
-        
+
         if (toCheck.length != dimensions) {
-            throw new IllegalArgumentException("point to check has " + toCheck.length 
-                    + " dimensions.  This dataset requires " + dimensions);
+            throw new IllegalArgumentException("point to check has "
+                    + toCheck.length + " dimensions.  This dataset requires "
+                    + dimensions);
         }
         return dataset.isUnique(toCheck, tolerance);
     }
@@ -546,8 +555,8 @@ public class Dataset {
     }
 
     /**
-     * returns k neighbors where the 0th item is the closest and the
-     * 1st item is the second closest etc.
+     * returns k neighbors where the 0th item is the closest and the 1st item is
+     * the second closest etc.
      *
      * @param k the number of points to retrieve
      * @param point the point to find neighbors for
@@ -556,11 +565,11 @@ public class Dataset {
     public int[] getKNearestNeighbors(final int k, final double[] point) {
         int[] nearest = new int[k];
         List<double[]> neighbors = dataset.getClosestPoints(k, point);
-        
+
         for (int i = 0; i < k; i++) {
             nearest[i] = dataset.getIndex(neighbors.get(i));
         }
-        
+
         return nearest;
     }
 
@@ -576,12 +585,14 @@ public class Dataset {
         int numPoints = getNumPoints();
 
         if (index1 < 0 || index1 > numPoints) {
-            System.out.println("Dataset.getDistance() - index1: " + index1 + " out of bounds");
+            System.out.println("Dataset.getDistance() - index1: " + index1
+                    + " out of bounds");
 
             // TODO throw exception
             return 0;
         } else if (index2 < 0 || index2 > numPoints) {
-            System.out.println("Dataset.getDistance() - index2: " + index2 + " out of bounds");
+            System.out.println("Dataset.getDistance() - index2: " + index2
+                    + " out of bounds");
 
             // TODO throw exception
             return 0;
@@ -802,7 +813,7 @@ public class Dataset {
 
         for (int i = 0; i < getNumPoints(); i++) {
             System.out.println("\n[" + i + "]");
-            tempPoint = (double[]) getPoint(i);
+            tempPoint = getPoint(i);
 
             for (int j = 0; j < tempPoint.length; j++) {
                 System.out.print(" " + tempPoint[j]);
@@ -823,7 +834,7 @@ public class Dataset {
         String[][] ret = new String[numPoints][dimensions];
 
         for (int i = 0; i < numPoints; i++) {
-            double[] tempPoint = (double[]) getPoint(i);
+            double[] tempPoint = getPoint(i);
 
             for (int j = 0; j < tempPoint.length; j++) {
                 ret[i][j] = Double.toString(tempPoint[j]);
@@ -853,7 +864,7 @@ public class Dataset {
         clear();
 
         for (int i = 0; i < persistentData.size(); i++) {
-            addPoint(Utils.getVectorString((String) persistentData.get(i), ","));
+            addPoint(Utils.getVectorString(persistentData.get(i), ","));
         }
     }
 

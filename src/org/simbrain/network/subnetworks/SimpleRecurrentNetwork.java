@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.LineLayout;
@@ -19,7 +19,7 @@ import org.simbrain.network.util.NetworkLayoutManager.Direction;
 
 /**
  * Builds a simple recurrent network from the specified parameters.
- * 
+ *
  * @author ztosi
  */
 
@@ -60,7 +60,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
 
     /**
      * Constructor specifying root network, and number of nodes in each layer.
-     * 
+     *
      * @param network underlying network
      * @param numInputNodes number of nodes in the input layer
      * @param numHiddenNodes number of nodes in the hidden and context layers
@@ -81,17 +81,19 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
 
     /** Builds a simple recurrent network. */
     public void build() {
-    	//TODO: implement new connectNeuronGroups method
+        // TODO: implement new connectNeuronGroups method
         // Initialize layers
-        List<Neuron> inputLayerNeurons  = new ArrayList<Neuron>();
-        List<Neuron> hiddenLayerNeurons  = new ArrayList<Neuron>();
-        List<Neuron> outputLayerNeurons  = new ArrayList<Neuron>();
-        List<Neuron> contextLayerNeurons  = new ArrayList<Neuron>();
-        
-        initializeLayer(inputLayerNeurons, new ClampedNeuronRule(), numInputNodes);
+        List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> outputLayerNeurons = new ArrayList<Neuron>();
+        List<Neuron> contextLayerNeurons = new ArrayList<Neuron>();
+
+        initializeLayer(inputLayerNeurons, new ClampedNeuronRule(),
+                numInputNodes);
         initializeLayer(hiddenLayerNeurons, hiddenNeuronType, numHiddenNodes);
         initializeLayer(outputLayerNeurons, outputNeuronType, numOutputNodes);
-        initializeLayer(contextLayerNeurons, new ClampedNeuronRule(), numHiddenNodes);
+        initializeLayer(contextLayerNeurons, new ClampedNeuronRule(),
+                numHiddenNodes);
 
         // Input Layer
         LineLayout layerLayout = new LineLayout(betweenNeuronInterval,
@@ -99,38 +101,37 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
         layerLayout.setInitialLocation(new Point((int) initialPosition.getX(),
                 (int) initialPosition.getY()));
         layerLayout.layoutNeurons(inputLayerNeurons);
-        inputLayer= new NeuronGroup(getParentNetwork(),
-                inputLayerNeurons);
+        inputLayer = new NeuronGroup(getParentNetwork(), inputLayerNeurons);
         inputLayer.setLabel("Inputs");
         addNeuronGroup(inputLayer);
-        
+
         // Hidden Layer
         layerLayout.layoutNeurons(hiddenLayerNeurons);
-        hiddenLayer= new NeuronGroup(getParentNetwork(),
-                hiddenLayerNeurons);
+        hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
         hiddenLayer.setLabel("Hidden layer");
         addNeuronGroup(hiddenLayer);
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
-        
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer,
+                Direction.NORTH, betweenLayerInterval);
+
         // Context Layer
         // Initial context layer values set to 0.5 (as in Elman 1991)
         layerLayout.layoutNeurons(contextLayerNeurons);
-        contextLayer = new NeuronGroup(getParentNetwork(),
-                contextLayerNeurons);
+        contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
         contextLayer.setLabel("Context nodes");
         addNeuronGroup(contextLayer);
         for (Neuron n : contextLayer.getNeuronList()) {
-            n.setActivation(0.5); //TODO: Make helper method
+            n.setActivation(0.5); // TODO: Make helper method
         }
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST, betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer,
+                Direction.EAST, betweenLayerInterval);
 
         // Output layer
         layerLayout.layoutNeurons(outputLayerNeurons);
-        outputLayer= new NeuronGroup(getParentNetwork(),
-                outputLayerNeurons);
+        outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         addNeuronGroup(outputLayer);
         outputLayer.setLabel("Output layer");
-        NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
+        NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer,
+                Direction.NORTH, betweenLayerInterval);
 
         // Connect the laid-out layers
         connect();
@@ -145,7 +146,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
         AllToAll connect = new AllToAll(this.getParentNetwork());
         connect.setAllowSelfConnection(false);
         connect.setExcitatoryRatio(.5);
-        //connect.setBaseExcitatorySynapse(null);
+        // connect.setBaseExcitatorySynapse(null);
         connectNeuronGroups(inputLayer, hiddenLayer, connect);
         connectNeuronGroups(contextLayer, hiddenLayer, connect);
         connectNeuronGroups(hiddenLayer, outputLayer, connect);
@@ -172,7 +173,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
 
     @Override
     public void update() {
-        
+
         inputLayer.update();
         hiddenLayer.update();
 
@@ -182,7 +183,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
             int index = hiddenLayer.getNeuronList().indexOf(n);
             contextLayer.getNeuronList().get(index).setActivation(act);
         }
-        
+
         outputLayer.update();
     }
 
@@ -218,7 +219,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
         this.outputNeuronType = outputNeuronType;
     }
 
-
     public void setHiddenNeuronType(NeuronUpdateRule hiddenNeuronType) {
         this.hiddenNeuronType = hiddenNeuronType;
     }
@@ -242,6 +242,5 @@ public final class SimpleRecurrentNetwork extends Subnetwork {
     public void setBetweenNeuronInterval(int betweenNeuronInterval) {
         this.betweenNeuronInterval = betweenNeuronInterval;
     }
-
 
 }

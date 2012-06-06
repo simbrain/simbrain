@@ -31,7 +31,6 @@ import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>LinearNeuronPanel</b>.
  */
@@ -85,7 +84,7 @@ public class LinearRulePanel extends AbstractNeuronPanel {
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        //Handle consistency of multiple selections
+        // Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(ruleList, LinearRule.class, "getSlope")) {
             tfSlope.setText(NULL_STRING);
         }
@@ -94,11 +93,13 @@ public class LinearRulePanel extends AbstractNeuronPanel {
             tfBias.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
+                "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, LinearRule.class,
+                "getAddNoise")) {
             isAddNoise.setNull();
         }
 

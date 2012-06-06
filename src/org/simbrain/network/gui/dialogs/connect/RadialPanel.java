@@ -22,8 +22,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.connections.Radial;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
 /**
  * <b>SparsePanel</b> creates a dialog for setting preferences of Sparse neuron
@@ -51,7 +51,6 @@ public class RadialPanel extends AbstractConnectionPanel {
 
     /** Set the excitatory synapse type. */
     private JButton setExcitatorySynapseType = new JButton();
-
 
     /**
      * This method is the default constructor.

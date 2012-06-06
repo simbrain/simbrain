@@ -35,8 +35,7 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 /**
  * Abstract pixel matrix node.
  */
-abstract class AbstractPixelMatrixNode
-    extends PNode {
+abstract class AbstractPixelMatrixNode extends PNode {
 
     /** Pixel matrix. */
     private final PixelMatrix pixelMatrix;
@@ -45,14 +44,14 @@ abstract class AbstractPixelMatrixNode
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = Utils.isMacOSX() ? new BasicStroke(
+            0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Outline paint. */
     private Paint outlinePaint = DEFAULT_OUTLINE_PAINT;
 
     /** Outline stroke. */
     private Stroke outlineStroke = DEFAULT_OUTLINE_STROKE;
-
 
     /**
      * Create a new abstract pixel matrix node with the specified pixel matrix.
@@ -69,17 +68,15 @@ abstract class AbstractPixelMatrixNode
         setWidth(this.pixelMatrix.getWidth());
     }
 
-
     /**
-     * Return the pixel matrix for this pixel matrix node.
-     * The pixel matrix will not be null.
+     * Return the pixel matrix for this pixel matrix node. The pixel matrix will
+     * not be null.
      *
      * @return the pixel matrix for this pixel matrix node
      */
     public final PixelMatrix getPixelMatrix() {
         return pixelMatrix;
     }
-
 
     /**
      * Return the outline paint for this pixel matrix node.
@@ -91,19 +88,21 @@ abstract class AbstractPixelMatrixNode
     }
 
     /**
-     * Set the outline paint for this pixel matrix node to <code>outlinePaint</code>.
+     * Set the outline paint for this pixel matrix node to
+     * <code>outlinePaint</code>.
      *
      * @param outlinePaint outline paint for this pixel matrix node
      */
     public final void setOutlinePaint(final Paint outlinePaint) {
         Paint oldOutlinePaint = this.outlinePaint;
         this.outlinePaint = outlinePaint;
-        firePropertyChange(-1,"outlinePaint", oldOutlinePaint, this.outlinePaint);
+        firePropertyChange(-1, "outlinePaint", oldOutlinePaint,
+                this.outlinePaint);
     }
 
     /**
-     * Return the outline stroke for this pixel matrix node.
-     * The outline stroke will not be null.
+     * Return the outline stroke for this pixel matrix node. The outline stroke
+     * will not be null.
      *
      * @return the outline stroke for this pixel matrix node
      */
@@ -112,9 +111,11 @@ abstract class AbstractPixelMatrixNode
     }
 
     /**
-     * Set the outline stroke for this pixel matrix node to <code>outlineStroke</code>.
+     * Set the outline stroke for this pixel matrix node to
+     * <code>outlineStroke</code>.
      *
-     * @param outlineStroke outline stroke for this pixel matrix node, must not be null
+     * @param outlineStroke outline stroke for this pixel matrix node, must not
+     *            be null
      */
     public final void setOutlineStroke(final Stroke outlineStroke) {
         if (outlineStroke == null) {
@@ -122,7 +123,8 @@ abstract class AbstractPixelMatrixNode
         }
         Stroke oldOutlineStroke = this.outlineStroke;
         this.outlineStroke = outlineStroke;
-        firePropertyChange(-1,"outlineStroke", oldOutlineStroke, this.outlineStroke);
+        firePropertyChange(-1, "outlineStroke", oldOutlineStroke,
+                this.outlineStroke);
     }
 
     /** {@inheritDoc} */

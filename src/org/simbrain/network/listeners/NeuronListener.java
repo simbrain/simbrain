@@ -23,8 +23,8 @@ import org.simbrain.network.core.NeuronUpdateRule;
 
 /**
  * Listener interface for receiving events relating to neurons. Classes
- * interested in responding to such events are registered with a Network,
- * which broadcasts those events to registered observer classes.
+ * interested in responding to such events are registered with a Network, which
+ * broadcasts those events to registered observer classes.
  */
 public interface NeuronListener {
 

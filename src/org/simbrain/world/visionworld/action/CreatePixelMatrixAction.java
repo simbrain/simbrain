@@ -28,12 +28,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Create pixel matrix action.
  */
-public final class CreatePixelMatrixAction
-    extends AbstractAction {
+public final class CreatePixelMatrixAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new create pixel matrix action.
@@ -49,7 +47,6 @@ public final class CreatePixelMatrixAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("PixelMatrix.png"));
         putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

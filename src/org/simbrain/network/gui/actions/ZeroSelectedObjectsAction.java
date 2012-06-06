@@ -33,16 +33,14 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Clear selected neurons action.
  */
-public final class ZeroSelectedObjectsAction
-    extends AbstractAction {
+public final class ZeroSelectedObjectsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new clear selected neurons action with the
-     * specified network panel.
+     * Create a new clear selected neurons action with the specified network
+     * panel.
      *
      * @param networkPanel network panel, must not be null
      */
@@ -55,21 +53,23 @@ public final class ZeroSelectedObjectsAction
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
-        putValue(SHORT_DESCRIPTION, "Set selected neurons and synapses to zero (c)");
+        putValue(SHORT_DESCRIPTION,
+                "Set selected neurons and synapses to zero (c)");
 
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke('c'), this);
         networkPanel.getActionMap().put(this, this);
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext(); ) {
+        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i
+                .hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             node.getNeuron().clear();
         }
-        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext(); ) {
+        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i
+                .hasNext();) {
             SynapseNode node = (SynapseNode) i.next();
             node.getSynapse().setStrength(0);
         }

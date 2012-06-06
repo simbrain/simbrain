@@ -24,7 +24,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.LogisticRule;
 
-
 /**
  * <b>LogisticNeuronPanel</b>.
  */
@@ -52,8 +51,9 @@ public class LogisticRulePanel extends AbstractNeuronPanel {
 
         tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class, "getGrowthRate")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(ruleList, LogisticRule.class,
+                "getGrowthRate")) {
             tfGrowthRate.setText(NULL_STRING);
         }
     }
@@ -74,7 +74,8 @@ public class LogisticRulePanel extends AbstractNeuronPanel {
             LogisticRule neuronRef = (LogisticRule) ruleList.get(i);
 
             if (!tfGrowthRate.getText().equals(NULL_STRING)) {
-                neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate.getText()));
+                neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
+                        .getText()));
             }
         }
     }

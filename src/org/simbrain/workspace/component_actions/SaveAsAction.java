@@ -18,12 +18,9 @@
  */
 package org.simbrain.workspace.component_actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.gui.GuiComponent;
@@ -35,7 +32,6 @@ public final class SaveAsAction extends AbstractAction {
 
     /** Network panel. */
     private final GuiComponent guiComponent;
-
 
     /**
      * Create a new save component action with the specified.
@@ -54,7 +50,6 @@ public final class SaveAsAction extends AbstractAction {
 
         this.guiComponent = guiComponent;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

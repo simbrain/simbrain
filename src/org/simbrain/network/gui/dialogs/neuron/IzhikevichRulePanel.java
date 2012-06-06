@@ -31,7 +31,6 @@ import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>IzhikevichNeuronPanel</b>.
  */
@@ -79,7 +78,7 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
         this.addBottomText("<html>For a list of useful parameter settings<p>"
-                        + "press the \"Help\" Button.</html>");
+                + "press the \"Help\" Button.</html>");
     }
 
     /**
@@ -96,7 +95,7 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
         tfD.setText(Double.toString(neuronRef.getD()));
         tsNoise.setSelected(neuronRef.getAddNoise());
 
-        //Handle consistency of multiple selections
+        // Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getA")) {
             tfA.setText(NULL_STRING);
         }
@@ -113,7 +112,8 @@ public class IzhikevichRulePanel extends AbstractNeuronPanel {
             tfD.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(ruleList, IzhikevichRule.class,
+                "getAddNoise")) {
             tsNoise.setNull();
         }
 

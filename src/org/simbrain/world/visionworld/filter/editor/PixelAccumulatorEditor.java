@@ -28,16 +28,14 @@ import org.simbrain.world.visionworld.filter.PixelAccumulator;
 /**
  * Pixel accumulator editor.
  */
-public final class PixelAccumulatorEditor
-    extends JPanel
-    implements FilterEditor {
+public final class PixelAccumulatorEditor extends JPanel implements
+        FilterEditor {
 
     /** Display name. */
     private static final String DISPLAY_NAME = "Pixel accumulator";
 
     /** Description. */
     private static final String DESCRIPTION = "Returns the number of black pixels";
-
 
     /**
      * Create a new pixel accumulator editor.
@@ -47,10 +45,9 @@ public final class PixelAccumulatorEditor
         setToolTipText(DESCRIPTION);
     }
 
-
     /** {@inheritDoc} */
     public Component getEditorComponent() {
-       return this;
+        return this;
     }
 
     /** {@inheritDoc} */

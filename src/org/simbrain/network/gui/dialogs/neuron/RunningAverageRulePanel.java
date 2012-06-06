@@ -53,8 +53,9 @@ public class RunningAverageRulePanel extends AbstractNeuronPanel {
 
         tfRateConstant.setText(Double.toString(neuronRef.getRateConstant()));
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, RunningAverageRule.class, "getRateConstant")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(ruleList, RunningAverageRule.class,
+                "getRateConstant")) {
             tfRateConstant.setText(NULL_STRING);
         }
     }
@@ -75,7 +76,8 @@ public class RunningAverageRulePanel extends AbstractNeuronPanel {
             RunningAverageRule neuronRef = (RunningAverageRule) ruleList.get(i);
 
             if (!tfRateConstant.getText().equals(NULL_STRING)) {
-                neuronRef.setRateConstant(Double.parseDouble(tfRateConstant.getText()));
+                neuronRef.setRateConstant(Double.parseDouble(tfRateConstant
+                        .getText()));
             }
         }
     }

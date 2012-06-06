@@ -12,24 +12,24 @@
 //
 ///**
 // * Acts as the consumer and producer associated with an Agent.
-// * 
+// *
 // * @author Matt Watson
 // */
 //public abstract class Bindings implements Consumer, Producer {
 //    /** An arbitrary prime number. */
 //    private static final int ARBITRARY_PRIME = 29;
-//    
+//
 //    /** The description of the bindings. */
 //    private final String description;
-//    
+//
 //    /** the component associated with this binding. */
 //    private ThreeDeeComponent component;
-//    
+//
 //    /** Whether the bindings should be applied to the agent. */
 //    private volatile boolean on = false;
 //    /** Once on has been set, the bindings remain on until the next iterator call is made. */
 //    private volatile boolean bind = false;
-//    
+//
 //    /**
 //     * Creates a new bindings object for the given agent
 //     * and component.
@@ -45,54 +45,54 @@
 //    void setComponent(ThreeDeeComponent parent) {
 //        this.component = parent;
 //    }
-//    
+//
 //    /**
 //     * Turns the bindings on or off depending on the value of on.
-//     * 
+//     *
 //     * @param on True to turn on and false to turn off.
 //     */
 //    public void setOn(final boolean on) {
 //        this.on = on;
 //        if (!bind) { bind = on; }
 //    }
-//    
+//
 //    /**
 //     * Returns whether these bindings are on.
-//     * 
+//     *
 //     * @return Whether these bindings are on.
 //     */
 //    protected boolean isOn() {
 //        return on;
 //    }
-//    
+//
 //    /**
 //     * Sets bind to the value of on.
 //     */
 //    protected void update() {
 //        this.bind = isOn();
 //    }
-//    
+//
 //    // TODO find a better name
 //    protected void updateExternal() {
-//        
+//
 //    }
-//    
+//
 //    /**
 //     * Returns whether bindings are being executed.
-//     * 
+//     *
 //     * @return Whether bindings are being executed.
 //     */
 //    protected boolean doBind() {
 //        return bind;
 //    }
-//    
+//
 //    /**
 //     * {@inheritDoc}
 //     */
 //    public WorkspaceComponent getParentComponent() {
 //        return component;
 //    }
-//    
+//
 //    /**
 //     * Binds to a single Action on an Agent.
 //     *
@@ -104,7 +104,7 @@
 //
 //        /**
 //         * Creates a new Binding.
-//         * 
+//         *
 //         * @param description The description for the Binding.
 //         */
 //        Binding(final String description) {
@@ -137,7 +137,7 @@
 //
 //        /**
 //         * Creates a new ConsumingBinding.
-//         * 
+//         *
 //         * @param description The description of the Binding.
 //         * @param action The action this Binding is bound to.
 //         */
@@ -150,13 +150,13 @@
 //
 //        /**
 //         * Returns the action for this Binding.
-//         * 
+//         *
 //         * @return The action for this Binding.
 //         */
 //        protected Action getAction() {
 //            return action;
 //        }
-//        
+//
 //        /**
 //         * {@inheritDoc}
 //         */
@@ -164,7 +164,7 @@
 //            action.setValue(value.floatValue());
 //        }
 //    }
-//    
+//
 //    /**
 //     * Implements a consumer binding.
 //     *
@@ -176,7 +176,7 @@
 //
 //        /**
 //         * Creates a new ConsumingBinding.
-//         * 
+//         *
 //         * @param sensor The sensor this Binding is bound to.
 //         */
 //        protected ProducingBinding(final Sensor sensor, String description) {
@@ -191,7 +191,7 @@
 //        public Double getValue() {
 //            return sensor.getValue();
 //        }
-//        
+//
 //        /**
 //         * {@inheritDoc}
 //         */
@@ -206,13 +206,13 @@
 //        @Override
 //        public boolean equals(final Object obj) {
 //            if (!(obj instanceof ProducingBinding)) return false;
-//            
+//
 //            ProducingBinding other = (ProducingBinding) obj;
-//            
+//
 //            return sensor.equals(other.sensor);
 //        }
 //    }
-//    
+//
 //    /**
 //     * {@inheritDoc}
 //     */
@@ -220,4 +220,4 @@
 ////        return "3D Agent";
 //        return description;
 //    }
-//}
+// }

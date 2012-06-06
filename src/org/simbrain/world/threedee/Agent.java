@@ -13,7 +13,10 @@ import org.simbrain.world.threedee.environment.Environment;
  * @author Matt Watson
  */
 public class Agent extends Moveable implements Entity {
-    /** the radius used to determine whether this agent has collided with another. */
+    /**
+     * the radius used to determine whether this agent has collided with
+     * another.
+     */
     private static final float COLLISION_RADIUS = 0.5f;
     /** the height that the agent 'hovers' above the terrain. */
     private static final float HOVER_HEIGHT = 0.5f;
@@ -34,8 +37,9 @@ public class Agent extends Moveable implements Entity {
     private volatile Point tenativeLocation;
     /** determines the limits (x, z) of the world. */
     private int limit;
+
     /** */
-    //private AgentBindings bindings;
+    // private AgentBindings bindings;
 
     /**
      * Create a new Agent with the given name.
@@ -47,7 +51,7 @@ public class Agent extends Moveable implements Entity {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
         this.name = name;
-        //this.bindings = new AgentBindings(this, component);
+        // this.bindings = new AgentBindings(this, component);
 
         logger.debug("created new Agent: " + name);
 
@@ -62,7 +66,7 @@ public class Agent extends Moveable implements Entity {
 
         logger = Logger.getLogger("" + Agent.class + '.' + name);
 
-        //bindings.setInputs();
+        // bindings.setInputs();
 
         return this;
     }
@@ -94,13 +98,13 @@ public class Agent extends Moveable implements Entity {
     public Vector getDirection() {
         return direction;
     }
-    
+
     /**
      * Sets the current direction.
      *
      * @param v the new direction.
      */
-    public void setDirection(final Vector v) {        
+    public void setDirection(final Vector v) {
         this.direction = v;
         this.tenativeDirection = v;
     }
@@ -123,22 +127,24 @@ public class Agent extends Moveable implements Entity {
     public void setTentativeLocation(final Point p) {
         this.tenativeLocation = p;
     }
-    
+
     /**
      * Sets the current and tentative locations and directions.
      *
-     * @param direction the direction vector that controls the view (updateable.)
+     * @param direction the direction vector that controls the view
+     *            (updateable.)
      * @param location the location of the view (updateable.)
      */
-//    public void init(Renderer renderer, Camera cam, int width, int height) {//final Vector direction, final Point location) {
-////        cam.setDirection(direction.toVector3f());
-////        cam.setLocation(location.toVector3f());
-//        
-////        System.out.println("setting w, h: " + width + ", " + height);
-//        
-////        this.width = width;
-////        this.height = height;
-//    }
+    // public void init(Renderer renderer, Camera cam, int width, int height)
+    // {//final Vector direction, final Point location) {
+    // // cam.setDirection(direction.toVector3f());
+    // // cam.setLocation(location.toVector3f());
+    //
+    // // System.out.println("setting w, h: " + width + ", " + height);
+    //
+    // // this.width = width;
+    // // this.height = height;
+    // }
 
     /**
      * Updates the tentative direction.
@@ -168,17 +174,21 @@ public class Agent extends Moveable implements Entity {
         super.doUpdates();
 
         /*
-         * if the agent has gone beyond it's limit
-         * move it to the other side the environment
+         * if the agent has gone beyond it's limit move it to the other side the
+         * environment
          */
         float x = tenativeLocation.getX();
         float z = tenativeLocation.getZ();
 
-        if (Math.abs(x) > limit) { x = (-1 * x); }
-        if (Math.abs(z) > limit) { z = (-1 * z); }
+        if (Math.abs(x) > limit) {
+            x = (-1 * x);
+        }
+        if (Math.abs(z) > limit) {
+            z = (-1 * z);
+        }
 
         tenativeLocation = new Point(x, tenativeLocation.getY(), z);
-        
+
         setFloor(environment.getFloorHeight(tenativeLocation));
     }
 
@@ -188,18 +198,22 @@ public class Agent extends Moveable implements Entity {
     public void setHeight() {
         final float height = environment.getFloorHeight(tenativeLocation);
 
-        if (!Float.isNaN(height)) { tenativeLocation = new Point(tenativeLocation.getX(),
-           height + HOVER_HEIGHT, tenativeLocation.getZ()); }
+        if (!Float.isNaN(height)) {
+            tenativeLocation = new Point(tenativeLocation.getX(), height
+                    + HOVER_HEIGHT, tenativeLocation.getZ());
+        }
     }
 
     /**
      * Updates the height based on the environment's terrain.
      */
     public void setFloor(final float height) {
-        if (!Float.isNaN(height)) { tenativeLocation = new Point(tenativeLocation.getX(),
-           height + HOVER_HEIGHT, tenativeLocation.getZ()); }
+        if (!Float.isNaN(height)) {
+            tenativeLocation = new Point(tenativeLocation.getX(), height
+                    + HOVER_HEIGHT, tenativeLocation.getZ());
+        }
     }
-    
+
     /**
      * Implements the logic for collisions.
      *
@@ -208,7 +222,9 @@ public class Agent extends Moveable implements Entity {
     public void collision(final Collision collision) {
         final float speed = getSpeed();
 
-        if (speed == 0) { return; }
+        if (speed == 0) {
+            return;
+        }
 
         tenativeDirection = getDirection();
         tenativeLocation = getLocation();
@@ -231,7 +247,7 @@ public class Agent extends Moveable implements Entity {
         direction = tenativeDirection;
         location = tenativeLocation;
     }
-    
+
     /**
      * Sets the environment for the agent.
      *
@@ -240,10 +256,10 @@ public class Agent extends Moveable implements Entity {
     public void setEnvironment(final Environment environment) {
         this.environment = environment;
     }
-    
+
     /**
      * Returns this agent's environment.
-     * 
+     *
      * @return This agent's environment.
      */
     public Environment getEnvironment() {
@@ -256,16 +272,16 @@ public class Agent extends Moveable implements Entity {
     public List<Odor> getOdors() {
         return Collections.singletonList(new Odor("red", this));
     }
-    
-//    /**
-//     * Returns the bindings for this agent.
-//     * 
-//     * @return The bindings for this agent.
-//     */
-//    public AgentBindings getBindings() {
-//        return bindings;
-//    }
-    
+
+    // /**
+    // * Returns the bindings for this agent.
+    // *
+    // * @return The bindings for this agent.
+    // */
+    // public AgentBindings getBindings() {
+    // return bindings;
+    // }
+
     public String toString() {
         return "agent[" + name + "]";
     }

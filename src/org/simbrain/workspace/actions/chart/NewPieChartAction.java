@@ -43,7 +43,6 @@ public final class NewPieChartAction extends WorkspaceAction {
         putValue(SHORT_DESCRIPTION, "New Pie Chart");
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         PieChartComponent plot = new PieChartComponent("");

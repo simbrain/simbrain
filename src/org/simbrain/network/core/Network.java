@@ -455,7 +455,7 @@ public class Network {
         }
 
         for (int i = 0; i < synapseList.size(); i++) {
-            Synapse w = (Synapse) synapseList.get(i);
+            Synapse w = synapseList.get(i);
             w.checkBounds();
         }
     }
@@ -823,7 +823,7 @@ public class Network {
      */
     // TODO: Either fix this or make its assumptions explicit
     public Synapse getWeight(final int i, final int j) {
-        return (Synapse) getNeuron(i).getFanOut().get(j);
+        return getNeuron(i).getFanOut().get(j);
     }
 
     /**
@@ -935,8 +935,8 @@ public class Network {
     }
 
     /**
-     * Create a "flat" list of groups, which includes the top-level groups
-     * plus all subgroups.
+     * Create a "flat" list of groups, which includes the top-level groups plus
+     * all subgroups.
      *
      * @return the flat list
      */
@@ -1064,9 +1064,9 @@ public class Network {
         }
 
         // Initialize groups
-        //for (Group group : this.getFlatGroupList()) {
-        //    group.postUnmarshallingInit();
-        //}
+        // for (Group group : this.getFlatGroupList()) {
+        // group.postUnmarshallingInit();
+        // }
 
         // Check for and remove corrupt synapses.
         // This should not happen but as of 1/24/11 I have not
@@ -1482,13 +1482,13 @@ public class Network {
 
         if (this.getSynapseList().size() > 0) {
             for (int i = 0; i < getSynapseList().size(); i++) {
-                Synapse tempRef = (Synapse) getSynapseList().get(i);
+                Synapse tempRef = getSynapseList().get(i);
                 ret += tempRef;
             }
         }
 
         for (int i = 0; i < getGroupList().size(); i++) {
-            Group group = (Group) getGroupList().get(i);
+            Group group = getGroupList().get(i);
             ret += group.toString();
         }
 
@@ -1654,8 +1654,8 @@ public class Network {
     }
 
     /**
-     * Convenience method for setting an update action. Moves
-     * all current actions to available list.
+     * Convenience method for setting an update action. Moves all current
+     * actions to available list.
      *
      * @param action new action
      */

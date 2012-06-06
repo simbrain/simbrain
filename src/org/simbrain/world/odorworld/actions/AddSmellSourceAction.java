@@ -42,8 +42,7 @@ public final class AddSmellSourceAction extends AbstractAction {
     /**
      * Create a new open plot action.
      *
-     * @param component
-     *            GUI component, must not be null.
+     * @param component GUI component, must not be null.
      */
     public AddSmellSourceAction(final OdorWorldPanel component,
             OdorWorldEntity entity) {
@@ -63,12 +62,11 @@ public final class AddSmellSourceAction extends AbstractAction {
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        String dimension = (String) JOptionPane
-                        .showInputDialog("How many dimensions will the smell vector have?");
+        String dimension = JOptionPane
+                .showInputDialog("How many dimensions will the smell vector have?");
         if (dimension != null) {
             int dims = Integer.parseInt(dimension);
-            entity.setSmellSource(new SmellSource(SimbrainMath
-                    .zeroVector(dims)));
+            entity.setSmellSource(new SmellSource(SimbrainMath.zeroVector(dims)));
         }
     }
 

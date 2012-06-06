@@ -21,8 +21,7 @@ package org.simbrain.world.visionworld.sensormatrix.editor;
 /**
  * Sensor matrix editor exception.
  */
-public final class SensorMatrixEditorException
-    extends Exception {
+public final class SensorMatrixEditorException extends Exception {
 
     /**
      * Create a new sensor matrix editor exception.
@@ -50,12 +49,14 @@ public final class SensorMatrixEditorException
     }
 
     /**
-     * Create a new sensor matrix editor exception with the specified message and cause.
+     * Create a new sensor matrix editor exception with the specified message
+     * and cause.
      *
      * @param message message
      * @param cause cause
      */
-    public SensorMatrixEditorException(final String message, final Throwable cause) {
+    public SensorMatrixEditorException(final String message,
+            final Throwable cause) {
         super(message, cause);
     }
 }

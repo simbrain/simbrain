@@ -1,4 +1,3 @@
-
 package org.simbrain.util;
 
 import java.awt.Component;
@@ -24,8 +23,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * Piccolo scene graph browser component.
  */
-public class SceneGraphBrowser
-    extends JTree {
+public class SceneGraphBrowser extends JTree {
 
     /** Root node. */
     private final PRoot root;
@@ -36,10 +34,8 @@ public class SceneGraphBrowser
     /** Refresh action. */
     private final Action refresh;
 
-
     /**
-     * Create a new scene graph browser component with the specified
-     * root node.
+     * Create a new scene graph browser component with the specified root node.
      *
      * @param root root node
      */
@@ -56,16 +52,15 @@ public class SceneGraphBrowser
         }
 
         refresh = new AbstractAction("Refresh") {
-                /** @see AbstractAction */
-                public void actionPerformed(final ActionEvent e) {
-                    ((Model) getModel()).fireRefresh();
-                }
-            };
+            /** @see AbstractAction */
+            public void actionPerformed(final ActionEvent e) {
+                ((Model) getModel()).fireRefresh();
+            }
+        };
 
         setModel(new Model());
         setCellRenderer(new Renderer());
     }
-
 
     /**
      * Return the refresh action for this scene graph browser.
@@ -79,8 +74,7 @@ public class SceneGraphBrowser
     /**
      * Renderer for <code>PNode</code>s.
      */
-    private class Renderer
-        extends DefaultTreeCellRenderer {
+    private class Renderer extends DefaultTreeCellRenderer {
 
         /**
          * Create a new renderer.
@@ -89,15 +83,16 @@ public class SceneGraphBrowser
             super();
         }
 
-
         /**
-         * Format bounds with the specified label to the specified string buffer.
+         * Format bounds with the specified label to the specified string
+         * buffer.
          *
          * @param sb string buffer
          * @param label bounds label
          * @param bounds bounds
          */
-        private void formatBounds(final StringBuffer sb, final String label, final PBounds bounds) {
+        private void formatBounds(final StringBuffer sb, final String label,
+                final PBounds bounds) {
             sb.append(" ");
             sb.append(label);
             sb.append("=[");
@@ -117,16 +112,18 @@ public class SceneGraphBrowser
                 final boolean isExpanded, final boolean isLeaf, final int row,
                 final boolean hasFocus) {
 
-            JLabel l = (JLabel) super.getTreeCellRendererComponent(tree, value, isSelected, isExpanded,
-                                                                   isLeaf, row, hasFocus);
+            JLabel l = (JLabel) super.getTreeCellRendererComponent(tree, value,
+                    isSelected, isExpanded, isLeaf, row, hasFocus);
             PNode node = (PNode) value;
             PBounds bounds = null;
             StringBuffer sb = new StringBuffer();
-            sb.append(node.getClass().getName().substring(node.getClass().getName().lastIndexOf(".") + 1));
+            sb.append(node.getClass().getName()
+                    .substring(node.getClass().getName().lastIndexOf(".") + 1));
 
             formatBounds(sb, "bounds", node.getBoundsReference());
             formatBounds(sb, "fullBounds", node.getFullBoundsReference());
-            //formatBounds(sb, "global", node.getGlobalBounds());  method only in cvs version of piccolo
+            // formatBounds(sb, "global", node.getGlobalBounds()); method only
+            // in cvs version of piccolo
             formatBounds(sb, "globalFull", node.getGlobalFullBounds());
 
             l.setText(sb.toString());
@@ -138,12 +135,10 @@ public class SceneGraphBrowser
     /**
      * Model that wraps the piccolo scene graph.
      */
-    private class Model
-        implements TreeModel {
+    private class Model implements TreeModel {
 
         /** Listener list. */
         private EventListenerList listenerList;
-
 
         /**
          * Create a new model.
@@ -151,7 +146,6 @@ public class SceneGraphBrowser
         public Model() {
             listenerList = new EventListenerList();
         }
-
 
         /** @see TreeModel */
         public Object getChild(final Object parent, final int index) {
@@ -189,13 +183,14 @@ public class SceneGraphBrowser
         }
 
         /** @see TreeModel */
-        public void valueForPathChanged(final TreePath path, final Object newValue) {
+        public void valueForPathChanged(final TreePath path,
+                final Object newValue) {
             // empty
         }
 
         /**
-         * Fire a wholesale refresh event.  This is an inefficient way
-         * of notifying listeners of changes, but is adequate enough for a debug
+         * Fire a wholesale refresh event. This is an inefficient way of
+         * notifying listeners of changes, but is adequate enough for a debug
          * component like this one.
          */
         public void fireRefresh() {
@@ -204,9 +199,10 @@ public class SceneGraphBrowser
             for (int i = (listeners.length - 2); i >= 0; i -= 2) {
                 if (listeners[i] == TreeModelListener.class) {
                     if (e == null) {
-                        e = new TreeModelEvent(this, new Object[] {root});
+                        e = new TreeModelEvent(this, new Object[] { root });
                     }
-                    ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
+                    ((TreeModelListener) listeners[i + 1])
+                            .treeStructureChanged(e);
                 }
             }
         }

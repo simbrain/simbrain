@@ -16,7 +16,7 @@ import org.simbrain.world.visionworld.filter.RgbFilter;
 
 /**
  * FilterEditor that creates RgbFilters.
- * 
+ *
  * @author Matt Watson
  */
 public class RgbFilterEditor implements FilterEditor {
@@ -26,7 +26,7 @@ public class RgbFilterEditor implements FilterEditor {
     private static final int TEXT_FIELD_WIDTH = 72;
     /** The spacing in the borders. */
     private static final int BORDER_SPACING = 6;
-    
+
     /** The panel containing the components. */
     JPanel panel = new JPanel();
     /** The layout. */
@@ -41,58 +41,66 @@ public class RgbFilterEditor implements FilterEditor {
     JTextField lower = new JTextField("0");
     /** The output upper bound. */
     JTextField upper = new JTextField("1");
-    
+
     /**
      * Creates a new instance.
      */
     public RgbFilterEditor() {
         panel.setLayout(layout);
-        
-        panel.setBorder(new CompoundBorder(new TitledBorder("RGB Filter Editor"),
-            new EmptyBorder(BORDER_SPACING, BORDER_SPACING, BORDER_SPACING, BORDER_SPACING)));
-        
+
+        panel.setBorder(new CompoundBorder(
+                new TitledBorder("RGB Filter Editor"), new EmptyBorder(
+                        BORDER_SPACING, BORDER_SPACING, BORDER_SPACING,
+                        BORDER_SPACING)));
+
         JLabel redLabel = new JLabel("Red");
         JLabel greenLabel = new JLabel("Green");
         JLabel blueLabel = new JLabel("Blue");
         JLabel lowerLabel = new JLabel("Output Lower Bound");
         JLabel upperLabel = new JLabel("Output Upper Bound");
-        
+
         add(redLabel, red);
         add(greenLabel, green);
         add(blueLabel, blue);
         add(lowerLabel, lower);
         add(upperLabel, upper);
     }
-    
+
     /** The previous label added. */
     private JLabel previous;
-    
+
     /**
      * Adds a label and a field combination.
-     * 
+     *
      * @param label The label to add.
      * @param field The field to add.
      */
     private void add(final JLabel label, final JTextField field) {
         panel.add(label);
         panel.add(field);
-        
+
         if (previous == null) {
-            layout.putConstraint(SpringLayout.NORTH, panel, -SPACING, SpringLayout.NORTH, label);
+            layout.putConstraint(SpringLayout.NORTH, panel, -SPACING,
+                    SpringLayout.NORTH, label);
         } else {
-            layout.putConstraint(SpringLayout.NORTH, label, SPACING, SpringLayout.SOUTH, previous);
+            layout.putConstraint(SpringLayout.NORTH, label, SPACING,
+                    SpringLayout.SOUTH, previous);
         }
-        
-        layout.putConstraint(SpringLayout.WEST, panel, -SPACING, SpringLayout.WEST, label);
-        layout.putConstraint(SpringLayout.SOUTH, panel, SPACING, SpringLayout.SOUTH, label);
-        layout.putConstraint(SpringLayout.EAST, field, -SPACING, SpringLayout.EAST, panel);
-        layout.putConstraint(SpringLayout.WEST, field, -(TEXT_FIELD_WIDTH + SPACING),
-            SpringLayout.EAST, panel);
-        layout.putConstraint(SpringLayout.SOUTH, field, SPACING, SpringLayout.SOUTH, label);
-        
+
+        layout.putConstraint(SpringLayout.WEST, panel, -SPACING,
+                SpringLayout.WEST, label);
+        layout.putConstraint(SpringLayout.SOUTH, panel, SPACING,
+                SpringLayout.SOUTH, label);
+        layout.putConstraint(SpringLayout.EAST, field, -SPACING,
+                SpringLayout.EAST, panel);
+        layout.putConstraint(SpringLayout.WEST, field,
+                -(TEXT_FIELD_WIDTH + SPACING), SpringLayout.EAST, panel);
+        layout.putConstraint(SpringLayout.SOUTH, field, SPACING,
+                SpringLayout.SOUTH, label);
+
         previous = label;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -102,13 +110,13 @@ public class RgbFilterEditor implements FilterEditor {
         int blue = getIntValue(this.blue);
         int lower = getIntValue(this.lower);
         int upper = getIntValue(this.upper);
-        
+
         return new RgbFilter(red, green, blue, lower, upper);
     }
-    
+
     /**
      * Returns the int value of the provided text field.
-     * 
+     *
      * @param panel The panel to get value from.
      * @return The int value.
      */
@@ -120,14 +128,14 @@ public class RgbFilterEditor implements FilterEditor {
             throw e;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public Component getEditorComponent() {
         return panel;
     }
-    
+
     /**
      * {@inheritDoc}
      */

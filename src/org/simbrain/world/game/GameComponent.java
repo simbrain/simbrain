@@ -7,7 +7,7 @@ import org.simbrain.world.game.tictactoe.TicTacToeModel;
 
 /**
  * Component type for board games.
- * 
+ *
  * @author Matt Watson
  */
 public class GameComponent extends WorkspaceComponent {
@@ -15,8 +15,8 @@ public class GameComponent extends WorkspaceComponent {
     private final TicTacToeModel model = new TicTacToeModel();
 
     /**
-     * The attributes that wrap the model to make it act as a producer
-     * and a consumer.
+     * The attributes that wrap the model to make it act as a producer and a
+     * consumer.
      */
     private final GameAttributes attributes = new GameAttributes(this, model);
 
@@ -25,18 +25,18 @@ public class GameComponent extends WorkspaceComponent {
      */
     public GameComponent() {
         super("Tic Tac Toe");
-        //addConsumer(attributes);
+        // addConsumer(attributes);
     }
 
     /**
      * Returns the game model.
-     * 
+     *
      * @return The game model.
      */
     public TicTacToeModel getModel() {
         return model;
     }
-    
+
     /**
      * Called when the component is closed.
      */
@@ -47,7 +47,7 @@ public class GameComponent extends WorkspaceComponent {
 
     /**
      * Saves the component to the given stream.
-     * 
+     *
      * @param output the output stream.
      * @param format the format type.
      */
@@ -55,6 +55,5 @@ public class GameComponent extends WorkspaceComponent {
     public void save(final OutputStream output, final String format) {
         throw new UnsupportedOperationException();
     }
-    
-        
+
 }

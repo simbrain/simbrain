@@ -21,7 +21,6 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 
-
 /**
  * <b>HebbianThresholdSynapse</b>.
  */
@@ -121,7 +120,8 @@ public class HebbianThresholdRule extends SynapseUpdateRule {
     /**
      * @param useSlidingOutputThreshold The useSlidingOutputThreshold to set.
      */
-    public void setUseSlidingOutputThreshold(final boolean useSlidingOutputThreshold) {
+    public void setUseSlidingOutputThreshold(
+            final boolean useSlidingOutputThreshold) {
         this.useSlidingOutputThreshold = useSlidingOutputThreshold;
     }
 

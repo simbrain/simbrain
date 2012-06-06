@@ -24,7 +24,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.neuron_update_rules.StochasticRule;
 
-
 /**
  * <b>StochasticNeuronPanel</b>.
  */
@@ -50,10 +49,12 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
     public void fillFieldValues() {
         StochasticRule neuronRef = (StochasticRule) ruleList.get(0);
 
-        tfFiringProbability.setText(Double.toString(neuronRef.getFiringProbability()));
+        tfFiringProbability.setText(Double.toString(neuronRef
+                .getFiringProbability()));
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(ruleList, StochasticRule.class, "getFiringProbability")) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(ruleList, StochasticRule.class,
+                "getFiringProbability")) {
             tfFiringProbability.setText(NULL_STRING);
         }
     }
@@ -63,7 +64,8 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         StochasticRule neuronRef = new StochasticRule();
-        tfFiringProbability.setText(Double.toString(neuronRef.getFiringProbability()));
+        tfFiringProbability.setText(Double.toString(neuronRef
+                .getFiringProbability()));
     }
 
     /**
@@ -74,7 +76,8 @@ public class StochasticRulePanel extends AbstractNeuronPanel {
             StochasticRule neuronRef = (StochasticRule) ruleList.get(i);
 
             if (!tfFiringProbability.getText().equals(NULL_STRING)) {
-                neuronRef.setFiringProbability(Double.parseDouble(tfFiringProbability.getText()));
+                neuronRef.setFiringProbability(Double
+                        .parseDouble(tfFiringProbability.getText()));
             }
         }
     }

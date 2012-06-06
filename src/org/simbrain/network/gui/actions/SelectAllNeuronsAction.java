@@ -29,12 +29,10 @@ import org.simbrain.network.gui.NetworkPanel;
 /**
  * Select all neurons.
  */
-public final class SelectAllNeuronsAction
-    extends AbstractAction {
+public final class SelectAllNeuronsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new select all neurons action with the specified network panel.
@@ -54,7 +52,6 @@ public final class SelectAllNeuronsAction
                 KeyStroke.getKeyStroke('n'), this);
         networkPanel.getActionMap().put(this, this);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

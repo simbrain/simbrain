@@ -30,8 +30,8 @@ public final class DataWorldPreferences {
     public static final String FS = System.getProperty("file.separator");
 
     /** The main user preference object. */
-    private static final Preferences PREFERENCES = Preferences.userRoot().node("/org/simbrain/world/dataworld");
-
+    private static final Preferences PREFERENCES = Preferences.userRoot().node(
+            "/org/simbrain/world/dataworld");
 
     /**
      * Private default constructor.
@@ -39,7 +39,6 @@ public final class DataWorldPreferences {
     private DataWorldPreferences() {
         // empty
     }
-
 
     /**
      * Save all user preferences.
@@ -60,8 +59,8 @@ public final class DataWorldPreferences {
     }
 
     /**
-     * Set the current directory preference setting to <code>dir</code>.
-     * (Not used now but to be used for imports...)
+     * Set the current directory preference setting to <code>dir</code>. (Not
+     * used now but to be used for imports...)
      *
      * @param dir current directory preference setting
      */
@@ -70,13 +69,14 @@ public final class DataWorldPreferences {
     }
 
     /**
-     * Return the current directory preference setting.  Defaults to
-     * the value returned by <code>getDefaultCurrentDirectory()</code>.
+     * Return the current directory preference setting. Defaults to the value
+     * returned by <code>getDefaultCurrentDirectory()</code>.
      *
      * @return the current directory preference setting
      */
     public static String getCurrentDirectory() {
-        return PREFERENCES.get("CurrentDirectory", getDefaultCurrentDirectory());
+        return PREFERENCES
+                .get("CurrentDirectory", getDefaultCurrentDirectory());
     }
 
     /**

@@ -33,17 +33,14 @@ public final class NewReaderWorldAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
-     * Create a new text world action with the specified
-     * workspace.
+     * Create a new text world action with the specified workspace.
      */
     public NewReaderWorldAction(Workspace workspace) {
         super("TextWorld-Reader (Beta)", workspace);
         putValue(SHORT_DESCRIPTION, "New Text World");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

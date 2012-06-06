@@ -12,11 +12,9 @@ import javax.swing.JToolTip;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolTipUI;
 
-
 /**
  * @author Zafir Anjum
  */
-
 
 public class JMultiLineToolTip extends JToolTip {
     /** */
@@ -58,12 +56,12 @@ public class JMultiLineToolTip extends JToolTip {
     public int getFixedWidth() {
         return fixedwidth;
     }
+
     /** */
     protected int columns = 0;
     /** */
     protected int fixedwidth = 0;
 }
-
 
 /** */
 class MultiLineToolTipUI extends BasicToolTipUI {
@@ -78,15 +76,19 @@ class MultiLineToolTipUI extends BasicToolTipUI {
     /** */
     private static JTextArea textArea;
 
-    /** @param c component
-     *  @return ret component*/
+    /**
+     * @param c component
+     * @return ret component
+     */
     public static ComponentUI createUI(final JComponent c) {
         return sharedInstance;
     }
+
     /** */
     public MultiLineToolTipUI() {
         super();
     }
+
     /** @param component */
     public void installUI(JComponent c) {
         super.installUI(c);
@@ -103,18 +105,21 @@ class MultiLineToolTipUI extends BasicToolTipUI {
         rendererPane = null;
     }
 
-    /** @param g graphics
-     *  @param c component
-     *   */
+    /**
+     * @param g graphics
+     * @param c component
+     * */
     public void paint(final Graphics g, final JComponent c) {
         Dimension size = c.getSize();
         textArea.setBackground(c.getBackground());
-        rendererPane.paintComponent(g, textArea, c, 1, 1,
-                        size.width - 1, size.height - 1, true);
+        rendererPane.paintComponent(g, textArea, c, 1, 1, size.width - 1,
+                size.height - 1, true);
     }
 
-    /** @param c component
-     *  @return ret dimension */
+    /**
+     * @param c component
+     * @return ret dimension
+     */
     public Dimension getPreferredSize(final JComponent c) {
         String tipText = ((JToolTip) c).getTipText();
         if (tipText == null) {
@@ -130,10 +135,10 @@ class MultiLineToolTipUI extends BasicToolTipUI {
         if (columns > 0) {
             textArea.setColumns(columns);
             textArea.setSize(0, 0);
-        textArea.setLineWrap(true);
+            textArea.setLineWrap(true);
             textArea.setSize(textArea.getPreferredSize());
         } else if (width > 0) {
-        textArea.setLineWrap(true);
+            textArea.setLineWrap(true);
             Dimension d = textArea.getPreferredSize();
             d.width = width;
             d.height++;
@@ -142,7 +147,6 @@ class MultiLineToolTipUI extends BasicToolTipUI {
             textArea.setLineWrap(false);
         }
 
-
         Dimension dim = textArea.getPreferredSize();
 
         dim.height += 1;
@@ -150,18 +154,19 @@ class MultiLineToolTipUI extends BasicToolTipUI {
         return dim;
     }
 
-    /** @param c component
-     *  @return ret dimension */
+    /**
+     * @param c component
+     * @return ret dimension
+     */
     public Dimension getMinimumSize(final JComponent c) {
         return getPreferredSize(c);
     }
 
-    /** @param c component
-     *  @return ret dimension */
+    /**
+     * @param c component
+     * @return ret dimension
+     */
     public Dimension getMaximumSize(final JComponent c) {
         return getPreferredSize(c);
     }
 }
-
-
-

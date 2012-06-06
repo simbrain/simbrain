@@ -20,7 +20,7 @@ package org.simbrain.workspace;
 
 /**
  * Class which can be used to create a producer.
- * 
+ *
  * @author jyoshimi
  */
 public class PotentialProducer extends PotentialAttribute {
@@ -38,7 +38,7 @@ public class PotentialProducer extends PotentialAttribute {
             String methodBaseName, Class<?> dataType, String description) {
         super(parent, object, methodBaseName, dataType, description);
     }
-    
+
     /**
      * Construct a potential attribute for the case where the method has one
      * argument only.
@@ -62,7 +62,7 @@ public class PotentialProducer extends PotentialAttribute {
     /**
      * Construct a potential attribute for the case where the method has
      * multiple arguments.
-     * 
+     *
      * @param parent parent workspace component
      * @param object base object containing method to call
      * @param methodName name of method to call
@@ -80,7 +80,7 @@ public class PotentialProducer extends PotentialAttribute {
 
     /**
      * Actualize this potential attribute into a producer.
-     * 
+     *
      * @return the producer corresponding to this potential attribute.
      */
     public Producer<?> createProducer() {

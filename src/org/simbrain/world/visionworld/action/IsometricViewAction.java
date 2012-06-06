@@ -27,12 +27,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Isometric view action.
  */
-public final class IsometricViewAction
-    extends AbstractAction {
+public final class IsometricViewAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new isometric view action.
@@ -44,10 +42,9 @@ public final class IsometricViewAction
         if (visionWorld == null) {
             throw new IllegalArgumentException("visionWorld must not be null");
         }
-        //putValue(SMALL_ICON, ResourceManager.getImageIcon("gridOffset.png"));
+        // putValue(SMALL_ICON, ResourceManager.getImageIcon("gridOffset.png"));
         this.visionWorld = visionWorld;
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

@@ -20,8 +20,8 @@ package org.simbrain.network.subnetworks;
 
 import java.util.Comparator;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.PointNeuronRule;
@@ -34,17 +34,17 @@ import org.simbrain.network.neuron_update_rules.PointNeuronRule;
  * Computational Explorations in Cognitive Neuroscience, p. 110. All page
  * references below are are to this book.
  */
-public class KWTA extends Subnetwork  {
+public class KWTA extends Subnetwork {
 
-    //TODO: Make q settable
-    //      Add average based version 
+    // TODO: Make q settable
+    // Add average based version
 
     /** k, that is, number of neurons to win a competition. */
     private int k = 1;
 
     /**
-     * Determines the relative contribution of the k and
-     * k+1 node to the threshold conductance.
+     * Determines the relative contribution of the k and k+1 node to the
+     * threshold conductance.
      */
     private double q = 0.25;
 
@@ -54,18 +54,18 @@ public class KWTA extends Subnetwork  {
      */
     private double inhibitoryConductance;
 
-    //REDO
-//
-//    /**
-//     * Copy constructor.
-//     *
-//     * @param newRoot new root network
-//     * @param oldNet old network.
-//     */
-//    public KWTA(Network newRoot, KWTA oldNet) {
-//        super(newRoot, oldNet);
-//        setK(oldNet.getK());
-//    }
+    // REDO
+    //
+    // /**
+    // * Copy constructor.
+    // *
+    // * @param newRoot new root network
+    // * @param oldNet old network.
+    // */
+    // public KWTA(Network newRoot, KWTA oldNet) {
+    // super(newRoot, oldNet);
+    // setK(oldNet.getK());
+    // }
 
     /**
      * Default constructor.
@@ -77,20 +77,20 @@ public class KWTA extends Subnetwork  {
     public KWTA(final Network root, final int k, final Layout layout) {
         super(root, 1, 1);
         for (int i = 0; i < k; i++) {
-            getNeuronGroup().addNeuron(new Neuron(getParentNetwork(), new PointNeuronRule()));
+            getNeuronGroup().addNeuron(
+                    new Neuron(getParentNetwork(), new PointNeuronRule()));
         }
         layout.layoutNeurons(getNeuronGroup().getNeuronList());
         getSynapseGroup().setDeleteWhenEmpty(false);
-		root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
-				getNeuronGroup(), getSynapseGroup());
+        root.getSynapseRouter().associateSynapseGroupWithTargetNeuronGroup(
+                getNeuronGroup(), getSynapseGroup());
         setLabel("K-Winner Take All");
     }
-
 
     @Override
     public void update() {
         sortNeurons();
-        //setCurrentThresholdCurrent();
+        // setCurrentThresholdCurrent();
         getNeuronGroup().update();
     }
 
@@ -99,15 +99,16 @@ public class KWTA extends Subnetwork  {
      */
     private void setCurrentThresholdCurrent() {
 
-        double highest = ((PointNeuronRule) getNeuronGroup().getNeuronList().get(k).getUpdateRule())
-              .getInhibitoryThresholdConductance();
-        double secondHighest = ((PointNeuronRule) getNeuronGroup().getNeuronList().get(k-1).getUpdateRule())
-            .getInhibitoryThresholdConductance();
+        double highest = ((PointNeuronRule) getNeuronGroup().getNeuronList()
+                .get(k).getUpdateRule()).getInhibitoryThresholdConductance();
+        double secondHighest = ((PointNeuronRule) getNeuronGroup()
+                .getNeuronList().get(k - 1).getUpdateRule())
+                .getInhibitoryThresholdConductance();
 
         inhibitoryConductance = secondHighest + q * (highest - secondHighest);
 
         // System.out.println("highest " + highest + "  secondHighest "
-        //  + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
+        // + secondHighest + " inhibitoryCondctance" + inhibitoryConductance);
 
         // Set inhibitory conductances in the layer
         for (Neuron neuron : getNeuronGroup().getNeuronList()) {
@@ -120,9 +121,9 @@ public class KWTA extends Subnetwork  {
      * Sort neurons by their excitatory conductance. See p. 101.
      */
     private void sortNeurons() {
-        
-        //REDO
-//        Collections.sort(this.getNeuronList(), new PointNeuronComparator());
+
+        // REDO
+        // Collections.sort(this.getNeuronList(), new PointNeuronComparator());
     }
 
     /**
@@ -134,9 +135,10 @@ public class KWTA extends Subnetwork  {
          * {@inheritDoc}
          */
         public int compare(Neuron neuron1, Neuron neuron2) {
-            return 
-                (int) ((PointNeuronRule)neuron1.getUpdateRule()).getExcitatoryConductance() - 
-                (int)((PointNeuronRule)neuron1.getUpdateRule()).getExcitatoryConductance();
+            return (int) ((PointNeuronRule) neuron1.getUpdateRule())
+                    .getExcitatoryConductance()
+                    - (int) ((PointNeuronRule) neuron1.getUpdateRule())
+                            .getExcitatoryConductance();
         }
     }
 

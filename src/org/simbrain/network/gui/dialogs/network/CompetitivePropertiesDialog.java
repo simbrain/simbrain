@@ -13,10 +13,12 @@ import org.simbrain.util.ShowHelpAction;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>CompetitivePropertiesDialog</b> is a dialog box for setting the properties of a competitive network.
+ * <b>CompetitivePropertiesDialog</b> is a dialog box for setting the properties
+ * of a competitive network.
  *
  */
-public class CompetitivePropertiesDialog extends StandardDialog implements ActionListener {
+public class CompetitivePropertiesDialog extends StandardDialog implements
+        ActionListener {
 
     /** Main Panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -62,7 +64,8 @@ public class CompetitivePropertiesDialog extends StandardDialog implements Actio
 
         fillFieldValues();
         checkLeakyEpsilon();
-        helpAction = new ShowHelpAction("Pages/Network/network/competitivenetwork.html");
+        helpAction = new ShowHelpAction(
+                "Pages/Network/network/competitivenetwork.html");
         helpButton.setAction(helpAction);
 
         this.addButton(helpButton);
@@ -79,13 +82,14 @@ public class CompetitivePropertiesDialog extends StandardDialog implements Actio
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
-      competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
-      competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
-      competitive.setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
-      competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
-      competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
-      super.closeDialogOk();
+        competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
+        competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
+        competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
+        competitive
+                .setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
+        competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
+        competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
+        super.closeDialogOk();
     }
 
     /**

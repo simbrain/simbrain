@@ -102,7 +102,6 @@ public final class VisionWorld extends PCanvas {
     /** Vision world desktop component. */
     private VisionWorldDesktopComponent desktop;
 
-
     /**
      * Create a new vision world with the specified model.
      *
@@ -126,41 +125,42 @@ public final class VisionWorld extends PCanvas {
 
         selectionModel = new SensorSelectionModel(this);
         editSensorsAction = new EditSensorsAction(this);
-        
+
         createNodes();
         modelListener = new VisionWorldModelListener() {
 
-                /** {@inheritDoc} */
-                public void pixelMatrixChanged(final VisionWorldModelEvent event) {
-                    getLayer().removeChild(pixelMatrixNode);
-                    getLayer().removeChild(sensorMatrixNode);
-                    pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
-                    selectionModel.clear();
-                    getLayer().addChild(pixelMatrixNode);
-                    getLayer().addChild(sensorMatrixNode);
-                    centerCamera();
-                }
+            /** {@inheritDoc} */
+            public void pixelMatrixChanged(final VisionWorldModelEvent event) {
+                getLayer().removeChild(pixelMatrixNode);
+                getLayer().removeChild(sensorMatrixNode);
+                pixelMatrixNode = new PixelMatrixImageNode(
+                        event.getPixelMatrix());
+                selectionModel.clear();
+                getLayer().addChild(pixelMatrixNode);
+                getLayer().addChild(sensorMatrixNode);
+                centerCamera();
+            }
 
-                /** {@inheritDoc} */
-                public void sensorMatrixChanged(final VisionWorldModelEvent event) {
-                    getLayer().removeChild(sensorMatrixNode);
-                    sensorMatrixNode = new SensorMatrixNode(VisionWorld.this, event.getSensorMatrix());
-                    selectionModel.clear();
-                    getLayer().addChild(sensorMatrixNode);
-                    centerCamera();
-                    updateSensorNodes();
-                }
-            };
+            /** {@inheritDoc} */
+            public void sensorMatrixChanged(final VisionWorldModelEvent event) {
+                getLayer().removeChild(sensorMatrixNode);
+                sensorMatrixNode = new SensorMatrixNode(VisionWorld.this,
+                        event.getSensorMatrix());
+                selectionModel.clear();
+                getLayer().addChild(sensorMatrixNode);
+                centerCamera();
+                updateSensorNodes();
+            }
+        };
 
         this.model.addModelListener(modelListener);
 
-        selectionListener = new SensorSelectionListener()
-            {
-                /** {@inheritDoc} */
-                public void selectionChanged(final SensorSelectionEvent e) {
-                    updateSelection(e);
-                }
-            };
+        selectionListener = new SensorSelectionListener() {
+            /** {@inheritDoc} */
+            public void selectionChanged(final SensorSelectionEvent e) {
+                updateSelection(e);
+            }
+        };
 
         selectionModel.addSensorSelectionListener(selectionListener);
 
@@ -198,10 +198,10 @@ public final class VisionWorld extends PCanvas {
         for (Sensor sensor : difference) {
             sensorNodes.get(sensor).setSelected(false);
         }
-        
-//        System.out.println("sensors: " + selection);
-//        System.out.println("sensorNodes: " + sensorNodes);
-        
+
+        // System.out.println("sensors: " + selection);
+        // System.out.println("sensorNodes: " + sensorNodes);
+
         for (Sensor sensor : selection) {
             sensorNodes.get(sensor).setSelected(true);
         }
@@ -211,11 +211,11 @@ public final class VisionWorld extends PCanvas {
      * Update the map of sensor to sensor nodes.
      */
     private void updateSensorNodes() {
-//        System.out.println("update sensor nodes");
-        
+        // System.out.println("update sensor nodes");
+
         sensorNodes.clear();
         Collection<?> allNodes = getLayer().getAllNodes();
-        for (Iterator<?> i = allNodes.iterator(); i.hasNext(); ) {
+        for (Iterator<?> i = allNodes.iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof SensorNode) {
                 SensorNode sensorNode = (SensorNode) node;
@@ -247,12 +247,12 @@ public final class VisionWorld extends PCanvas {
         PLayer layer = getLayer();
         PCamera camera = getCamera();
         PBounds fullBounds = layer.getFullBoundsReference();
-        double shortestSide = Math.min(fullBounds.getHeight(), fullBounds.getWidth());
+        double shortestSide = Math.min(fullBounds.getHeight(),
+                fullBounds.getWidth());
         double padding = Math.min(VIEW_PADDING, shortestSide * 0.1d);
         PBounds paddedBounds = new PBounds(fullBounds.getX() - padding,
-                                           fullBounds.getY() - padding,
-                                           fullBounds.getWidth() + (2 * padding),
-                                           fullBounds.getHeight() + (2 * padding));
+                fullBounds.getY() - padding, fullBounds.getWidth()
+                        + (2 * padding), fullBounds.getHeight() + (2 * padding));
         camera.animateViewToCenterBounds(paddedBounds, true, 0L);
     }
 
@@ -270,8 +270,7 @@ public final class VisionWorld extends PCanvas {
     }
 
     /**
-     * Return the model for this vision world.
-     * The model will not be null.
+     * Return the model for this vision world. The model will not be null.
      *
      * @return the model for this vision world
      */
@@ -280,8 +279,8 @@ public final class VisionWorld extends PCanvas {
     }
 
     /**
-     * Return the sensor selection model for this vision world.
-     * The sensor selection model will not be null.
+     * Return the sensor selection model for this vision world. The sensor
+     * selection model will not be null.
      *
      * @return the sensor selection model for this vision world
      */
@@ -328,7 +327,8 @@ public final class VisionWorld extends PCanvas {
     public void stackedView() {
         sensorMatrixNode.setVisible(true);
         sensorMatrixNode.moveToFront();
-        sensorMatrixNode.setOffset(sensorMatrixNode.getWidth() * -0.1d, sensorMatrixNode.getHeight() * 0.1d);
+        sensorMatrixNode.setOffset(sensorMatrixNode.getWidth() * -0.1d,
+                sensorMatrixNode.getHeight() * 0.1d);
         if (pixelMatrixNode.hasFocus()) {
             pixelMatrixNode.setFocus(false);
         }
@@ -345,7 +345,8 @@ public final class VisionWorld extends PCanvas {
     public void sideBySideView() {
         sensorMatrixNode.setVisible(true);
         sensorMatrixNode.moveToFront();
-        double x = sensorMatrixNode.getWidth() + (sensorMatrixNode.getWidth() * 0.1d);
+        double x = sensorMatrixNode.getWidth()
+                + (sensorMatrixNode.getWidth() * 0.1d);
         sensorMatrixNode.setOffset(-x, 0.0d);
         if (pixelMatrixNode.hasFocus()) {
             pixelMatrixNode.setFocus(false);
@@ -373,11 +374,13 @@ public final class VisionWorld extends PCanvas {
         }
         Point2D sensorCenter = sensorMatrixNode.getBounds().getCenter2D();
         sensorMatrixNode.getTransformReference(true).scale(1.0d, 0.573558d);
-        sensorMatrixNode.getTransformReference(true).rotate(Math.PI/4.0d, sensorCenter.getX(), sensorCenter.getY());
+        sensorMatrixNode.getTransformReference(true).rotate(Math.PI / 4.0d,
+                sensorCenter.getX(), sensorCenter.getY());
 
         Point2D pixelCenter = sensorMatrixNode.getBounds().getCenter2D();
         pixelMatrixNode.getTransformReference(true).scale(1.0d, 0.573558d);
-        pixelMatrixNode.getTransformReference(true).rotate(Math.PI/4.0d, pixelCenter.getX(), pixelCenter.getY());
+        pixelMatrixNode.getTransformReference(true).rotate(Math.PI / 4.0d,
+                pixelCenter.getX(), pixelCenter.getY());
 
         centerCamera();
     }
@@ -418,8 +421,11 @@ public final class VisionWorld extends PCanvas {
      * @return a list of file menu actions for this vision world
      */
     public List<Action> getFileMenuActions() {
-        return Arrays.asList(new Action[] {new OpenVisionWorldAction(desktop), new SaveVisionWorldAsAction(desktop),
-                new SaveVisionWorldAction(desktop), new CreatePixelMatrixAction(this), new CreateSensorMatrixAction(this)});
+        return Arrays.asList(new Action[] { new OpenVisionWorldAction(desktop),
+                new SaveVisionWorldAsAction(desktop),
+                new SaveVisionWorldAction(desktop),
+                new CreatePixelMatrixAction(this),
+                new CreateSensorMatrixAction(this) });
     }
 
     /**
@@ -428,12 +434,13 @@ public final class VisionWorld extends PCanvas {
      * @return a list of edit menu actions for this vision world
      */
     public List<Action> getEditMenuActions() {
-        return Arrays.asList(new Action[] {editSensorsAction, new SelectAllAction(this), new SelectNoneAction(this)});
+        return Arrays.asList(new Action[] { editSensorsAction,
+                new SelectAllAction(this), new SelectNoneAction(this) });
     }
 
     /**
-     * Return the edit sensors action for this vision world.  The edit
-     * sensors action will not be null.
+     * Return the edit sensors action for this vision world. The edit sensors
+     * action will not be null.
      *
      * @return the edit sensors action for this vision world
      */
@@ -447,14 +454,17 @@ public final class VisionWorld extends PCanvas {
      * @return a list of view menu actions for this vision world
      */
     public List<Action> getViewMenuActions() {
-        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new PaintViewAction(this)});
+        return Arrays.asList(new Action[] { new NormalViewAction(this),
+                new StackedViewAction(this), new PaintViewAction(this) });
     }
 
     /**
      * Sets the desktop component.
+     *
      * @param desktop component to set
      */
-    public void setVisionWorldDesktopComponent(final VisionWorldDesktopComponent desktop) {
+    public void setVisionWorldDesktopComponent(
+            final VisionWorldDesktopComponent desktop) {
         this.desktop = desktop;
     }
 

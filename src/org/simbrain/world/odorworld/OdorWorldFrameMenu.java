@@ -33,7 +33,6 @@ import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenuComponent;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 
-
 /**
  * <b>OdorWorldFrameMenu</b>.
  */
@@ -41,7 +40,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
     private static final long serialVersionUID = 1L;
 
-    //TODO: Replace all this with actions.
+    // TODO: Replace all this with actions.
 
     /** Parent frame. */
     private OdorWorldDesktopComponent parent;
@@ -69,15 +68,17 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
     /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("World Help");
-    
+
     /** Reference to odor world. */
     private final OdorWorld world;
 
     /**
      * Odor world frame menu constructor.
+     *
      * @param frame Frame to create menu
      */
-    public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame, OdorWorld world) {
+    public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame,
+            OdorWorld world) {
         parent = frame;
         this.world = world;
     }
@@ -93,10 +94,11 @@ public class OdorWorldFrameMenu extends JMenuBar {
         // Coupling Menu
         add(new CouplingMenuComponent("Couple", parent.getWorkspaceComponent()
                 .getWorkspace(), parent.getWorkspaceComponent()));
-        
+
         // Help Menu
         add(helpMenu);
-        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/OdorWorld.html");
+        ShowHelpAction helpAction = new ShowHelpAction(
+                "Pages/Worlds/OdorWorld/OdorWorld.html");
         helpItem.setAction(helpAction);
         helpMenu.add(helpItem);
     }
@@ -125,9 +127,9 @@ public class OdorWorldFrameMenu extends JMenuBar {
         editMenu.add(pasteItem);
         editMenu.addSeparator();
         clearAllItems.addActionListener(new ActionListener() {
-    		public void actionPerformed(ActionEvent e) {
-    			world.deleteAllEntities();
-    		}
+            public void actionPerformed(ActionEvent e) {
+                world.deleteAllEntities();
+            }
         });
         editMenu.add(clearAllItems);
 

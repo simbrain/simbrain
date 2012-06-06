@@ -21,7 +21,6 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 
-
 /**
  * <b>ClampedSynapse</b>.
  */
@@ -43,9 +42,9 @@ public class ClampedSynapseRule extends SynapseUpdateRule {
 
     @Override
     public void update(Synapse synapse) {
-//        if (clipped) {
-//            super.setStrength(Synapse(synapse.getStrength()));
-//        }
+        // if (clipped) {
+        // super.setStrength(Synapse(synapse.getStrength()));
+        // }
     }
 
     @Override

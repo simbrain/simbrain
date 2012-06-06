@@ -28,8 +28,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 /**
  * Context menu event handler.
  */
-final class ContextMenuEventHandler
-    extends PBasicInputEventHandler {
+final class ContextMenuEventHandler extends PBasicInputEventHandler {
 
     /** Network Panel. */
     private final NetworkPanel networkPanel;
@@ -50,10 +49,11 @@ final class ContextMenuEventHandler
      */
     private void showContextMenu(final PInputEvent event) {
 
-        event.setHandled(true);  // seems to confuse zoom event handler??
+        event.setHandled(true); // seems to confuse zoom event handler??
         JPopupMenu contextMenu = networkPanel.getContextMenu();
         Point2D canvasPosition = event.getCanvasPosition();
-        contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
+        contextMenu.show(networkPanel, (int) canvasPosition.getX(),
+                (int) canvasPosition.getY());
         networkPanel.getCanvas().getCamera().localToView(canvasPosition);
         networkPanel.setLastClickedPosition(canvasPosition);
     }

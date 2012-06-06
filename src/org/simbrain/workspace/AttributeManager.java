@@ -19,36 +19,34 @@ package org.simbrain.workspace;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * A raft of methods for creating attributes and potential attributes. For
  * attributes (Producer and Consumer) the main creation method, using reflection
- * is here. 
- * 
- * You can create an attribute without specifying a description, in
- * which case a standard description is created. For potential attributes
- * (PotentialProducer and PotentialConsumer), there are two choices, so that
- * there are four creation methods. As with attributes, you can specify a custom
- * description or not. You can also use an attribute type when creating the
- * potential attribute.
- * 
- * Main type.  The type used when passing info from producer to consumer.
- * These must match.
- * 
- * Auxiliary arguments.   Used when calling the method (using reflection) associated
- * with a producer or consumer.   In these cases both the argument types and
- * an unchanging argument value must be specified.
- * 
- * For producers (getters): the return type is the main type, and all args are additional.
- *  Example: double getValue(int bar-index).   
- *      double is the main type
- *      int is auxiliary
- *      
+ * is here.
+ *
+ * You can create an attribute without specifying a description, in which case a
+ * standard description is created. For potential attributes (PotentialProducer
+ * and PotentialConsumer), there are two choices, so that there are four
+ * creation methods. As with attributes, you can specify a custom description or
+ * not. You can also use an attribute type when creating the potential
+ * attribute.
+ *
+ * Main type. The type used when passing info from producer to consumer. These
+ * must match.
+ *
+ * Auxiliary arguments. Used when calling the method (using reflection)
+ * associated with a producer or consumer. In these cases both the argument
+ * types and an unchanging argument value must be specified.
+ *
+ * For producers (getters): the return type is the main type, and all args are
+ * additional. Example: double getValue(int bar-index). double is the main type
+ * int is auxiliary
+ *
  * For consumers (setters): the _first_ argument is the main type, and all other
- *  arguments are auxiliary. 
- * 
- * TODO: Refer other classes here for info 
+ * arguments are auxiliary.
+ *
+ * TODO: Refer other classes here for info
  *
  * @author jyoshimi
  */
@@ -227,7 +225,7 @@ public class AttributeManager {
 
     /**
      * Create an actual producer from a potential producer.
-     * 
+     *
      * @param potentialAttribute the potential attribute to actualize
      * @return the resulting producer
      */
@@ -248,8 +246,7 @@ public class AttributeManager {
      * main datatype argument, because that is implicitly the first element of
      * argument dataTypes.
      *
-     * TODO: Currently only works for one or two arguments
-     * only.
+     * TODO: Currently only works for one or two arguments only.
      *
      * @param parentObject parent object
      * @param methodName name of method
@@ -295,9 +292,10 @@ public class AttributeManager {
                 try {
                     // Currently only works for case of one or two arguments.
                     if (argumentDataTypes.length == 1) {
-                        theMethod.invoke(parentObject, new Object[] { value });                        
+                        theMethod.invoke(parentObject, new Object[] { value });
                     } else {
-                        theMethod.invoke(parentObject, new Object[] {value, argumentValues[0]});
+                        theMethod.invoke(parentObject, new Object[] { value,
+                                argumentValues[0] });
                     }
                 } catch (IllegalArgumentException e) {
                     // TODO Auto-generated catch block
@@ -366,28 +364,26 @@ public class AttributeManager {
     }
 
     /**
-     * Create a consumer using:
-     *  1) Parent Object
-     *  2) Method name
-     *  3) Data type (so no auxiliary args: one value in argument list and null value list)
-     *  Description is automatically created.
+     * Create a consumer using: 1) Parent Object 2) Method name 3) Data type (so
+     * no auxiliary args: one value in argument list and null value list)
+     * Description is automatically created.
      */
     public Consumer<?> createConsumer(final Object baseObject,
             final String methodName, final Class<?> dataType) {
-        String description = getDescriptionString(baseObject, methodName, dataType);
+        String description = getDescriptionString(baseObject, methodName,
+                dataType);
         return createConsumer(baseObject, methodName,
                 new Class<?>[] { dataType }, null, description);
     }
 
     /**
-     * Create a consumer using:
-     *  1) Parent Object
-     *  2) Method name
-     *  3) Data type (so no auxiliary args: one value in argument list and null value list)
-     *  4) Description
+     * Create a consumer using: 1) Parent Object 2) Method name 3) Data type (so
+     * no auxiliary args: one value in argument list and null value list) 4)
+     * Description
      */
     public Consumer<?> createConsumer(final Object baseObject,
-            final String methodName, final Class<?> dataType, final String description) {
+            final String methodName, final Class<?> dataType,
+            final String description) {
         return createConsumer(baseObject, methodName,
                 new Class<?>[] { dataType }, null, description);
     }
@@ -398,15 +394,18 @@ public class AttributeManager {
      * @param potentialAttribute the potential attribute to actualize
      * @return the resulting consumer
      */
-    public Consumer<?> createConsumer(final PotentialAttribute potentialAttribute) {
-        return createConsumer(potentialAttribute.getBaseObject(), potentialAttribute
-                .getMethodName(), potentialAttribute.getArgumentDataTypes(), potentialAttribute.getArgumentValues(),
+    public Consumer<?> createConsumer(
+            final PotentialAttribute potentialAttribute) {
+        return createConsumer(potentialAttribute.getBaseObject(),
+                potentialAttribute.getMethodName(),
+                potentialAttribute.getArgumentDataTypes(),
+                potentialAttribute.getArgumentValues(),
                 potentialAttribute.getDescription());
     }
 
-    //////////////////////////////////////////
+    // ////////////////////////////////////////
     // POTENTIAL ATTRIBUTE CREATION METHODS //
-    //////////////////////////////////////////
+    // ////////////////////////////////////////
 
     /**
      * Create a potential producer. All information is provided.
@@ -468,7 +467,7 @@ public class AttributeManager {
         return createPotentialProducer(baseObject, methodName, dataType,
                 description);
     }
-    
+
     // Potential Consumers
 
     /**
@@ -476,7 +475,8 @@ public class AttributeManager {
      *
      * @param parentObject base object
      * @param methodName name of method
-     * @param dataType type of data  (so no auxiliary args: one value in argument list and null value list)
+     * @param dataType type of data (so no auxiliary args: one value in argument
+     *            list and null value list)
      * @param description custom description
      * @return the resulting consumer
      */
@@ -484,7 +484,7 @@ public class AttributeManager {
             final String methodName, final Class<?> dataType,
             final String description) {
         return new PotentialConsumer(parentComponent, parentObject, methodName,
-                new Class<?>[]{dataType}, null, description);
+                new Class<?>[] { dataType }, null, description);
     }
 
     /**

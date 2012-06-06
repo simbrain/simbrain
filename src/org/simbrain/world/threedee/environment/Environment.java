@@ -39,10 +39,10 @@ public class Environment {
     private Timer timer;
 
     private TimerTask task;
-    
+
     /** The elements in this environment. */
     private Map<Renderer, Node> parents = new HashMap<Renderer, Node>();
-    
+
     /** The elements in this environment. */
     private final List<Element> elements = new ArrayList<Element>();
 
@@ -51,24 +51,24 @@ public class Environment {
 
     /** The odors in this environment. */
     private final Odors odors = new Odors();
-    
+
     /** The size of the environment. */
     private final int size = 256;
-    
+
     /** The terrain for the environment. */
     private final Terrain terrain = new Terrain(size);
 
     private Random random = new Random();
-    
+
     /** The sky for the environment. */
-//    private Sky sky = new Sky();
-    
+    // private Sky sky = new Sky();
+
     /**
      * Creates a new environment.
      */
     public Environment() {
         elements.add(terrain);
-        
+
         for (int i = 0; i < 10; i++) {
             add(new Plant());
         }
@@ -77,78 +77,80 @@ public class Environment {
     public void setTimer(Timer timer) {
         this.timer = timer;
     }
-    
+
     private Object readResolve() {
         random = new Random();
         parents = new HashMap<Renderer, Node>();
-        
+
         return this;
     }
-    
+
     public void add(Element element) {
         boolean collided;
         int radius = 100;
-        
+
         do {
             collided = false;
             Point tentative = element.getTentative().centerPoint();
             element.setFloor(getFloorHeight(tentative));
-            
+
             if (findCollision(element)) {
                 float x = random.nextInt(radius);
                 float z = random.nextInt(radius);
-                
+
                 element.setTentativeLocation(new Point(x, tentative.getY(), z));
-                
-                if (radius * 2 < size) radius += radius;
+
+                if (radius * 2 < size)
+                    radius += radius;
                 collided = true;
             }
         } while (collided);
-        
+
         element.commit();
-        
+
         elements.add(element);
         odors.addOdors(element);
     }
-    
+
     /**
      * Adds an agent to this environment.
-     * 
+     *
      * @param agent the agent to add
      */
     public void add(final Agent agent) {
         AgentElement element = new AgentElement(agent);
-        
+
         for (Map.Entry<Renderer, Node> parent : parents.entrySet()) {
             element.init(parent.getKey(), parent.getValue());
         }
-        
+
         addViewable(agent);
-//        views.add(agent);
+        // views.add(agent);
         agent.setEnvironment(this);
-        
+
         int limit = (size * 2) - 1;
-        
+
         agent.setLimit(limit);
-                
+
         add(element);
     }
 
     private boolean findCollision(Element element) {
         for (Element other : elements) {
-            if (other == element) continue;
-                        
+            if (other == element)
+                continue;
+
             if (element.getTentative().intersects(other.getTentative())) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Adds a new view.
-     * 
+     *
      * @param view the view to add
      */
     public void addViewable(final Viewable view) {
@@ -158,7 +160,7 @@ public class Environment {
 
     /**
      * Returns the floor height at the x and z coordinates of the given point.
-     * 
+     *
      * @param location The location to get the floor height at.
      * @return The floor height at the x and z coordinates of the given point.
      */
@@ -168,19 +170,20 @@ public class Environment {
 
     /**
      * Initializes the environment with the given renderer and parent.
-     * 
+     *
      * @param renderer the renderer
      * @param parent the parent node
      */
-    public void init(final Agent agent, final Renderer renderer, final Node parent) {
+    public void init(final Agent agent, final Renderer renderer,
+            final Node parent) {
         LOGGER.debug("init: " + renderer);
 
         parents.put(renderer, parent);
-        
+
         for (final Element element : elements) {
             LOGGER.debug("element: " + element);
-            if (!(element instanceof AgentElement
-            && ((AgentElement) element).getAgent() == agent)) {
+            if (!(element instanceof AgentElement && ((AgentElement) element)
+                    .getAgent() == agent)) {
                 element.init(renderer, parent);
             }
         }
@@ -195,20 +198,20 @@ public class Environment {
                     update();
                 }
             };
-            
+
             timer.schedule(task, REFRESH_WAIT, REFRESH_WAIT);
         }
     }
-    
+
     public void remove(Renderer renderer) {
         parents.remove(renderer);
     }
-    
+
     public void killTimer() {
         task.cancel();
-//        timer = null;
+        // timer = null;
     }
-    
+
     /**
      * Calls updates on all the elements, looks for collisions, fires any
      * collision events, commits the elements, and updates the views.
@@ -224,13 +227,17 @@ public class Environment {
             final Element a = elements.get(i);
             final SpatialData aData = a.getTentative();
 
-            if (aData == null) { continue; }
+            if (aData == null) {
+                continue;
+            }
 
             for (int j = i + 1; j < elements.size(); j++) {
                 final Element b = elements.get(j);
                 final SpatialData bData = b.getTentative();
 
-                if (bData == null) { continue; }
+                if (bData == null) {
+                    continue;
+                }
 
                 if (aData.intersects(bData)) {
                     final CollisionData data = new CollisionData(a, b);
@@ -249,20 +256,20 @@ public class Environment {
             view.updateView();
         }
     }
-    
+
     /**
      * Returns the odors in this environment.
-     * 
+     *
      * @return The odors in this environment.
      */
     public Odors getOdors() {
         return odors;
     }
-    
+
     /**
      * Helper class for managing collision data temporarily creates the
      * collision data objects for both elements involved in the collision.
-     * 
+     *
      * @author Matt Watson
      */
     private static class CollisionData {
@@ -273,14 +280,14 @@ public class Environment {
 
         /**
          * Creates a new CollisionData instance.
-         * 
+         *
          * @param a The first element.
          * @param b The second element.
          */
         CollisionData(final Element a, final Element b) {
             /**
              * Inner class for collision calculations.
-             * 
+             *
              * @author Matt Watson
              */
             class CollisionLocal implements Collision {
@@ -291,24 +298,28 @@ public class Environment {
 
                 /**
                  * Creates a new CollisionLocal instance.
-                 * 
+                 *
                  * @param other The other element.
-                 * @param center The center of the element this collision is respective to.
-                 * @param fraction The the fraction representing the how far from the center
-                 *        point to the bounding sphere surface the collision took place.
+                 * @param center The center of the element this collision is
+                 *            respective to.
+                 * @param fraction The the fraction representing the how far
+                 *            from the center point to the bounding sphere
+                 *            surface the collision took place.
                  */
-                CollisionLocal(final Element other, final Point center, final float fraction) {
+                CollisionLocal(final Element other, final Point center,
+                        final float fraction) {
                     this.other = other;
 
-                    center.toVector3f().interpolate(other.getTentative().centerPoint()
-                        .toVector3f(), fraction);
+                    center.toVector3f().interpolate(
+                            other.getTentative().centerPoint().toVector3f(),
+                            fraction);
 
                     this.point = center;
                 }
 
                 /**
                  * Returns the other element in the collision.
-                 * 
+                 *
                  * @return The other element in the collision.
                  */
                 public Element other() {
@@ -317,7 +328,7 @@ public class Environment {
 
                 /**
                  * Returns the point of impact.
-                 * 
+                 *
                  * @return The point of impact.
                  */
                 public Point point() {
@@ -325,14 +336,16 @@ public class Environment {
                 }
 
             }
-            
+
             float aRadius = a.getTentative().radius();
             float bRadius = b.getTentative().radius();
-            
+
             final float total = aRadius + bRadius;
 
-            collisionA = new CollisionLocal(b, a.getTentative().centerPoint(), total / aRadius);
-            collisionB = new CollisionLocal(a, b.getTentative().centerPoint(), total / bRadius);
+            collisionA = new CollisionLocal(b, a.getTentative().centerPoint(),
+                    total / aRadius);
+            collisionB = new CollisionLocal(a, b.getTentative().centerPoint(),
+                    total / bRadius);
         }
     }
 }

@@ -21,7 +21,6 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 
-
 /**
  * <b>HebbianCPCA</b>.
  */
@@ -80,13 +79,15 @@ public class HebbianCPCARule extends SynapseUpdateRule {
         double input = synapse.getSource().getActivation();
         double output = synapse.getTarget().getActivation();
 
-        double deltaW = learningRate * ((output * input) - (output * synapse.getStrength())); // Equation 4.12
-        //deltaW = learningRate * (output * input * (m - strength) + output * (1 - input) * (-strength));
-        //strength = sigmoidal(strength);
-        //strength = clip(strength + deltaW);
+        double deltaW = learningRate
+                * ((output * input) - (output * synapse.getStrength())); // Equation
+                                                                         // 4.12
+        // deltaW = learningRate * (output * input * (m - strength) + output *
+        // (1 - input) * (-strength));
+        // strength = sigmoidal(strength);
+        // strength = clip(strength + deltaW);
         synapse.setStrength(synapse.getStrength() + deltaW);
     }
-
 
     /**
      * Sigmoidal Function (see equation 4.23 in O'Reilly and Munakata).
@@ -125,7 +126,6 @@ public class HebbianCPCARule extends SynapseUpdateRule {
     public double getLambda() {
         return lambda;
     }
-
 
     /**
      * @param momentum The momentum to set.

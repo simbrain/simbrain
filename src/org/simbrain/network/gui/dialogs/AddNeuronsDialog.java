@@ -155,8 +155,7 @@ public class AddNeuronsDialog extends StandardDialog {
     private void addNeuronsToPanel() {
         int number = Integer.parseInt(numNeurons.getText());
         for (int i = 0; i < number; i++) {
-            Neuron neuron = new Neuron(networkPanel.getNetwork(),
-                    baseNeuron);
+            Neuron neuron = new Neuron(networkPanel.getNetwork(), baseNeuron);
             nodes.add(new NeuronNode(networkPanel, neuron));
             networkPanel.getNetwork().addNeuron(neuron);
         }

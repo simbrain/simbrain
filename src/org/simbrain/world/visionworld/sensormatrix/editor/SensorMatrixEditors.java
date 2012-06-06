@@ -34,8 +34,10 @@ public final class SensorMatrixEditors {
     public static final SensorMatrixEditor SPARSE = new SparseSensorMatrixEditor();
 
     /** Private array of sensor matrix editors. */
-    private static final SensorMatrixEditor[] values = new SensorMatrixEditor[] { DENSE, SPARSE };
+    private static final SensorMatrixEditor[] values = new SensorMatrixEditor[] {
+            DENSE, SPARSE };
 
     /** Public list of sensor matrix editors. */
-    public static final List<SensorMatrixEditor> VALUES = Collections.unmodifiableList(Arrays.asList(values));
+    public static final List<SensorMatrixEditor> VALUES = Collections
+            .unmodifiableList(Arrays.asList(values));
 }

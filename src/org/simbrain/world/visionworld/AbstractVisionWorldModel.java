@@ -22,12 +22,11 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Abstract implementation of VisionWorldModel which
- * provides VisionWorldModelListener management.
+ * Abstract implementation of VisionWorldModel which provides
+ * VisionWorldModelListener management.
  */
-abstract class AbstractVisionWorldModel
-    extends VisionWorldModelListenerSupport
-    implements VisionWorldModel {
+abstract class AbstractVisionWorldModel extends VisionWorldModelListenerSupport
+        implements VisionWorldModel {
 
     /**
      * Create a new abstract vision world model.
@@ -39,27 +38,27 @@ abstract class AbstractVisionWorldModel
 
     /**
      * Returns a properly initialized xstream object.
+     *
      * @return the XStream object
      */
     public static XStream getXStream() {
         XStream xstream = new XStream(new DomDriver());
-      //TODO: Too much is stored in pixel matrix and elsewhere
-        //  Also the pixels don't actually get stored
-      //xstream.omitField(MutableVisionWorldModel.class, "pixelMatrix"); 
+        // TODO: Too much is stored in pixel matrix and elsewhere
+        // Also the pixels don't actually get stored
+        // xstream.omitField(MutableVisionWorldModel.class, "pixelMatrix");
         return xstream;
     }
 
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
+     * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
      *
      * @return Initialized object.
      */
     private Object readResolve() {
-//        logger = Logger.getLogger(Network.class);
-//        this.updatePriorities = new TreeSet<Integer>();
+        // logger = Logger.getLogger(Network.class);
+        // this.updatePriorities = new TreeSet<Integer>();
         return this;
     }
 }

@@ -36,7 +36,6 @@ public final class SaveAction extends AbstractAction {
     /** Network panel. */
     private final GuiComponent guiComponent;
 
-
     /**
      * Create a new save component action with the specified.
      *
@@ -52,13 +51,12 @@ public final class SaveAction extends AbstractAction {
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+                KeyEvent.VK_S, Toolkit.getDefaultToolkit()
+                        .getMenuShortcutKeyMask()));
 
         this.guiComponent = guiComponent;
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

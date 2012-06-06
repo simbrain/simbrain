@@ -25,13 +25,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
-
 
 /**
  * <b>GridLayoutPanel</b> allows the user to define the layout of a network.
  */
-public class GridLayoutPanel extends AbstractLayoutPanel  {
+public class GridLayoutPanel extends AbstractLayoutPanel {
 
     /** Spacing field. */
     private JTextField tfNumColumns = new JTextField();

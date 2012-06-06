@@ -29,7 +29,7 @@ public interface Predicate {
      * Does the object have the relevant property?
      *
      * @param object property to check
-     * @return true if the  predicate applies to the supplied object
+     * @return true if the predicate applies to the supplied object
      */
     public boolean evaluate(final Object object);
 

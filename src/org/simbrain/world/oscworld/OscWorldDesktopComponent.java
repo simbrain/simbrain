@@ -49,8 +49,8 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * OSC world desktop component.
  */
-public final class OscWorldDesktopComponent
-    extends GuiComponent<OscWorldComponent> {
+public final class OscWorldDesktopComponent extends
+        GuiComponent<OscWorldComponent> {
 
     /** List of OSC out message consumers. */
     private final JList consumers;
@@ -58,97 +58,104 @@ public final class OscWorldDesktopComponent
     /** List of OSC in message producers. */
     private final JList producers;
 
-
     /**
-     * Create a new OSC world desktop component with the specified OSC world component.
+     * Create a new OSC world desktop component with the specified OSC world
+     * component.
      *
      * @param frame parent frame
      * @param oscWorldComponent OSC world component
      */
     public OscWorldDesktopComponent(final GenericFrame frame,
-                                    final OscWorldComponent oscWorldComponent) {
+            final OscWorldComponent oscWorldComponent) {
         super(frame, oscWorldComponent);
 
         Action closeAction = new CloseAction();
         Action createOscInMessageAction = new CreateOscInMessageAction();
         Action createOscOutMessageAction = new CreateOscOutMessageAction();
-//        consumers = new JList(new EventListModel(oscWorldComponent.getConsumersEventList()));
-//        producers = new JList(new EventListModel(oscWorldComponent.getProducersEventList()));
+        // consumers = new JList(new
+        // EventListModel(oscWorldComponent.getConsumersEventList()));
+        // producers = new JList(new
+        // EventListModel(oscWorldComponent.getProducersEventList()));
 
         // TODO: Unbreak below!
         consumers = new JList();
         producers = new JList();
 
-        
         consumers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         consumers.setVisibleRowCount(16);
         consumers.addMouseListener(new MouseAdapter() {
-                /** {@inheritDoc} */
-                public void mousePressed(final MouseEvent event) {
-                    if (event.isPopupTrigger()) {
-                        showContextMenu(event);
-                    }
+            /** {@inheritDoc} */
+            public void mousePressed(final MouseEvent event) {
+                if (event.isPopupTrigger()) {
+                    showContextMenu(event);
                 }
+            }
 
-                /** {@inheritDoc} */
-                public void mouseReleased(final MouseEvent event) {
-                    if (event.isPopupTrigger()) {
-                        showContextMenu(event);
-                    }
+            /** {@inheritDoc} */
+            public void mouseReleased(final MouseEvent event) {
+                if (event.isPopupTrigger()) {
+                    showContextMenu(event);
                 }
+            }
 
-                /**
-                 * Show the consumer context menu if a consumer is selected.
-                 *
-                 * @param event mouse event
-                 */
-                private void showContextMenu(final MouseEvent event) {
-                    if (consumers.getSelectedIndex() > -1) {
-//                        JPopupMenu contextMenu = new JPopupMenu();
-//                        OscMessageConsumer consumer = (OscMessageConsumer) consumers.getSelectedValue();
-//                        ProducingAttributeMenu producerMenu = new ProducingAttributeMenu("Receive coupling from", oscWorldComponent.getWorkspace(),
-//                                                                           consumer.getConsumingAttributes().get(0));
-//                        producerMenu.setText("Set input source");
-//                        contextMenu.add(producerMenu);
-//                        contextMenu.show(consumers, event.getX(), event.getY());
-                    }
+            /**
+             * Show the consumer context menu if a consumer is selected.
+             *
+             * @param event mouse event
+             */
+            private void showContextMenu(final MouseEvent event) {
+                if (consumers.getSelectedIndex() > -1) {
+                    // JPopupMenu contextMenu = new JPopupMenu();
+                    // OscMessageConsumer consumer = (OscMessageConsumer)
+                    // consumers.getSelectedValue();
+                    // ProducingAttributeMenu producerMenu = new
+                    // ProducingAttributeMenu("Receive coupling from",
+                    // oscWorldComponent.getWorkspace(),
+                    // consumer.getConsumingAttributes().get(0));
+                    // producerMenu.setText("Set input source");
+                    // contextMenu.add(producerMenu);
+                    // contextMenu.show(consumers, event.getX(), event.getY());
                 }
-            });
+            }
+        });
 
         producers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         producers.setVisibleRowCount(16);
         producers.addMouseListener(new MouseAdapter() {
-                /** {@inheritDoc} */
-                public void mousePressed(final MouseEvent event) {
-                    if (event.isPopupTrigger()) {
-                        showContextMenu(event);
-                    }
+            /** {@inheritDoc} */
+            public void mousePressed(final MouseEvent event) {
+                if (event.isPopupTrigger()) {
+                    showContextMenu(event);
                 }
+            }
 
-                /** {@inheritDoc} */
-                public void mouseReleased(final MouseEvent event) {
-                    if (event.isPopupTrigger()) {
-                        showContextMenu(event);
-                    }
+            /** {@inheritDoc} */
+            public void mouseReleased(final MouseEvent event) {
+                if (event.isPopupTrigger()) {
+                    showContextMenu(event);
                 }
+            }
 
-                /**
-                 * Show the consumer context menu if a consumer is selected.
-                 *
-                 * @param event mouse event
-                 */
-                private void showContextMenu(final MouseEvent event) {
-                    if (producers.getSelectedIndex() > -1) {
-                        JPopupMenu contextMenu = new JPopupMenu();
-//                        OscMessageProducer producer = (OscMessageProducer) producers.getSelectedValue();
-//                        ConsumingAttributeMenu consumerMenu = new ConsumingAttributeMenu("Send coupling to", oscWorldComponent.getWorkspace(),
-//                                                                           producer.getProducingAttributes().get(0));
-//                        consumerMenu.setText("Set output target");
-//                        contextMenu.add(consumerMenu);
-//                        contextMenu.show(producers, event.getX(), event.getY());
-                    }
+            /**
+             * Show the consumer context menu if a consumer is selected.
+             *
+             * @param event mouse event
+             */
+            private void showContextMenu(final MouseEvent event) {
+                if (producers.getSelectedIndex() > -1) {
+                    JPopupMenu contextMenu = new JPopupMenu();
+                    // OscMessageProducer producer = (OscMessageProducer)
+                    // producers.getSelectedValue();
+                    // ConsumingAttributeMenu consumerMenu = new
+                    // ConsumingAttributeMenu("Send coupling to",
+                    // oscWorldComponent.getWorkspace(),
+                    // producer.getProducingAttributes().get(0));
+                    // consumerMenu.setText("Set output target");
+                    // contextMenu.add(consumerMenu);
+                    // contextMenu.show(producers, event.getX(), event.getY());
                 }
-            });
+            }
+        });
 
         JMenuBar menuBar = new JMenuBar();
         JToolBar toolBar = new JToolBar();
@@ -165,15 +172,19 @@ public final class OscWorldDesktopComponent
         getParentFrame().setJMenuBar(menuBar);
 
         LabelledItemPanel inPanel = new LabelledItemPanel();
-        inPanel.addItem("OSC in host:", new JLabel(oscWorldComponent.getOscInHost()));
-        inPanel.addItem("OSC in port:", new JLabel(String.valueOf(oscWorldComponent.getOscInPort())));
-        //inPanel.addSpacing(11);
+        inPanel.addItem("OSC in host:",
+                new JLabel(oscWorldComponent.getOscInHost()));
+        inPanel.addItem("OSC in port:",
+                new JLabel(String.valueOf(oscWorldComponent.getOscInPort())));
+        // inPanel.addSpacing(11);
         inPanel.addItem("OSC in messages:", new JScrollPane(producers));
 
         LabelledItemPanel outPanel = new LabelledItemPanel();
-        outPanel.addItem("OSC out host:", new JLabel(oscWorldComponent.getOscOutHost()));
-        outPanel.addItem("OSC out port:", new JLabel(String.valueOf(oscWorldComponent.getOscOutPort())));
-        //outPanel.addSpacing(11);
+        outPanel.addItem("OSC out host:",
+                new JLabel(oscWorldComponent.getOscOutHost()));
+        outPanel.addItem("OSC out port:",
+                new JLabel(String.valueOf(oscWorldComponent.getOscOutPort())));
+        // outPanel.addSpacing(11);
         outPanel.addItem("OSC out messages:", new JScrollPane(consumers));
 
         JPanel mainPanel = new JPanel();
@@ -192,25 +203,23 @@ public final class OscWorldDesktopComponent
         // empty
     }
 
-
     /**
      * Close action.
      */
-    private final class CloseAction
-        extends AbstractAction {
+    private final class CloseAction extends AbstractAction {
 
         /**
          * Create a new close action.
          */
         CloseAction() {
-            // TODO:  would be nice to have internal frame title here, e.g. "OscWorldDesktop 1"
+            // TODO: would be nice to have internal frame title here, e.g.
+            // "OscWorldDesktop 1"
             super("Close");
             putValue(Action.LONG_DESCRIPTION, "Close");
-            KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_W,
-                                                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+            KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
+                    .getDefaultToolkit().getMenuShortcutKeyMask());
             putValue(Action.ACCELERATOR_KEY, keyStroke);
         }
-
 
         /** {@inheritDoc} */
         public void actionPerformed(final ActionEvent event) {
@@ -221,8 +230,7 @@ public final class OscWorldDesktopComponent
     /**
      * Create OSC in message action.
      */
-    private final class CreateOscInMessageAction
-        extends AbstractAction {
+    private final class CreateOscInMessageAction extends AbstractAction {
 
         /**
          * Create a new create OSC in message action.
@@ -232,24 +240,27 @@ public final class OscWorldDesktopComponent
             putValue(Action.LONG_DESCRIPTION, "Create a new OSC in message");
         }
 
-
         /** {@inheritDoc} */
         public void actionPerformed(final ActionEvent event) {
             SwingUtilities.invokeLater(new Runnable() {
-                    /** {@inheritDoc} */
-                    public void run() {
-                        String address = JOptionPane.showInputDialog(null, "Create a new OSC in message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC in message address:", "Create a new OSC in message", JOptionPane.QUESTION_MESSAGE);
-                        getWorkspaceComponent().addInMessage(address);
-                    }
-                });
+                /** {@inheritDoc} */
+                public void run() {
+                    String address = JOptionPane
+                            .showInputDialog(
+                                    null,
+                                    "Create a new OSC in message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC in message address:",
+                                    "Create a new OSC in message",
+                                    JOptionPane.QUESTION_MESSAGE);
+                    getWorkspaceComponent().addInMessage(address);
+                }
+            });
         }
     }
 
     /**
      * Create OSC out message action.
      */
-    private final class CreateOscOutMessageAction
-        extends AbstractAction {
+    private final class CreateOscOutMessageAction extends AbstractAction {
 
         /**
          * Create a new create OSC out message action.
@@ -259,16 +270,20 @@ public final class OscWorldDesktopComponent
             putValue(Action.LONG_DESCRIPTION, "Create a new OSC out message");
         }
 
-
         /** {@inheritDoc} */
         public void actionPerformed(final ActionEvent event) {
             SwingUtilities.invokeLater(new Runnable() {
-                    /** {@inheritDoc} */
-                    public void run() {
-                        String address = JOptionPane.showInputDialog(null, "Create a new OSC out message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC out message address:", "Create a new OSC out message", JOptionPane.QUESTION_MESSAGE);
-                        getWorkspaceComponent().addOutMessage(address);
-                    }
-                });
+                /** {@inheritDoc} */
+                public void run() {
+                    String address = JOptionPane
+                            .showInputDialog(
+                                    null,
+                                    "Create a new OSC out message with the specified address.\nThe address must begin with a '/' character.\n\n\nOSC out message address:",
+                                    "Create a new OSC out message",
+                                    JOptionPane.QUESTION_MESSAGE);
+                    getWorkspaceComponent().addOutMessage(address);
+                }
+            });
         }
     }
 }

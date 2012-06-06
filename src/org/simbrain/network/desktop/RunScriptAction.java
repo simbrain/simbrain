@@ -37,13 +37,13 @@ import bsh.Interpreter;
  */
 public final class RunScriptAction extends AbstractAction {
 
-    /** Reference to Network Panel*/
+    /** Reference to Network Panel */
     private NetworkPanel networkPanel;
 
     /** Script directory. */
     private static final String SCRIPT_MENU_DIRECTORY = "."
-        + System.getProperty("file.separator") + "scripts"  + System.getProperty("file.separator") + "network" ;
-
+            + System.getProperty("file.separator") + "scripts"
+            + System.getProperty("file.separator") + "network";
 
     /**
      * Create a new script action for the workspace.
@@ -67,11 +67,11 @@ public final class RunScriptAction extends AbstractAction {
                 interpreter.set("networkPanel", networkPanel);
                 interpreter.source(scriptFile.toString());
             } catch (FileNotFoundException e) {
-               System.out.println("File not found");
-               e.printStackTrace();
+                System.out.println("File not found");
+                e.printStackTrace();
             } catch (IOException e) {
-               System.out.println("IO Exception");
-               e.printStackTrace();
+                System.out.println("IO Exception");
+                e.printStackTrace();
             } catch (EvalError e) {
                 System.out.println("Evaluation error");
                 e.printStackTrace();

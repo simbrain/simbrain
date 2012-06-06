@@ -24,7 +24,7 @@ import java.util.Random;
 import org.simbrain.util.Utils;
 
 /**
- * Superclass for data tables with numeric data.  Provides functions for
+ * Superclass for data tables with numeric data. Provides functions for
  * modifying those numeric values, and for import / export from .csv files.
  *
  * @author jyoshimi
@@ -154,11 +154,11 @@ public abstract class NumericTable extends SimbrainDataTable<Double> {
 
         String[][] values = Utils.getStringMatrix(file);
         if (this instanceof MutableTable) {
-            ((MutableTable)this).reset(values.length, values[0].length);            
+            ((MutableTable) this).reset(values.length, values[0].length);
         }
         for (int i = 0; i < values.length; i++) {
             for (int j = 0; j < values[0].length; j++) {
-                if (((String) (values[i][j])).length() > 0) {
+                if ((values[i][j]).length() > 0) {
                     Double num = new Double(0);
                     try {
                         num = Double.valueOf(values[i][j]);
@@ -180,7 +180,7 @@ public abstract class NumericTable extends SimbrainDataTable<Double> {
      */
     public void setData(double[][] data) {
         if (this instanceof MutableTable) {
-            ((MutableTable)this).reset(data.length, data[0].length);            
+            ((MutableTable) this).reset(data.length, data[0].length);
         }
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[0].length; j++) {
@@ -200,13 +200,13 @@ public abstract class NumericTable extends SimbrainDataTable<Double> {
         double returnList[][] = new double[getRowCount()][getColumnCount()];
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                returnList[i][j] = (Double) this.getValue(i, j);
+                returnList[i][j] = this.getValue(i, j);
             }
         }
         return returnList;
     }
 
-    //TODO: Needed?  Also superclass not tested
+    // TODO: Needed? Also superclass not tested
     @Override
     public String[][] asStringArray() {
         double doubleArray[][] = asArray();
@@ -218,6 +218,5 @@ public abstract class NumericTable extends SimbrainDataTable<Double> {
         }
         return stringArray;
     }
-
 
 }

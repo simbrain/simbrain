@@ -23,11 +23,11 @@ import javax.swing.JTextField;
 import org.simbrain.network.gui.NetworkUtils;
 import org.simbrain.network.synapse_update_rules.spikeresponders.ProbabilisticResponder;
 
-
 /**
  * <b>ProbabilisticSpikeResponderPanel</b>.
  */
-public class ProbabilisticSpikeResponderPanel extends AbstractSpikeResponsePanel {
+public class ProbabilisticSpikeResponderPanel extends
+        AbstractSpikeResponsePanel {
 
     /** Activation Probability. */
     private JTextField tfActivationProbability = new JTextField();
@@ -49,17 +49,22 @@ public class ProbabilisticSpikeResponderPanel extends AbstractSpikeResponsePanel
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        ProbabilisticResponder spikeResponder = (ProbabilisticResponder) spikeResponderList.get(0);
+        ProbabilisticResponder spikeResponder = (ProbabilisticResponder) spikeResponderList
+                .get(0);
 
-        tfActivationProbability.setText(Double.toString(spikeResponder.getActivationProbability()));
-        tfResponseValue.setText(Double.toString(spikeResponder.getResponseValue()));
+        tfActivationProbability.setText(Double.toString(spikeResponder
+                .getActivationProbability()));
+        tfResponseValue.setText(Double.toString(spikeResponder
+                .getResponseValue()));
 
-        //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(spikeResponderList, ProbabilisticResponder.class, "getActivationProbability")) {
+        // Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(spikeResponderList,
+                ProbabilisticResponder.class, "getActivationProbability")) {
             tfActivationProbability.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(spikeResponderList, ProbabilisticResponder.class, "getResponseValue")) {
+        if (!NetworkUtils.isConsistent(spikeResponderList,
+                ProbabilisticResponder.class, "getResponseValue")) {
             tfResponseValue.setText(NULL_STRING);
         }
     }
@@ -69,8 +74,10 @@ public class ProbabilisticSpikeResponderPanel extends AbstractSpikeResponsePanel
      */
     public void fillDefaultValues() {
         ProbabilisticResponder spikerRef = new ProbabilisticResponder();
-        tfActivationProbability.setText(Double.toString(spikerRef.getActivationProbability()));
-        tfResponseValue.setText(Double.toString(spikerRef.getActivationProbability()));
+        tfActivationProbability.setText(Double.toString(spikerRef
+                .getActivationProbability()));
+        tfResponseValue.setText(Double.toString(spikerRef
+                .getActivationProbability()));
     }
 
     /**
@@ -78,14 +85,17 @@ public class ProbabilisticSpikeResponderPanel extends AbstractSpikeResponsePanel
      */
     public void commitChanges() {
         for (int i = 0; i < spikeResponderList.size(); i++) {
-            ProbabilisticResponder stepRef = (ProbabilisticResponder) spikeResponderList.get(i);
+            ProbabilisticResponder stepRef = (ProbabilisticResponder) spikeResponderList
+                    .get(i);
 
             if (!tfActivationProbability.getText().equals(NULL_STRING)) {
-                stepRef.setActivationProbability(Double.parseDouble(tfActivationProbability.getText()));
+                stepRef.setActivationProbability(Double
+                        .parseDouble(tfActivationProbability.getText()));
             }
 
             if (!tfResponseValue.getText().equals(NULL_STRING)) {
-                stepRef.setResponseValue(Double.parseDouble(tfResponseValue.getText()));
+                stepRef.setResponseValue(Double.parseDouble(tfResponseValue
+                        .getText()));
             }
         }
     }

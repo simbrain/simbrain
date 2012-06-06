@@ -34,12 +34,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Paste action.
  */
-public final class PasteAction
-    extends AbstractAction {
+public final class PasteAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new paste action with the specified network panel.
@@ -56,18 +54,19 @@ public final class PasteAction
         this.networkPanel = networkPanel;
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_V, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_V,
+                toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Paste.png"));
         updateAction();
         Clipboard.addClipboardListener(new ClipboardListener() {
 
-                /** @see NetworkSelectionListener */
-                public void clipboardChanged() {
-                    updateAction();
-                }
-            });
+            /** @see NetworkSelectionListener */
+            public void clipboardChanged() {
+                updateAction();
+            }
+        });
     }
 
     /**

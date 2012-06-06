@@ -48,19 +48,19 @@ public abstract class ConnectNeurons {
     protected List<? extends Neuron> targetNeurons;
 
     /** The default ratio of excitatory to inhibitory weights. */
-	protected static double DEFAULT_EXCITATORY_RATIO = 0.5;
+    protected static double DEFAULT_EXCITATORY_RATIO = 0.5;
 
-	/** The default excitatory strength. */
-	protected static double DEFAULT_EXCITATORY_STRENGTH = 1;
+    /** The default excitatory strength. */
+    protected static double DEFAULT_EXCITATORY_STRENGTH = 1;
 
-	/** The default inhibitory strength. */
-	protected static double DEFAULT_INHIBITORY_STRENGTH = -1;
+    /** The default inhibitory strength. */
+    protected static double DEFAULT_INHIBITORY_STRENGTH = -1;
 
     /**
      * Ratio of excitatory to inhibitory neurons. 1 means all excitatory, 0
      * means all inhibitory.
      */
-	protected double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
+    protected double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
     /** Template synapse for excitatory synapses. */
     protected Synapse baseExcitatorySynapse = Synapse.getTemplateSynapse();
@@ -83,23 +83,22 @@ public abstract class ConnectNeurons {
     /**
      * Default constructor.
      *
-     * @param network network to receive  connections
+     * @param network network to receive connections
      * @param neurons source neurons
      * @param neurons2 target neurons
      */
     public ConnectNeurons(final Network network,
-    		final List<? extends Neuron> neurons,
-    		final List<? extends Neuron> neurons2) {
+            final List<? extends Neuron> neurons,
+            final List<? extends Neuron> neurons2) {
         this.network = network;
         sourceNeurons = neurons;
         targetNeurons = neurons2;
     }
 
     /**
-     * This parameter-free constructor is used in the desktop.  User:
-     *  - Picks a connection style in the GUI
-     *  - Selects source and target neurons
-     *  - Invokes connection.
+     * This parameter-free constructor is used in the desktop. User: - Picks a
+     * connection style in the GUI - Selects source and target neurons - Invokes
+     * connection.
      */
     public ConnectNeurons() {
     }
@@ -126,10 +125,11 @@ public abstract class ConnectNeurons {
 
     /**
      * An accessor for the parent network.
+     *
      * @return the parent network.
      */
-    public Network getNetwork(){
-    	return network;
+    public Network getNetwork() {
+        return network;
     }
 
     /**
@@ -163,35 +163,36 @@ public abstract class ConnectNeurons {
     /**
      * Sets the ratio of excitatory to inhibitory connections. The inhibitory
      * part of the ratio is assumed to be 1- excitatoryRatio. So, 1 is all
-     * excitatory (1:0), 0 is all inhibitory (0:1), .7 is 70% excitatory (.7:.3), etc.
+     * excitatory (1:0), 0 is all inhibitory (0:1), .7 is 70% excitatory
+     * (.7:.3), etc.
      *
      * @param excitatoryRatio ratio of excitatory to inhibitory connections
      */
-	public void setExcitatoryRatio(double excitatoryRatio) {
+    public void setExcitatoryRatio(double excitatoryRatio) {
         if (excitatoryRatio < 0 || excitatoryRatio > 1.0) {
             throw new IllegalArgumentException("Invalid excitatory ratio value");
         }
-		this.excitatoryRatio = excitatoryRatio;
-	}
+        this.excitatoryRatio = excitatoryRatio;
+    }
 
-	public static double getDefaultRatio() {
-		return DEFAULT_EXCITATORY_RATIO;
-	}
+    public static double getDefaultRatio() {
+        return DEFAULT_EXCITATORY_RATIO;
+    }
 
-	public RandomSource getInhibitoryRandomizer() {
-		return inhibitoryRandomizer;
-	}
+    public RandomSource getInhibitoryRandomizer() {
+        return inhibitoryRandomizer;
+    }
 
-	public RandomSource getExcitatoryRandomizer() {
-		return excitatoryRandomizer;
-	}
+    public RandomSource getExcitatoryRandomizer() {
+        return excitatoryRandomizer;
+    }
 
-	public void setEnableExcitatoryRandomization(boolean enableExRand) {
-		this.enableExcitatoryRandomization = enableExRand;
-	}
+    public void setEnableExcitatoryRandomization(boolean enableExRand) {
+        this.enableExcitatoryRandomization = enableExRand;
+    }
 
-	public void setEnableInhibitoryRandomization(boolean enableInRand) {
-		this.enableInhibitoryRandomization = enableInRand;
-	}
+    public void setEnableInhibitoryRandomization(boolean enableInRand) {
+        this.enableInhibitoryRandomization = enableInRand;
+    }
 
 }

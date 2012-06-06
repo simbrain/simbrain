@@ -38,8 +38,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
     private SimbrainDesktop desktop;
 
     /**
-     * Create an open data world with the specified
-     * workspace.
+     * Create an open data world with the specified workspace.
      */
     public OpenCouplingManagerAction(final SimbrainDesktop desktop) {
         super("Open coupling manager");
@@ -55,7 +54,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         DesktopCouplingManager cm = new DesktopCouplingManager(desktop, frame);
         frame.setTitle("Coupling Manager");
         frame.setContentPane(cm);
-//        frame.setSize(850, 420);
+        // frame.setSize(850, 420);
         frame.setResizable(true);
         frame.setClosable(true);
         frame.setMaximizable(true);

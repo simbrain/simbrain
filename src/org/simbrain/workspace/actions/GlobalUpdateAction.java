@@ -36,50 +36,48 @@ public final class GlobalUpdateAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
-     * Create an open data world with the specified
-     * workspace.
+     * Create an open data world with the specified workspace.
      */
     public GlobalUpdateAction(Workspace workspace) {
         super("Global update", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
         putValue(SHORT_DESCRIPTION, "Global step network update algorithm");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, toolkit
-                .getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
+                toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
 
         // Listen to workspace updater so that this button can be enabled or
         // disabled depending on whether the workspace is running or not.
-        workspace.getUpdater().addUpdaterListener(new WorkspaceUpdaterListener() {
+        workspace.getUpdater().addUpdaterListener(
+                new WorkspaceUpdaterListener() {
 
-            public void changeNumThreads() {
-                // TODO Auto-generated method stub
-            }
+                    public void changeNumThreads() {
+                        // TODO Auto-generated method stub
+                    }
 
-            public void changedUpdateController() {
-                // TODO Auto-generated method stub
-            }
+                    public void changedUpdateController() {
+                        // TODO Auto-generated method stub
+                    }
 
-            public void updatingStarted() {
-                GlobalUpdateAction.this.setEnabled(false);
-            }
+                    public void updatingStarted() {
+                        GlobalUpdateAction.this.setEnabled(false);
+                    }
 
-            public void updatingFinished() {
-                GlobalUpdateAction.this.setEnabled(true);
-            }
+                    public void updatingFinished() {
+                        GlobalUpdateAction.this.setEnabled(true);
+                    }
 
-            public void updatedCouplings(int update) {
-            }
+                    public void updatedCouplings(int update) {
+                    }
 
-            public void workspaceUpdated() {
-            }
+                    public void workspaceUpdated() {
+                    }
 
-        });
+                });
 
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

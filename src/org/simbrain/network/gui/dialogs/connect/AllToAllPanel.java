@@ -40,13 +40,14 @@ import org.simbrain.network.connections.AllToAll;
  */
 public class AllToAllPanel extends AbstractConnectionPanel {
 
-	private ExcitatoryInhibitoryPropertiesPanel eipPanel; 
-	
+    private ExcitatoryInhibitoryPropertiesPanel eipPanel;
+
     /** Allow self connection check box. */
     private JCheckBox allowSelfConnect = new JCheckBox();
 
     /**
      * This method is the default constructor.
+     *
      * @param connection type
      */
     public AllToAllPanel(final AllToAll connection) {
@@ -63,42 +64,40 @@ public class AllToAllPanel extends AbstractConnectionPanel {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         this.add(eipPanel, gbc);
-        
+
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 0, 10);
         gbc.gridy = 9;
         gbc.gridheight = 1;
         this.add(new JSeparator(), gbc);
-        
-        
+
         gbc.gridy = 10;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(10, 5, 0, 10);
-        
+
         JPanel allowSelfConnectPanel = new JPanel();
         FlowLayout ASCPFL = new FlowLayout(FlowLayout.LEFT);
         allowSelfConnectPanel.setLayout(ASCPFL);
         allowSelfConnectPanel.add(new JLabel("Allow Self-Connections: "));
         allowSelfConnectPanel.add(allowSelfConnect);
-        
+
         this.add(allowSelfConnectPanel, gbc);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void commitChanges() {
-    	((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
+        ((AllToAll) connection).setAllowSelfConnection(allowSelfConnect
                 .isSelected());
-    	eipPanel.commitChanges();
+        eipPanel.commitChanges();
     }
-    
 
     /**
      * {@inheritDoc}
      */
     public void fillFieldValues() {
-       
+
     }
 
 }

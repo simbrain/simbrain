@@ -28,12 +28,10 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Paint view action.
  */
-public final class PaintViewAction
-    extends AbstractAction {
+public final class PaintViewAction extends AbstractAction {
 
     /** Vision world. */
     private final VisionWorld visionWorld;
-
 
     /**
      * Create a new paint view action.
@@ -49,7 +47,6 @@ public final class PaintViewAction
         putValue(SMALL_ICON, ResourceManager.getImageIcon("PaintView.png"));
         putValue(SHORT_DESCRIPTION, "Paint View");
     }
-
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {

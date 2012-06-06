@@ -50,7 +50,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * means recreating components, couplings, and update actions. Also some effort
  * has been made to allow reuse between individual component save / reopen and
  * workspace level save / reopen.
- * 
+ *
  * @author Matt Watson
  */
 public class WorkspaceSerializer {
@@ -82,7 +82,8 @@ public class WorkspaceSerializer {
      */
     public void serialize(final OutputStream output) throws IOException {
         ZipOutputStream zipStream = new ZipOutputStream(output);
-        WorkspaceComponentSerializer serializer = new WorkspaceComponentSerializer(zipStream);
+        WorkspaceComponentSerializer serializer = new WorkspaceComponentSerializer(
+                zipStream);
         ArchiveContents archive = new ArchiveContents(workspace, serializer);
 
         workspace.preSerializationInit();
@@ -91,15 +92,18 @@ public class WorkspaceSerializer {
         serializeComponents(serializer, archive, zipStream);
 
         // Serialize couplings
-        for (Coupling<?> coupling : workspace.getCouplingManager().getCouplings()) {
+        for (Coupling<?> coupling : workspace.getCouplingManager()
+                .getCouplings()) {
             archive.addCoupling(coupling);
         }
-        
+
         // Serialize update actions
-        for (UpdateAction action: workspace.getUpdater().getUpdateManager().getActionList()) {
+        for (UpdateAction action : workspace.getUpdater().getUpdateManager()
+                .getActionList()) {
             archive.addUpdateAction(action);
         }
-        for (UpdateAction action: workspace.getUpdater().getUpdateManager().getAvailableActionList()) {
+        for (UpdateAction action : workspace.getUpdater().getUpdateManager()
+                .getAvailableActionList()) {
             archive.addAvailableUpdateAction(action);
         }
 
@@ -117,8 +121,10 @@ public class WorkspaceSerializer {
      * @param zipStream The zipstream to write to.
      * @throws IOException If there is an IO error.
      */
-    private void serializeComponents(final WorkspaceComponentSerializer serializer,
-            final ArchiveContents archive, final ZipOutputStream zipStream) throws IOException {
+    private void serializeComponents(
+            final WorkspaceComponentSerializer serializer,
+            final ArchiveContents archive, final ZipOutputStream zipStream)
+            throws IOException {
 
         for (WorkspaceComponent component : workspace.getComponentList()) {
 
@@ -137,8 +143,8 @@ public class WorkspaceSerializer {
              * it's serialized here.
              */
             if (desktopComponent != null) {
-				ArchiveContents.ArchivedComponent.ArchivedDesktopComponent dc = archiveComp
-						.addDesktopComponent(desktopComponent);
+                ArchiveContents.ArchivedComponent.ArchivedDesktopComponent dc = archiveComp
+                        .addDesktopComponent(desktopComponent);
                 entry = new ZipEntry(dc.getUri());
                 zipStream.putNextEntry(entry);
                 desktopComponent.save(zipStream);
@@ -160,7 +166,8 @@ public class WorkspaceSerializer {
     /**
      * Creates a workspace from a zip compressed input stream.
      *
-     * @param stream The stream to read from.  This is expected to be zip compressed.
+     * @param stream The stream to read from. This is expected to be zip
+     *            compressed.
      * @param exclude The list of uris to ignore on import.
      * @throws IOException if an IO error occurs.
      */
@@ -172,11 +179,12 @@ public class WorkspaceSerializer {
 
         byte[] buffer = new byte[BUFFER_SIZE];
 
-        for (int read; (read = stream.read(buffer)) >= 0; ) {
+        for (int read; (read = stream.read(buffer)) >= 0;) {
             bytes.write(buffer, 0, read);
         }
 
-        ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bytes.toByteArray()));
+        ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(
+                bytes.toByteArray()));
         ArchiveContents contents = null;
         WorkspaceComponentDeserializer componentDeserializer = new WorkspaceComponentDeserializer();
 
@@ -200,13 +208,15 @@ public class WorkspaceSerializer {
 
         // Add Components
         if (contents.getArchivedComponents() != null) {
-            for (ArchiveContents.ArchivedComponent archivedComponent : contents.getArchivedComponents()) {
+            for (ArchiveContents.ArchivedComponent archivedComponent : contents
+                    .getArchivedComponents()) {
                 if (exclude.contains(archivedComponent.getUri())) {
                     continue;
                 }
 
                 WorkspaceComponent wc = componentDeserializer
-                        .deserializeWorkspaceComponent(archivedComponent,
+                        .deserializeWorkspaceComponent(
+                                archivedComponent,
                                 new ByteArrayInputStream(entries
                                         .get(archivedComponent.getUri())));
 
@@ -214,15 +224,15 @@ public class WorkspaceSerializer {
                 // created
                 workspace.addWorkspaceComponent(wc);
 
-				if (archivedComponent.getDesktopComponent() != null) {
-					Rectangle bounds = (Rectangle) new XStream(new DomDriver())
-							.fromXML(new ByteArrayInputStream(entries
-									.get(archivedComponent
-											.getDesktopComponent().getUri())));
-					GuiComponent<?> desktopComponent = desktop
-							.getDesktopComponent(wc);
-					desktopComponent.getParentFrame().setBounds(bounds);
-				}
+                if (archivedComponent.getDesktopComponent() != null) {
+                    Rectangle bounds = (Rectangle) new XStream(new DomDriver())
+                            .fromXML(new ByteArrayInputStream(entries
+                                    .get(archivedComponent
+                                            .getDesktopComponent().getUri())));
+                    GuiComponent<?> desktopComponent = desktop
+                            .getDesktopComponent(wc);
+                    desktopComponent.getParentFrame().setBounds(bounds);
+                }
             }
         }
 
@@ -246,64 +256,90 @@ public class WorkspaceSerializer {
                                 .getParentRef());
 
                 // Get attributes from references
-                Producer<?> producer = (Producer<?>) sourceComponent
+                Producer<?> producer = sourceComponent
                         .getAttributeManager()
                         .createProducer(
-                                sourceComponent.getObjectFromKey(
-                                        couplingRef.getArchivedProducer().getBaseObjectKey()),
-                                        couplingRef.getArchivedProducer().getMethodBaseName(),
-                                        couplingRef.getArchivedProducer().getDataType(),
-                                        couplingRef.getArchivedProducer().getArgumentDataTypes(),
-                                        couplingRef.getArchivedProducer().getArgumentValues(),
-                                        couplingRef.getArchivedProducer().getDescription());
-                
-                Class[] argDataTypes = couplingRef.getArchivedConsumer().getArgumentDataTypes();
-                Consumer<?> consumer = (Consumer<?>) targetComponent
-                        .getAttributeManager()
-                        .createConsumer(
-                                targetComponent.getObjectFromKey(
-                                        couplingRef.getArchivedConsumer().getBaseObjectKey()),
-                                        couplingRef.getArchivedConsumer().getMethodBaseName(),
-                                        argDataTypes,
-                                        couplingRef.getArchivedConsumer().getArgumentValues(),
-                                        couplingRef.getArchivedConsumer().getDescription());
+                                sourceComponent.getObjectFromKey(couplingRef
+                                        .getArchivedProducer()
+                                        .getBaseObjectKey()),
+                                couplingRef.getArchivedProducer()
+                                        .getMethodBaseName(),
+                                couplingRef.getArchivedProducer().getDataType(),
+                                couplingRef.getArchivedProducer()
+                                        .getArgumentDataTypes(),
+                                couplingRef.getArchivedProducer()
+                                        .getArgumentValues(),
+                                couplingRef.getArchivedProducer()
+                                        .getDescription());
+
+                Class[] argDataTypes = couplingRef.getArchivedConsumer()
+                        .getArgumentDataTypes();
+                Consumer<?> consumer = targetComponent
+                        .getAttributeManager().createConsumer(
+                                targetComponent.getObjectFromKey(couplingRef
+                                        .getArchivedConsumer()
+                                        .getBaseObjectKey()),
+                                couplingRef.getArchivedConsumer()
+                                        .getMethodBaseName(),
+                                argDataTypes,
+                                couplingRef.getArchivedConsumer()
+                                        .getArgumentValues(),
+                                couplingRef.getArchivedConsumer()
+                                        .getDescription());
                 workspace.addCoupling(new Coupling(producer, consumer));
 
             }
         }
-        
+
         // Add update actions
-    	workspace.getUpdater().getUpdateManager().clear();
+        workspace.getUpdater().getUpdateManager().clear();
         if (contents.getArchivedActions() != null) {
-            for (ArchiveContents.ArchivedUpdateAction actionRef : contents.getArchivedActions()) {
-            	workspace.getUpdater().getUpdateManager().addAction(contents.createUpdateAction(workspace, componentDeserializer, actionRef));
-            }
-        }        
-        if (contents.getArchivedAvailableActions() != null) {
-            for (ArchiveContents.ArchivedUpdateAction actionRef : contents.getArchivedAvailableActions()) {
-            	workspace.getUpdater().getUpdateManager().addAvailableAction(contents.createUpdateAction(workspace, componentDeserializer, actionRef));
+            for (ArchiveContents.ArchivedUpdateAction actionRef : contents
+                    .getArchivedActions()) {
+                workspace
+                        .getUpdater()
+                        .getUpdateManager()
+                        .addAction(
+                                contents.createUpdateAction(workspace,
+                                        componentDeserializer, actionRef));
             }
         }
-		
-        // Deserialize workspace parameters (serialization occurs in ArchiveContents.java).
+        if (contents.getArchivedAvailableActions() != null) {
+            for (ArchiveContents.ArchivedUpdateAction actionRef : contents
+                    .getArchivedAvailableActions()) {
+                workspace
+                        .getUpdater()
+                        .getUpdateManager()
+                        .addAvailableAction(
+                                contents.createUpdateAction(workspace,
+                                        componentDeserializer, actionRef));
+            }
+        }
+
+        // Deserialize workspace parameters (serialization occurs in
+        // ArchiveContents.java).
         if (contents.getWorkspaceParameters() != null) {
             workspace.setUpdateDelay(contents.getWorkspaceParameters()
-                    .getUpdateDelay());            
+                    .getUpdateDelay());
         }
     }
 
     /**
      * Helper method that will read the InputStream repeatedly until the given
      * array is filled.
+     *
      * @param istream the InputStream to read from.
      * @param bytes the array to write to
      * @throws IOException if there is an IO error
      */
-    private static void read(final InputStream istream, final byte[] bytes) throws IOException {
+    private static void read(final InputStream istream, final byte[] bytes)
+            throws IOException {
         int pos = 0;
         while (pos < bytes.length) {
             int read = istream.read(bytes, pos, bytes.length - pos);
-            if (read < 0) { throw new RuntimeException("premature EOF"); }
+            if (read < 0) {
+                throw new RuntimeException("premature EOF");
+            }
             pos += read;
         }
     }
@@ -311,11 +347,11 @@ public class WorkspaceSerializer {
     /**
      * Helper method for openings workspace components from a file.
      *
-     * A call might look like this 
-     *      <code>NetworkComponent networkComponent =
+     * A call might look like this <code>NetworkComponent networkComponent =
      *      (NetworkComponent) WorkspaceFileOpener(NetworkComponent.class, new File("Net.xml"));</code>
      *
-     * @param fileClass the type of Workpsace component to open; a subclass of WorkspaceComponent.
+     * @param fileClass the type of Workpsace component to open; a subclass of
+     *            WorkspaceComponent.
      * @param file the File to open
      * @return the workspace component
      */
@@ -346,7 +382,7 @@ public class WorkspaceSerializer {
      */
     public static void save(File file, Workspace workspace) {
         if (file != null) {
-            //System.out.println("Workspace Save -->" + file);
+            // System.out.println("Workspace Save -->" + file);
             try {
                 FileOutputStream ostream = new FileOutputStream(file);
                 try {

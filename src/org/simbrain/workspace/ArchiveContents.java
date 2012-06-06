@@ -134,8 +134,9 @@ class ArchiveContents {
             if (coupling != null) {
                 coupling_id = coupling.getId();
             } else {
-                System.err.println("Invalid coupling action found while saving:"
-                        + action.getDescription());
+                System.err
+                        .println("Invalid coupling action found while saving:"
+                                + action.getDescription());
             }
         }
 

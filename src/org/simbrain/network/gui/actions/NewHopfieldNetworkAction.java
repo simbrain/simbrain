@@ -28,12 +28,10 @@ import org.simbrain.network.gui.dialogs.network.HopfieldCreationDialog;
 /**
  * New discrete hopfield network action.
  */
-public final class NewHopfieldNetworkAction
-    extends AbstractAction {
+public final class NewHopfieldNetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new new discrete hopfield network action with the specified
@@ -52,8 +50,6 @@ public final class NewHopfieldNetworkAction
         this.networkPanel = networkPanel;
     }
 
-
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
@@ -62,19 +58,19 @@ public final class NewHopfieldNetworkAction
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
-//        if (!dialog.hasUserCancelled()) {
-//            if (dialog.getType() == HopfieldDialog.DISCRETE) {
-//                DiscreteHopfield hop = new DiscreteHopfield(dialog
-//                        .getNumUnits());
-//                this.addNetwork(hop, dialog.getCurrentLayout());
-//            } else if (dialog.getType() == HopfieldDialog.CONTINUOUS) {
-//                ContinuousHopfield hop = new ContinuousHopfield(dialog
-//                        .getNumUnits());
-//                this.addNetwork(hop, dialog.getCurrentLayout());
-//            }
-//        }
-//
-//        repaint();
+        // if (!dialog.hasUserCancelled()) {
+        // if (dialog.getType() == HopfieldDialog.DISCRETE) {
+        // DiscreteHopfield hop = new DiscreteHopfield(dialog
+        // .getNumUnits());
+        // this.addNetwork(hop, dialog.getCurrentLayout());
+        // } else if (dialog.getType() == HopfieldDialog.CONTINUOUS) {
+        // ContinuousHopfield hop = new ContinuousHopfield(dialog
+        // .getNumUnits());
+        // this.addNetwork(hop, dialog.getCurrentLayout());
+        // }
+        // }
+        //
+        // repaint();
 
     }
 }

@@ -31,7 +31,6 @@ import org.simbrain.network.util.RandomSource;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 
-
 /**
  * <b>IACNeuronPanel</b>.
  */
@@ -85,7 +84,7 @@ public class IACRulePanel extends AbstractNeuronPanel {
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
 
-        //Handle consistency of multiple selections
+        // Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(ruleList, IACRule.class, "getDecay")) {
             tfDecay.setText(NULL_STRING);
         }

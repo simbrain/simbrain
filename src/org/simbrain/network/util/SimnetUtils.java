@@ -15,7 +15,6 @@ package org.simbrain.network.util;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -68,19 +67,19 @@ public class SimnetUtils {
     }
 
     /**
-	 * Set the weights connecting two lists of neurons using a weight matrix.
-	 * Assumes that each row of the matrix corresponds to a source neuron's
-	 * fan-out weight vector, as above. If a weight is missing it is added to
-	 * the root network (from where it can in some cases be routed to a
-	 * SynapseGroup)
-	 * 
-	 * @param network network in which missing weights should be added.
-	 * @param src the list of source neurons
-	 * @param tar the list of target neurons
-	 * @param w the new weight values for the network.
-	 */
-    public static void setWeights(
-            final List<Neuron> src, final List<Neuron> tar, final double[][] w) {
+     * Set the weights connecting two lists of neurons using a weight matrix.
+     * Assumes that each row of the matrix corresponds to a source neuron's
+     * fan-out weight vector, as above. If a weight is missing it is added to
+     * the root network (from where it can in some cases be routed to a
+     * SynapseGroup)
+     *
+     * @param network network in which missing weights should be added.
+     * @param src the list of source neurons
+     * @param tar the list of target neurons
+     * @param w the new weight values for the network.
+     */
+    public static void setWeights(final List<Neuron> src,
+            final List<Neuron> tar, final double[][] w) {
         for (int i = 0; i < src.size(); i++) {
             for (int j = 0; j < tar.size(); j++) {
                 Synapse s = Network.getSynapse(src.get(i), tar.get(j));
@@ -263,7 +262,7 @@ public class SimnetUtils {
 
         // Stop adding layers when the number of layers exceeds this. Here
         // to prevent infinite recursions that result when invalid networks
-        // are used with these methods.  Perhaps there is a better way to
+        // are used with these methods. Perhaps there is a better way to
         // check for such a problem though...
         final int MAXLAYERS = 100;
 

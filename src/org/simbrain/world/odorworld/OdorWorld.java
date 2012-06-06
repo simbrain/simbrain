@@ -97,7 +97,7 @@ public class OdorWorld {
      */
     public void addEntity(final OdorWorldEntity entity) {
 
-       // Set the entity's id
+        // Set the entity's id
         entity.setId(entityIDGenerator.getId());
 
         // Add entity to the map
@@ -111,9 +111,9 @@ public class OdorWorld {
         recomputeMaxStimulusLength();
 
     }
-    
+
     /**
-     * Does the world contain this entity? 
+     * Does the world contain this entity?
      *
      * @param entity the entity to check for
      * @return whether it is in this world or not.
@@ -125,7 +125,7 @@ public class OdorWorld {
     /**
      * Adds an agent and by default adds several sensors and effectors to it.
      *
-     * @param entity the entity  corresponding to the agent
+     * @param entity the entity corresponding to the agent
      */
     public void addAgent(final OdorWorldEntity entity) {
 
@@ -136,15 +136,17 @@ public class OdorWorld {
             // Add effectors (currently none)
 
             // Add sensors
-            entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8, 50));
+            entity.addSensor(new SmellSensor(entity, "Smell-Left", Math.PI / 8,
+                    50));
             entity.addSensor(new SmellSensor(entity, "Smell-Center", 0, 0));
-            entity.addSensor(new SmellSensor(entity, "Smell-Right", -Math.PI / 8, 50));
+            entity.addSensor(new SmellSensor(entity, "Smell-Right",
+                    -Math.PI / 8, 50));
         }
         addEntity(entity);
     }
 
     /**
-     * Returns the entity with the given id, or, failing that, a given name.  If
+     * Returns the entity with the given id, or, failing that, a given name. If
      * no entity is found return null.
      *
      * @param id name of entity
@@ -217,24 +219,24 @@ public class OdorWorld {
         // map.removeSprite(entity);
         if (entityList.contains(entity)) {
             entityList.remove(entity);
-            for(Sensor sensor : entity.getSensors()) {
+            for (Sensor sensor : entity.getSensors()) {
                 fireSensorRemoved(sensor);
             }
-            for(Effector effector : entity.getEffectors()) {
+            for (Effector effector : entity.getEffectors()) {
                 fireEffectorRemoved(effector);
             }
             recomputeMaxStimulusLength();
             fireEntityRemoved(entity);
         }
     }
-    
+
     /**
      * Delete all entities.
      */
     public void deleteAllEntities() {
-    	for (OdorWorldEntity entity : entityList) {
-    		deleteEntity(entity);
-    	}
+        for (OdorWorldEntity entity : entityList) {
+            deleteEntity(entity);
+        }
     }
 
     /**
@@ -277,7 +279,7 @@ public class OdorWorld {
     private Object readResolve() {
         listenerList = new ArrayList<WorldListener>();
         if (agentNameGenerator == null) {
-            agentNameGenerator = new SimpleId("Agent" , 1);
+            agentNameGenerator = new SimpleId("Agent", 1);
         }
 
         for (OdorWorldEntity entity : entityList) {
@@ -315,7 +317,8 @@ public class OdorWorld {
             if (entity == otherEntity) {
                 continue;
             }
-            if (otherEntity.getReducedBounds().intersects(entity.getReducedBounds())) {
+            if (otherEntity.getReducedBounds().intersects(
+                    entity.getReducedBounds())) {
                 otherEntity.setHasCollided(true);
             }
         }
@@ -336,7 +339,8 @@ public class OdorWorld {
         // Update creature
         entity.update(elapsedTime);
 
-        //System.out.println(sprite.getId() + " new - x: " + sprite.getX() + " y:" + sprite.getY());
+        // System.out.println(sprite.getId() + " new - x: " + sprite.getX() +
+        // " y:" + sprite.getY());
     }
 
     /**
@@ -550,6 +554,7 @@ public class OdorWorld {
             firePropertyChangedEvent();
         }
     }
+
     /**
      * @param height the height to set
      */

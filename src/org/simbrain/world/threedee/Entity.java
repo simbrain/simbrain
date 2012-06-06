@@ -3,8 +3,8 @@ package org.simbrain.world.threedee;
 import java.util.List;
 
 /**
- * Abstraction that defines a entity in the environment that agents
- * may interact with.
+ * Abstraction that defines a entity in the environment that agents may interact
+ * with.
  *
  * @author Matt Watson
  */
@@ -39,25 +39,26 @@ public interface Entity {
         private final double strength;
         /** The parent of the odor. */
         private final Entity parent;
-        
+
         /**
          * Creates an odor with the given name and default strength.
-         * 
+         *
          * @param name The name of the odor.
          * @param parent The parent of the odor.
          */
         public Odor(final String name, final Entity parent) {
             this(name, DEFAULT_ODOR_STRENGTH, parent);
         }
-        
+
         /**
          * Creates an odor with the given name and strength.
-         * 
+         *
          * @param name The name of the odor.
          * @param strength The strength of the odor.
          * @param parent The parent of the odor.
          */
-        public Odor(final String name, final double strength, final Entity parent) {
+        public Odor(final String name, final double strength,
+                final Entity parent) {
             this.name = name;
             this.strength = strength;
             this.parent = parent;
@@ -65,7 +66,7 @@ public interface Entity {
 
         /**
          * Returns the name of the odor.
-         * 
+         *
          * @return The name of the odor.
          */
         public String getName() {
@@ -74,20 +75,19 @@ public interface Entity {
 
         /**
          * Returns the strength of the odor.
-         * 
+         *
          * @return The strength of the odor.
          */
         public double getStrength() {
             return strength;
         }
-        
+
         /**
          * Returns the parent of this odor.
-         * 
+         *
          * @return The parent of this odor.
          */
-        public Entity getParent()
-        {
+        public Entity getParent() {
             return parent;
         }
     }

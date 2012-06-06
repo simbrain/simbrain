@@ -40,7 +40,8 @@ import org.simbrain.util.TristateDropDown;
 public class RandomPanel extends LabelledItemPanel implements ActionListener {
 
     /** Distribution combo box. */
-    private JComboBox cbDistribution = new JComboBox(RandomSource.getFunctionList());
+    private JComboBox cbDistribution = new JComboBox(
+            RandomSource.getFunctionList());
 
     /** Upper bound field. */
     private JTextField tfUpBound = new JTextField();
@@ -104,7 +105,8 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     }
 
     /**
-     * Enable or disable the upper and lower bounds fields depending on state of rounding button.
+     * Enable or disable the upper and lower bounds fields depending on state of
+     * rounding button.
      */
     private void checkBounds() {
         if (tsClipping.getSelectedIndex() == TristateDropDown.getFALSE()) {
@@ -137,41 +139,51 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         tsClipping.setSelected(rand.getClipping());
         tfLowBound.setText(Double.toString(rand.getLowerBound()));
         tfUpBound.setText(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        tfStandardDeviation
+                .setText(Double.toString(rand.getStandardDeviation()));
         tfMean.setText(Double.toString(rand.getMean()));
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getDistributionIndex")) {
-            if ((cbDistribution.getItemCount() == RandomSource.getFunctionList().length)) {
+        // Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class,
+                "getDistributionIndex")) {
+            if ((cbDistribution.getItemCount() == RandomSource
+                    .getFunctionList().length)) {
                 cbDistribution.addItem(nullString);
             }
 
-            cbDistribution.setSelectedIndex(RandomSource.getFunctionList().length);
+            cbDistribution
+                    .setSelectedIndex(RandomSource.getFunctionList().length);
         }
 
-        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class,
+                "getClipping")) {
             tsClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getLowerBound")) {
+        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class,
+                "getLowerBound")) {
             tfLowBound.setText(nullString);
         }
 
-        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getUpperBound")) {
+        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class,
+                "getUpperBound")) {
             tfUpBound.setText(nullString);
         }
 
-        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getStandardDeviation")) {
+        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class,
+                "getStandardDeviation")) {
             tfStandardDeviation.setText(nullString);
         }
 
-        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getMean")) {
+        if (!NetworkUtils.isConsistent(randomizers, RandomSource.class,
+                "getMean")) {
             tfMean.setText(nullString);
         }
     }
 
     /**
      * Fills fields with values from a Random Source.
+     *
      * @param rand
      */
     public void fillFieldValues(RandomSource rand) {
@@ -179,10 +191,11 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         tsClipping.setSelected(rand.getClipping());
         tfLowBound.setText(Double.toString(rand.getLowerBound()));
         tfUpBound.setText(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        tfStandardDeviation
+                .setText(Double.toString(rand.getStandardDeviation()));
         tfMean.setText(Double.toString(rand.getMean()));
     }
-    
+
     /**
      * Fills fields with default values.
      */
@@ -192,7 +205,8 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         tsClipping.setSelected(rand.getClipping());
         tfLowBound.setText(Double.toString(rand.getLowerBound()));
         tfUpBound.setText(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        tfStandardDeviation
+                .setText(Double.toString(rand.getStandardDeviation()));
         tfMean.setText(Double.toString(rand.getMean()));
     }
 
@@ -214,8 +228,10 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
             rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
         }
 
-        if (!tfStandardDeviation.getText().equals(nullString) && tfStandardDeviation.isEnabled()) {
-            rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation.getText()));
+        if (!tfStandardDeviation.getText().equals(nullString)
+                && tfStandardDeviation.isEnabled()) {
+            rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation
+                    .getText()));
         }
 
         if (!tfMean.getText().equals(nullString) && tfMean.isEnabled()) {

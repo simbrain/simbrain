@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.LabelledItemPanel;
 
-
 /**
  * <b>LayoutPanel</b> allows the user to define the layout of a network.
  */
@@ -47,7 +46,7 @@ public class LayoutPanel extends JPanel implements ActionListener {
     /** Main panel. */
     private JPanel mainPanel = new JPanel();
 
-    /** Array of layout panels available to a given network type.*/
+    /** Array of layout panels available to a given network type. */
     private AbstractLayoutPanel[] layouts;
 
     /** Parent dialog pane. */
@@ -59,7 +58,8 @@ public class LayoutPanel extends JPanel implements ActionListener {
      * @param parentDialog Dialog calling layout panel
      * @param layouts list of layouts available to a network type.
      */
-    public LayoutPanel(final JDialog parentDialog, final AbstractLayoutPanel[] layouts) {
+    public LayoutPanel(final JDialog parentDialog,
+            final AbstractLayoutPanel[] layouts) {
         this.parentDialog = parentDialog;
         this.setLayout(new BorderLayout());
         this.layouts = layouts;
@@ -81,9 +81,10 @@ public class LayoutPanel extends JPanel implements ActionListener {
 
         for (int i = 0; i < layouts.length; i++) {
             AbstractLayoutPanel layout = layouts[i];
-            if (cbLayouts.getSelectedItem().equals(layout.getNeuronLayout().getLayoutName())) {
+            if (cbLayouts.getSelectedItem().equals(
+                    layout.getNeuronLayout().getLayoutName())) {
                 mainPanel.remove(layoutPanel);
-                layoutPanel  = layout;
+                layoutPanel = layout;
                 mainPanel.add(layoutPanel);
                 break;
             }
@@ -97,7 +98,7 @@ public class LayoutPanel extends JPanel implements ActionListener {
      * @return the new layout
      */
     public Layout getNeuronLayout() {
-     return layoutPanel.getNeuronLayout();
+        return layoutPanel.getNeuronLayout();
     }
 
 }

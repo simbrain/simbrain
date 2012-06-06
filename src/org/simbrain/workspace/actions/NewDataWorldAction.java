@@ -34,8 +34,7 @@ public final class NewDataWorldAction extends WorkspaceAction {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Create a new data world action with the specified
-     * workspace.
+     * Create a new data world action with the specified workspace.
      */
     public NewDataWorldAction(Workspace workspace) {
         super("Data World", workspace);

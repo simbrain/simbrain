@@ -28,8 +28,8 @@ import org.simbrain.network.core.Synapse;
 
 /**
  * <b>CopyPaste</b> provides utilities for creating copies of arbitrary
- * collections of network objects (neurons, synapses, groups, text
- * objects, etc.).
+ * collections of network objects (neurons, synapses, groups, text objects,
+ * etc.).
  */
 public class CopyPaste {
 
@@ -47,24 +47,23 @@ public class CopyPaste {
 
         ArrayList<Object> ret = new ArrayList<Object>();
         // Match new to old neurons for synapse adding
-        Hashtable<Neuron, Neuron> neuronMappings =
-            new Hashtable<Neuron, Neuron>();
+        Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
         ArrayList<Synapse> synapses = new ArrayList<Synapse>();
 
         for (Object item : items) {
             if (item instanceof Neuron) {
-				Neuron oldNeuron = ((Neuron) item);
-				Neuron newNeuron = new Neuron(newParent, oldNeuron);
-				ret.add(newNeuron);
-				neuronMappings.put(oldNeuron, newNeuron);
+                Neuron oldNeuron = ((Neuron) item);
+                Neuron newNeuron = new Neuron(newParent, oldNeuron);
+                ret.add(newNeuron);
+                neuronMappings.put(oldNeuron, newNeuron);
             } else if (item instanceof Synapse) {
                 if (!isStranded((Synapse) item, items)) {
                     synapses.add((Synapse) item);
                 }
             } else if (item instanceof NetworkTextObject) {
                 NetworkTextObject text = ((NetworkTextObject) item);
-                NetworkTextObject newText = new NetworkTextObject(
-                        newParent, text);
+                NetworkTextObject newText = new NetworkTextObject(newParent,
+                        text);
                 ret.add(newText);
             }
         }
@@ -72,9 +71,8 @@ public class CopyPaste {
         // Copy synapses
         for (Synapse synapse : synapses) {
             // Parent network for the new synapses inherited from neurons
-            Synapse newSynapse = new Synapse(
-                    neuronMappings.get(synapse.getSource()),
-                    neuronMappings.get(synapse.getTarget()),
+            Synapse newSynapse = new Synapse(neuronMappings.get(synapse
+                    .getSource()), neuronMappings.get(synapse.getTarget()),
                     synapse.getLearningRule().deepCopy(), synapse);
             ret.add(newSynapse);
         }

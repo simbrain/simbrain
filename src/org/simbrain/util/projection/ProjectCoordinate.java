@@ -33,7 +33,7 @@ public class ProjectCoordinate extends ProjectionMethod {
 
     /**
      * ProjectionMethod coordinate constructor.
-     * 
+     *
      * @param set ProjectionMethod setting
      */
     public ProjectCoordinate(final Settings set) {
@@ -42,7 +42,7 @@ public class ProjectCoordinate extends ProjectionMethod {
 
     /**
      * Initializes the coordinage dataset.
-     * 
+     *
      * @param up Upper data set
      * @param down Lower data set
      */
@@ -146,7 +146,7 @@ public class ProjectCoordinate extends ProjectionMethod {
     /**
      * In auto-find the projection automatically uses the most variant
      * dimensions.
-     * 
+     *
      * @return true if in auto-find mode, false otherwise
      */
     public boolean isAutoFind() {
@@ -156,7 +156,7 @@ public class ProjectCoordinate extends ProjectionMethod {
     /**
      * In auto-find the projection automatically uses the most variant
      * dimensions.
-     * 
+     *
      * @param b whether to use auto-find mode
      */
     public void setAutoFind(final boolean b) {

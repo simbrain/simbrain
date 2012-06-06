@@ -21,7 +21,6 @@ package org.simbrain.network.layouts;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 
 /**
@@ -57,7 +56,6 @@ public class LineLayout implements Layout {
     /** Spacing between neurons. */
     private double spacing = 40;
 
-
     /**
      * Create a layout.
      *
@@ -88,7 +86,8 @@ public class LineLayout implements Layout {
     /**
      * Default Constructor.
      */
-    public LineLayout() { }
+    public LineLayout() {
+    }
 
     /**
      * {@inheritDoc}
@@ -134,7 +133,7 @@ public class LineLayout implements Layout {
      */
     public void setOrientation(final LineOrientation orientation) {
         this.orientation = orientation;
-        //System.out.println("LineLayout orientation: " + this.orientation);
+        // System.out.println("LineLayout orientation: " + this.orientation);
     }
 
     /**

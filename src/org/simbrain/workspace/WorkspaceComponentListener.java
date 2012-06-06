@@ -26,7 +26,6 @@ package org.simbrain.workspace;
  */
 public interface WorkspaceComponentListener {
 
-
     /**
      * Called when the workspace component is updated.
      */
@@ -35,11 +34,11 @@ public interface WorkspaceComponentListener {
     /**
      * Called when the component's gui(s) are turned on or off.
      */
-	public void guiToggled();
+    public void guiToggled();
 
     /**
      * Called when the component is turned on or off.
      */
-	public void componentOnOffToggled();
+    public void componentOnOffToggled();
 
 }

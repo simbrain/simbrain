@@ -27,25 +27,25 @@ import cern.colt.matrix.impl.SparseObjectMatrix2D;
 /**
  * Sparse sensor matrix.
  */
-public final class SparseSensorMatrix
-    extends AbstractSensorMatrix {
+public final class SparseSensorMatrix extends AbstractSensorMatrix {
 
     /** 2D object matrix of sensors. */
     private final ObjectMatrix2D sensors;
-
 
     /**
      * Create a new sparse sensor matrix with the specified filter.
      *
      * @param rows number of rows, must be <code>&gt;= 1</code>
      * @param columns number of columns, must be <code>&gt;= 1</code>
-     * @param receptiveFieldWidth receptive field width, must be <code>&gt;= 0</code>
-     * @param receptiveFieldHeight receptive field height, must be <code>&gt;= 0</code>
+     * @param receptiveFieldWidth receptive field width, must be
+     *            <code>&gt;= 0</code>
+     * @param receptiveFieldHeight receptive field height, must be
+     *            <code>&gt;= 0</code>
      * @param defaultFilter default filter
      */
     public SparseSensorMatrix(final int rows, final int columns,
-                              final int receptiveFieldWidth, final int receptiveFieldHeight,
-                              final Filter defaultFilter) {
+            final int receptiveFieldWidth, final int receptiveFieldHeight,
+            final Filter defaultFilter) {
         super(receptiveFieldWidth, receptiveFieldHeight, defaultFilter);
         if (rows < 1) {
             throw new IllegalArgumentException("rows must be >= 1");
@@ -55,7 +55,6 @@ public final class SparseSensorMatrix
         }
         sensors = new SparseObjectMatrix2D(rows, columns);
     }
-
 
     /** {@inheritDoc} */
     public int rows() {

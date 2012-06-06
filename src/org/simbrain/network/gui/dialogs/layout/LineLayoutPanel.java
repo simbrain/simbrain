@@ -16,8 +16,6 @@ package org.simbrain.network.gui.dialogs.layout;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 
@@ -32,7 +30,7 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
     /** Layout style selected. */
     private JComboBox cbLayouts = new JComboBox(new LineOrientation[] {
             LineOrientation.HORIZONTAL, LineOrientation.VERTICAL });
-    
+
     /** Reference to the underlying layout. */
     private final LineLayout layout;
 
@@ -47,8 +45,7 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
 
     @Override
     public void commitChanges() {
-        layout
-                .setOrientation((LineOrientation) cbLayouts.getSelectedItem());
+        layout.setOrientation((LineOrientation) cbLayouts.getSelectedItem());
         layout.setSpacing(Double.parseDouble(tfSpacing.getText()));
     }
 

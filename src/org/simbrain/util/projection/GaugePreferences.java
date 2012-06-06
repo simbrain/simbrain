@@ -23,18 +23,18 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * <b>GaugePreferences</b> handles storage and retrieval of user preferences, e.g.
- * background color for the GaugePanel, point size, etc.
+ * <b>GaugePreferences</b> handles storage and retrieval of user preferences,
+ * e.g. background color for the GaugePanel, point size, etc.
  */
 public final class GaugePreferences {
-    
+
     /**
      * Private constructor prevents instantiation.
      */
     private GaugePreferences() {
         /* no implementation */
     }
-    
+
     /** The default tolerance. */
     private static final double DEFAULT_TOLERANCE = .5;
     /** The default perturbation. */
@@ -43,14 +43,14 @@ public final class GaugePreferences {
     private static final int DEFAULT_ITERATIONS_BETWEEN_UPDATES = 10;
     /** The default epsilon. */
     private static final int DEFAULT_EPSILON = 3;
-    
+
     /** User preferences. */
-    private static final Preferences GAUGE_PREFERENCES = Preferences.userRoot().node(
-        "/org/simbrain/gauge");
-    
+    private static final Preferences GAUGE_PREFERENCES = Preferences.userRoot()
+            .node("/org/simbrain/gauge");
+
     /** File system separator. */
     public static final String FS = System.getProperty("file.separator");
-    
+
     /**
      * Save all user preferences.
      */
@@ -104,11 +104,11 @@ public final class GaugePreferences {
         setEpsilon(getDefaultEpsilon());
     }
 
-    //////////////////////////////////////////////////////////////////
-    // Getters and setters for user preferences                     //
-    // Note that default values for preferences are stored in the   //
-    // second argument of the getter method                         //
-    //////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////
+    // Getters and setters for user preferences //
+    // Note that default values for preferences are stored in the //
+    // second argument of the getter method //
+    // ////////////////////////////////////////////////////////////////
     /**
      * @param rgbColor Sets Background color.
      */
@@ -120,7 +120,8 @@ public final class GaugePreferences {
      * @return Current background color.
      */
     public static int getBackgroundColor() {
-        return GAUGE_PREFERENCES.getInt("BackgroundColor", getDefaultBackgroundColor());
+        return GAUGE_PREFERENCES.getInt("BackgroundColor",
+                getDefaultBackgroundColor());
     }
 
     /**
@@ -162,7 +163,8 @@ public final class GaugePreferences {
      * @return Default color.
      */
     public static int getDefaultColor() {
-        return GAUGE_PREFERENCES.getInt("DefaultColor", getDefaultDefaultColor());
+        return GAUGE_PREFERENCES.getInt("DefaultColor",
+                getDefaultDefaultColor());
     }
 
     /**
@@ -186,8 +188,6 @@ public final class GaugePreferences {
         return GAUGE_PREFERENCES.getDouble("Tolerance", getDefaultTolerance());
     }
 
-    
-    
     /**
      * @return Default tolerance
      */
@@ -206,7 +206,8 @@ public final class GaugePreferences {
      * @return Current perturbation amount.
      */
     public static double getPerturbationAmount() {
-        return GAUGE_PREFERENCES.getDouble("PerturbationAmount", getDefaultPerturbationAmount());
+        return GAUGE_PREFERENCES.getDouble("PerturbationAmount",
+                getDefaultPerturbationAmount());
     }
 
     /**
@@ -248,7 +249,8 @@ public final class GaugePreferences {
      * @return Current set status bar value.
      */
     public static boolean getShowStatusBar() {
-        return GAUGE_PREFERENCES.getBoolean("ShowStatusBar", getDefaultShowStatusBar());
+        return GAUGE_PREFERENCES.getBoolean("ShowStatusBar",
+                getDefaultShowStatusBar());
     }
 
     /**
@@ -269,7 +271,8 @@ public final class GaugePreferences {
      * @return Current color data points value.
      */
     public static boolean getColorDataPoints() {
-        return GAUGE_PREFERENCES.getBoolean("ColorDataPoints", getDefaultColorDataPoints());
+        return GAUGE_PREFERENCES.getBoolean("ColorDataPoints",
+                getDefaultColorDataPoints());
     }
 
     /**
@@ -312,7 +315,7 @@ public final class GaugePreferences {
      */
     public static int getIterationsBetweenUpdates() {
         return GAUGE_PREFERENCES.getInt("IterationsBetweenUptates",
-            getDefaultIterationsBetweenUpdates());
+                getDefaultIterationsBetweenUpdates());
     }
 
     /**
@@ -438,7 +441,8 @@ public final class GaugePreferences {
      * @return Current default projector value.
      */
     public static String getDefaultProjector() {
-        return GAUGE_PREFERENCES.get("DefaultProjector", getDefaultDefaultProjector());
+        return GAUGE_PREFERENCES.get("DefaultProjector",
+                getDefaultDefaultProjector());
     }
 
     /**
@@ -459,7 +463,8 @@ public final class GaugePreferences {
      * @return Current directory value.
      */
     public static String getCurrentDirectory() {
-        return GAUGE_PREFERENCES.get("CurrentDirectory", getDefaultCurrentDirectory());
+        return GAUGE_PREFERENCES.get("CurrentDirectory",
+                getDefaultCurrentDirectory());
     }
 
     /**

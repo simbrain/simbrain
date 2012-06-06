@@ -26,10 +26,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
 /**
- * <b>LabelledItemPanel</b> provides a panel for laying out labelled elements neatly with all the labels and elements
- * aligned down the screen.
+ * <b>LabelledItemPanel</b> provides a panel for laying out labelled elements
+ * neatly with all the labels and elements aligned down the screen.
  *
  * @author David Fraser
  * @author Michael Harris
@@ -69,7 +68,8 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * This method adds a labelled item to the panel. The item is added to the row below the last item added.
+     * This method adds a labelled item to the panel. The item is added to the
+     * row below the last item added.
      *
      * @param labelText The label text for the item.
      * @param item The item to be added.
@@ -104,7 +104,8 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * Modification of addItem which takes a label, rather than text, as an argument.
+     * Modification of addItem which takes a label, rather than text, as an
+     * argument.
      *
      * @param label Label to be added
      * @param item SimbrainComponent to be added

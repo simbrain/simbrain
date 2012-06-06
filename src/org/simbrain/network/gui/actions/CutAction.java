@@ -33,12 +33,10 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Cut action.
  */
-public final class CutAction
-    extends AbstractAction {
+public final class CutAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
-
 
     /**
      * Create a new cut action with the specified network panel.
@@ -55,7 +53,8 @@ public final class CutAction
         this.networkPanel = networkPanel;
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_X, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_X,
+                toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Cut.png"));
@@ -64,11 +63,11 @@ public final class CutAction
         // add a selection listener to update state based on selection
         networkPanel.addSelectionListener(new NetworkSelectionListener() {
 
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent event) {
-                    updateAction();
-                }
-            });
+            /** @see NetworkSelectionListener */
+            public void selectionChanged(final NetworkSelectionEvent event) {
+                updateAction();
+            }
+        });
     }
 
     /**

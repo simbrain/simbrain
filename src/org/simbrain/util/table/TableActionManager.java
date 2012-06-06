@@ -110,7 +110,6 @@ public class TableActionManager {
         };
     }
 
-
     /**
      * Action for randomizing table.
      *
@@ -368,7 +367,7 @@ public class TableActionManager {
             public void actionPerformed(ActionEvent arg0) {
                 if (table.getSelectedRow() != -1) {
                     ((MutableTable) table.getData()).insertRow(
-                            table.getSelectedRow(), new Double(0));                    
+                            table.getSelectedRow(), new Double(0));
                 }
             }
 
@@ -429,8 +428,9 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                // TODO: For this and others, if not use a sensible value (for not selected case)
-                // selection = getSelectedRow or else it = 
+                // TODO: For this and others, if not use a sensible value (for
+                // not selected case)
+                // selection = getSelectedRow or else it =
                 if (jtable.getSelectedRow() != -1) {
                     ((MutableTable) jtable.getData()).removeRow(jtable
                             .getSelectedRow());
@@ -492,7 +492,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String numRows = (String) JOptionPane.showInputDialog(null,
+                String numRows = JOptionPane.showInputDialog(null,
                         "Number of rows to add:", "5");
                 table.addRows(Integer.parseInt(numRows), 0);
             }
@@ -521,7 +521,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String numCols = (String) JOptionPane.showInputDialog(null,
+                String numCols = JOptionPane.showInputDialog(null,
                         "Number of columns to add:", "5");
                 table.addColumns(Integer.parseInt(numCols), 0);
             }
@@ -580,7 +580,7 @@ public class TableActionManager {
              * {@inheritDoc}
              */
             public void actionPerformed(ActionEvent arg0) {
-                String val = (String) JOptionPane.showInputDialog(null,
+                String val = JOptionPane.showInputDialog(null,
                         "Value:", "0");
                 table.fill(Double.parseDouble(val));
             }

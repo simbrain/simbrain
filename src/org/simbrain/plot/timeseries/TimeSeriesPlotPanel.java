@@ -83,16 +83,15 @@ public class TimeSeriesPlotPanel extends JPanel {
     public void init() {
 
         // Generate the graph
-        chart = ChartFactory.createXYLineChart(
-            "Time series", // Title
-            "Iterations", // x-axis Label
-            "Value(s)", // y-axis Label
-            model.getDataset(), // Dataset
-            PlotOrientation.VERTICAL, // Plot Orientation
-            true, // Show Legend
-            true, // Use tooltips
-            false // Configure chart to generate URLs?
-        );
+        chart = ChartFactory.createXYLineChart("Time series", // Title
+                "Iterations", // x-axis Label
+                "Value(s)", // y-axis Label
+                model.getDataset(), // Dataset
+                PlotOrientation.VERTICAL, // Plot Orientation
+                true, // Show Legend
+                true, // Use tooltips
+                false // Configure chart to generate URLs?
+                );
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 
@@ -101,20 +100,22 @@ public class TimeSeriesPlotPanel extends JPanel {
             public void chartSettingsUpdated() {
 
                 // Handle range properties
-                chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
+                chart.getXYPlot().getRangeAxis()
+                        .setAutoRange(model.isAutoRange());
                 if (!model.isAutoRange()) {
-                    chart.getXYPlot().getRangeAxis().setRange(
-                            model.getRangeLowerBound(),
-                            model.getRangeUpperBound());
+                    chart.getXYPlot()
+                            .getRangeAxis()
+                            .setRange(model.getRangeLowerBound(),
+                                    model.getRangeUpperBound());
                 }
 
                 // Handle domain properties
                 if (model.isFixedWidth()) {
-                    chart.getXYPlot().getDomainAxis().setFixedAutoRange(
-                            model.getWindowSize());
+                    chart.getXYPlot().getDomainAxis()
+                            .setFixedAutoRange(model.getWindowSize());
                 } else {
-                   chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
-                   chart.getXYPlot().getDomainAxis().setAutoRange(true);
+                    chart.getXYPlot().getDomainAxis().setFixedAutoRange(-1);
+                    chart.getXYPlot().getDomainAxis().setAutoRange(true);
                 }
 
             }
@@ -144,7 +145,8 @@ public class TimeSeriesPlotPanel extends JPanel {
      */
     public void addAddDeleteButtons() {
         JButton deleteButton = new JButton("Delete");
-        deleteButton.setAction(TimeSeriesPlotActions.getRemoveSourceAction(this));
+        deleteButton.setAction(TimeSeriesPlotActions
+                .getRemoveSourceAction(this));
         JButton addButton = new JButton("Add");
         addButton.setAction(TimeSeriesPlotActions.getAddSourceAction(this));
         buttonPanel.add(deleteButton);
@@ -165,10 +167,11 @@ public class TimeSeriesPlotPanel extends JPanel {
      * Add button for showing preferences.
      */
     public void addPreferencesButton() {
-      JButton prefsButton = new JButton("Prefs");
-      prefsButton.setHideActionText(true);
-      prefsButton.setAction(TimeSeriesPlotActions.getPropertiesDialogAction(this));
-      buttonPanel.add(prefsButton);
+        JButton prefsButton = new JButton("Prefs");
+        prefsButton.setHideActionText(true);
+        prefsButton.setAction(TimeSeriesPlotActions
+                .getPropertiesDialogAction(this));
+        buttonPanel.add(prefsButton);
     }
 
     /**

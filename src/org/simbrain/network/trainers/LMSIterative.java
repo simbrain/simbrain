@@ -24,7 +24,6 @@ import java.util.List;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.ClampedNeuronRule;
@@ -37,7 +36,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
  */
 public class LMSIterative extends IterableTrainer {
 
-	/** Current error. */
+    /** Current error. */
     private double rmsError;
 
     /** Learning rate. */
@@ -49,9 +48,9 @@ public class LMSIterative extends IterableTrainer {
      * @param network
      */
     public LMSIterative(Trainable network) {
-		super(network);
-	}
-    
+        super(network);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -62,7 +61,7 @@ public class LMSIterative extends IterableTrainer {
     @Override
     public void apply() {
 
-    	rmsError = 0;
+        rmsError = 0;
 
         // Set local variables
         int numRows = network.getInputData().length;
@@ -74,12 +73,12 @@ public class LMSIterative extends IterableTrainer {
 
             // Set input layer values
             for (int i = 0; i < numInputs; i++) {
-                network.getInputNeurons().get(i).setActivation(network.getInputData()[row][i]);
+                network.getInputNeurons().get(i)
+                        .setActivation(network.getInputData()[row][i]);
             }
 
             // Update output node
             Network.updateNeurons(network.getOutputNeurons());
-
 
             // Iterate through weights and biases and update them
             for (int i = 0; i < numOutputs; i++) {
@@ -94,18 +93,21 @@ public class LMSIterative extends IterableTrainer {
                 for (Synapse synapse : outputNeuron.getFanIn()) {
                     double deltaW = (learningRate * error * synapse.getSource()
                             .getActivation());
-                    //System.out.println(Utils.round(deltaW,2) + "=" + error + " * " + synapse.getSource()
-                    //        .getActivation());
+                    // System.out.println(Utils.round(deltaW,2) + "=" + error +
+                    // " * " + synapse.getSource()
+                    // .getActivation());
                     synapse.setStrength(synapse.getStrength() + deltaW);
                 }
 
-                //System.out.println("Row " + row + "," + outputNeuron.getId() + ":"
-                //        + targetValue + " - " + 
-                //        Utils.round(outputNeuron.getActivation(),2) + " (" + 
-                //        Utils.round(error,2) + ")");                
+                // System.out.println("Row " + row + "," + outputNeuron.getId()
+                // + ":"
+                // + targetValue + " - " +
+                // Utils.round(outputNeuron.getActivation(),2) + " (" +
+                // Utils.round(error,2) + ")");
 
                 // Update bias of target neuron
-                BiasedUpdateRule bias = (BiasedUpdateRule)outputNeuron.getUpdateRule();
+                BiasedUpdateRule bias = (BiasedUpdateRule) outputNeuron
+                        .getUpdateRule();
                 bias.setBias(bias.getBias() + (learningRate * error));
             }
             rmsError = Math.sqrt(rmsError / (numInputs * numOutputs));
@@ -114,21 +116,21 @@ public class LMSIterative extends IterableTrainer {
         incrementIteration();
     }
 
-
     /**
-	 * A standard way of randomizing networks to which LMSIterative is applied,
-	 * by randomizing bias on output nodes and the single layer of weights.
-	 */
+     * A standard way of randomizing networks to which LMSIterative is applied,
+     * by randomizing bias on output nodes and the single layer of weights.
+     */
     public void randomize() {
         for (Neuron neuron : network.getOutputNeurons()) {
             neuron.clear(); // Looks nicer in the GUI
             neuron.randomizeFanIn();
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
-                ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(Math.random());
+                ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(Math
+                        .random());
             }
         }
     }
-    
+
     /**
      * @return the learningRate
      */
@@ -171,21 +173,21 @@ public class LMSIterative extends IterableTrainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 4; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuronRule()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
             network.addNeuron(neuron);
             inputLayer.add(neuron);
-            //System.out.println("Input " + i + " = " + neuron.getId());
+            // System.out.println("Input " + i + " = " + neuron.getId());
         }
 
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
             Neuron neuron = new Neuron(network, new LinearRule());
-            ((BiasedUpdateRule)neuron.getUpdateRule()).setBias(0);
+            ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);
-            //System.out.println("Output " + i + " = " + neuron.getId());
+            // System.out.println("Output " + i + " = " + neuron.getId());
             outputLayer.add(neuron);
         }
 
@@ -194,27 +196,36 @@ public class LMSIterative extends IterableTrainer {
         connection.connectNeurons();
 
         // Set initial weights (from an Emergent sim)
-        Network.getSynapse(inputLayer.get(0), outputLayer.get(0)).setStrength(.352391);
-        Network.getSynapse(inputLayer.get(1), outputLayer.get(0)).setStrength(.354468);
-        Network.getSynapse(inputLayer.get(2), outputLayer.get(0)).setStrength(.338344);
-        Network.getSynapse(inputLayer.get(3), outputLayer.get(0)).setStrength(.3593);
-        Network.getSynapse(inputLayer.get(0), outputLayer.get(1)).setStrength(.561543);
-        Network.getSynapse(inputLayer.get(1), outputLayer.get(1)).setStrength(.584706);
-        Network.getSynapse(inputLayer.get(2), outputLayer.get(1)).setStrength(.355258);
-        Network.getSynapse(inputLayer.get(3), outputLayer.get(1)).setStrength(.555266);
+        Network.getSynapse(inputLayer.get(0), outputLayer.get(0)).setStrength(
+                .352391);
+        Network.getSynapse(inputLayer.get(1), outputLayer.get(0)).setStrength(
+                .354468);
+        Network.getSynapse(inputLayer.get(2), outputLayer.get(0)).setStrength(
+                .338344);
+        Network.getSynapse(inputLayer.get(3), outputLayer.get(0)).setStrength(
+                .3593);
+        Network.getSynapse(inputLayer.get(0), outputLayer.get(1)).setStrength(
+                .561543);
+        Network.getSynapse(inputLayer.get(1), outputLayer.get(1)).setStrength(
+                .584706);
+        Network.getSynapse(inputLayer.get(2), outputLayer.get(1)).setStrength(
+                .355258);
+        Network.getSynapse(inputLayer.get(3), outputLayer.get(1)).setStrength(
+                .555266);
 
         // Initialize the trainer
-        //REDO
-//        LMSIterative trainer = new LMSIterative(network, inputLayer, outputLayer);
-//        network.setInputData(inputData);
-//        trainer.setTrainingData(trainingData);
-//        int epochs = 1000; // Error gets low with 1000 epochs
-//        for (int i = 0; i < epochs; i++) {
-//            trainer.apply();
-//            //System.out.println(network);
-//            System.out.println("Epoch " + i + ", error = "
-//                    + ((IterableAlgorithm) trainer).getError());
-//        }
+        // REDO
+        // LMSIterative trainer = new LMSIterative(network, inputLayer,
+        // outputLayer);
+        // network.setInputData(inputData);
+        // trainer.setTrainingData(trainingData);
+        // int epochs = 1000; // Error gets low with 1000 epochs
+        // for (int i = 0; i < epochs; i++) {
+        // trainer.apply();
+        // //System.out.println(network);
+        // System.out.println("Epoch " + i + ", error = "
+        // + ((IterableAlgorithm) trainer).getError());
+        // }
     }
 
     /**
@@ -222,8 +233,8 @@ public class LMSIterative extends IterableTrainer {
      */
     public static void test() {
 
-        double inputData[][] = { { 1, 1}, {-1,1}, {1,-1},{-1,-1}};
-        double trainingData[][] = { {1},{0},{0},{0}};
+        double inputData[][] = { { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 } };
+        double trainingData[][] = { { 1 }, { 0 }, { 0 }, { 0 } };
 
         // TODO: Long API! Must be shortcuts...
 
@@ -233,21 +244,21 @@ public class LMSIterative extends IterableTrainer {
         // Set up input layer
         List<Neuron> inputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 2; i++) {
-            Neuron neuron = new Neuron(network, new ClampedNeuronRule()); 
+            Neuron neuron = new Neuron(network, new ClampedNeuronRule());
             network.addNeuron(neuron);
             inputLayer.add(neuron);
-            //System.out.println("Input " + i + " = " + neuron.getId());
+            // System.out.println("Input " + i + " = " + neuron.getId());
         }
 
         // Set up output layer
         List<Neuron> outputLayer = new ArrayList<Neuron>();
         for (int i = 0; i < 1; i++) {
-            Neuron neuron = new Neuron(network, new LinearRule()); 
-            ((BiasedUpdateRule)neuron.getUpdateRule()).setBias(0);
+            Neuron neuron = new Neuron(network, new LinearRule());
+            ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
             neuron.setLowerBound(0);
             neuron.setUpperBound(1);
             network.addNeuron(neuron);
-            //System.out.println("Output " + i + " = " + neuron.getId());
+            // System.out.println("Output " + i + " = " + neuron.getId());
             outputLayer.add(neuron);
         }
 
@@ -259,18 +270,19 @@ public class LMSIterative extends IterableTrainer {
         network.randomizeWeights();
 
         // Initialize the trainer
-        //REDO
-//        LMSIterative trainer = new LMSIterative(network, inputLayer, outputLayer);
-//        trainer.learningRate = .01;
-//        trainer.setInputData(inputData);
-//        trainer.setTrainingData(trainingData);
-//        int epochs = 1000;
-//        for (int i = 0; i < epochs; i++) {
-//            trainer.apply();
-//            //System.out.println(network);
-//            System.out.println("Epoch " + i + ", error = "
-//                    + ((IterableAlgorithm) trainer).getError());
-//        }
+        // REDO
+        // LMSIterative trainer = new LMSIterative(network, inputLayer,
+        // outputLayer);
+        // trainer.learningRate = .01;
+        // trainer.setInputData(inputData);
+        // trainer.setTrainingData(trainingData);
+        // int epochs = 1000;
+        // for (int i = 0; i < epochs; i++) {
+        // trainer.apply();
+        // //System.out.println(network);
+        // System.out.println("Epoch " + i + ", error = "
+        // + ((IterableAlgorithm) trainer).getError());
+        // }
     }
 
 }

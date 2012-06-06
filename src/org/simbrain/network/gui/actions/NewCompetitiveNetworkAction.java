@@ -28,16 +28,14 @@ import org.simbrain.network.gui.dialogs.network.CompetitiveCreationDialog;
 /**
  * New competitive network action.
  */
-public final class NewCompetitiveNetworkAction
-    extends AbstractAction {
+public final class NewCompetitiveNetworkAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new new competitive network action with the specified
-     * network panel.
+     * Create a new new competitive network action with the specified network
+     * panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -52,20 +50,20 @@ public final class NewCompetitiveNetworkAction
         this.networkPanel = networkPanel;
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        CompetitiveCreationDialog dialog = new CompetitiveCreationDialog(networkPanel);
+        CompetitiveCreationDialog dialog = new CompetitiveCreationDialog(
+                networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
-//        if (!dialog.hasUserCancelled()) {
-//            Competitive compNet = new Competitive(dialog.getNumberOfNeurons());
-//            compNet.setEpsilon(dialog.getEpsilon());
-//            this.addNetwork(compNet, "Line");
-//       }
-//       renderObjects();
+        // if (!dialog.hasUserCancelled()) {
+        // Competitive compNet = new Competitive(dialog.getNumberOfNeurons());
+        // compNet.setEpsilon(dialog.getEpsilon());
+        // this.addNetwork(compNet, "Line");
+        // }
+        // renderObjects();
     }
 }

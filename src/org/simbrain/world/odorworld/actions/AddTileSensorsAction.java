@@ -28,8 +28,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 /**
  * Action for adding tile sensors.
  */
-public final class AddTileSensorsAction
-    extends AbstractAction {
+public final class AddTileSensorsAction extends AbstractAction {
 
     /** Entity to add tile sensors to. */
     private final OdorWorldEntity entity;
@@ -40,21 +39,17 @@ public final class AddTileSensorsAction
      * @param component GUI component, must not be null.
      */
     public AddTileSensorsAction(OdorWorldEntity entity) {
-        super("Add Tile Sensors" );
+        super("Add Tile Sensors");
         this.entity = entity;
-        //putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        // putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
         putValue(SHORT_DESCRIPTION, "Add tile sensors...");
     }
 
-
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        // TODO: Quick and dirty here.  Make a proper dialog!
-        String resultString = (String) JOptionPane
-        .showInputDialog(
-                null,
-                "Rows, Columns, Offset.",
-                "10,10,0");
+        // TODO: Quick and dirty here. Make a proper dialog!
+        String resultString = JOptionPane.showInputDialog(null,
+                "Rows, Columns, Offset.", "10,10,0");
         if (resultString != null) {
             String[] parsedString = resultString.split(",");
             int rows = Integer.parseInt(parsedString[0]);

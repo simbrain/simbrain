@@ -30,16 +30,13 @@ import org.simbrain.resource.ResourceManager;
 /**
  * Clamps neurons action.
  */
-public final class ClampNeuronsAction
-    extends AbstractAction {
+public final class ClampNeuronsAction extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-
     /**
-     * Create a new clamp neurons action with the specified
-     * network panel.
+     * Create a new clamp neurons action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
@@ -53,7 +50,6 @@ public final class ClampNeuronsAction
 
         this.networkPanel = networkPanel;
 
-
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp_N.png"));
         putValue(SHORT_DESCRIPTION, "Clamp Neurons");
     }
@@ -62,7 +58,7 @@ public final class ClampNeuronsAction
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-//        JToggleButton cb = (JToggleButton) event.getSource();
+        // JToggleButton cb = (JToggleButton) event.getSource();
         if (event.getSource() instanceof JToggleButton) {
             JToggleButton cb = (JToggleButton) event.getSource();
             networkPanel.getNetwork().setClampNeurons(cb.isSelected());
@@ -72,7 +68,7 @@ public final class ClampNeuronsAction
         }
 
         // Determine status
-//        networkPanel.getNetwork().setClampNeurons(cb.isSelected());
+        // networkPanel.getNetwork().setClampNeurons(cb.isSelected());
 
     }
 }

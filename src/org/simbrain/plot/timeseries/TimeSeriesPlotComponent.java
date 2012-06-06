@@ -39,9 +39,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     /** Time Series consumer type. */
     private AttributeType timeSeriesConsumerType;
 
-     /** Objects which can be used to add data to time series plot. */
+    /** Objects which can be used to add data to time series plot. */
     private List<TimeSeriesSetter> setterList = new ArrayList<TimeSeriesSetter>();
-
 
     /**
      * Create new time series plot component.
@@ -57,13 +56,14 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * Creates a new time series component from a specified model.
-     * Used in deserializing.
+     * Creates a new time series component from a specified model. Used in
+     * deserializing.
      *
      * @param name chart name
      * @param model chart model
      */
-    public TimeSeriesPlotComponent(final String name, final TimeSeriesModel model) {
+    public TimeSeriesPlotComponent(final String name,
+            final TimeSeriesModel model) {
         super(name);
         this.model = model;
         initializeAttributes();
@@ -84,13 +84,12 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         addListener();
     }
 
-
-
-   /**
+    /**
      * Initialize consuming attributes.
      */
     private void initializeAttributes() {
-        timeSeriesConsumerType = new AttributeType(this, "Series", "setValue", double.class, true);
+        timeSeriesConsumerType = new AttributeType(this, "Series", "setValue",
+                double.class, true);
         addConsumerType(timeSeriesConsumerType);
         for (int i = 0; i < model.getDataset().getSeriesCount(); i++) {
             addTimeSeriesSetter(i);
@@ -131,15 +130,17 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (timeSeriesConsumerType.isVisible()) {
             for (TimeSeriesSetter setter : setterList) {
-                String description = timeSeriesConsumerType.getSimpleDescription("Time Series " + setter.getIndex());
+                String description = timeSeriesConsumerType
+                        .getSimpleDescription("Time Series "
+                                + setter.getIndex());
                 PotentialConsumer consumerID = getAttributeManager()
-                        .createPotentialConsumer(setter, timeSeriesConsumerType, description);
+                        .createPotentialConsumer(setter,
+                                timeSeriesConsumerType, description);
                 returnList.add(consumerID);
             }
         }
         return returnList;
     }
-
 
     /**
      * Add chart listener to model.
@@ -190,7 +191,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         try {
             int i = Integer.parseInt(objectKey);
             TimeSeriesSetter setter = new TimeSeriesSetter(i);
-            return  setter;
+            return setter;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
         }
@@ -204,10 +205,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return null;
     }
 
-
     /**
-     * Standard method call made to objects after they are deserialized.
-     * See:
+     * Standard method call made to objects after they are deserialized. See:
      * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
      *
@@ -219,6 +218,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     /**
      * Opens a saved time series plot.
+     *
      * @param input stream
      * @param name name of file
      * @param format format
@@ -226,7 +226,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      */
     public static TimeSeriesPlotComponent open(final InputStream input,
             final String name, final String format) {
-        TimeSeriesModel dataModel = (TimeSeriesModel) TimeSeriesModel.getXStream().fromXML(input);
+        TimeSeriesModel dataModel = (TimeSeriesModel) TimeSeriesModel
+                .getXStream().fromXML(input);
         return new TimeSeriesPlotComponent(name, dataModel);
     }
 

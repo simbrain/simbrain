@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 /**
  * For testing ReflectivePropertyEditor.
- * 
+ *
  * @author Jeff Yoshimi
  */
 public class TestObject {
@@ -41,7 +41,7 @@ public class TestObject {
     short theShort = 20; // TODO: Figure out about shorts...
 
     // Array test(s)
-    double[] doubleArray = new double[]{.1,.2,.3,4};
+    double[] doubleArray = new double[] { .1, .2, .3, 4 };
 
     // Enum / Combo Box test
     private TestEnum theEnum = TestEnum.FOUR;
@@ -81,7 +81,7 @@ public class TestObject {
 
     /*
      * Wrap the enum object in a ComboBoxable wrapper
-     * 
+     *
      * @return the boxable
      */
     public ComboBoxWrapper getEnumeration() {
@@ -100,9 +100,8 @@ public class TestObject {
 
     /**
      * Sets the enumeration based on a boxable object.
-     * 
-     * @param boxable
-     *            the boxable to set
+     *
+     * @param boxable the boxable to set
      */
     public void setEnumeration(ComboBoxWrapper object) {
         theEnum = (TestEnum) object.getCurrentObject();
@@ -110,15 +109,15 @@ public class TestObject {
 
     /**
      * Simple test routine.
-     * 
-     * @param args
-     *            not used.
+     *
+     * @param args not used.
      */
     public static void main(String[] args) {
 
         // Test ReflectivePropertyEditor as a panel with ok / cancel
         TestObject testObject = new TestObject();
-        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(testObject);
+        ReflectivePropertyEditor editor = new ReflectivePropertyEditor(
+                testObject);
         JDialog dialog = editor.getDialog();
         dialog.pack();
         dialog.setVisible(true);
@@ -156,8 +155,7 @@ public class TestObject {
     }
 
     /**
-     * @param theColor
-     *            the theColor to set
+     * @param theColor the theColor to set
      */
     public void setTheColor(Color theColor) {
         this.theColor = theColor;
@@ -171,8 +169,7 @@ public class TestObject {
     }
 
     /**
-     * @param theBool
-     *            the theBool to set
+     * @param theBool the theBool to set
      */
     public void setTheBool(boolean theBool) {
         this.theBool = theBool;
@@ -186,8 +183,7 @@ public class TestObject {
     }
 
     /**
-     * @param theBooleanObject
-     *            the theBooleanObject to set
+     * @param theBooleanObject the theBooleanObject to set
      */
     public void setTheBooleanObject(Boolean theBooleanObject) {
         this.theBooleanObject = theBooleanObject;
@@ -201,8 +197,7 @@ public class TestObject {
     }
 
     /**
-     * @param theString
-     *            the theString to set
+     * @param theString the theString to set
      */
     public void setTheString(String theString) {
         this.theString = theString;
@@ -216,8 +211,7 @@ public class TestObject {
     }
 
     /**
-     * @param theIntObject
-     *            the theIntObject to set
+     * @param theIntObject the theIntObject to set
      */
     public void setTheIntObject(Integer theIntObject) {
         this.theIntObject = theIntObject;
@@ -231,8 +225,7 @@ public class TestObject {
     }
 
     /**
-     * @param theDoubleObject
-     *            the theDoubleObject to set
+     * @param theDoubleObject the theDoubleObject to set
      */
     public void setTheDoubleObject(Double theDoubleObject) {
         this.theDoubleObject = theDoubleObject;
@@ -246,8 +239,7 @@ public class TestObject {
     }
 
     /**
-     * @param theFloatObject
-     *            the theFloatObject to set
+     * @param theFloatObject the theFloatObject to set
      */
     public void setTheFloatObject(Float theFloatObject) {
         this.theFloatObject = theFloatObject;
@@ -261,8 +253,7 @@ public class TestObject {
     }
 
     /**
-     * @param theLongObject
-     *            the theLongObject to set
+     * @param theLongObject the theLongObject to set
      */
     public void setTheLongObject(Long theLongObject) {
         this.theLongObject = theLongObject;
@@ -276,8 +267,7 @@ public class TestObject {
     }
 
     /**
-     * @param theShortObject
-     *            the theShortObject to set
+     * @param theShortObject the theShortObject to set
      */
     public void setTheShortObject(Short theShortObject) {
         this.theShortObject = theShortObject;
@@ -291,8 +281,7 @@ public class TestObject {
     }
 
     /**
-     * @param theInt
-     *            the theInt to set
+     * @param theInt the theInt to set
      */
     public void setTheInt(int theInt) {
         this.theInt = theInt;
@@ -306,8 +295,7 @@ public class TestObject {
     }
 
     /**
-     * @param theDouble
-     *            the theDouble to set
+     * @param theDouble the theDouble to set
      */
     public void setTheDouble(double theDouble) {
         this.theDouble = theDouble;
@@ -321,8 +309,7 @@ public class TestObject {
     }
 
     /**
-     * @param theFloat
-     *            the theFloat to set
+     * @param theFloat the theFloat to set
      */
     public void setTheFloat(float theFloat) {
         this.theFloat = theFloat;
@@ -336,8 +323,7 @@ public class TestObject {
     }
 
     /**
-     * @param theLong
-     *            the theLong to set
+     * @param theLong the theLong to set
      */
     public void setTheLong(long theLong) {
         this.theLong = theLong;
@@ -351,8 +337,7 @@ public class TestObject {
     }
 
     /**
-     * @param theShort
-     *            the theShort to set
+     * @param theShort the theShort to set
      */
     public void setTheShort(short theShort) {
         this.theShort = theShort;

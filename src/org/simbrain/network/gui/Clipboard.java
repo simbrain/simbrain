@@ -26,11 +26,8 @@ import java.util.Iterator;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.network.util.CopyPaste;
 import org.simbrain.network.util.SimnetUtils;
-
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -78,9 +75,11 @@ public class Clipboard {
         // Create a copy of the clipboard objects.
         ArrayList copy = CopyPaste.getCopy(net.getNetwork(), clipboard);
 
-        // Gather data for translating the object then add the objects to the network.
+        // Gather data for translating the object then add the objects to the
+        // network.
         Point2D upperLeft = SimnetUtils.getUpperLeft(clipboard);
-        translate(copy, getPasteOffset(net, upperLeft,  "X"), getPasteOffset(net, upperLeft, "Y"));
+        translate(copy, getPasteOffset(net, upperLeft, "X"),
+                getPasteOffset(net, upperLeft, "Y"));
         net.getNetwork().addObjects(copy);
 
         // Select pasted items
@@ -95,13 +94,14 @@ public class Clipboard {
      * @param list list of objects.
      * @return list of objects to be selected after pasting.
      */
-    private static ArrayList getPostPasteSelectionObjects(final NetworkPanel net, final ArrayList list) {
+    private static ArrayList getPostPasteSelectionObjects(
+            final NetworkPanel net, final ArrayList list) {
         ArrayList<Object> ret = new ArrayList<Object>();
         for (Object object : list) {
             if (object instanceof Neuron) {
-                ret.add((NeuronNode)net.getObjectNodeMap().get(object));
+                ret.add(net.getObjectNodeMap().get(object));
             } else if (object instanceof NetworkTextObject) {
-                ret.add((TextNode)net.getObjectNodeMap().get(object));
+                ret.add(net.getObjectNodeMap().get(object));
             }
         }
         return ret;
@@ -115,39 +115,42 @@ public class Clipboard {
     }
 
     /**
-     * Returns the paste offset.  Handles complexities of paste-trails.
+     * Returns the paste offset. Handles complexities of paste-trails.
      *
-     * Begin where the last object was pasted (default to a standard position if none has).
-     * Add the size of the object.
-     * Add the number of recent clicks times the paste increment. 
+     * Begin where the last object was pasted (default to a standard position if
+     * none has). Add the size of the object. Add the number of recent clicks
+     * times the paste increment.
      *
      * @param net reference to network panel.
      * @param upperLeft the upper left of the group of objects to be pasted
      * @param xOrY whether to return x or y offset.
      * @return the offset for the pasted items.
      */
-    private static double getPasteOffset(final NetworkPanel net, final Point2D upperLeft, final String xOrY) {
+    private static double getPasteOffset(final NetworkPanel net,
+            final Point2D upperLeft, final String xOrY) {
 
         if (xOrY.equals("X")) {
-            return (net.getBeginPosition().getX() - upperLeft.getX()
-                    - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "X")));
+            return (net.getBeginPosition().getX() - upperLeft.getX() - ((net
+                    .getNumberOfPastes() + 1) * getPasteIncrement(net, "X")));
         } else {
-            return (net.getBeginPosition().getY() - upperLeft.getY()
-                    - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
+            return (net.getBeginPosition().getY() - upperLeft.getY() - ((net
+                    .getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
         }
     }
 
     /**
      * Private method for handling complexities of paste-trails.
      *
-     * When first pasting, paste at the default location relative to the original paste.
-     * Otherwise use the paste increment computed by the network.
+     * When first pasting, paste at the default location relative to the
+     * original paste. Otherwise use the paste increment computed by the
+     * network.
      *
      * @param net Reference to network
      * @param xOrY Whether to look at x or y values
      * @return the proper paste increment
      */
-    private static double getPasteIncrement(final NetworkPanel net, final String xOrY) {
+    private static double getPasteIncrement(final NetworkPanel net,
+            final String xOrY) {
 
         if (xOrY.equals("X")) {
             if (net.getPasteX() != 0) {
@@ -180,7 +183,7 @@ public class Clipboard {
      * Fire a clipboard changed event to all registered model listeners.
      */
     public static void fireClipboardChanged() {
-        for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
             ClipboardListener listener = (ClipboardListener) i.next();
             listener.clipboardChanged();
         }
@@ -193,7 +196,8 @@ public class Clipboard {
      * @param offsetX x offset for translation.
      * @param offsetY y offset for translation.
      */
-    public static void translate(final ArrayList objects, final double offsetX, final double offsetY) {
+    public static void translate(final ArrayList objects, final double offsetX,
+            final double offsetY) {
         for (Object object : objects) {
             if (object instanceof Neuron) {
                 Neuron neuron = (Neuron) object;

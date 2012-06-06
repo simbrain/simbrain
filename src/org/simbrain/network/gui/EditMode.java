@@ -42,7 +42,8 @@ public final class EditMode {
     private Cursor cursor;
 
     /** Selection edit mode. */
-    public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
+    public static final EditMode SELECTION = new EditMode("selection",
+            "Arrow.png");
 
     /** Pan edit mode. */
     public static final EditMode PAN = new EditMode("pan", "Pan.png");
@@ -51,7 +52,8 @@ public final class EditMode {
     public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomIn.png");
 
     /** Zoom out edit mode. */
-    public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.png");
+    public static final EditMode ZOOM_OUT = new EditMode("zoom out",
+            "ZoomOut.png");
 
     /** Text edit mode. */
     public static final EditMode TEXT = new EditMode("text", "Text.png");
@@ -60,9 +62,10 @@ public final class EditMode {
     private static final int DEFAULT_WAND_RADIUS = 40;
 
     /** Wand mode mode. */
-    public static final EditMode WAND = new EditMode("wand", DEFAULT_WAND_RADIUS);
+    public static final EditMode WAND = new EditMode("wand",
+            DEFAULT_WAND_RADIUS);
 
-   /** Radius of wand in wand mode. */
+    /** Radius of wand in wand mode. */
     private int wandRadius = DEFAULT_WAND_RADIUS;
 
     /**
@@ -83,10 +86,10 @@ public final class EditMode {
     }
 
     BufferedImage image;
-    
+
     /**
      * Construct a "wand" edit mode. TODO: Is this the right place for this?
-     * 
+     *
      * @param name name of edit mode
      * @param radius radius of wand
      */
@@ -141,11 +144,11 @@ public final class EditMode {
     }
 
     /**
-     * Return true if this edit mode is either <code>ZOOM_IN</code>
-     * or <code>ZOOM_OUT</code>.
+     * Return true if this edit mode is either <code>ZOOM_IN</code> or
+     * <code>ZOOM_OUT</code>.
      *
-     * @return true if this edit mode is either <code>ZOOM_IN</code>
-     *    or <code>ZOOM_OUT</code>
+     * @return true if this edit mode is either <code>ZOOM_IN</code> or
+     *         <code>ZOOM_OUT</code>
      */
     public boolean isZoom() {
         return ((this == ZOOM_IN) || (this == ZOOM_OUT));

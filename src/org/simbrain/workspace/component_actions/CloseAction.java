@@ -28,18 +28,15 @@ import javax.swing.KeyStroke;
 import org.simbrain.workspace.WorkspaceComponent;
 
 /**
- * Close component action.  For use in individual component menus.
+ * Close component action. For use in individual component menus.
  */
-public final class CloseAction
-    extends AbstractAction {
+public final class CloseAction extends AbstractAction {
 
     /** Parent component. */
     private final WorkspaceComponent workspaceComponent;
 
-
     /**
-     * Create a new close network action with the specified.
-     * network panel.
+     * Create a new close network action with the specified. network panel.
      *
      * @param workspaceComponent component, must not be null
      */
@@ -48,16 +45,17 @@ public final class CloseAction
         super("Close");
 
         if (workspaceComponent == null) {
-            throw new IllegalArgumentException("networkDesktopComponent must not be null");
+            throw new IllegalArgumentException(
+                    "networkDesktopComponent must not be null");
         }
 
         this.workspaceComponent = workspaceComponent;
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+                KeyEvent.VK_W, Toolkit.getDefaultToolkit()
+                        .getMenuShortcutKeyMask()));
 
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

@@ -19,7 +19,7 @@ import com.jmex.awt.SimpleCanvasImpl;
 
 /**
  * Implements a canvas that renders the perspective of an Agent.
- * 
+ *
  * @author Matt Watson
  */
 public class AgentView extends SimpleCanvasImpl {
@@ -27,21 +27,19 @@ public class AgentView extends SimpleCanvasImpl {
     private static final Logger LOGGER = Logger.getLogger(AgentView.class);
     /** The default serial version ID. */
     private static final long serialVersionUID = 1L;
-    
+
     /** The environment this view is displaying. */
     private final Environment environment;
-    
+
     /** The viewable that controls what is seen. */
     private final Agent agent;
-    
-    private final ConcurrentLinkedQueue<FutureTask<Matrix>> queue 
-      = new ConcurrentLinkedQueue<FutureTask<Matrix>>();
-  
-    
+
+    private final ConcurrentLinkedQueue<FutureTask<Matrix>> queue = new ConcurrentLinkedQueue<FutureTask<Matrix>>();
+
     /**
      * Constructs an instance with the provided Viewable and Environment at the
      * given width and height.
-     * 
+     *
      * @param viewable the viewable that controls the view
      * @param environment the environment this view displays
      * @param width the width
@@ -50,29 +48,29 @@ public class AgentView extends SimpleCanvasImpl {
     AgentView(final Agent viewable, final Environment environment,
             final int width, final int height) {
         super(width, height);
-    
+
         this.environment = environment;
         this.agent = viewable;
     }
-    
+
     public int getWidth() {
         return width;
     }
-    
+
     public int getHeight() {
         return height;
     }
-    
+
     /**
      * Returns the renderer for the canvas.
-     * 
+     *
      * @return the renderer for the canvas
      */
     @Override
     public Renderer getRenderer() {
         return renderer;
     }
-    
+
     /**
      * Calls init on the environment and viewable.
      */
@@ -82,23 +80,22 @@ public class AgentView extends SimpleCanvasImpl {
         LOGGER.debug("frustum right: " + cam.getFrustumRight());
         LOGGER.debug("frustum top: " + cam.getFrustumTop());
         LOGGER.debug("frustum bottom: " + cam.getFrustumBottom());
-    
+
         /*
-         * Sets up a cullstate to improve performance
-         * This will prevent triangles that are not visible
-         * from be rendered.
+         * Sets up a cullstate to improve performance This will prevent
+         * triangles that are not visible from be rendered.
          */
         CullState cs = renderer.createCullState();
         cs.setCullMode(CullState.CS_BACK);
         rootNode.setRenderState(cs);
-        
+
         environment.init(agent, getRenderer(), rootNode);
     }
-    
+
     public void close() {
         environment.remove(getRenderer());
     }
-    
+
     /**
      * Calls update on the camera.
      */
@@ -106,7 +103,7 @@ public class AgentView extends SimpleCanvasImpl {
     public void simpleUpdate() {
         cam.update();
     }
-    
+
     /**
      * Calls render on the viewable.
      */
@@ -114,16 +111,16 @@ public class AgentView extends SimpleCanvasImpl {
     public void simpleRender() {
         agent.render(cam);
     }
-    
+
     @Override
     public void doRender() {
         super.doRender();
-        
+
         for (FutureTask<Matrix> grab; (grab = queue.poll()) != null;) {
             grab.run();
         }
     }
-    
+
     public BufferedImage getSnapshot() {
         Callable<Matrix> exe = new Callable<Matrix>() {
             public Matrix call() {
@@ -133,12 +130,12 @@ public class AgentView extends SimpleCanvasImpl {
                 return matrix;
             }
         };
-        
+
         FutureTask<Matrix> grab = new FutureTask<Matrix>(exe);
-        
+
         queue.add(grab);
         Matrix matrix;
-        
+
         try {
             matrix = grab.get();
         } catch (InterruptedException e) {
@@ -146,36 +143,37 @@ public class AgentView extends SimpleCanvasImpl {
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
-                
-        int xOffset = 12;//(mode.getWidth() - width) / 2;
-        int yOffset = 34;//(mode.getHeight() - height) / 2;
-        
-        BufferedImage image = new BufferedImage(width - xOffset, height - yOffset, BufferedImage.TYPE_INT_RGB);
+
+        int xOffset = 12;// (mode.getWidth() - width) / 2;
+        int yOffset = 34;// (mode.getHeight() - height) / 2;
+
+        BufferedImage image = new BufferedImage(width - xOffset, height
+                - yOffset, BufferedImage.TYPE_INT_RGB);
 
         /* Grab each pixel information and set it to the BufferedImage info. */
         for (int x = 0; x < width - xOffset; x++) {
             for (int y = 0; y < height - yOffset; y++) {
                 int rgb = matrix.get(x, (height - 1) - y);
-               
+
                 image.setRGB(x, y, rgb);
             }
         }
-        
+
         return image;
     }
-    
+
     private static class Matrix {
         final IntBuffer buffer;
         final int width;
         final int height;
-        
+
         Matrix(int width, int height) {
             this.buffer = ByteBuffer.allocateDirect(width * height * 4)
-                .order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
+                    .order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
             this.width = width;
             this.height = height;
         }
-        
+
         int get(final int x, final int y) {
             try {
                 return buffer.get((y * width) + x);

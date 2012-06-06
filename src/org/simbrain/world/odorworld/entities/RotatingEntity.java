@@ -31,7 +31,7 @@ import org.simbrain.world.odorworld.OdorWorld;
 public class RotatingEntity extends OdorWorldEntity {
 
     /** Images for various angles. */
-    private TreeMap<Double, Animation>  imageMap;
+    private TreeMap<Double, Animation> imageMap;
 
     /** Current heading / orientation. */
     private double heading = DEFAULT_HEADING;
@@ -52,17 +52,17 @@ public class RotatingEntity extends OdorWorldEntity {
     private static final String DEFAULT_TYPE = "Mouse";
 
     // TODO: Poorly named. Image or image-set name.
-    /** Type; used to load images. */  
+    /** Type; used to load images. */
     private String entityType = DEFAULT_TYPE;
 
     /** Obvious... */
     private final static double DEGREES_IN_A_CIRCLE = 360;
 
-     /**
-      * Create a rotating entity using default map.
-      *
-      * @param world parent world
-      */
+    /**
+     * Create a rotating entity using default map.
+     *
+     * @param world parent world
+     */
     public RotatingEntity(final OdorWorld world) {
         super(world);
         initTreeMap();
@@ -106,7 +106,7 @@ public class RotatingEntity extends OdorWorldEntity {
      * @param d the orientation, in degrees
      */
     public void setHeading(final double d) {
-        //System.out.println("setOrientation:" + d);
+        // System.out.println("setOrientation:" + d);
         heading = d;
         updateImageBasedOnHeading();
         getParentWorld().fireEntityChanged(this);
@@ -129,7 +129,7 @@ public class RotatingEntity extends OdorWorldEntity {
      */
     private double computeAngle(final double val) {
 
-        //TODO: This will not work for vals greater or less than 360
+        // TODO: This will not work for vals greater or less than 360
         double retVal = val;
         if (val >= DEGREES_IN_A_CIRCLE) {
             retVal -= DEGREES_IN_A_CIRCLE;
@@ -148,10 +148,10 @@ public class RotatingEntity extends OdorWorldEntity {
 
         behavior.apply(elapsedTime);
 
-        if  (!isBlocked()) {
-            heading =  computeAngle(heading);
-            //System.out.println("heading:" + heading);
-            //TODO: only do this if heading has changed
+        if (!isBlocked()) {
+            heading = computeAngle(heading);
+            // System.out.println("heading:" + heading);
+            // TODO: only do this if heading has changed
             updateImageBasedOnHeading();
             getAnimation().update(elapsedTime);
         }
@@ -162,7 +162,7 @@ public class RotatingEntity extends OdorWorldEntity {
      */
     private void updateImageBasedOnHeading() {
         for (Entry<Double, Animation> entry : imageMap.entrySet()) {
-            //System.out.println("" + heading + "-" + entry.getKey());
+            // System.out.println("" + heading + "-" + entry.getKey());
             if (heading < entry.getKey()) {
                 setAnimation(entry.getValue());
                 break;
@@ -268,7 +268,8 @@ public class RotatingEntity extends OdorWorldEntity {
     }
 
     /**
-     *  Move the entity in a straight line relative to its current heading.
+     * Move the entity in a straight line relative to its current heading.
+     *
      * @param amount
      */
     public void goStraight(double amount) {

@@ -23,55 +23,58 @@ import bsh.Interpreter;
 
 /**
  * Update using a custom action saved as a beanshell script.
- * 
+ *
  * @author jyoshimi
  */
 public class UpdateActionCustom implements UpdateAction {
 
     /** Provides access to workspace updater. */
     private final WorkspaceUpdater updater;
-        
+
     /** The custom update script in persistable string form. */
     private String scriptString;
 
-    /** The interpreter for converting the the script into an executable update action. */
+    /**
+     * The interpreter for converting the the script into an executable update
+     * action.
+     */
     private Interpreter interpreter = new Interpreter();
 
     /** Custom update action. */
     private UpdateAction theAction;
-    
+
     /**
      * @param controls update controls
      */
-	public UpdateActionCustom(final WorkspaceUpdater updater,
-			final String script) {
-		this.updater = updater;
-		this.scriptString = script;
-		init();
-	}
-	
-	/**
-	 * Initialize the interpreter.
-	 */
-	public void init() {
-		if (interpreter == null) {
-			interpreter = new Interpreter();
-		}
-		try {
-			interpreter.set("updater", updater);
-			interpreter.set("workspace", updater.getWorkspace());
-			interpreter.eval(scriptString);
-			theAction = ((UpdateAction)interpreter.get("action"));
-		} catch (EvalError e) {
-			e.printStackTrace();
-		}		
-	}
-    
-    /** 
+    public UpdateActionCustom(final WorkspaceUpdater updater,
+            final String script) {
+        this.updater = updater;
+        this.scriptString = script;
+        init();
+    }
+
+    /**
+     * Initialize the interpreter.
+     */
+    public void init() {
+        if (interpreter == null) {
+            interpreter = new Interpreter();
+        }
+        try {
+            interpreter.set("updater", updater);
+            interpreter.set("workspace", updater.getWorkspace());
+            interpreter.eval(scriptString);
+            theAction = ((UpdateAction) interpreter.get("action"));
+        } catch (EvalError e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void invoke() {
-    	theAction.invoke();
+        theAction.invoke();
     }
 
     @Override
@@ -79,23 +82,23 @@ public class UpdateActionCustom implements UpdateAction {
         return theAction.getDescription();
     }
 
-	@Override
-	public String getLongDescription() {
-		return theAction.getLongDescription();
-	}
+    @Override
+    public String getLongDescription() {
+        return theAction.getLongDescription();
+    }
 
-	/**
-	 * @return the scriptString
-	 */
-	public String getScriptString() {
-		return scriptString;
-	}
+    /**
+     * @return the scriptString
+     */
+    public String getScriptString() {
+        return scriptString;
+    }
 
-	/**
-	 * @param scriptString the scriptString to set
-	 */
-	public void setScriptString(String scriptString) {
-		this.scriptString = scriptString;
-	}
+    /**
+     * @param scriptString the scriptString to set
+     */
+    public void setScriptString(String scriptString) {
+        this.scriptString = scriptString;
+    }
 
 }

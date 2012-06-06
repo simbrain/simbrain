@@ -38,7 +38,8 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class DataWorldComponent extends WorkspaceComponent {
 
     /** The static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(DataWorldComponent.class);
+    private static final Logger LOGGER = Logger
+            .getLogger(DataWorldComponent.class);
 
     /** Table model. */
     private DefaultNumericTable dataModel;
@@ -54,10 +55,12 @@ public class DataWorldComponent extends WorkspaceComponent {
     private List<ColumnAttribute> producerList = new ArrayList<ColumnAttribute>();
 
     /** Producing column attribute type. */
-    private final AttributeType producingColumnType = new AttributeType(this, "Column", "getValue", double.class, true);
+    private final AttributeType producingColumnType = new AttributeType(this,
+            "Column", "getValue", double.class, true);
 
     /** Consuming column attribute type. */
-    private final AttributeType consumingColumnType = new AttributeType(this, "Column", "setValue", double.class, true);
+    private final AttributeType consumingColumnType = new AttributeType(this,
+            "Column", "setValue", double.class, true);
 
     /**
      * This method is the default constructor.
@@ -83,6 +86,7 @@ public class DataWorldComponent extends WorkspaceComponent {
 
     /**
      * Construct a data world component from data.
+     *
      * @param name name of component
      * @param inputData data data to use to initialize the model
      */
@@ -99,9 +103,10 @@ public class DataWorldComponent extends WorkspaceComponent {
      * @param dataModel the model
      */
     @SuppressWarnings("unchecked")
-    public DataWorldComponent(final String name, final DefaultNumericTable dataModel) {
+    public DataWorldComponent(final String name,
+            final DefaultNumericTable dataModel) {
         super(name);
-        this.dataModel = (DefaultNumericTable) dataModel;
+        this.dataModel = dataModel;
         init();
     }
 
@@ -126,8 +131,12 @@ public class DataWorldComponent extends WorkspaceComponent {
         List<PotentialConsumer> returnList = new ArrayList<PotentialConsumer>();
         if (consumingColumnType.isVisible()) {
             for (ColumnAttribute attribute : consumerList) {
-                String description = consumingColumnType.getSimpleDescription("Column " + (attribute.getIndex() + 1));
-                PotentialConsumer consumer = getAttributeManager().createPotentialConsumer(attribute, consumingColumnType, description);
+                String description = consumingColumnType
+                        .getSimpleDescription("Column "
+                                + (attribute.getIndex() + 1));
+                PotentialConsumer consumer = getAttributeManager()
+                        .createPotentialConsumer(attribute,
+                                consumingColumnType, description);
                 returnList.add(consumer);
             }
         }
@@ -139,14 +148,16 @@ public class DataWorldComponent extends WorkspaceComponent {
         List<PotentialProducer> returnList = new ArrayList<PotentialProducer>();
         if (producingColumnType.isVisible()) {
             for (ColumnAttribute attribute : consumerList) {
-                String description = producingColumnType.getDescription("Column_" + (attribute.getIndex() + 1));
-                PotentialProducer producer = getAttributeManager().createPotentialProducer(attribute, producingColumnType, description);
+                String description = producingColumnType
+                        .getDescription("Column_" + (attribute.getIndex() + 1));
+                PotentialProducer producer = getAttributeManager()
+                        .createPotentialProducer(attribute,
+                                producingColumnType, description);
                 returnList.add(producer);
             }
         }
         return returnList;
     }
-
 
     /** Listener. */
     private final SimbrainTableListener listener = new SimbrainTableListener() {
@@ -257,11 +268,12 @@ public class DataWorldComponent extends WorkspaceComponent {
      * @param format format of file
      * @return new component
      */
-    public static DataWorldComponent open(InputStream input, String name, String format) {
-        // TODO: Use format  to determine how to open this.
+    public static DataWorldComponent open(InputStream input, String name,
+            String format) {
+        // TODO: Use format to determine how to open this.
         DefaultNumericTable model = (DefaultNumericTable) DefaultNumericTable
                 .getXStream().fromXML(input);
-        return new  DataWorldComponent(name,  model);
+        return new DataWorldComponent(name, model);
     }
 
     /**
@@ -305,7 +317,7 @@ public class DataWorldComponent extends WorkspaceComponent {
             } else if (producerOrConsumer.equalsIgnoreCase("consumerList")) {
                 attribute = getColumnAttribute(i, consumerList);
             }
-            return  attribute;
+            return attribute;
         } catch (NumberFormatException e) {
             return null; // the supplied string was not an integer
         }

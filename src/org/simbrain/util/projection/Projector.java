@@ -19,7 +19,6 @@
 package org.simbrain.util.projection;
 
 import org.apache.log4j.Logger;
-import org.simbrain.util.SimbrainMath;
 
 /**
  * <b>Projector</b> is the main class of the high dimensional visualizer, which

@@ -69,6 +69,7 @@ public class ScatterPlotModel extends ChartModel {
 
     /**
      * Scatter plot model constructor.
+     *
      * @param parent component
      */
     public ScatterPlotModel() {
@@ -101,8 +102,8 @@ public class ScatterPlotModel extends ChartModel {
     }
 
     /**
-     * Create specified number of set of data sources.
-     * Adds these two existing data sources.
+     * Create specified number of set of data sources. Adds these two existing
+     * data sources.
      *
      * @param numDataSources number of data sources to initialize plot with
      */
@@ -130,7 +131,7 @@ public class ScatterPlotModel extends ChartModel {
         if (lastSeriesIndex >= 0) {
             this.fireDataSourceRemoved(lastSeriesIndex);
             dataset.removeSeries(lastSeriesIndex);
-            //chartSeriesPaint.remove(lastSeriesIndex);
+            // chartSeriesPaint.remove(lastSeriesIndex);
         }
     }
 
@@ -144,9 +145,9 @@ public class ScatterPlotModel extends ChartModel {
         }
     }
 
-
     /**
      * Returns a properly initialized xstream object.
+     *
      * @return the XStream object
      */
     public static XStream getXStream() {
@@ -282,9 +283,11 @@ public class ScatterPlotModel extends ChartModel {
 
     /**
      * Boolean show history.
+     *
      * @param value show history
      */
     public void setShowHistory(final boolean value) {
         showHistory = value;
         fireSettingsChanged();
-    }}
+    }
+}

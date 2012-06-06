@@ -31,11 +31,11 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * PNode representation of a group of synapses.
- * 
+ *
  * @author jyoshimi
  */
 public class SynapseGroupNode extends GroupNode {
-    
+
     /**
      * Create a Synapse Group PNode.
      *
@@ -45,12 +45,11 @@ public class SynapseGroupNode extends GroupNode {
     public SynapseGroupNode(NetworkPanel networkPanel, SynapseGroup group) {
         super(networkPanel, group);
         setStroke(null); // Comment this out to see outline
-        //getInteractionBox().setPaint(Color.white);
-        //setOutlinePadding(-30);
+        // getInteractionBox().setPaint(Color.white);
+        // setOutlinePadding(-30);
         setPickable(false);
     }
-   
-    
+
     @Override
     public void updateBounds() {
         PBounds bounds = new PBounds();
@@ -61,10 +60,12 @@ public class SynapseGroupNode extends GroupNode {
                 bounds.add(childBounds);
                 if (node instanceof SynapseNode) {
                     // Recurrent synapses screw things up when they have area 0
-                    Rectangle synapseBounds = ((SynapseNode) node).getLine().getBounds();
-                    double area = synapseBounds.getHeight() * synapseBounds.getWidth();
+                    Rectangle synapseBounds = ((SynapseNode) node).getLine()
+                            .getBounds();
+                    double area = synapseBounds.getHeight()
+                            * synapseBounds.getWidth();
                     if (area > 0) {
-                        bounds.add(((SynapseNode) node).getLine().getBounds());                        
+                        bounds.add(((SynapseNode) node).getLine().getBounds());
                     }
                 }
             }
@@ -76,15 +77,13 @@ public class SynapseGroupNode extends GroupNode {
 
             // Can also use setPathToEllipse
             setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                    (float) bounds.getWidth(), (float) bounds.getHeight());            
-
+                    (float) bounds.getWidth(), (float) bounds.getHeight());
 
         } else {
             // TODO Need to get reference to parent nodes.
             System.err.println("Bounds are null");
-            bounds = null;            
+            bounds = null;
         }
-
 
         updateInteractionBox();
     }
@@ -92,10 +91,10 @@ public class SynapseGroupNode extends GroupNode {
     @Override
     protected void updateInteractionBox() {
         InteractionBox interactionBox = getInteractionBox();
-        interactionBox.setOffset(this.getBounds().getCenterX()
-               - interactionBox.getWidth()*2, this.getBounds().getCenterY()
-                - interactionBox.getHeight());    
+        interactionBox.setOffset(
+                this.getBounds().getCenterX() - interactionBox.getWidth() * 2,
+                this.getBounds().getCenterY() - interactionBox.getHeight());
         interactionBox.moveToFront();
-    }    
-    
+    }
+
 }

@@ -116,7 +116,7 @@ public class AdditiveRule extends NeuronUpdateRule {
      * Implements a Hopfield type sigmoidal function.
      *
      * @param x input to function
-     * @return  output of function
+     * @return output of function
      */
     private double g(final double x) {
         return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
